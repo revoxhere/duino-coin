@@ -1,27 +1,38 @@
-import serial, time, random, socket
+#!/usr/bin/env python
 
-#2597!!!!!!!!!
+###########################################
+#   Duino-Coin miner version 0.1 alpha    #
+# https://github.com/revoxhere/duino-coin #
+#       copyright by revox 2019           #
+###########################################
+
+import serial, time, random, socket, datetime, sys
 
 users = {}
 status = ""
-ser = serial.Serial('COM8')
-host = '127.0.0.1'
-port = 5000
+ser = serial.Serial('COM8') #COM on windows, /dev/... on linux... i presume? this needs testing
+host = '127.0.0.1' #server ip
+port = 5000 #server port
 s = socket.socket()
-s.connect((host, port))
-#
-#print("Key is:", key)
+try: #establish connection
+    s.connect((host, port))
+    print("Successfully connected to the mining server!")
+except:
+    print("Server communication failed! Can't reach mining servers!")
+    time.sleep(10)
+    sys.exit()
 
+print("*****Official duino-coin miner*****")
 welcome = input("Do you have an duino-coin acount? y/n: ")
 print(" ")
-if welcome == "n":
+if welcome == "n": #login system
     while True:
         print("***Please register on pool:***")
         username = input("Enter a username:")
         password = input("Enter a password:")
         password1 = input("Confirm password:")
         if password == password1:
-            s.send(bytes('REGI' , encoding='utf8'))
+            s.send(bytes('REGI' , encoding='utf8')) #send register request to server
             time.sleep(0.1)
             s.send(bytes(username , encoding='utf8'))
             time.sleep(0.1)
@@ -31,12 +42,14 @@ if welcome == "n":
             if key == "OK":
                 print(" ")
                 print("Successfully registered!")
-                print("Now you can login!")
-                welcome = "y"
-                break
+                print("Now you can restart the program and login!")
+                time.sleep(10)
+                sys.exit()
             if key == "NO":
                 print(" ")
                 print("That user is already registered!")
+                time.sleep(10)
+                sys.exit()
         
 if welcome == "y":
     while True:
@@ -44,7 +57,7 @@ if welcome == "y":
         username = input("Username:")
         password = input("Password:")
         time.sleep(0.1)
-        s.send(bytes('LOGI' , encoding='utf8'))
+        s.send(bytes('LOGI' , encoding='utf8')) #send login request to server
         time.sleep(0.1)
         s.send(bytes(username , encoding='utf8'))
         time.sleep(0.1)
@@ -59,28 +72,31 @@ if welcome == "y":
         if key == "NO":
             print(" ")
             print("Invalid credentials! If you don't have an account, restart and register.")
+            time.sleep(10)
+            sys.exit()
  
 
-def mine():
-    s.send(bytes("MINE", encoding='utf8'))
+def mine(): #mining section
+    s.send(bytes("MINE", encoding='utf8')) #send mine request to server
     time.sleep(0.1)
     while True:
+        now = datetime.datetime.now()
         work = random.randint(0,9)
         work2 = random.randint(0,9)
 
-        ser.write(b'1') #connection establishment key
+        ser.write(b'1') #establish connection to arduino
         connection = ser.readline()
         connection=connection.decode('utf-8')
     
-        ser.write(str(work).encode())
+        ser.write(str(work).encode()) #give work to arduino
         ser.write(str(work2).encode())
     
-        result = ser.readline()
+        result = ser.readline() #get and hash the result
         result=result.decode('utf-8')
-        print("The result is", result)
-        s.send(bytes(result, encoding='utf8'))
+        print(now.strftime("[%Y-%m-%d %H:%M:%S]"), "Share found (yay!!!) at", result,) #some spicy messages
+        s.send(bytes(result, encoding='utf8')) #send result to server which will take care of rest
         time.sleep(0.1)
 
-mine()
+mine() #JUST... MINE :D
 
 
