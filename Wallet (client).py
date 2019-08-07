@@ -10,8 +10,8 @@ import time, socket, sys, os
 
 users = {}
 status = ""
-host = '127.0.0.1' #server ip
-port = 5000 #server port
+host = '0.tcp.ngrok.io' #server ip
+port = 15847 #server port
 s = socket.socket()
 try: #try to establish connection
     s.connect((host, port))
@@ -32,9 +32,9 @@ if welcome == "n": #login system, same as in miner
         password1 = input("Confirm password:")
         if password == password1:
             s.send(bytes('REGI' , encoding='utf8'))
-            time.sleep(0.1)
+            time.sleep(0.2)
             s.send(bytes(username , encoding='utf8'))
-            time.sleep(0.1)
+            time.sleep(0.2)
             s.send(bytes(password , encoding='utf8'))
             key = s.recv(2)
             key=key.decode()
@@ -55,11 +55,10 @@ if welcome == "y":
         print("***Please login to wallet:***")
         username = input("Username:")
         password = input("Password:")
-        time.sleep(0.1)
         s.send(bytes('LOGI' , encoding='utf8'))
-        time.sleep(0.1)
+        time.sleep(0.2)
         s.send(bytes(username , encoding='utf8'))
-        time.sleep(0.1)
+        time.sleep(0.2)
         s.send(bytes(password , encoding='utf8'))
         key = s.recv(2)
         key=key.decode()
@@ -79,7 +78,7 @@ while ans:
     time.sleep(0.1)
     s.send(bytes('BALA' , encoding='utf8'))
     time.sleep(0.1)
-    balance = s.recv(11)
+    balance = s.recv(32)
     balance=balance.decode()
     print("*****Official duino-coin WALLET client*****")
     print("\n")

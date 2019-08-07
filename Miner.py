@@ -11,8 +11,8 @@ import serial, time, random, socket, datetime, sys
 users = {}
 status = ""
 ser = serial.Serial('COM8') #COM on windows, /dev/... on linux... i presume? this needs testing
-host = '127.0.0.1' #server ip
-port = 5000 #server port
+host = '0.tcp.ngrok.io' #server ip
+port = 15847 #server port
 s = socket.socket()
 try: #establish connection
     s.connect((host, port))

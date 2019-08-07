@@ -24,8 +24,8 @@ class ClientThread(threading.Thread): #separate thread for every user
         while True:
             data = clientsock.recv(4)
             data=data.decode()
-            print("Recieved:", data)
             if data == "REGI": #registration
+                #time.sleep(0.3)
                 print("started register")
                 username = clientsock.recv(16)
                 username=username.decode()
@@ -42,12 +42,12 @@ class ClientThread(threading.Thread): #separate thread for every user
                 if regf.is_file():
                     print("Account already exists!")
                     clientsock.send(bytes("NO", encoding='utf8'))
-            print("Recieved:", data)
-            
             if data == "LOGI": #login
+                #time.sleep(0.1)
                 print("started login")
                 username = clientsock.recv(16)
                 username=username.decode()
+                #time.sleep(0.1)
                 print("Username:", username)
                 password = clientsock.recv(16)
                 password=password.decode()
@@ -94,7 +94,13 @@ class ClientThread(threading.Thread): #separate thread for every user
                     balance = file.readline()
                     file.close()
                 except:
-                    print("Error occured while checking funds!")
+                    file = open(username+"balance.txt", "w")
+                    file.write(str(0))
+                    file.close()
+                    print("Had to set", username, "balance to 0!")
+                    file = open(username+"balance.txt", "r")
+                    balance = file.readline()
+                    file.close()
                 clientsock.send(bytes(balance, encoding='utf8'))
 
             if data == "SEND": #sending funds section
@@ -126,16 +132,20 @@ class ClientThread(threading.Thread): #separate thread for every user
                     if bankf.is_file():
                         #it exists, now -amount from username and +amount to name
                         try:
-                            #remove amount from sender's balance
+                            #get senders' balance
+                            file = open(username+"balance.txt", "r")
+                            balance = file.readline()
+                            file.close()
+                            #remove amount from senders' balance
                             balance = float(balance) - float(amount)
                             file = open(username+"balance.txt", "w")
                             file.write(str(balance))
                             file.close()
-                            #get recipient's balance
+                            #get recipients' balance
                             file = open(name+"balance.txt", "r")
                             namebal = file.readline()
                             file.close()
-                            #add amount to recipient's balance
+                            #add amount to recipients' balance
                             namebal = float(namebal) + float(amount)
                             file = open(name+"balance.txt", "w")
                             file.write(str(namebal))
@@ -147,9 +157,9 @@ class ClientThread(threading.Thread): #separate thread for every user
                     if not bankf.is_file(): #message if recipient doesn't exist
                         print("The recepient", name, "doesn't exist!")
                         clientsock.send(bytes("Error! The recipient doesn't exist! Make sure he submited at least one share!", encoding='utf8'))
-            time.sleep(0.1)
+            #time.sleep(0.1)
 
-host = "127.0.0.1"
+host = "localhost"
 port = 5000
 
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
