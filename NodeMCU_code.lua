@@ -5,9 +5,6 @@ work = ""
 work2 = ""
 waiting = 0
 
--- nodemcu nie potrzebuje tego śmiesznego serial.begin bo nawet go nie ma, domyślnie jest na baud rate 115200
--- delay całkowicie usunięty bo może spowodować że nodemcu sie całe wypierdoli a wydaje mi sie że bardzo potrzebny nie jest
-
 uart.on("data", 0, function(data) --check for connection establishment key
     if data == "1" then
         waiting = 1
