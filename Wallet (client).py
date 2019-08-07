@@ -11,7 +11,7 @@ import time, socket, sys, os
 users = {}
 status = ""
 host = '0.tcp.ngrok.io' #server ip
-port = 18867 #server port
+port = 14808 #server port
 s = socket.socket()
 try: #try to establish connection
     s.connect((host, port))
