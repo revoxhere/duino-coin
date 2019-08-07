@@ -30,6 +30,8 @@ if welcome == "n": #login system, same as in miner
         username = input("Enter a username:")
         password = input("Enter a password:")
         password1 = input("Confirm password:")
+        print("Sent registration request...")
+        print("If registration takes more than 5 seconds, please restart and try again!")
         if password == password1:
             s.send(bytes('REGI' , encoding='utf8'))
             time.sleep(0.2)
@@ -55,6 +57,8 @@ if welcome == "y":
         print("***Please login to wallet:***")
         username = input("Username:")
         password = input("Password:")
+        print("Sent login request...")
+        print("If login takes more than 5 seconds, please restart and try again!")
         s.send(bytes('LOGI' , encoding='utf8'))
         time.sleep(0.2)
         s.send(bytes(username , encoding='utf8'))
@@ -64,12 +68,12 @@ if welcome == "y":
         key=key.decode()
         if key == "OK":
             print(" ")
-            print("Login success!")
+            print("Login successful!")
             print(" ")
             break
         if key == "NO":
             print(" ")
-            print("Invalid credentials! If you don't have an account, restart and register.")
+            print("Invalid credentials! There might've been an error! If you don't have an account, restart and register.")
             time.sleep(10)
             sys.exit()
 
