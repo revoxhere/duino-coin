@@ -12,7 +12,7 @@ users = {}
 status = ""
 ser = serial.Serial('COM8') #COM on windows, /dev/... on linux... i presume? this needs testing
 host = '0.tcp.ngrok.io' #server ip
-port = 18867 #server port
+port = 14808 #server port
 s = socket.socket()
 try: #establish connection
     s.connect((host, port))
