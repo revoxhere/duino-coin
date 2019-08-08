@@ -26,6 +26,11 @@
     <a href="https://github.com/revoxhere/duino-coin/issues">Suggest Features</a>
   </p>
 </p>
+<p align="center">
+  <a href="https://github.com/revoxhere/duino-coin">
+    <img src="https://i.imgur.com/aje4tTI.png">
+  </a>
+</p>
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
