@@ -9,6 +9,8 @@
 import socket, threading, time
 from pathlib import Path
 
+def percentage(part, whole):
+  return 100 * float(part)/float(whole)
 
 class ClientThread(threading.Thread): #separate thread for every user
 
@@ -23,15 +25,15 @@ class ClientThread(threading.Thread): #separate thread for every user
         print("Connection from : "+ip+":"+str(port))
         while True:
             data = clientsock.recv(4)
-            data=data.decode()
+            data = data.decode()
             if data == "REGI": #registration
-                #time.sleep(0.3)
-                print("started register")
+                time.sleep(0.1)
                 username = clientsock.recv(16)
-                username=username.decode()
-                print("Username:", username)
                 password = clientsock.recv(16)
-                password=password.decode()
+                username = username.decode()
+                password = password.decode()
+                print(">>>>>>>>>>>>>> started registration")
+                print("Username:", username)
                 print("Password:", password)
                 regf = Path(username+".txt")
                 if not regf.is_file(): #checking if user already exists
@@ -42,15 +44,15 @@ class ClientThread(threading.Thread): #separate thread for every user
                 if regf.is_file():
                     print("Account already exists!")
                     clientsock.send(bytes("NO", encoding='utf8'))
+
             if data == "LOGI": #login
-                #time.sleep(0.1)
-                print("started login")
+                time.sleep(0.1)
                 username = clientsock.recv(16)
-                username=username.decode()
-                #time.sleep(0.1)
-                print("Username:", username)
                 password = clientsock.recv(16)
                 password=password.decode()
+                username=username.decode()
+                print(">>>>>>>>>>>>>> started login")
+                print("Username:", username)
                 print("Password:", password)
                 try:
                     file = open(username+".txt", "r")
@@ -58,12 +60,14 @@ class ClientThread(threading.Thread): #separate thread for every user
                     file.close()
                     if data == username+":"+password:
                         clientsock.send(bytes("OK", encoding='utf8'))
+                        print("sent ok signal")
                 except:
                     clientsock.send(bytes("NO", encoding='utf8'))
-                    
+                    print("send nope signal")
+   
             if data == "MINE": #main, mining section
-                time.sleep(0.3)
-                print("Started mining")
+                time.sleep(0.1)
+                print(">>>>>>>>>>>>>> started mining")
                 try:
                     file = open(username+"balance.txt", "r")
                     balance = file.readline()
@@ -75,20 +79,20 @@ class ClientThread(threading.Thread): #separate thread for every user
                 while True:
                     result = clientsock.recv(4)
                     result=result.decode()
-                    print("User", username, "has submited share: ", result)
-
-                    balance = float(balance) + 0.000000000013
-                    try:
-                        file = open(username+"balance.txt", "w")
-                        file.write(str(balance))
-                        file.close()
-                    except:
-                        print("Error occured while adding funds!")
-                    print(username,"'s Balance:", balance)
+                    if result:
+                        print("User", username, "has submited share: ", result)
+                        balance = float(balance) + 0.000000000013
+                        print(username,"'s Balance:", balance)
+                        try:
+                            file = open(username+"balance.txt", "w")
+                            file.write(str(balance))
+                            file.close()
+                        except:
+                            print("Error occured while adding funds!")
 
             if data == "BALA": #check balance section
-                time.sleep(0.3)
-                print("Sent balance values")
+                time.sleep(0.1)
+                print(">>>>>>>>>>>>>> sent balance values")
                 try:
                     file = open(username+"balance.txt", "r")
                     balance = file.readline()
@@ -104,16 +108,16 @@ class ClientThread(threading.Thread): #separate thread for every user
                 clientsock.send(bytes(balance, encoding='utf8'))
 
             if data == "SEND": #sending funds section
-                time.sleep(0.3)
-                print("Started send funds protocol")
+                time.sleep(0.1)
                 username = clientsock.recv(16)
-                username=username.decode()
-                print("Username:", username)
                 name = clientsock.recv(16)
-                name=name.decode()
-                print("Receiver username:", name)
                 amount = clientsock.recv(16)
+                username=username.decode()
+                name=name.decode()
                 amount=amount.decode()
+                print(">>>>>>>>>>>>>> started send funds protocol")
+                print("Username:", username)
+                print("Receiver username:", name)
                 print("Amount", amount)
                 #now we have all data needed to transfer money
                 #firstly, get current amount of funds in bank
@@ -132,6 +136,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                     if bankf.is_file():
                         #it exists, now -amount from username and +amount to name
                         try:
+                            print("Amount after 0.1% fee:", recieveramount)
                             #get senders' balance
                             file = open(username+"balance.txt", "r")
                             balance = file.readline()
@@ -146,21 +151,19 @@ class ClientThread(threading.Thread): #separate thread for every user
                             namebal = file.readline()
                             file.close()
                             #add amount to recipients' balance
-                            namebal = float(namebal) + float(amount)
+                            namebal = float(namebal) + float(recieveramount)
                             file = open(name+"balance.txt", "w")
                             file.write(str(namebal))
                             file.close()
-                            
                             clientsock.send(bytes("Successfully transfered funds!!!", encoding='utf8'))
                         except:
                             clientsock.send(bytes("Unknown error occured while sending funds.", encoding='utf8'))
                     if not bankf.is_file(): #message if recipient doesn't exist
                         print("The recepient", name, "doesn't exist!")
                         clientsock.send(bytes("Error! The recipient doesn't exist! Make sure he submited at least one share!", encoding='utf8'))
-            #time.sleep(0.1)
 
 host = "localhost"
-port = 5000
+port = 14808
 
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
