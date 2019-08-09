@@ -125,8 +125,12 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Authors
 
 * **Idea, programming & stuff:** [Robert "revox" Piotrowski](https://github.com/revoxhere/) - robik123.345@gmail.com
-* **[NodeMCU code](https://github.com/revoxhere/duino-coin/blob/master/NodeMCU_code/NodeMCU_code.lua):** Alina
 * **[Artwork](https://i.imgur.com/ZRRGDjs.png):** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
 * **Testing:** [Jan Malewski](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ), [MrKris7100](https://www.youtube.com/user/MrKris7100), [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg), Alina
+
+### Community-made stuff
+
+* **[NodeMCU code](https://github.com/revoxhere/duino-coin/blob/master/NodeMCU_code/NodeMCU_code.lua):** Alina
+* **[AutoIt miner](https://github.com/revoxhere/duino-coin/blob/master/Community%20Miners/AutoIt%20Miner.au3):** [MrKris7100](https://www.youtube.com/user/MrKris7100)
 
 Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
