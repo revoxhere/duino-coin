@@ -10,7 +10,7 @@ import time, socket, sys, os
 
 users = {}
 status = ""
-host = 'localhost' #server ip
+host = 'serveo.net' #server ip
 port = 14808 #server port
 s = socket.socket()
 try: #try to establish connection
