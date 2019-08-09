@@ -125,6 +125,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Authors
 
 * **Idea, programming & stuff:** [Robert "revox" Piotrowski](https://github.com/revoxhere/) - robik123.345@gmail.com
+* **Social stuff:** [Jan Malewski](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
 * **[Artwork](https://i.imgur.com/ZRRGDjs.png):** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
 * **Testing:** [Jan Malewski](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ), [MrKris7100](https://www.youtube.com/user/MrKris7100), [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg), Alina
 
