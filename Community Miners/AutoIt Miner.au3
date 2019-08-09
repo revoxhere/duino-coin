@@ -1,3 +1,6 @@
+; Special thanks to MrKris7100 for making AutoIt PC miner!
+; Feel free to test the code and post the results
+
 #NoTrayIcon
 TCPStartup()
 Global $connection, $hash_count
