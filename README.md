@@ -130,7 +130,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ### Community-made stuff
 
-* **[NodeMCU code](https://github.com/revoxhere/duino-coin/blob/master/NodeMCU_code/NodeMCU_code.lua):** Alina
+* **[NodeMCU code](https://github.com/revoxhere/duino-coin/blob/master/Community%20Miners/NodeMCU_Code.lua):** Alina
 * **[AutoIt miner](https://github.com/revoxhere/duino-coin/blob/master/Community%20Miners/AutoIt%20Miner.au3):** [MrKris7100](https://www.youtube.com/user/MrKris7100)
 
 Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
