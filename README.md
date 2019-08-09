@@ -65,7 +65,7 @@ This section briefly lists major frameworks that you duino-coin uses.
 * [Python and IDLE](https://www.python.org)
 * [pySerial](https://pythonhosted.org/pyserial/)
 * [Arduino IDE](https://www.arduino.cc)
-* [ngrok](https://ngrok.com)
+* [serveo](https://serveo.net)
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -74,30 +74,22 @@ Instructions to get started with duino-coins.
 
 ### Prerequisites
 
-#### Windows
-If you're using Windows, just grab latest [release](https://github.com/revoxhere/duino-coin/releases) for Windows.
-Unzip the archive and you are ready to go.
-
 #### Linux
 If you're using Linux, you need to download some dependencies:
 ```bash
 sudo apt install python3 python-pip
 python -m pip install pyserial
 ```
-Then download latest [release](https://github.com/revoxhere/duino-coin/releases) for Linux and unzip it.
-
 <!-- USAGE EXAMPLES -->
 ## Usage
 
 #### Windows
-After you have downloaded latest [release](https://github.com/revoxhere/duino-coin/releases), just launch `Miner.exe` or `Wallet.exe`
-depending on what you want to do.
+After you have downloaded latest [release](https://github.com/revoxhere/duino-coin/releases), just launch `Miner.exe` or `Wallet.exe` depending on what you want to do.
 
 #### Linux
-After you have downloaded prerequisites and latest [release](https://github.com/revoxhere/duino-coin/releases), launch `Miner.py` or `Wallet.py` using `python3`
-depending on what you want to do.
+After you have downloaded prerequisites and latest [release](https://github.com/revoxhere/duino-coin/releases), launch `Miner.py` or `Wallet.py` using `python3` depending on what you want to do.
 
-**NOTE: if connecting to arduino fails, you may need to use `sudo` to lauch `Miner.py`!**
+**NOTE: if when using miner connecting to arduino fails, you may need to use `sudo` to lauch `Miner.py`!**
 ```bash
 sudo python3 Miner.py
 ```
