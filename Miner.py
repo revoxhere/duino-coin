@@ -29,7 +29,7 @@ try:
     ser = serial.Serial(port) #COM on windows
 except:
     print("Error while trying to connect to COM port:", port)
-host = 'localhost' #server ip
+host = 'serveo.net' #server ip
 port = 14808 #server port
 s = socket.socket()
 
