@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###########################################
-#   Duino-Coin miner version 0.1 alpha    #
+#   Duino-Coin miner version 0.3 alpha    #
 # https://github.com/revoxhere/duino-coin #
 #       copyright by revox 2019           #
 ###########################################
@@ -9,18 +9,19 @@
 import serial, time, random, socket, datetime, sys, serial.tools.list_ports, re
 
 print("*****Official duino-coin miner*****")
+print("*************version 3*************")
 print("\n")
-print(" Please wait while searching for ports...")
+print("Please wait while searching for ports...")
 comlist = serial.tools.list_ports.comports()
 connected = []
 for element in comlist:
     connected.append(element.device)
-print(" Found COM ports: " + str(connected))
+print("Found COM ports: " + str(connected))
 print("\n")
 port = input("Please input com port of arduino COM port (e.g. COM8): ")
 if port.isdigit():
     port='COM'+port
-print("Selected COM port", port)
+print("Selected COM port:", port)
 print("\n")
 
 users = {}
@@ -29,7 +30,7 @@ try:
     ser = serial.Serial(port) #COM on windows
 except:
     print("Error while trying to connect to COM port:", port)
-host = 'serveo.net' #server ip
+host = 'localhost' #server ip
 port = 14808 #server port
 s = socket.socket()
 
@@ -37,7 +38,7 @@ try: #establish connection
     s.connect((host, port))
     print("Successfully connected to the mining server!")
 except:
-    print("Server communication failed! Can't reach mining servers!")
+    print("Server communication failed! A server update is probably underway. Please try again in a couple of hours.")
     time.sleep(10)
     sys.exit()
 
@@ -110,7 +111,7 @@ def mine(): #mining section
         now = datetime.datetime.now()
         work = random.randint(0,9)
         work2 = random.randint(0,9)
-
+        
         ser.write(b'1') #establish connection to arduino
         connection = ser.readline()
         connection=connection.decode('utf-8')
@@ -121,10 +122,12 @@ def mine(): #mining section
         result = ser.readline() #get and hash the result
         result=result.decode('utf-8')
         result=result.translate({ord('\n'): None})
-        print(now.strftime("[%Y-%m-%d %H:%M:%S]"), "accepted:", currenthash, "/", currenthash, ", share found at:", result) #some spicy messages
+        print(now.strftime("[%Y-%m-%d %H:%M:%S]"), "submitted:", currenthash, "/", currenthash, ", share found at:", result) #some spicy messages
+        s.send(bytes(int(work)))
+        s.send(bytes(int(work2)))
         s.send(bytes(result, encoding='utf8')) #send result to server which will take care of rest
-        time.sleep(0.1)
+        time.sleep(0.15)
 
-mine() #JUST... MINE :D
+mine() #HAPPY MINING :D
 
 

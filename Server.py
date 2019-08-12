@@ -77,8 +77,26 @@ class ClientThread(threading.Thread): #separate thread for every user
                     file.write(str(0))
                     file.close()
                 while True:
-                    result = clientsock.recv(4)
+                    work = clientsock.recv(1)
+                    work2 = clientsock.recv(1)
+                    result = clientsock.recv(8)
                     result=result.decode()
+                    work=work.decode()
+                    work2=work2.decode()
+                    try:
+                      work = int(work)
+                      work2 = int(work2)
+                      print("User", username, "has submited block: ", work, work2)
+                      balance = float(balance) + 0.0000000169420
+                      print(username,"'s Balance:", balance)
+                      try:
+                          file = open(username+"balance.txt", "w")
+                          file.write(str(balance))
+                          file.close()
+                      except:
+                          print("Error occured while adding funds!")
+                    except:
+                      pass
                     if result:
                         print("User", username, "has submited share: ", result)
                         balance = float(balance) + 0.000000000013
@@ -87,6 +105,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                             file = open(username+"balance.txt", "w")
                             file.write(str(balance))
                             file.close()
+                            time.sleep(0.15)
                         except:
                             print("Error occured while adding funds!")
 

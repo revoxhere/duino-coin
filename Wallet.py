@@ -10,18 +10,20 @@ import time, socket, sys, os
 
 users = {}
 status = ""
-host = 'serveo.net' #server ip
+host = 'localhost' #server ip
 port = 14808 #server port
 s = socket.socket()
+
+print("*****Official duino-coin wallet*****")
+print("*************version 3**************")
+print("\n")
 try: #try to establish connection
     s.connect((host, port))
     print("Successfully connected to the wallet server!")
 except:
-    print("Server communication failed! Can't reach wallet servers!")
+    print("Server communication failed! A server update is probably underway. Please try again in a couple of hours.")
     time.sleep(10)
     sys.exit()
-
-print("*****Official duino-coin WALLET client*****")
 welcome = input("Do you have an duino-coin pool acount? y/n: ")
 print(" ")
 if welcome == "n": #login system
@@ -35,9 +37,9 @@ if welcome == "n": #login system
         if password == password1:
             s.send(bytes('REGI' , encoding='utf8')) #send register request to server
             time.sleep(0.1)
-            s.send(bytes(username , encoding='utf8'))
+            s.send(bytes(username, encoding='utf8'))
             time.sleep(0.1)
-            s.send(bytes(password , encoding='utf8'))
+            s.send(bytes(password, encoding='utf8'))
             key = s.recv(2)
             key=key.decode()
             if key == "OK":
@@ -62,9 +64,9 @@ if welcome == "y":
         time.sleep(0.1)
         s.send(bytes('LOGI' , encoding='utf8')) #send login request to server
         time.sleep(0.1)
-        s.send(bytes(username , encoding='utf8'))
+        s.send(bytes(username, encoding='utf8'))
         time.sleep(0.1)
-        s.send(bytes(password , encoding='utf8'))
+        s.send(bytes(password, encoding='utf8'))
         key = s.recv(2)
         key=key.decode()
         if key == "OK":
