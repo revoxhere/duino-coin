@@ -83,18 +83,7 @@ python -m pip install pyserial
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-#### Windows
-After you have downloaded latest [release](https://github.com/revoxhere/duino-coin/releases), just launch `Miner.exe` or `Wallet.exe` depending on what you want to do.
-
-#### Linux
-After you have downloaded prerequisites and latest [release](https://github.com/revoxhere/duino-coin/releases), launch `Miner.py` or `Wallet.py` using `python3` depending on what you want to do.
-
-**NOTE: if when using miner connecting to arduino fails, you may need to use `sudo` to lauch `Miner.py`!**
-```bash
-sudo python3 Miner.py
-```
-
-_For more detailed guides, please refer to [Wikis](https://github.com/revoxhere/duino-coin/wiki)_
+Detailed help about usage can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki)
 
 <!-- CONTRIBUTING -->
 ## Contributing
