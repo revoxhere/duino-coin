@@ -1,4 +1,1 @@
-title: Hello
-layout: default
-
-Hello!
+# Welcome to the official duino-coin blog-website!
