@@ -1,5 +1,5 @@
 /*///////////////////////////////////////////////
-/   Duino-Coin arduino code version 0.1 alpha   /
+/   Duino-Coin arduino code version 0.2 alpha   /
 /     https://github.com/revoxhere/duino-coin   /
 /             copyright by revox 2019           /
 ///////////////////////////////////////////////*/
@@ -16,13 +16,12 @@ void setup() { //setup
 void loop() { //main loop
   input = Serial.readString(); //check for connection establishment key
   if (input == 1) {
-    Serial.println("CONNECTED"); //feedback for the miner
-    delay (1000); //important, propably can be changed but works best at 1000
+    Serial.println("CONNECTED"); //feedback the miner
+    delay(150); //fastest rate possible, pool doesn't accept more shares
     char work  = Serial.read(); //get work
     char work2  = Serial.read();
-    hash = work+work2*work2+work*work; //hash the work
+    hash = work+work2*work+work*work; //hash the work
     Serial.println(hash); //send back the result
-    delay(500); //important, propably can be changed but the miner needs time to communcate with server
-    //if both delays are set too low, you will get invalid shares
+    //delay(150); //fastest rate possible
   }
 }
