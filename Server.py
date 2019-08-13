@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
 ###########################################
-#   Duino-Coin server version 0.1 alpha   #
+#   Duino-Coin public-server version 0.3  #
 # https://github.com/revoxhere/duino-coin #
 #       copyright by revox 2019           #
 ###########################################
+# Important: this version of the server is different than one used in "real" duino-coin network.
 
 import socket, threading, time
 from pathlib import Path
