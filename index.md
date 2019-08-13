@@ -2,6 +2,13 @@
 
 ### Duino coin is an innovative "cryptocurrency" project that can be mined using Arduino (or other AVR) boards (processors).
 
+## 13.08.2019: 10 registered users
+Welcome back! <br>
+Duino-Coin network has now 10 registered users! <br>
+Pretty exciting, isn't it? <br>
+
+***
+
 ## 12.08.2019: New reward system
 Hi duino miners! <br>
 Today a new release is out! <br>
@@ -13,12 +20,11 @@ If result's aren't the same or miner hasn't submitted his work, very low or zero
 This way, I kept (partial) compatibilty with older miners and softly pushed new algorithm. <br>
 <br>
 Also, server update: now shares cannot be submitted faster than 150ms (each). This prevents attacks and invalid share spam. <br>
-
 **That's it for today! Happy mining!**
 
 *** 
 
-## 12.08.2019: Webpage is out
+## 12.08.2019: Webpage
 Hi everyone! <br>
 I've decided to create a GitHub Page. <br>
 Here I'll describe latest updates about duino-coins.
