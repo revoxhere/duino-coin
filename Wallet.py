@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###########################################
-#   Duino-Coin wallet version 0.1 alpha   #
+#   Duino-Coin wallet version 0.3 alpha   #
 # https://github.com/revoxhere/duino-coin #
 #       copyright by revox 2019           #
 ###########################################
