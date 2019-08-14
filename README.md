@@ -37,6 +37,7 @@
 
 * [About the Project](#about-the-project)
   * [Built With](#built-with)
+* [News](#news)
 * [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Usage](#usage)
@@ -66,6 +67,10 @@ This section briefly lists major frameworks that you duino-coin uses.
 * [pySerial](https://pythonhosted.org/pyserial/)
 * [Arduino IDE](https://www.arduino.cc)
 * [serveo](https://serveo.net)
+
+## News
+
+News about future features and other things can be found at duino-coin official blog: https://revoxhere.github.io/duino-coin/
 
 <!-- GETTING STARTED -->
 ## Getting Started
