@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###########################################
-#   Duino-Coin public-server version 0.3  #
+#   Duino-Coin public-server version 0.4  #
 # https://github.com/revoxhere/duino-coin #
 #	   copyright by revox 2019		   #
 ###########################################
@@ -21,6 +21,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 		print("[+] New thread started for "+ip+":"+str(port))
 
 	def run(self):
+		thread_id = threading.get_ident()
 		print("Connection from : "+ip+":"+str(port))
 		while True:
 			data = clientsock.recv(1024)
@@ -29,9 +30,9 @@ class ClientThread(threading.Thread): #separate thread for every user
 			if data[0] == "REGI": #registration
 				username = data[1]
 				password = data[2]
-				print(">>>>>>>>>>>>>> started registration")
-				print("Username:", username)
-				print("Password:", password)
+				print("Register request")
+				print(">Username:", username)
+				print(">Password:", password)
 				regf = Path(username+".txt")
 				if not regf.is_file(): #checking if user already exists
 					file = open(username+".txt", "w")
@@ -45,31 +46,32 @@ class ClientThread(threading.Thread): #separate thread for every user
 			if data[0] == "LOGI": #login
 				username = data[1]
 				password = data[2]
-				print(">>>>>>>>>>>>>> started login")
-				print("Username:", username)
-				print("Password:", password)
+				print("User logging in")
+				print(">Username:", username)
+				print(">Password:", password)
 				try:
 					file = open(username+".txt", "r")
 					data = file.readline()
 					file.close()
 					if data == username+":"+password:
 						clientsock.send(bytes("OK", encoding='utf8'))
-						print("sent ok signal")
+						print("User logged")
 				except:
 					clientsock.send(bytes("NO", encoding='utf8'))
-					print("send nope signal")
+					print("Bad password")
    
 			if data[0] == "JOB": #main, mining section
 				print("New job for user: " + username)
-				file = open("lastblock", "r+")
-				lastblock = file.readline()
-				rand = random.randint(0, 100)
-				hashing = hashlib.sha1(str(lastblock + str(rand)).encode("utf-8"))
-				clientsock.send(bytes(lastblock + "," + hashing.hexdigest(), encoding='utf8'))
-				file.seek(0)
-				file.write(hashing.hexdigest())
-				file.truncate()
-				file.close()
+				with locker:
+					file = open("lastblock", "r+")
+					lastblock = file.readline()
+					rand = random.randint(0, 100)
+					hashing = hashlib.sha1(str(lastblock + str(rand)).encode("utf-8"))
+					clientsock.send(bytes(lastblock + "," + hashing.hexdigest(), encoding='utf8'))
+					file.seek(0)
+					file.write(hashing.hexdigest())
+					file.truncate()
+					file.close()
 				result = clientsock.recv(1024)
 				if result.decode() == str(rand):
 					print("Good result (" + str(result.decode()) + ")")
@@ -157,6 +159,7 @@ tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 tcpsock.bind((host,port))
 threads = []
 
+locker = threading.Lock()
 
 while True:
 	try:
