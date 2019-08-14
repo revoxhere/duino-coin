@@ -2,6 +2,15 @@
 
 ### Duino coin is an innovative "cryptocurrency" project that can be mined using Arduino (or other AVR) boards (processors).
 
+***
+
+## 14.08.2019: Better algorithm in the works
+Hi everyone! <br>
+Thanks to MrKris7100 SHA1 implementation is now worked on! <br>
+I'm very thankful for him! See ya later in the next update. <br>
+
+***
+
 ## 13.08.2019: 10 registered users
 Welcome back! <br>
 Duino-Coin network has now 10 registered users! <br>
