@@ -28,7 +28,7 @@
 </p>
 <p align="center">
   <a href="https://github.com/revoxhere/duino-coin">
-    <img src="https://i.imgur.com/4aKM2KU.png">
+    <img src="https://i.imgur.com/tox8f68.png">
   </a>
 </p>
 
@@ -70,7 +70,7 @@ This section briefly lists major frameworks that you duino-coin uses.
 
 ## News
 
-News about future features and other things can be found at duino-coin official blog: https://revoxhere.github.io/duino-coin/
+News about updates, future features and other things can be found at [duino-coin official blog](https://revoxhere.github.io/duino-coin/).
 
 <!-- GETTING STARTED -->
 ## Getting Started
