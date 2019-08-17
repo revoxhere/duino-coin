@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+
+###########################################
+#        Duino-Coin miner version 0.4     #
+# https://github.com/revoxhere/duino-coin #
+#  copyright by MrKris7100 & revox 2019   #
+###########################################
+
 import socket, threading, time, random, hashlib, configparser, sys
 from pathlib import Path
 
