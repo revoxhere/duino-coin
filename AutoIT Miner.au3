@@ -11,10 +11,10 @@
 Global $shares[2], $socket, $last_hash_count = 0, $hash_Count = 0, $pool_address, $pool_port, $username, $password
 If Not FileExists(@ScriptDir & "\config.ini") Then
 	ConsoleWrite("Initial configuration, you can edit 'config.ini' later" & @CRLF & @CRLF)
-	ConsoleWrite("Enter pool adddress: ")
+	ConsoleWrite("Enter pool adddress (official: serveo.net): ")
 	$pool_address = Cin()
 	IniWrite(@ScriptDir & "\config.ini", "pool", "address", $pool_address)
-	ConsoleWrite("Enter pool port: ")
+	ConsoleWrite("Enter pool port (official: 14808): ")
 	$pool_port = Cin()
 	IniWrite(@ScriptDir & "\config.ini", "pool", "port", $pool_port)
 	ConsoleWrite("Enter username: ")
