@@ -3,10 +3,11 @@
 ###########################################
 #   Duino-Coin public-server version 0.4  #
 # https://github.com/revoxhere/duino-coin #
-#	   copyright by revox 2019		   #
+#  copyright by MrKris7100 & revox 2019   #
 ###########################################
 # Important: this version of the server is different than one used in "real" duino-coin network.
 
+print("Duino-Coin server version 0.4")
 import socket, threading, time, random, hashlib
 from pathlib import Path
 
@@ -24,9 +25,12 @@ class ClientThread(threading.Thread): #separate thread for every user
 		thread_id = threading.get_ident()
 		print("Connection from : "+ip+":"+str(port))
 		while True:
-			data = clientsock.recv(1024)
-			data = data.decode()
-			data = data.split(",")
+			try:
+				data = clientsock.recv(1024)
+				data = data.decode()
+				data = data.split(",")
+			except:
+				thread.exit()
 			if data[0] == "REGI": #registration
 				username = data[1]
 				password = data[2]
@@ -45,6 +49,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 				if regf.is_file():
 					print("Account already exists!")
 					clientsock.send(bytes("NO", encoding='utf8'))
+					thread.exit()
 
 			if data[0] == "LOGI": #login
 				username = data[1]
@@ -62,6 +67,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 				except:
 					clientsock.send(bytes("NO", encoding='utf8'))
 					print("Bad password")
+					thread.exit()
    
 			if data[0] == "JOB": #main, mining section
 				print("New job for user: " + username)
@@ -91,12 +97,14 @@ class ClientThread(threading.Thread): #separate thread for every user
 				else:
 					print("Bad result (" + str(result.decode()) + ")")
 					clientsock.send(bytes("BAD", encoding="utf8"))
+					
 			if data[0] == "BALA": #check balance section
 				print(">>>>>>>>>>>>>> sent balance values")
 				file = open(username+"balance.txt", "r")
 				balance = file.readline()
 				file.close()
 				clientsock.send(bytes(balance, encoding='utf8'))
+				thread.exit()
 
 			if data[0] == "SEND": #sending funds section
 				username = data[1]
@@ -115,6 +123,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 					file.close()
 				except:
 					print("Error occured while checking funds!")
+					thread.exit()
 				#verify that the balance is higher or equal to transfered amount
 				if amount >= balance:
 					clientsock.send(bytes("Error! Your balance is lower than amount you want to transfer!", encoding='utf8'))
@@ -145,9 +154,11 @@ class ClientThread(threading.Thread): #separate thread for every user
 							clientsock.send(bytes("Successfully transfered funds!!!", encoding='utf8'))
 						except:
 							clientsock.send(bytes("Unknown error occured while sending funds.", encoding='utf8'))
+							thread.exit()
 					if not bankf.is_file(): #message if recipient doesn't exist
 						print("The recepient", name, "doesn't exist!")
-						clientsock.send(bytes("Error! The recipient doesn't exist! Make sure he submited at least one share!", encoding='utf8'))
+						clientsock.send(bytes("Error! The recipient doesn't exist!", encoding='utf8'))
+						thread.exit()
 
 host = "localhost"
 port = 14808
