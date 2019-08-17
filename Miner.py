@@ -1,133 +1,84 @@
-#!/usr/bin/env python
+import socket, threading, time, random, hashlib, configparser, sys
+from pathlib import Path
 
-###########################################
-#   Duino-Coin miner version 0.3 alpha    #
-# https://github.com/revoxhere/duino-coin #
-#       copyright by revox 2019           #
-###########################################
+def hush():
+	global last_hash_count, hash_count
+	last_hash_count = hash_count
+	hash_count = 0
+	threading.Timer(1.0, hush).start()
+shares = [0, 0]
+last_hash_count = 0
+hash_count = 0
+config = configparser.ConfigParser()
+if not Path("config.ini").is_file():
+	print("Initial configuration, you can edit 'config.ini' laten\n")
+	pool_address = input("Enter pool adddress: ")
+	pool_port = input("Enter pool port: ")
+	username = input("Enter username: ")
+	password = input("Enter password: ")
+	config['pool'] = {"address": pool_address,
+	"port": pool_port,
+	"username": username,
+	"password": password}
+	with open("config.ini", "w") as configfile:
+		config.write(configfile)
+	sys.exit()
+else:
+	config.read("config.ini")
+	pool_address = config["pool"]["address"]
+	pool_port = config["pool"]["port"]
+	username = config["pool"]["username"]
+	password = config["pool"]["password"]
 
-import serial, time, random, socket, datetime, sys, serial.tools.list_ports, re
-
-print("*****Official duino-coin miner*****")
-print("*************version 3*************")
-print("\n")
-print("Please wait while searching for ports...")
-comlist = serial.tools.list_ports.comports()
-connected = []
-for element in comlist:
-    connected.append(element.device)
-print("Found COM ports: " + str(connected))
-print("\n")
-port = input("Please input com port of arduino COM port (e.g. COM8): ")
-if port.isdigit():
-    port='COM'+port
-print("Selected COM port:", port)
-print("\n")
-
-users = {}
-status = ""
-try:
-    ser = serial.Serial(port) #COM on windows
-except:
-    print("Error while trying to connect to COM port:", port)
-host = 'localhost' #server ip
-port = 14808 #server port
-s = socket.socket()
-
-try: #establish connection
-    s.connect((host, port))
-    print("Successfully connected to the mining server!")
-except:
-    print("Server communication failed! A server update is probably underway. Please try again in a couple of hours.")
-    time.sleep(10)
-    sys.exit()
-
-welcome = input("Do you have an duino-coin acount? y/n: ")
-print(" ")
-if welcome == "n": #login system
-    while True:
-        print("***Please register on pool:***")
-        username = input("Enter a username:")
-        password = input("Enter a password:")
-        password1 = input("Confirm password:")
-        print("Sent registration request...")
-        print("If registration takes more than 5 seconds, please restart and try again!")
-        if password == password1:
-            s.send(bytes('REGI' , encoding='utf8')) #send register request to server
-            time.sleep(0.1)
-            s.send(bytes(username , encoding='utf8'))
-            time.sleep(0.1)
-            s.send(bytes(password , encoding='utf8'))
-            key = s.recv(2)
-            key=key.decode()
-            if key == "OK":
-                print(" ")
-                print("Successfully registered!")
-                print("Now you can restart the program and login!")
-                time.sleep(10)
-                sys.exit()
-            if key == "NO":
-                print(" ")
-                print("That user is already registered!")
-                time.sleep(10)
-                sys.exit()
-        
-if welcome == "y":
-    while True:
-        print("***Please login to pool:***")
-        username = input("Username:")
-        password = input("Password:")
-        print("Sent login request...")
-        print("If login takes more than 5 seconds, please restart and try again!")
-        time.sleep(0.1)
-        s.send(bytes('LOGI' , encoding='utf8')) #send login request to server
-        time.sleep(0.1)
-        s.send(bytes(username , encoding='utf8'))
-        time.sleep(0.1)
-        s.send(bytes(password , encoding='utf8'))
-        key = s.recv(2)
-        key=key.decode()
-        if key == "OK":
-            print(" ")
-            print("Login successful!")
-            print(" ")
-            break
-        if key == "NO":
-            print(" ")
-            print("Invalid credentials! There might've been an error. Try again! If you don't have an account, restart and register.")
-            time.sleep(10)
-            sys.exit()
- 
-
-def mine(): #mining section
-    print("Starting mining on official duino-coin pool")
-    print("1 arduino thread started, using official duino-coin algorithm.")
-    print("Sending work request to server")
-    s.send(bytes("MINE", encoding='utf8')) #send mine request to server
-    time.sleep(0.1)
-    currenthash = 0
-    while True:
-        currenthash=currenthash+1
-        now = datetime.datetime.now()
-        work = random.randint(0,9)
-        work2 = random.randint(0,9)
-        
-        ser.write(b'1') #establish connection to arduino
-        connection = ser.readline()
-        connection=connection.decode('utf-8')
-    
-        ser.write(str(work).encode()) #give work to arduino
-        ser.write(str(work2).encode())
-    
-        result = ser.readline() #get and hash the result
-        result=result.decode('utf-8')
-        result=result.translate({ord('\n'): None})
-        print(now.strftime("[%Y-%m-%d %H:%M:%S]"), "submitted:", currenthash, "/", currenthash, ", share found at:", result) #some spicy messages
-        s.send(bytes(int(work)))
-        s.send(bytes(int(work2)))
-        s.send(bytes(result, encoding='utf8')) #send result to server which will take care of rest
-        time.sleep(0.15)
-
-mine() #HAPPY MINING :D
-
-
+while True:
+	print("Connecting to pool...")
+	soc = socket.socket()
+	try:
+		soc.connect((pool_address, int(pool_port)))
+		print("Connected!")
+		break
+	except:
+		print("Cannot connect to pool server. Retrying in 30 seconds...")
+		time.sleep(30)
+	time.sleep(0.025)
+print("Logging in...")
+soc.send(bytes("LOGI," + username + "," + password, encoding="utf8"))
+while True:
+	resp = soc.recv(1024).decode()
+	if resp == "OK":
+		print("Logged in!")
+		break
+	if resp == "NO":
+		print("Error, closing in 5 seconds...")
+		soc.close()
+		time.sleep(5)
+		sys.exit()
+	time.sleep(0.025)
+print("Start mining...")
+hush()
+while True:
+	soc.send(bytes("JOB", encoding="utf8"))
+	while True:
+		job = soc.recv(1024).decode()
+		if job:
+			break
+		time.sleep(0.025)
+	print("Recived new job from pool.")
+	job = job.split(",")
+	for iJob in range(101):
+		hash = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest()
+		hash_count = hash_count + 1
+		if job[1] == hash:
+			soc.send(bytes(str(iJob), encoding="utf8"))
+			while True:
+				good = soc.recv(1024).decode()
+				if good == "GOOD":
+					shares[0] = shares[0] + 1 # Share accepted
+					print("Share accepted " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " (" + str(shares[0] / (shares[0] + shares[1]) * 100) + "%), " + str(last_hash_count) + " H/s")
+					break
+				elif good == "BAD":
+					shares[1] = shares[1] + 1 # SHare rejected
+					print("Share rejected " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " (" + str(shares[0] / (shares[0] + shares[1]) * 100) + "%), " + str(last_hash_count) + " H/s")
+					break
+				time.sleep(0.025)
+			break
