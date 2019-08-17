@@ -36,8 +36,11 @@ class ClientThread(threading.Thread): #separate thread for every user
 				regf = Path(username+".txt")
 				if not regf.is_file(): #checking if user already exists
 					file = open(username+".txt", "w")
-					file.write(username+":"+password)
+					file.write(password)
 					file.close()
+					file = open(username+"balance.txt", "w")
+					file.write(str(new_users_balance))
+					file.close
 					clientsock.send(bytes("OK", encoding='utf8'))
 				if regf.is_file():
 					print("Account already exists!")
@@ -53,7 +56,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 					file = open(username+".txt", "r")
 					data = file.readline()
 					file.close()
-					if data == username+":"+password:
+					if data == password:
 						clientsock.send(bytes("OK", encoding='utf8'))
 						print("User logged")
 				except:
@@ -63,6 +66,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 			if data[0] == "JOB": #main, mining section
 				print("New job for user: " + username)
 				with locker:
+					print("Thread(" + str(thread_id) + ") Locking resources")
 					file = open("lastblock", "r+")
 					lastblock = file.readline()
 					rand = random.randint(0, 100)
@@ -72,31 +76,26 @@ class ClientThread(threading.Thread): #separate thread for every user
 					file.write(hashing.hexdigest())
 					file.truncate()
 					file.close()
+					print("Thread(" + str(thread_id) + ") Unlocking resources")
 				result = clientsock.recv(1024)
 				if result.decode() == str(rand):
 					print("Good result (" + str(result.decode()) + ")")
 					file = open(username+"balance.txt", "r+")
 					balance = float(file.readline())
-					balance = balance + 0.000500
+					balance = balance + reward
 					file.seek(0)
 					file.write(str(balance))
 					file.truncate()
 					file.close()
 					clientsock.send(bytes("GOOD", encoding="utf8"))
+				else:
+					print("Bad result (" + str(result.decode()) + ")")
+					clientsock.send(bytes("BAD", encoding="utf8"))
 			if data[0] == "BALA": #check balance section
 				print(">>>>>>>>>>>>>> sent balance values")
-				try:
-					file = open(username+"balance.txt", "r")
-					balance = file.readline()
-					file.close()
-				except:
-					file = open(username+"balance.txt", "w")
-					file.write(str(0))
-					file.close()
-					print("Had to set", username, "balance to 0!")
-					file = open(username+"balance.txt", "r")
-					balance = file.readline()
-					file.close()
+				file = open(username+"balance.txt", "r")
+				balance = file.readline()
+				file.close()
 				clientsock.send(bytes(balance, encoding='utf8'))
 
 			if data[0] == "SEND": #sending funds section
@@ -152,6 +151,8 @@ class ClientThread(threading.Thread): #separate thread for every user
 
 host = "localhost"
 port = 14808
+new_users_balance = 0
+reward = 0.000500
 
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -160,6 +161,12 @@ tcpsock.bind((host,port))
 threads = []
 
 locker = threading.Lock()
+
+regf = Path("lastblock")
+if not regf.is_file():
+	file = open("lastblock", "w")
+	file.write(hashlib.sha1(str("revox.heremrkris7100").encode("utf-8")).hexdigest())
+	file.close()
 
 while True:
 	try:
