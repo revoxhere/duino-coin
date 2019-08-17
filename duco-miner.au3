@@ -1,3 +1,9 @@
+; ###########################################
+; #        Duino-Coin miner version 0.4     #
+; # https://github.com/revoxhere/duino-coin #
+; #       copyright by MrKris7100 2019      #
+; ###########################################
+
 #Region ;**** Directives created by AutoIt3Wrapper_GUI ****
 #AutoIt3Wrapper_Change2CUI=y
 #EndRegion ;**** Directives created by AutoIt3Wrapper_GUI ****
