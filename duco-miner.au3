@@ -17,7 +17,6 @@ If Not FileExists(@ScriptDir & "\config.ini") Then
 	ConsoleWrite("Enter password: ")
 	$password = Cin()
 	IniWrite(@ScriptDir & "\config.ini", "pool", "password", $password)
-	IniWrite(@ScriptDir & "\config.ini", "miner", "printtime", "30")
 Else
 	$pool_address = IniRead(@ScriptDir & "\config.ini", "pool", "address", "0")
 	$pool_port = IniRead(@ScriptDir & "\config.ini", "pool", "port", "0")
