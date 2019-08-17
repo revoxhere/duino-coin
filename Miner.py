@@ -19,9 +19,9 @@ last_hash_count = 0
 hash_count = 0
 config = configparser.ConfigParser()
 if not Path("config.ini").is_file():
-	print("Initial configuration, you can edit 'config.ini' laten\n")
-	pool_address = input("Enter pool adddress: ")
-	pool_port = input("Enter pool port: ")
+	print("Initial configuration, you can edit 'config.ini' later\n")
+	pool_address = input("Enter pool adddress (official: serveo.net): ")
+	pool_port = input("Enter pool port (official: 14808): ")
 	username = input("Enter username: ")
 	password = input("Enter password: ")
 	config['pool'] = {"address": pool_address,
