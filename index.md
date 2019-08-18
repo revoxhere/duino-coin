@@ -3,6 +3,14 @@
 ### Duino coin is an innovative "cryptocurrency" project that can be mined using Arduino (or other AVR) boards (processors).
 
 ***
+
+## 18.08.2019: Planned (temporary) server shutdown
+Due to many changes, official servers will be offline for a few days.<br>
+We need to fix and change many things so this may take some time. <br>
+When we'll be done, you will be notified by a new release, blog post and readme file changes. <br>
+
+***
+
 ## 17.08.2019: Quick status update
 Welcome back! <br>
 Sorry for inactivity, I was on a little vacation. <br>
@@ -10,7 +18,6 @@ Sorry for inactivity, I was on a little vacation. <br>
 Official servers were offline for I think ~2 days, sorry for that. Now they're up and running. <br>
 
 ***
-
 
 ## 14.08.2019: Better algorithm in the works
 Hi everyone! <br>
