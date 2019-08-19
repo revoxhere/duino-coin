@@ -67,9 +67,9 @@ While 1
 		If $job Then ExitLoop
 		Sleep(25)
 	WEnd
-	ConsoleWrite("Recived new job from pool." & @CRLF)
 	$job = StringSplit($job, ",", 2)
-	For $iJob = 0 To 100
+	ConsoleWrite("Recived new job from pool. Diff: " & $job[2] & @CRLF)
+	For $iJob = 0 To 100 * $job[2]
 		$hash = StringLower(StringTrimLeft(_Crypt_HashData($job[0] & $iJob, 0x00008004), 2))
 		$hash_count += 1
 		If $job[1] = $hash Then
