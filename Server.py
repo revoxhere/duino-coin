@@ -8,7 +8,7 @@
 # Important: this version of the server is a bit different than one used in "real" duino-coin network.
 
 print("Duino-Coin server version 0.4")
-import socket, threading, time, random, hashlib
+import socket, threading, time, random, hashlib, math
 from pathlib import Path
 
 def percentage(part, whole):
@@ -65,17 +65,21 @@ class ClientThread(threading.Thread): #separate thread for every user
 			if data[0] == "JOB": #main, mining section
 				print("New job for user: " + username)
 				with locker:
-					print("Thread(" + str(thread_id) + ") Locking resources")
+					print("Thread(" + str(thread_id) + ") Locking lastblock")
+					file = open("blocks", "r")
+					blocks = int(file.readline())
+					file.close()
 					file = open("lastblock", "r+")
 					lastblock = file.readline()
-					rand = random.randint(0, 100)
+					diff = math.ceil(blocks / diff_incrase_per)
+					rand = random.randint(0, 100 * diff)
 					hashing = hashlib.sha1(str(lastblock + str(rand)).encode("utf-8"))
-					self.clientsock.send(bytes(lastblock + "," + hashing.hexdigest(), encoding='utf8'))
+					self.clientsock.send(bytes(lastblock + "," + hashing.hexdigest() + "," + str(diff), encoding='utf8'))
 					file.seek(0)
 					file.write(hashing.hexdigest())
 					file.truncate()
 					file.close()
-					print("Thread(" + str(thread_id) + ") Unlocking resources")
+					print("Thread(" + str(thread_id) + ") Unlocking lastblock")
 				result = self.clientsock.recv(1024)
 				if result.decode() == str(rand):
 					print("Good result (" + str(result.decode()) + ")")
@@ -87,6 +91,15 @@ class ClientThread(threading.Thread): #separate thread for every user
 					file.truncate()
 					file.close()
 					self.clientsock.send(bytes("GOOD", encoding="utf8"))
+					with locker:
+						print("Thread(" + str(thread_id) + ") Locking blocks")
+						blocks = blocks + 1
+						file = open("blocks", "w")
+						file.seek(0)
+						file.write(str(blocks))
+						file.truncate()
+						file.close()
+						print("Thread(" + str(thread_id) + ") Unlocking blocks")
 				else:
 					print("Bad result (" + str(result.decode()) + ")")
 					self.clientsock.send(bytes("BAD", encoding="utf8"))
@@ -153,6 +166,7 @@ host = "localhost"
 port = 14808
 new_users_balance = 0
 reward = 0.000005
+diff_incrase_per = 100000
 
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -162,10 +176,13 @@ threads = []
 
 locker = threading.Lock()
 
-regf = Path("lastblock")
-if not regf.is_file():
+if not Path("lastblock").is_file():
 	file = open("lastblock", "w")
 	file.write(hashlib.sha1(str("revox.heremrkris7100").encode("utf-8")).hexdigest())
+	file.close()
+if not Path("blocks").is_file():
+	file = open("blocks", "w")
+	file.write("0")
 	file.close()
 
 while True:

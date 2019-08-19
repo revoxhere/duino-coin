@@ -61,6 +61,7 @@ while True:
 		time.sleep(5)
 		sys.exit()
 	time.sleep(0.025)
+
 print("Start mining...")
 hush()
 while True:
@@ -70,9 +71,11 @@ while True:
 		if job:
 			break
 		time.sleep(0.025)
+
 	print("Recived new job from pool.")
 	job = job.split(",")
-	for iJob in range(101):
+	print("Recived new job from pool. Diff: " + job[2])
+	for iJob in range(100 * int(job[2]) + 1):
 		hash = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest()
 		hash_count = hash_count + 1
 		if job[1] == hash:
