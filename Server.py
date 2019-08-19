@@ -15,22 +15,21 @@ def percentage(part, whole):
   return 100 * float(part)/float(whole)
 
 class ClientThread(threading.Thread): #separate thread for every user
-	def __init__(self,ip,port):
+	def __init__(self,ip,port,clientsock):
+		print(clientsock)
 		threading.Thread.__init__(self)
 		self.ip = ip
 		self.port = port
+		self.clientsock = clientsock
 		print("[+] New thread started for "+ip+":"+str(port))
 
 	def run(self):
 		thread_id = threading.get_ident()
 		print("Connection from : "+ip+":"+str(port))
 		while True:
-			try:
-				data = clientsock.recv(1024)
-				data = data.decode()
-				data = data.split(",")
-			except:
-				break
+			data = self.clientsock.recv(1024)
+			data = data.decode()
+			data = data.split(",")
 			if data[0] == "REGI": #registration
 				username = data[1]
 				password = data[2]
@@ -45,10 +44,10 @@ class ClientThread(threading.Thread): #separate thread for every user
 					file = open(username+"balance.txt", "w")
 					file.write(str(new_users_balance))
 					file.close
-					clientsock.send(bytes("OK", encoding='utf8'))
+					self.clientsock.send(bytes("OK", encoding='utf8'))
 				if regf.is_file():
 					print("Account already exists!")
-					clientsock.send(bytes("NO", encoding='utf8'))
+					self.clientsock.send(bytes("NO", encoding='utf8'))
 					break
 
 			if data[0] == "LOGI": #login
@@ -57,17 +56,11 @@ class ClientThread(threading.Thread): #separate thread for every user
 				print("User logging in")
 				print(">Username:", username)
 				print(">Password:", password)
-				try:
-					file = open(username+".txt", "r")
-					data = file.readline()
-					file.close()
-					if data == password:
-						clientsock.send(bytes("OK", encoding='utf8'))
-						print("User logged")
-				except:
-					clientsock.send(bytes("NO", encoding='utf8'))
-					print("Bad password")
-					break
+				file = open(username+".txt", "r")
+				data = file.readline()
+				file.close()
+				self.clientsock.send(bytes("OK", encoding='utf8'))
+				print("User logged")
    
 			if data[0] == "JOB": #main, mining section
 				print("New job for user: " + username)
@@ -77,13 +70,13 @@ class ClientThread(threading.Thread): #separate thread for every user
 					lastblock = file.readline()
 					rand = random.randint(0, 100)
 					hashing = hashlib.sha1(str(lastblock + str(rand)).encode("utf-8"))
-					clientsock.send(bytes(lastblock + "," + hashing.hexdigest(), encoding='utf8'))
+					self.clientsock.send(bytes(lastblock + "," + hashing.hexdigest(), encoding='utf8'))
 					file.seek(0)
 					file.write(hashing.hexdigest())
 					file.truncate()
 					file.close()
 					print("Thread(" + str(thread_id) + ") Unlocking resources")
-				result = clientsock.recv(1024)
+				result = self.clientsock.recv(1024)
 				if result.decode() == str(rand):
 					print("Good result (" + str(result.decode()) + ")")
 					file = open(username+"balance.txt", "r+")
@@ -93,18 +86,17 @@ class ClientThread(threading.Thread): #separate thread for every user
 					file.write(str(balance))
 					file.truncate()
 					file.close()
-					clientsock.send(bytes("GOOD", encoding="utf8"))
+					self.clientsock.send(bytes("GOOD", encoding="utf8"))
 				else:
 					print("Bad result (" + str(result.decode()) + ")")
-					clientsock.send(bytes("BAD", encoding="utf8"))
+					self.clientsock.send(bytes("BAD", encoding="utf8"))
 					
 			if data[0] == "BALA": #check balance section
 				print(">>>>>>>>>>>>>> sent balance values")
 				file = open(username+"balance.txt", "r")
 				balance = file.readline()
 				file.close()
-				clientsock.send(bytes(balance, encoding='utf8'))
-				break
+				self.clientsock.send(bytes(balance, encoding='utf8'))
 
 			if data[0] == "SEND": #sending funds section
 				username = data[1]
@@ -123,10 +115,9 @@ class ClientThread(threading.Thread): #separate thread for every user
 					file.close()
 				except:
 					print("Error occured while checking funds!")
-					break
 				#verify that the balance is higher or equal to transfered amount
 				if amount >= balance:
-					clientsock.send(bytes("Error! Your balance is lower than amount you want to transfer!", encoding='utf8'))
+					self.clientsock.send(bytes("Error! Your balance is lower than amount you want to transfer!", encoding='utf8'))
 				if amount <= balance: #if ok, check if recipient adress exists
 					bankf = Path(name+"balance.txt")
 					if bankf.is_file():
@@ -151,19 +142,17 @@ class ClientThread(threading.Thread): #separate thread for every user
 							file = open(name+"balance.txt", "w")
 							file.write(str(namebal))
 							file.close()
-							clientsock.send(bytes("Successfully transfered funds!!!", encoding='utf8'))
+							self.clientsock.send(bytes("Successfully transfered funds!!!", encoding='utf8'))
 						except:
-							clientsock.send(bytes("Unknown error occured while sending funds.", encoding='utf8'))
-							break
+							self.clientsock.send(bytes("Unknown error occured while sending funds.", encoding='utf8'))
 					if not bankf.is_file(): #message if recipient doesn't exist
 						print("The recepient", name, "doesn't exist!")
-						clientsock.send(bytes("Error! The recipient doesn't exist!", encoding='utf8'))
-						break
+						self.clientsock.send(bytes("Error! The recipient doesn't exist!", encoding='utf8'))
 
 host = "localhost"
 port = 14808
 new_users_balance = 0
-reward = 0.000500
+reward = 0.000005
 
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -183,8 +172,8 @@ while True:
 	try:
 		tcpsock.listen(16)
 		print("\nListening for incoming connections...")
-		(clientsock, (ip, port)) = tcpsock.accept()
-		newthread = ClientThread(ip, port)
+		(conn, (ip, port)) = tcpsock.accept()
+		newthread = ClientThread(ip, port, conn)
 		newthread.start()
 		threads.append(newthread)
 	except:
