@@ -30,7 +30,6 @@ if not Path("config.ini").is_file():
 	"password": password}
 	with open("config.ini", "w") as configfile:
 		config.write(configfile)
-	sys.exit()
 else:
 	config.read("config.ini")
 	pool_address = config["pool"]["address"]
