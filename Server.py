@@ -7,7 +7,7 @@
 ###########################################
 # Important: this version of the server is a bit different than one used in "real" duino-coin network.
 
-print("Duino-Coin server version 0.5")
+print("Duino-Coin server version 0.4")
 import socket, threading, time, random, hashlib, math
 from pathlib import Path
 
@@ -16,12 +16,12 @@ def percentage(part, whole):
 
 class ClientThread(threading.Thread): #separate thread for every user
 	def __init__(self, ip, port, clientsock):
-		thread_id = str(threading.get_ident())
+		self.thread_id = str(threading.get_ident())
 		threading.Thread.__init__(self)
 		self.ip = ip
 		self.port = port
 		self.clientsock = clientsock
-		print("[+] New thread started (" + thread_id + ")")
+		print("[+] New thread started (" + self.thread_id + ")")
 
 	def run(self):
 		print("Connection from : " + self.ip + ":" + str(self.port))
@@ -61,7 +61,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 			elif data[0] == "JOB": #main, mining section
 				print("New job for user: " + username)
 				with locker:
-					print("Thread(" + thread_id + ") Locking lastblock")
+					print("Thread(" + self.thread_id + ") Locking lastblock")
 					file = open("blocks", "r")
 					blocks = int(file.readline())
 					file.close()
@@ -70,14 +70,14 @@ class ClientThread(threading.Thread): #separate thread for every user
 					diff = math.ceil(blocks / diff_incrase_per)
 					rand = random.randint(0, 100 * diff)
 					hashing = hashlib.sha1(str(lastblock + str(rand)).encode("utf-8"))
+					print("Sending job: " + hashing.hexdigest())
 					self.clientsock.send(bytes(lastblock + "," + hashing.hexdigest() + "," + str(diff), encoding='utf8'))
 					file.seek(0)
 					file.write(hashing.hexdigest())
 					file.truncate()
 					file.close()
-					print("Thread(" + thread_id + ") Unlocking lastblock")
-				result = self.clientsock.recv(1024)
-				result.decode()
+					print("Thread(" + self.thread_id + ") Unlocking lastblock")
+				result = self.clientsock.recv(1024).decode()
 				if result == str(rand):
 					print("Good result (" + str(result) + ")")
 					file = open(username + "balance.txt", "r+")
@@ -89,14 +89,14 @@ class ClientThread(threading.Thread): #separate thread for every user
 					file.close()
 					self.clientsock.send(bytes("GOOD", encoding="utf8"))
 					with locker:
-						print("Thread(" + thread_id + ") Locking blocks")
+						print("Thread(" + self.thread_id + ") Locking blocks")
 						blocks+= 1
 						file = open("blocks", "w")
 						file.seek(0)
 						file.write(str(blocks))
 						file.truncate()
 						file.close()
-						print("Thread(" + thread_id + ") Unlocking blocks")
+						print("Thread(" + self.thread_id + ") Unlocking blocks")
 				else:
 					print("Bad result (" + str(result) + ")")
 					self.clientsock.send(bytes("BAD", encoding="utf8"))
