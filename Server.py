@@ -125,7 +125,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 				except:
 					print("Error occured while checking funds!")
 				#verify that the balance is higher or equal to transfered amount
-				if amount >= balance:
+				if amount > balance:
 					self.clientsock.send(bytes("Error! Your balance is lower than amount you want to transfer!", encoding='utf8'))
 				else: #if ok, check if recipient adress exists
 					if Path(name + "balance.txt").is_file():
