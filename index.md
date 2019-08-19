@@ -4,6 +4,15 @@
 
 ***
 
+## 19.08.2019: SHA1 Server done!!!
+SHA1 Algorithm is now fully working and implemented.<br>
+PC Miner (AutoIT and Python) is also working flawlessly.. <br>
+**Everything thanks to MrKris7100!** <br>
+Things left to do: Wallet and Arduino code. <br>
+Servers will be back online in a few days. <br>
+
+***
+
 ## 18.08.2019: Planned (temporary) server inaccessibility
 Due to many changes, official servers will be offline for a few days.<br>
 We need to fix and change many things so this may take some time. <br>
