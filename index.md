@@ -4,12 +4,19 @@
 
 ***
 
-## 19.08.2019: SHA1 Server done!!!
+## 20.08.2019: Quick info
+Server has received a few bugfixes and optimalization changes (thanks, MrKris7100!) <br>
+PC Miner (AutoIT and Python) - also done. <br>
+GUI Wallet - 1/3 done. <br>
+Arduino code - I haven't started working at it yet. <br>
+
+***
+
+## 19.08.2019: SHA1 Server and miner done!!!
 SHA1 Algorithm is now fully working and implemented.<br>
-PC Miner (AutoIT and Python) is also working flawlessly.. <br>
 **Everything thanks to MrKris7100!** <br>
-Things left to do: Wallet and Arduino code. <br>
-Servers will be back online in a few days. <br>
+Things left to do: Wallet, some Miner changes and Arduino code. <br>
+Servers will be back online in a few days, as soon as everything's ready. <br>
 
 ***
 
