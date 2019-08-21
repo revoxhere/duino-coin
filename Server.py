@@ -1,19 +1,22 @@
 #!/usr/bin/env python
 
 ###########################################
-#   Duino-Coin public-server version 0.4  #
+#   Duino-Coin public-server version 0.5  #
 # https://github.com/revoxhere/duino-coin #
 #  copyright by MrKris7100 & revox 2019   #
 ###########################################
 # Important: this version of the server is a bit different than one used in "real" duino-coin network.
 
-print("Duino-Coin server version 0.4")
-import socket, threading, time, random, hashlib, math
+VER = "0.5"
+
+import socket, threading, time, random, hashlib, math, datetime
 from pathlib import Path
 
-def percentage(part, whole):
-  return 100 * float(part)/float(whole)
-
+def ServerLog(whattolog):
+	now = datetime.datetime.now()
+	now = now.strftime("[%Y-%m-%d %H:%M:%S] ")
+	print(now + whattolog)
+	
 class ClientThread(threading.Thread): #separate thread for every user
 	def __init__(self, ip, port, clientsock):
 		self.thread_id = str(threading.get_ident())
@@ -21,10 +24,10 @@ class ClientThread(threading.Thread): #separate thread for every user
 		self.ip = ip
 		self.port = port
 		self.clientsock = clientsock
-		print("[+] New thread started (" + self.thread_id + ")")
+		ServerLog("New thread started (" + self.thread_id + ")")
 
 	def run(self):
-		print("Connection from : " + self.ip + ":" + str(self.port))
+		ServerLog("Connection from : " + self.ip + ":" + str(self.port))
 		while True:
 			data = self.clientsock.recv(1024)
 			data = data.decode()
@@ -32,9 +35,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 			if data[0] == "REGI": #registration
 				username = data[1]
 				password = data[2]
-				print("Register request")
-				print(">Username:", username)
-				print(">Password:", password)
+				ServerLog("Client request account registration.")
 				if not Path(username + ".txt").is_file(): #checking if user already exists
 					file = open(username + ".txt", "w")
 					file.write(password)
@@ -43,25 +44,31 @@ class ClientThread(threading.Thread): #separate thread for every user
 					file.write(str(new_users_balance))
 					file.close
 					self.clientsock.send(bytes("OK", encoding='utf8'))
+					ServerLog("New user (" + username + ") registered")
 				else:
-					print("Account already exists!")
+					ServerLog("Account already exists!")
 					self.clientsock.send(bytes("NO", encoding='utf8'))
 					break
 			elif data[0] == "LOGI": #login
 				username = data[1]
 				password = data[2]
-				print("User logging in")
-				print(">Username:", username)
-				print(">Password:", password)
-				file = open(username + ".txt", "r")
-				data = file.readline()
-				file.close()
-				self.clientsock.send(bytes("OK", encoding='utf8'))
-				print("User logged")
+				ServerLog("Client request logging in to account " + username)
+				if Path(username + ".txt").is_file():
+					file = open(username + ".txt", "r")
+					data = file.readline()
+					file.close()
+					if password == data:
+						self.clientsock.send(bytes("OK", encoding='utf8'))
+						ServerLog("Password matches, user logged")
+					else:
+						ServerLog("Incorrect password")
+						self.clientsock.send(bytes("NO", encoding='utf8'))
+				else:
+					ServerLog("User doesn't exist!")
+					self.clientsock.send(bytes("NO", encoding='utf8'))
 			elif data[0] == "JOB": #main, mining section
-				print("New job for user: " + username)
+				ServerLog("New job for user: " + username)
 				with locker:
-					print("Thread(" + self.thread_id + ") Locking lastblock")
 					file = open("blocks", "r")
 					blocks = int(file.readline())
 					file.close()
@@ -70,16 +77,15 @@ class ClientThread(threading.Thread): #separate thread for every user
 					diff = math.ceil(blocks / diff_incrase_per)
 					rand = random.randint(0, 100 * diff)
 					hashing = hashlib.sha1(str(lastblock + str(rand)).encode("utf-8"))
-					print("Sending job: " + hashing.hexdigest())
+					ServerLog("Sending target hash: " + hashing.hexdigest())
 					self.clientsock.send(bytes(lastblock + "," + hashing.hexdigest() + "," + str(diff), encoding='utf8'))
 					file.seek(0)
 					file.write(hashing.hexdigest())
 					file.truncate()
 					file.close()
-					print("Thread(" + self.thread_id + ") Unlocking lastblock")
 				result = self.clientsock.recv(1024).decode()
 				if result == str(rand):
-					print("Good result (" + str(result) + ")")
+					ServerLog("Recived good result (" + str(result) + ")")
 					file = open(username + "balance.txt", "r+")
 					balance = float(file.readline())
 					balance += reward
@@ -89,47 +95,42 @@ class ClientThread(threading.Thread): #separate thread for every user
 					file.close()
 					self.clientsock.send(bytes("GOOD", encoding="utf8"))
 					with locker:
-						print("Thread(" + self.thread_id + ") Locking blocks")
 						blocks+= 1
 						file = open("blocks", "w")
 						file.seek(0)
 						file.write(str(blocks))
 						file.truncate()
 						file.close()
-						print("Thread(" + self.thread_id + ") Unlocking blocks")
 				else:
-					print("Bad result (" + str(result) + ")")
+					ServerLog("Recived bad result (" + str(result) + ")")
 					self.clientsock.send(bytes("BAD", encoding="utf8"))
 					
 			elif data[0] == "BALA": #check balance section
-				print(">>>>>>>>>>>>>> sent balance values")
+				ServerLog("Client request balance check")
 				file = open(username + "balance.txt", "r")
 				balance = file.readline()
 				file.close()
 				self.clientsock.send(bytes(balance, encoding='utf8'))
 
 			elif data[0] == "SEND": #sending funds section
-				username = data[1]
-				name = data[2]
+				sender = data[1]
+				reciver = data[2]
 				amount = float(data[3])
-				print(">>>>>>>>>>>>>> started send funds protocol")
-				print("Username:", username)
-				print("Receiver username:", name)
-				print("Amount", amount)
+				ServerLog("Client request transfer funds")
 				#now we have all data needed to transfer money
 				#firstly, get current amount of funds in bank
-				print("Sent balance values")
 				try:
-					file = open(username + "balance.txt", "r+")
+					file = open(sender + "balance.txt", "r+")
 					balance = float(file.readline())
 				except:
-					print("Error occured while checking funds!")
+					ServerLog("Can't checks sender's (" + sender + ") balance")
+				if Path(
 				#verify that the balance is higher or equal to transfered amount
 				if amount > balance:
 					self.clientsock.send(bytes("Error! Your balance is lower than amount you want to transfer!", encoding='utf8'))
 				else: #if ok, check if recipient adress exists
-					if Path(name + "balance.txt").is_file():
-						#it exists, now -amount from username and +amount to name
+					if Path(reciver + "balance.txt").is_file():
+						#it exists, now -amount from sender and +amount to reciver
 						try:
 							#remove amount from senders' balance
 							balance -= amount
@@ -138,20 +139,22 @@ class ClientThread(threading.Thread): #separate thread for every user
 							file.truncate()
 							file.close
 							#get recipients' balance and add amount
-							file = open(name+"balance.txt", "r+")
-							namebal = float(file.readline())
-							namebal += amount
+							file = open(reciver+"balance.txt", "r+")
+							reciverbal = float(file.readline())
+							reciverbal += amount
 							file.seek(0)
-							file.write(str(namebal))
+							file.write(str(reciverbal))
 							file.truncate()
 							file.close()
 							self.clientsock.send(bytes("Successfully transfered funds!!!", encoding='utf8'))
+							ServerLog("Transferred " + str(amount) + " DUCO from " + sender + " to " + reciver)
 						except:
 							self.clientsock.send(bytes("Unknown error occured while sending funds.", encoding='utf8'))
 					else: #message if recipient doesn't exist
-						print("The recepient", name, "doesn't exist!")
+						ServerLog("The recepient", reciver, "doesn't exist!")
 						self.clientsock.send(bytes("Error! The recipient doesn't exist!", encoding='utf8'))
 
+ServerLog("duino-coin Server v" + VER)
 host = "localhost"
 port = 14808
 new_users_balance = 0
@@ -163,9 +166,9 @@ tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
 try:
 	tcpsock.bind((host,port))
-	print("Server started...")
+	ServerLog("Server started...")
 except:
-	print("Error during TCP socket...")
+	ServerLog("Error during TCP socket...")
 	time.sleep(5)
 	sys.exit()
 threads = []
@@ -180,7 +183,7 @@ if not Path("blocks").is_file():
 	file = open("blocks", "w")
 	file.write("0")
 	file.close()
-print("Listening for incoming connections...")
+ServerLog("Listening for incoming connections...")
 while True:
 	try:
 		tcpsock.listen(16)
@@ -189,7 +192,7 @@ while True:
 		newthread.start()
 		threads.append(newthread)
 	except:
-		print("Error in main loop!")
+		ServerLog("Error in main loop!")
 
 for t in threads:
 	t.join()
