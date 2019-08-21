@@ -13,7 +13,7 @@ from pathlib import Path
 
 users = {}
 status = ""
-host = 'localhost' #official server ip
+host = 'serveo.net' #official server ip
 port = 14808 #official server port
 s = socket.socket()
 config = configparser.ConfigParser()
@@ -28,7 +28,7 @@ def Signup(): #signup definition
         roots = Tk() #register window
         roots.resizable(False, False)
         roots.title('Register')
-        intruction = Label(roots, text='Please enter your credentials to register\n')
+
         nameL = Label(roots, text='Username: ')
         pwordL = Label(roots, text='Password: ')
         pwordconfirm = Label(roots, text='Confirm Password: ')
@@ -78,9 +78,6 @@ def Login():
         rootA.resizable(False, False)
         rootA.title('Login')
  
-        intruction = Label(rootA, text='Please enter your credentials to login\n')
-        intruction.grid(sticky=E)
- 
         nameL = Label(rootA, text='Username: ')
         pwordL = Label(rootA, text='Password: ')
         nameL.grid(row=1, sticky=W)
@@ -106,7 +103,7 @@ def CheckLogin():
         key=key.decode()
         if key == "OK":
                 messagebox.showinfo("Title", "Successfully logged in!\nYour login data will be automatically remembered!")
-                config['pool'] = {"address": "localhost",
+                config['pool'] = {"address": "serveo.net",
                 "port": 14808,
                 "username": username,
                 "password": password}
@@ -128,21 +125,21 @@ def SelectScr():
         window.geometry("330x200")
         window.resizable(False, False)
         window.title("Duino-Coin wallet")
-
+        
         label = tkinter.Label(window, text = "").pack()       
         label = tkinter.Label(window, text = " Welcome to the Duino-Coin wallet!", font="-weight bold").pack()
         label = tkinter.Label(window, text = " It looks like it's your first time launching this program. ").pack()
         label = tkinter.Label(window, text = " Do you have an Duino-Coin account?").pack()
-        
         label = tkinter.Label(window, text = "").pack()
         tkinter.Button(window, text = "  Yes, login me! ", command = Login).pack() 
         tkinter.Button(window, text = " No, register me!", command = Signup).pack()
         label = tkinter.Label(window, text = "").pack() 
         label = tkinter.Label(window, text = "                                        2019 Duino-Coin developers").pack()
-        
-        window.mainloop()
 
+        window.mainloop()
+        
 def WalletScr():
+        global username
         print("Using pre-defined settings")
         config.read("config.ini")
         username = config["pool"]["username"]
@@ -159,25 +156,85 @@ def WalletScr():
                 os.remove("config.ini")
                 SelectScr()
 
+def FSSSend():
+        global receipent 
+        global amount
+        receipent = receipentA.get()
+        amount = amountA.get()
+        
+        if amount.isupper() or amount.islower():
+                print("Amount contains letters!")
+                messagebox.showerror("Error!","Incorrect amount!")
+                send.destroy()
+
+        print("Sending ", amount, " funds from:", username, "to", receipent)
+        s.send(bytes("SEND,"+username+","+receipent+","+amount, encoding='utf8')) #send sending funds request to server
+        time.sleep(0.1)
+        message = s.recv(1024).decode('utf8')
+        message = ''.join([i for i in message if not i.isdigit()]) #sometimes crappy numbers happen, idk why so remove them
+        messagebox.showinfo("Server message", message) #print server message
+        send.destroy()
+        WalletWindow()
+
 def Send():
+        global amountA
+        global receipentA
+        global send
+        wallet.destroy()
+        send = Tk() #sending funds window
+        send.resizable(False, False)
+        send.title('Send funds')
+        
+        label = tkinter.Label(send, text = "Your balance: "+balance+" DUCO")
+        receipentA = Label(send, text="Receipents' username: ")
+        amountA = Label(send, text='Amount: ')
+        receipentA.grid(row=1, column=0, sticky=W) 
+        amountA.grid(row=2, column=0, sticky=W)
+        label.grid(row=0, column=0, sticky=W)
+
+        receipentA = Entry(send)
+        amountA = Entry(send)
+        receipentA.grid(row=1, column=1)
+        amountA.grid(row=2, column=1)
+
+         
+        signupButton = Button(send, text='Send funds', command=FSSSend)
+        signupButton.grid(columnspan=2, sticky=W)
+        send.mainloop()
+
+def Receive(): #receiving funds help dialog
+        messagebox.showinfo("Receive funds", "To receive funds, instruct others to send money to your username ("+username+").")
         pass
-def Receive():
-        pass
+
 def About():
-        pass
+        global about
+        
+        about = Tk() #about window
+        about.resizable(False, False)
+        about.geometry("300x90")
+        about.title('About')
+
+        label = tkinter.Label(about, text = "Official Duino-Coin wallet", font="-weight bold").pack()
+        label = tkinter.Label(about, text = "Wallet version: 0.5 alpha").pack()
+        label = tkinter.Label(about, text = "Made by revox from Duino-Coin developers").pack()
+        label = tkinter.Label(about, text = "Learn more at: github.com/revoxhere/duino-coin").pack()
+
+
 def getBalance():
         global balance
         s.send(bytes("BALA", encoding='utf8'))
         time.sleep(0.025)
-        balance = s.recv(8)
+        balance = s.recv(6)
         balance = balance.decode('utf8')
-        print("Balance:", balance)
+        print("Got balance from server:", balance)
 
 def WalletWindow():
         getBalance()
+        global wallet
+        
         print("Displaying main wallet window")
         wallet = tkinter.Tk()
-        wallet.geometry("320x270")
+        wallet.geometry("320x250")
         wallet.resizable(False, False)
         wallet.title("Duino-Coin wallet")
 
@@ -189,33 +246,30 @@ def WalletWindow():
         label = tkinter.Label(wallet, text = "Official Duino-Coin wallet", font="-weight bold", background='white').place(relx=.5, rely=.09, anchor="c")
         label = tkinter.Label(wallet, text = "").grid()
         label = tkinter.Label(wallet, text = "Balance: "+balance+" DUCO", background='white').place(relx=.5, rely=.2, anchor="c")
-
-        label = tkinter.Label(wallet, text = "").grid()
-        label = tkinter.Label(wallet, text = "").grid()
-        label = tkinter.Label(wallet, text = "").grid()
         
         tkinter.Button(wallet, text = "    Send funds    ", command = Send).place(relx=0.3, rely=0.40)
         tkinter.Button(wallet, text = "  Receive funds  ", command = Receive).place(relx=0.3, rely=0.55)
         tkinter.Button(wallet, text = "        About        ", command = About).place(relx=0.3, rely=0.70)
         
         label = tkinter.Label(wallet, text = "2019 Duino-Coin developers", background='white').place(relx=0.46, rely=0.91)
-        label = tkinter.Label(wallet, text = "version 0.5 alpha", background='white').place(relx=0.66, rely=0.85)
         
         wallet.mainloop()
+        
+def Start():
+        try:
+                s.connect((host, port))
+                print("Connected to the server")
+                if not Path("config.ini").is_file():
+                        SelectScr()
+                else:
+                        WalletScr()
+        except:
+                root = tkinter.Tk()
+                root.withdraw()
+                messagebox.showerror("Error!","Server communication failed!\nA server update is probably underway.\nPlease try again in a couple of hours.")
+                sys.exit()
 
-
-try:
-        s.connect((host, port))
-        print("Connected to the server")
-        if not Path("config.ini").is_file():
-                SelectScr()
-        else:
-                WalletScr()
-except:
-        root = tkinter.Tk()
-        root.withdraw()
-        messagebox.showerror("Error!","Server communication failed!\nA server update is probably underway.\nPlease try again in a couple of hours.")
-        sys.exit()
+Start()
 
 
  
