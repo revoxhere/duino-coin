@@ -103,9 +103,7 @@ def CheckLogin():
         key=key.decode()
         if key == "OK":
                 messagebox.showinfo("Title", "Successfully logged in!\nYour login data will be automatically remembered!")
-                config['pool'] = {"address": "serveo.net",
-                "port": 14808,
-                "username": username,
+                config['pool'] = {"username": username,
                 "password": password}
                 with open("config.ini", "w") as configfile:
                         config.write(configfile)
