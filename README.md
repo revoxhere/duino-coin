@@ -13,11 +13,9 @@
 
   <h3 align="center">Start mining on you avr boards!</h3>
 
-  <p align="center">
-    Feel free to explore this innovative project! 
+  <p align="center"> 
     <br />
     <a href="https://github.com/revoxhere/duino-coin/wiki"><strong>Explore wikis »</strong></a>
-    <br />
     <br />
     <a href="https://github.com/revoxhere/duino-coin/">View Demo</a>
     ·
@@ -36,14 +34,13 @@
 ## Table of Contents
 
 * [About the Project](#about-the-project)
-  * [Built With](#built-with)
 * [News](#news)
 * [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Usage](#usage)
 * [Contributing](#contributing)
 * [License](#license)
-* [Contact](#contact)
+* [Built With](#built-with)
 * [Authors](#authors)
 
 
@@ -57,16 +54,9 @@
 There are many cryptocurrencies available. However, there are none that use avr boards. I think it's a great idea to use them.
 
 Here's why:
-* You may have some Arduino boards that don't do anything. Why not help duino-coin network by mining?
-* In the future, duino-coin may be worth something. So why not mine some?
+* You may have some Arduino boards that don't do anything.
+* In the future, duino-coin may be worth something.
 * Even if duino-coin won't ever catch any value, you will be able to proudly say that you supported beginner programmer project :smile:
-
-### Built With
-This section briefly lists major frameworks that you duino-coin uses.
-* [Python and IDLE](https://www.python.org)
-* [pySerial](https://pythonhosted.org/pyserial/)
-* [Arduino IDE](https://www.arduino.cc)
-* [serveo](https://serveo.net)
 
 ## News
 
@@ -85,15 +75,22 @@ If you're using Linux, you need to download some dependencies:
 sudo apt install python3 python-pip
 python -m pip install pyserial
 ```
-<!-- USAGE EXAMPLES -->
+#### Windows
+If you're using Windows, you don't need to install anything. Just grab latest [release](https://github.com/revoxhere/duino-coin/releases) and you're ready to go.
+
 ## Usage
 
-Detailed help about usage can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki)
+Grab latest [release](https://github.com/revoxhere/duino-coin/releases) for your OS. <br>
+Launch Arduino Miner, Miner or Wallet depending on what you want to do. <br>
+Programs will display you all information and help you need. <br>
+
+Detailed help about usage, installation and configuration can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki)
 
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create. 
+Any contributions you make are **greatly appreciated**.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -107,6 +104,13 @@ Contributions are what make the open source community such an amazing place to b
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
+### Built With
+This section briefly lists major frameworks that you duino-coin uses.
+* [Python and IDLE](https://www.python.org)
+* [pySerial](https://pythonhosted.org/pyserial/)
+* [Arduino IDE](https://www.arduino.cc)
+* [serveo](https://serveo.net)
+
 <!-- AUTHORS -->
 ## Authors
 
@@ -115,9 +119,5 @@ Distributed under the MIT License. See `LICENSE` for more information.
 * **Wikis & Social stuff:** [Jan "Furim" Malewski](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
 * **[Artwork](https://i.imgur.com/ZRRGDjs.png):** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
 * **Testing:** [Jan Malewski](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ), [MrKris7100](https://www.youtube.com/user/MrKris7100), [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg), Alina
-
-### Community-made stuff
-
-* **[AutoIt miner](https://github.com/revoxhere/duino-coin/blob/master/AutoIT%20Miner.au3):** [MrKris7100](https://www.youtube.com/user/MrKris7100)
 
 Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
