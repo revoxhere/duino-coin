@@ -1,6 +1,13 @@
 # Welcome to the official duino-coin blog!
 
-### Duino coin is an innovative cryptocurrency project that supports official mining using Arduino (or other AVR) boards (processors).
+### Duino coin is an innovative cryptocurrency project that supports official mining using Arduino (or other AVR) boards.
+
+***
+
+## 22.08.2019: ALPHA 5 IS OUT!!!
+**SHA1 IMPLEMENTATION, GUI WALLET, NEW MINER, NEW ARDUINO MINER - ALL OF THIS IN [NEW RELEASE](https://github.com/revoxhere/duino-coin/releases)!** <br>
+Many new, exciting, fresh stuff today! Everything I spoke about in previous posts is now ready to use! <br>
+What are you waiting for? Download all-new Arduino Miner and start mining those Duino-Coins! :smile:
 
 ***
 
