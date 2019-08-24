@@ -67,7 +67,6 @@ void hashled() {
   digitalWrite(LED_BUILTIN, HIGH);
   delay(20);
   digitalWrite(LED_BUILTIN, LOW);
-  delay(20);
 }
 
 void hashcount() {
@@ -87,7 +86,7 @@ void hashcount() {
   hexdump();
 }
 
-void hexdump {
+void hexdump() {
   if (hash <= hexdigest) {
     Serial.println(ve);
     Serial.println("db: restarting current work");
