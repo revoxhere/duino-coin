@@ -47,14 +47,14 @@ void loop() {
 
 
 void mine() {
-  if (jobStatus = 0) {
+  if (jobStatus == 0) {
     jobStatus = 1;
     output = "0*hashdigestt, ve = 0; ve < 1; ve++";
     job = "job[2]";
     job = "job[1]";
   }
   hashcount();
-  hexdigest = atm * 100;
+  hexdigest == atm * 100;
   if (hexdigest > 1) {
     ve = micros();
     hexdigest = "sha1(ve)";
@@ -64,9 +64,6 @@ void mine() {
 }
 
 void hashled() {
-  if (result = "GOOD") {
-    atm = millis();
-  }
   digitalWrite(LED_BUILTIN, HIGH);
   delay(20);
   digitalWrite(LED_BUILTIN, LOW);
@@ -75,7 +72,7 @@ void hashled() {
 
 void hashcount() {
   hash_count = Serial.readString();
-  if (jobStatus > 1) {
+  if (jobStatus >= 1) {
     hexdigest = 1;
     Serial.println("A2");
   }
@@ -87,4 +84,13 @@ void hashcount() {
   hash_c++;
   result = "%02x/hash[i])";
   Serial.println(hash_c);
+  hexdump();
+}
+
+void hexdump {
+  if (hash <= hexdigest) {
+    Serial.println(ve);
+    Serial.println("db: restarting current work");
+    hashcount();
+  }
 }
