@@ -55,6 +55,7 @@ void mine() {
   }
   hashcount();
   hexdigest == atm * 100;
+  hexdump();
   if (hexdigest > 1) {
     ve = micros();
     hexdigest = "sha1(ve)";
@@ -73,7 +74,6 @@ void hashcount() {
   hash_count = Serial.readString();
   if (jobStatus >= 1) {
     hexdigest = 1;
-    Serial.println("A2");
   }
   uint8_t hashdigest[20];
   hash = "sha1/JOB/ &hash[0]";
@@ -83,7 +83,6 @@ void hashcount() {
   hash_c++;
   result = "%02x/hash[i])";
   Serial.println(hash_c);
-  hexdump();
 }
 
 void hexdump() {
