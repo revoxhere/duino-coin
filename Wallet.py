@@ -103,9 +103,9 @@ def CheckLogin():
         key=key.decode()
         if key == "OK":
                 messagebox.showinfo("Title", "Successfully logged in!\nYour login data will be automatically remembered!")
-                config['pool'] = {"username": username,
+                config['wallet'] = {"username": username,
                 "password": password}
-                with open("config.ini", "w") as configfile:
+                with open("WalletConfig.ini", "w") as configfile:
                         config.write(configfile)
                 rootA.destroy()
                 WalletScr()
@@ -139,9 +139,9 @@ def SelectScr():
 def WalletScr():
         global username
         print("Using pre-defined settings")
-        config.read("config.ini")
-        username = config["pool"]["username"]
-        password = config["pool"]["password"]
+        config.read("WalletConfig.ini")
+        username = config["wallet"]["username"]
+        password = config["wallet"]["password"]
         print("Pre-defined settings:", username, password)
         
         s.send(bytes("LOGI,"+username+","+password, encoding='utf8')) #send login request to server
@@ -151,7 +151,7 @@ def WalletScr():
                 WalletWindow()
         if key == "NO":
                 messagebox.showerror("Error!","Error in pre-defined credentials!\nRemoving them and again starting login select window")
-                os.remove("config.ini")
+                os.remove("WalletConfig.ini")
                 SelectScr()
 
 def FSSSend():
@@ -235,21 +235,16 @@ def WalletWindow():
         wallet.geometry("320x250")
         wallet.resizable(False, False)
         wallet.title("Duino-Coin wallet")
-
         
-        photo = PhotoImage(file = "bg.gif")
-        w = Label(wallet, image=photo)
-        w.grid()
-        
-        label = tkinter.Label(wallet, text = "Official Duino-Coin wallet", font="-weight bold", background='white').place(relx=.5, rely=.09, anchor="c")
+        label = tkinter.Label(wallet, text = "Official Duino-Coin wallet", font="-weight bold").place(relx=.5, rely=.09, anchor="c")
         label = tkinter.Label(wallet, text = "").grid()
-        label = tkinter.Label(wallet, text = "Balance: "+balance+" DUCO", background='white').place(relx=.5, rely=.2, anchor="c")
+        label = tkinter.Label(wallet, text = "Balance: "+balance+" DUCO").place(relx=.5, rely=.2, anchor="c")
         
         tkinter.Button(wallet, text = "    Send funds    ", command = Send).place(relx=0.3, rely=0.40)
         tkinter.Button(wallet, text = "  Receive funds  ", command = Receive).place(relx=0.3, rely=0.55)
         tkinter.Button(wallet, text = "        About        ", command = About).place(relx=0.3, rely=0.70)
         
-        label = tkinter.Label(wallet, text = "2019 Duino-Coin developers", background='white').place(relx=0.46, rely=0.91)
+        label = tkinter.Label(wallet, text = "2019 Duino-Coin developers").place(relx=0.46, rely=0.91)
         
         wallet.mainloop()
         
@@ -257,7 +252,7 @@ def Start():
         try:
                 s.connect((host, port))
                 print("Connected to the server")
-                if not Path("config.ini").is_file():
+                if not Path("WalletConfig.ini").is_file():
                         SelectScr()
                 else:
                         WalletScr()
