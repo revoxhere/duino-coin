@@ -4,6 +4,12 @@
 
 ***
 
+## 25.08.2019: Alpha 5.1 - Small update
+In today's new release I've fixed a bug between Miner and Wallet. <br>
+It doesn't break compatibility with older version, so if everything's working fine for you, **you can stay on Alpha 5.** <br>
+
+***
+
 ## 25.08.2019: Plans for next release
 Hello! In this blog post I'm going to present some future features (probably for next release?). <br>
 Firstly, I'll make a few YouTube videos to spread the word about DUCO. <br>
