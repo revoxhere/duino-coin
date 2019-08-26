@@ -15,9 +15,11 @@
 
   <p align="center"> 
     <br />
-    <a href="https://github.com/revoxhere/duino-coin/wiki"><strong>Explore wikis »</strong></a>
+    <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>View Demo »</strong></a>
     <br />
-    <a href="https://github.com/revoxhere/duino-coin/">View Demo</a>
+    <a href="https://github.com/revoxhere/duino-coin/wiki">Explore Wikis</a>
+    .
+    <a href="https://www.youtube.com/watch?v=E9ZP68wvxwo">View Tutorial</a>
     ·
     <a href="https://github.com/revoxhere/duino-coin/issues">Report Bugs</a>
     ·
