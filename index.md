@@ -4,6 +4,12 @@
 
 ***
 
+## 29.08.2019: Scheduled pool inaccessibility
+Official servers will be offline for a few days as I'm changing some things in software. <br>
+Sorry for this! <br>
+
+***
+
 ## 25.08.2019: Alpha 5.1 - Small update
 In today's new release I've fixed a bug between Miner and Wallet. <br>
 It doesn't break compatibility with older version, so if everything's working fine for you, **you can stay on Alpha 5.** <br>
