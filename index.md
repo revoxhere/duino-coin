@@ -4,6 +4,10 @@
 
 ***
 
+## 30.08.2019: Pool/servers back online
+
+***
+
 ## 29.08.2019: Scheduled pool inaccessibility
 Official servers will be offline for a few days as I'm changing some things in software. <br>
 Sorry for this! <br>
