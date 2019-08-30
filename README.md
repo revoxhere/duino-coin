@@ -116,7 +116,7 @@ This section briefly lists major frameworks that you duino-coin uses.
 <!-- AUTHORS -->
 ## Authors
 
-* **Idea, programming & stuff:** [Robert "revox" Piotrowski](https://github.com/revoxhere/) - [YouTube](youtube.com/c/reVox96) - robik123.345@gmail.com
+* **Idea, programming & stuff:** [Robert "revox" Piotrowski](https://github.com/revoxhere/) - [YouTube](https://youtube.com/c/reVox96) - robik123.345@gmail.com
 * **Programming & SHA1 stuff:** [MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) 
 * **Wikis & Social stuff:** [Jan "Furim" Malewski](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
 * **[Artwork](https://i.imgur.com/ZRRGDjs.png):** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
