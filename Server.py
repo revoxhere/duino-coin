@@ -9,7 +9,7 @@
 
 VER = "0.5"
 
-import socket, threading, time, random, hashlib, math, datetime
+import socket, threading, time, random, hashlib, math, datetime, re
 from pathlib import Path
 
 def ServerLog(whattolog):
@@ -36,27 +36,42 @@ class ClientThread(threading.Thread): #separate thread for every user
 				username = data[1]
 				password = data[2]
 				ServerLog("Client request account registration.")
-				if not Path(username + ".txt").is_file(): #checking if user already exists
-					file = open(username + ".txt", "w")
-					file.write(password)
-					file.close()
-					file = open(username + "balance.txt", "w")
-					file.write(str(new_users_balance))
-					file.close
-					self.clientsock.send(bytes("OK", encoding='utf8'))
-					ServerLog("New user (" + username + ") registered")
+				file = open("log.txt", "w")
+				file.write("Tried to register user:"+username+" using "+password)
+				file.close()
+				if re.match(regex,username):
+					if not Path(username + ".txt").is_file(): #checking if user already exists
+						file = open(username + ".txt", "w")
+						file.write(password)
+						file.close()
+						file = open(username + "balance.txt", "w")
+						file.write(str(new_users_balance))
+						file.close
+						self.clientsock.send(bytes("OK", encoding='utf8'))
+						ServerLog("New user (" + username + ") registered")
+						file = open("log.txt", "w")
+						file.write("Registered: "+username+" using "+password)
+						file.close()
+					else:
+						ServerLog("Account already exists!")
+						self.clientsock.send(bytes("NO", encoding='utf8'))
+						break
 				else:
-					ServerLog("Account already exists!")
+					ServerLog("Unallowed characters!!!")
 					self.clientsock.send(bytes("NO", encoding='utf8'))
 					break
 			elif data[0] == "LOGI": #login
 				username = data[1]
 				password = data[2]
 				ServerLog("Client request logging in to account " + username)
-				if Path(username + ".txt").is_file():
-					file = open(username + ".txt", "r")
-					data = file.readline()
-					file.close()
+				if re.match(regex,username):
+					try:
+						file = open(username + ".txt", "r")
+						data = file.readline()
+						file.close()
+					except:
+						ServerLog("User doesn't exist!")
+						self.clientsock.send(bytes("NO", encoding='utf8'))
 					if password == data:
 						self.clientsock.send(bytes("OK", encoding='utf8'))
 						ServerLog("Password matches, user logged")
@@ -158,7 +173,8 @@ host = "localhost"
 port = 14808
 new_users_balance = 0
 reward = 0.000005
-diff_incrase_per = 100000
+regex = r'^[\w\d_()]*$'
+diff_incrase_per = 500000
 
 tcpsock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

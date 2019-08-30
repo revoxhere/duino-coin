@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###########################################
-#   Duino-Coin wallet version 0.5 alpha   #
+#   Duino-Coin wallet version 0.5.1 alpha #
 # https://github.com/revoxhere/duino-coin #
 #       copyright by revox 2019           #
 ###########################################
@@ -61,7 +61,7 @@ def FSSignup():
                         roots.destroy()
                         Login()
                 if key == "NO":
-                        messagebox.showerror("Error!", "User "+username+" is already registered!\nPlease try again!")
+                        messagebox.showerror("Error!", "User "+username+" is already registered or you've used non-allowed characters!\nPlease try again!")
                         roots.destroy()
                         Signup()
         else:
@@ -213,7 +213,7 @@ def About():
         about.title('About')
 
         label = tkinter.Label(about, text = "Official Duino-Coin wallet", font="-weight bold").pack()
-        label = tkinter.Label(about, text = "Wallet version: 0.5 alpha").pack()
+        label = tkinter.Label(about, text = "Wallet version: 0.5.1 alpha").pack()
         label = tkinter.Label(about, text = "Made by revox from Duino-Coin developers").pack()
         label = tkinter.Label(about, text = "Learn more at: github.com/revoxhere/duino-coin").pack()
 
