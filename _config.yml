@@ -1,3 +1,4 @@
 theme: jekyll-theme-cayman
 title: Duino-Coin
 description: First ever cryptocurrency that can be mined using Arduino (and similar) boards.
+show_downloads: true
