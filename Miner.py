@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###########################################
-#        Duino-Coin miner version 0.4     #
+#        Duino-Coin miner version 0.5.2   #
 # https://github.com/revoxhere/duino-coin #
 #  copyright by MrKris7100 & revox 2019   #
 ###########################################
@@ -18,8 +18,8 @@ shares = [0, 0]
 last_hash_count = 0
 hash_count = 0
 config = configparser.ConfigParser()
-if not Path("config.ini").is_file():
-	print("Initial configuration, you can edit 'config.ini' later\n")
+if not Path("MinerConfig.ini").is_file():
+	print("Initial configuration, you can edit 'MinerConfig.ini' later\n")
 	pool_address = input("Enter pool adddress (official: serveo.net): ")
 	pool_port = input("Enter pool port (official: 14808): ")
 	username = input("Enter username: ")
@@ -28,10 +28,10 @@ if not Path("config.ini").is_file():
 	"port": pool_port,
 	"username": username,
 	"password": password}
-	with open("config.ini", "w") as configfile:
+	with open("MinerConfig.ini", "w") as configfile:
 		config.write(configfile)
 else:
-	config.read("config.ini")
+	config.read("MinerConfig.ini")
 	pool_address = config["pool"]["address"]
 	pool_port = config["pool"]["port"]
 	username = config["pool"]["username"]
