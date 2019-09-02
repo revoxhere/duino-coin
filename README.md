@@ -19,11 +19,11 @@
     <br />
     <a href="https://github.com/revoxhere/duino-coin/wiki">Explore Wikis</a>
     .
-    <a href="https://www.youtube.com/watch?v=E9ZP68wvxwo">View Tutorial</a>
-    ·
+    <a href="https://www.youtube.com/watch?v=E9ZP68wvxwo">View Tutorial</a> <br>
     <a href="https://github.com/revoxhere/duino-coin/issues">Report Bugs</a>
     ·
-    <a href="https://github.com/revoxhere/duino-coin/issues">Suggest Features</a>
+    <a href="https://github.com/revoxhere/duino-coin/issues">Suggest Features</a> <br>
+    <a href="https://revoxhere.github.io/duco-exchange/">Exchange DUCO to other cryptocurrency</a>
   </p>
 </p>
 <p align="center">
