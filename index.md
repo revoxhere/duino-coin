@@ -6,7 +6,7 @@
 
 ## 2.09.2019: Exchange Duino-Coins to Coin Magi
 I'm proudly to announce, that you can now experimentally exchange DUCO to XMG! <br>
-**DUCO Exchange service:** https://revoxhere.github.io/duco-exchange/ <br>
+**DUCO Exchange service:** [https://revoxhere.github.io/duco-exchange/](https://revoxhere.github.io/duco-exchange/) <br>
 
 ***
 
