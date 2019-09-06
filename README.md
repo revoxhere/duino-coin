@@ -122,4 +122,5 @@ This section briefly lists major frameworks that you duino-coin uses.
 * **[Artwork](https://i.imgur.com/ZRRGDjs.png):** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
 * **Testing:** [Jan Malewski](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ), [MrKris7100](https://www.youtube.com/user/MrKris7100), [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg), Alina
 
-Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
+Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/) <br> <br>
+<sup><sub>Tags (ignore): Duino Coin Coin Magi XMG DUCO Cryptocurrency Exchange Website Stocks Bitcoin Ethereum Litecoin Arduino AVR Rate Digital Cryptocoins
