@@ -5,9 +5,9 @@
 
 ***
 
-## 6.09.2019: Register now and receive signup bonus!
-To push on even more movement onto Duino-Coin development, new registered users will now receive 0,5 DUCO just for signing up! <br>
-To don't make existing users upset, block reward has been increased. <br>
+## 6.09.2019: Register to receive signup bonus!
+For a limited time, newly registered users will now receive 0.5 DUCO just for signing up! <br>
+Other than that, block reward has been increased. <br>
 Also, alpha 5.2 will be out soon. It contains various bugfixes and other optimizations. <br>
 
 ***
