@@ -2,6 +2,14 @@
 
 ### Duino coin is an cryptocurrency project that is the only one that supports official mining using Arduino (or other AVR) boards.
 
+
+***
+
+## 6.09.2019: Register now and receive signup bonus!
+To push on even more movement onto Duino-Coin development, new registered users will now receive 0,5 DUCO just for signing up! <br>
+To don't make existing users upset, block reward has been increased. <br>
+Also, alpha 5.2 will be out soon. It contains various bugfixes and other optimizations. <br>
+
 ***
 
 ## 2.09.2019: Exchange Duino-Coins to Coin Magi
