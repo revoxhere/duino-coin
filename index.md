@@ -2,6 +2,12 @@
 
 ### Duino coin is an cryptocurrency project that is the only one that supports official mining using Arduino (or other AVR) boards.
 
+***
+
+## 9.09.2019: 25 registered users and 100 diff reached!
+Hooray! Today we've reached 100 difficulty on official pool. <br>
+Official Duino-Coin network now has 25 registered users. Welcome everyone! <br>
+![100 difficulty](https://i.imgur.com/jWuwQ5E.png)
 
 ***
 
