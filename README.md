@@ -22,7 +22,7 @@
     <a href="https://www.youtube.com/watch?v=E9ZP68wvxwo">Watch tutorial</a> <br>
     <a href="https://github.com/revoxhere/duino-coin/issues">Report bugs</a>
     ·
-    <a href="https://github.com/revoxhere/duino-coin/issues">Suggest Ffeatures</a> <br>
+    <a href="https://github.com/revoxhere/duino-coin/issues">Suggest features</a> <br>
     <a href="https://revoxhere.github.io/duco-exchange/">Exchange DUCO to other cryptocurrency</a>
   </p>
 </p>
