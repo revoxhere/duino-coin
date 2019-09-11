@@ -14,15 +14,15 @@
   <h3 align="center">Start mining on you avr boards!</h3>
 
   <p align="center"> 
-    <br />
-    <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>View Demo »</strong></a>
-    <br />
-    <a href="https://github.com/revoxhere/duino-coin/wiki">Explore Wikis</a>
+    <br>
+    <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>Watch demo »</strong></a>
+    <br>
+    <a href="https://github.com/revoxhere/duino-coin/wiki">Explore wikis</a>
     .
-    <a href="https://www.youtube.com/watch?v=E9ZP68wvxwo">View Tutorial</a> <br>
-    <a href="https://github.com/revoxhere/duino-coin/issues">Report Bugs</a>
+    <a href="https://www.youtube.com/watch?v=E9ZP68wvxwo">Watch tutorial</a> <br>
+    <a href="https://github.com/revoxhere/duino-coin/issues">Report bugs</a>
     ·
-    <a href="https://github.com/revoxhere/duino-coin/issues">Suggest Features</a> <br>
+    <a href="https://github.com/revoxhere/duino-coin/issues">Suggest Ffeatures</a> <br>
     <a href="https://revoxhere.github.io/duco-exchange/">Exchange DUCO to other cryptocurrency</a>
   </p>
 </p>
@@ -57,8 +57,8 @@ There are many cryptocurrencies available. However, there are none that use avr 
 
 Here's why:
 * You may have some Arduino boards that don't do anything.
-* In the future, duino-coin may be worth something.
-* Even if duino-coin won't ever catch any value, you will be able to proudly say that you supported beginner programmer project :smile:
+* ~In the future, duino-coin may be worth something.~ 1 Duino-Coin is already worth ~0.1 Coin Magi at the time I'm writing this!
+* Exchange Duino-Coin [here](https://revoxhere.github.io/duco-exchange/). ~Even if duino-coin won't ever catch any value, you will be able to proudly say that you supported beginner programmer project :smile:~
 
 ## News
 
