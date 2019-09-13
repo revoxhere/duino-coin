@@ -55,8 +55,10 @@ def FSSignup(): #signup server communication section
         password = pwordE.get()
         if password == passwordconfirm:
                 s.send(bytes("REGI,"+username+","+password, encoding='utf8')) #send register request to server
-                key = s.recv(2)
+                key = s.recv(3)
                 key=key.decode()
+                time.sleep(0.025)
+                key = s.recv(2)
                 if key == "OK":
                         messagebox.showinfo("Title", "Successfully registered user "+username+".\nNow you can login!")
                         roots.destroy()
@@ -100,6 +102,8 @@ def CheckLogin(): #login server communication section
         password = pwordEL.get()
         s.send(bytes("LOGI,"+username+","+password, encoding='utf8')) #send login request to server
         
+        key = s.recv(3)
+        time.sleep(0.025)
         key = s.recv(2)
         key=key.decode()
         if key == "OK":
@@ -145,10 +149,14 @@ def WalletScr():
         password = config["wallet"]["password"]
         print("Pre-defined settings:", username, password)
         
-        s.send(bytes("LOGI,"+username+","+password, encoding='utf8')) #send login request to server
+        s.send(bytes("LOGI,"+username+","+password, encoding='utf8'))
+        key = s.recv(3)
+        time.sleep(0.025)
         key = s.recv(2)
         key=key.decode()
+        print(key)
         if key == "OK":
+                print("ok")
                 WalletWindow()
         if key == "NO":
                 messagebox.showerror("Error!","Error in pre-defined credentials!\nRemoving them and again starting login select window")
