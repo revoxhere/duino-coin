@@ -5,8 +5,9 @@
 # https://github.com/revoxhere/duino-coin #
 #  copyright by MrKris7100 & revox 2019   #
 ###########################################
-# Important: this version of the server is a bit different than one used in official duino-coin network.
+# Important: this version of the server is a bit different than one used in "real" duino-coin network.
 # !!! If you want to host pool/server yourself, you need to firstly install 'psutil' using pip install psutil !!!
+
 VER = "0.6"
 
 import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, json, os, psutil, string
@@ -75,7 +76,7 @@ class InputProc(threading.Thread):
 					file.write(randomString(32))
 					file.close()
 			else:
-				if cmd == "kickall"
+				if cmd == "kickall":
 					#Kicking (disconnecting) all connected users
 					kicklist.append(-1)
 				if cmd == "serverinfo":
@@ -105,8 +106,14 @@ class ClientThread(threading.Thread): #separate thread for every user
 		self.ip = ip
 		self.port = port
 		self.clientsock = clientsock
-
+		try:
+			#Sending server version to client
+			clientsock.send(bytes(VER, encoding='utf8'))
+		except socket.error as err:
+			if err.errno == errno.ECONNRESET:
+				err = True
 	def run(self):
+		err = False
 		global server_info, hashrates, kicklist
 		#New user connected
 		username = ""
@@ -118,12 +125,6 @@ class ClientThread(threading.Thread): #separate thread for every user
 		#Adding hashrate statistic for connected user
 		hashrates[thread_id] = {"username" : username, "hashrate" : 0}
 		while True:
-			try:
-				#Sending server version to client
-				self.clientsock.send(bytes(VER, encoding='utf8'))
-			except socket.error as err:
-				if err.errno == errno.ECONNRESET:
-					break
 			#Checking "kicklist" for "kickall" command
 			if -1 in kicklist:
 				del kicklist[:]
@@ -364,15 +365,15 @@ hashrates = {}
 config = configparser.ConfigParser()
 locker = threading.Lock()
 
-#Initial files and folders checking and creating
+#Initial files and folders checking and making
 if not Path("logs").is_dir():
-	mkdir("logs")
+	os.mkdir("logs")
 if not Path("config").is_dir():
-	mkdir("config")
+	os.mkdir("config")
 if not Path("users").is_dir():
-	mkdir("users")
+	os.mkdir("users")
 if not Path("balances").is_dir():
-	mkdir("balances")
+	os.mkdir("balances")
 if not Path("config/lastblock").is_file():
 	file = open("config/lastblock", "w")
 	file.write(hashlib.sha1(str("revox.heremrkris7100").encode("utf-8")).hexdigest())
@@ -382,8 +383,8 @@ if not Path("config/blocks").is_file():
 	file.write("0")
 	file.close()
 #Initial configuration
-if not Path("config/ServerConfig.ini").is_file():
-	print("Initial configuration, you can edit 'ServerConfig.ini' in 'config' folder later\n")
+if not Path("config/config.ini").is_file():
+	print("Initial configuration, you can edit 'config.ini' in 'config' folder later\n")
 	host = input("Enter server host adddress: ")
 	port = input("Enter server port: ")
 	new_user_balance = input("Enter default balance for new users: ")
@@ -394,11 +395,11 @@ if not Path("config/ServerConfig.ini").is_file():
 	"new_user_bal": new_user_balance,
 	"reward": reward,
 	"diff_incrase_per": diff_incrase_per}
-	with open("config/ServerConfig.ini", "w") as configfile:
+	with open("config/config.ini", "w") as configfile:
 		config.write(configfile)
 #Loading server config from INI if exists
 else:
-	config.read("config/ServerConfig.ini")
+	config.read("config/config.ini")
 	host = config['server']['host']
 	port = config['server']['port']
 	new_user_balance = config['server']['new_user_bal']
@@ -420,7 +421,7 @@ except:
 
 #Thread for updating server info
 UpdateServerInfo()
-#Main server loop
+#Main server Loop
 ServerLog("Listening for incoming connections...")
 while True:
 	#Starting thread for input procesing
