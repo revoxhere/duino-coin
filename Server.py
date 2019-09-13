@@ -5,8 +5,8 @@
 # https://github.com/revoxhere/duino-coin #
 #  copyright by MrKris7100 & revox 2019   #
 ###########################################
-# Important: this version of the server is a bit different than one used in "real" duino-coin network.
-
+# Important: this version of the server is a bit different than one used in official duino-coin network.
+# !!! If you want to host pool/server yourself, you need to firstly install 'psutil' using pip install psutil !!!
 VER = "0.6"
 
 import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, json, os, psutil, string
@@ -364,7 +364,7 @@ hashrates = {}
 config = configparser.ConfigParser()
 locker = threading.Lock()
 
-#Initial files and folders checking and making
+#Initial files and folders checking and creating
 if not Path("logs").is_dir():
 	mkdir("logs")
 if not Path("config").is_dir():
@@ -382,8 +382,8 @@ if not Path("config/blocks").is_file():
 	file.write("0")
 	file.close()
 #Initial configuration
-if not Path("config/config.ini").is_file():
-	print("Initial configuration, you can edit 'config.ini' in 'config' folder later\n")
+if not Path("config/ServerConfig.ini").is_file():
+	print("Initial configuration, you can edit 'ServerConfig.ini' in 'config' folder later\n")
 	host = input("Enter server host adddress: ")
 	port = input("Enter server port: ")
 	new_user_balance = input("Enter default balance for new users: ")
@@ -394,11 +394,11 @@ if not Path("config/config.ini").is_file():
 	"new_user_bal": new_user_balance,
 	"reward": reward,
 	"diff_incrase_per": diff_incrase_per}
-	with open("config/config.ini", "w") as configfile:
+	with open("config/ServerConfig.ini", "w") as configfile:
 		config.write(configfile)
 #Loading server config from INI if exists
 else:
-	config.read("config/config.ini")
+	config.read("config/ServerConfig.ini")
 	host = config['server']['host']
 	port = config['server']['port']
 	new_user_balance = config['server']['new_user_bal']
@@ -420,7 +420,7 @@ except:
 
 #Thread for updating server info
 UpdateServerInfo()
-#Main server Loop
+#Main server loop
 ServerLog("Listening for incoming connections...")
 while True:
 	#Starting thread for input procesing
