@@ -1,5 +1,5 @@
 /*///////////////////////////////////////////////
-  /  Duino-Coin arduino code version 0.5 alpha    /
+  /  Duino-Coin arduino code version 0.6 alpha    /
   /    https://github.com/revoxhere/duino-coin    /
   /            copyright by revox 2019            /
   /////////////////////////////////////////////////
