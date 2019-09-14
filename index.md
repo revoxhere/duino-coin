@@ -1,5 +1,4 @@
 # Official duino-coin blog - welcome!
-**Duino coin is an cryptocurrency that is the first one in the world that supports official mining using Arduino (or other compatible AVR) boards.**
 
 ***
 
