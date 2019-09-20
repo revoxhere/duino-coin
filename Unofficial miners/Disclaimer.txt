@@ -1,0 +1,1 @@
+Warning: use of these miners is not supported by us if something doesn't work or goes wrong. These are mainly maintained by commmunity.
