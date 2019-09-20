@@ -18,12 +18,12 @@
     <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>Watch demo »</strong></a>
     <br>
     <a href="https://github.com/revoxhere/duino-coin/wiki">Explore wikis</a>
-    .
+    <sub><sup>•</sub></sup>
     <a href="https://www.youtube.com/watch?v=E9ZP68wvxwo">Watch tutorial</a> <br>
     <a href="https://github.com/revoxhere/duino-coin/issues">Report bugs</a>
-    ·
+    <sub><sup>•</sub></sup>
     <a href="https://github.com/revoxhere/duino-coin/issues">Suggest features</a> <br>
-    <a href="https://revoxhere.github.io/duco-exchange/">Exchange DUCO to other cryptocurrency</a>
+    <a href="https://revoxhere.github.io/duco-exchange/"><strong>Exchange DUCO to other cryptocurrency</strong></a>
   </p>
 </p>
 <p align="center">
