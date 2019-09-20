@@ -12,6 +12,7 @@ from tkinter import messagebox
 from tkinter import *
 from pathlib import Path
 
+#setting variables
 users = {}
 status = ""
 host = 'serveo.net' #official server ip
