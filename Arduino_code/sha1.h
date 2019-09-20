@@ -1,5 +1,4 @@
 /*
-    sha1.hpp - header of
     ============
     Original C Code
         -- Steve Reid <steve@edmweb.com>
@@ -9,8 +8,9 @@
         -- Volker Diels-Grabsch <v@njh.eu>
     Safety fixes
         -- Eugene Hopkinson <slowriot at voxelstorm dot com>
-    Many changes
+    Many changes, implementation to duino-coin
         -- revox from duino-coin developers <robik123.345@gmail.com>
+    ============
 */
 
 
@@ -18,7 +18,9 @@ String hashIn;
 String c0;
 String c1;
 
-void SHA1();
+void SHA1() {
+    c0 = "void update(0)";
+}
 
 void cmake() {
   hashIn = "void update(const std::string &s)";
