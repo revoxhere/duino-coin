@@ -1,34 +1,38 @@
 #!/usr/bin/env python
 
-###########################################
-#     Duino-Coin PC miner version 0.6     #
-# https://github.com/revoxhere/duino-coin #
-#  copyright by MrKris7100 & revox 2019   #
-###########################################
+print("===========================================")
+print("    Duino-Coin PC miner version 0.6.1")
+print(" https://github.com/revoxhere/duino-coin")
+print("   copyright by MrKris7100 & revox 2019")
+print("===========================================\n")
 
-import socket, threading, time, random, hashlib, configparser, sys
+import socket, threading, time, random, hashlib, configparser, sys, datetime
+from decimal import Decimal
 from pathlib import Path
 
-VER = "0.6"
+VER = "0.6" #it's really 0.6.1 but we set it as 0.6 because server is still 0.6.1
 
 def hush():
-	global last_hash_count, hash_count
+	global last_hash_count, hash_count, khash_count
 	last_hash_count = hash_count
+	khash_count = last_hash_count / 1000
 	hash_count = 0
 	threading.Timer(1.0, hush).start()
 	
 shares = [0, 0]
+diff = 0
 last_hash_count = 0
+khash_count = 0
 hash_count = 0
 config = configparser.ConfigParser()
 
 if not Path("MinerConfig.ini").is_file():
 	print("Initial configuration, you can edit 'MinerConfig.ini' file later.")
-	print("Don't have an account? Use Wallet to register.\n")
+	print("Don't have an account? Use Wallet first to register.\n")
 	pool_address = input("Enter pool adddress (official: serveo.net): ")
 	pool_port = input("Enter pool port (official: 14808): ")
-	username = input("Enter username: ")
-	password = input("Enter password: ")
+	username = input("Enter username (the one you used to register): ")
+	password = input("Enter password (the one you used to register): ")
 	config['pool'] = {"address": pool_address,
 	"port": pool_port,
 	"username": username,
@@ -43,67 +47,75 @@ else:
 	password = config["pool"]["password"]
 
 while True:
-	print("Connecting to pool...")
 	soc = socket.socket()
 	try:
 		soc.connect((pool_address, int(pool_port)))
-		print("Connected!")
+		time.sleep(1)
+		now = datetime.datetime.now()
+		print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "Successfully connected to pool on tcp://"+pool_address+":"+pool_port)
 		break
 	except:
-		print("Cannot connect to pool server. Retrying in 30 seconds...")
+		now = datetime.datetime.now()
+		print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "Cannot connect to pool server. Retrying in 30 seconds...")
 		time.sleep(30)
 	time.sleep(0.025)
 	
-print("Checking version...")
 SERVER_VER = soc.recv(1024).decode()
 if SERVER_VER == VER:
-	print("Miner is up-to-date.")
+	now = datetime.datetime.now()
+	print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "Successfully checked if miner is up-to-date.")
 else:
-	print("Miner is outdated, please download latest version from https://github.com/revoxhere/duino-coin/releases/")
-	print("Exiting in 5s.")
+	now = datetime.datetime.now()
+	print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "Miner is outdated, please download latest version from https://github.com/revoxhere/duino-coin/releases/")
+	print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "Exiting in 5 seconds.")
 	time.sleep(5)
 	sys.exit()
 	
-print("Logging in...")
-soc.send(bytes("LOGI," + username + "," + password, encoding="utf8"))
+soc.send(bytes("LOGI," + username + "," + password, encoding="utf8")) # Send login data
 while True:
 	resp = soc.recv(1024).decode()
 	if resp == "OK":
-		print("Logged in!")
+		now = datetime.datetime.now()
+		print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "Successfully logged in.")
 		break
 	if resp == "NO":
-		print("Error, closing in 5 seconds...")
+		now = datetime.datetime.now()
+		print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "Error! Wrong credentials or account doesn't exist! If you don't have an account, register using Wallet!\nExiting in 5 seconds.")
 		soc.close()
 		time.sleep(5)
 		sys.exit()
-	time.sleep(0.025)
+	time.sleep(0.025) # Try again if no response after 0.025 seconds
 
-print("Started mining thread...")
-hush()
+now = datetime.datetime.now()
+print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "Miner thread started, using 'SHA' algorithm.")
+time.sleep(3)
+hush() # Start hash counter thread
 while True:
 	soc.send(bytes("JOB", encoding="utf8"))
 	while True:
-		job = soc.recv(1024).decode()
+		job = soc.recv(1024).decode() # Get work from pool
 		if job:
 			break
-		time.sleep(0.025)
-
-	job = job.split(",")
-	print("Recived new job from pool, difficulty: " + job[2])
-	for iJob in range(100 * int(job[2]) + 1):
+		time.sleep(0.025) # Try again if no response after 0.025 seconds
+	job = job.split(",") # Split the job received from pool
+	diff = job[2]
+	for iJob in range(100 * int(job[2]) + 1): # Hashing algorithm
 		hash = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest()
 		hash_count = hash_count + 1
 		if job[1] == hash:
-			soc.send(bytes(str(iJob) + "," + str(last_hash_count), encoding="utf8"))
+			soc.send(bytes(str(iJob) + "," + str(last_hash_count), encoding="utf8")) # Send result of hashing algorithm to pool
 			while True:
-				good = soc.recv(1024).decode()
-				if good == "GOOD":
-					shares[0] = shares[0] + 1 # Share accepted
-					print("Share accepted " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " (" + str(shares[0] / (shares[0] + shares[1]) * 100) + "%), " + str(last_hash_count) + " H/s (yay!!!)")
+				feedback = soc.recv(1024).decode()
+				if feedback == "GOOD":
+					now = datetime.datetime.now()
+					shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
+					print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "accepted: " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " shares (" + str(shares[0] / (shares[0] + shares[1]) * 100) + "%), diff: " + str(diff) + ", " + str(khash_count) + " khash/s (yay!!!)")
 					break
-				elif good == "BAD":
-					shares[1] = shares[1] + 1 # SHare rejected
-					print("Share rejected " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " (" + str(shares[0] / (shares[0] + shares[1]) * 100) + "%), " + str(last_hash_count) + " H/s (boo!!!)")
+				elif feedback == "BAD":
+					now = datetime.datetime.now()
+					shares[1] = shares[1] + 1 # Share rejected = increment bad shares counter by 1
+					print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "rejected: " + str(shares[1]) + "/" + str(shares[1] + shares[1]) + " shares (" + str(shares[0] / (shares[0] + shares[1]) * 100) + "%), diff: " + str(diff) + ", " + str(khash_count) + " khash/s (boo!!!)")
 					break
-				time.sleep(0.025)
+				time.sleep(0.025) # Try again if no response after 0.025 seconds
 			break
+
