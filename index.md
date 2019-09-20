@@ -1,5 +1,4 @@
 # Official duino-coin blog - welcome!
-**Duino coin is an cryptocurrency that is the first one in the world that supports official mining using Arduino (or other compatible AVR) boards.**
 
 ***
 
@@ -9,8 +8,8 @@ As you might've noticed, we were doing many changes in past few days. <br>
 That's because we are working on a pool statistics website! <br>
 New Alpha 6 server now has built-in API so it will be easier for us to get and display these statistics. <br>
 Other than that, you now can find *Exchange* button in Wallet, along with some fixes. <br>
-Arduino and PC Miners have also received some minor improvements. <br>
-[Download Alpha 6](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6)
+Arduino and PC Miners have also received some minor improvements.
+### [Download Alpha 6](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6)
 
 ***
 
