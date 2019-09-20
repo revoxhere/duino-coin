@@ -28,7 +28,7 @@
 </p>
 <p align="center">
   <a href="https://github.com/revoxhere/duino-coin">
-    <img src="https://i.imgur.com/tox8f68.png">
+    <img src="https://i.imgur.com/x6zTLEa.png">
   </a>
 </p>
 
