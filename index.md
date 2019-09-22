@@ -2,6 +2,12 @@
 
 ***
 
+## 22.09.2019: 300 diff reached!
+Hello again! Today we've reached difficulty 300! <br>
+![300 difficulty](https://i.imgur.com/lyfU5Pf.png)
+
+***
+
 ## 22.09.2019: Repository clean-up
 Hello Miners! <br>
 To make GitHub repo more visually appealing, I've made: <br>
@@ -10,6 +16,7 @@ To make GitHub repo more visually appealing, I've made: <br>
 * separate folder for community-made miners
 * fixed typos in README
 * other small visual changes not worth describing :P
+* changed some visuals in PC Miner (0.6.2)
 
 Statistics website will be in the works soon. <br>
 We still need to fix some things with the server. <br>
