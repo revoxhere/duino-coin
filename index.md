@@ -2,6 +2,22 @@
 
 ***
 
+## 22.09.2019: Repository clean-up
+Hello Miners! <br>
+To make GitHub repo more visually appealing, I've made: <br>
+
+* separate branch for GitHub pages
+* separate folder for community-made miners
+* fixed typos in README
+* other small visual changes not worth describing :P
+
+Statistics website will be in the works soon. <br>
+We still need to fix some things with the server. <br>
+Also I'd like to mention user **ironmanmp** - he already mined **over 30 Duino-Coins!** Good work - literally! <br>
+That's it for now. Stay tuned for more!
+
+***
+
 ## 13.09.2019: Alpha 6 released
 Hello everyone! <br>
 As you might've noticed, we were doing many changes in past few days. <br>
@@ -13,10 +29,11 @@ Arduino and PC Miners have also received some minor improvements.
 
 ***
 
-## 9.09.2019: 25 registered users and 100 diff reached!
+## 9.09.2019: 30 registered users and 100 diff reached!
 Hooray! Today we've reached 100 difficulty on official pool. <br>
-Also, official Duino-Coin network now has ~~25~~ **30** registered users. **Welcome everyone!** <br>
-![100 difficulty](https://i.imgur.com/jWuwQ5E.png)
+![100 difficulty](https://i.imgur.com/jWuwQ5E.png) <br>
+Also, Duino-Coin network has reached over 30 registered users! <br>
+**Welcome everyone :)!**
 
 ***
 
