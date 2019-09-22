@@ -1,7 +1,7 @@
 <!--
 *** Official duino coin readme
 *** copyright by revox, 2019
-*** Thanks to: othneildrew for providing nice template!
+*** Thanks to: othneildrew for providing nice template! :)
 -->
 
 <!-- LOGO -->
@@ -11,7 +11,7 @@
     <img src="https://i.imgur.com/ZRRGDjs.png">
   </a>
 
-  <h3 align="center">Start mining on you avr boards!</h3>
+  <h3 align="center">Make use of your AVR boards!</h3>
 
   <p align="center"> 
     <br>
@@ -35,11 +35,10 @@
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
 
-* [About the Project](#about-the-project)
+* [About Duino-Coin](#about-the-project)
 * [News](#news)
+* [Prerequisites](#prerequisites)
 * [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Usage](#usage)
 * [Contributing](#contributing)
 * [License](#license)
 * [Built With](#built-with)
@@ -64,29 +63,25 @@ Here's why:
 
 News about updates, future features and other things can be found at [duino-coin official blog](https://revoxhere.github.io/duino-coin/).
 
-<!-- GETTING STARTED -->
-## Getting Started
+## Prerequisites
 
-Instructions to get started with duino-coins.
-
-### Prerequisites
-
-#### Linux
+### Linux
 If you're using Linux, you need to download some dependencies:
 ```bash
 sudo apt install python3 python-pip
 python -m pip install pyserial
 ```
-#### Windows
+### Windows
 If you're using Windows, you don't need to install anything. Just grab latest [release](https://github.com/revoxhere/duino-coin/releases) and you're ready to go.
 
-## Usage
+## Getting Started
 
 Grab latest [release](https://github.com/revoxhere/duino-coin/releases) for your OS. <br>
 Launch Arduino Miner, Miner or Wallet depending on what you want to do. <br>
 Programs will display you all information and help you need. <br>
 
-Detailed help about usage, installation and configuration can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki)
+If you encounter any problems, need detailed help about usage, installation or configuration, see our [Wikis](https://github.com/revoxhere/duino-coin/wiki). <br>
+If you can't find what you need, open an [Issue](https://github.com/revoxhere/duino-coin/issues), we'll help!
 
 <!-- CONTRIBUTING -->
 ## Contributing
