@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 print("===========================================")
-print("    Duino-Coin PC miner version 0.6.1")
+print("    Duino-Coin PC miner version 0.6.2")
 print(" https://github.com/revoxhere/duino-coin")
 print("   copyright by MrKris7100 & revox 2019")
 print("===========================================\n")
@@ -9,8 +9,9 @@ print("===========================================\n")
 import socket, threading, time, random, hashlib, configparser, sys, datetime
 from decimal import Decimal
 from pathlib import Path
+time.sleep(0.5)
 
-VER = "0.6" #it's really 0.6.1 but we set it as 0.6 because server is still 0.6.1
+VER = "0.6" #it's really 0.6.2 but we set it as 0.6 because server is still 0.6 (we only change it when new "big" version comes up, e.g. 0.5 or 0.3)
 
 def hush():
 	global last_hash_count, hash_count, khash_count
@@ -109,12 +110,12 @@ while True:
 				if feedback == "GOOD":
 					now = datetime.datetime.now()
 					shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
-					print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "accepted: " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " shares (" + str(shares[0] / (shares[0] + shares[1]) * 100) + "%), diff: " + str(diff) + ", " + str(khash_count) + " khash/s (yay!!!)")
+					print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "accepted: " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " (" + str(shares[0] / (shares[0] + shares[1]) * 100) + "%), diff: " + str(diff) + ", " + str(khash_count) + " khash/s (yay!!!)")
 					break
 				elif feedback == "BAD":
 					now = datetime.datetime.now()
 					shares[1] = shares[1] + 1 # Share rejected = increment bad shares counter by 1
-					print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "rejected: " + str(shares[1]) + "/" + str(shares[1] + shares[1]) + " shares (" + str(shares[0] / (shares[0] + shares[1]) * 100) + "%), diff: " + str(diff) + ", " + str(khash_count) + " khash/s (boo!!!)")
+					print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "rejected: " + str(shares[1]) + "/" + str(shares[1] + shares[1]) + " (" + str(shares[0] / (shares[0] + shares[1]) * 100) + "%), diff: " + str(diff) + ", " + str(khash_count) + " khash/s (boo!!!)")
 					break
 				time.sleep(0.025) # Try again if no response after 0.025 seconds
 			break
