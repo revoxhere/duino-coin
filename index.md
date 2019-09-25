@@ -16,7 +16,7 @@ To make GitHub repo more visually appealing, I've made: <br>
 * separate folder for community-made miners
 * fixed typos in README
 * other small visual changes not worth describing :P
-* changed some visuals in PC Miner (0.6.2)
+* not Git related, but changed some visuals in PC Miner (v0.6.2)
 
 Statistics website will be in the works soon. <br>
 We still need to fix some things with the server. <br>
@@ -52,7 +52,7 @@ Also, alpha 5.2 will be out soon. It contains various bugfixes and other optimiz
 ***
 
 ## 2.09.2019: Exchange Duino-Coins to Coin Magi
-I'm proudly to announce, that you can now experimentally exchange DUCO to XMG! <br>
+I'm proud to announce, that you can now experimentally exchange DUCO to XMG! (and the other-way around) <br>
 **DUCO Exchange service:** [https://revoxhere.github.io/duco-exchange/](https://revoxhere.github.io/duco-exchange/) <br>
 
 ***
