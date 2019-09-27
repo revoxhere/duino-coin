@@ -50,8 +50,8 @@ def UpdateServerInfo():
 	file.write(str(" kH/s\n"))
 	file.write(str("Pool workers: "))
 	file.write(str(server_info["miners"]))
-	file.write(str(" ("))
-	file.write(str(''.join([hashrates[x]["username"] for x in hashrates])))
+	file.write(str(" (Last connected: "))
+	file.write(str(' '.join([hashrates[x]["username"] for x in hashrates])))
 	file.write(str(")\n"))
 	with locker:
 		blok = open("config/blocks", "r")
@@ -342,7 +342,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 					if err.errno == errno.ECONNRESET:
 						break
 			elif username != "" and data[0] == "SEND": #sending funds section
-				sender = data[1]
+				sender = username
 				reciver = data[2]
 				amount = float(data[3])
 				ServerLog("Client request transfer funds")
