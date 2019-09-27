@@ -2,6 +2,14 @@
 
 ***
 
+## 27.09.2019: Pool statistics website
+Hello! Pool statistics website is now ready! <br>
+Maybe you'll be able to see your nickname on it! :) <br>
+It is updated every 120 seconds, so give it some time if you're not seeing youself.
+### [Visit Duino-Coin Statistics website](https://revoxhere.github.io/duco-statistics/)
+
+***
+
 ## 22.09.2019: 300 diff reached!
 Hello again! Today we've reached difficulty 300! <br>
 ![300 difficulty](https://i.imgur.com/lyfU5Pf.png)
