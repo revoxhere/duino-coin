@@ -24,6 +24,7 @@
     <sub><sup>•</sub></sup>
     <a href="https://github.com/revoxhere/duino-coin/issues">Suggest features</a> <br>
     <a href="https://revoxhere.github.io/duco-exchange/"><strong>Exchange DUCO to other cryptocurrency</strong></a>
+    <a href="https://revoxhere.github.io/duco-statistics/"><strong>View pool statistics</strong></a>
   </p>
 </p>
 <p align="center">
