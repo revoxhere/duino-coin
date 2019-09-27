@@ -7,11 +7,13 @@
 ###########################################
 # Important: this version of the server is a bit different than one used in "real" duino-coin network.
 # !!! If you want to host pool/server yourself, you need to firstly install 'psutil' using pip install psutil !!!
+# !!! If you want to host pool/server yourself, you need to firstly install 'PyGithub' using pip install PyGithub !!!
 
 VER = "0.6"
 
-import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, json, os, psutil, string
+import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, os, psutil, string
 from pathlib import Path
+from github import Github
 
 def ServerLog(whattolog):
 	#Getting actual date and time
@@ -25,7 +27,9 @@ def ServerLog(whattolog):
 	logfile.close()
 	
 def UpdateServerInfo():
-	global server_info, hashrates
+	global server_info, hashrates, threads, diff, update_count, gitrepo, gitusername
+	now = datetime.datetime.now()
+	now = now.strftime("%H:%M:%S")
 	#Nulling pool hashrate stat
 	server_info['pool_hashrate'] = 0
 	#Counting registered users
@@ -35,13 +39,56 @@ def UpdateServerInfo():
 		server_info['pool_hashrate'] += hashrates[hashrate]["hashrate"]
 	#Preparing json data for API
 	data = {"pool_miners" : server_info["miners"], "pool_hashrate" : server_info["pool_hashrate"], "users" : server_info["users"], "miners" : {}}
-	#Adding mining users to API's json
+	#Adding mining users to API's output
 	for hashrate in hashrates:
 		data["miners"][hashrate] = hashrates[hashrate]
-	#Writing json data to API
-	with open("config/api.json", "w") as fJson:
-		json.dump(data, fJson, indent=4)
-	#Wait 5 seconds and repeat
+	
+	#Writing data to text API
+	file = open("config/api.txt", "w")
+	file.write(str("Pool/Net hashrate: "))
+	file.write(str(int((server_info['pool_hashrate']) / 1000)))
+	file.write(str(" kH/s\n"))
+	file.write(str("Pool workers: "))
+	file.write(str(server_info["miners"]))
+	file.write(str(" ("))
+	file.write(str(''.join([hashrates[x]["username"] for x in hashrates])))
+	file.write(str(")\n"))
+	with locker:
+		blok = open("config/blocks", "r")
+		bloki = blok.readline()
+		file.write(str("Mined blocks: " + bloki))
+		blok.close()
+	file.write(str("\n"))
+	file.write(str("Last block: "))
+	lastblok = open("config/lastblock", "r+")
+	lastblokid = lastblok.readline().rstrip("\n\r ")[:10] + (lastblok.readline().rstrip("\n\r ")[10:] and '..')
+	file.write(str(lastblokid))
+	lastblok.close()
+	file.write(str(" [...]"))
+	file.write(str("\nCurrent difficulty: "))
+	diff = math.ceil(int(bloki) / diff_incrase_per)
+	file.write(str(diff))
+	file.write(str("\nBlock reward: "))
+	file.write(str(reward))
+	file.write(str(" DUCO/block"))
+	file.write(str("\nDUCO/XMG: 10.47 (^)"))
+	file.write(str("\nLast update: "))
+	file.write(str(now))
+	file.write(str(" (updated every 120s)"))
+	file.close() #End of API file writing
+	#Update api file on GitHub
+	try: #Create new file if it doesn't exist
+		repo.create_file("api.txt", "test", "test", branch="master")
+		ServerLog("File didn't exist on GitHub repo, created it!")
+	except:
+		pass
+	file_contents = Path("config/api.txt").read_text() #Get api file contents
+	update_count = update_count + 1 #Increment update counter by 1
+	repo = g.get_repo(gitusername+"/"+gitrepo)
+	contents = repo.get_contents("api.txt") #Get contents of previous file for SHA verification
+	repo.update_file(contents.path, "Statistics update #"+str(update_count), str(file_contents), contents.sha, branch="master") #Post statistics file into github
+	ServerLog("Updated statistics file on GitHub. Update count:"+str(update_count))
+	#Wait 120 seconds and repeat
 	threading.Timer(5, UpdateServerInfo).start()
 	
 def randomString(stringLength=10):
@@ -81,19 +128,22 @@ class InputProc(threading.Thread):
 					kicklist.append(-1)
 				if cmd == "serverinfo":
 					#Displaying server's info like version, resource usage, etc.
-					print("Duino-coin server, version: " + VER)
+					print("Duino-Coin server by revox & MrKris7100 from DUCO developers")
+					print("Server version: " + VER)
+					print("\nConnected GitHub account: "+str(gitusername)+", publishing on: "+str(gitrepo))
+					print("  GitHub update count: "+str(update_count))
 					print("\nServer resources usage:")
-					print("CPU: " + str(proc.cpu_percent()) + "%")
-					print("MEM: " + "{:.1f}".format(proc.memory_info()[0] / 2 ** 20) + "MB")
+					print("  CPU usage: " + str(proc.cpu_percent()) + "%")
+					print("  Memory usage: " + "{:.1f}".format(proc.memory_info()[0] / 2 ** 20) + "MB")
 					print("\nConnected miners: " + str(server_info["miners"]))
 					print("Server hashrate: " + str(server_info["pool_hashrate"]) + " H/s")
-					print("Registered users: " + str(server_info["users"]))
+					print("Registered users count: " + str(server_info["users"]))
 					with locker:
 						file = open("config/blocks", "r")
-						print("\nMined blocks: " + file.readline())
+						print("\nMined blocks count: " + file.readline())
 						file.close()
 						file = open("config/lastblock", "r+")
-						print("Last block: " + file.readline())
+						print("Last block hash: " + file.readline())
 						file.close()
 				if cmd == "stop":
 					#Shutting down server
@@ -114,7 +164,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 				err = True
 	def run(self):
 		err = False
-		global server_info, hashrates, kicklist
+		global server_info, hashrates, kicklist, thread_id, diff
 		#New user connected
 		username = ""
 		#Getting thread id for this connection
@@ -145,7 +195,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 			if data[0] == "REGI":
 				username = data[1]
 				password = data[2]
-				ServerLog("Client request account registration.")
+				ServerLog("Client "+str(username)+" has requested account registration.")
 				#Checking username for unallowed characters
 				if re.match(regex,username):
 					#Checking if user already exists
@@ -246,7 +296,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 					hashrates[thread_id]["hashrate"] = int(response[1])
 				else:
 					result = response
-					hashrates[thread_id]["hashrate"] = 0
+					hashrates[thread_id]["hashrate"] = 1000
 				#Checking recived result is good hash
 				if result == str(rand):
 					ServerLog("Recived good result (" + str(result) + ")")
@@ -364,6 +414,7 @@ server_info = {'miners' : 0, 'pool_hashrate' : 0, 'users' : 0}
 hashrates = {}
 config = configparser.ConfigParser()
 locker = threading.Lock()
+update_count = 0
 
 #Initial files and folders checking and making
 if not Path("logs").is_dir():
@@ -384,17 +435,23 @@ if not Path("config/blocks").is_file():
 	file.close()
 #Initial configuration
 if not Path("config/config.ini").is_file():
-	print("Initial configuration, you can edit 'config.ini' in 'config' folder later\n")
+	print("Initial server configuration\n")
 	host = input("Enter server host adddress: ")
 	port = input("Enter server port: ")
 	new_user_balance = input("Enter default balance for new users: ")
-	reward = input("Enter block reward: ")
+	reward = input("Enter default block reward: ")
 	diff_incrase_per = input("Enter how many blocks are needed for incrase difficulty: ")
+	gitusername = input("Enter GitHub username to push api: ")
+	gitpassword = input("Enter GitHub password to push api: ")
+	gitrepo = input("Enter GitHub repository name to push api: ")
 	config['server'] = {"host": host,
 	"port": port,
 	"new_user_bal": new_user_balance,
 	"reward": reward,
-	"diff_incrase_per": diff_incrase_per}
+	"diff_incrase_per": diff_incrase_per,
+	"gitusername": gitusername,
+	"gitpassword": gitpassword,
+	"gitrepo": gitrepo}
 	with open("config/config.ini", "w") as configfile:
 		config.write(configfile)
 #Loading server config from INI if exists
@@ -405,6 +462,9 @@ else:
 	new_user_balance = config['server']['new_user_bal']
 	reward = config['server']['reward']
 	diff_incrase_per = config['server']['diff_incrase_per']
+	gitusername = config['server']['gitusername']
+	gitpassword = config['server']['gitpassword']
+	gitrepo = config['server']['gitrepo']
 	ServerLog("Loaded server config: " + host + ", " + port + ", " + new_user_balance + ", " + reward + ", " + diff_incrase_per)
 #Converting some variables to numbers
 port = int(port)
@@ -413,13 +473,20 @@ diff_incrase_per = int(diff_incrase_per)
 #Binding socket
 try:
 	tcpsock.bind((host, port))
-	ServerLog("Server started...")
+	ServerLog("TCP server started...")
 except:
-	ServerLog("Error during TCP socket...")
+	ServerLog("Error during TCP socket!")
 	time.sleep(5)
 	sys.exit()
-
-#Thread for updating server info
+#Logging in to GitHub
+try:
+	g = Github(gitusername, gitpassword)
+	ServerLog("Logged in to GitHub...")
+except:
+	ServerLog("Error logging in to GitHub!")
+	time.sleep(5)
+	sys.exit()
+#Thread for updating server info api
 UpdateServerInfo()
 #Main server Loop
 ServerLog("Listening for incoming connections...")
