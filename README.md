@@ -14,7 +14,6 @@
   <h3 align="center">An innovative cryptocurrency project</h3>
 
   <p align="center"> 
-    <br>
     <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>Watch demo »</strong></a>
     <br>
     <a href="https://github.com/revoxhere/duino-coin/wiki">Explore wikis</a>
