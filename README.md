@@ -11,7 +11,7 @@
     <img src="https://i.imgur.com/ZRRGDjs.png">
   </a>
 
-  <h3 align="center">An innovative cryptocurrency project</h3>
+  <!-- <h3 align="center">An innovative cryptocurrency project</h3> -->
 
   <p align="center"> 
     <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>Watch demo »</strong></a>
