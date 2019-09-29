@@ -11,7 +11,7 @@
     <img src="https://i.imgur.com/ZRRGDjs.png">
   </a>
 
-  <h3 align="center">Make use of your AVR boards!</h3>
+  <h3 align="center">An innovative cryptocurrency project</h3>
 
   <p align="center"> 
     <br>
@@ -19,10 +19,8 @@
     <br>
     <a href="https://github.com/revoxhere/duino-coin/wiki">Explore wikis</a>
     <sub><sup>•</sub></sup>
-    <a href="https://www.youtube.com/watch?v=E9ZP68wvxwo">Watch tutorial</a> <br>
     <a href="https://github.com/revoxhere/duino-coin/issues">Report bugs</a>
-    <sub><sup>•</sub></sup>
-    <a href="https://github.com/revoxhere/duino-coin/issues">Suggest features</a> <br>
+    <br>
     <a href="https://revoxhere.github.io/duco-exchange/"><strong>Exchange DUCO to other cryptocurrency</strong></a>
     <br>
     <a href="https://revoxhere.github.io/duco-statistics/"><strong>View pool statistics</strong></a>
