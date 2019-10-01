@@ -3,15 +3,15 @@
 *** 
 
 ## 1.10.2019: Why it's the best time to mine Duino-Coins
-Some theoretical news today. <br>
+**Some theoretical news today.** <br>
 I'd like to share with you why now is the best time to buy/mine duino-coins:
 1 DUCO is roughly 0.1 XMG, so 10 DUCO is 1 XMG.
-Using official pool, at let's say 400 difficulty, at current block reward, mining one DUCO using low-end PC takes no more than 30 minutes.
+Using official pool, at let's say 400 difficulty, at current block reward, mining one DUCO using **low-end** PC takes no more than 30 minutes.
 So, in the worst-case scenario mining 10 DUCO - 1 XMG will take 5 hours. <br>
-With the ever-changing price of altcoins, including Magi, in one day you should be ale to mine $0.14. That's $4,3/month (in the worst case scenario). <br>
+With the ever-changing price of altcoins, in one day you should be ale to mine $0.14. That's **$4,3/month in the worst case scenario.** <br>
 Mining the same amount of $ but by mining XMG in the best case scenario would take you at least 2,5 months on the same setup. <br>
-Great fact od that you can exchange any amount of DUCO (no minimal payout/deposit)! <br>
-So, these are mine thoughts on DUCO mining profitability. Hope you enjoyed these numbers :)
+Good to know fact is that you can exchange **any** amount of DUCO - no minimal payout/depost like on other half-crefible sites. <br>
+So, these are mine thoughts on DUCO mining profitability. Hope you enjoyed these numbers :) <br>
 **Mine while you can!**
 
 ***
