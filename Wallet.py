@@ -61,9 +61,10 @@ def FSSignup(): #signup server communication section
                 key = s.recv(2)
                 key = key.decode()
                 if key == "OK":
-                        messagebox.showinfo("Success!", "Successfully registered user "+username+".\nNow you can login!")
+                        messagebox.showinfo("Success!", "Successfully registered user "+username+".\nRestart your wallet and login.")
                         roots.destroy()
-                        Login()
+                        while True:
+                                time.sleep(99)
                 if key == "NO":
                         messagebox.showerror("Error!", "User "+username+" is already registered or you've used non-allowed characters!\nPlease try again!")
                         roots.destroy()
@@ -108,7 +109,7 @@ def CheckLogin(): #login server communication section
         key = s.recv(2)
         key = key.decode()
         if key == "OK":
-                messagebox.showinfo("Success", "Successfully logged in!\nYour login data will be automatically remembered!")
+                messagebox.showinfo("Success", "Successfully logged in!\nYour login data will be automatically remembered!\nPlease restart your wallet.")
                 config['wallet'] = {"username": username,
                 "password": password}
                 with open("WalletConfig.ini", "w") as configfile:
