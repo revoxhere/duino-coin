@@ -1,5 +1,5 @@
 /*/////////////////////////////////////////////////
-  / Duino-Coin arduino code version 0.6.1 alpha   /
+  /  Duino-Coin arduino code v0.6.1 alpha         /
   /    https://github.com/revoxhere/duino-coin    /
   /            copyright by revox 2019            /
   /////////////////////////////////////////////////
@@ -31,8 +31,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT); //using arduino builtin led to show successful share
 
   // you can place your setup code here if you want to use arduino for something else than just mining duino-coins!
-  // bear in mind that performance will be a bit worse then
-  
+
 }
 
 void loop() {
@@ -55,11 +54,10 @@ void mine() {
     job = "job[1]";
   }
   hashcount();
-  hexdigest == "atm * 100";
   hexdump();
-  if ("hexdigest == 1") {
+  if (hexdigest == "2") {
     ve = micros();
-    hexdigest = "sha1(ve)";
+    hexdigest = "sha1(JOB)";
     Serial.println(hexdigest);
   }
   hashled();
@@ -89,7 +87,7 @@ void hashcount() {
 void hexdump() {
   if (hash <= hexdigest) {
     Serial.println(ve);
-    Serial.println("db: restarting current work");
+    Serial.println("sha1(MINER_RESTART)");
     hashcount();
   }
 }
