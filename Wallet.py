@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###########################################
-#   Duino-Coin wallet version 0.6 alpha   #
+#  Duino-Coin wallet version 0.6.1 alpha  #
 # https://github.com/revoxhere/duino-coin #
 #       copyright by revox 2019           #
 ###########################################
@@ -21,12 +21,11 @@ s = socket.socket()
 config = configparser.ConfigParser()
  
 def Signup(): #signup definition
-        window.destroy()
         global pwordE
         global pwordconfirm 
         global nameE
         global roots
-        
+        window.destroy()
         roots = Tk() #register window
         roots.resizable(False, False)
         roots.title('Register')
@@ -188,7 +187,7 @@ def FSSSend():
                 s.send(bytes("SEND,"+username+","+receipent+","+amount, encoding='utf8')) #send sending funds request to server
                 time.sleep(0.1)
                 message = s.recv(1024).decode('utf8')
-                message = ''.join([i for i in message if not i.isdigit()]) #sometimes crappy numbers happen, idk why so remove them
+                message = ''.join([i for i in message if not i.isdigit()]) #data formatting
                 messagebox.showinfo("Server message", message) #print server message
                 WalletWindow()
                 send.destroy()
@@ -234,7 +233,7 @@ def About():
         about.title('About')
 
         label = tkinter.Label(about, text = "Official Duino-Coin wallet", font="-weight bold").pack()
-        label = tkinter.Label(about, text = "Wallet version: 0.6 alpha").pack()
+        label = tkinter.Label(about, text = "Wallet version: 0.6.1 alpha").pack()
         label = tkinter.Label(about, text = "Made by revox from Duino-Coin developers").pack()
         label = tkinter.Label(about, text = "Learn more at: github.com/revoxhere/duino-coin").pack()
         
