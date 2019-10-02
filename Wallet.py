@@ -60,8 +60,9 @@ def FSSignup(): #signup server communication section
                 key=key.decode()
                 time.sleep(0.025)
                 key = s.recv(2)
+                key = key.decode()
                 if key == "OK":
-                        messagebox.showinfo("Title", "Successfully registered user "+username+".\nNow you can login!")
+                        messagebox.showinfo("Success!", "Successfully registered user "+username+".\nNow you can login!")
                         roots.destroy()
                         Login()
                 if key == "NO":
@@ -106,7 +107,7 @@ def CheckLogin(): #login server communication section
         key = s.recv(3)
         time.sleep(0.025)
         key = s.recv(2)
-        key=key.decode()
+        key = key.decode()
         if key == "OK":
                 messagebox.showinfo("Success", "Successfully logged in!\nYour login data will be automatically remembered!")
                 config['wallet'] = {"username": username,
