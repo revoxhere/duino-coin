@@ -2,8 +2,15 @@
 
 ***
 
-# 2.10.2019 Warning: wallet registration is broken! Registration coinformation dialog doesn't appear. Will be fixed ASAP! Sorry!
-Logging-in still works though.
+## 2.10.2019: Alpha 6.1 released: registration bug fixed
+Today I've released Alpha 6.1. It fixes a bug in the Wallet that caused registration problems. It also contains new miner that includes some performance and "UI" tweaks. There still may be some bugs left, but at least registration and logging-in works.
+### [Download Alpha 6.1 here](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.1)
+
+***
+
+## 2.10.2019: Warning: registration bug
+Wallet registration is broken: registration dialog doesn't appear. <br>
+Logging-in still works though. **Everything will be fixed ASAP! Sorry for problems!**
 
 *** 
 
