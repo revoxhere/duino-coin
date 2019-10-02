@@ -1,5 +1,10 @@
 # Official duino-coin blog - welcome!
 
+***
+
+# 2.10.2019 Warning: wallet registration is broken! Registration coinformation dialog doesn't appear. Will be fixed ASAP! Sorry!
+Logging-in still works though.
+
 *** 
 
 ## 1.10.2019: Why it's the best time to mine Duino-Coins
