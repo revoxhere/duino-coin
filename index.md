@@ -1,6 +1,6 @@
 # Official duino-coin blog - welcome!
 
-## 22.09.2019: 400 diff reached!
+## 3.09.2019: 400 diff reached!
 Hello! Today we've reached difficulty 400! <br>
 ![400 difficulty](https://i.imgur.com/7epbuPp.png)
 ![400 difficulty](https://i.imgur.com/mtZoS5D.png) <br>
