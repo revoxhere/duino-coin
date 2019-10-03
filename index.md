@@ -1,5 +1,11 @@
 # Official duino-coin blog - welcome!
 
+## 22.09.2019: 400 diff reached!
+Hello! Today we've reached difficulty 400! <br>
+![400 difficulty](https://i.imgur.com/7epbuPp.png)
+![400 difficulty](https://i.imgur.com/mtZoS5D.png) <br>
+Yeah, that's a lot of diff 400 in one blog post.
+
 ***
 
 ## 2.10.2019: Alpha 6.1 released: registration bug fixed
