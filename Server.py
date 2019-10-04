@@ -289,21 +289,22 @@ class ClientThread(threading.Thread): #separate thread for every user
 				except socket.error as err:
 					if err.errno == errno.ECONNRESET:
 						break
-				#Old 0.5.1 version compatibility
+				#0.5.1 version compatibility
 				if response.find(",") != -1:
 					response = response.split(",")
 					result = response[0]
 					hashrates[thread_id]["hashrate"] = int(response[1])
 				else:
 					result = response
-					hashrates[thread_id]["hashrate"] = 1000
+					hashrates[thread_id]["hashrate"] = 10
 				#Checking recived result is good hash
 				if result == str(rand):
 					ServerLog("Recived good result (" + str(result) + ")")
 					#Rewarding user for good hash
 					file = open("balances/" + username + ".txt", "r+")
-					balance = float(file.readline())
-					balance += reward
+					balance = str(float(file.readline())).rstrip("\n\r ")
+					balance = float(balance) + float(reward)
+					balance = str(balance).rstrip("\n\r ")
 					file.seek(0)
 					file.write(str(balance))
 					file.truncate()
