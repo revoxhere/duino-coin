@@ -23,6 +23,8 @@
     <a href="https://github.com/revoxhere/duino-coin/issues">Report bugs</a>
     <br>
     <a href="https://revoxhere.github.io/duco-exchange/">Exchange DUCO to other cryptocurrency</a>
+    <br>
+    <!--<a href="https://github.com/MrKris7100">Explore DUCOv2 - cryptocurrency with XMG inregraton</a>-->
   </p>
 </p>
 <p align="center">
