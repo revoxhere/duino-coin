@@ -1,6 +1,6 @@
 # Official duino-coin blog - welcome!
 
-## 3.09.2019: 400 diff reached!
+## 3.10.2019: 400 diff reached!
 Hello! Today we've reached difficulty 400! <br>
 ![400 difficulty](https://i.imgur.com/7epbuPp.png)
 ![400 difficulty](https://i.imgur.com/mtZoS5D.png) <br>
@@ -11,6 +11,7 @@ Yeah, that's a lot of diff 400 in one blog post.
 ## 2.10.2019: Alpha 6.1 released: registration bug fixed
 Today I've released Alpha 6.1. It fixes a bug in the Wallet that caused registration problems. It also contains new miner that includes some performance and "UI" tweaks. There still may be some bugs left, but at least registration and logging-in works.
 ### [Download Alpha 6.1 here](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.1)
+### [Pool statistics website](https://revoxhere.github.io/duco-statistics/)
 
 ***
 
