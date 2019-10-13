@@ -112,7 +112,7 @@ Any contributions you make are **greatly appreciated**.
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ### Built With
-This section briefly lists major frameworks that you duino-coin uses:
+This section briefly lists major frameworks that Duino-Coin uses:
 * [Python and IDLE](https://www.python.org) - programming,
 * [pySerial](https://pythonhosted.org/pyserial/) - Arduino and Python communication,
 * [Arduino IDE](https://www.arduino.cc) - Arduino programming and debugging,
