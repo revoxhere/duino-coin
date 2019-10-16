@@ -16,6 +16,8 @@
   <p align="center"> 
     <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>Watch demo »</strong></a>
     <br>
+    <a href="https://discord.gg/RDJC672">Join our Discord</a>
+    <br>
     <a href="https://revoxhere.github.io/duco-statistics/">View pool statistics</a>
     <br>
     <a href="https://github.com/revoxhere/duino-coin/wiki">Explore wikis</a>
