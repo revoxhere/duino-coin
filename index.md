@@ -1,5 +1,13 @@
 # Official duino-coin blog - welcome!
 
+## 16.10.2019: Status update
+Welcome back Duino-Miners! Long time no see, huh? <br>
+Main reason I created this post is that now we have a [Discord server](https://discord.gg/qa88ZYM)! <br>
+Come and talk with us, we will also try to solve any issues with Duino-Coin :) <br>
+Other than that, Duino-Coin is now so popular that we went from 400 to 670 difficulty in less than two weeks! <br>
+We have 46 registered users and many of them are active daily. <br>
+It's hard to say how thankful I am that you guys are still staying with us!
+
 ## 3.10.2019: 400 diff reached!
 Hello! Today we've reached difficulty 400! <br>
 ![400 difficulty](https://i.imgur.com/7epbuPp.png)
