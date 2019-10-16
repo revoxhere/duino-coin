@@ -29,11 +29,11 @@
     <!--<a href="https://github.com/MrKris7100">Explore DUCOv2 - cryptocurrency with XMG inregraton</a>-->
   </p>
 </p>
-<p align="center">
-  <a href="https://github.com/revoxhere/duino-coin">
-    <img src="https://i.imgur.com/x6zTLEa.png">
-  </a>
-</p>
+
+[![Python](https://img.shields.io/badge/Python-3.7-green.svg)](https://github.com/revoxhere/duino-coin/search?l=py)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Release: Alpha 6.1](https://img.shields.io/badge/Release-Alpha_6.1-red.svg)](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.1)
+[![Discord](https://img.shields.io/discord/604697675430101003.svg?color=Blue&label=Discord&logo=Discord)](https://discord.gg/qa88ZYM)
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
