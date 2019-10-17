@@ -1,6 +1,3 @@
-layout: page
-title: "Duino-Coin Blog"
-
 # Official duino-coin blog - welcome!
 
 ## 16.10.2019: Status update
