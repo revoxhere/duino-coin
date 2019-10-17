@@ -1,5 +1,7 @@
 # Official duino-coin blog - welcome!
 
+<button name="button">Click me</button>
+
 ## 16.10.2019: Status update
 Welcome back Duino-Miners! Long time no see, huh? <br>
 Main reason I created this post is that now we have a [Discord server](https://discord.gg/qa88ZYM)! <br>
