@@ -1,6 +1,6 @@
 # Official duino-coin blog - welcome!
 
-<button name="FAQ" onclick="https://revoxhere.github.io/duino-coin/faq">FAQ</button>
+[FAQ](https://revoxhere.github.io/duino-coin/faq){: .btn}
 
 ## 16.10.2019: Status update
 Welcome back Duino-Miners! Long time no see, huh? <br>
