@@ -6,6 +6,6 @@ permalink: /faq/
 
 ## Frequently Asked Questions
 
-<button name="Main page" onclick="https://revoxhere.github.io/duino-coin/">Main page</button>
+[Back to homepage](https://revoxhere.github.io/duino-coin/){: .btn}
 
 coming soon
