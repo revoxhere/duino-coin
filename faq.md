@@ -2,4 +2,5 @@ layout: page
 title: "Duino-Coin FAQ"
 permalink: /faq/
 
-### test
+## Frequently Asked Questions
+coming soon
