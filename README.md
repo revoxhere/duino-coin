@@ -71,9 +71,9 @@ Why would you want to mine on Arduino?
 
 ## News and FAQ
 
-**News** about updates, future features and other things can be found at the [official blog](https://revoxhere.github.io/duino-coin/faq/). <br>
-Frequently Asked Questions (**FAQ**) can be found [here]
-If you want to check official **pool statistics**, visit [this page](https://revoxhere.github.io/duco-statistics/).
+**News** about updates, future features and other things can be found at the [official blog](https://revoxhere.github.io/duino-coin/). <br>
+Frequently Asked Questions (**FAQ**) can be found [here](https://revoxhere.github.io/duino-coin/faq) <br>
+You can check **pool statistics** by visiting [this page](https://revoxhere.github.io/duco-statistics/).
 
 ## Prerequisites
 
