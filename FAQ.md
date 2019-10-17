@@ -1,5 +1,5 @@
 layout: page
 title: "Duino-Coin FAQ"
-permalink: /faq/
+permalink: /FAQ/
 
 ### test
