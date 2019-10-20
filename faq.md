@@ -4,7 +4,7 @@ title: "Duino-Coin Official FAQ"
 permalink: /faq/
 -->
 
-<button onclick="window.location.href = 'https://revoxhere.github.io/duino-coin/faq';">Homepage</button>
+<button onclick="window.location.href = 'https://revoxhere.github.io/duino-coin/';">Homepage</button>
 <button onclick="window.location.href = '';">FAQ</button>
 <button onclick="window.location.href = '';">Whitepaper</button> *(SOON)*
 
