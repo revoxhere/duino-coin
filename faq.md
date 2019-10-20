@@ -1,6 +1,6 @@
 <!--
 layout: page
-title: "Duino-Coin FAQ"
+title: "Duino-Coin Official FAQ"
 permalink: /faq/
 -->
 
@@ -23,7 +23,7 @@ permalink: /faq/
 ***
 
 * * **Q:** Is there a Discord server? <br>
-   * **A:** Yes! Come and talk with us: https://discord.gg/qa88ZYM <br>
+   * **A:** Yes! Come and talk with us: [https://discord.gg/qa88ZYM](https://discord.gg/qa88ZYM) <br>
 You will find there general chat, benchmarking room and much more to come in the future!
 
 ***
