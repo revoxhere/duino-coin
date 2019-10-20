@@ -1,3 +1,8 @@
+<!--
+layout: page
+title: "Duino-Coin Official Blog"
+-->
+
 # Official duino-coin blog - welcome!
 
 <button onclick="window.location.href = '';">Homepage</button>
