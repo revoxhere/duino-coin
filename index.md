@@ -1,6 +1,17 @@
 # Official duino-coin blog - welcome!
 
+<button onclick="window.location.href = '';">Homepage</button>
 <button onclick="window.location.href = 'https://revoxhere.github.io/duino-coin/faq';">FAQ</button>
+<button onclick="window.location.href = '';">Whitepaper</button> *(SOON)*
+
+## 20.10.2019: Plans for 0.6.4
+![](https://media.discordapp.net/attachments/634115103037325313/635391774030037004/Screenshot_20191020-101953.png?width=300&height=600) <br>
+Do you have something you'd like to see in future release? <br>
+Let's talk about it at our [Discord](https://discord.gg/qa88ZYM)! <br>
+
+Versions **0.6.2** and/or **0.6.3** will be released in a few hours. <br>
+They don't contain many changes so updating to them isn't necessary. <br>
+**Happy mining!**
 
 ## 16.10.2019: Status update
 Welcome back Duino-Miners! Long time no see, huh? <br>
