@@ -1,7 +1,10 @@
-import socket, time, datetime, subprocess
-pool_address = "serveo.net"
-pool_port = "14808"
+# Automatically restart SSH server (run a batch file) if it's down in some way.
+# This is used in Official Duino-Coin network to automatically fix connection problems.
+# Can be used to run another application if official pool is down, experiment. Everything's up to you.
 
+import socket, time, datetime, subprocess
+pool_address = "serveo.net" 
+pool_port = "14808" #pool to check
 
 while True:
     soc = socket.socket()
@@ -11,21 +14,19 @@ while True:
             soc.settimeout(1.0)
             resp = soc.recv(1024).decode()
             soc.settimeout(None)
-            if resp == "0.6":
+            if resp == "0.6": #change if using a different version
                 now = datetime.datetime.now()
                 print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "Server is up and running [OK] on tcp://"+pool_address+":"+pool_port)
             else:
                 now = datetime.datetime.now()
                 print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + "> Server is running but SSH not! [ERROR] Restarting!")
-                subprocess.call([r'C:\Users\revox.lola\Desktop\Server\autorestart.bat'])
+                subprocess.call([r'restart.bat']) #run something
         except:
             now = datetime.datetime.now()
             print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + ">>>>> Server is running but SSH not! [ERROR] Restarting!")
-            subprocess.call([r'C:\Users\revox.lola\Desktop\Server\autorestart.bat'])
+            subprocess.call([r'restart.bat']) #run something
     except:
         now = datetime.datetime.now()
         print(now.strftime("[%Y-%m-%d %H:%M:%S] ") + ">>> Server is down! [ERROR] Restarting!")
-        subprocess.call([r'C:\Users\revox.lola\Desktop\Server\autorestart.bat'])
-
+        subprocess.call([r'restart.bat']) #run something
     time.sleep(10)
-    
