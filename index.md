@@ -14,7 +14,7 @@ title: "Duino-Coin Official Blog"
 Do you have something you'd like to see in future release? <br>
 Let's talk about it at our [Discord](https://discord.gg/qa88ZYM)! <br>
 
-Versions **0.6.2** and/or **0.6.3** will be released in a few hours. <br>
+~~Versions **0.6.2** and/or **0.6.3** will be released in a few hours.~~ <br>
 They don't contain many changes so updating to them isn't necessary. <br>
 **Happy mining!**
 
