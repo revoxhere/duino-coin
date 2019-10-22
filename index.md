@@ -9,6 +9,11 @@ title: "Duino-Coin Official Blog"
 <button onclick="window.location.href = 'https://revoxhere.github.io/duino-coin/faq';">FAQ</button>
 <button onclick="window.location.href = '';">Whitepaper</button> *(SOON)*
 
+## 22.10.2019: End of outage - pool back online
+After a 4 hour inaccessibility, **serveo.net is back online and thus our pool.**
+
+***
+
 ## 22.10.2019: Possible temporary connection problems
 **Serveo.net is down** - Duino-Coin pool will be not accessible until serveo developers will fix the problem. <br>
 Sorry for inconvenience, but we can't do anything about it.
