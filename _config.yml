@@ -1,4 +1,4 @@
-theme: jekyll-theme-cayman
+theme: jekyll-material-theme
 title: Duino-Coin
 description: Duino coin is an cryptocurrency that is the first one in the world that supports official mining using Arduino (or other compatible AVR) boards.
 show_downloads: true
