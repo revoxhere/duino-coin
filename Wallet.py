@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###########################################
-#  Duino-Coin wallet version 0.6.1 alpha  #
+#  Duino-Coin wallet version 0.6.4 alpha  #
 # https://github.com/revoxhere/duino-coin #
 #       copyright by revox 2019           #
 ###########################################
@@ -144,7 +144,7 @@ def SelectScr(): #first-time launch window
         window.mainloop()
         
 def WalletScr():
-        global username
+        global username, password
         print("Using pre-defined settings")
         config.read("WalletConfig.ini")
         username = config["wallet"]["username"]
@@ -204,7 +204,7 @@ def Send():
         send.resizable(False, False)
         send.title('Send funds')
         
-        label = tkinter.Label(send, text = "Your balance: "+balance+" DUCO")
+        label = tkinter.Label(send, text = "Your balance: "+balancegood+" DUCO")
         receipentA = Label(send, text="Receipents' username: ")
         amountA = Label(send, text='Amount: ')
         receipentA.grid(row=1, column=0, sticky=W) 
@@ -234,7 +234,7 @@ def About():
         about.title('About')
 
         label = tkinter.Label(about, text = "Official Duino-Coin wallet", font="-weight bold").pack()
-        label = tkinter.Label(about, text = "Wallet version: 0.6.1 alpha").pack()
+        label = tkinter.Label(about, text = "Wallet version: 0.6.4 alpha").pack()
         label = tkinter.Label(about, text = "Made by revox from Duino-Coin developers").pack()
         label = tkinter.Label(about, text = "Learn more at: github.com/revoxhere/duino-coin").pack()
         
@@ -243,17 +243,24 @@ def Exchange():
         pass
 
 def getBalance():
-        global balance
+        global balancegood, wallet
         s.send(bytes("BALA", encoding='utf8'))
         time.sleep(0.025)
-        balance = s.recv(6)
+        balance = s.recv(1024)
         balance = balance.decode('utf8')
-        print("Got balance from server:", balance)
+        balance = balance[:6]
+        if "." in balance:
+                balancegood = balance
+                print("Balance:", balancegood)
+                try:
+                        label = tkinter.Label(wallet, text = "Your balance: "+balancegood+" (DUCO)").place(relx=.5, rely=.2, anchor="c")
+                except:
+                        pass
+        threading.Timer(1, getBalance).start()
         
-
 def WalletWindow():
         getBalance()
-        global wallet
+        global wallet, label
         
         print("Displaying main wallet window")
         wallet = tkinter.Tk()
@@ -263,7 +270,7 @@ def WalletWindow():
         
         label = tkinter.Label(wallet, text = "Official Duino-Coin wallet", font="-weight bold").place(relx=.5, rely=.09, anchor="c")
         label = tkinter.Label(wallet, text = "").grid()
-        label = tkinter.Label(wallet, text = "Your balance: "+balance+" (DUCO)").place(relx=.5, rely=.2, anchor="c")
+        label = tkinter.Label(wallet, text = "Your balance: "+balancegood+" (DUCO)").place(relx=.5, rely=.2, anchor="c")
         
         tkinter.Button(wallet, text = "     Send funds     ", command = Send).place(relx=0.355, rely=0.30)
         tkinter.Button(wallet, text = "   Receive funds   ", command = Receive).place(relx=0.353, rely=0.45)
@@ -271,8 +278,8 @@ def WalletWindow():
         tkinter.Button(wallet, text = "          About          ", command = About).place(relx=0.35, rely=0.75)
         
         label = tkinter.Label(wallet, text = "2019 Duino-Coin developers").place(relx=0.46, rely=0.91)
-        
         wallet.mainloop()
+
         
 def Start():
         try:
@@ -287,6 +294,7 @@ def Start():
                 root.withdraw()
                 messagebox.showerror("Error!","Server communication failed!\nA server update is probably underway.\nPlease try again in a couple of hours.")
                 sys.exit()
+
 
 Start()
 
