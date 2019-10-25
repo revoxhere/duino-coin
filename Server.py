@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ###########################################
-# Duino-Coin public-server version 0.6.3  #
+# Duino-Coin public-server version 0.6.4  #
 # https://github.com/revoxhere/duino-coin #
 #  copyright by MrKris7100 & revox 2019   #
 ###########################################
@@ -11,7 +11,7 @@
 
 VER = "0.6"
 
-import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, os, psutil, string
+import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, os, psutil, string, json
 from pathlib import Path
 from github import Github
 
@@ -39,14 +39,14 @@ def ServerLogHash(whattolog): #Separate serverlog section for mining section deb
         pass
         
 def UpdateServerInfo():
-        global server_info, hashrates, threads, diff, update_count, gitrepo, gitusername
+        global server_info, hashrates, threads, diff, update_count, gitrepo, gitusername, rewardap, blocks, userinfo
         now = datetime.datetime.now()
         now = now.strftime("%H:%M:%S")
         #Nulling pool hashrate stat
         server_info['pool_hashrate'] = 0
         #Counting registered users
         server_info['users'] = len(os.listdir('users'))
-        #Addition miners hashrate and update pool's hashrate
+        #Adding miners hashrate and updating pool's hashrate
         for hashrate in hashrates:
                 server_info['pool_hashrate'] += hashrates[hashrate]["hashrate"]
         #Preparing json data for API
@@ -61,9 +61,20 @@ def UpdateServerInfo():
         file.write(str(" kH/s\n"))
         file.write(str("Pool workers: "))
         file.write(str(server_info["miners"]))
-        file.write(str(" ("))
-        file.write(str(' '.join([hashrates[x]["username"] for x in hashrates])))
-        file.write(str(")\n"))
+        file.write(str("\nWorkers and their H/s: ("))
+        for x in hashrates.values():
+                userinfo = str(x) #Recursively formatting and removing unwanted characters from dictionary. Making this took me longer than it should...
+                userinfo = userinfo.replace('\'username\'', '')
+                userinfo = userinfo.replace(':', '')
+                userinfo = userinfo.replace('\'hashrate\'', ':')
+                userinfo = userinfo.replace(',', '')
+                userinfo = userinfo.replace('{', '')
+                userinfo = userinfo.replace('}', '')
+                userinfo = userinfo.replace('>', '')
+                userinfo = userinfo.replace('<', '')
+                userinfo = userinfo.replace('\'', '')
+                userinfo = userinfo.lstrip()
+        file.write(str(userinfo)+")\n")
         with locker:
                 blok = open("config/blocks", "r")
                 bloki = blok.readline()
@@ -79,10 +90,12 @@ def UpdateServerInfo():
         file.write(str("\nCurrent difficulty: "))
         diff = math.ceil(int(bloki) / diff_incrase_per)
         file.write(str(diff))
+        reward = float(0.000001) * int(diff)
+        reward = str(reward)[:7]
         file.write(str("\nReward: "))
         file.write(str(reward))
         file.write(str(" DUCO/block"))
-        file.write(str("\nDUCO/XMG: 9.82 (\/)"))
+        file.write(str("\nDUCO/XMG: 12.44 (/\)"))
         file.write(str("\nLast updated: "))
         file.write(str(now))
         file.write(str(" (updated every 90s)"))
@@ -97,8 +110,11 @@ def UpdateServerInfo():
         update_count = update_count + 1 #Increment update counter by 1
         repo = g.get_repo("revoxhere/"+gitrepo)
         contents = repo.get_contents("api.txt") #Get contents of previous file for SHA verification
-        repo.update_file(contents.path, "Statistics update #"+str(update_count), str(file_contents), contents.sha, branch="master") #Post statistics file into github
-        ServerLog("Updated statistics file on GitHub. Update count:"+str(update_count))
+        try:
+                repo.update_file(contents.path, "Statistics update #"+str(update_count), str(file_contents), contents.sha, branch="master") #Post statistics file into github
+                ServerLog("Updated statistics file on GitHub. Update count:"+str(update_count))
+        except:
+                ServerLog("Failed to update statistics file!")
         #Wait 90 seconds and repeat
         threading.Timer(90, UpdateServerInfo).start()
         
@@ -273,7 +289,8 @@ class ClientThread(threading.Thread): #separate thread for every user
                                 
                         #Client requested new job for him
                         elif username != "" and data[0] == "JOB": #main, mining section
-                                ServerLog("New job for user: " + username)
+                                hashrates[thread_id]
+                                ServerLogHash("New job for user: " + username)
                                 #Waiting for unlocked files then locking them
                                 with locker:
                                         #Reading blocks amount
@@ -326,6 +343,8 @@ class ClientThread(threading.Thread): #separate thread for every user
                                         #Rewarding user for good hash
                                         with locker: #Using locker because some users submitted problems when mining on many devices and weird things happened
                                                 bal = open("balances/" + username + ".txt", "r")
+                                                global reward
+                                                reward = float(0.000001) * int(diff)
                                                 balance = str(float(bal.readline())).rstrip("\n\r ")
                                                 balance = float(balance) + float(reward)
                                                 bal = open("balances/" + username + ".txt", "w")
@@ -349,7 +368,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                                                 blo.close()
                                 else:
                                         #Recived hash is bad
-                                        ServerLogHash("Recived bad result (" + str(result[0]) + ")")
+                                        ServerLogHash("Recived bad result!"+result)
                                         try:
                                                 self.clientsock.send(bytes("BAD", encoding="utf8"))
                                         except socket.error as err:
@@ -372,7 +391,6 @@ class ClientThread(threading.Thread): #separate thread for every user
                         elif username != "" and data[0] == "CLOSE":
                                 try:
                                         ServerLog("Client requested thread (" + thread_id + ") closing")
-                                        print("Klouz")
                                         #Closing socket connection
                                         self.clientsock.close()
                                         #Decrasing number of connected miners
@@ -442,8 +460,6 @@ class ClientThread(threading.Thread): #separate thread for every user
                         ServerLog("Thread (" + thread_id + ") and connection closed")
                         #Closing socket connection
                         self.clientsock.close()
-                        #Decrasing number of connected miners
-                        server_info['miners'] -= 1
                         #Delete this miner from statistics
                         del hashrates[thread_id]
                 except:
@@ -456,6 +472,7 @@ tcpsock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 threads = []
 kicklist = []
 server_info = {'miners' : 0, 'pool_hashrate' : 0, 'users' : 0}
+userinfo = ""
 hashrates = {}
 config = configparser.ConfigParser()
 locker = threading.Lock()
@@ -513,7 +530,7 @@ else:
         ServerLog("Loaded server config: " + host + ", " + port + ", " + new_user_balance + ", " + reward + ", " + diff_incrase_per)
 #Converting some variables to numbers
 port = int(port)
-reward = float(reward)
+
 diff_incrase_per = int(diff_incrase_per)
 #Binding socket
 try:
@@ -552,3 +569,4 @@ while True:
 
 for t in threads:
         t.join()
+
