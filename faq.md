@@ -6,7 +6,7 @@ permalink: /faq/
 
 <button onclick="window.location.href = 'https://revoxhere.github.io/duino-coin/';">Homepage</button>
 
-## Frequently Asked Questions
+## Frequently Asked Questions - website in development!
 
 * * **Q:** Where can I exchange Duino-Coins? <br>
    * **A:** E.g. at [DUCO Exchange](https://revoxhere.github.io/duco-exchange/) (DUCO to XMG, soon DUCO TO BTC)
