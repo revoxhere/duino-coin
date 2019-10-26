@@ -1,136 +1,136 @@
 import socket,threading,time,random,configparser,sys,serial,hashlib,serial.tools.list_ports,datetime
-d=print
-B=int
-a=float
-E=str
-y=input
-x=open
+Q=print
+m=int
+u=float
+X=str
+J=input
+F=open
 i=True
-U=bytes
-k=range
-A=hash
-g=datetime
-D=datetime.datetime
-e=hashlib.sha1
-Y=serial.Serial
-H=serial.tools
-n=sys.exit
-K=configparser.ConfigParser
-m=random.randint
-Q=time.sleep
-W=threading.Timer
-l=socket.socket
+t=bytes
+c=range
+v=hash
+U=datetime
+P=datetime.datetime
+b=hashlib.sha1
+L=serial.Serial
+D=serial.tools
+a=sys.exit
+H=configparser.ConfigParser
+o=random.randint
+O=time.sleep
+z=threading.Timer
+y=socket.socket
 from pathlib import Path
-d("===========================================")
-d("  Duino-Coin Arduino miner version 0.6.4")
-d(" https://github.com/revoxhere/duino-coin")
-d("        copyright by revox 2019")
-d("===========================================\n")
-def L():
- global p,r,O
- p=r
- q=m(716,906)
- c=q/100
- O=B(r)*a(c)
- if O<2.7:
-  O=a(O)+B(1)*a(c)
- if O>20.0:
-  O=a(O)-B(10)
- O=E(O)[:4]
- r=0
- W(1,L).start()
-u=[0,0]
-p=0
-r=0
-O=0
-b=K()
+Q("===========================================")
+Q("  Duino-Coin Arduino miner version 0.6.4")
+Q(" https://github.com/revoxhere/duino-coin")
+Q("        copyright by revox 2019")
+Q("===========================================\n")
+def l():
+ global f,d,e
+ f=d
+ K=o(716,906)
+ B=K/100
+ e=m(d)*u(B)
+ if e<2.7:
+  e=u(e)+m(1)*u(B)
+ if e>20.0:
+  e=u(e)-m(10)
+ e=X(e)[:4]
+ d=0
+ z(1,l).start()
+E=[0,0]
+f=0
+d=0
+e=0
+q=H()
 if not Path("ArduinoMinerConfig_0.6.4.ini").is_file():
- d("Initial configuration, you can edit 'ArduinoMinerConfig_0.6.4.ini' later\n")
- d("Scanning ports...")
- P=H.list_ports.comports()
- R=[]
- for j in P:
-  R.append(j.device)
- d("Found COM ports: "+E(R))
- M=y("Enter your Arduino port (e.g: COM8): ")
- J=y("Enter pool adddress (official: serveo.net): ")
- s=y("Enter pool port (official: 14808): ")
- V=y("Enter username: ")
- o=y("Enter password: ")
- b['arduinominer']={"address":J,"arduino":M,"port":s,"username":V,"password":o}
- with x("ArduinoMinerConfig_0.6.4.ini","w")as configfile:
-  b.write(configfile)
+ Q("Initial configuration, you can edit 'ArduinoMinerConfig_0.6.4.ini' later\n")
+ Q("Scanning ports...")
+ I=D.list_ports.comports()
+ V=[]
+ for T in I:
+  V.append(T.device)
+ Q("Found COM ports: "+X(V))
+ S=J("Enter your Arduino port (e.g: COM8): ")
+ s=J("Enter pool adddress (official: serveo.net): ")
+ n=J("Enter pool port (official: 14808): ")
+ N=J("Enter username (the one you used to register): ")
+ W=J("Enter password (the one you used to register): ")
+ q['arduinominer']={"address":s,"arduino":S,"port":n,"username":N,"password":W}
+ with F("ArduinoMinerConfig_0.6.4.ini","w")as configfile:
+  q.write(configfile)
 else:
- b.read("ArduinoMinerConfig_0.6.4.ini")
- M=b["arduinominer"]["arduino"]
- J=b["arduinominer"]["address"]
- s=b["arduinominer"]["port"]
- V=b["arduinominer"]["username"]
- o=b["arduinominer"]["password"]
+ q.read("ArduinoMinerConfig_0.6.4.ini")
+ S=q["arduinominer"]["arduino"]
+ s=q["arduinominer"]["address"]
+ n=q["arduinominer"]["port"]
+ N=q["arduinominer"]["username"]
+ W=q["arduinominer"]["password"]
 while i:
- F=l()
+ h=y()
  try:
-  F.connect((J,B(s)))
-  C=D.now()
-  d(C.strftime("[%H:%M:%S] ")+"Connected to pool on tcp://"+J+":"+s)
+  h.connect((s,m(n)))
+  x=P.now()
+  Q(x.strftime("[%H:%M:%S] ")+"Connected to pool on tcp://"+s+":"+n)
   break
  except:
-  d(C.strftime("[%H:%M:%S] ")+"Cannot connect to pool server. Outage? Server update? Retrying in 15 seconds...")
-  Q(15)
- Q(0.025)
+  Q(x.strftime("[%H:%M:%S] ")+"Cannot connect to pool server. Outage? Server update? Retrying in 15 seconds...")
+  O(15)
+ O(0.025)
 while i:
  try:
-  G=Y(M,115200)
-  C=D.now()
-  d(C.strftime("[%H:%M:%S] ")+"Connected to Arduino on port "+M)
+  r=L(S,115200)
+  x=P.now()
+  Q(x.strftime("[%H:%M:%S] ")+"Connected to Arduino on port "+S)
   break
  except:
-  d(C.strftime("[%H:%M:%S] ")+"Cannot connect to Arduino. Check your ArduinoMinerConfig.ini file. Also make sure you have the right permissions to COM port.")
-  Q(15)
-  n()
- Q(0.025)
-F.send(U("LOGI,"+V+","+o,encoding="utf8"))
+  Q(x.strftime("[%H:%M:%S] ")+"Cannot connect to Arduino. Check your ArduinoMinerConfig.ini file. Also make sure you have the right permissions to COM port.")
+  O(15)
+  a()
+ O(0.025)
+h.send(t("LOGI,"+N+","+W,encoding="utf8"))
 while i:
- I=F.recv(1024).decode()
- if I=="OK":
-  C=D.now()
-  d(C.strftime("[%H:%M:%S] ")+"Successfully logged in.")
+ w=h.recv(1024).decode()
+ if w=="OK":
+  x=P.now()
+  Q(x.strftime("[%H:%M:%S] ")+"Successfully logged in.")
   break
- if I=="NO":
-  C=D.now()
-  d(C.strftime("[%H:%M:%S] ")+"Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
-  F.close()
- Q(0.025)
-C=D.now()
-d(C.strftime("[%H:%M:%S] ")+"Arduino miner thread started, using 'SHA' algorithm.")
-L()
-F.send(U("JOB",encoding="utf8"))
+ if w=="NO":
+  x=P.now()
+  Q(x.strftime("[%H:%M:%S] ")+"Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
+  h.close()
+ O(0.025)
+x=P.now()
+Q(x.strftime("[%H:%M:%S] ")+"Arduino miner thread started, using 'SHA' algorithm.")
+l()
+h.send(t("JOB",encoding="utf8"))
 while i:
- F.send(U("JOB",encoding="utf8"))
+ h.send(t("JOB",encoding="utf8"))
  while i:
-  w=F.recv(1024).decode()
-  if w:
+  g=h.recv(1024).decode()
+  if g:
    break
-  Q(0.025)
- w=w.split(",")
- S=w[2]
- for v in k(100*B(w[2])+1):
-  A=e(E(w[0]+E(v)).encode("utf-8")).hexdigest()
-  if w[1]==A:
-   G.write(U(E(r),encoding="utf8"))
-   r=G.readline().decode('utf8').rstrip()
-   F.send(U(E(v),encoding="utf8"))
+  O(0.025)
+ g=g.split(",")
+ A=g[2]
+ for G in c(100*m(g[2])+1):
+  v=b(X(g[0]+X(G)).encode("utf-8")).hexdigest()
+  if g[1]==v:
+   r.write(t(X(d),encoding="utf8"))
+   d=r.readline().decode('utf8').rstrip()
+   h.send(t(X(G)+","+X(e)+" (Arduino)",encoding="utf8"))
    while i:
-    X=F.recv(1024).decode()
-    if X=="GOOD":
-     C=D.now()
-     u[0]=u[0]+1 
-     d(C.strftime("[%H:%M:%S] ")+"accepted: "+E(u[0])+"/"+E(u[0]+u[1])+" ("+E(u[0]/(u[0]+u[1])*100)[:5]+"%), diff: "+E(S)+", "+E(O)+" hashes/s (yay!!!)")
+    k=h.recv(1024).decode()
+    if k=="GOOD":
+     x=P.now()
+     E[0]=E[0]+1 
+     Q(x.strftime("[%H:%M:%S] ")+"accepted: "+X(E[0])+"/"+X(E[0]+E[1])+" ("+X(E[0]/(E[0]+E[1])*100)[:5]+"%), diff: "+X(A)+", "+X(e)+" hashes/s (yay!!!)")
      break
-    elif X=="BAD":
-     C=D.now()
-     u[1]=u[1]+1 
-     d(C.strftime("[%H:%M:%S] ")+"rejected: "+E(u[1])+"/"+E(u[1]+u[1])+" ("+E(u[0]/(u[0]+u[1])*100)[:5]+"%), diff: "+E(S)+", "+E(O)+" hashes/s (boo!!!)")
+    elif k=="BAD":
+     x=P.now()
+     E[1]=E[1]+1 
+     Q(x.strftime("[%H:%M:%S] ")+"rejected: "+X(E[1])+"/"+X(E[1]+E[1])+" ("+X(E[0]/(E[0]+E[1])*100)[:5]+"%), diff: "+X(A)+", "+X(e)+" hashes/s (boo!!!)")
      break
    break
 # Created by pyminifier (https://github.com/liftoff/pyminifier)
