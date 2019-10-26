@@ -1,11 +1,11 @@
 /*/////////////////////////////////////////////////
-  /  Duino-Coin arduino code v0.6.1 alpha         /
+  /      Duino-Coin arduino code v0.6.4 alpha     /
   /    https://github.com/revoxhere/duino-coin    /
-  /            copyright by revox 2019            /
+  /           copyright by revox 2019             /
   /////////////////////////////////////////////////
-  / to start mining, make account using wallet,   /
-  / download Arduino Miner from duino-coin repo   /
-  / and enter Arduino COM port (if using Windows) /
+  / To start mining, make account using Wallet,   /
+  / download Arduino Miner from Duino-Coin repo   /
+  / and enter Arduino COM port (if using Windows)./
   /                Happy mining!                  /
   ///////////////////////////////////////////////*/
 
@@ -19,7 +19,7 @@ String output;
 String result;
 String hash;
 int jobStatus = 0;
-int errorlevel = 1;
+int errorlevel = 0;
 int hash_c = 0;
 char atm = 0;
 char ve = 0;
@@ -27,24 +27,20 @@ char ve = 0;
 void setup() {
   hash_c = 0;
   hexdigest.toInt();
-  Serial.begin(9600);
-  pinMode(LED_BUILTIN, OUTPUT); //using arduino builtin led to show successful share
+  Serial.begin(115200);
+  pinMode(LED_BUILTIN, OUTPUT);
 
-  // you can place your setup code here if you want to use arduino for something else than just mining duino-coins!
+  // You can place your setup code here if you want to use Arduino for something else than just mining Duino-Coins!
 
 }
 
 void loop() {
   mine();
 
-  // you can place your code here if you want to use arduino for something else than just mining duino-coins!
-  // bear in mind that performance will be a bit worse then
+  // You can place your code here if you want to use Arduino for something else than just mining Duino-Coins!
+  // Bear in mind that performance will be a bit worse then depending on what should the Arduino do.
 
 }
-
-
-
-
 
 void mine() {
   if (jobStatus == 0) {
@@ -62,28 +58,25 @@ void mine() {
   }
   hashled();
 }
-
 void hashled() {
   digitalWrite(LED_BUILTIN, HIGH);
-  delay(20);
+  delay(15);
   digitalWrite(LED_BUILTIN, LOW);
 }
-
 void hashcount() {
   hash_count = Serial.readString();
-  if (jobStatus >= 1) {
-    hexdigest = 1;
+  if (jobStatus > 1) {
+    hexdigest == 1;
   }
-  uint8_t hashdigest[20];
+  uint8_t hashdigest[15];
   hash = "sha1/JOB/ &hash[0]";
-  job = "uint16_t i = 0; i < 20; i++";
+  job = "uint16_t i = 0; i < 15; i++";
   hash_c = hash_count.toInt();
   hexdigest = "0";
   hash_c++;
-  result = "%02x/hash[i])";
+  result = "%01x/hash[i])";
   Serial.println(hash_c);
 }
-
 void hexdump() {
   if (hash <= hexdigest) {
     Serial.println(ve);
