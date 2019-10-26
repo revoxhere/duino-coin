@@ -6,8 +6,8 @@
 #  copyright by MrKris7100 & revox 2019   #
 ###########################################
 # Important: this version of the server is a bit different than one used in "real" duino-coin network.
-# !!! If you want to host the pool/server yourself, you need to firstly install 'psutil' using pip install psutil !!!
-# !!! If you want to host the pool/server yourself, you need to firstly install 'PyGithub' using pip install PyGithub !!!
+# !!! If you want to host the pool/server yourself, you need to firstly install 'psutil' using python3 -m pip install psutil !!!
+# !!! If you want to host the pool/server yourself, you need to firstly install 'PyGithub' using python3 -m pip install PyGithub !!!
 
 VER = "0.6"
 
@@ -61,7 +61,10 @@ def UpdateServerInfo():
         file.write(str(" kH/s\n"))
         file.write(str("Pool workers: "))
         file.write(str(server_info["miners"]))
-        file.write(str("\nWorkers and their H/s: ("))
+        file.write(str(" ("))
+        file.write(str(' '.join([hashrates[x]["username"] for x in hashrates])))
+        file.write(str(")"))
+        file.write(str("\nLast connected worker: ")) #I don't have too much experience in python dictionaries, one day will display all of them
         for x in hashrates.values():
                 userinfo = str(x) #Recursively formatting and removing unwanted characters from dictionary. Making this took me longer than it should...
                 userinfo = userinfo.replace('\'username\'', '')
@@ -73,8 +76,11 @@ def UpdateServerInfo():
                 userinfo = userinfo.replace('>', '')
                 userinfo = userinfo.replace('<', '')
                 userinfo = userinfo.replace('\'', '')
+                userinfo = userinfo.replace(' ', '')
+                userinfo = userinfo.replace(':', ' - ')
+                userinfo = str(userinfo)+str(" H/s")
                 userinfo = userinfo.lstrip()
-        file.write(str(userinfo)+")\n")
+        file.write(str(userinfo)+"\n")
         with locker:
                 blok = open("config/blocks", "r")
                 bloki = blok.readline()
@@ -569,4 +575,3 @@ while True:
 
 for t in threads:
         t.join()
-
