@@ -4,9 +4,7 @@ title: "Duino-Coin Official FAQ"
 permalink: /faq/
 -->
 
-<button onclick="window.location.href = 'https://revoxhere.github.io/duino-coin/';">Homepage</button>
-
-## Frequently Asked Questions - website in development!
+## Frequently Asked Questions
 
 * * **Q:** Where can I exchange Duino-Coins? <br>
    * **A:** E.g. at [DUCO Exchange](https://revoxhere.github.io/duco-exchange/) (DUCO to XMG, soon DUCO TO BTC)
@@ -27,7 +25,7 @@ You will find there general chat, benchmarking room and much more to come in the
 ***
 
 * * **Q:** Can I see each miner hashrate on the pool statistics website?
-   * **A:** Not yet. This feature should be available when v0.6.4 releases.
+   * **A:** Partially, you can only see the hashrate of last connected miner, this feature will be improved in the future.
 
 ***
 
