@@ -4,9 +4,9 @@ title: "Duino-Coin Official Blog"
 permalink: /blog/
 -->
 
-# Official duino-coin blog - welcome!
+# Official duino-coin blog - website in development!
 
-<button onclick="window.location.href = '';">Homepage</button>
+<button onclick="window.location.href = 'https://revoxhere.github.io/duino-coin/';">Homepage</button>
 
 ## 26.10.2019: Version 0.6.4 released!
 Changelog and download links here: [https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4)
