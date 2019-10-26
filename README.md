@@ -26,7 +26,6 @@
     <br>
     <a href="https://revoxhere.github.io/duco-exchange/">Exchange DUCO to other cryptocurrency</a>
     <br>
-    <!--<a href="https://github.com/MrKris7100">Explore DUCOv2 - cryptocurrency with XMG inregraton</a>-->
   </p>
 </p>
 
@@ -71,7 +70,8 @@ Why would you want to mine on Arduino?
 
 ## News and FAQ
 
-**News** about updates, future features and other things can be found at the [official blog](https://revoxhere.github.io/duino-coin/). <br>
+Duino-Coin website: [https://revoxhere.github.io/duino-coin/](https://revoxhere.github.io/duino-coin/)
+**News** about updates, future features and other things can be found at the [official blog](https://revoxhere.github.io/duino-coin/blog). <br>
 Frequently Asked Questions (**FAQ**) can be found [here](https://revoxhere.github.io/duino-coin/faq) <br>
 You can check **pool statistics** by visiting [this page](https://revoxhere.github.io/duco-statistics/).
 
