@@ -1,13 +1,17 @@
 <!--
 layout: page
 title: "Duino-Coin Official Blog"
+permalink: /blog/
 -->
 
 # Official duino-coin blog - welcome!
 
 <button onclick="window.location.href = '';">Homepage</button>
-<button onclick="window.location.href = 'https://revoxhere.github.io/duino-coin/faq';">FAQ</button>
-<button onclick="window.location.href = '';">Whitepaper</button> *(SOON)*
+
+## 26.10.2019: Version 0.6.4 released!
+Changelog and download links here: [https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4)
+
+***
 
 ## 22.10.2019: End of outage - pool back online
 After a 4 hour inaccessibility, **serveo.net is back online and thus our pool.**
