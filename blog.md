@@ -4,9 +4,9 @@ title: "Duino-Coin Official Blog"
 permalink: /blog/
 -->
 
-# Official duino-coin blog - website in development!
+# Official Duino-Coin Blog
 
-<button onclick="window.location.href = 'https://revoxhere.github.io/duino-coin/';">Homepage</button>
+***
 
 ## 26.10.2019: Version 0.6.4 released!
 Changelog and download links here: [https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4)
@@ -29,8 +29,7 @@ Sorry for inconvenience, but we can't do anything about it.
 Do you have something you'd like to see in future release? <br>
 Let's talk about it at our [Discord](https://discord.gg/qa88ZYM)! <br>
 
-~~Versions **0.6.2** and/or **0.6.3** will be released in a few hours.~~ <br>
-~~They don't contain many changes so updating to them isn't necessary. ~~<br>
+~~Versions **0.6.2** and/or **0.6.3** will be released in a few hours. <br>
 **Happy mining!**
 
 ***
