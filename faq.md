@@ -6,7 +6,7 @@ permalink: /faq/
 <head>
   <style>
     a {
-    color: hotpink;
+    color: gold;
     }
   </style>
 </head>
