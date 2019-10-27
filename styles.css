@@ -3,7 +3,18 @@ html *
    font-family: Arial !important;
 }
 
-a:visited, a:link, a:active
-{
-    text-decoration: none !important;
+a:link {
+  text-decoration: none;
+}
+
+a:visited {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active {
+  text-decoration: underline;
 }
