@@ -1,0 +1,9 @@
+### template colors, used site-wide via css ###
+colors:
+  black:     '#111ff1'
+  white:     '#fefefe'
+  blue:      '#faafee'
+  green:     '#9bcf2f'
+  purple:    '#c869bf'
+  orange:    '#fab125'
+  turquoise: '#0fbfcf'
