@@ -2,6 +2,16 @@
 layout: page
 title: "Duino-Coin Official FAQ"
 permalink: /faq/
+
+<html>
+  <head>
+    <style>
+      a {
+      color: hotpink;
+      }
+    </style>
+  </head>
+</html>
 -->
 
 ## Frequently Asked Questions
