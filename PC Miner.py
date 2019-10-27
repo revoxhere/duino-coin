@@ -57,7 +57,6 @@ def connect():
                 soc = socket.socket()
                 try:
                         soc.connect((str(pool_address), int(pool_port)))
-                        soc.settimeout(0.1)
                         now = datetime.datetime.now()
                         print(now.strftime("[%H:%M:%S] ") + "Connected to pool on tcp://"+pool_address+":"+pool_port)
                         break
@@ -167,4 +166,3 @@ while True:
                                                 break
                                         time.sleep(0.025) # Try again if no response
                                 break
-        time.sleep(1) # Restart loop
