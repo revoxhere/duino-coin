@@ -25,7 +25,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.7-green.svg)](https://github.com/revoxhere/duino-coin/search?l=py)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Release: Alpha 6.1](https://img.shields.io/badge/Release-Alpha_6.4-red.svg)](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4)
+[![Release: Alpha 6.4.1](https://img.shields.io/badge/Release-Alpha_6.4.1-red.svg)](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4.1)
 [![Discord](https://img.shields.io/discord/604697675430101003.svg?color=Blue&label=Discord&logo=Discord)](https://discord.gg/qa88ZYM)
 
 <!-- TABLE OF CONTENTS -->
