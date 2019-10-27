@@ -8,23 +8,17 @@
 <br />
 <p align="center">
   <a href="https://github.com/revoxhere/duino-coin">
-    <img src="https://i.imgur.com/ZRRGDjs.png">
+    <img src="https://i.imgur.com/0UJK85H.png">
   </a>
-
-  <!-- <h3 align="center">An innovative cryptocurrency project</h3> -->
 
   <p align="center"> 
     <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>Watch demo »</strong></a>
     <br>
-    <a href="https://discord.gg/qa88ZYM">Join our Discord</a>
-    <br>
-    <a href="https://revoxhere.github.io/duco-statistics/">View pool statistics</a>
-    <br>
-    <a href="https://github.com/revoxhere/duino-coin/wiki">Explore wikis</a>
-    <sub><sup>•</sub></sup>
-    <a href="https://github.com/revoxhere/duino-coin/issues">Report bugs</a>
-    <br>
-    <a href="https://revoxhere.github.io/duco-exchange/">Exchange DUCO to other cryptocurrency</a>
+    <a href="https://discord.gg/qa88ZYM">Our Discord</a>
+    •
+    <a href="https://revoxhere.github.io/duco-statistics/">Network statistics</a>
+    •
+    <a href="https://revoxhere.github.io/duco-exchange/">DUCO Exchange</a>
     <br>
   </p>
 </p>
@@ -38,7 +32,7 @@
 ## Table of Contents
 
 * [About Duino-Coin](#about-the-project)
-* [News and FAQ](#news-and-faq)
+* [Useful links](#useful-links)
 * [Prerequisites](#prerequisites)
 * [Getting Started](#getting-started)
 * [Contributing](#contributing)
@@ -51,29 +45,31 @@
 ## About The Project
 
  <a href="https://github.com/revoxhere/duino-coin">
-  <img src="https://i.imgur.com/XxdhsUm.png" alt="Logo" width="320" height="50">
+  <img src="https://i.imgur.com/0UJK85H.png" alt="Logo" width="320" height="50">
  </a>
 
-There are many cryptocurrencies available. Most of them can be mined, but only using powerful CPUs, GPUs or ASICs to make some real money. There aren't many that support "normal" ways of mining. <br>
-I've always wanted to do something related to cryptocurrencies with Arduino. Thats why I created Duino-Coin. Cryptocurrency that can be mined with regular home computers, smartphones (you can use app called [PyDroid](https://play.google.com/store/apps/details?id=ru.iiec.pydroid3) to run PC Miner), Arduino boards (you can find Arduino code in every [release](https://github.com/revoxhere/duino-coin/releases)) and much more in the future.
+From the official website:
+  There are many cryptocurrencies available. Most of them can be mined, but only using powerful CPUs, GPUs or ASICs to make some real money. <br>
+  I think this goes against a statement that currency should be for everyone. <br>
+  I've also wanted to do something related to cryptocurrencies with Arduino because nobody has done that yet. <br>
+  That's why Duino-Coin was created. <br>
+  **A first-ever cryptocurrency that can be profitably mined with regular home computers, smartphones, Arduino boards and everything that can hash SHA.** <br>
 
-Generally, why should you mine Duino-Coin?
-* ~In the future, duino-coin may be worth something.~ 1 DUCO (Duino-Coin) is worth ~0.1 XMG (Coin Magi) at the time I'm writing this. You can exchange it [here](https://revoxhere.github.io/duco-exchange/).
-* Mining Duino-Coins isn't very CPU intensive.
-* It can be mined using various platforms.
-* Mining on regular computers and smartphones is profitable.
-* You will be able to proudly say that you supported my project :smile:
+**Duino-Coin is:**
+* **centralized** - no need to download gigabytes of stuff, your funds are secure
+* **available worldwide** - all you need is internet access
+* **cost effective** - why? read [this blog post](https://revoxhere.github.io/duino-coin/blog#1102019-why-its-the-best-time-to-mine-duino-coins)
+* **open-source** - anyone can contribute
 
-Why would you want to mine on Arduino?
-* You may have some Arduino boards that don't do anything.
-* Watching Arduino do something useful that produces money is satisfying.
 
-## News and FAQ
+## Useful links
 
-Duino-Coin website: [https://revoxhere.github.io/duino-coin/](https://revoxhere.github.io/duino-coin/)
-**News** about updates, future features and other things can be found at the [official blog](https://revoxhere.github.io/duino-coin/blog). <br>
-Frequently Asked Questions (**FAQ**) can be found [here](https://revoxhere.github.io/duino-coin/faq) <br>
-You can check **pool statistics** by visiting [this page](https://revoxhere.github.io/duco-statistics/).
+Official Duino-Coin website: [https://revoxhere.github.io/duino-coin/](https://revoxhere.github.io/duino-coin/)<br>
+News, updates, can be found at the [official Duino-Coin Blog](https://revoxhere.github.io/duino-coin/blog). <br>
+Frequently Asked Questions (FAQ) can be found [here](https://revoxhere.github.io/duino-coin/faq) <br>
+Check pool statistics by visiting [this page](https://revoxhere.github.io/duco-statistics/).
+Exchange Duino-Coins to other cryptocurrencies at the [DUCO Exchange](https://revoxhere.github.io/duco-exchange/). <br>
+Talk with us at our [Discord](https://discord.gg/qa88ZYM). <br>
 
 ## Prerequisites
 
@@ -81,33 +77,33 @@ You can check **pool statistics** by visiting [this page](https://revoxhere.gith
 If you're using Linux, you need to download some dependencies:
 ```bash
 sudo apt install python3 python-pip
-python -m pip install pyserial
+python3 -m pip install pyserial
 ```
 ### Windows
 If you're just a casual user and don't care about unstable stuff you don't need to install anything. Just grab latest [release](https://github.com/revoxhere/duino-coin/releases) and you're ready to go.
 
+***
+
+If you want to run Arduino Miner after cloning it from GitHub repo instead of downloading release, make sure you have `pyserial` library installed (`py -m pip install pyserial`).
+
 ## Getting Started
 
-Grab latest [release](https://github.com/revoxhere/duino-coin/releases) for your OS. <br>
-Launch `Wallet` to register. Then you can login. <br>
-After making an account, run `Miner` or `Arduino Miner` to mine Duino-Coins. <br>
-Programs will display you all information and help you need. <br>
+Getting started guide is available [here](https://revoxhere.github.io/duino-coin/getting-started)
 
 If you need detailed help about usage, installation or configuration, see our [Wikis](https://github.com/revoxhere/duino-coin/wiki). <br>
-If you can't find what you need, open an [Issue](https://github.com/revoxhere/duino-coin/issues), we'll help in no time!
+If you can't find what you need, open an [Issue](https://github.com/revoxhere/duino-coin/issues) asking for more documentation or better, ask for help at our [Discord](https://discord.gg/qa88ZYM).
 
 <!-- CONTRIBUTING -->
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. 
-Any contributions you make are **greatly appreciated**.
+Any contributions you make are greatly appreciated.
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+2. Create your feature branch (e.g. new readme)
+3. Commit your changes
 5. Make sure everything works as intended
-6. Open a Pull Request :wink:
+6. Open a pull request
 
 <!-- LICENSE -->
 ## License
@@ -116,12 +112,12 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ### Built With
 This section briefly lists major frameworks that Duino-Coin uses:
-* [Python and IDLE](https://www.python.org) - programming,
-* [pySerial](https://pythonhosted.org/pyserial/) - Arduino and Python communication,
-* [Arduino IDE](https://www.arduino.cc) - Arduino programming and debugging,
-* [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) - creating Windows executables,
-* [PyGithub](https://github.com/PyGithub/PyGithub) - pool statistics API integration,
-* [serveo](https://serveo.net) - hosting official pool.
+* [Python and IDLE](https://www.python.org) - programming
+* [pySerial](https://pythonhosted.org/pyserial/) - Arduino and Python communication
+* [Arduino IDE](https://www.arduino.cc) - Arduino programming and debugging
+* [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) - creating Windows executables
+* [PyGithub](https://github.com/PyGithub/PyGithub) - pool statistics API integration
+* [serveo](https://serveo.net) - hosting official pool
 
 <!-- AUTHORS -->
 ## Authors
@@ -133,4 +129,4 @@ This section briefly lists major frameworks that Duino-Coin uses:
 * **Testing:** [Jan Malewski](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ), [MrKris7100](https://www.youtube.com/user/MrKris7100), [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg), Alina
 
 Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/) <br> <br>
-<sup><sub>Tags (ignore): Duino Coin Coin Magi XMG DUCO Cryptocurrency Exchange Website Stocks Bitcoin Ethereum Litecoin Arduino AVR Rate Digital Cryptocoins
+<sup><sub>SEO tags (ignore): Duino Coin Coin Magi XMG DUCO Cryptocurrency Exchange Website Stocks Bitcoin Ethereum Litecoin Arduino AVR Rate Digital Cryptocoins Cryptocurrencies pyserial python idle auto py to exe pygithub serveo
