@@ -6,7 +6,3 @@ html *
 a:hover {
   text-decoration: underline !important;
 }
-
-a:active {
-  text-decoration: underline !important;
-}
