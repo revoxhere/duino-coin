@@ -2,7 +2,3 @@ html *
 {
    font-family: Arial !important;
 }
-
-a:hover {
-  text-decoration: underline !important;
-}
