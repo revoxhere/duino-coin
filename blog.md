@@ -4,6 +4,14 @@ title: "Duino-Coin Official Blog"
 permalink: /blog/
 -->
 
+<head>
+  <style>
+    a {
+    color: gold;
+    }
+  </style>
+</head>
+
 # Official Duino-Coin Blog
 
 ***
