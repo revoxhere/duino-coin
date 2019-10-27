@@ -4,17 +4,17 @@ html *
 }
 
 a:link {
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 a:visited {
-  text-decoration: none;
+  text-decoration: none !important;
 }
 
 a:hover {
-  text-decoration: underline;
+  text-decoration: underline !important;
 }
 
 a:active {
-  text-decoration: underline;
+  text-decoration: underline !important;
 }
