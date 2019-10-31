@@ -42,7 +42,7 @@
 * [Contributing](#contributing)
 * [License](#license)
 * [Built With](#built-with)
-* [Authors](#authors)
+* [Our Team](#our-team)
 
 
 <!-- ABOUT THE PROJECT -->
@@ -124,13 +124,12 @@ This section briefly lists major frameworks that Duino-Coin uses:
 * [serveo](https://serveo.net) - hosting official pool
 
 <!-- AUTHORS -->
-## Authors
+## Our Team
 
-* **Idea, lead programming:** [Robert "revox" Piotrowski](https://github.com/revoxhere/) - [YouTube](https://youtube.com/c/reVox96) - robik123.345@gmail.com
-* **Programming:** [MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) 
-* **Wikis & Social stuff:** [Jan "Furim" Malewski](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
-* **[Artwork](https://i.imgur.com/ZRRGDjs.png):** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
-* **Testing:** [Jan Malewski](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ), [MrKris7100](https://www.youtube.com/user/MrKris7100), [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg), Alina
+* **Lead developer:** [Robert "revox" Piotrowski](https://github.com/revoxhere/) - [YouTube](https://youtube.com/c/reVox96) - robik123.345@gmail.com
+* **SHA algorithm implementation:** [MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) 
+* **Social manager:** [Jan "Furim" Malewski](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
+* **Artwork designer:** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
 
 Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/) <br> <br>
 <sup><sub>SEO tags (ignore): Duino Coin Coin Magi XMG DUCO Cryptocurrency Exchange Website Stocks Bitcoin Ethereum Litecoin Arduino AVR Rate Digital Cryptocoins Cryptocurrencies pyserial python idle auto py to exe pygithub serveo
