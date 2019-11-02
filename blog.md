@@ -16,6 +16,21 @@ permalink: /blog/
 
 ***
 
+## 2.11.2019: Pool offline - serveo.net down (again)
+Serveo is down, we can't do anything about it. 
+
+***
+
+## 1.11.2019: Bitcoin Forum thread
+We've finally made a bitcointalk topic! Read the conversation here: [https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
+
+***
+
+## 27.10.2019: Version 0.6.4.1 released!
+Changelog and download links here: [https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4.1](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4.1)
+
+***
+
 ## 26.10.2019: Version 0.6.4 released!
 Changelog and download links here: [https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4)
 
