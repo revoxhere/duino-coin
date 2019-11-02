@@ -21,7 +21,8 @@ DUE TO SERVEO STILL BEING OFFLINE, WE'VE BOOTED UP **BACKUP POOL SERVER.**<br>
 Wallet will not work, because it's hard-coded to serveo, but you can use miners. <br>
 Point them to: 
 * Pool address: **0.tcp.ngrok.io**
-* Pool port: **13966**
+* Pool port: **13966** <br>
+
 Delete `MinerConfing_0.6.4` file and then you will be able to re-run the setup with entering pool address and port.
 
 ***
