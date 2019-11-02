@@ -37,7 +37,7 @@ You will find there general chat, benchmarking room and much more to come in the
 ***
 
 * * **Q:** Where can I find Duino-Coin whitepaper? <br>
-   * **A:** Whitepaper is in the works. When it will be ready, this message will be updated.
+   * **A:** Here: [https://revoxhere.github.io/duino-coin/whitepaper.pdf](https://revoxhere.github.io/duino-coin/whitepaper.pdf)
    
 ***
    
