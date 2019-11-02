@@ -16,6 +16,11 @@ permalink: /blog/
 
 ***
 
+## 2.11.2019: Pool is back online
+Finally! Serveo and our pool is back up and running again.
+
+***
+
 ## 2.11.2019: Backup pool
 DUE TO SERVEO STILL BEING OFFLINE, WE'VE BOOTED UP **BACKUP POOL SERVER.**<br>
 Wallet will not work, because it's hard-coded to serveo, but you can use miners. <br>
@@ -61,7 +66,7 @@ Sorry for inconvenience, but we can't do anything about it.
 ## 20.10.2019: Plans for 0.6.4
 ![](https://media.discordapp.net/attachments/634115103037325313/635391774030037004/Screenshot_20191020-101953.png?width=300&height=600) <br>
 Do you have something you'd like to see in future release? <br>
-Let's talk about it at our [Discord](https://discord.gg/qa88ZYM)! <br>
+Let's talk about it at our [Discord](https://discord.gg/XJpT3UQ)! <br>
 
 ~~Versions **0.6.2** and/or **0.6.3** will be released in a few hours. <br>
 **Happy mining!**
@@ -70,7 +75,7 @@ Let's talk about it at our [Discord](https://discord.gg/qa88ZYM)! <br>
 
 ## 16.10.2019: Status update
 Welcome back Duino-Miners! Long time no see, huh? <br>
-Main reason I created this post is that now we have a [Discord server](https://discord.gg/qa88ZYM)! <br>
+Main reason I created this post is that now we have a [Discord server](https://discord.gg/XJpT3UQ)! <br>
 Come and talk with us, we will also try to solve any issues with Duino-Coin :) <br>
 Other than that, Duino-Coin is now so popular that we went from 400 to 670 difficulty in less than two weeks! <br>
 We have 46 registered users and many of them are active daily. <br>
