@@ -26,7 +26,7 @@ permalink: /faq/
 ***
 
 * * **Q:** Is there a Discord server? <br>
-   * **A:** Yes! Come and talk with us: [https://discord.gg/qa88ZYM](https://discord.gg/qa88ZYM) <br>
+   * **A:** Yes! Come and talk with us: [https://discord.gg/XJpT3UQ](https://discord.gg/XJpT3UQ) <br>
 You will find there general chat, benchmarking room and much more to come in the future!
 
 ***
