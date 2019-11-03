@@ -14,7 +14,7 @@
   <p align="center"> 
     <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>Watch demo »</strong></a>
     <br>
-    <a href="https://discord.gg/XJpT3UQ">Our Discord</a>
+    <a href="https://revoxhere.github.io/duino-coin/">Whitepaper</a>
     •
     <a href="https://revoxhere.github.io/duco-statistics/">Network statistics</a>
     •
@@ -52,19 +52,13 @@
   <img src="https://i.imgur.com/0UJK85H.png" alt="Logo" width="320" height="50">
  </a>
 
-From the official website:
-  There are many cryptocurrencies available. Most of them can be mined, but only using powerful CPUs, GPUs or ASICs to make some real money. <br>
-  I think this goes against a statement that currency should be for everyone. <br>
-  I've also wanted to do something related to cryptocurrencies with Arduino because nobody has done that yet. <br>
-  That's why Duino-Coin was created. <br>
-  **A first-ever cryptocurrency that can be profitably mined with regular home computers, smartphones, Arduino boards and everything that can hash SHA.** <br>
+  A first-ever cryptocurrency that can be profitably mined with regular home computers, smartphones, Arduino boards and everything that can hash SHA. <br>
 
 **Duino-Coin is:**
 * **centralized** - no need to download gigabytes of stuff, your funds are secure
 * **available worldwide** - all you need is internet access
 * **cost effective** - why? read [this blog post](https://revoxhere.github.io/duino-coin/blog#1102019-why-its-the-best-time-to-mine-duino-coins)
 * **open-source** - anyone can contribute
-
 
 ## Useful links
 
