@@ -14,7 +14,7 @@
   <p align="center"> 
     <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>Watch demo »</strong></a>
     <br>
-    <a href="https://revoxhere.github.io/duino-coin/">Whitepaper</a>
+    <a href="https://revoxhere.github.io/duino-coin/whitepaper.pdf">Whitepaper</a>
     •
     <a href="https://revoxhere.github.io/duco-statistics/">Network statistics</a>
     •
