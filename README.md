@@ -125,5 +125,12 @@ This section briefly lists major frameworks that Duino-Coin uses:
 * **Social manager:** [Jan "Furim" Malewski](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
 * **Artwork designer:** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
 
+<!-- DONATIONS -->
+## Donate
+
+To help the project growing, you can donate to the following Coin Magi (XMG) address: <br>
+`93qJ8j93ibCye7pTWKTu88pr6a8xy7EUqC`
+Thanks in advance :) <br>
+
 Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/) <br> <br>
 <sup><sub>SEO tags (ignore): Duino Coin Coin Magi XMG DUCO Cryptocurrency Exchange Website Stocks Bitcoin Ethereum Litecoin Arduino AVR Rate Digital Cryptocoins Cryptocurrencies pyserial python idle auto py to exe pygithub serveo
