@@ -16,6 +16,22 @@ permalink: /blog/
 
 ***
 
+## 10.11.2019: Version 0.6.5 released!
+Colored PC Miner, re-designed Wallet and much more in Alpha 6.5! <br>
+More info here: [releases/tag/alpha-0.6.5](https://github.com/revoxhere/duino-coin/releases/tag/alpha-0.6.5)
+
+***
+
+## 9.11.2019: Backup pool
+Serveo declared inaccessibility for a few days, so here's a *crude* backup server: <br>
+* Pool address: **0.tcp.ngrok.io** 
+* Pool port: **14005** <br>
+
+Wallet will not work, because it's hard-coded to serveo, but you can use miners. <br>
+Delete `MinerConfing_0.6.5` file and then you will be able to re-run the setup with entering pool address and port.
+
+***
+
 ## 2.11.2019: Pool is back online
 Finally! Serveo and our pool is back up and running again.
 
@@ -43,12 +59,12 @@ We've finally made a bitcointalk topic! Read the conversation here: [https://bit
 ***
 
 ## 27.10.2019: Version 0.6.4.1 released!
-Changelog and download links here: [https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4.1](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4.1)
+Changelog and download links here: [releases/tag/alpha-6.4.1](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4.1)
 
 ***
 
 ## 26.10.2019: Version 0.6.4 released!
-Changelog and download links here: [https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4)
+Changelog and download links here: [releases/tag/alpha-6.4](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.4)
 
 ***
 
