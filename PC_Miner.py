@@ -35,12 +35,12 @@ def loadConfig():
 	global pool_address, pool_port, username, password, efficiency
 	if not Path("MinerConfig_0.6.5.ini").is_file():
 		print(Style.BRIGHT + "Initial configuration, you can edit 'MinerConfig_0.6.5.ini' file later.")
-		print("Don't have an account? Use " + Fore.YELLOW + "Wallet" + " to register.\n")
-		pool_address = input("Enter pool adddress " + Fore.YELLOW + "(official: serveo.net): ")
-		pool_port = input("Enter pool port " + Fore.YELLOW + "(official: 14808): ")
-		username = input("Enter username (the one you used to register): " + Fore.YELLOW)
-		password = input("Enter password (the one you used to register): " + Fore.YELLOW)
-		efficiency = input("Enter mining intensity " + Fore.YELLOW + "(1-100)%: ")
+		print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
+		pool_address = input("Enter pool adddress " + "(official: serveo.net): ")
+		pool_port = input("Enter pool port " + "(official: 14808): ")
+		username = input("Enter username (the one you used to register): ")
+		password = input("Enter password (the one you used to register): ")
+		efficiency = input("Enter mining intensity " + "(1-100)%: ")
 		config['miner'] = {"address": pool_address,
 		"port": pool_port,
 		"username": username,
