@@ -1,5 +1,6 @@
 0.tcp.ngrok.io
-1karakanowo
+10013
+=================
 First line represents the pool IP address.
 Second line is the pool port.
 Other lines aren't used.
