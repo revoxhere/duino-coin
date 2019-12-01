@@ -24,7 +24,6 @@ while True:
                         content = res.content.decode().splitlines() #Read content and split into lines
                         host = content[0] #Line 1 = pool address
                         port = content[1] #Line 2 = pool port
-                        print(host, port)
                         debug = debug + "Received pool IP and port.\n"
                         break
                 else:
