@@ -29,8 +29,8 @@
 [![Discord](https://img.shields.io/discord/604697675430101003.svg?color=Blue&label=Discord&logo=Discord)](https://discord.gg/XJpT3UQ)
 [![Python](https://img.shields.io/badge/Bitcointalk-Duino_Coin-gold.svg)](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
 
-## Important info (16.11.19)
-**Duino Coin network will be offline until serveo will come back online** (they need to fix some phishing issues). Serveo dev declares that after it will be fixed it should work stable then. As an apology to this inconvinience, every user that was active in the last 2 weeks will receive **5 DUCO**.
+## Important info (1.12.19)
+**Duino Coin is back online** and release 0.6.7 is ready and it includes automatic pool address and ip finder so no more need to manually type them :) It will be released in a few days. For now, use **0.tcp.ngrok.io** on port **10013**.
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
