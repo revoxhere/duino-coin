@@ -1,25 +1,39 @@
 #!/usr/bin/env python
 
 ###########################################
-#  Duino-Coin wallet version 0.6.5 alpha  #
+#  Duino-Coin wallet version 0.6.7 alpha  #
 # https://github.com/revoxhere/duino-coin #
 #       copyright by revox 2019           #
 ###########################################
 
-import time, socket, sys, os, configparser, tkinter, webbrowser, urllib.request, random
+import time, socket, sys, os, configparser, tkinter, webbrowser, urllib.request, random, requests
 import threading
 from tkinter import messagebox
 from tkinter import *
 from pathlib import Path
 
 #setting variables
-debug = "Starting debug file of DUCO wallet v0.6.5\n"
+debug = "Starting debug file of DUCO wallet v0.6.7\n"
 users = {}
 status = ""
-host = "0.tcp.ngrok.io" #official server ip
-port = 19921 #official server port
+res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+while True:
+        try:
+                res = requests.get(res, data = None) #Use request to grab data from raw github file
+                if res.status_code == 200: #Check for response
+                        content = res.content.decode().splitlines() #Read content and split into lines
+                        host = content[0] #Line 1 = pool address
+                        port = content[1] #Line 2 = pool port
+                        print(host, port)
+                        debug = debug + "Received pool IP and port.\n"
+                        break
+                else:
+                        time.sleep(0.025)
+        except:
+                debug = debug + "Error while receiving pool data.\n"
+                time.sleep(15)
+        time.sleep(0.025)
 s = socket.socket()
-
 balanceusd = 0
 sending = 0
 debug = debug + "Successfully set variables\n"
@@ -42,11 +56,11 @@ debug = debug + "Calculated prices\n"
 debug = debug + "XMG/USD price is: " + str(xmgusd) + "\n"
 debug = debug + "DUCO/USD price is: " + str(ducousd) + "\n"
 
-if not Path("bg_0.6.5.gif").is_file():
+if not Path("bg_0.6.7.gif").is_file():
         try:
                 debug = debug + "Downloading latest background file\n"
                 url = 'https://i.imgur.com/4bvAxvA.gif'
-                urllib.request.urlretrieve(url, 'bg_0.6.5.gif')
+                urllib.request.urlretrieve(url, 'bg_0.6.7.gif')
         except:
                 debug = debug + "Couldn't download background file!\n"
 else:
@@ -162,7 +176,7 @@ def SelectScr(): #first-time launch window
         window = tkinter.Tk()
         window.geometry("355x190")
         window.resizable(False, False)
-        window.title("Duino-Coin wallet v0.6.5")
+        window.title("Duino-Coin wallet v0.6.7")
         window.configure(background='white')
         
         label = tkinter.Label(window, text = "", bg="white").pack()       
@@ -205,7 +219,7 @@ def num_there(s):
     return any(i.isdigit() for i in s)
 
 def FSSSend():
-        global receipent, fsssend, amount, debug, sending
+        global receipent, fsssend, amount, debug, sending, username
         sendit = "OK"
         receipent = receipentA.get()
         amount = amountA.get()
@@ -287,7 +301,7 @@ def About():
 
         label = tkinter.Label(about, text = "", bg="white").pack()
         label = tkinter.Label(about, text = "Duino-Coin wallet", font="-weight bold", bg="white").pack()
-        label = tkinter.Label(about, text = "Version: 0.6.5 alpha", bg="white").pack()
+        label = tkinter.Label(about, text = "Version: 0.6.7 alpha", bg="white").pack()
         label = tkinter.Label(about, text = "Made by revox from Duino-Coin developers", bg="white").pack()
         tkinter.Button(about, text = "Duino-Coin GitHub", command = GitHub, bg="white").pack()
         label = tkinter.Label(about, text = "", bg="white").pack()
@@ -339,9 +353,9 @@ def WalletWindow():
         wallet = tkinter.Tk()
         wallet.geometry("500x300")
         wallet.resizable(False, False)
-        wallet.title("Duino-Coin wallet v0.6.5")
+        wallet.title("Duino-Coin wallet v0.6.7")
 
-        filename = PhotoImage(file = "bg_0.6.5.gif")
+        filename = PhotoImage(file = "bg_0.6.7.gif")
         background_label = Label(wallet, image=filename)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
         
@@ -360,9 +374,9 @@ def WalletWindow():
         wallet.mainloop()
         
 def Start():
-        global debug
+        global debug, host, port
         try:
-                s.connect((host, port))
+                s.connect((str(host), int(port)))
                 s.settimeout(30)
                 debug = debug + "Connected to the server\n"
                 if not Path("WalletConfig.ini").is_file():
