@@ -1,5 +1,12 @@
-import socket, threading, time, random, hashlib, configparser, sys, datetime, os, signal, time
-from pip._internal import main
+#!/usr/bin/env python
+
+###########################################
+#  Duino-Coin wallet version 0.6.7 alpha  #
+# https://github.com/revoxhere/duino-coin #
+#       copyright by revox 2019           #
+###########################################
+
+import socket, threading, time, random, re, hashlib, configparser, sys, datetime, os, signal, time, requests
 from decimal import Decimal
 from pathlib import Path
 from signal import signal, SIGINT
@@ -7,13 +14,13 @@ from signal import signal, SIGINT
 try:
     from colorama import init, Fore, Back, Style
 except:
-    print("Colorama is not installed. Installing it...")
-    main(['install', '--user', 'colorama'])
-    print("\n")
+    print("Colorama is not installed. Please install it using pip install colorama")
+    sys.exit()
 
 global shares, diff, last_hash_count, khash_count, hash_count, config, VER, connection_counter
 shares = [0, 0]
 diff = 0
+res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
 last_hash_count = 0
 khash_count = 1 #1kh/s if 0 (impossible number)
 hash_count = 10000
@@ -33,31 +40,48 @@ def hush():
 
 def loadConfig():
 	global pool_address, pool_port, username, password, efficiency
-	if not Path("MinerConfig_0.6.5.ini").is_file():
-		print(Style.BRIGHT + "Initial configuration, you can edit 'MinerConfig_0.6.5.ini' file later.")
+	if not Path("MinerConfig_0.6.7.ini").is_file():
+		print(Style.BRIGHT + "Initial configuration, you can edit 'MinerConfig_0.6.7.ini' file later.")
 		print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
-		pool_address = input("Enter pool adddress " + "(official: serveo.net): ")
-		pool_port = input("Enter pool port " + "(official: 14808): ")
 		username = input("Enter username (the one you used to register): ")
 		password = input("Enter password (the one you used to register): ")
 		efficiency = input("Enter mining intensity " + "(1-100)%: ")
-		config['miner'] = {"address": pool_address,
-		"port": pool_port,
+		efficiency = re.sub("\D", "", efficiency)
+		if int(efficiency) > int(100):
+			efficiency = 100
+		if int(efficiency) < int(1):
+			efficiency = 1
+		config['miner'] = {
 		"username": username,
 		"password": password,
 		"efficiency": efficiency}
-		with open("MinerConfig_0.6.5.ini", "w") as configfile:
+		with open("MinerConfig_0.6.7.ini", "w") as configfile:
 			config.write(configfile)
 	else:
-		config.read("MinerConfig_0.6.5.ini")
-		pool_address = config["miner"]["address"]
-		pool_port = config["miner"]["port"]
+		config.read("MinerConfig_0.6.7.ini")
 		username = config["miner"]["username"]
 		password = config["miner"]["password"]
 		efficiency = config["miner"]["efficiency"]
 
 def connect():
-	global soc, connection_counter
+	global soc, connection_counter, res
+	while True:
+		try:
+			res = requests.get(res, data = None) #Use request to grab data from raw github file
+			if res.status_code == 200: #Check for response
+				content = res.content.decode().splitlines() #Read content and split into lines
+				pool_address = content[0] #Line 1 = pool address
+				pool_port = content[1] #Line 2 = pool port
+				now = datetime.datetime.now()
+				print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.GREEN + "Successfully received pool address and IP.")
+				break
+			else:
+				time.sleep(0.025)
+		except:
+			now = datetime.datetime.now()
+			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Cannot receive pool address and IP. Exiting in 15 seconds.")
+			time.sleep(15)
+		time.sleep(0.025)
 	while True:
 		soc = socket.socket()
 		try:
@@ -168,30 +192,30 @@ init(autoreset=True)
 hush()
 while True:
     signal(SIGINT, handler)
-    print(Fore.WHITE + "===========================================")
-    print("    Duino-Coin PC miner version 0.6.5")
+    print("===========================================")
+    print("    Duino-Coin PC miner version 0.6.7")
     print(" https://github.com/revoxhere/duino-coin")
     print("   copyright by MrKris7100 & revox 2019")
     print("===========================================\n")
     try:
             loadConfig() #Firstly, load configfile
     except:
-            print(Style.BIRGHT + Fore.RED + "There was an error loading the configfile. Try removing it and re-running configuration."  + Style.RESET_ALL)
+            print(Style.BRIGHT + Fore.RED + "There was an error loading the configfile. Try removing it and re-running configuration."  + Style.RESET_ALL)
     try:
             connect() #Connect to pool
     except:
-            print(Style.BIRGHT + Fore.RED + "There was an error connecting to pool. Check your config file." + Style.RESET_ALL)
+            print(Style.BRIGHT + Fore.RED + "There was an error connecting to pool. Check your config file." + Style.RESET_ALL)
     try:
             checkVersion() #Check version and display update message if miner isn't updated
     except:
-            print(Style.BIRGHT + Fore.RED + "There was an error checking version. Restarting." + Style.RESET_ALL)
+            print(Style.BRIGHT + Fore.RED + "There was an error checking version. Restarting." + Style.RESET_ALL)
     try:
             login() #Login, obviously
     except:
-            print(Style.BIRGHT + Fore.RED + "There was an error while logging in. Restarting." + Style.RESET_ALL)
+            print(Style.BRIGHT + Fore.RED + "There was an error while logging in. Restarting." + Style.RESET_ALL)
     try:
             mine() #Start mining
     except:
-            print(Style.BIRGHT + Fore.RED + "There was an error while mining. Restarting." + Style.RESET_ALL)
+            print(Style.BRIGHT + Fore.RED + "There was an error while mining. Restarting." + Style.RESET_ALL)
     print(Style.RESET_ALL)
     time.sleep(1)
