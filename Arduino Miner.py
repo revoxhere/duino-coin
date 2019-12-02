@@ -1,4 +1,4 @@
-import socket,threading,time,random,configparser,sys,serial,hashlib,serial.tools.list_ports,datetime
+import socket,threading,time,random,configparser,sys,serial,hashlib,serial.tools.list_ports,datetime,requests
 O=print
 h=int
 E=float
@@ -18,11 +18,12 @@ I=sys.exit
 R=configparser.ConfigParser
 e=random.randint
 X=time.sleep
+res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
 B=threading.Timer
 A=socket.socket
 from pathlib import Path
 O("===========================================")
-O("  Duino-Coin Arduino miner version 0.6.4")
+O("  Duino-Coin Arduino miner version 0.6.7")
 O(" https://github.com/revoxhere/duino-coin")
 O("        copyright by revox 2019")
 O("===========================================\n")
@@ -44,8 +45,25 @@ S=0
 b=0
 z=0
 f=R()
-if not Path("ArduinoMinerConfig_0.6.4.ini").is_file():
- O("Initial configuration, you can edit 'ArduinoMinerConfig_0.6.4.ini' later\n")
+while True:
+        try:
+                res = requests.get(res, data = None) #Use request to grab data from raw github file
+                if res.status_code == 200: #Check for response
+                        content = res.content.decode().splitlines() #Read content and split into lines
+                        pool_address = content[0] #Line 1 = pool address
+                        pool_port = content[1] #Line 2 = pool port
+                        H=Y.now()
+                        O(H.strftime("[%H:%M:%S] ")+"Successfully received pool IP and port.")
+                        break
+                else:
+                        X(0.025)
+        except:
+                H=Y.now()
+                O(H.strftime("[%H:%M:%S] ")+"Couldn't receive pool IP and port. Exiting in 15 seconds.")
+                X(15)
+        X(0.025)
+if not Path("ArduinoMinerConfig_0.6.7.ini").is_file():
+ O("Initial configuration, you can edit 'ArduinoMinerConfig_0.6.7.ini' later\n")
  O("Scanning ports...")
  W=o.list_ports.comports()
  P=[]
@@ -53,18 +71,16 @@ if not Path("ArduinoMinerConfig_0.6.4.ini").is_file():
   P.append(i.device)
  O("Found COM ports: "+a(P))
  y=Q("Enter your Arduino port (e.g: COM8): ")
- p=Q("Enter pool adddress (official: serveo.net): ")
- x=Q("Enter pool port (official: 14808): ")
  M=Q("Enter username (the one you used to register): ")
  l=Q("Enter password (the one you used to register): ")
- f['arduinominer']={"address":p,"arduino":y,"port":x,"username":M,"password":l}
- with q("ArduinoMinerConfig_0.6.4.ini","w")as configfile:
+ f['arduinominer']={"arduino":y,"username":M,"password":l}
+ with q("ArduinoMinerConfig_0.6.7.ini","w")as configfile:
   f.write(configfile)
 else:
- f.read("ArduinoMinerConfig_0.6.4.ini")
+ f.read("ArduinoMinerConfig_0.6.7.ini")
  y=f["arduinominer"]["arduino"]
- p=f["arduinominer"]["address"]
- x=f["arduinominer"]["port"]
+ p=pool_address
+ x=pool_port
  M=f["arduinominer"]["username"]
  l=f["arduinominer"]["password"]
 while J:
@@ -133,4 +149,3 @@ while J:
      O(H.strftime("[%H:%M:%S] ")+"rejected: "+a(c[1])+"/"+a(c[1]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%), diff: "+a(D)+", "+a(z)+" hashes/s (boo!!!)")
      break
    break
-# Created by pyminifier (https://github.com/liftoff/pyminifier)
