@@ -16,6 +16,12 @@ permalink: /blog/
 
 ***
 
+## 2.12.2019: Network back up online and version 0.6.7 released!
+What more to say, the network is working and there's Alpha 6.7 which includes automatic server search. <br>
+Download it here: [releases/tag/alpha-6.7](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.7)
+
+***
+
 ## 16.11.2019: Network offline
 
 Duino Coin network will be offline until serveo will come back online (they need to fix some phishing issues). <br>
@@ -26,7 +32,7 @@ As an apology to this inconvinience, every user that was active in the last 2 we
 
 ## 10.11.2019: Version 0.6.5 released!
 Colored PC Miner, re-designed Wallet and much more in Alpha 6.5! <br>
-More info here: [releases/tag/alpha-0.6.5](https://github.com/revoxhere/duino-coin/releases/tag/alpha-0.6.5)
+More info here: [releases/tag/alpha-6.5](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.5)
 
 ***
 
