@@ -23,14 +23,11 @@
   </p>
 </p>
 
-[![Python](https://img.shields.io/badge/Python-3.7-green.svg)](https://github.com/revoxhere/duino-coin/search?l=py)
+[![Python](https://img.shields.io/badge/Python-3-green.svg)](https://github.com/revoxhere/duino-coin/search?l=py)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Release: Alpha 6.5](https://img.shields.io/badge/Release-Alpha_6.5-red.svg)](https://github.com/revoxhere/duino-coin/releases/tag/alpha-0.6.5)
+[![Release: Alpha 6.7](https://img.shields.io/badge/Release-Alpha_6.7-red.svg)](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.7)
 [![Discord](https://img.shields.io/discord/604697675430101003.svg?color=Blue&label=Discord&logo=Discord)](https://discord.gg/XJpT3UQ)
-[![Python](https://img.shields.io/badge/Bitcointalk-Duino_Coin-gold.svg)](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
-
-## Important info (1.12.19)
-**Duino Coin is back online** and release 0.6.7 is ready and it includes automatic pool address and ip finder so no more need to manually type them :) It will be released in a few days. For now, use **0.tcp.ngrok.io** on port **10013**.
+[![Bitcointalk](https://img.shields.io/badge/Bitcointalk-Duino_Coin-gold.svg)](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
@@ -76,13 +73,14 @@ If you're using Linux, you need to download some dependencies:
 ```bash
 sudo apt install python3 python-pip
 python3 -m pip install pyserial
+python3 -m pip install requests
 ```
 ### Windows
 If you're just a casual user and don't care about unstable stuff you don't need to install anything. Just grab latest [release](https://github.com/revoxhere/duino-coin/releases) and you're ready to go.
 
 ***
 
-If you want to run Arduino Miner after cloning it from GitHub repo instead of downloading release, make sure you have `pyserial` library installed (`py -m pip install pyserial`).
+If you want to run Arduino Miner after cloning it from GitHub repo instead of downloading release, make sure you have `pyserial` and `requests` library installed (`py -m pip install pyserial`, `py -m pip install requests`).
 
 ## Getting Started
 
@@ -98,7 +96,7 @@ Contributions are what make the open source community such an amazing place to b
 Any contributions you make are greatly appreciated.
 
 1. Fork the Project
-2. Create your feature branch (e.g. new readme)
+2. Create your feature branch
 3. Commit your changes
 5. Make sure everything works as intended
 6. Open a pull request
@@ -129,8 +127,8 @@ This section briefly lists major frameworks that Duino-Coin uses:
 ## Donate
 
 To help the project growing, you can donate to the following Coin Magi (XMG) address: <br>
-`93qJ8j93ibCye7pTWKTu88pr6a8xy7EUqC`
-Thanks in advance :) <br>
+`93qJ8j93ibCye7pTWKTu88pr6a8xy7EUqC` <br>
+Thank you in advance :) <br>
 
 Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/) <br> <br>
 <sup><sub>SEO tags (ignore): Duino Coin Coin Magi XMG DUCO Cryptocurrency Exchange Website Stocks Bitcoin Ethereum Litecoin Arduino AVR Rate Digital Cryptocoins Cryptocurrencies pyserial python idle auto py to exe pygithub serveo
