@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+
+###########################################
+# Duino-Coin Arduino Miner ver0.6.7 alpha #
+# https://github.com/revoxhere/duino-coin #
+#       copyright by revox 2019           #
+###########################################
+
 import socket,threading,time,random,configparser,sys,serial,hashlib,serial.tools.list_ports,datetime,requests
 O=print
 h=int
@@ -46,22 +54,22 @@ b=0
 z=0
 f=R()
 while True:
-        try:
-                res = requests.get(res, data = None) #Use request to grab data from raw github file
-                if res.status_code == 200: #Check for response
-                        content = res.content.decode().splitlines() #Read content and split into lines
-                        pool_address = content[0] #Line 1 = pool address
-                        pool_port = content[1] #Line 2 = pool port
-                        H=Y.now()
-                        O(H.strftime("[%H:%M:%S] ")+"Successfully received pool IP and port.")
-                        break
-                else:
-                        X(0.025)
-        except:
-                H=Y.now()
-                O(H.strftime("[%H:%M:%S] ")+"Couldn't receive pool IP and port. Exiting in 15 seconds.")
-                X(15)
-        X(0.025)
+ try:
+  res = requests.get(res, data = None)
+  if res.status_code == 200:
+   content = res.content.decode().splitlines()
+   pool_address = content[0]
+   pool_port = content[1]
+   H=Y.now()
+   O(H.strftime("[%H:%M:%S] ")+"Successfully received pool IP and port.")
+   break
+  else:
+   X(0.025)
+ except:
+  H=Y.now()
+  O(H.strftime("[%H:%M:%S] ")+"Couldn't receive pool IP and port. Exiting in 15 seconds.")
+  X(15)
+ X(0.025)
 if not Path("ArduinoMinerConfig_0.6.7.ini").is_file():
  O("Initial configuration, you can edit 'ArduinoMinerConfig_0.6.7.ini' later\n")
  O("Scanning ports...")
