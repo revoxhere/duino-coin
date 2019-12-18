@@ -16,6 +16,30 @@ permalink: /blog/
 
 ***
 
+## 18.12.2019: Christmas artwork contest!
+Ready to compete and win some coins? <br>
+Your job is to create one of the following Duino-Coin themed artworks.<br>
+Voting will happen on [Duino-Coin Discord server](https://discord.gg/XJpT3UQ). <br>
+Multiple entries are allowed.
+
+* **Wallet background** - 5:3 ratio (e.g. 500x300px), make sure the artwork isn't NSFW and buttons won't cover important parts, doesn't need to be christmas themed, rest is up to you. 
+  * **1st place** will be included in the Alpha 7 release and the winner will receive 30 DuinoCoins. 
+  * **2nd place** winner will receive 20 DuinoCoins. 
+  * **3rd place** winner will receive 10 DuinoCoins. 
+  * **Other users** that took part in the contest will receive 5 DuinoCoins.
+
+* **Christmas-themed background** - 16:9 ratio (e.g. 1280x720), make sure the artwork isn't NSFW; the artwork should include the duco logo (big or small, find it on the website and github)
+  * **1st place** will be the new Duino-Coin logo/thumbnail and the winner will receive 30 DuinoCoins. 
+  * **2nd place** winner will receive 20 DuinoCoins. 
+  * **3rd place** winner will receive 10 DuinoCoins. 
+  * **Other users** that took part in the contest will receive 5 DuinoCoins.
+
+* **Other custom submissions** will also be rewarded if they will be interesting.
+
+**Deadline: 22 december 2019.** Remember to invite your friends too! Happy designing! :)
+
+***
+
 ## 2.12.2019: Network back up online and version 0.6.7 released!
 What more to say, the network is working and there's Alpha 6.7 which includes automatic server search. <br>
 Download it here: [releases/tag/alpha-6.7](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.7)
