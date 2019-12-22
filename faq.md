@@ -13,15 +13,19 @@ permalink: /faq/
 
 ## Frequently Asked Questions
 
-* * **Q:** Where can I exchange Duino-Coins? <br>
-   * **A:** E.g. at [DUCO Exchange](https://revoxhere.github.io/duco-exchange/) (DUCO to XMG, soon DUCO TO BTC)
+* * **Q:** What is Duino-Coin? <br>
+   * **A:** Short answer: a new type of cryptocurrency. You can learn more about it on the [official website](https://revoxhere.github.io/duino-coin/).
+
+***
+
+* * **Q:** Is Duino-Coin worth anything? Where can I exchange it? <br>
+   * **A:** Sure it is! You can exchange it at [DUCO Exchange](https://revoxhere.github.io/duco-exchange/).
 
 ***
 
 * * **Q:** Why sometimes mining stops, I can't check account balance and can't reconnect?<br>
    * **A:** Lately our TCP tunnel provider is probably having some connection issues.<br>
    Best thing to do in this situation is to just wait a few minutes and pool will be back online.<br> 
-   If problem persists for a longer time, open an [Issue](https://github.com/revoxhere/duino-coin/issues).
 
 ***
 
@@ -29,6 +33,11 @@ permalink: /faq/
    * **A:** Yes! Come and talk with us: [https://discord.gg/XJpT3UQ](https://discord.gg/XJpT3UQ) <br>
 You will find there general chat, benchmarking room and much more to come in the future!
 
+***
+
+* * **Q:** Where can I find some info about the official pool?
+   * **A:** [Here](https://revoxhere.github.io/duco-statistics/) is the official website.
+   
 ***
 
 * * **Q:** Can I see each miner hashrate on the pool statistics website?
