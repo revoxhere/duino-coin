@@ -16,6 +16,11 @@ permalink: /blog/
 
 ***
 
+## 1.01.2020: 🎉
+![2019 in review](https://i.imgur.com/7EmBgEj.png)
+
+***
+
 ## 18.12.2019: Christmas artwork contest!
 Ready to compete and win some coins? <br>
 Your job is to create one of the following Duino-Coin themed artworks.<br>
