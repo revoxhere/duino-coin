@@ -17,6 +17,15 @@ permalink: /blog/
 
 ***
 
+## 4.01.2020: Alpha 6.8 is in the works. 
+In it, I'll try to fix most of the bugs from all Alpha 6 releases. <br>
+Alpha 6.9 may be released to fix some leftovers. <br>
+We are also preparing for Alpha 7. <br>
+It's going to be a 'big' update so everyone will have to upgrade. <br>
+But a few more weeks until this happens.
+
+***
+
 ## 1.01.2020: 🎉
 ![2019 in review](https://i.imgur.com/7EmBgEj.png)
 
