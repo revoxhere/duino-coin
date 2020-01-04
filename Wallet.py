@@ -1,7 +1,6 @@
-#!/usr/bin/env python
-
+#!/usr/bin/env python3
 ###########################################
-#  Duino-Coin wallet version 0.6.7 alpha  #
+#  Duino-Coin wallet version 0.6.8 alpha  #
 # https://github.com/revoxhere/duino-coin #
 #       copyright by revox 2019           #
 ###########################################
@@ -12,9 +11,12 @@ from tkinter import messagebox
 from tkinter import *
 from pathlib import Path
 
-#setting variables
-debug = "Starting debug file of DUCO wallet v0.6.7\n"
-users = {}
+debug = "Starting debug file of DUCO wallet v0.6.8\n"
+
+try:
+        os.mkdir("res") #resources folder
+except:
+        pass
 status = ""
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
 while True:
@@ -30,11 +32,11 @@ while True:
                         time.sleep(0.025)
         except:
                 debug = debug + "Error while receiving pool data.\n"
-                time.sleep(15)
         time.sleep(0.025)
 s = socket.socket()
 balanceusd = 0
 sending = 0
+alt_mode = 0
 debug = debug + "Successfully set variables\n"
 try:
         config = configparser.ConfigParser()
@@ -45,7 +47,7 @@ except:
 # 1 XMG = ~0.02 USD
 # 1 DUCO = ~0.002 USD
 # price is also backed up by some luck during trading, so small randomness is added
-# 9.11.2019
+# 1.01.2020
 rand = random.randint(1000,1090)
 rand = rand / 1000
 xmgusd = 0.02985
@@ -55,15 +57,25 @@ debug = debug + "Calculated prices\n"
 debug = debug + "XMG/USD price is: " + str(xmgusd) + "\n"
 debug = debug + "DUCO/USD price is: " + str(ducousd) + "\n"
 
-if not Path("bg_0.6.7.gif").is_file():
+if not Path("res/bg_0.6.8.gif").is_file():
         try:
                 debug = debug + "Downloading latest background file\n"
-                url = 'https://i.imgur.com/4bvAxvA.gif'
-                urllib.request.urlretrieve(url, 'bg_0.6.7.gif')
+                url = 'https://i.imgur.com/r6g8eR9.gif'
+                urllib.request.urlretrieve(url, 'res/bg_0.6.8.gif')
         except:
                 debug = debug + "Couldn't download background file!\n"
 else:
         debug = debug + "Background image already downloaded\n"
+
+if not Path("res/bg_0.6.8_alt.gif").is_file():
+        try:
+                debug = debug + "Downloading latest background file\n"
+                url = 'https://i.imgur.com/bUlETdV.gif'
+                urllib.request.urlretrieve(url, 'res/bg_0.6.8_alt.gif')
+        except:
+                debug = debug + "Couldn't download alternate background file!\n"
+else:
+        debug = debug + "Alternate background image already downloaded\n"
  
 def Signup(): #signup definition
         global pwordE
@@ -157,7 +169,7 @@ def CheckLogin(): #login server communication section
         if key == "OK":
                 config['wallet'] = {"username": username,
                 "password": password}
-                with open("WalletConfig.ini", "w") as configfile:
+                with open("res/WalletConfig.ini", "w") as configfile:
                         config.write(configfile)
                 rootA.destroy()
                 WalletWindow()
@@ -175,7 +187,7 @@ def SelectScr(): #first-time launch window
         window = tkinter.Tk()
         window.geometry("355x190")
         window.resizable(False, False)
-        window.title("Duino-Coin wallet v0.6.7")
+        window.title("Duino-Coin wallet v0.6.8")
         window.configure(background='white')
         
         label = tkinter.Label(window, text = "", bg="white").pack()       
@@ -189,10 +201,18 @@ def SelectScr(): #first-time launch window
         window.mainloop()
         
 def WalletScr():
-        global username, password, debug
-        config.read("WalletConfig.ini")
+        global username, password, debug, alt_mode
+        config.read("res/WalletConfig.ini")
         username = config["wallet"]["username"]
         password = config["wallet"]["password"]
+        try:
+                alt_mode = config["wallet"]["alt_mode"]
+        except:
+                config['wallet'] = {"username": username,
+                "password": password,
+                "alt_mode": str(0)}
+                with open("WalletConfig.ini", "w") as configfile:
+                        config.write(configfile)
         debug = debug + "Using pre-defined settings of user " + str(username) + "\n"
         try:
                 debug = debug + "Successfully logged-in\n"
@@ -209,7 +229,7 @@ def WalletScr():
                 WalletWindow()
         if key == "NO":
                 messagebox.showerror("Error!","Error in pre-defined configfile (WalletConfig.ini)!\nRemove it and restart the wallet.")
-                os.remove("WalletConfig.ini")
+                os.remove("res/WalletConfig.ini")
                 SelectScr()
         else:
                 WalletScr()
@@ -265,7 +285,7 @@ def Send():
         send.title('Send funds')
         send.configure(background='white')
         
-        label = tkinter.Label(send, text = "Your balance: "+balancegood+" DUCO", bg="white")
+        label = tkinter.Label(send, text = "Your balance: "+balance+" DUCO", bg="white")
         receipentA = Label(send, text="Receipents' username: ", bg="white")
         amountA = Label(send, text='Amount: ', bg="white")
         receipentA.grid(row=1, column=0, sticky=W) 
@@ -289,21 +309,50 @@ def Receive(): #receiving funds help dialog
                 messagebox.showinfo("Receive funds", "To receive funds, instruct others to send money to your username.")
         pass
 
+def alton():
+        global username, password, debug, alt_mode
+        config['wallet'] = {"username": username,
+        "password": password,
+        "alt_mode": str(1)}
+        with open("res/WalletConfig.ini", "w") as configfile:
+                config.write(configfile)
+        debug = debug + "Set alternative background.\n"
+        messagebox.showinfo("Restart needed!","In order to apply changes, restart your wallet.\nThis months background was made by: niebieskikot")
+        
+def altoff():
+        global username, password, debug, alt_mode
+        config['wallet'] = {"username": username,
+        "password": password,
+        "alt_mode": str(0)}
+        with open("res/WalletConfig.ini", "w") as configfile:
+                config.write(configfile)
+        debug = debug + "Set normal background.\n"
+        messagebox.showinfo("Restart needed!","In order to apply changes, restart your wallet.")
+
+
 def About():
         global about, debug
         
         about = Tk() #about window
         about.resizable(False, False)
-        about.geometry("400x300")
+        about.geometry("400x400")
         about.title('About')
         about.configure(background='white')
 
         label = tkinter.Label(about, text = "", bg="white").pack()
         label = tkinter.Label(about, text = "Duino-Coin wallet", font="-weight bold", bg="white").pack()
-        label = tkinter.Label(about, text = "Version: 0.6.7 alpha", bg="white").pack()
+        label = tkinter.Label(about, text = "Version: 0.6.8 alpha", bg="white").pack()
         label = tkinter.Label(about, text = "Made by revox from Duino-Coin developers", bg="white").pack()
-        tkinter.Button(about, text = "Duino-Coin GitHub", command = GitHub, bg="white").pack()
+        tkinter.Button(about, text = "Duino-Coin GitHub", command = GitHub, bg="white", width = 46).pack()
         label = tkinter.Label(about, text = "", bg="white").pack()
+        
+        A = tkinter.Button(about, text = "Use alternative mode", command = alton, bg="white", width = 20)
+        A.place(rely=0.3, relx=0.06)
+        N = tkinter.Button(about, text = "Use regular mode", command = altoff, bg="white", width = 20)
+        N.place(rely=0.3, relx=0.52)
+
+        label = tkinter.Label(about, text = "", bg="white").pack()
+     
         label = tkinter.Label(about, text = "Debug output (useful for diagnosing problems):", bg="white").pack()
         S = tkinter.Scrollbar(about)
         T = tkinter.Text(about, height=3, width=50)
@@ -322,7 +371,7 @@ def Exchange():
         pass
 
 def getBalance():
-        global balancegood, wallet, ducousd, balanceusd, sending
+        global balance, wallet, ducousd, balanceusd, sending, debug
         if sending == 1:
                 try:
                         threading.Timer(1, getBalance).stop()
@@ -331,38 +380,45 @@ def getBalance():
         else:
                 s.send(bytes("BALA", encoding='utf8'))
                 time.sleep(0.025)
-                balance = s.recv(1024)
-                balance = balance.decode('utf8')
-                balance = balance[:10]
-                if "." in balance:
-                        balancegood = balance
+                try:
+                        balance = s.recv(1024)
+                        balance = balance.decode('utf8')
+                except:
+                        getBalance()
+
+                if "." in str(balance):
                         try:
-                                label = tkinter.Label(wallet, text = "Your balance: "+balancegood+" (DUCO)", bg="white", font=("Arial", 12)).place(relx=.1, rely=.15)
+                                balance = round(float(balance), 8)
                         except:
-                                pass
+                                getBalance()
+
+                        label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO", bg="white", font=("Arial", 12)).place(relx=.1, rely=.15)
+                else:
+                        debug = debug + "Error while receiving balance!\n"
+                        getBalance()
                 balanceusd = float(balance) * float(ducousd)
                 balanceusd = str(balanceusd)[:8]
                 ducousd = str(ducousd)[:8]
-                threading.Timer(1, getBalance).start()
+                threading.Timer(1.5, getBalance).start()
         
 def WalletWindow():
-        getBalance()
-        global wallet, label
+        global wallet, label, alt_mode
         
         wallet = tkinter.Tk()
         wallet.geometry("500x300")
         wallet.resizable(False, False)
-        wallet.title("Duino-Coin wallet v0.6.7")
-
-        filename = PhotoImage(file = "bg_0.6.7.gif")
+        wallet.title("Duino-Coin wallet v0.6.8")
+        if int(alt_mode) == 1:
+                filename = PhotoImage(file = "res/bg_0.6.8_alt.gif")
+        else:
+                filename = PhotoImage(file = "res/bg_0.6.8.gif")
         background_label = Label(wallet, image=filename)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
+        getBalance()
         
-        label = tkinter.Label(wallet, text = "Duino-Coin wallet", bg="white", fg="gold", font=("Arial", 20, "bold")).place(relx=.5, rely=.06, anchor="c")
-        label = tkinter.Label(wallet, text = "", bg="white").place()
-        label = tkinter.Label(wallet, text = "Your balance: "+balancegood+" (DUCO)", bg="white", font=("Arial", 12)).place(relx=.1, rely=.15)
-        label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd), bg="white", font=("Arial", 10)).place(relx=.1, rely=.213)
-        label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd), bg="white", font=("Arial", 10)).place(relx=.1, rely=.27)
+        label = tkinter.Label(wallet, text = "Duino-Coin wallet", bg="white", fg="gold", font=("Arial", 20, "bold")).place(relx=.5, rely=.08, anchor="c")
+        label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $", bg="white", font=("Arial", 10)).place(relx=.1, rely=.213)
+        label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $", bg="white", font=("Arial", 10)).place(relx=.1, rely=.27)
         
         tkinter.Button(wallet, text = "Send funds", command = Send, bg="white", font=("Arial", 10), height = 1, width = 30).place(relx=0.1, rely=0.42)
         tkinter.Button(wallet, text = "Receive funds", command = Receive, bg="white", font=("Arial", 10), height = 1, width = 30).place(relx=0.1, rely=0.53)
@@ -376,15 +432,15 @@ def Start():
         global debug, host, port
         try:
                 s.connect((str(host), int(port)))
-                s.settimeout(30)
+                s.settimeout(1)
                 debug = debug + "Connected to the server\n"
-                if not Path("WalletConfig.ini").is_file():
+                if not Path("res/WalletConfig.ini").is_file():
                         SelectScr()
                 else:
                         WalletScr()
-        except:
+        except SystemExit:
                 root = tkinter.Tk()
                 root.withdraw()
-                messagebox.showerror("Error!","A server update is probably underway.\nPlease try again later.")
+                messagebox.showerror("Error!","Please try again later.\nServer is under maintenance.")
                 sys.exit()
 Start()
