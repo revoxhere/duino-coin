@@ -1,12 +1,11 @@
-#!/usr/bin/env python
-
+#!/usr/bin/env python3
 ###########################################
-#  Duino-Coin wallet version 0.6.7 alpha  #
+#  Duino-Coin wallet version 0.6.8 alpha  #
 # https://github.com/revoxhere/duino-coin #
 #       copyright by revox 2019           #
 ###########################################
 
-import socket, threading, time, random, re, hashlib, configparser, sys, datetime, os, signal, time, requests
+import socket, statistics, threading, time, random, re, hashlib, configparser, sys, datetime, os, signal, time, requests
 from decimal import Decimal
 from pathlib import Path
 from signal import signal, SIGINT
@@ -22,26 +21,30 @@ shares = [0, 0]
 diff = 0
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
 last_hash_count = 0
-khash_count = 1 #1kh/s if 0 (impossible number)
-hash_count = 10000
+khash_count = 0 #1kh/s if 0 (impossible number)
+hash_count = 0
+hash_mean = []
 config = configparser.ConfigParser()
 VER = "0.6" #big version number
 timeout = 15 #timeout after n seconds
 catch = 0
 
 def hush():
-	global last_hash_count, hash_count, khash_count
+	global last_hash_count, hash_count, khash_count, hash_mean
 	last_hash_count = hash_count
 	khash_count = last_hash_count / 1000
 	if khash_count == 0:
-		khash_count = 10.0
+		khash_count = 1.01
+	hash_mean.append(khash_count)
+	khash_count = statistics.mean(hash_mean)
+	khash_count = round(khash_count, 2)
 	hash_count = 0
 	threading.Timer(1.0, hush).start()
 
 def loadConfig():
 	global pool_address, pool_port, username, password, efficiency
-	if not Path("MinerConfig_0.6.7.ini").is_file():
-		print(Style.BRIGHT + "Initial configuration, you can edit 'MinerConfig_0.6.7.ini' file later.")
+	if not Path("MinerConfig_0.6.8.ini").is_file():
+		print(Style.BRIGHT + "Initial configuration, you can edit 'MinerConfig_0.6.8.ini' file later.")
 		print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
 		username = input("Enter username (the one you used to register): ")
 		password = input("Enter password (the one you used to register): ")
@@ -55,10 +58,10 @@ def loadConfig():
 		"username": username,
 		"password": password,
 		"efficiency": efficiency}
-		with open("MinerConfig_0.6.7.ini", "w") as configfile:
+		with open("MinerConfig_0.6.8.ini", "w") as configfile:
 			config.write(configfile)
 	else:
-		config.read("MinerConfig_0.6.7.ini")
+		config.read("MinerConfig_0.6.8.ini")
 		username = config["miner"]["username"]
 		password = config["miner"]["password"]
 		efficiency = config["miner"]["efficiency"]
@@ -81,6 +84,7 @@ def connect():
 			now = datetime.datetime.now()
 			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Cannot receive pool address and IP. Exiting in 15 seconds.")
 			time.sleep(15)
+			os._exit()
 		time.sleep(0.025)
 	while True:
 		soc = socket.socket()
@@ -94,6 +98,7 @@ def connect():
 			now = datetime.datetime.now()
 			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Cannot connect to pool server. There is probably a server update going on. Retrying in 15 seconds...")
 			time.sleep(15)
+			os._exit()
 		time.sleep(0.025)
 
 def checkVersion():
@@ -104,10 +109,10 @@ def checkVersion():
 			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.GREEN + "Successfully checked if miner is up-to-date.")
 		else:
 			now = datetime.datetime.now()
-			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Miner is outdated, please download latest version from https://github.com/revoxhere/duino-coin/releases/")
+			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/")
 			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Exiting in 15 seconds.")
 			time.sleep(15)
-			sys.exit()
+			os._exit()
 	except:
 		connect()
 
@@ -128,7 +133,7 @@ def login():
 				print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
 				soc.close()
 				time.sleep(15)
-				sys.exit()
+				os._exit()
 		except:
 			connect()
 
@@ -183,7 +188,7 @@ def mine():
 
 def handler(signal_received, frame):
     # Handle any cleanup here
-    print("SIGINT or CTRL-C detected. Exiting gracefully.")
+    print("SIGINT or CTRL-C detected. Goodbye!")
     soc.send(bytes("CLOSE", encoding="utf8"))
     os._exit(0)
 
@@ -193,7 +198,7 @@ hush()
 while True:
     signal(SIGINT, handler)
     print("===========================================")
-    print("    Duino-Coin PC miner version 0.6.7")
+    print("    Duino-Coin PC miner version 0.6.8")
     print(" https://github.com/revoxhere/duino-coin")
     print("   copyright by MrKris7100 & revox 2019")
     print("===========================================\n")
