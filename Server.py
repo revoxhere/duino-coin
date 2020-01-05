@@ -1,7 +1,6 @@
-#!/usr/bin/env python
-
+#!/usr/bin/env python3
 ###########################################
-# Duino-Coin public-server version 0.6.4  #
+# Duino-Coin public-server version 0.6.8  #
 # https://github.com/revoxhere/duino-coin #
 #  copyright by MrKris7100 & revox 2019   #
 ###########################################
@@ -17,14 +16,16 @@ from github import Github
 
 def ServerLog(whattolog):
         #Getting actual date and time
-        now = datetime.datetime.now()
+        #now = datetime.datetime.now()
         #Creating and opening today's log file
-        logfile = open(now.strftime("logs/%Y-%m-%d.txt"), "a")
+        #logfile = open(now.strftime("logs/%Y-%m-%d.txt"), "a")
         #Time formating
-        now = now.strftime("[%Y-%m-%d %H:%M:%S] ")
+        #now = now.strftime("[%Y-%m-%d %H:%M:%S] ")
         #Writing message and closing file
-        logfile.write(now + whattolog + "\n")
-        logfile.close()
+        #logfile.write(now + whattolog + "\n")
+        #print(whattolog+"\n")
+        #logfile.close()
+        pass
 
 def ServerLogHash(whattolog): #Separate serverlog section for mining section debugging. Not used in proper pool to reduce disk usage. 
         #Getting actual date and time
@@ -36,6 +37,7 @@ def ServerLogHash(whattolog): #Separate serverlog section for mining section deb
         #Writing message and closing file
         #logfile.write(now + whattolog + "\n")
         #logfile.close()
+        #print(whattolog+"\n")
         pass
         
 def UpdateServerInfo():
@@ -97,7 +99,7 @@ def UpdateServerInfo():
         diff = math.ceil(int(bloki) / diff_incrase_per)
         file.write(str(diff))
         reward = float(0.000001) * int(diff)
-        reward = str(reward)[:7]
+        reward = str(reward)[:8]
         file.write(str("\nReward: "))
         file.write(str(reward))
         file.write(str(" DUCO/block"))
@@ -182,6 +184,7 @@ class InputProc(threading.Thread):
                                         #Shutting down server
                                         with locker:
                                                 sys.exit()
+                time.sleep(1)
 
 class ClientThread(threading.Thread): #separate thread for every user
         def __init__(self, ip, port, clientsock):
@@ -189,6 +192,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                 self.ip = ip
                 self.port = port
                 self.clientsock = clientsock
+                #clientsock.settimeout(60)
                 try:
                         #Sending server version to client
                         clientsock.send(bytes(VER, encoding='utf8'))
@@ -229,7 +233,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                                 username = data[1]
                                 password = data[2]
                                 server_info['miners'] += 1
-                                hashrates[thread_id] = {"username" : username, "hashrate" : 0}
+                                hashrates[int(thread_id)] = {"username" : username, "hashrate" : 0}
                                 ServerLog("Client "+str(username)+" has requested account registration.")
                                 #Checking username for unallowed characters
                                 if re.match(regex,username):
@@ -240,8 +244,8 @@ class ClientThread(threading.Thread): #separate thread for every user
                                                 file.write(password)
                                                 file.close()
                                                 file = open("balances/" + username + ".txt", "w")
-                                                file.write(str(new_user_balance))
-                                                file.close
+                                                file.write(str("0.5"))
+                                                file.close()
                                                 self.clientsock.send(bytes("OK", encoding='utf8'))
                                                 ServerLog("New user (" + username + ") registered")
                                         else:
@@ -260,9 +264,10 @@ class ClientThread(threading.Thread): #separate thread for every user
                                 username = data[1]
                                 password = data[2]
                                 server_info['miners'] += 1
-                                hashrates[thread_id] = {"username" : username, "hashrate" : 0}
+                                hashrates[int(thread_id)] = {"username" : username, "hashrate" : 0}
                                 ServerLog("Client request logging in to account " + username)
                                 #Checking username for unallowed characters
+                                print(thread_id)
                                 if re.match(regex,username):
                                         #Checking that user exists
                                         try:
@@ -281,7 +286,10 @@ class ClientThread(threading.Thread): #separate thread for every user
                                                 self.clientsock.send(bytes("OK", encoding='utf8'))
                                                 ServerLog("Password matches, user logged")
                                                 #Updating statistics username
-                                                hashrates[thread_id]["username"] = username
+                                                try:
+                                                        hashrates[int(thread_id)]["username"] = username
+                                                except:
+                                                        pass
                                         else:
                                                 #Bad password, disconneting
                                                 ServerLog("Incorrect password")
@@ -295,8 +303,6 @@ class ClientThread(threading.Thread): #separate thread for every user
                                 
                         #Client requested new job for him
                         elif username != "" and data[0] == "JOB": #main, mining section
-                                hashrates[thread_id]
-                                ServerLogHash("New job for user: " + username)
                                 #Waiting for unlocked files then locking them
                                 with locker:
                                         #Reading blocks amount
@@ -330,19 +336,22 @@ class ClientThread(threading.Thread): #separate thread for every user
                                         if err.errno == errno.ECONNRESET:
                                                 break
                                 #0.5.1 version compatibility
-                                if response.find(",") != -1:
-                                        try:
-                                                response = response.split(",")
-                                                result = response[0]
-                                                hashrates[thread_id]["hashrate"] = int(response[1])
-                                        except:
-                                                pass
-                                else:
-                                        try:
-                                                result = response
-                                                hashrates[thread_id]["hashrate"] = 1000 #1kH/s if none submitted
-                                        except:
-                                                pass
+                                try:
+                                        if response.find(",") != -1:
+                                                try:
+                                                        response = response.split(",")
+                                                        result = response[0]
+                                                        hashrates[int(thread_id)]["hashrate"] = int(response[1])
+                                                except:
+                                                        pass
+                                        else:
+                                                try:
+                                                        result = response
+                                                        hashrates[int(thread_id)]["hashrate"] = 1000 #1kH/s if none submitted
+                                                except:
+                                                        pass
+                                except:
+                                        pass
                                 #Checking recived result is good hash
                                 if result == str(rand):
                                         ServerLogHash("Recived good result (" + str(result) + ")")
@@ -350,7 +359,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                                         with locker: #Using locker because some users submitted problems when mining on many devices and weird things happened
                                                 bal = open("balances/" + username + ".txt", "r")
                                                 global reward
-                                                reward = float(0.000001) * int(diff)
+                                                reward = float(0.0000001) * int(diff)
                                                 balance = str(float(bal.readline())).rstrip("\n\r ")
                                                 balance = float(balance) + float(reward)
                                                 bal = open("balances/" + username + ".txt", "w")
@@ -377,9 +386,9 @@ class ClientThread(threading.Thread): #separate thread for every user
                                         ServerLogHash("Recived bad result!"+result)
                                         try:
                                                 self.clientsock.send(bytes("BAD", encoding="utf8"))
-                                        except socket.error as err:
-                                                if err.errno == errno.ECONNRESET:
-                                                        break
+                                        except:
+                                                break
+                                time.sleep(0.1)
                                                 
                         #Client requested account balance checking
                         elif username != "" and data[0] == "BALA": #check balance section
@@ -389,9 +398,9 @@ class ClientThread(threading.Thread): #separate thread for every user
                                 file.close()
                                 try:
                                         self.clientsock.send(bytes(balance, encoding='utf8'))
-                                except socket.error as err:
-                                        if err.errno == errno.ECONNRESET:
-                                                break
+                                except:
+                                        break
+                                time.sleep(1)
 
                         #Close connection request, may be used in the future
                         elif username != "" and data[0] == "CLOSE":
@@ -402,9 +411,11 @@ class ClientThread(threading.Thread): #separate thread for every user
                                         #Decrasing number of connected miners
                                         server_info['miners'] -= 1
                                         #Delete this miner from statistics
-                                        del hashrates[thread_id]
+                                        del hashrates[int(thread_id)]
+                                        time.sleep(5)
                                 except:
                                         ServerLog("Error closing connection (" + thread_id + ")!")
+                                        time.sleep(5)
                                 
                         elif username != "" and data[0] == "SEND": #sending funds section
                                 sender = username
@@ -422,9 +433,8 @@ class ClientThread(threading.Thread): #separate thread for every user
                                 if amount > balance:
                                         try:
                                                 self.clientsock.send(bytes("Error! Your balance is lower than amount you want to transfer!", encoding='utf8'))
-                                        except socket.error as err:
-                                                if err.errno == errno.ECONNRESET:
-                                                        break
+                                        except:
+                                                break
                                 else: #if ok, check if recipient adress exists
                                         if Path("balances/" + reciver + ".txt").is_file():
                                                 #it exists, now -amount from sender and +amount to reciver
@@ -446,30 +456,31 @@ class ClientThread(threading.Thread): #separate thread for every user
                                                         try:
                                                                 self.clientsock.send(bytes("Successfully transfered funds!!!", encoding='utf8'))
                                                         except socket.error as err:
-                                                                if err.errno == errno.ECONNRESET:
-                                                                        break
+                                                                break
                                                         ServerLog("Transferred " + str(amount) + " DUCO from " + sender + " to " + reciver)
                                                 except:
                                                         try:
                                                                 self.clientsock.send(bytes("Unknown error occured while sending funds.", encoding='utf8'))
                                                         except socket.error as err:
-                                                                if err.errno == errno.ECONNRESET:
-                                                                        break
+                                                                break
                                         else: #message if recipient doesn't exist
-                                                ServerLog("The recepient", reciver, "doesn't exist!")
+                                                ServerLog("The recepient "+reciver+" doesn't exist!")
                                                 try:
                                                         self.clientsock.send(bytes("Error! The recipient doesn't exist!", encoding='utf8'))
                                                 except socket.error as err:
-                                                        if err.errno == errno.ECONNRESET:
-                                                                break
+                                                        break
+                ServerLog("Thread (" + thread_id + ") and connection closed")
+                #Closing socket connection
+                self.clientsock.close()
+                
+                #Delete this miner from statistics
                 try:
-                        ServerLog("Thread (" + thread_id + ") and connection closed")
-                        #Closing socket connection
-                        self.clientsock.close()
-                        #Delete this miner from statistics
-                        del hashrates[thread_id]
+                        del hashrates[int(thread_id)]
+                        server_info['miners'] -= 1
+                        ServerLog("Del passed!")
                 except:
-                        ServerLog("Error closing connection (" + thread_id + ")!")
+                        ServerLog("Error removing from dict " + str(thread_id))
+                time.sleep(5)
                         
 
 regex = r'^[\w\d_()]*$'
@@ -572,6 +583,7 @@ while True:
                 threads.append(newthread)
         except:
                 ServerLog("Error in main loop!")
+        time.sleep(0.025)
 
 for t in threads:
         t.join()
