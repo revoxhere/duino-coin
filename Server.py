@@ -58,7 +58,7 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
   file.write(str(" ("))
   file.write(str(' '.join([hashrates[x]["username"] for x in hashrates])))
   file.write(str(")"))
-  file.write(str("\nRegistered users: "
+  file.write(str("\nRegistered users: "))
   file.write(str(server_info["users"]))
   file.write(str("\nLast connected worker: ")) # This will be improved one day
   for x in hashrates.values():
@@ -92,10 +92,10 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
   file.write(str("\nCurrent difficulty: "))
   diff = math.ceil(int(bloki) / diff_incrase_per)
   file.write(str(diff))
-  reward = round(float(0.000000002) * int(diff), 10)
+  reward = round(float(0.000002) * int(diff), 10)
   file.write(str("\nReward: "))
   file.write(str(reward))
-  file.write(str("\nDUCO/block"))
+  file.write(str(" DUCO/block"))
   file.write(str("\nLast updated: "))
   file.write(str(now))
   file.write(str("(GMT+1) (updated every 60s)"))
@@ -215,8 +215,11 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
         if err.errno == errno.ECONNRESET:
           break
       if data:
-        data = data.decode()
-        data = data.split(",")
+        try:
+          data = data.decode()
+          data = data.split(",")
+        except:
+          break
 
       ######################## REGISTRATION PROTOCOL ########################
       if data[0] == "REGI":
@@ -292,7 +295,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
 
       ######################## MINING PROTOCOL ########################
       elif username != "" and data[0] == "JOB":
-        time.sleep(1)
+        time.sleep(0.2)
         # Wait for unlocked files then lock them
         with locker:
           # Read blocks amount
@@ -344,7 +347,6 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           pass
         # Checking received result
         if result == str(rand):
-          print("received result good")
           ServerLogHash("Recived good result (" + str(result) + ")")
           # Rewarding user for good hash
           with locker: # Using locker to fix problems when mining on many devices with one account
@@ -374,7 +376,6 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
             blo.close()
         else:
           # If result is bad send "BAD"
-          print("received bad resultage")
           ServerLogHash("Recived bad result!"+result)
           try:
             self.clientsock.send(bytes("BAD", encoding="utf8"))
@@ -383,7 +384,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
 
       ######################## BALANCE CHECK PROTOCOL ########################
       elif username != "" and data[0] == "BALA":
-        time.sleep(1)
+        time.sleep(0.2)
         ServerLog("Client request balance check")
         file = open("balances/" + username + ".txt", "r")
         balance = file.readline()
@@ -410,7 +411,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           
       ######################## SENDING PROTOCOL ########################
       elif username != "" and data[0] == "SEND":
-        time.sleep(1)
+        time.sleep(0.2)
         sender = username
         reciver = data[2]
         amount = float(data[3])
@@ -485,8 +486,6 @@ hashrates = {}
 config = configparser.ConfigParser()
 locker = threading.Lock()
 update_count = 0
-port = int(port)
-diff_incrase_per = int(diff_incrase_per)
 VER = "0.6"
 
 ######################## INITIAL FILE CREATION ########################
@@ -538,7 +537,8 @@ else:
   gitusername = config['server']['gitusername']
   gitpassword = config['server']['gitpassword']
   gitrepo = config['server']['gitrepo']
-  ServerLog("Loaded server config: " + host + ", " + port + ", " + new_user_balance + ", " + reward + ", " + diff_incrase_per)
+  port = int(port)
+  diff_incrase_per = int(diff_incrase_per)
 
 ######################## BIND SOCKETS ########################
 try:
