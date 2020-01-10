@@ -34,6 +34,14 @@ config = configparser.ConfigParser()
 VER = "0.6" # "Big" version number
 timeout = 10 # Socket timeout
 
+
+def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
+    print("\nSIGINT or CTRL-C detected. Exiting gracefully.")
+    soc.send(bytes("CLOSE", encoding="utf8"))
+    os._exit(0)
+
+signal(SIGINT, handler) # Enable signal handler
+
 def Greeting(): # Greeting message depending on time :)
 	global greeting, message
 	print(Style.RESET_ALL)
@@ -85,7 +93,6 @@ def loadConfig(): # Config loading section
 		username = input("Enter username (the one you used to register): ")
 		password = input("Enter password (the one you used to register): ")
 		efficiency = input("Enter mining intensity " + "(1-100)%: ")
-		supporter = input("Do you want to additionally support the network?  (y/n) ")
 		
 		efficiency = re.sub("\D", "", efficiency)  # Check wheter efficiency is correct
 		if int(efficiency) > int(100):
@@ -96,8 +103,7 @@ def loadConfig(): # Config loading section
 		config['miner'] = { # Format data
 		"username": username,
 		"password": password,
-		"efficiency": efficiency,
-                "supporter": supporter}
+		"efficiency": efficiency}
 		
 		with open("MinerConfig_beta.1.ini", "w") as configfile: # Write data to file
 			config.write(configfile)
@@ -107,8 +113,7 @@ def loadConfig(): # Config loading section
 		username = config["miner"]["username"]
 		password = config["miner"]["password"]
 		efficiency = config["miner"]["efficiency"]
-		supporter = config["miner"]["supporter"]
-
+		
 
 def Connect(): # Connect to pool section
 	global soc, connection_counter, res, pool_address, pool_port
@@ -125,7 +130,6 @@ def Connect(): # Connect to pool section
 				pool_port = content[1] #Line 2 = pool port
 
 				now = datetime.datetime.now()
-				print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Successfully received pool address and IP.")
 				break # Continue
 			else:
 				time.sleep(0.025) # Restart if wrong status code
@@ -154,12 +158,12 @@ def Connect(): # Connect to pool section
 			soc.connect((str(pool_address), int(pool_port)))
 			soc.settimeout(timeout)
 			now = datetime.datetime.now()
-			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Connected to pool on tcp://"+pool_address+":"+pool_port)
+			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Connected to the server")
 			break # If connection was established, continue
 		
 		except: # If it wasn't, display a message and exit
 			now = datetime.datetime.now()
-			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Cannot connect to pool server. There is probably a server update going on. Retrying in 15 seconds...")
+			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Cannot connect to the server. It is probably under maintenance. Retrying in 15 seconds...")
 			time.sleep(15)
 			os._exit()
 			
@@ -176,8 +180,6 @@ def checkVersion():
 			
 		if SERVER_VER == VER: # If miner is up-to-date, display a message and continue
 			now = datetime.datetime.now()
-			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Successfully checked if miner is up-to-date.")
-
 		else:
 			now = datetime.datetime.now()
 			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/")
@@ -203,7 +205,7 @@ def Login():
 				
 			if resp == "OK": # Check wheter login information was correct
 				now = datetime.datetime.now()
-				print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Successfully logged in.")
+				print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Logged in successfully")
 				break # If it was, continue
 			
 			if resp == "NO":
@@ -223,6 +225,7 @@ def Mine(): # Mining section
 	
 	now = datetime.datetime.now()
 	print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Miner thread started using SHA1 algorithm.")
+	print(now.strftime(Style.DIM + "\n") + Fore.YELLOW + "Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit " + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Fore.YELLOW + " to learn more.\n")
 
 	efficiency = 100 - int(efficiency) # Calulate efficiency
 	efficiency = efficiency * 0.01
@@ -246,8 +249,8 @@ def Mine(): # Mining section
 		except:
 			Connect() # Reconnect if pool down
 			
-		for iJob in range(100 * int(job[2]) + 1): # Calculate numbers with difficulty
-			hash = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest() # Calculate hash
+		for iJob in range(100 * int(job[2]) + 1): # Calculate hash with difficulty
+			hash = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest() # Generate hash
 			hash_count = hash_count + 1 # Increment hash counter
 			
 			if job[1] == hash: # If result is even with job, send the result
@@ -275,18 +278,10 @@ def Mine(): # Mining section
 				break # Repeat
 
 
-def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
-    print("\nSIGINT or CTRL-C detected. Exiting gracefully.")
-    soc.send(bytes("CLOSE", encoding="utf8"))
-    os._exit(0)
-
-
 init(autoreset=True) # Enable colorama
 hush() # Start hash calculator
 
 while True:
-    signal(SIGINT, handler) # Enable signal handler
-    
     try:
             loadConfig() # Load configfile
     except:
@@ -319,4 +314,3 @@ while True:
 
     print(Style.RESET_ALL)
     time.sleep(0.025) # Restart if error
-    print("Something went wrong! Restarting main program loop!")
