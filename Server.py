@@ -1,6 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
+
 ###########################################
-# Duino-Coin public-server version 0.6.8  #
+# Duino-Coin Server   #
 # https://github.com/revoxhere/duino-coin #
 #  copyright by MrKris7100 & revox 2019   #
 ###########################################
@@ -23,9 +24,8 @@ def ServerLog(whattolog):
         #now = now.strftime("[%Y-%m-%d %H:%M:%S] ")
         #Writing message and closing file
         #logfile.write(now + whattolog + "\n")
-        #print(whattolog+"\n")
+        print(whattolog+"\n")
         #logfile.close()
-        pass
 
 def ServerLogHash(whattolog): #Separate serverlog section for mining section debugging. Not used in proper pool to reduce disk usage. 
         #Getting actual date and time
@@ -37,8 +37,7 @@ def ServerLogHash(whattolog): #Separate serverlog section for mining section deb
         #Writing message and closing file
         #logfile.write(now + whattolog + "\n")
         #logfile.close()
-        #print(whattolog+"\n")
-        pass
+        print(whattolog+"\n")
         
 def UpdateServerInfo():
         global server_info, hashrates, threads, diff, update_count, gitrepo, gitusername, rewardap, blocks, userinfo
@@ -124,6 +123,7 @@ def UpdateServerInfo():
         except:
                 ServerLog("Failed to update statistics file!")
         #Wait 90 seconds and repeat
+        print("this thing run")
         threading.Timer(90, UpdateServerInfo).start()
         
 def randomString(stringLength=10):
@@ -192,16 +192,17 @@ class ClientThread(threading.Thread): #separate thread for every user
                 self.ip = ip
                 self.port = port
                 self.clientsock = clientsock
-                #clientsock.settimeout(60)
+                clientsock.settimeout(1)
                 try:
                         #Sending server version to client
                         clientsock.send(bytes(VER, encoding='utf8'))
+                        print("sent ver")
                 except socket.error as err:
                         if err.errno == errno.ECONNRESET:
                                 err = True
         def run(self):
                 err = False
-                global server_info, hashrates, kicklist, thread_id, diff
+                global server_info, hashrates, kicklist, thread_id, diff, data
                 #New user connected
                 username = ""
                 #Getting thread id for this connection
@@ -230,6 +231,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                         
                         #Recived register request
                         if data[0] == "REGI":
+                                print("sending regi")
                                 username = data[1]
                                 password = data[2]
                                 server_info['miners'] += 1
@@ -261,6 +263,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                                 
                         #Recived login request
                         elif data[0] == "LOGI": #login
+                                print("sending logi")
                                 username = data[1]
                                 password = data[2]
                                 server_info['miners'] += 1
@@ -303,6 +306,8 @@ class ClientThread(threading.Thread): #separate thread for every user
                                 
                         #Client requested new job for him
                         elif username != "" and data[0] == "JOB": #main, mining section
+                                time.sleep(1)
+                                print("sending job")
                                 #Waiting for unlocked files then locking them
                                 with locker:
                                         #Reading blocks amount
@@ -354,12 +359,13 @@ class ClientThread(threading.Thread): #separate thread for every user
                                         pass
                                 #Checking recived result is good hash
                                 if result == str(rand):
+                                        print("received result good")
                                         ServerLogHash("Recived good result (" + str(result) + ")")
                                         #Rewarding user for good hash
                                         with locker: #Using locker because some users submitted problems when mining on many devices and weird things happened
                                                 bal = open("balances/" + username + ".txt", "r")
                                                 global reward
-                                                reward = float(0.0000001) * int(diff)
+                                                reward = float(0.000000002) * int(diff)
                                                 balance = str(float(bal.readline())).rstrip("\n\r ")
                                                 balance = float(balance) + float(reward)
                                                 bal = open("balances/" + username + ".txt", "w")
@@ -383,6 +389,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                                                 blo.close()
                                 else:
                                         #Recived hash is bad
+                                        print("received bad resultage")
                                         ServerLogHash("Recived bad result!"+result)
                                         try:
                                                 self.clientsock.send(bytes("BAD", encoding="utf8"))
@@ -392,6 +399,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                                                 
                         #Client requested account balance checking
                         elif username != "" and data[0] == "BALA": #check balance section
+                                print("sending bala")
                                 ServerLog("Client request balance check")
                                 file = open("balances/" + username + ".txt", "r")
                                 balance = file.readline()
@@ -404,6 +412,7 @@ class ClientThread(threading.Thread): #separate thread for every user
 
                         #Close connection request, may be used in the future
                         elif username != "" and data[0] == "CLOSE":
+                                print("sending close")
                                 try:
                                         ServerLog("Client requested thread (" + thread_id + ") closing")
                                         #Closing socket connection
@@ -418,6 +427,7 @@ class ClientThread(threading.Thread): #separate thread for every user
                                         time.sleep(5)
                                 
                         elif username != "" and data[0] == "SEND": #sending funds section
+                                time.sleep(1)
                                 sender = username
                                 reciver = data[2]
                                 amount = float(data[3])
@@ -570,14 +580,14 @@ UpdateServerInfo()
 #Main server Loop
 ServerLog("Listening for incoming connections...")
 while True:
+        print("main while true loop...")
         #Starting thread for input procesing
         newthread = InputProc()
         newthread.start()
         try:
                 #Listening for new connections
-                tcpsock.listen(16)
+                tcpsock.listen(1)
                 (conn, (ip, port)) = tcpsock.accept()
-                #Starting thread for new connection
                 newthread = ClientThread(ip, port, conn)
                 newthread.start()
                 threads.append(newthread)
