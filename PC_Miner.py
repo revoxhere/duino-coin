@@ -138,7 +138,7 @@ def Connect(): # Connect to pool section
 			now = datetime.datetime.now()
 			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Cannot receive pool address and IP. Exiting in 15 seconds.")
 			time.sleep(15)
-			os._exit()
+			os._exit(0)
 			
 		time.sleep(0.025)
 		
@@ -165,7 +165,7 @@ def Connect(): # Connect to pool section
 			now = datetime.datetime.now()
 			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Cannot connect to the server. It is probably under maintenance. Retrying in 15 seconds...")
 			time.sleep(15)
-			os._exit()
+			os._exit(0)
 			
 		Connect()	
 		time.sleep(0.025)
@@ -185,7 +185,7 @@ def checkVersion():
 			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/")
 			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Exiting in 15 seconds.")
 			time.sleep(15)
-			os._exit()
+			os._exit(0)
 	except:
 		Connect() # Reconnect if pool down
 
@@ -213,7 +213,7 @@ def Login():
 				print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
 				soc.close()
 				time.sleep(15)
-				os._exit() # If it wasn't, display a message and exit
+				os._exit(0) # If it wasn't, display a message and exit
 		except:
 			Connect() # Reconnect if pool down
 
