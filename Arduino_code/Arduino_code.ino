@@ -1,13 +1,12 @@
-/*/////////////////////////////////////////////////
-  /      Duino-Coin arduino code v0.6.4 alpha     /
-  /    https://github.com/revoxhere/duino-coin    /
-  /           copyright by revox 2019             /
-  /////////////////////////////////////////////////
-  / To start mining, make account using Wallet,   /
-  / download Arduino Miner from Duino-Coin repo   /
-  / and enter Arduino COM port (if using Windows)./
-  /                Happy mining!                  /
-  ///////////////////////////////////////////////*/
+//////////////////////////////////////////////
+// Duino-Coin PC Miner (Beta v1) © revox 2020
+// https://github.com/revoxhere/duino-coin 
+//////////////////////////////////////////////
+// To start mining, make account using Wallet,
+// download Arduino Miner from Duino-Coin repo  
+// and enter Arduino COM port (if using Windows).
+//                Happy mining!                  
+//////////////////////////////////////////////
 
 #include <Arduino.h>
 #include "Hash.h"
