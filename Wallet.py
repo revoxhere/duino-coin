@@ -31,7 +31,7 @@ balance = 0
 background = ""
 newbalance = 0
 sending = 0
-VER = "0.7" # "Big" version number  (0.7 = Beta 1)
+VER = "0.6"
 colorA = "white" #white when in light mode
 colorB = "black" #black when in light mode
 colorC = "gray" #gray
@@ -259,7 +259,7 @@ def loadConfig(): # Load config protocol
 
     while True: # Receive server key
         time.sleep(0.025)
-        key = s.recv(4).decode()
+        key = s.recv(3).decode()
         debug += "Received server keys\n"
         if key == "OK":
             WalletWindow()
@@ -267,11 +267,13 @@ def loadConfig(): # Load config protocol
         if key == "NO":
             messagebox.showerror("Error","Fatal error in configfile (WalletConfig.ini)!\nRemove it and resourcestart the wallet.")
             os._exit(0)
+        else:
+            loadConfig()
 
 def Send():
     global amount, receipent, send
     balanceTimer.cancel()
-    send = Tk() #sending funds window
+    send = Tk() # Sending funds window
     send.resizable(False, False)
     send.title('Send funds')
     send.configure(background = str(colorA))
@@ -355,12 +357,16 @@ def About():
     about.configure(background = str(colorA))
     
     v = StringVar(master = about)
-    v.set(int(theme))
+    try:
+        v.set(int(theme)) # Doesn't work if you open this window second time, will be fixed later
+    except:
+        pass
 
-    label = tkinter.Label(about, text = "Duino-Coin Wallet", font=("Verdana", 20, "bold"), fg = str(colorHighlight), bg = str(colorA)).pack()
+    label = tkinter.Label(about, text = "Duino-Coin wallet", font=("Verdana", 20, "bold"), fg = str(colorHighlight), bg = str(colorA)).pack()
     label = tkinter.Label(about, text = "Beta 1 (holy cow, we made a beta release!)", fg = str(colorB), bg = str(colorA)).pack()
     label = tkinter.Label(about, text = "Made by revox from Duino-Coin developers", fg = str(colorB), bg = str(colorA)).pack()
-    tkinter.Button(about, text = "Duino-Coin GitHub", activebackground = str(colorHighlight), command = GitHub, fg = str(colorB), bg = str(colorA)).pack()
+    tkinter.Button(about, text = "Duino-Coin GitHub", activebackground = str(colorHighlight), command = GitHub, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=5)
+    tkinter.Button(about, text = "Support the project (donate)", activebackground = str(colorHighlight), command = Donate, width=35, height=1, fg = str(colorB), bg = str(colorA)).pack(pady=3)
     label = tkinter.Label(about, text = "", fg = str(colorB), bg = str(colorA)).pack()
 
     label = tkinter.Label(about, text = "Select theme:", fg = str(colorB), bg = str(colorA)).pack()
@@ -384,10 +390,13 @@ def About():
 
 
 def GitHub():
-    webbrowser.open_new_tab("https://github.com/revoxhere/duino-coin")
+    webbrowser.open_new_tab("https://github.com/revoxhere/duino-coin/")
     
 def Exchange():
     webbrowser.open_new_tab("https://revoxhere.github.io/duco-exchange/")
+
+def Donate():
+    webbrowser.open_new_tab("https://revoxhere.github.io/duino-coin/donate/")    
 
 def getBalance():
     global balance, wallet, ducousd, balanceusd, debug, balanceTimer
@@ -408,21 +417,21 @@ def getBalance():
         if balance == oldbalance: # Don'balanceTimer play animation if no change in balance
             pass
         else: # Animation
-            label = tkinter.Label(wallet, text = "Your balance: "+str(oldbalance)+" DUCO   ", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
-            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
+            label = tkinter.Label(wallet, text = "Your balance: "+str(oldbalance)+" DUCO      ", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
             time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Your balance: "+str(oldbalance)+" DUCO   ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
-            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
+            label = tkinter.Label(wallet, text = "Your balance: "+str(oldbalance)+" DUCO      ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
             time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO  ", bg = str(colorA), fg = str(colorA), font=("Arial", 12)).place(relx=.1, rely=.15)
-            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $", bg = str(colorA), fg = str(colorA), font=("Arial", 10)).place(relx=.1, rely=.27)
+            label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg = str(colorA), font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorA), font=("Arial", 10)).place(relx=.1, rely=.27)
             wallet.title("Duino-Coin Wallet (Beta 1) - "+str(round(float(balance), 2))+" DUCO")
             time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO  ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
-            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
+            label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
             time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO  ", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
-            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
+            label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
             time.sleep(0.05)
     else:
         debug += "Error while receiving balance!\n"
@@ -516,10 +525,9 @@ if not Path("resources/bg_beta.1_alt.gif").is_file(): # Community theme backgrou
 else:
     debug += "Community background image already downloaded\n"
 
-
 try:
   s.connect((str(host), int(port)))
-  s.settimeout(5)
+  s.settimeout(10)
   debug += "Connected to the server\n"
 except SystemExit:
   serverMsg = tkinter.Tk()
