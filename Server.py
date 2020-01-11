@@ -184,7 +184,6 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
     self.ip = ip
     self.port = port
     self.clientsock = clientsock
-    clientsock.settimeout(1)
     try:
       # Send server version to client
       clientsock.send(bytes(VER, encoding='utf8'))
@@ -486,7 +485,7 @@ hashrates = {}
 config = configparser.ConfigParser()
 locker = threading.Lock()
 update_count = 0
-VER = "0.6"
+VER = "0.7" # "Big" version number  (0.7 = Beta 1)
 
 ######################## INITIAL FILE CREATION ########################
 if not Path("logs").is_dir():
