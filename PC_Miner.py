@@ -31,7 +31,7 @@ khash_count = 0
 hash_count = 0
 hash_mean = []
 config = configparser.ConfigParser()
-VER = "0.6" # "Big" version number
+VER = "0.7" # "Big" version number  (0.7 = Beta 1)
 timeout = 10 # Socket timeout
 
 
