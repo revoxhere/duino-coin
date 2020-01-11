@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-#############################################
-# Duino-Coin PC Miner (Beta v1) © revox 2020
+##################################################
+# Duino-Coin Arduino Miner (Beta v1) © revox 2020
 # https://github.com/revoxhere/duino-coin 
-#############################################
+##################################################
 import socket,threading,time,random,configparser,sys,serial,hashlib,serial.tools.list_ports,datetime,requests
 from pathlib import Path
 
