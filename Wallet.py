@@ -31,7 +31,7 @@ balance = 0
 background = ""
 newbalance = 0
 sending = 0
-VER = "0.6"
+VER = "0.7" # "Big" version number  (0.7 = Beta 1)
 colorA = "white" #white when in light mode
 colorB = "black" #black when in light mode
 colorC = "gray" #gray
