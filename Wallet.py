@@ -396,7 +396,7 @@ def Exchange():
     webbrowser.open_new_tab("https://revoxhere.github.io/duco-exchange/")
 
 def Donate():
-    webbrowser.open_new_tab("https://revoxhere.github.io/duino-coin/donate/")    
+    webbrowser.open_new_tab("https://revoxhere.github.io/duino-coin/donate")    
 
 def getBalance():
     global balance, wallet, ducousd, balanceusd, debug, balanceTimer
