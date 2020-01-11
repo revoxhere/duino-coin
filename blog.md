@@ -17,6 +17,17 @@ permalink: /blog/
 
 ***
 
+## 11.01.2020: Beta 1 almost done
+Beta 1 is probably going to be one of the most exciting updates so far! We've tried to fix almost every bug and added features that were asked on our Discord server. It will be released in a few hours.
+
+***
+
+## 6.01.2020: Alpha 6.8 released
+Last Alpha release - download it here: [releases/tag/alpha-6.8](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.8)
+
+
+***
+
 ## 4.01.2020: Alpha 6.8 is in the works. 
 In it, I'll try to fix most of the bugs from all Alpha 6 releases. <br>
 Alpha 6.9 may be released to fix some leftovers. <br>
