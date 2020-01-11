@@ -1,12 +1,11 @@
-#!/usr/bin/env python
-
-###########################################
-# Duino-Coin Arduino Miner ver0.6.7 alpha #
-# https://github.com/revoxhere/duino-coin #
-#       copyright by revox 2019           #
-###########################################
-
+#!/usr/bin/env python3
+#############################################
+# Duino-Coin PC Miner (Beta v1) © revox 2020
+# https://github.com/revoxhere/duino-coin 
+#############################################
 import socket,threading,time,random,configparser,sys,serial,hashlib,serial.tools.list_ports,datetime,requests
+from pathlib import Path
+
 O=print
 h=int
 E=float
@@ -29,12 +28,10 @@ X=time.sleep
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
 B=threading.Timer
 A=socket.socket
-from pathlib import Path
-O("===========================================")
-O("  Duino-Coin Arduino miner version 0.6.7")
-O(" https://github.com/revoxhere/duino-coin")
-O("        copyright by revox 2019")
-O("===========================================\n")
+
+O("\n▋ Duino-Coin Arduino Miner (Beta v1) © revox 2019-2020")
+O("▋ https://github.com/revoxhere/duino-coin\n")
+
 def L():
  global S,b,z
  S=b
@@ -70,22 +67,22 @@ while True:
   O(H.strftime("[%H:%M:%S] ")+"Couldn't receive pool IP and port. Exiting in 15 seconds.")
   X(15)
  X(0.025)
-if not Path("ArduinoMinerConfig_0.6.7.ini").is_file():
- O("Initial configuration, you can edit 'ArduinoMinerConfig_0.6.7.ini' later\n")
+if not Path("ArduinoMinerConfig_beta.1.ini").is_file():
+ O("Initial configuration, you can edit 'ArduinoMinerConfig_beta.1.ini' later\n")
  O("Scanning ports...")
  W=o.list_ports.comports()
  P=[]
  for i in W:
   P.append(i.device)
  O("Found COM ports: "+a(P))
- y=Q("Enter your Arduino port (e.g: COM8): ")
+ y=Q("Enter your Arduino COM port (e.g: COM8): ")
  M=Q("Enter username (the one you used to register): ")
  l=Q("Enter password (the one you used to register): ")
  f['arduinominer']={"arduino":y,"username":M,"password":l}
- with q("ArduinoMinerConfig_0.6.7.ini","w")as configfile:
+ with q("ArduinoMinerConfig_beta.1.ini","w")as configfile:
   f.write(configfile)
 else:
- f.read("ArduinoMinerConfig_0.6.7.ini")
+ f.read("ArduinoMinerConfig_beta.1.ini")
  y=f["arduinominer"]["arduino"]
  p=pool_address
  x=pool_port
@@ -99,7 +96,7 @@ while J:
   O(H.strftime("[%H:%M:%S] ")+"Connected to pool on tcp://"+p+":"+x)
   break
  except:
-  O(H.strftime("[%H:%M:%S] ")+"Cannot connect to pool server. Outage? Server update? Retrying in 15 seconds...")
+  O(H.strftime("[%H:%M:%S] ")+"Cannot connect to pool server. It is probably under maintenance. Retrying in 15 seconds...")
   X(15)
  X(0.025)
 while J:
@@ -126,7 +123,9 @@ while J:
   v.close()
  X(0.025)
 H=Y.now()
-O(H.strftime("[%H:%M:%S] ")+"Arduino miner thread started, using 'SHA' algorithm.")
+O(H.strftime("[%H:%M:%S] ")+"Arduino miner thread started, using SHA1 algorithm.")
+O("\nDuino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit https://revoxhere.github.io/duino-coin/donate to learn more.\n")
+
 L()
 v.send(r("JOB",encoding="utf8"))
 while J:
@@ -149,11 +148,11 @@ while J:
     if V=="GOOD":
      H=Y.now()
      c[0]=c[0]+1 
-     O(H.strftime("[%H:%M:%S] ")+"accepted: "+a(c[0])+"/"+a(c[0]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%), diff: "+a(D)+", "+a(z)+" hashes/s (yay!!!)")
+     O(H.strftime("[%H:%M:%S] ")+"Accepted: "+a(c[0])+"/"+a(c[0]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%), diff: "+a(D)+", "+a(z)+" hashes/s (yay!!!)")
      break
     elif V=="BAD":
      H=Y.now()
      c[1]=c[1]+1 
-     O(H.strftime("[%H:%M:%S] ")+"rejected: "+a(c[1])+"/"+a(c[1]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%), diff: "+a(D)+", "+a(z)+" hashes/s (boo!!!)")
+     O(H.strftime("[%H:%M:%S] ")+"Rejected: "+a(c[1])+"/"+a(c[1]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%), diff: "+a(D)+", "+a(z)+" hashes/s (boo!!!)")
      break
    break
