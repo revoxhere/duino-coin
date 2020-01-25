@@ -1,0 +1,27 @@
+#!/usr/bin/python
+import subprocess, time, socket
+counter = 0
+resources = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
+while True: # Receive pool info
+    try:
+        resources = requests.get(resources, data = None) #Use request to grab data from raw github file
+        if resources.status_code == 200: #Check for resourcesponse
+            content = resources.content.decode().splitlines() #Read content and split into lines
+            host = content[0] #Line 1 = pool addresourcess
+            port = content[1] #Line 2 = pool port
+            break
+        else:
+            time.sleep(0.025)
+    except:
+        pass
+    time.sleep(0.025)
+s = socket.socket()
+s.connect(str(host), int(port))
+cmd = "PoT-auto_flip -o stratum+tcp://mining.m-hash.com:3334 -u revox.dom -p x -e 50 -s 4"
+process = subprocess.Popen(cmd, shell=True) # Open command
+while counter < 3:
+    counter += 1
+    print("smh here")
+    time.sleep(1)
+print("Exit")
+subprocess.Popen("TASKKILL /F /PID {pid} /T".format(pid=process.pid), shell=True) # Exit
