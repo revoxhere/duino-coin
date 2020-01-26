@@ -13,6 +13,12 @@ if os.name != 'nt': # Check if running on Windows
   if win != "y":
     os._exit(1)
 
+if not Path("PoT_auto.exe").is_file(): # Check for PoT exe
+  print("✗ PoT executable is missing. Exiting in 15s.")
+  time.sleep(15)
+  os._exit(1)
+ 
+
 try: # Check if colorama is installed
   from colorama import init, Fore, Back, Style
 except:
@@ -29,12 +35,12 @@ except:
 
 # Setting variables
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
-cmd = "PoT-auto_flip -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.dom -p x -e 50 -s 4" # Miner command
+cmd = "PoT_auto.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.dom -p x -e 50 -s 4" # Miner command
 income = 0
 timer = 30
 reward = 0.025219
 config = configparser.ConfigParser()
-VER = "0.8" # "Big" version number  (0.7 = Beta 1)
+VER = "0.8" # "Big" version number  (0.8 = Beta 2)
 timeout = 10 # Socket timeout
 
 
