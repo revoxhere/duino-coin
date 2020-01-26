@@ -1,7 +1,7 @@
 <!--
-*** Official duino coin readme
-*** copyright by revox, 2019
-*** Thanks to: othneildrew for providing nice template! :)
+*** Official Duino Coin README
+*** copyright by revox, 2019-2020
+*** Thanks to othneildrew for providing nice template! :)
 -->
 
 <!-- LOGO -->
@@ -25,7 +25,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3-green.svg)](https://github.com/revoxhere/duino-coin/search?l=py)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Release: Beta 1](https://img.shields.io/badge/Release-Beta_1-red.svg)](https://github.com/revoxhere/duino-coin/releases/tag/beta-1)
+[![Release: Beta 2](https://img.shields.io/badge/Release-Beta_2-red.svg)](https://github.com/revoxhere/duino-coin/releases/tag/beta-2)
 [![Discord](https://img.shields.io/discord/604697675430101003.svg?color=Blue&label=Discord&logo=Discord)](https://discord.gg/XJpT3UQ)
 [![Bitcointalk](https://img.shields.io/badge/Bitcointalk-Duino_Coin-gold.svg)](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
 
@@ -111,6 +111,7 @@ This section briefly lists major frameworks that Duino-Coin uses:
 * [Arduino IDE](https://www.arduino.cc) - Arduino programming and debugging
 * [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) - creating executables
 * [PyGithub](https://github.com/PyGithub/PyGithub) - pool statistics API integration
+* [m-cpuminer-v2](https://github.com/m-pays/m-cpuminer-v2/) - Proof-of-Time rewards
 
 <!-- AUTHORS -->
 ## Our Team
