@@ -17,14 +17,22 @@ permalink: /blog/
 
 ***
 
+## 26.01.2020: Beta 2 - Proof-of-Time miner
+Third way to mine - Proof-of-Time! <br>
+It's a super-new concept (someone has to make breakthroughs in the crypto world, just like we did with Arduino miner...) so please report if there are problems and what would you all improve :) <br>
+Also, today is my birthday so happy bday to myself :P <br>
+Download Beta 2 here: [releases/tag/beta-2](https://github.com/revoxhere/duino-coin/releases/tag/beta-2)
+
+***
+
 ## 11.01.2020: Beta 1 almost done
 Beta 1 is probably going to be one of the most exciting updates so far! We've tried to fix almost every bug and added features that were asked on our Discord server. It will be released in a few hours.
+Download Beta 1 here: [releases/tag/beta-1](https://github.com/revoxhere/duino-coin/releases/tag/beta-1)
 
 ***
 
 ## 6.01.2020: Alpha 6.8 released
 Last Alpha release - download it here: [releases/tag/alpha-6.8](https://github.com/revoxhere/duino-coin/releases/tag/alpha-6.8)
-
 
 ***
 
