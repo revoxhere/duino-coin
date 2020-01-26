@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##################################################
-# Duino-Coin Arduino Miner (Beta v1) © revox 2020
+# Duino-Coin Arduino Miner (Beta v2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ##################################################
 import socket,threading,time,random,configparser,sys,serial,hashlib,serial.tools.list_ports,datetime,requests
@@ -29,7 +29,7 @@ res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.
 B=threading.Timer
 A=socket.socket
 
-O("\n▋ Duino-Coin Arduino Miner (Beta v1) © revox 2019-2020")
+O("\n▋ Duino-Coin Arduino Miner (Beta v2) © revox 2019-2020")
 O("▋ https://github.com/revoxhere/duino-coin\n")
 
 def L():
@@ -67,8 +67,8 @@ while True:
   O(H.strftime("[%H:%M:%S] ")+"Couldn't receive pool IP and port. Exiting in 15 seconds.")
   X(15)
  X(0.025)
-if not Path("ArduinoMinerConfig_beta.1.ini").is_file():
- O("Initial configuration, you can edit 'ArduinoMinerConfig_beta.1.ini' later\n")
+if not Path("ArduinoMinerConfig_beta.2.ini").is_file():
+ O("Initial configuration, you can edit 'ArduinoMinerConfig_beta.2.ini' later\n")
  O("Scanning ports...")
  W=o.list_ports.comports()
  P=[]
@@ -79,10 +79,10 @@ if not Path("ArduinoMinerConfig_beta.1.ini").is_file():
  M=Q("Enter username (the one you used to register): ")
  l=Q("Enter password (the one you used to register): ")
  f['arduinominer']={"arduino":y,"username":M,"password":l}
- with q("ArduinoMinerConfig_beta.1.ini","w")as configfile:
+ with q("ArduinoMinerConfig_beta.2.ini","w")as configfile:
   f.write(configfile)
 else:
- f.read("ArduinoMinerConfig_beta.1.ini")
+ f.read("ArduinoMinerConfig_beta.2.ini")
  y=f["arduinominer"]["arduino"]
  p=pool_address
  x=pool_port
