@@ -1,44 +1,40 @@
 #!/usr/bin/env python3
-#############################################
+##############################################
 # Duino-Coin PoT Miner (Beta v2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
-#############################################
-import socket, statistics, threading, time, random, numpy, re, hashlib, configparser, sys, datetime, os, signal, subprocess # Import libraries
+##############################################
+import socket, statistics, threading, time, numpy, re, configparser, sys, datetime, os, signal, subprocess # Import libraries
 from decimal import Decimal
 from pathlib import Path
 from signal import signal, SIGINT
 
 if os.name != 'nt': # Check if running on Windows
-  print("✗ You aren't using a Windows machine, miner will not work correctly.")
+  win = input("✗ You can use Proof-Of-Time miner only on Windows. Type 'y' to continue.")
+  if win != "y":
+    os._exit(1)
 
 try: # Check if colorama is installed
   from colorama import init, Fore, Back, Style
 except:
   print("✗ Colorama is not installed. Please install it using pip install colorama. Exiting in 15s.")
   time.sleep(15)
-  os._exit()
+  os._exit(1)
 
 try: # Check if requests is installed
   import requests
 except:
   print("✗ Requests is not installed. Please install it using pip install requests. Exiting in 15s.")
   time.sleep(15)
-  os._exit()
+  os._exit(1)
 
 # Setting variables
-shares = [0, 0]
-diff = 0
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 cmd = "PoT-auto_flip -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.dom -p x -e 50 -s 4" # Miner command
-last_hash_count = 0
-khash_count = 0
-hash_count = 0
 income = 0
-hash_mean = []
-timer = 60
-reward = 0.0025219
+timer = 30
+reward = 0.025219
 config = configparser.ConfigParser()
-VER = "0.7" # "Big" version number  (0.7 = Beta 1)
+VER = "0.8" # "Big" version number  (0.7 = Beta 1)
 timeout = 10 # Socket timeout
 
 
@@ -73,31 +69,15 @@ def Greeting(): # Greeting message depending on time :)
   else:
         greeting = "Hello"
     
-  message   ="║ Duino-Coin Proof of Time Miner (Beta v2) © revox 2019-2020\n" # Startup message
-  message   += "║ https://github.com/revoxhere/duino-coin\n"
-  message   += "║ "+str(greeting)+", "+str(username)+" \U0001F44B\n\n"
+  message  = "║ Duino-Coin Proof-of-Time Miner (Beta v2) © revox 2019-2020\n" # Startup message
+  message += "║ https://github.com/revoxhere/duino-coin\n"
+  message += "║ "+str(greeting)+", "+str(username)+" \U0001F44B\n\n"
   
   for char in message:
     sys.stdout.write(char)
     sys.stdout.flush()
     time.sleep(0.01)
 
-def hush(): # Hashes/sec calculation
-  global last_hash_count, hash_count, khash_count, hash_mean
-  
-  last_hash_count = hash_count
-  khash_count = last_hash_count / 1000
-  if khash_count == 0:
-    khash_count = 1.00
-    
-  hash_mean.append(khash_count) # Calculate average hashrate
-  khash_count = statistics.mean(hash_mean)
-  khash_count = round(khash_count, 2)
-  
-  hash_count = 0 # Reset counter
-  
-  threading.Timer(1.0, hush).start() # Run this def every 1s
-  
 
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, password, efficiency
@@ -143,7 +123,7 @@ def Connect(): # Connect to pool section
         
     except:
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "✗ Cannot receive pool address and IP. Exiting in 15 seconds.")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Cannot receive pool address and IP. Exiting in 15 seconds.")
       time.sleep(15)
       os._exit(0)
       
@@ -164,13 +144,11 @@ def Connect(): # Connect to pool section
     try: # Try to connect
       soc.connect((str(pool_address), int(pool_port)))
       soc.settimeout(timeout)
-      now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "✓ Connected to the server")
       break # If connection was established, continue
     
     except: # If it wasn't, display a message and exit
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "✗ Cannot connect to the server. It is probably under maintenance. Retrying in 15 seconds...")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Cannot connect to the server. It is probably under maintenance. Retrying in 15 seconds...")
       time.sleep(15)
       os._exit(0)
       
@@ -187,9 +165,10 @@ def checkVersion():
       
     if SERVER_VER == VER: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Connected to the server (v"+str(SERVER_VER)+")")
     else:
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "✗ Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/\nExiting in 15 seconds.")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/\nExiting in 15 seconds.")
       time.sleep(15)
       os._exit(0)
   except:
@@ -211,12 +190,12 @@ def Login():
         
       if resp == "OK": # Check wheter login information was correct
         now = datetime.datetime.now()
-        print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "✓ Logged in successfully")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Logged in successfully")
         break # If it was, continue
       
       if resp == "NO":
         now = datetime.datetime.now()
-        print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "✗ Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
         soc.close()
         time.sleep(15)
         os._exit(0) # If it wasn't, display a message and exit
@@ -231,30 +210,29 @@ def Mine(): # "Mining" section
     try: # Start Magi Miner
         process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
         now = datetime.datetime.now()
-        print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "✓ Proof of Time thread started")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Proof of Time thread started")
     except:
         now = datetime.datetime.now()
-        print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "✗ Error while launching PoT executable!\nExiting in 15s.")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Error while launching PoT executable!\nExiting in 15s.")
         time.sleep(15)
         os._exit(0)
 
     now = datetime.datetime.now()
-    print(now.strftime(Style.DIM + "\n") + Fore.YELLOW + "ⓘ  Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit " + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Fore.YELLOW + " to learn more.\n")
+    print(now.strftime(Style.DIM + "\n") + Fore.YELLOW + "ⓘ　Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit " + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Fore.YELLOW + " to learn more.\n")
 
     while True:
+        print("", end = Style.DIM + Fore.YELLOW + f"\r⏲　Next reward in {timer:02} seconds " + Style.RESET_ALL + Style.DIM + "▓"*timer + " ")
         timer -= 1
-        print("", end=f"\r⏲  Next reward in {timer} seconds")
         time.sleep(1)
         if timer <= 0: # Ask for reward every 60s; btw. even if you'd change it, server wouldn't allow for faster submission. You can check it.
             income += reward
             income = round(float(income), 8)
-            timer = 60 # Reset the timer
+            timer = 30 # Reset the timer
             soc.send(bytes("PoTr", encoding="utf8")) # Send Proof-of-Time-reward request
             now = datetime.datetime.now()
-            print("", end=f"\r" + now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "» You've been rewarded! This session income: " + str(income) + " DUCO\n")
+            print("", end=f"\r" + now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "» You've been rewarded! This session estimated income is " + str(income) + " DUCO\n")
 
 init(autoreset=True) # Enable colorama
-hush() # Start hash calculator
 
 while True:
   try:
@@ -285,7 +263,7 @@ while True:
   try:
       Mine() # "Mine"
   except:
-      print(Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
+      print(Style.BRIGHT + Fore.RED + "✗ There was an error in PoT section. Restarting." + Style.RESET_ALL)
 
   print(Style.RESET_ALL)
   time.sleep(0.025) # Restart if error
