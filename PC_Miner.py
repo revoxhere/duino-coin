@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin PC Miner (Beta v1) © revox 2020
+# Duino-Coin PC Miner (Beta v2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 #############################################
 import socket, statistics, threading, time, random, re, hashlib, configparser, sys, datetime, os, signal # Import libraries
@@ -11,16 +11,16 @@ from signal import signal, SIGINT
 try: # Check if colorama is installed
 	from colorama import init, Fore, Back, Style
 except:
-	print("Colorama is not installed. Please install it using pip install colorama. Exiting in 15s.")
+	print("✗ Colorama is not installed. Please install it using pip install colorama. Exiting in 15s.")
 	time.sleep(15)
-	os._exit()
+	os._exit(1)
 
 try: # Check if requests is installed
 	import requests
 except:
-	print("Requests is not installed. Please install it using pip install requests. Exiting in 15s.")
+	print("✗ Requests is not installed. Please install it using pip install requests. Exiting in 15s.")
 	time.sleep(15)
-	os._exit()
+	os._exit(1)
 
 # Setting variables
 shares = [0, 0]
@@ -31,12 +31,12 @@ khash_count = 0
 hash_count = 0
 hash_mean = []
 config = configparser.ConfigParser()
-VER = "0.7" # "Big" version number  (0.7 = Beta 1)
+VER = "0.8" # "Big" version number  (0.8 = Beta 2)
 timeout = 10 # Socket timeout
 
 
 def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
-    print("\nSIGINT or CTRL-C detected. Exiting gracefully.")
+    print("\n✓ SIGINT detected - Exiting gracefully. See you soon!")
     soc.send(bytes("CLOSE", encoding="utf8"))
     os._exit(0)
 
@@ -56,10 +56,12 @@ def Greeting(): # Greeting message depending on time :)
 		greeting = "Good afternoon"
 	elif current_hour >= 18 :
 		greeting = "Good evening"
+	else:
+		greeting = "Hello"
 		
-	message     ="▋ Duino-Coin PC Miner (Beta v1) © revox 2019-2020\n" # Startup message
-	message   += "▋ https://github.com/revoxhere/duino-coin\n"
-	message   += "▋ "+str(greeting)+", "+str(username)+"!\n\n"
+	message     ="║ Duino-Coin PC Miner (Beta v2) © revox 2019-2020\n" # Startup message
+	message   += "║ https://github.com/revoxhere/duino-coin\n"
+	message   += "║ "+str(greeting)+", "+str(username)+" \U0001F44B\n\n"
 	
 	for char in message:
 		sys.stdout.write(char)
@@ -86,13 +88,13 @@ def hush(): # Hashes/sec calculation
 def loadConfig(): # Config loading section
 	global pool_address, pool_port, username, password, efficiency
 	
-	if not Path("MinerConfig_beta.1.ini").is_file(): # Initial configuration section
-		print(Style.BRIGHT + "Initial configuration, you can edit 'MinerConfig_beta.1.ini' file later.")
+	if not Path("MinerConfig_beta.2.ini").is_file(): # Initial configuration section
+		print(Style.BRIGHT + "Initial configuration, you can edit 'MinerConfig_beta.2.ini' file later.")
 		print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
 
-		username = input("Enter username (the one you used to register): ")
-		password = input("Enter password (the one you used to register): ")
-		efficiency = input("Enter mining intensity " + "(1-100)%: ")
+		username = input("Enter your username: ")
+		password = input("Enter your password: ")
+		efficiency = input("Enter mining intensity (1-100)%: ")
 		
 		efficiency = re.sub("\D", "", efficiency)  # Check wheter efficiency is correct
 		if int(efficiency) > int(100):
@@ -105,11 +107,11 @@ def loadConfig(): # Config loading section
 		"password": password,
 		"efficiency": efficiency}
 		
-		with open("MinerConfig_beta.1.ini", "w") as configfile: # Write data to file
+		with open("MinerConfig_beta.2.ini", "w") as configfile: # Write data to file
 			config.write(configfile)
 
 	else: # If config already exists, load from it
-		config.read("MinerConfig_beta.1.ini")
+		config.read("MinerConfig_beta.2.ini")
 		username = config["miner"]["username"]
 		password = config["miner"]["password"]
 		efficiency = config["miner"]["efficiency"]
@@ -136,7 +138,7 @@ def Connect(): # Connect to pool section
 				
 		except:
 			now = datetime.datetime.now()
-			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Cannot receive pool address and IP. Exiting in 15 seconds.")
+			print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Cannot receive pool address and IP. Exiting in 15 seconds.")
 			time.sleep(15)
 			os._exit(0)
 			
@@ -157,13 +159,11 @@ def Connect(): # Connect to pool section
 		try: # Try to connect
 			soc.connect((str(pool_address), int(pool_port)))
 			soc.settimeout(timeout)
-			now = datetime.datetime.now()
-			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Connected to the server")
 			break # If connection was established, continue
 		
 		except: # If it wasn't, display a message and exit
 			now = datetime.datetime.now()
-			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Cannot connect to the server. It is probably under maintenance. Retrying in 15 seconds...")
+			print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Cannot connect to the server. It is probably under maintenance. Retrying in 15 seconds...")
 			time.sleep(15)
 			os._exit(0)
 			
@@ -180,10 +180,11 @@ def checkVersion():
 			
 		if SERVER_VER == VER: # If miner is up-to-date, display a message and continue
 			now = datetime.datetime.now()
+			print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Connected to the server (v"+str(SERVER_VER)+")")
+
 		else:
 			now = datetime.datetime.now()
-			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/")
-			print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Exiting in 15 seconds.")
+			print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/ Exiting in 15 seconds.")
 			time.sleep(15)
 			os._exit(0)
 	except:
@@ -205,12 +206,12 @@ def Login():
 				
 			if resp == "OK": # Check wheter login information was correct
 				now = datetime.datetime.now()
-				print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Logged in successfully")
+				print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Logged in successfully")
 				break # If it was, continue
 			
 			if resp == "NO":
 				now = datetime.datetime.now()
-				print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
+				print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
 				soc.close()
 				time.sleep(15)
 				os._exit(0) # If it wasn't, display a message and exit
@@ -224,8 +225,8 @@ def Mine(): # Mining section
 	global last_hash_count, hash_count, khash_count, efficiency
 	
 	now = datetime.datetime.now()
-	print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Miner thread started using SHA1 algorithm.")
-	print(now.strftime(Style.DIM + "\n") + Fore.YELLOW + "Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit " + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Fore.YELLOW + " to learn more.\n")
+	print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Miner thread started using SHA algorithm.")
+	print(now.strftime(Style.DIM + "\n") + Fore.YELLOW + "ⓘ　Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit " + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Fore.YELLOW + " to learn more.\n")
 
 	efficiency = 100 - int(efficiency) # Calulate efficiency
 	efficiency = efficiency * 0.01
@@ -267,12 +268,12 @@ def Mine(): # Mining section
 					if feedback == "GOOD": # If result was good
 						now = datetime.datetime.now()
 						shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
-						print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.YELLOW + "Accepted: " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%)," + Style.NORMAL + Fore.WHITE + " diff: " + str(diff) + ", " + Style.BRIGHT + str(khash_count) + " khash/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
+						print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "⛏️ Accepted " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
 						break # Repeat
 					elif feedback == "BAD": # If result was bad
 						now = datetime.datetime.now()
 						shares[1] = shares[1] + 1 # Share rejected = increment bad shares counter by 1
-						print(now.strftime(Style.DIM + "[%H:%M:%S] ") + Fore.RED + "Rejected: " + str(shares[1]) + "/" + str(shares[1] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%)," + Style.NORMAL + Fore.WHITE + " diff: " + str(diff) + ", " + Style.BRIGHT + str(khash_count) + " khash/s "  + Style.BRIGHT + Fore.RED + "(boo!!!)")
+						print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Rejected " + str(shares[1]) + "/" + str(shares[1] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + str(khash_count) + " kH/s "  + Style.BRIGHT + Fore.RED + "(boo!!!)")
 						break # Repeat
 					time.sleep(0.025) # Try again if no response
 				break # Repeat
@@ -285,32 +286,32 @@ while True:
     try:
             loadConfig() # Load configfile
     except:
-            print(Style.BRIGHT + Fore.RED + "There was an error loading the configfile. Try removing it and re-running configuration."  + Style.RESET_ALL)
+            print(Style.BRIGHT + Fore.RED + "✗ There was an error loading the configfile. Try removing it and re-running configuration."  + Style.RESET_ALL)
 
     try:
 	    Greeting() # Display greeting message
     except:
-	    print(Style.BRIGHT + Fore.RED + "You somehow managed to break the greeting message!"  + Style.RESET_ALL)
+	    print(Style.BRIGHT + Fore.RED + "✗ You somehow managed to break the greeting message!"  + Style.RESET_ALL)
 
     try:
             Connect() # Connect to pool
     except:
-            print(Style.BRIGHT + Fore.RED + "There was an error connecting to pool. Check your config file." + Style.RESET_ALL)
+            print(Style.BRIGHT + Fore.RED + "✗ There was an error connecting to pool. Check your config file." + Style.RESET_ALL)
 
     try:
             checkVersion() # Check version
     except:
-            print(Style.BRIGHT + Fore.RED + "There was an error checking version. Restarting." + Style.RESET_ALL)
+            print(Style.BRIGHT + Fore.RED + "✗ There was an error checking version. Restarting." + Style.RESET_ALL)
 
     try:
             Login() # Login
     except:
-            print(Style.BRIGHT + Fore.RED + "There was an error while logging in. Restarting." + Style.RESET_ALL)
+            print(Style.BRIGHT + Fore.RED + "✗ There was an error while logging in. Restarting." + Style.RESET_ALL)
 
     try:
             Mine() # Mine
     except:
-            print(Style.BRIGHT + Fore.RED + "There was an error while mining. Restarting." + Style.RESET_ALL)
+            print(Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
 
     print(Style.RESET_ALL)
     time.sleep(0.025) # Restart if error
