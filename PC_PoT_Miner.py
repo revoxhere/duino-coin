@@ -35,7 +35,6 @@ except:
 
 # Setting variables
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
-cmd = "PoT_auto.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.dom -p x -e 50 -s 4" # Miner command
 income = 0
 timer = 30
 reward = 0.025219
@@ -87,13 +86,14 @@ def Greeting(): # Greeting message depending on time :)
 
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, password, efficiency
+  cmd = "PoT_auto -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin -p x -e 50 -s 4" # Miner command
   
   if not Path("PoTConfig_beta.2.ini").is_file(): # Initial configuration section
     print(Style.BRIGHT + "Initial configuration, you can edit 'MinerConfig_beta.1.ini' file later.")
     print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
 
-    username = input("Enter username (the one you used to register): ")
-    password = input("Enter password (the one you used to register): ")
+    username = input("Enter your username: ")
+    password = input("Enter your password: ")
     
     config['miner'] = { # Format data
     "username": username,
