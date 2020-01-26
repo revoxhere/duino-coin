@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Server (Beta v1) © revox 2020
+# Duino-Coin Server (Beta v2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 #############################################
 import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, os, psutil, string, json
@@ -74,9 +74,9 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
     userinfo = userinfo.replace('\'', '')
     userinfo = userinfo.replace(' ', '')
     userinfo = userinfo.replace(':', ' - ')
-    userinfo = str(userinfo)+str(" H/s")
     userinfo = userinfo.lstrip()
-  file.write(str(userinfo)+"\n")
+  userinfo = int(userinfo) / 1000
+  file.write(str(userinfo)+" kH/s\n")
   with locker:
     blok = open("config/blocks", "r")
     bloki = blok.readline()
@@ -92,13 +92,13 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
   file.write(str("\nCurrent difficulty: "))
   diff = math.ceil(int(bloki) / diff_incrase_per)
   file.write(str(diff))
-  reward = round(float(0.000002) * int(diff), 10)
+  reward = round(float(0.000025219) * int(diff), 10)
   file.write(str("\nReward: "))
   file.write(str(reward))
   file.write(str(" DUCO/block"))
   file.write(str("\nLast updated: "))
   file.write(str(now))
-  file.write(str("(GMT+1) (updated every 60s)"))
+  file.write(str(" (GMT+1) (updated every 60s)"))
   file.close() # End of API file writing
   ######################## UPDATE API FILE ########################
   try: # Create new file if it doesn't exist
@@ -349,10 +349,16 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           ServerLogHash("Recived good result (" + str(result) + ")")
           # Rewarding user for good hash
           with locker: # Using locker to fix problems when mining on many devices with one account
-            bal = open("balances/" + username + ".txt", "r")
             global reward
-            reward = float(0.000000002) * int(diff)
+            
+            bal = open("balances/" + username + ".txt", "r")
             balance = str(float(bal.readline())).rstrip("\n\r ")
+            
+            if float(balance) < 30: #New users will mine a bit faster :)
+              reward = float(0.00025219) * int(diff)
+            else:
+              reward = float(0.000025219) * int(diff)
+              
             balance = float(balance) + float(reward)
             bal = open("balances/" + username + ".txt", "w")
             bal.seek(0)
@@ -380,6 +386,21 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
             self.clientsock.send(bytes("BAD", encoding="utf8"))
           except:
             break
+          
+      ######################## PROOF OF TIME PROTOCOL ########################
+      elif username != "" and data[0] == "PoTr":
+        time.sleep(0.2)
+        with locker: # Using locker to fix problems when mining on many devices with one account
+          reward = float(0.0025219)
+          bal = open("balances/" + username + ".txt", "r")
+          balance = str(float(bal.readline())).rstrip("\n\r ")
+          balance = float(balance) + float(reward)
+          bal = open("balances/" + username + ".txt", "w")
+          bal.seek(0)
+          bal.write(str(balance))
+          bal.truncate()
+          bal.close()
+        time.sleep(59)
 
       ######################## BALANCE CHECK PROTOCOL ########################
       elif username != "" and data[0] == "BALA":
@@ -485,7 +506,7 @@ hashrates = {}
 config = configparser.ConfigParser()
 locker = threading.Lock()
 update_count = 0
-VER = "0.7" # "Big" version number  (0.7 = Beta 1)
+VER = "0.7" # "Big" version number  (0.8 = Beta 2)
 
 ######################## INITIAL FILE CREATION ########################
 if not Path("logs").is_dir():
