@@ -17,6 +17,15 @@ permalink: /blog/
 
 ***
 
+## 27.01.2020: Video!
+
+<video width="320" height="240" controls>
+  <source src="https://cdn.discordapp.com/attachments/634115103037325313/671411552494288925/ducopromo.mp4" type="video/mp4">
+Your browser does not support the video tag. Visit https://cdn.discordapp.com/attachments/634115103037325313/671411552494288925/ducopromo.mp4 manually.
+</video>
+
+***
+
 ## 26.01.2020: Beta 2 - Proof-of-Time miner
 Third way to mine - Proof-of-Time! <br>
 It's a super-new concept (someone has to make breakthroughs in the crypto world, just like we did with Arduino miner...) so please report if there are problems and what would you all improve :) <br>
