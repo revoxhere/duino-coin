@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-#############################################
-# Duino-Coin PC Miner (Beta v2) © revox 2020
+##############################################
+# Duino-Coin PC Miner (Beta 2.2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
-#############################################
+##############################################
 import socket, statistics, threading, time, random, re, hashlib, configparser, sys, datetime, os, signal # Import libraries
 from decimal import Decimal
 from pathlib import Path
@@ -11,14 +11,16 @@ from signal import signal, SIGINT
 try: # Check if colorama is installed
 	from colorama import init, Fore, Back, Style
 except:
-	print("✗ Colorama is not installed. Please install it using pip install colorama. Exiting in 15s.")
+	now = datetime.datetime.now()
+	print(now.strftime("%H:%M:%S ") + "✗ Colorama is not installed. Please install it using pip install colorama. Exiting in 15s.")
 	time.sleep(15)
 	os._exit(1)
 
 try: # Check if requests is installed
 	import requests
 except:
-	print("✗ Requests is not installed. Please install it using pip install requests. Exiting in 15s.")
+	now = datetime.datetime.now()
+	print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Requests is not installed. Please install it using pip install requests. Exiting in 15s.")
 	time.sleep(15)
 	os._exit(1)
 
@@ -36,9 +38,10 @@ timeout = 10 # Socket timeout
 
 
 def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
-    print("\n✓ SIGINT detected - Exiting gracefully. See you soon!")
-    soc.send(bytes("CLOSE", encoding="utf8"))
-    os._exit(0)
+	now = datetime.datetime.now()
+	print(now.strftime(Style.DIM + "\n%H:%M:%S ") + Fore.YELLOW + "✓ SIGINT detected - Exiting gracefully. See you soon!")
+	soc.send(bytes("CLOSE", encoding="utf8"))
+	os._exit(0)
 
 signal(SIGINT, handler) # Enable signal handler
 
@@ -59,7 +62,7 @@ def Greeting(): # Greeting message depending on time :)
 	else:
 		greeting = "Hello"
 		
-	message     ="║ Duino-Coin PC Miner (Beta v2) © revox 2019-2020\n" # Startup message
+	message     ="║ Duino-Coin PC Miner (Beta 2.2) © revox 2019-2020\n" # Startup message
 	message   += "║ https://github.com/revoxhere/duino-coin\n"
 	message   += "║ "+str(greeting)+", "+str(username)+" \U0001F44B\n\n"
 	
@@ -88,8 +91,8 @@ def hush(): # Hashes/sec calculation
 def loadConfig(): # Config loading section
 	global pool_address, pool_port, username, password, efficiency
 	
-	if not Path("MinerConfig_beta.2.ini").is_file(): # Initial configuration section
-		print(Style.BRIGHT + "Initial configuration, you can edit 'MinerConfig_beta.2.ini' file later.")
+	if not Path("Miner_b2.2_resources/Miner_config.ini").is_file(): # Initial configuration section
+		print(Style.BRIGHT + "Initial configuration, you can edit 'Miner_b2.2_resources/Miner_config.ini' file later.")
 		print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
 
 		username = input("Enter your username: ")
@@ -107,11 +110,11 @@ def loadConfig(): # Config loading section
 		"password": password,
 		"efficiency": efficiency}
 		
-		with open("MinerConfig_beta.2.ini", "w") as configfile: # Write data to file
+		with open("Miner_b2.2_resources/Miner_config.ini", "w") as configfile: # Write data to file
 			config.write(configfile)
 
 	else: # If config already exists, load from it
-		config.read("MinerConfig_beta.2.ini")
+		config.read("Miner_b2.2_resources/Miner_config.ini")
 		username = config["miner"]["username"]
 		password = config["miner"]["password"]
 		efficiency = config["miner"]["efficiency"]
@@ -277,7 +280,10 @@ def Mine(): # Mining section
 						break # Repeat
 					time.sleep(0.025) # Try again if no response
 				break # Repeat
-
+try:
+    os.mkdir("Miner_b2.2_resources") # Create resources folder if it doesn't exist
+except:
+    pass
 
 init(autoreset=True) # Enable colorama
 hush() # Start hash calculator
