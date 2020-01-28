@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Wallet (Beta v2) © revox 2020
+# Duino-Coin Wallet (Beta 2.2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 #############################################
 import time, socket, sys, os, subprocess, configparser, tkinter, webbrowser, urllib.request, random # Import libraries
@@ -15,7 +15,7 @@ except:
     print("Requests is not installed. Install it with: pip install requests. Exiting in 15s.")
     time.sleep(15)
 
-debug = "Starting debug file of Duino-Coin Wallet (Beta v2)\n"
+debug = "Starting debug file of Duino-Coin Wallet (Beta 2.2)\n"
 
 rand = random.randint(1000,1090) # luck in trading - small randomness
 rand = rand / 1000
@@ -49,10 +49,10 @@ def setTheme():
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str("1")}
-    with open("WalletResources/WalletConfig.ini", "w") as configfile:
+    with open("Wallet_b2.2_resources/Wallet_config.ini", "w") as configfile:
       config.write(configfile)
     debug += "Using dark mode\n"
-    background = "WalletResources/bg_beta.2_light.gif"
+    background = "Wallet_b2.2_resources/Wallet_background_light.gif"
     colorA = "white" #white when in day mode
     colorB = "black" #black when in day mode
     colorC = "gray"  #gray
@@ -63,24 +63,24 @@ def setTheme():
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str("2")}
-    with open("WalletResources/WalletConfig.ini", "w") as configfile:
+    with open("Wallet_b2.2_resources/Wallet_config.ini", "w") as configfile:
       config.write(configfile)
     debug += "Using community mode\n"
-    background = "WalletResources/bg_beta.2_dark.gif"
+    background = "Wallet_b2.2_resources/Wallet_background_dark.gif"
     colorA = "#121212"
     colorB = "#dff9fb"
     colorC = "gray"
     colorHighlight = "#f9ca24"
-    messagebox.showinfo("Information", "Please restart the Wallet to apply changes.\nCommunity background for this version was created by ATAR4XY") # Display info
+    messagebox.showinfo("Information", "Please restart the Wallet to apply changes.\nThis versions' community background was made by Mucha.") # Display info
      
   if v.get() == "0":
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str("0")}
-    with open("WalletResources/WalletConfig.ini", "w") as configfile:
+    with open("Wallet_b2.2_resources/Wallet_config.ini", "w") as configfile:
       config.write(configfile)
     debug += "Using light mode\n"
-    background = "WalletResources/bg_beta.2_alt.gif"
+    background = "Wallet_b2.2_resources/Wallet_background_community.gif"
     colorA = "red"
     colorB = "blue"
     colorC = "gray"
@@ -93,7 +93,7 @@ def selectWindow(): # First-time launch window
     window = tkinter.Tk()
     window.geometry("355x190")
     window.resizable(False, False)
-    window.title("Duino-Coin Wallet (Beta 2)")
+    window.title("Duino-Coin Wallet (Beta 2.2)")
     window.configure(background = str(colorA))
     
     label = tkinter.Label(window, text = "", bg = str(colorA), fg = str(colorB)).pack()     
@@ -202,7 +202,7 @@ def loginProtocol(): # First-time login protocol
         config['wallet'] = {"username": username,
                   "password": password,
                   "theme": str("0")}
-        with open("WalletResources/WalletConfig.ini", "w") as configfile:
+        with open("Wallet_b2.2_resources/Wallet_config.ini", "w") as configfile:
             config.write(configfile)
         rootA.destroy()
         loadConfig()
@@ -218,14 +218,14 @@ def loadConfig(): # Load config protocol
     global username, password, debug
     global theme, background, colorA, colorB, colorC, colorHighlight
     
-    config.read("WalletResources/WalletConfig.ini")
+    config.read("Wallet_b2.2_resources/Wallet_config.ini")
     username = config["wallet"]["username"]
     password = config["wallet"]["password"]
     theme = config["wallet"]["theme"]
     
     if str(theme) == "0": # Light mode
       debug += "Using light theme\n"
-      background = "WalletResources/bg_beta.2_light.gif"
+      background = "Wallet_b2.2_resources/Wallet_background_light.gif"
       colorA = "white" #white when in light mode
       colorB = "black" #black when in light mode
       colorC = "gray"  #gray
@@ -233,7 +233,7 @@ def loadConfig(): # Load config protocol
       
     if str(theme) == "1": # Dark theme
       debug += "Using dark theme\n"
-      background = "WalletResources/bg_beta.2_dark.gif"
+      background = "Wallet_b2.2_resources/Wallet_background_dark.gif"
       colorA = "#121212"
       colorB = "#dff9fb"
       colorC = "gray"
@@ -241,11 +241,11 @@ def loadConfig(): # Load config protocol
       
     if str(theme) == "2": # Community theme
       debug += "Using community theme\n"
-      background = "WalletResources/bg_beta.2_alt.gif"
-      colorA = "red"
-      colorB = "white"
+      background = "Wallet_b2.2_resources/Wallet_background_community.gif"
+      colorA = "#e3ffff"
+      colorB = "#042975"
       colorC = "gray"
-      colorHighlight = "#f9ca24"
+      colorHighlight = "#3498db"
 
     while True: # Login
         time.sleep(0.025)
@@ -265,7 +265,7 @@ def loadConfig(): # Load config protocol
             WalletWindow()
             os._exit(0)
         if key == "NO":
-            messagebox.showerror("Error","Fatal error in configfile (WalletConfig.ini)!\nRemove it and restart the wallet.")
+            messagebox.showerror("Error","Fatal error in configfile (Wallet_config.ini)!\nRemove it and restart the wallet.")
             os._exit(0)
         else:
             loadConfig()
@@ -367,7 +367,7 @@ def About():
         v.set(int(2))
 
     label = tkinter.Label(about, text = "Duino-Coin Wallet", font=("Verdana", 20, "bold"), fg = str(colorHighlight), bg = str(colorA)).pack()
-    label = tkinter.Label(about, text = "Beta 2 (holy cow, we made a beta release!)", fg = str(colorB), bg = str(colorA)).pack()
+    label = tkinter.Label(about, text = "Beta 2.2 (holy cow, we made a beta release!)", fg = str(colorB), bg = str(colorA)).pack()
     label = tkinter.Label(about, text = "Made by revox from Duino-Coin developers", fg = str(colorB), bg = str(colorA)).pack()
     tkinter.Button(about, text = "Duino-Coin GitHub", activebackground = str(colorHighlight), command = GitHub, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=5)
     tkinter.Button(about, text = "Support the project (donate)", activebackground = str(colorHighlight), command = Donate, width=35, height=1, fg = str(colorB), bg = str(colorA)).pack(pady=3)
@@ -429,7 +429,7 @@ def getBalance():
             time.sleep(0.05)
             label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg = str(colorA), font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorA), font=("Arial", 10)).place(relx=.1, rely=.27)
-            wallet.title("Duino-Coin Wallet (Beta 2) - "+str(round(float(balance), 2))+" DUCO")
+            wallet.title("Duino-Coin Wallet (Beta 2.2) - "+str(round(float(balance), 2))+" DUCO")
             time.sleep(0.05)
             label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
@@ -451,7 +451,7 @@ def WalletWindow():
     wallet.geometry("500x300")
     wallet.resizable(False, False)
     wallet.configure(background = str(colorA))
-    wallet.title("Duino-Coin Wallet (Beta 2)")
+    wallet.title("Duino-Coin Wallet (Beta 2.2)")
     filename = PhotoImage(file = str(background))
     background_label = Label(wallet, image = filename)
     background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
@@ -470,7 +470,7 @@ def WalletWindow():
     wallet.mainloop()
 
 try:
-    os.mkdir("WalletResources") # Create WalletResources folder if it doesn'balanceTimer exist
+    os.mkdir("Wallet_b2.2_resources") # Create WalletResources folder if it doesn'balanceTimer exist
 except:
     pass
 
@@ -498,32 +498,32 @@ except:
     debug += "Error while loading configfile!!!\n"
     
 
-if not Path("WalletResources/bg_beta.2_light.gif").is_file(): # Light mode background
+if not Path("Wallet_b2.2_resources/Wallet_background_light.gif").is_file(): # Light mode background
     try:
-        debug += "Downloading latest background file\n"
+        debug += "Downloading latest light background file\n"
         url = 'https://i.imgur.com/6n3ZCHR.gif'
-        urllib.request.urlretrieve(url, 'WalletResources/bg_beta.2_light.gif')
+        urllib.request.urlretrieve(url, 'Wallet_b2.2_resources/Wallet_background_light.gif')
     except:
         debug += "Couldn't download background file!\n"
 else:
-    debug += "Background image already downloaded\n"
+    debug += "Light background image already downloaded\n"
 
-if not Path("WalletResources/bg_beta.2_dark.gif").is_file(): # Dark mode background
+if not Path("Wallet_b2.2_resources/Wallet_background_dark.gif").is_file(): # Dark mode background
     try:
-        debug += "Downloading latest background file\n"
+        debug += "Downloading latest dark background file\n"
         url = 'https://i.imgur.com/ZPBCeHv.gif'
-        urllib.request.urlretrieve(url, 'WalletResources/bg_beta.2_dark.gif')
+        urllib.request.urlretrieve(url, 'Wallet_b2.2_resources/Wallet_background_dark.gif')
     except:
         debug += "Couldn't download background file!\n"
 else:
-    debug += "Background image already downloaded\n"
+    debug += "Dark background image already downloaded\n"
 
 
-if not Path("WalletResources/bg_beta.2_alt.gif").is_file(): # Community theme background
+if not Path("Wallet_b2.2_resources/Wallet_background_community.gif").is_file(): # Community theme background
     try:
-        debug += "Downloading latest background file\n"
-        url = 'https://i.imgur.com/V2IJjEi.png'
-        urllib.request.urlretrieve(url, 'WalletResources/bg_beta.2_alt.gif')
+        debug += "Downloading latest community background file\n"
+        url = 'https://i.imgur.com/4TqMYlt.gif'
+        urllib.request.urlretrieve(url, 'Wallet_b2.2_resources/Wallet_background_community.gif')
     except:
         debug += "Couldn't download community background file!\n"
 else:
@@ -539,7 +539,7 @@ except SystemExit:
   messagebox.showerror("Error","Server is under maintenance.\nPlease try again in a few hours.")
   os._exit(0)
     
-if not Path("WalletResources/WalletConfig.ini").is_file():
+if not Path("Wallet_b2.2_resources/Wallet_config.ini").is_file():
   selectWindow()
   loadConfig()
 else:
