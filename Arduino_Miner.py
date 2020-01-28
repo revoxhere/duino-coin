@@ -165,4 +165,3 @@ while J:
      O(H.strftime("[%H:%M:%S] ")+"Rejected "+a(c[1])+"/"+a(c[1]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%) • diff: "+a(D)+" • "+a(z)+" h/s (boo!!!)")
      break
    break
- 
