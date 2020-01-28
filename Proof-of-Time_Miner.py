@@ -47,8 +47,8 @@ if os.name != 'nt': # Check if running on Windows
 # Set variables
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 income = 0
-timer = 30
-reward = 0.025219
+timer = 45
+reward = 0.0252195
 config = configparser.ConfigParser()
 VER = "0.8" # "Big" version number  (0.8 = Beta 2)
 timeout = 10 # Socket timeout
@@ -97,8 +97,8 @@ def Greeting(): # Greeting message depending on time :)
 
 
 def loadConfig(): # Config loading section
-  global pool_address, pool_port, username, password, efficiency
-  cmd = "start PoT_b2.2_resources/PoT_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin -p x -e 30 -s 4" # Miner command
+  global pool_address, pool_port, username, password, efficiency, cmd
+  cmd = "cd PoT_b2.2_resources & PoT_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin -p x -e 10 -s 4" # Miner command
 
   if not Path("PoT_b2.2_resources/PoT_executable.exe").is_file(): # Initial configuration section
     now = datetime.datetime.now()
@@ -256,10 +256,10 @@ def Mine(): # "Mining" section
         print("", end = Style.DIM + Fore.YELLOW + f"\r⏲　Next reward in {timer:02} seconds " + Style.RESET_ALL + Style.DIM + "▓"*timer + " ")
         timer -= 1
         time.sleep(1)
-        if timer <= 0: # Ask for reward every 30s; server won't allow faster submission
+        if timer <= 0: # Ask for reward every 45s; server won't allow faster submission
             income += reward
             income = round(float(income), 8)
-            timer = 30 # Reset the timer
+            timer = 45 # Reset the timer
             soc.send(bytes("PoTr", encoding="utf8")) # Send Proof-of-Time-reward request
             now = datetime.datetime.now()
             print("", end=f"\r" + now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "» You've been rewarded! This session estimated income is " + str(income) + " DUCO\n")
