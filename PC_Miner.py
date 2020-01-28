@@ -271,12 +271,12 @@ def Mine(): # Mining section
 					if feedback == "GOOD": # If result was good
 						now = datetime.datetime.now()
 						shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
-						print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "⛏️ Accepted " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
+						print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "⛏️ Accepted " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
 						break # Repeat
 					elif feedback == "BAD": # If result was bad
 						now = datetime.datetime.now()
 						shares[1] = shares[1] + 1 # Share rejected = increment bad shares counter by 1
-						print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Rejected " + str(shares[1]) + "/" + str(shares[1] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + str(khash_count) + " kH/s "  + Style.BRIGHT + Fore.RED + "(boo!!!)")
+						print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ Rejected " + str(shares[1]) + "/" + str(shares[1] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + str(khash_count) + " kH/s "  + Style.BRIGHT + Fore.RED + "(boo!!!)")
 						break # Repeat
 					time.sleep(0.025) # Try again if no response
 				break # Repeat
