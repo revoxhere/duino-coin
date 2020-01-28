@@ -17,6 +17,12 @@ permalink: /blog/
 
 ***
 
+## 28.01.2020: Beta 2.2 - Proof-of-Time Miner fixes
+...and some other minor improvements. <br>
+Download Beta 2.2 here: [releases/tag/beta-2](https://github.com/revoxhere/duino-coin/releases/tag/beta-2.2)
+
+***
+
 ## 27.01.2020: Video!
 
 <video width="320" height="240" controls>
@@ -34,8 +40,9 @@ Download Beta 2 here: [releases/tag/beta-2](https://github.com/revoxhere/duino-c
 
 ***
 
-## 11.01.2020: Beta 1 almost done
-Beta 1 is probably going to be one of the most exciting updates so far! We've tried to fix almost every bug and added features that were asked on our Discord server. It will be released in a few hours.
+## 11.01.2020: Beta 1 (almost) done
+Beta 1 is probably going to be one of the most exciting updates so far! We've tried to fix almost every bug and added features that were asked on our Discord server. It will be released in a few hours. <br>
+<br>
 Download Beta 1 here: [releases/tag/beta-1](https://github.com/revoxhere/duino-coin/releases/tag/beta-1)
 
 ***
@@ -47,8 +54,7 @@ Last Alpha release - download it here: [releases/tag/alpha-6.8](https://github.c
 
 ## 4.01.2020: Alpha 6.8 is in the works. 
 In it, I'll try to fix most of the bugs from all Alpha 6 releases. <br>
-Alpha 6.9 may be released to fix some leftovers. <br>
-We are also preparing for Alpha 7. <br>
+We are also preparing for Alpha 7 or Beta 1 <br>
 It's going to be a 'big' update so everyone will have to upgrade. <br>
 But a few more weeks until this happens.
 
