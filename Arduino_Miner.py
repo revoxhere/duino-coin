@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-##################################################
-# Duino-Coin Arduino Miner (Beta v2) © revox 2020
+###################################################
+# Duino-Coin Arduino Miner (Beta 2.2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
-##################################################
-import socket,threading,time,random,configparser,sys,serial,hashlib,serial.tools.list_ports,datetime,requests
+###################################################
+import socket,threading,time,random,configparser,sys,os,serial,hashlib,serial.tools.list_ports,datetime
 from pathlib import Path
+
+try:
+    import requests
+except:
+    print("Requests is not installed. Please install it with pip install requests")
 
 O=print
 h=int
@@ -29,8 +34,13 @@ res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.
 B=threading.Timer
 A=socket.socket
 
-O("\n▋ Duino-Coin Arduino Miner (Beta v2) © revox 2019-2020")
-O("▋ https://github.com/revoxhere/duino-coin\n")
+try:
+    os.mkdir("ArduinoMiner_b2.2_resources")
+except:
+    pass
+
+O("\n║ Duino-Coin Arduino Miner (Beta 2.2) © revox 2019-2020")
+O("║ https://github.com/revoxhere/duino-coin\n")
 
 def L():
  global S,b,z
@@ -57,8 +67,6 @@ while True:
    content = res.content.decode().splitlines()
    pool_address = content[0]
    pool_port = content[1]
-   H=Y.now()
-   O(H.strftime("[%H:%M:%S] ")+"Successfully received pool IP and port.")
    break
   else:
    X(0.025)
@@ -67,8 +75,8 @@ while True:
   O(H.strftime("[%H:%M:%S] ")+"Couldn't receive pool IP and port. Exiting in 15 seconds.")
   X(15)
  X(0.025)
-if not Path("ArduinoMinerConfig_beta.2.ini").is_file():
- O("Initial configuration, you can edit 'ArduinoMinerConfig_beta.2.ini' later\n")
+if not Path("ArduinoMiner_b2.2_resources/Arduino_config.ini").is_file():
+ O("Initial configuration, you can edit 'ArduinoMiner_b2.2_resources/Arduino_config.ini' later\n")
  O("Scanning ports...")
  W=o.list_ports.comports()
  P=[]
@@ -76,26 +84,27 @@ if not Path("ArduinoMinerConfig_beta.2.ini").is_file():
   P.append(i.device)
  O("Found COM ports: "+a(P))
  y=Q("Enter your Arduino COM port (e.g: COM8): ")
- M=Q("Enter username (the one you used to register): ")
- l=Q("Enter password (the one you used to register): ")
+ M=Q("Enter your username: ")
+ l=Q("Enter your password: ")
  f['arduinominer']={"arduino":y,"username":M,"password":l}
- with q("ArduinoMinerConfig_beta.2.ini","w")as configfile:
+ with q("ArduinoMiner_b2.2_resources/Arduino_config.ini","w")as configfile:
   f.write(configfile)
 else:
- f.read("ArduinoMinerConfig_beta.2.ini")
+ f.read("ArduinoMiner_b2.2_resources/Arduino_config.ini")
  y=f["arduinominer"]["arduino"]
- p=pool_address
- x=pool_port
  M=f["arduinominer"]["username"]
  l=f["arduinominer"]["password"]
 while J:
  v=A()
+ p=pool_address
+ x=pool_port
  try:
   v.connect((p,h(x)))
   H=Y.now()
   O(H.strftime("[%H:%M:%S] ")+"Connected to pool on tcp://"+p+":"+x)
   break
  except:
+  H=Y.now()
   O(H.strftime("[%H:%M:%S] ")+"Cannot connect to pool server. It is probably under maintenance. Retrying in 15 seconds...")
   X(15)
  X(0.025)
@@ -123,7 +132,7 @@ while J:
   v.close()
  X(0.025)
 H=Y.now()
-O(H.strftime("[%H:%M:%S] ")+"Arduino miner thread started, using SHA1 algorithm.")
+O(H.strftime("[%H:%M:%S] ")+"Arduino miner thread started, using SHA algorithm.")
 O("\nDuino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit https://revoxhere.github.io/duino-coin/donate to learn more.\n")
 
 L()
@@ -148,11 +157,11 @@ while J:
     if V=="GOOD":
      H=Y.now()
      c[0]=c[0]+1 
-     O(H.strftime("[%H:%M:%S] ")+"Accepted: "+a(c[0])+"/"+a(c[0]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%), diff: "+a(D)+", "+a(z)+" hashes/s (yay!!!)")
+     O(H.strftime("[%H:%M:%S] ")+"Accepted "+a(c[0])+"/"+a(c[0]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%) • diff: "+a(D)+" • "+a(z)+" h/s (yay!!!)")
      break
     elif V=="BAD":
      H=Y.now()
      c[1]=c[1]+1 
-     O(H.strftime("[%H:%M:%S] ")+"Rejected: "+a(c[1])+"/"+a(c[1]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%), diff: "+a(D)+", "+a(z)+" hashes/s (boo!!!)")
+     O(H.strftime("[%H:%M:%S] ")+"Rejected "+a(c[1])+"/"+a(c[1]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%) • diff: "+a(D)+" • "+a(z)+" h/s (boo!!!)")
      break
    break
