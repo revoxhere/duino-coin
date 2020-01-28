@@ -12,13 +12,15 @@ try: # Check if colorama is installed
   from colorama import init, Fore, Back, Style
   init(autoreset=True) # Enable colorama
 except:
-  print("✗ Colorama is not installed. Please install it using pip install colorama.\nExiting in 15s.")
+	now = datetime.datetime.now()
+	print(now.strftime("%H:%M:%S ") + "✗ Colorama is not installed. Please install it using pip install colorama.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
 
 try: # Check if requests is installed
   import requests
 except:
+  now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Requests is not installed. Please install it using pip install requests.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
