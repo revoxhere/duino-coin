@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-################################################
-# Duino-Coin PoT Miner (Beta v2.2) © revox 2020
+###############################################
+# Duino-Coin PoT Miner (Beta 2.2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
-################################################
+###############################################
 import socket, statistics, threading, time, re, configparser, sys, datetime, os, signal, subprocess # Import libraries
 from decimal import Decimal
 from pathlib import Path
@@ -12,8 +12,8 @@ try: # Check if colorama is installed
   from colorama import init, Fore, Back, Style
   init(autoreset=True) # Enable colorama
 except:
-	now = datetime.datetime.now()
-	print(now.strftime("%H:%M:%S ") + "✗ Colorama is not installed. Please install it using pip install colorama.\nExiting in 15s.")
+  now = datetime.datetime.now()
+  print(now.strftime("%H:%M:%S ") + "✗ Colorama is not installed. Please install it using pip install colorama.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
 
@@ -88,7 +88,7 @@ def Greeting(): # Greeting message depending on time :)
   else:
     greeting = "Hello"
     
-  message  = "║ Duino-Coin Proof-of-Time Miner (Beta v2.2) © revox 2019-2020\n" # Startup message
+  message  = "║ Duino-Coin Proof-of-Time Miner (Beta 2.2) © revox 2019-2020\n" # Startup message
   message += "║ https://github.com/revoxhere/duino-coin\n"
   message += "║ "+str(greeting)+", "+str(username)+" \U0001F44B\n\n"
   
@@ -123,7 +123,7 @@ def loadConfig(): # Config loading section
     username = input("Enter your username: ")
     password = input("Enter your password: ")
     
-    config['miner'] = { # Format data
+    config['pot'] = { # Format data
     "username": username,
     "password": password}
     
@@ -132,8 +132,8 @@ def loadConfig(): # Config loading section
 
   else: # If config already exists, load from it
     config.read("PoT_b2.2_resources/PoT_config.ini")
-    username = config["miner"]["username"]
-    password = config["miner"]["password"]
+    username = config["pot"]["username"]
+    password = config["pot"]["password"]
     
 
 def Connect(): # Connect to pool section
@@ -255,7 +255,7 @@ def Mine(): # "Mining" section
     print(now.strftime(Style.DIM + "\n") + Fore.YELLOW + "ⓘ　Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit " + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Fore.YELLOW + " to learn more.\n")
 
     while True:
-        print("", end = Style.DIM + Fore.YELLOW + f"\r⏲　Next reward in {timer:02} seconds " + Style.RESET_ALL + Style.DIM + "▓"*timer + " ")
+        print("", end = Style.DIM + Fore.YELLOW + "\r⏲　Next reward in " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + f"{timer:02}"  + Style.RESET_ALL + Style.DIM + Fore.YELLOW + " seconds " + Style.RESET_ALL + Style.DIM + "▚"*timer + " ")
         timer -= 1
         time.sleep(1)
         if timer <= 0: # Ask for reward every 45s; server won't allow faster submission
@@ -264,39 +264,45 @@ def Mine(): # "Mining" section
             timer = 45 # Reset the timer
             soc.send(bytes("PoTr", encoding="utf8")) # Send Proof-of-Time-reward request
             now = datetime.datetime.now()
-            print("", end=f"\r" + now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "» You've been rewarded! This session estimated income is " + str(income) + " DUCO\n")
+            print("", end=f"\r" + now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "» You've been rewarded • This session estimated income is " + str(income) + " DUCO\n")
 
 
 while True:
   try:
-      loadConfig() # Load configfile
+    loadConfig() # Load configfile
   except:
-      print(Style.BRIGHT + Fore.RED + "✗ There was an error loading the configfile. Try removing it and re-running configuration."  + Style.RESET_ALL)
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error loading the configfile. Try removing it and re-running configuration."  + Style.RESET_ALL)
+    time.sleep(15)
+    os._exit(1)
 
   try:
     Greeting() # Display greeting message
   except:
     print(Style.BRIGHT + Fore.RED + "✗ You somehow managed to break the greeting message!"  + Style.RESET_ALL)
+    time.sleep(15)
+    os._exit(1)
+    
+  try:
+    Connect() # Connect to pool
+  except:
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error connecting to pool. Check your configfile." + Style.RESET_ALL)
+    time.sleep(15)
+    os._exit(1)
+    
+  try:
+    checkVersion() # Check version
+  except:
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error checking version. Restarting." + Style.RESET_ALL)
 
   try:
-      Connect() # Connect to pool
+    Login() # Login
   except:
-      print(Style.BRIGHT + Fore.RED + "✗ There was an error connecting to pool. Check your config file." + Style.RESET_ALL)
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error while logging in. Restarting." + Style.RESET_ALL)
 
   try:
-      checkVersion() # Check version
+    Mine() # "Mine"
   except:
-      print(Style.BRIGHT + Fore.RED + "✗ There was an error checking version. Restarting." + Style.RESET_ALL)
-
-  try:
-      Login() # Login
-  except:
-      print(Style.BRIGHT + Fore.RED + "✗ There was an error while logging in. Restarting." + Style.RESET_ALL)
-
-  try:
-      Mine() # "Mine"
-  except:
-      print(Style.BRIGHT + Fore.RED + "✗ There was an error in PoT section. Restarting." + Style.RESET_ALL)
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error in PoT section. Restarting." + Style.RESET_ALL)
 
   print(Style.RESET_ALL)
   time.sleep(0.025) # Restart if error
