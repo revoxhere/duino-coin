@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-###############################################
-# Duino-Coin PoT Miner (Beta 2.2) © revox 2020
+#################################################
+# Duino-Coin PoT Miner (Beta 2.2.1) © revox 2020
 # https://github.com/revoxhere/duino-coin 
-###############################################
+#################################################
 import socket, statistics, threading, time, re, configparser, sys, datetime, os, signal, subprocess # Import libraries
 from decimal import Decimal
 from pathlib import Path
@@ -88,7 +88,7 @@ def Greeting(): # Greeting message depending on time :)
   else:
     greeting = "Hello"
     
-  message  = "║ Duino-Coin Proof-of-Time Miner (Beta 2.2) © revox 2019-2020\n" # Startup message
+  message  = "║ Duino-Coin Proof-of-Time Miner (Beta 2.2.1) © revox 2019-2020\n" # Startup message
   message += "║ https://github.com/revoxhere/duino-coin\n"
   message += "║ "+str(greeting)+", "+str(username)+" \U0001F44B\n\n"
   
@@ -100,7 +100,7 @@ def Greeting(): # Greeting message depending on time :)
 
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, password, efficiency, cmd
-  cmd = "cd PoT_b2.2_resources & PoT_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin -p x -e 10 -s 4" # Miner command
+  cmd = "cd PoT_b2.2_resources & PoT_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin -p duinocoin -e 80 -s 4" # Miner command
 
   if not Path("PoT_b2.2_resources/PoT_executable.exe").is_file(): # Initial configuration section
     now = datetime.datetime.now()
