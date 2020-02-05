@@ -118,7 +118,7 @@ def Greeting(): # Greeting message depending on time :)
 
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, password, efficiency, cmd
-  cmd = "cd PoT_b3_resources & PoT_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin -p x -e 10 -s 4" # Miner command
+  cmd = "cd PoT_b3_resources & PoT_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin_potminer -p x -e 10 -s 4" # Miner command
 
   if not Path("PoT_b3_resources/PoT_executable.exe").is_file(): # Initial configuration section
     now = datetime.datetime.now()
