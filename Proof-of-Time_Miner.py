@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-#################################################
-# Duino-Coin PoT Miner (Beta 2.2.1) © revox 2020
+###############################################
+# Duino-Coin PoT Miner (Beta 3) © revox 2020
 # https://github.com/revoxhere/duino-coin 
-#################################################
-import socket, statistics, threading, time, re, configparser, sys, datetime, os, signal, subprocess # Import libraries
+###############################################
+import socket, statistics, threading, time, re, configparser, sys, getpass, platform, datetime, os, signal, subprocess # Import libraries
 from decimal import Decimal
 from pathlib import Path
 from signal import signal, SIGINT
@@ -33,28 +33,46 @@ except:
   time.sleep(15)
   os._exit(1)
 
-if not Path("PoT_b2.2_resources").is_dir(): # Check if resources folder exists
+try: # Check if tendo is installed
+	from tendo import singleton
+except:
+	now = datetime.datetime.now()
+	print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Tendo is not installed. Please install it using pip install tendo.\nExiting in 15s.")
+	time.sleep(15)
+	os._exit(1)
+
+if not Path("PoT_b3_resources").is_dir(): # Check if resources folder exists
   try:
-    os.mkdir("PoT_b2.2_resources") # Create resources folder
+    os.mkdir("PoT_b3_resources") # Create resources folder
   except:
     now = datetime.datetime.now()
     print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Couldn't create resources directory.\nExiting in 15s.")
 
-if os.name != 'nt': # Check if running on Windows
+if not os.name == 'nt': # Check if running on Windows
   now = datetime.datetime.now()
   win = input(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ You can use Proof-Of-Time Miner only on Windows. Continue anyway? [y/n] ")
   if win != "y":
-    os._exit(1)
+    os._exit(0)
 
 # Set variables
-res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
+res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Server IP file
 income = 0
 timer = 45
-reward = 0.0252195
+reward = 0.0252195 # Default PoT reward
 config = configparser.ConfigParser()
-VER = "0.8" # "Big" version number  (0.8 = Beta 2)
+VER = "0.8" # "Big" version number  (0.9 = Beta 3)
 timeout = 10 # Socket timeout
+pcusername = getpass.getuser() # Get clients' username
+platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
+publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
 
+try: # Check if another pcminer instance is already running
+        potminer = singleton.SingleInstance()
+except:
+        now = datetime.datetime.now()
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Only one instance can be running at once.\nExiting in 15 seconds.")
+        time.sleep(15)
+        os._exit(1)
 
 def handler(signal_received, frame): # If SIGINT received, do as much cleanup as possible
   now = datetime.datetime.now()
@@ -88,7 +106,7 @@ def Greeting(): # Greeting message depending on time :)
   else:
     greeting = "Hello"
     
-  message  = "║ Duino-Coin Proof-of-Time Miner (Beta 2.2.1) © revox 2019-2020\n" # Startup message
+  message  = "║ Duino-Coin Proof-of-Time Miner (Beta 3) © revox 2019-2020\n" # Startup message
   message += "║ https://github.com/revoxhere/duino-coin\n"
   message += "║ "+str(greeting)+", "+str(username)+" \U0001F44B\n\n"
   
@@ -100,24 +118,21 @@ def Greeting(): # Greeting message depending on time :)
 
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, password, efficiency, cmd
-  cmd = "cd PoT_b2.2_resources & PoT_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin -p duinocoin -e 80 -s 4" # Miner command
+  cmd = "cd PoT_b3_resources & PoT_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin -p x -e 10 -s 4" # Miner command
 
-  if not Path("PoT_b2.2_resources/PoT_executable.exe").is_file(): # Initial configuration section
+  if not Path("PoT_b3_resources/PoT_executable.exe").is_file(): # Initial configuration section
     now = datetime.datetime.now()
     print(now.strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "ⓘ　Downloading required PoT executable. It may be detected by your antivirus software as malware but it's just a FALSE POSITIVE. Add PoT to whitelist if it keeps being deleted.")
 
     url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
     r = requests.get(url)
 
-    with open('PoT_b2.2_resources/PoT_executable.exe', 'wb') as f:
+    with open('PoT_b3_resources/PoT_executable.exe', 'wb') as f:
         f.write(r.content)
 
-    now = datetime.datetime.now()
-    print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Downloaded PoT executable\n")
 
-
-  if not Path("PoT_b2.2_resources/PoT_config.ini").is_file(): # Initial configuration section
-    print(Style.RESET_ALL + Style.BRIGHT + "Initial configuration, you can edit 'PoT_b2.2_resources/PoT_config.ini' file later.")
+  if not Path("PoT_b3_resources/PoT_config.ini").is_file(): # Initial configuration section
+    print(Style.RESET_ALL + Style.BRIGHT + "Initial configuration, you can edit 'PoT_b3_resources/PoT_config.ini' file later.")
     print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
 
     username = input("Enter your username: ")
@@ -127,11 +142,11 @@ def loadConfig(): # Config loading section
     "username": username,
     "password": password}
     
-    with open("PoT_b2.2_resources/PoT_config.ini", "w") as configfile: # Write data to file
+    with open("PoT_b3_resources/PoT_config.ini", "w") as configfile: # Write data to file
       config.write(configfile)
 
   else: # If config already exists, load from it
-    config.read("PoT_b2.2_resources/PoT_config.ini")
+    config.read("PoT_b3_resources/PoT_config.ini")
     username = config["pot"]["username"]
     password = config["pot"]["password"]
     
@@ -223,16 +238,21 @@ def Login():
         Connect() # Reconnect if pool down
         
       if resp == "OK": # Check wheter login information was correct
+        soc.send(bytes("FROM," + "PoT_Miner," + str(pcusername) + "," + str(publicip) + "," + str(platform), encoding="utf8")) # Send info to server about client
+
         now = datetime.datetime.now()
         print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Logged in successfully")
+
         break # If it was, continue
       
       if resp == "NO":
         now = datetime.datetime.now()
-        print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Error! Wrong credentials, account doesn't exist or you are already connected!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
+
         soc.close()
         time.sleep(15)
         os._exit(1) # If it wasn't, display a message and exit
+
     except:
       Connect() # Reconnect if pool down
 
@@ -255,7 +275,7 @@ def Mine(): # "Mining" section
     print(now.strftime(Style.DIM + "\n") + Fore.YELLOW + "ⓘ　Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit " + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Fore.YELLOW + " to learn more.\n")
 
     while True:
-        print("", end = Style.DIM + Fore.YELLOW + "\r⏲　Next reward in " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + f"{timer:02}"  + Style.RESET_ALL + Style.DIM + Fore.YELLOW + " seconds " + Style.RESET_ALL + Style.DIM + "▚"*timer + " ")
+        print("", end = Style.DIM + Fore.YELLOW + "\r⏲　Next reward in " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + f"{timer:02}"  + Style.RESET_ALL + Style.DIM + Fore.YELLOW + " seconds " + Style.RESET_ALL + Style.DIM + "▰"*timer + " ")
         timer -= 1
         time.sleep(1)
         if timer <= 0: # Ask for reward every 45s; server won't allow faster submission
