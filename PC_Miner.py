@@ -45,7 +45,7 @@ VER = "0.8" # "Big" version number  (0.9 = Beta 3)
 timeout = 10 # Socket timeout
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
-cmd = "cd Miner_b3_resources & Miner_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin_pcminer -p x -e 20 -s 4" # Miner command
+cmd = "cd Miner_b3_resources & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 20 -s 4" # Miner command
 publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
 
 
