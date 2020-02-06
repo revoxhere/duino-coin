@@ -52,7 +52,7 @@ VER = "0.7" # "Big" version number  (0.8 = Beta 2)
 debug += "Successfully set variables\n"
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
-cmd = "cd Wallet_b3_resources & Wallet_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin_wallet -p x -e 10 -s 4" # Miner command
+cmd = "cd Wallet_b3_resources & Wallet_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_wallet -p x -e 20 -s 4" # Miner command
 publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
 themes = [
   ("Light mode"),
@@ -399,7 +399,7 @@ def About():
         v.set(int(2))
 
     label = tkinter.Label(about, text = "Duino-Coin Wallet", font=("Verdana", 20, "bold"), fg = str(colorHighlight), bg = str(colorA)).pack()
-    label = tkinter.Label(about, text = "Beta 3 (next will be 1.0!)", fg = str(colorB), bg = str(colorA)).pack()
+    label = tkinter.Label(about, text = "Beta 3 (1.0 is next!)", fg = str(colorB), bg = str(colorA)).pack()
     label = tkinter.Label(about, text = "Made by revox from Duino-Coin developers", fg = str(colorB), bg = str(colorA)).pack()
     tkinter.Button(about, text = "Duino-Coin GitHub", activebackground = str(colorHighlight), command = GitHub, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=5)
     tkinter.Button(about, text = "Support the project (donate)", activebackground = str(colorHighlight), command = Donate, width=35, height=1, fg = str(colorB), bg = str(colorA)).pack(pady=3)
