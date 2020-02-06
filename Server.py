@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Server (Beta v2) © revox 2020
+# Duino-Coin Server (Beta 3) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 #############################################
 import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, os, psutil, string, json
@@ -31,6 +31,12 @@ def ServerLogHash(whattolog): # Separate serverlog section for mining section de
   #logfile.close()
   #print(whattolog+"\n")
   pass
+
+def search(myDict, search1):
+    search.a=[]
+    for key, value in myDict.items():
+        if search1 in value:
+            search.a.append(key)
   
 def UpdateServerInfo(): ######################## API PROTOCOL ########################
   global server_info, hashrates, threads, diff, update_count, gitrepo, gitusername, rewardap, blocks, userinfo
@@ -75,8 +81,7 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
     userinfo = userinfo.replace(' ', '')
     userinfo = userinfo.replace(':', ' - ')
     userinfo = userinfo.lstrip()
-  userinfo = int(userinfo) / 1000
-  file.write(str(userinfo)+" kH/s\n")
+  file.write(str(userinfo)+" H/s\n")
   with locker:
     blok = open("config/blocks", "r")
     bloki = blok.readline()
@@ -98,7 +103,7 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
   file.write(str(" DUCO/block"))
   file.write(str("\nLast updated: "))
   file.write(str(now))
-  file.write(str(" (GMT+1) (updated every 60s)"))
+  file.write(str(" (GMT+1) (updated every 90s)"))
   file.close() # End of API file writing
   ######################## UPDATE API FILE ########################
   try: # Create new file if it doesn't exist
@@ -115,8 +120,8 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
     ServerLog("Updated statistics file on GitHub. Update count:"+str(update_count))
   except:
     ServerLog("Failed to update statistics file!")
-  # Run every 60s
-  threading.Timer(60, UpdateServerInfo).start()
+  # Run every 90s
+  threading.Timer(90, UpdateServerInfo).start()
   
 def randomString(stringLength=10):
     # Generate random string with specified length
@@ -150,6 +155,8 @@ class InputProc(threading.Thread): ######################## SERVER CONSOLE #####
           file.write(randomString(32))
           file.close()
       else:
+        if cmd == "hashrates":
+          print(hashrates)
         if cmd == "kickall":
           # Kick (disconnect) all connected users
           kicklist.append(-1)
@@ -191,8 +198,9 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
       if err.errno == errno.ECONNRESET:
         err = True
   def run(self):
+    conn.settimeout(15)
     err = False
-    global server_info, hashrates, kicklist, thread_id, diff, data
+    global server_info, hashrates, kicklist, thread_id, diff, data, users
     # New user connected
     username = ""
     # Get thread id for this connection
@@ -219,6 +227,8 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           data = data.split(",")
         except:
           break
+      else:
+        break
 
       ######################## REGISTRATION PROTOCOL ########################
       if data[0] == "REGI":
@@ -274,8 +284,8 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           # Compare saved password with received password
           if password == data:
             # Password matches
-            self.clientsock.send(bytes("OK", encoding='utf8'))
             ServerLog("Password matches, user logged")
+            self.clientsock.send(bytes("OK", encoding='utf8'))
             # Update statistics username
             try:
               hashrates[int(thread_id)]["username"] = username
@@ -291,6 +301,16 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           ServerLog("User doesn't exist!")
           self.clientsock.send(bytes("NO", encoding='utf8'))
           break
+        
+      ######################## CLIENT INFO PROTOCOL ########################
+      elif username != "" and data[0] == "FROM":
+        print("receiving from")
+        time.sleep(0.1)
+        client = data[1]
+        pcusername = data[2]
+        ip = data[3]
+        platform = data[4]
+        print(str(client), str(pcusername), str(ip), str(platform))
 
       ######################## MINING PROTOCOL ########################
       elif username != "" and data[0] == "JOB":
@@ -333,7 +353,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
             try:
               response = response.split(",")
               result = response[0]
-              hashrates[int(thread_id)]["hashrate"] = int(response[1])
+              hashrates[int(thread_id)]["hashrate"] = float(response[1])
             except:
               pass
           else: # Alpha 5 compatibility
@@ -354,10 +374,16 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
             bal = open("balances/" + username + ".txt", "r")
             balance = str(float(bal.readline())).rstrip("\n\r ")
             
-            if float(balance) < 30: #New users will mine a bit faster :)
-              reward = float(0.00025219) * int(diff)
+            if float(balance) < 30: # New users will mine a bit faster
+              reward = float(0.00025219)
             else:
-              reward = float(0.000025219) * int(diff)
+              if float(balance) < 50: # lower than 50
+                reward = float(0.000050219)
+              else:
+                if float(balance) < 80: # lower than 80
+                  reward = float(0.000005200)
+                else:
+                  reward = float(0.00000024439)
               
             balance = float(balance) + float(reward)
             bal = open("balances/" + username + ".txt", "w")
@@ -391,7 +417,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
       elif username != "" and data[0] == "PoTr":
         time.sleep(0.2)
         with locker: # Using locker to fix problems when mining on many devices with one account
-          reward = float(0.0025219)
+          reward = float(0.025219)
           bal = open("balances/" + username + ".txt", "r")
           balance = str(float(bal.readline())).rstrip("\n\r ")
           balance = float(balance) + float(reward)
@@ -400,7 +426,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           bal.write(str(balance))
           bal.truncate()
           bal.close()
-        time.sleep(59)
+        time.sleep(44)
 
       ######################## BALANCE CHECK PROTOCOL ########################
       elif username != "" and data[0] == "BALA":
@@ -423,6 +449,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           # Decrease number of connected miners
           server_info['miners'] -= 1
           # Delete this miner from statistics
+          users = users.replace(" "+str(username), "")
           del hashrates[int(thread_id)]
           time.sleep(1)
         except:
@@ -487,6 +514,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
     
     # Delete this miner from statistics
     try:
+      users = users.replace(" "+str(username), "")
       del hashrates[int(thread_id)]
       server_info['miners'] -= 1
       ServerLog("Del passed!")
@@ -506,7 +534,8 @@ hashrates = {}
 config = configparser.ConfigParser()
 locker = threading.Lock()
 update_count = 0
-VER = "0.7" # "Big" version number  (0.8 = Beta 2)
+users = ""
+VER = "0.9" # "Big" version number  (0.9 = Beta 3)
 
 ######################## INITIAL FILE CREATION ########################
 if not Path("logs").is_dir():
