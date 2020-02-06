@@ -118,11 +118,11 @@ def Greeting(): # Greeting message depending on time :)
 
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, password, efficiency, cmd
-  cmd = "cd PoT_b3_resources & PoT_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin_potminer -p x -e 10 -s 4" # Miner command
+  cmd = "cd PoT_b3_resources & PoT_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_potminer -p x -e 10 -s 4" # Miner command
 
   if not Path("PoT_b3_resources/PoT_executable.exe").is_file(): # Initial configuration section
     now = datetime.datetime.now()
-    print(now.strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "ⓘ　Downloading required PoT executable. It may be detected by your antivirus software as malware but it's just a FALSE POSITIVE. Add PoT to whitelist if it keeps being deleted.")
+    print(now.strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "ⓘ　Downloading required PoT executable")
 
     url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
     r = requests.get(url)
@@ -214,7 +214,7 @@ def checkVersion():
       
     if SERVER_VER == VER: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Connected to the server (v"+str(SERVER_VER)+")")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Connected to the Duino-Coin server (v"+str(SERVER_VER)+")")
     else:
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/\nExiting in 15 seconds.")
