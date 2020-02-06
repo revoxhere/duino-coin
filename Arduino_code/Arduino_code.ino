@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////
-// Duino-Coin Arduino Code (Beta v2) © revox 2020
+// Duino-Coin Arduino Code (Beta 3) © revox 2020
 // https://github.com/revoxhere/duino-coin 
 //////////////////////////////////////////////////
 // To start mining, make account using Wallet,
