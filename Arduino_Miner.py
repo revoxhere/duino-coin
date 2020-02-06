@@ -31,7 +31,7 @@ res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.
 ver = 0.8 # "Big" version number
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
-cmd = "cd ArduinoMiner_b3_resources & ArduinoMiner_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.duinocoin_arduino -p x -e 10 -s 4" # Miner command
+cmd = "cd ArduinoMiner_b3_resources & ArduinoMiner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 10 -s 4" # Miner command
 publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
 c=[0, 0]
 S = 0
@@ -138,7 +138,7 @@ while True:
       print(H.strftime("%H:%M:%S ") + "✗ Cannot connect to pool server. It is probably under maintenance. Exiting in 15 seconds.")
       time.sleep(15)
       os._exit(1)
-  print(H.strftime("%H:%M:%S ") + "✓ Connected to the Duino-Coin pool (v" + str(server_ver) + ")")
+  print(H.strftime("%H:%M:%S ") + "✓ Connected to the Duino-Coin server (v" + str(server_ver) + ")")
   break
  except:
   H = datetime.datetime.now()
@@ -170,7 +170,7 @@ while True:
   v.close()
  time.sleep(0.025)
 H = datetime.datetime.now()
-print(H.strftime("%H:%M:%S ") + "✓ Arduino miner thread started, using SHA algorithm")
+print(H.strftime("%H:%M:%S ") + "✓ Arduino miner thread started using SHA algorithm")
 print("\nⓘ　Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit https://revoxhere.github.io/duino-coin/donate to learn more.\n")
 
 hush()
