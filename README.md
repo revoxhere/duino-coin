@@ -25,7 +25,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3-green.svg)](https://github.com/revoxhere/duino-coin/search?l=py)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Release: Beta 2.2](https://img.shields.io/badge/Release-Beta_2.2-red.svg)](https://github.com/revoxhere/duino-coin/releases/tag/beta-2.2)
+[![Release: Beta 3](https://img.shields.io/badge/Release-Beta_3-red.svg)](https://github.com/revoxhere/duino-coin/releases/tag/beta-3)
 [![Discord](https://img.shields.io/discord/604697675430101003.svg?color=Blue&label=Discord&logo=Discord)](https://discord.gg/XJpT3UQ)
 [![Bitcointalk](https://img.shields.io/badge/Bitcointalk-Duino_Coin-gold.svg)](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
 
@@ -49,12 +49,12 @@
   <img src="https://i.imgur.com/0UJK85H.png" alt="Logo" width="320" height="50">
  </a>
 
-  A first-ever cryptocurrency that can be profitably mined with regular home computers, smartphones, Arduino boards and everything that can hash SHA. <br>
+  A first-ever cryptocurrency that can be mined with regular home computers, smartphones, Arduino boards and many other platforms.<br>
 
 **Duino-Coin is:**
-* **centralized ⇒ lightweight** - no need to download gigabytes of stuff, your funds are secure
+* **centralized ⇒ lightweight** - no need to download gigabytes of stuff
 * **available worldwide** - all you need is internet access
-* **cost effective** - why? read [this blog post](https://revoxhere.github.io/duino-coin/blog#1102019-why-its-the-best-time-to-mine-duino-coins)
+* **cost effective** - read [this blog post](https://revoxhere.github.io/duino-coin/blog#1102019-why-its-the-best-time-to-mine-duino-coins)
 * **open-source** - anyone can contribute
 
 ## Useful links
