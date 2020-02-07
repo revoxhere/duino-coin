@@ -198,7 +198,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
       if err.errno == errno.ECONNRESET:
         err = True
   def run(self):
-    conn.settimeout(15)
+    conn.settimeout(60)
     err = False
     global server_info, hashrates, kicklist, thread_id, diff, data, users
     # New user connected
@@ -515,11 +515,16 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
     # Delete this miner from statistics
     try:
       users = users.replace(" "+str(username), "")
+    except:
+       ServerLog("Error removing from users " + str(thread_id))
+    try:
       del hashrates[int(thread_id)]
-      server_info['miners'] -= 1
-      ServerLog("Del passed!")
     except:
       ServerLog("Error removing from dict " + str(thread_id))
+    try:
+      server_info['miners'] -= 1
+    except:
+      ServerLog("Error -1 server_info " + str(thread_id))
     time.sleep(1)
       
 ######################## VARIABLES ########################
@@ -538,8 +543,6 @@ users = ""
 VER = "0.9" # "Big" version number  (0.9 = Beta 3)
 
 ######################## INITIAL FILE CREATION ########################
-if not Path("logs").is_dir():
-  os.mkdir("logs")
 if not Path("config").is_dir():
   os.mkdir("config")
 if not Path("users").is_dir():
@@ -617,7 +620,7 @@ while True:
   newthread.start()
   try:
     # Listen for new connections
-    tcpsock.listen(1)
+    tcpsock.listen(16)
     (conn, (ip, port)) = tcpsock.accept()
     newthread = ClientThread(ip, port, conn)
     newthread.start()
