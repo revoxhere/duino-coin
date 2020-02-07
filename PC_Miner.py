@@ -41,7 +41,7 @@ khash_count = 0
 hash_count = 0
 hash_mean = []
 config = configparser.ConfigParser()
-VER = "0.8" # "Big" version number  (0.9 = Beta 3)
+VER = "0.9" # "Big" version number  (0.9 = Beta 3)
 timeout = 10 # Socket timeout
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
