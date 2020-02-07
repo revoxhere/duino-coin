@@ -60,7 +60,7 @@ income = 0
 timer = 45
 reward = 0.0252195 # Default PoT reward
 config = configparser.ConfigParser()
-VER = "0.8" # "Big" version number  (0.9 = Beta 3)
+VER = "0.9" # "Big" version number  (0.9 = Beta 3)
 timeout = 10 # Socket timeout
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
