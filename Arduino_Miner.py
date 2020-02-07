@@ -28,7 +28,7 @@ except:
     pass
 
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
-ver = 0.8 # "Big" version number
+ver = 0.9 # "Big" version number
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
 cmd = "cd ArduinoMiner_b3_resources & ArduinoMiner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 10 -s 4" # Miner command
