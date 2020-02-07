@@ -48,7 +48,7 @@ balance = 0
 background = ""
 newbalance = 0
 sending = 0
-VER = "0.7" # "Big" version number  (0.8 = Beta 2)
+VER = "0.9" # "Big" version number  (0.8 = Beta 2)
 debug += "Successfully set variables\n"
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
