@@ -49,7 +49,7 @@
   <img src="https://i.imgur.com/0UJK85H.png" alt="Logo" width="320" height="50">
  </a>
 
-  A first-ever cryptocurrency that can be mined with regular home computers, smartphones, Arduino boards and many other platforms.<br>
+  A cryptocurrency that can be mined with computers, smartphones, Arduino boards and many other platforms.<br>
 
 **Duino-Coin is:**
 * **centralized ⇒ lightweight** - no need to download gigabytes of stuff
