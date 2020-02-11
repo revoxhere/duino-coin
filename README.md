@@ -1,5 +1,5 @@
 <!--
-*** Official Duino Coin README
+*** Official Duino Coin README.md
 *** copyright by revox, 2019-2020
 *** Thanks to othneildrew for providing nice template! :)
 -->
@@ -18,16 +18,16 @@
     •
     <a href="https://revoxhere.github.io/duco-statistics/">Network statistics</a>
     •
-    <a href="https://revoxhere.github.io/duco-exchange/">DUCO Exchange</a>
+    <a href="https://revoxhere.github.io/duco-exchange/">Exchange</a>
     <br>
   </p>
 </p>
 
-[![Python](https://img.shields.io/badge/Python-3-green.svg)](https://github.com/revoxhere/duino-coin/search?l=py)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Release: Beta 3](https://img.shields.io/badge/Release-Beta_3-red.svg)](https://github.com/revoxhere/duino-coin/releases/tag/beta-3)
-[![Discord](https://img.shields.io/discord/604697675430101003.svg?color=Blue&label=Discord&logo=Discord)](https://discord.gg/XJpT3UQ)
-[![Bitcointalk](https://img.shields.io/badge/Bitcointalk-Duino_Coin-gold.svg)](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
+[![Python](https://img.shields.io/badge/Python-3-green.svg?style=flat&logo=python)](https://github.com/revoxhere/duino-coin/search?l=py)
+[![License: MIT](https://img.shields.io/badge/License-MIT-important.svg?style=flat)](https://opensource.org/licenses/MIT)
+[![Release: Beta 3](https://img.shields.io/badge/Release-Beta_3-critical.svg?style=flat)](https://github.com/revoxhere/duino-coin/releases/tag/beta-3)
+[![Discord](https://img.shields.io/discord/604697675430101003.svg?color=Blue&label=Discord&logo=Discord?style=flat)](https://discord.gg/XJpT3UQ)
+[![Bitcointalk](https://img.shields.io/badge/Bitcointalk-Duino_Coin-gold.svg?style=flat)](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
