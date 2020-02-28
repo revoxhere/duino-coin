@@ -46,10 +46,10 @@
 ## About The Project
 
  <a href="https://revoxhere.github.io/duino-coin/">
-  <img src="https://i.imgur.com/0UJK85H.png" alt="Logo" width="320" height="50">
+  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" alt="Logo" width="70">
  </a>
 
-  A cryptocurrency that can be mined with computers, smartphones, Arduino boards and many other platforms.<br>
+  Duino-Coin is a cryptocurrency that can be mined with computers, smartphones, Arduino boards and many other platforms.<br>
 
 **Duino-Coin is:**
 * **centralized ⇒ lightweight** - no need to download gigabytes of stuff
