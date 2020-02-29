@@ -1,10 +1,10 @@
 //////////////////////////////////////////////////
-// Duino-Coin Arduino Code (Beta 3) © revox 2020
+// Duino-Coin Arduino Code (1.0) © revox 2019-2020
 // https://github.com/revoxhere/duino-coin 
 //////////////////////////////////////////////////
 // To start mining, make account using Wallet,
 // download Arduino Miner from Duino-Coin repo  
-// and enter Arduino COM port (if using Windows).
+// and enter your Arduino serial port.
 //                Happy mining!
 //////////////////////////////////////////////////
 
