@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-##############################################
-# Duino-Coin PC Miner (Beta 3.1rc) © revox 2020
+##########################################
+# Duino-Coin PC Miner (1.0) © revox 2020
 # https://github.com/revoxhere/duino-coin 
-##############################################
+##########################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
 from decimal import Decimal
 from pathlib import Path
@@ -33,12 +33,16 @@ khash_count = 0
 hash_count = 0
 hash_mean = []
 config = configparser.ConfigParser()
-VER = "0.9" # "Big" version number  (0.9 = Beta 3.1rc)
-timeout = 10 # Socket timeout
+VER = "1.0" # Version number
+timeout = 5 # Socket timeout
+autorestart = 0
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
-cmd = "cd Miner_b3.1rc_resources & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 99 -s 4" # Miner command
 publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
+
+def title(title):
+  if os.name == 'nt':
+    os.system("title "+title)
         
 def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
   now = datetime.datetime.now()
@@ -65,7 +69,7 @@ def Greeting(): # Greeting message depending on time
   else:
     greeting = "Welcome back"
     
-  message     ="| Duino-Coin PC Miner (Beta 3.1rc) © revox 2019-2020\n" # Startup message
+  message     ="| Duino-Coin PC Miner (1.0) © revox 2019-2020\n" # Startup message
   message   += "| https://github.com/revoxhere/duino-coin\n"
   message   += "| "+str(greeting)+", "+str(username)+"!\n\n"
   
@@ -74,10 +78,10 @@ def Greeting(): # Greeting message depending on time
     sys.stdout.flush()
     time.sleep(0.01)
     
-  if not Path("Miner_b3.1rc_resources/Miner_executable.exe").is_file(): # Initial miner executable section
+  if not Path("Miner_1.0_resources/Miner_executable.exe").is_file(): # Initial miner executable section
     url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
     r = requests.get(url)
-    with open('Miner_b3.1rc_resources/Miner_executable.exe', 'wb') as f:
+    with open('Miner_1.0_resources/Miner_executable.exe', 'wb') as f:
       f.write(r.content)
   try: # Network support           
     process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
@@ -99,13 +103,18 @@ def hush(): # Hashes/sec calculation
   hash_count = 0 # Reset counter
   
   threading.Timer(1.0, hush).start() # Run this def every 1s
-  
 
-def loadConfig(): # Config loading section
-  global pool_address, pool_port, username, password, efficiency
+def restart(): # Hashes/sec calculation
+  time.sleep(int(autorestart))
+  print(Style.BRIGHT + "ⓘ　Restarting the miner")
+  os.execl(sys.executable, sys.executable, * sys.argv)
   
-  if not Path("Miner_b3.1rc_resources/Miner_config.ini").is_file(): # Initial configuration section
-    print(Style.BRIGHT + "Initial configuration, you can edit 'Miner_b3.1rc_resources/Miner_config.ini' file later.")
+def loadConfig(): # Config loading section
+  global pool_address, pool_port, username, password, efficiency, autorestart
+  cmd = "cd Miner_1.0_resources & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 99 -s 4" # Miner command
+  
+  if not Path("Miner_1.0_resources/Miner_config.ini").is_file(): # Initial configuration section
+    print(Style.BRIGHT + "Initial configuration, you can edit 'Miner_1.0_resources/Miner_config.ini' file later.")
     print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
 
     username = input("Enter your username: ")
@@ -121,17 +130,19 @@ def loadConfig(): # Config loading section
     config['miner'] = { # Format data
     "username": username,
     "password": password,
-    "efficiency": efficiency}
+    "efficiency": efficiency,
+    "autorestart": 0}
     
-    with open("Miner_b3.1rc_resources/Miner_config.ini", "w") as configfile: # Write data to file
+    with open("Miner_1.0_resources/Miner_config.ini", "w") as configfile: # Write data to file
       config.write(configfile)
 
   else: # If config already exists, load from it
-    config.read("Miner_b3.1rc_resources/Miner_config.ini")
+    config.read("Miner_1.0_resources/Miner_config.ini")
     username = config["miner"]["username"]
     password = config["miner"]["password"]
     efficiency = config["miner"]["efficiency"]
-    
+    autorestart = config["miner"]["autorestart"]
+
 
 def Connect(): # Connect to pool section
   global soc, connection_counter, res, pool_address, pool_port
@@ -194,26 +205,28 @@ def checkVersion():
     except:
       Connect() # Reconnect if pool down
 
-    if SERVER_VER == "":
+    if len(SERVER_VER) != 3:
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Cannot connect to the server. It is probably under maintenance.\nRetrying in 15 seconds.")
       time.sleep(15)
       Connect()                      
       
-    if SERVER_VER == VER: # If miner is up-to-date, display a message and continue
+    if SERVER_VER == VER and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Connected to the Duino-Coin server (v"+str(SERVER_VER)+")")
-
+    
     else:
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/\nExiting in 15 seconds.")
       time.sleep(15)
       os._exit(1)
+    
   except:
     Connect() # Reconnect if pool down
 
 
 def Login():
+  global autorestart
   while True:
     try:
       try:
@@ -248,6 +261,12 @@ def Login():
       Connect() # Reconnect if pool down
 
     time.sleep(0.025) # Try again if no response
+  
+  if int(autorestart) < 0:
+    autorestart = 0
+  if int(autorestart) > 0:
+    now = datetime.datetime.now()
+    print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Autorestarter is enabled (restarting every " + autorestart + " seconds)")
 
 
 def Mine(): # Mining section
@@ -297,6 +316,7 @@ def Mine(): # Mining section
           if feedback == "GOOD": # If result was good
             now = datetime.datetime.now()
             shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
+            title("Duino-Coin PC Miner (1.0) - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
             print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "⛏️ Accepted " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
             break # Repeat
           elif feedback == "BAD": # If result was bad
@@ -306,8 +326,9 @@ def Mine(): # Mining section
             break # Repeat
           time.sleep(0.025) # Try again if no response
         break # Repeat
+      
 try:
-    os.mkdir("Miner_b3.1rc_resources") # Create resources folder if it doesn't exist
+    os.mkdir("Miner_1.0_resources") # Create resources folder if it doesn't exist
 except:
     pass
 
@@ -315,35 +336,43 @@ init(autoreset=True) # Enable colorama
 hush() # Start hash calculator
 
 while True:
-    try:
-            loadConfig() # Load configfile
-    except:
-            print(Style.BRIGHT + Fore.RED + "✗ There was an error loading the configfile. Try removing it and re-running configuration."  + Style.RESET_ALL)
+  title("Duino-Coin PC Miner (1.0)")
+  try:
+    loadConfig() # Load configfile
+  except:
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error loading the configfile. Try removing it and re-running configuration."  + Style.RESET_ALL)
 
-    try:
-      Greeting() # Display greeting message
-    except:
-      print(Style.BRIGHT + Fore.RED + "✗ You somehow managed to break the greeting message!"  + Style.RESET_ALL)
+  try: # Setup autorestarter
+    if int(autorestart) > 0:
+      now = datetime.datetime.now()
+      threading.Thread(target=restart).start() # Start autorestarter if enabled
+  except:
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error in autorestarter. Check configuration file." + Style.RESET_ALL)    
 
-    try:
-            Connect() # Connect to pool
-    except:
-            print(Style.BRIGHT + Fore.RED + "✗ There was an error connecting to pool. Check your config file." + Style.RESET_ALL)
+  try:
+    Greeting() # Display greeting message
+  except:
+    print(Style.BRIGHT + Fore.RED + "✗ You somehow managed to break the greeting message!"  + Style.RESET_ALL)
 
-    try:
-            checkVersion() # Check version
-    except:
-            print(Style.BRIGHT + Fore.RED + "✗ There was an error checking version. Restarting." + Style.RESET_ALL)
+  try:
+    Connect() # Connect to pool
+  except:
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error connecting to pool. Check your config file." + Style.RESET_ALL)
 
-    try:
-            Login() # Login
-    except:
-            print(Style.BRIGHT + Fore.RED + "✗ There was an error while logging in. Restarting." + Style.RESET_ALL)
+  try:
+    checkVersion() # Check version
+  except:
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error checking version. Restarting." + Style.RESET_ALL)
 
-    try:
-            Mine() # Mine
-    except:
-            print(Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
+  try:
+    Login() # Login
+  except:
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error while logging in. Restarting." + Style.RESET_ALL)
 
-    print(Style.RESET_ALL)
-    time.sleep(0.025) # Restart if error
+  try:
+    Mine() # Mine
+  except:
+    print(Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
+
+  print(Style.RESET_ALL)
+  time.sleep(0.025) # Restart if error
