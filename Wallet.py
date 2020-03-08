@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Wallet (1.0) © revox 2020
+# Duino-Coin Wallet (1.1) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 #############################################
-import time, socket, sys, os, subprocess, configparser, tkinter, getpass, platform, webbrowser, urllib.request, random # Import libraries
+import time, socket, sys, os, subprocess, datetime, configparser, tkinter, getpass, platform, webbrowser, urllib.request, random # Import libraries
 import threading
 from tkinter import messagebox
 from tkinter import *
@@ -16,6 +16,8 @@ except:
     time.sleep(15)
 
 debug = "Starting debug file of Duino-Coin Wallet (1.0)\n"
+xmgusd = 0.023119
+resources = "Wallet_1.0_resources/"
 
 # Default colors
 colorA = "white" #white when in light mode
@@ -29,7 +31,7 @@ loadingScr.resizable(False, False)
 loadingScr.title('Loading...')
 loadingScr.geometry("300x90")
 try:
-    loadingScr.iconbitmap("Wallet_1.0_resources/Wallet_icon.ico")
+    loadingScr.iconbitmap(str(resources) + "Wallet_icon.ico")
 except:
     pass # Icon won't work on linux
 loadingScr.configure(background = str(colorA))
@@ -39,12 +41,6 @@ label = tkinter.Label(loadingScr, text = "LOADING", font=("Arial", 11, "bold"), 
 label = tkinter.Label(loadingScr, text = "Setting variables...", bg = str(colorA), fg = str(colorC), font=("Arial", 8)).place(relx = 0.01, rely = 0.8)  
 loadingScr.update()
 
-rand = random.randint(1000,1090) # luck in trading - small randomness
-rand = rand / 1000
-xmgusd = 0.027361
-xmgusd = float(xmgusd) * float(rand)
-ducousd = float(xmgusd) / float(8)
-debug += "Calculated prices\n"
 WalletResources = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 s = socket.socket()
 balanceusd = 0
@@ -74,10 +70,10 @@ def setTheme():
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str("1")}
-    with open("Wallet_1.0_resources/Wallet_config.ini", "w") as configfile:
+    with open(str(resources) + "Wallet_config.ini", "w") as configfile:
       config.write(configfile)
     debug += "Using dark mode\n"
-    background = "Wallet_1.0_resources/Wallet_background_light.gif"
+    background = str(resources) + "Wallet_background_light.gif"
     colorA = "white" #white when in day mode
     colorB = "black" #black when in day mode
     colorC = "gray"  #gray
@@ -88,10 +84,10 @@ def setTheme():
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str("2")}
-    with open("Wallet_1.0_resources/Wallet_config.ini", "w") as configfile:
+    with open(str(resources) + "Wallet_config.ini", "w") as configfile:
       config.write(configfile)
     debug += "Using community mode\n"
-    background = "Wallet_1.0_resources/Wallet_background_dark.gif"
+    background = str(resources) + "Wallet_background_dark.gif"
     colorB = "black"
     colorA = "#cafce8"
     colorC = "gray"
@@ -102,10 +98,10 @@ def setTheme():
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str("0")}
-    with open("Wallet_1.0_resources/Wallet_config.ini", "w") as configfile:
+    with open(str(resources) + "Wallet_config.ini", "w") as configfile:
       config.write(configfile)
     debug += "Using light mode\n"
-    background = "Wallet_1.0_resources/Wallet_background_community.gif"
+    background = str(resources) + "Wallet_background_community.gif"
     colorA = "red"
     colorB = "blue"
     colorC = "gray"
@@ -119,7 +115,7 @@ def selectWindow(): # First-time launch window
     window.geometry("355x190")
     window.resizable(False, False)
     try:
-        window.iconbitmap("Wallet_1.0_resources/Wallet_icon.ico")
+        window.iconbitmap(str(resources) + "Wallet_icon.ico")
     except:
         pass # Icon won't work on linux
     window.title("Duino-Coin Wallet (1.0)")
@@ -145,7 +141,7 @@ def Register(): #signup definition
     register.resizable(False, False)
     register.title('Register')
     try:
-        register.iconbitmap("Wallet_1.0_resources/Wallet_icon.ico")
+        register.iconbitmap(str(resources) + "Wallet_icon.ico")
     except:
         pass # Icon won't work on linux
     register.configure(background = str(colorA))
@@ -203,7 +199,7 @@ def Login(): #login window
     rootA.resizable(False, False)
     rootA.title('Login')
     try:
-        rootA.iconbitmap("Wallet_1.0_resources/Wallet_icon.ico")
+        rootA.iconbitmap(str(resources) + "Wallet_icon.ico")
     except:
         pass # Icon won't work on linux
     rootA.configure(background = str(colorA))
@@ -239,7 +235,7 @@ def loginProtocol(): # First-time login protocol
         config['wallet'] = {"username": username,
                   "password": password,
                   "theme": str("0")}
-        with open("Wallet_1.0_resources/Wallet_config.ini", "w") as configfile:
+        with open(str(resources) + "Wallet_config.ini", "w") as configfile:
             config.write(configfile)
         rootA.destroy()
         loadConfig()
@@ -259,14 +255,14 @@ def loadConfig(): # Load config protocol
     label = tkinter.Label(loadingScr, text = "Parsing configfile..." + str(" ")*20, bg = str("white"), fg = str("gray"), font=("Arial", 8)).place(relx = 0.01, rely = 0.8)  
     loadingScr.update()
     
-    config.read("Wallet_1.0_resources/Wallet_config.ini")
+    config.read(str(resources) + "Wallet_config.ini")
     username = config["wallet"]["username"]
     password = config["wallet"]["password"]
     theme = config["wallet"]["theme"]
     
     if str(theme) == "0": # Light mode
       debug += "Using light theme\n"
-      background = "Wallet_1.0_resources/Wallet_background_light.gif"
+      background = str(resources) + "Wallet_background_light.gif"
       colorA = "white" #white when in light mode
       colorB = "black" #black when in light mode
       colorC = "gray"  #gray
@@ -274,7 +270,7 @@ def loadConfig(): # Load config protocol
       
     if str(theme) == "1": # Dark theme
       debug += "Using dark theme\n"
-      background = "Wallet_1.0_resources/Wallet_background_dark.gif"
+      background = str(resources) + "Wallet_background_dark.gif"
       colorA = "#121212"
       colorB = "#dff9fb"
       colorC = "gray"
@@ -282,7 +278,7 @@ def loadConfig(): # Load config protocol
       
     if str(theme) == "2": # Community theme
       debug += "Using community theme\n"
-      background = "Wallet_1.0_resources/Wallet_background_community.gif"
+      background = str(resources) + "Wallet_background_community.gif"
       colorB = "black"
       colorA = "#cafce8"
       colorC = "gray"
@@ -327,12 +323,11 @@ def loadConfig(): # Load config protocol
 
 def Send():
     global amount, receipent, send
-    balanceTimer.cancel()
     send = Tk() # Sending funds window
     send.resizable(False, False)
     send.title('Send funds')
     try:
-        send.iconbitmap("Wallet_1.0_resources/Wallet_icon.ico")
+        send.iconbitmap(str(resources) + "Wallet_icon.ico")
     except:
         pass # Icon won't work on linux
     send.configure(background = str(colorA))
@@ -386,6 +381,7 @@ def sendProtocol():
                 else: # Send funds
         
                     debug += "Sending "+amount+" DUCO from: "+username+" to "+receipent+"\n"
+                    balanceTimer.cancel()
                     try:
                         s.send(bytes("SEND,"+username+","+receipent+","+amount, encoding='utf8')) #send sending funds request to server
                     except:
@@ -414,7 +410,7 @@ def About():
     about.geometry("400x400")
     about.title('About')
     try:
-        about.iconbitmap("Wallet_1.0_resources/Wallet_icon.ico")
+        about.iconbitmap(str(resources) + "Wallet_icon.ico")
     except:
         pass # Icon won't work on linux
     about.configure(background = str(colorA))
@@ -431,10 +427,10 @@ def About():
 
     label = tkinter.Label(about, text = "Duino-Coin Wallet", font=("Verdana", 20, "bold"), fg = str(colorHighlight), bg = str(colorA)).pack()
     label = tkinter.Label(about, text = "version 1.0", fg = str(colorB), bg = str(colorA)).pack()
-    label = tkinter.Label(about, text = "Made by revox from Duino-Coin developers", fg = str(colorB), bg = str(colorA)).pack()
     tkinter.Button(about, text = "Duino-Coin GitHub page", activebackground = str(colorHighlight), height = 1, command = GitHub, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=4)
     tkinter.Button(about, text = "Duino-Coin Discord server", activebackground = str(colorHighlight), height = 1, command = Discord, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=3)
     tkinter.Button(about, text = "Support the project (Donate)", activebackground = str(colorHighlight), height = 1, command = Donate, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=4)
+
     label = tkinter.Label(about, text = "", fg = str(colorB), bg = str(colorA)).pack()
 
     label = tkinter.Label(about, text = "Select theme:", fg = str(colorB), bg = str(colorA)).pack()
@@ -471,66 +467,120 @@ def Donate():
 def getBalance():
     global balance, wallet, ducousd, balanceusd, debug, balanceTimer
     
+    transactions = open("Wallet.bin","r+")
+    oldcontent = (transactions).read()
     s.send(bytes("BALA", encoding='utf8'))
     time.sleep(0.025)
     oldbalance = balance
+    
     try:
         balance = s.recv(1024).decode('utf8')
+        if oldbalance <= 0:
+            oldbalance = balance
     except:
         getBalance()
         
     if "." in str(balance): # Check wheter we received proper data
+        now = datetime.datetime.now()
+        current_time = now.strftime("%H:%M:%S")
+        transactions = open("Wallet.bin","r+")
+        oldcontent = (transactions).read()
+        transactions.seek(0, 0)
+
+        
         balance = round(float(balance), 12) # Format balances
         balanceusd = round(float(balance) * float(ducousd), 8)
         ducousd = round(float(ducousd), 8)
+        difference = round(float(balance) - float(oldbalance), 6)
         
+        if difference != 0.0: # Check if balance has changed
+            
+            if difference >= 0: # Add prefix
+                difference = " +" + str(difference) 
+            else:
+                difference = " " + str(difference)
+
+            transactions.write(str(current_time) + str(difference) + " ᕲ\n" + oldcontent) # Write to file
+            transactions.close()
+            
+        transactions = open("Wallet.bin","r") # Read from file
+        content = transactions.read().splitlines()
+        transactionslist = "Last transactions:\n" + content[0] + "\n" + content[1] + "\n" + content[2] + "\n" + content[3] + "\n" + content[4] + "\n" + content[5] + "\n" + content[6] + "\n" + content[7] + "\n" + content[8] + "\n" + content[9]           
+
         if balance == oldbalance: # Don't play animation if no change in balance
             pass
         else: # Animation
-            label = tkinter.Label(wallet, text = "Balance: "+str(oldbalance)+" DUCO      ", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Balance: "+str(oldbalance)+" DUCO"+str(" ")*99, bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
+            transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = str(colorB), justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
             time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Balance: "+str(oldbalance)+" DUCO      ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
+            label = tkinter.Label(wallet, text = "Balance: "+str(oldbalance)+" DUCO"+str(" ")*99, bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
-            time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg = str(colorA), font=("Arial", 12)).place(relx=.1, rely=.15)
+            transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = "gray", justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
+            time.sleep(0.07)
+            label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO"+str(" ")*99, bg = str(colorA), fg = str(colorA), font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorA), font=("Arial", 10)).place(relx=.1, rely=.27)
+            transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = str(colorA), justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
             wallet.title("Duino-Coin Wallet (1.0) - "+str(round(float(balance), 4))+" DUCO")
-            time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
+            time.sleep(0.13)
+            label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO"+str(" ")*99, bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
-            time.sleep(0.05)
-            label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO      ", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
+            transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = "gray", justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
+            time.sleep(0.07)
+            label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO"+str(" ")*99, bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
             label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
-            time.sleep(0.05)
+            transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = str(colorB), justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
+
     else:
         debug += "Error while receiving balance!\n"
         getBalance() # Try again
 
-    balanceTimer = threading.Timer(1.5, getBalance)
+    balanceTimer = threading.Timer(1, getBalance)
     balanceTimer.start()
+
+def getDucoPrice():
+    global wallet, ducousd, xmgusd, debug
+    
+    rand = random.randint(1000,1090) # luck in trading - small randomness
+    rand = rand / 1000
+    xmgusd = float(xmgusd) * float(rand)
+    ducousd = round(float(xmgusd) / float(8), 8)
+    debug += "Calculated prices\n"
+    
+    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $"+str("   "), bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.213)
+    time.sleep(0.05)
+    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $"+str("   "), bg = str(colorA), fg = "gray", font=("Arial", 10)).place(relx=.1, rely=.213)
+    time.sleep(0.07)
+    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $"+str("   "), bg = str(colorA), fg = str(colorA), font=("Arial", 10)).place(relx=.1, rely=.213)
+    time.sleep(0.13)
+    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $"+str("   "), bg = str(colorA), fg = "gray", font=("Arial", 10)).place(relx=.1, rely=.213)
+    time.sleep(0.07)
+    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $"+str("   "), bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.213)
+
+
+    DucoPrice = threading.Timer(10, getDucoPrice) # Run every 10s
+    DucoPrice.start()
     
 def WalletWindow():
-    global wallet, label, userstatus
-    
+    global wallet, label, userstatus, debug
+
     wallet = tkinter.Tk()
     wallet.geometry("500x300")
     wallet.resizable(False, False)
     wallet.configure(background = str(colorA))
     wallet.title("Duino-Coin Wallet (1.0)")
     try:
-        wallet.iconbitmap("Wallet_1.0_resources/Wallet_icon.ico")
+        wallet.iconbitmap(str(resources) + "Wallet_icon.ico")
     except:
         pass # Icon won't work on linux
     filename = PhotoImage(file = str(background))
     background_label = Label(wallet, image = filename)
     background_label.place(x = 0, y = 0, relwidth = 1, relheight = 1)
+    getDucoPrice()
     getBalance()
 
-    
     label = tkinter.Label(wallet, text = "Duino-Coin Wallet", bg = str(colorA), fg = str(colorHighlight), font=("Verdana", 20, "bold")).place(relx=.5, rely=.08, anchor="c")
-    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.213)
-    label = tkinter.Label(wallet, text = "Logged in as " + username + " (" + userstatus + ")", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx = 0.1, rely = 0.325)    
+    label = tkinter.Label(wallet, text = "Logged in as " + username + " (" + userstatus + ")", bg = str(colorA), fg = "gray", font=("Arial", 10)).place(relx = 0.1, rely = 0.325)    
     
     tkinter.Button(wallet, text = "Send funds", command = Send, activebackground = str(colorHighlight), bg = str(colorA), fg = str(colorB), font=("Arial", 10), height = 1, width = 30).place(relx = 0.1, rely = 0.42)
     tkinter.Button(wallet, text = "Receive funds", command = Receive, activebackground = str(colorHighlight), bg = str(colorA), fg = str(colorB), font=("Arial", 10), height = 1, width = 30).place(relx = 0.1, rely = 0.53)
@@ -549,6 +599,10 @@ try:
 except:
     pass
 
+try:
+    open(str(resources) + "Wallet.bin", w) # Create resources folder if it doesn't exist
+except:
+    pass
 
 while True: # Receive pool info
     try:
@@ -573,7 +627,7 @@ except:
     debug += "Error while loading configfile!!!\n"
     
 
-if not Path("Wallet_1.0_resources/Wallet_background_light.gif").is_file(): # Light mode background
+if not Path(str(resources) + "Wallet_background_light.gif").is_file(): # Light mode background
     try:
         debug += "Downloading latest light background file\n"
         url = 'https://i.imgur.com/T6Kww9q.gif'
@@ -583,7 +637,7 @@ if not Path("Wallet_1.0_resources/Wallet_background_light.gif").is_file(): # Lig
 else:
     debug += "Light background image already downloaded\n"
 
-if not Path("Wallet_1.0_resources/Wallet_background_dark.gif").is_file(): # Dark mode background
+if not Path(str(resources) + "Wallet_background_dark.gif").is_file(): # Dark mode background
     try:
         debug += "Downloading latest dark background file\n"
         url = 'https://i.imgur.com/HGOqqcO.gif'
@@ -594,7 +648,7 @@ else:
     debug += "Dark background image already downloaded\n"
 
 
-if not Path("Wallet_1.0_resources/Wallet_background_community.gif").is_file(): # Community theme background
+if not Path(str(resources) + "Wallet_background_community.gif").is_file(): # Community theme background
     try:
         debug += "Downloading latest community background file\n"
         url = 'https://i.imgur.com/USziyQy.gif'
@@ -604,7 +658,7 @@ if not Path("Wallet_1.0_resources/Wallet_background_community.gif").is_file(): #
 else:
     debug += "Community background image already downloaded\n"
 
-if not Path("Wallet_1.0_resources/Wallet_icon.ico").is_file(): # Community theme background
+if not Path(str(resources) + "Wallet_icon.ico").is_file(): # Community theme background
     try:
         debug += "Downloading latest icon\n"
         url = 'https://raw.githubusercontent.com/revoxhere/duino-coin/master/Resources/NewWallet.ico'
@@ -629,7 +683,7 @@ except SystemExit:
   messagebox.showerror("Error","Server is under maintenance.\nPlease try again in a few hours.")
   os._exit(0)
     
-if not Path("Wallet_1.0_resources/Wallet_config.ini").is_file():
+if not Path(str(resources) + "Wallet_config.ini").is_file():
   label = tkinter.Label(loadingScr, text = "Launching for the first time..." + str(" ")*20, bg = str(colorA), fg = str(colorC), font=("Arial", 8)).place(relx = 0.01, rely = 0.8)
   loadingScr.update()
   selectWindow()
