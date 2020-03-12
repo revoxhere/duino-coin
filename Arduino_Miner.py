@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ###################################################
-# Duino-Coin Arduino Miner (1.0) © revox 2020
+# Duino-Coin Arduino Miner (1.1) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ###################################################
 import socket, subprocess, threading, time, random, configparser, getpass, sys, os, hashlib, datetime, signal, platform
@@ -22,22 +22,23 @@ try:
 except:
     print("✗ Serial.tools.list_ports is not installed. Please install it with pip install serial.tools.list_ports")
 
-try:
-    os.mkdir("ArduinoMiner_1.0_resources")
-except:
-    pass
-
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
-ver = 1.0 # Version number
+ver = 1.1 # Version number
+resources = "ArduinoMiner_"+str(ver)+"_resources"
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
-cmd = "cd ArduinoMiner_1.0_resources & ArduinoMiner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 10 -s 4" # Miner command
+cmd = "cd "+str(resources)+" & ArduinoMiner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 10 -s 4" # Miner command
 publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
 c=[0, 0]
 S = 0
 b = 0
 z = 0
-f = configparser.ConfigParser()
+config = configparser.ConfigParser()
+
+try:
+    os.mkdir(str(resources))
+except:
+    pass
 
 def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
     now = datetime.datetime.now()
@@ -67,14 +68,14 @@ def hush():
      z = 0.56
  threading.Timer(1, hush).start()
 
-print("\n| Duino-Coin Arduino Miner (1.0) © revox 2019-2020")
+print("\n| Duino-Coin Arduino Miner ("+str(ver)+") © revox 2019-2020")
 print("| https://github.com/revoxhere/duino-coin\n")
 
 try:
-    if not Path("ArduinoMiner_1.0_resources/ArduinoMiner_executable.exe").is_file(): # Initial miner executable section
+    if not Path(str(resources)+"/ArduinoMiner_executable.exe").is_file(): # Initial miner executable section
      url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
      r = requests.get(url)
-     with open('ArduinoMiner_1.0_resources/ArduinoMiner_executable.exe', 'wb') as f:
+     with open(str(resources)+'/ArduinoMiner_executable.exe', 'wb') as f:
       f.write(r.content)
     try: # Network support           
      process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
@@ -98,8 +99,8 @@ while True:
   print(H.strftime("%H:%M:%S ") + "✗ Couldn't receive pool IP and port.\nExiting in 15 seconds.")
   time.sleep(15)
  time.sleep(0.025)
-if not Path("ArduinoMiner_1.0_resources/Arduino_config.ini").is_file():
- print("Initial configuration, you can edit 'ArduinoMiner_1.0_resources/Arduino_config.ini' later\n")
+if not Path(str(resources)+"/Arduino_config.ini").is_file():
+ print("Initial configuration, you can edit "+str(resources)+"/Arduino_config.ini file later\n")
  print("Scanning ports...")
  W = serial.tools.list_ports.comports()
  devices=[]
@@ -112,14 +113,17 @@ if not Path("ArduinoMiner_1.0_resources/Arduino_config.ini").is_file():
  y = input("Enter your Arduino port (e.g: COM8 or /dev/ttyUSB0): ")
  M = input("Enter your username: ")
  l = input("Enter your password: ")
- f['arduinominer']={"arduino":y,"username":M,"password":l}
- with open("ArduinoMiner_1.0_resources/Arduino_config.ini","w")as configfile:
-  f.write(configfile)
+ config['arduinominer']={
+    "arduino":str(y),
+    "username":str(M),
+    "password":str(l)}
+ with open(str(resources)+"/Arduino_config.ini","w") as configfile:
+  config.write(configfile)
 else:
- f.read("ArduinoMiner_1.0_resources/Arduino_config.ini")
- y = f["arduinominer"]["arduino"]
- M = f["arduinominer"]["username"]
- l = f["arduinominer"]["password"]
+ config.read(str(resources)+"/Arduino_config.ini")
+ y = config["arduinominer"]["arduino"]
+ M = config["arduinominer"]["username"]
+ l = config["arduinominer"]["password"]
 while True:
  v = socket.socket()
  p = pool_address
@@ -152,7 +156,7 @@ while True:
   print(H.strftime("%H:%M:%S ") + "✓ Connected to the Arduino (" + y + ")")
   break
  except:
-  print(H.strftime("%H:%M:%S ") + "✗ Cannot connect to the Arduino. Check your ArduinoMinerConfig.ini file and make sure you have the right permissions to open the port (sudo, admin?).")
+  print(H.strftime("%H:%M:%S ") + "✗ Cannot connect to the Arduino. Check your ArduinoMinerConfig.ini file and make sure you have the right permissions to open the port (are you sudo/admin?).")
   time.sleep(15)
   sys.exit()
  time.sleep(0.025)
