@@ -694,4 +694,4 @@ if not Path(str(resources) + "Wallet_config.ini").is_file():
   selectWindow()
   loadConfig()
 else:
-  loadConfig()
+  loadConfig() 
