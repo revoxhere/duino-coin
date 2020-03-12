@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Server (Beta 3) © revox 2020
+# Duino-Coin Server (1.1) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 #############################################
 import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, os, psutil, string, json
@@ -14,11 +14,12 @@ def ServerLog(whattolog):  # Serverlog section for debugging. Not used in proper
   #Creating and opening today's log file
   #logfile = open(now.strftime("logs/%Y-%m-%d.txt"), "a")
   #Time formating
-  #now = now.strftime("[%Y-%m-%d %H:%M:%S] ")
+  now = datetime.datetime.now()
+  now = now.strftime("%H:%M:%S")
   #Writing message and closing file
   #logfile.write(now + whattolog + "\n")
   #logfile.close()
-  print(whattolog)
+  print(now, whattolog)
 
 def ServerLogHash(whattolog): # Separate serverlog section for mining section debugging. Not used in proper pool to reduce disk usage. 
   #Getting actual date and time
@@ -60,9 +61,6 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
   file.write(str("Pool hashrate: "))
   file.write(str(int((server_info['pool_hashrate']) / 1000)))
   file.write(str(" kH/s\n"))
-  file.write(str("Active workers: "))
-  file.write(str(server_info["miners"]))
-  file.write(str(" ("))
   miners = []
   for x in hashrates:
     miners.append(hashrates[x]["username"])
@@ -70,6 +68,9 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
   for i in miners: 
     if i not in res: 
         res.append(i)
+  file.write(str("Active workers: "))
+  file.write(str(len(res)))
+  file.write(str(" ("))
   file.write(str(', '.join(map(str, res))))
   file.write(str(")"))
   file.write(str("\nRegistered users: "))
@@ -78,19 +79,16 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
   bloki = blok.readline()
   blok.close()
   file.write(str("\nMined blocks: " + bloki))
-  file.write(str("\nLast block #: "))
+  file.write(str("\nLast block hash: "))
   lastblok = open("config/lastblock", "r+")
-  lastblokid = lastblok.readline().rstrip("\n\r ")[:10] + (lastblok.readline().rstrip("\n\r ")[10:] and '..')
+  lastblokid = lastblok.readline().rstrip("\n\r ")[:16] + (lastblok.readline().rstrip("\n\r ")[16:] and '..')
   file.write(str(lastblokid))
   lastblok.close()
-  file.write(str(" [...]"))
+  file.write(str("..."))
   file.write(str("\nCurrent difficulty: "))
   diff = math.ceil(int(bloki) / diff_incrase_per)
   file.write(str(diff))
-  reward = round(float(0.000025219) * int(diff), 10)
-  file.write(str("\nReward: "))
-  file.write(str(reward))
-  file.write(str(" DUCO/block"))
+  file.write(str("\nEstimated reward: 0.00025219 DUCO/block"))
   file.write(str("\nLast updated: "))
   file.write(str(now))
   file.write(str(" (GMT+1) (updated every 90s)"))
@@ -365,15 +363,15 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
               reward = float(0.00025219)
             else:
               if float(balance) < 50: # Lower than 50
-                reward = float(0.000050219)
+                reward = float(0.00008219)
               else:
                 if float(balance) < 80: # Lower than 80
-                  reward = float(0.000003200)
+                  reward = float(0.00001200)
                 else:
-                  if float(balance) < 150: # Lower than 150
-                    reward = float(0.000000024439)
-                  else: # Higher than 150
-                    reward = float(0.000000001519)
+                  if float(balance) < 100: # Lower than 100
+                    reward = float(0.0000014439)
+                  else: # Higher than 100
+                    reward = float(0.000000719)
               
             balance = float(balance) + float(reward)
             bal = open("balances/" + username + ".txt", "w")
@@ -411,20 +409,10 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           bal = open("balances/" + username + ".txt", "r")
           balance = str(float(bal.readline())).rstrip("\n\r ")\
 
-          if float(balance) < 30: # New users will mine a bit faster
+          if float(balance) < 60: # New users will mine a bit faster
             reward = float(0.025219)
           else:
-            if float(balance) < 50: # lower than 50
-              reward = float(0.0025219)
-            else:
-              if float(balance) < 80: # lower than 80
-                reward = float(0.00025219)
-              else:
-                if float(balance) < 150:
-                  reward = float(0.000025219)
-                else:
-                  reward = float(0.0000006519)
-                  
+            reward = float(0.006219)
           balance = float(balance) + float(reward)
           bal = open("balances/" + username + ".txt", "w")
           bal.seek(0)
@@ -587,7 +575,7 @@ config = configparser.ConfigParser()
 locker = threading.Lock()
 update_count = 0
 users = ""
-VER = "0.9" # "Big" version number  (0.9 = Beta 3)
+VER = "1.1" # Version number
 
 ######################## INITIAL FILE CREATION ########################
 if not Path("config").is_dir():
