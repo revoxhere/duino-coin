@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin PC Miner (1.0) © revox 2020
+# Duino-Coin PC Miner (1.1) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ##########################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
@@ -33,7 +33,8 @@ khash_count = 0
 hash_count = 0
 hash_mean = []
 config = configparser.ConfigParser()
-VER = "1.0" # Version number
+VER = "1.1" # Version number
+resources = "PCMiner_"+str(VER)+"_resources"
 timeout = 5 # Socket timeout
 autorestart = 0
 pcusername = getpass.getuser() # Get clients' username
@@ -69,7 +70,7 @@ def Greeting(): # Greeting message depending on time
   else:
     greeting = "Welcome back"
     
-  message     ="| Duino-Coin PC Miner (1.0) © revox 2019-2020\n" # Startup message
+  message     ="| Duino-Coin PC Miner ("+str(VER)+") © revox 2019-2020\n" # Startup message
   message   += "| https://github.com/revoxhere/duino-coin\n"
   message   += "| "+str(greeting)+", "+str(username)+"!\n\n"
   
@@ -78,10 +79,10 @@ def Greeting(): # Greeting message depending on time
     sys.stdout.flush()
     time.sleep(0.01)
     
-  if not Path("Miner_1.0_resources/Miner_executable.exe").is_file(): # Initial miner executable section
+  if not Path(str(resources) + "/Miner_executable.exe").is_file(): # Initial miner executable section
     url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
     r = requests.get(url)
-    with open('Miner_1.0_resources/Miner_executable.exe', 'wb') as f:
+    with open(str(resources) + '/Miner_executable.exe', 'wb') as f:
       f.write(r.content)
   try: # Network support           
     process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
@@ -111,10 +112,10 @@ def restart(): # Hashes/sec calculation
   
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, password, efficiency, autorestart
-  cmd = "cd Miner_1.0_resources & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 99 -s 4" # Miner command
+  cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 99 -s 4" # Miner command
   
-  if not Path("Miner_1.0_resources/Miner_config.ini").is_file(): # Initial configuration section
-    print(Style.BRIGHT + "Initial configuration, you can edit 'Miner_1.0_resources/Miner_config.ini' file later.")
+  if not Path(str(resources) + "/Miner_config.ini").is_file(): # Initial configuration section
+    print(Style.BRIGHT + "Initial configuration, you can edit "+str(resources) + "/Miner_config.ini file later.")
     print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
 
     username = input("Enter your username: ")
@@ -133,11 +134,11 @@ def loadConfig(): # Config loading section
     "efficiency": efficiency,
     "autorestart": 0}
     
-    with open("Miner_1.0_resources/Miner_config.ini", "w") as configfile: # Write data to file
+    with open(str(resources) + "/Miner_config.ini", "w") as configfile: # Write data to file
       config.write(configfile)
 
   else: # If config already exists, load from it
-    config.read("Miner_1.0_resources/Miner_config.ini")
+    config.read(str(resources) + "/Miner_config.ini")
     username = config["miner"]["username"]
     password = config["miner"]["password"]
     efficiency = config["miner"]["efficiency"]
@@ -316,7 +317,7 @@ def Mine(): # Mining section
           if feedback == "GOOD": # If result was good
             now = datetime.datetime.now()
             shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
-            title("Duino-Coin PC Miner (1.0) - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+            title("Duino-Coin PC Miner ("+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
             print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "⛏️ Accepted " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
             break # Repeat
           elif feedback == "BAD": # If result was bad
@@ -328,7 +329,7 @@ def Mine(): # Mining section
         break # Repeat
       
 try:
-    os.mkdir("Miner_1.0_resources") # Create resources folder if it doesn't exist
+    os.mkdir(str(resources)) # Create resources folder if it doesn't exist
 except:
     pass
 
@@ -336,7 +337,7 @@ init(autoreset=True) # Enable colorama
 hush() # Start hash calculator
 
 while True:
-  title("Duino-Coin PC Miner (1.0)")
+  title("Duino-Coin PC Miner ("+str(VER)+")")
   try:
     loadConfig() # Load configfile
   except:
