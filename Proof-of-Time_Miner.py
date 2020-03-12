@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ###############################################
-# Duino-Coin PoT Miner (1.0) © revox 2020
+# Duino-Coin PoT Miner (1.1) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ###############################################
 import socket, statistics, threading, time, re, configparser, sys, getpass, platform, datetime, os, signal, subprocess # Import libraries
@@ -33,32 +33,32 @@ except:
   time.sleep(15)
   os._exit(1)
 
+# Set variables
+res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Server IP file
+income = 0
+timer = 40
+reward = 0.0252195 # Default PoT reward
+config = configparser.ConfigParser()
+VER = "1.1" # Version number
+resources = "PoTMiner_"+str(VER)+"_resources" # Resources folder
+timeout = 5 # Socket timeout
+autorestart = 0
+pcusername = getpass.getuser() # Get clients' username
+platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
+publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
 
-if not Path("PoT_1.0_resources").is_dir(): # Check if resources folder exists
+if not Path(str(resources)).is_dir(): # Check if resources folder exists
   try:
-    os.mkdir("PoT_1.0_resources") # Create resources folder
+    os.mkdir(str(resources)) # Create resources folder
   except:
     now = datetime.datetime.now()
     print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Couldn't create resources directory.\nExiting in 15s.")
 
 if not os.name == 'nt': # Check if running on Windows
   now = datetime.datetime.now()
-  win = print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ You can use Proof-Of-Time Miner only on Windows. Continue anyway? [y/n] ")
-  #if win != "y":
-    #os._exit(0)
-
-# Set variables
-res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Server IP file
-income = 0
-timer = 45
-reward = 0.0252195 # Default PoT reward
-config = configparser.ConfigParser()
-VER = "1.0" # Version number
-timeout = 5 # Socket timeout
-autorestart = 0
-pcusername = getpass.getuser() # Get clients' username
-platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
-publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
+  win = input(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ You can use Proof-Of-Time Miner only on Windows. Continue anyway? [y/n] ")
+  if win != "y":
+    os._exit(0)
 
 def title(title):
   if os.name == 'nt':
@@ -96,7 +96,7 @@ def Greeting(): # Greeting message depending on time :)
   else:
     greeting = "Welcome back"
     
-  message  = "| Duino-Coin Proof-of-Time Miner (1.0) © revox 2019-2020\n" # Startup message
+  message  = "| Duino-Coin Proof-of-Time Miner ("+str(VER)+") © revox 2019-2020\n" # Startup message
   message += "| https://github.com/revoxhere/duino-coin\n"
   message += "| "+str(greeting)+", "+str(username)+"!\n\n"
   
@@ -113,20 +113,20 @@ def restart(): # Hashes/sec calculation
 
 def loadConfig(): # Config loading section
   global pool_address, autorestart, pool_port, username, password, efficiency, cmd
-  cmd = "cd PoT_1.0_resources & PoT_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_potminer -p x -e 10 -s 4" # Miner command
+  cmd = "cd " + str(resources) + " & PoT_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_potminer -p x -e 10 -s 4" # Miner command
 
-  if not Path("PoT_1.0_resources/PoT_executable.exe").is_file(): # Initial configuration section
+  if not Path(str(resources) + "/PoT_executable.exe").is_file(): # Initial configuration section
     now = datetime.datetime.now()
     print(now.strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "ⓘ　Downloading required PoT executable")
 
     url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
     r = requests.get(url)
 
-    with open('PoT_1.0_resources/PoT_executable.exe', 'wb') as f:
+    with open(str(resources) + '/PoT_executable.exe', 'wb') as f:
         f.write(r.content)
 
-  if not Path("PoT_1.0_resources/PoT_config.ini").is_file(): # Initial configuration section
-    print(Style.RESET_ALL + Style.BRIGHT + "Initial configuration, you can edit 'PoT_1.0_resources/PoT_config.ini' file later.")
+  if not Path(str(resources) + "/PoT_config.ini").is_file(): # Initial configuration section
+    print(Style.RESET_ALL + Style.BRIGHT + "Initial configuration, you can edit "+str(resources)+"/PoT_config.ini' file later.")
     print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
 
     username = input("Enter your username: ")
@@ -137,11 +137,11 @@ def loadConfig(): # Config loading section
     "password": password,
     "autorestart": 0}
     
-    with open("PoT_1.0_resources/PoT_config.ini", "w") as configfile: # Write data to file
+    with open(str(resources) + "/PoT_config.ini", "w") as configfile: # Write data to file
       config.write(configfile)
 
   else: # If config already exists, load from it
-    config.read("PoT_1.0_resources/PoT_config.ini")
+    config.read(str(resources) + "/PoT_config.ini")
     username = config["pot"]["username"]
     password = config["pot"]["password"]
     autorestart = config["pot"]["autorestart"]
@@ -289,17 +289,17 @@ def Mine(): # PoT section
         print("", end = Style.DIM + Fore.YELLOW + "\r⏲　Next reward in " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + f"{timer:02}"  + Style.RESET_ALL + Style.DIM + Fore.YELLOW + " seconds " + Style.RESET_ALL + Style.DIM + "="*timer + " ")
         timer -= 1
         time.sleep(1)
-        title("Duino-Coin PoT Miner (1.0) - next reward in "+str(timer)+"s, session earnings: "+str(income)+" DUCO")
+        title("Duino-Coin PoT Miner ("+str(VER)+") - next reward in "+str(timer)+"s, session earnings: "+str(income)+" DUCO")
         if timer <= 0: # Ask for reward every 45s; server won't allow faster submission
             income += reward
             income = round(float(income), 8)
-            timer = 45 # Reset the timer
+            timer = 40 # Reset the timer
             soc.send(bytes("PoTr", encoding="utf8")) # Send Proof-of-Time-reward request
             now = datetime.datetime.now()
             print("", end=f"\r" + now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "» You've been rewarded • This session estimated income is " + str(income) + " DUCO\n")
 
 while True:
-  title("Duino-Coin PoT Miner (1.0)")
+  title("Duino-Coin PoT Miner ("+str(VER)+")")
   try:
     loadConfig() # Load configfile
   except:
