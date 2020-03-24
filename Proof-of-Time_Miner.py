@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ###############################################
-# Duino-Coin PoT Miner (1.1) © revox 2020
+# Duino-Coin PoT Miner (1.2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ###############################################
 import socket, statistics, threading, time, re, configparser, sys, getpass, platform, datetime, os, signal, subprocess # Import libraries
@@ -36,10 +36,10 @@ except:
 # Set variables
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Server IP file
 income = 0
-timer = 40
-reward = 0.0252195 # Default PoT reward
+timer = 45
+reward = 0.0232195 # Default PoT reward
 config = configparser.ConfigParser()
-VER = "1.1" # Version number
+VER = "1.2" # Version number
 resources = "PoTMiner_"+str(VER)+"_resources" # Resources folder
 timeout = 5 # Socket timeout
 autorestart = 0
@@ -96,7 +96,7 @@ def Greeting(): # Greeting message depending on time :)
   else:
     greeting = "Welcome back"
     
-  message  = "| Duino-Coin Proof-of-Time Miner ("+str(VER)+") © revox 2019-2020\n" # Startup message
+  message  = "| Duino-Coin © Proof-of-Time Miner ("+str(VER)+") 2019-2020\n" # Startup message
   message += "| https://github.com/revoxhere/duino-coin\n"
   message += "| "+str(greeting)+", "+str(username)+"!\n\n"
   
@@ -214,7 +214,7 @@ def checkVersion():
       time.sleep(15)
       Connect()                      
       
-    if SERVER_VER == VER and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
+    if SERVER_VER <= VER and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Connected to the Duino-Coin server (v"+str(SERVER_VER)+")")
     
@@ -293,7 +293,7 @@ def Mine(): # PoT section
         if timer <= 0: # Ask for reward every 45s; server won't allow faster submission
             income += reward
             income = round(float(income), 8)
-            timer = 40 # Reset the timer
+            timer = 45 # Reset the timer
             soc.send(bytes("PoTr", encoding="utf8")) # Send Proof-of-Time-reward request
             now = datetime.datetime.now()
             print("", end=f"\r" + now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "» You've been rewarded • This session estimated income is " + str(income) + " DUCO\n")
