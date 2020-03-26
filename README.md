@@ -62,7 +62,7 @@
 Official Duino-Coin website: [https://revoxhere.github.io/duino-coin/](https://revoxhere.github.io/duino-coin/)<br>
 Network statistics: [https://revoxhere.github.io/duco-statistics/](https://revoxhere.github.io/duco-statistics/).<br>
 Exchange Duino-Coins to other cryptocurrencies at the [DUCO Exchange](https://revoxhere.github.io/duco-exchange/). <br>
-Talk with us at our [Discord](https://discord.gg/XJpT3UQ). <br>
+Talk with us at our [Discord](https://discord.gg/KyADZT3). <br>
 
 ## Prerequisites
 
