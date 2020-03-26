@@ -15,6 +15,8 @@ permalink: /blog/
 
 # Official Duino-Coin Blog
 
+Blog has been moved to our [Discord](https://discord.gg/KyADZT3)
+
 ***
 
 ## 28.01.2020: Beta 2.2 - Proof-of-Time Miner fixes
