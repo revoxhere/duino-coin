@@ -13,7 +13,7 @@ try: # Check if colorama is installed
   init(autoreset=True) # Enable colorama
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "✗ Colorama is not installed. Please install it using pip install colorama.\nUse Minimal-PC_Miner if you can't install it.\nExiting in 15s.")
+  print(now.strftime("%H:%M:%S ") + "✗ Colorama is not installed. Please install it using: python3 -m pip install colorama.\nUse Minimal-PC_Miner if you can't install it.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
 
@@ -21,7 +21,7 @@ try: # Check if requests is installed
   import requests
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "✗ Requests is not installed. Please install it using pip install requests.\nUse Minimal-PC_Miner if you can't install it.\nExiting in 15s.")
+  print(now.strftime("%H:%M:%S ") + "✗ Requests is not installed. Please install it using: python3 -m pip install requests.\nUse Minimal-PC_Miner if you can't install it.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
 
@@ -131,11 +131,12 @@ def loadConfig(): # Config loading section
 
     username = input("Enter your username: ")
     password = input("Enter your password: ")
+    autorestart = input("Enter after how many seconds miner should be restarted (0 - disable autorestarter): ")
     
     config['pot'] = { # Format data
     "username": username,
     "password": password,
-    "autorestart": 0}
+    "autorestart": autorestart}
     
     with open(str(resources) + "/PoT_config.ini", "w") as configfile: # Write data to file
       config.write(configfile)
@@ -220,9 +221,9 @@ def checkVersion():
     
     else:
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/\nExiting in 15 seconds.")
-      time.sleep(15)
-      os._exit(1)
+      cont = input(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/ or type \'continue\' if you wish to continue anyway.\n")
+      if cont != "continue": 
+        os._exit(1)
       
   except:
     Connect() # Reconnect if pool down
