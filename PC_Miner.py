@@ -12,7 +12,7 @@ try: # Check if colorama is installed
   from colorama import init, Fore, Back, Style
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "✗ Colorama is not installed. Please install it using pip install colorama.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
+  print(now.strftime("%H:%M:%S ") + "✗ Colorama is not installed. Please install it using: python3 -m pip install colorama.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
 
@@ -20,7 +20,7 @@ try: # Check if requests is installed
   import requests
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "✗ Requests is not installed. Please install it using pip install requests.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
+  print(now.strftime("%H:%M:%S ") + "✗ Requests is not installed. Please install it using: python3 -m pip install requests.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
 
@@ -117,6 +117,7 @@ def loadConfig(): # Config loading section
     username = input("Enter your username: ")
     password = input("Enter your password: ")
     efficiency = input("Enter mining intensity (1-100)%: ")
+    autorestart = input("Enter after how many seconds miner should be restarted (0 - disable autorestarter): ")
     
     efficiency = re.sub("\D", "", efficiency)  # Check wheter efficiency is correct
     if int(efficiency) > int(100):
@@ -128,7 +129,7 @@ def loadConfig(): # Config loading section
     "username": username,
     "password": password,
     "efficiency": efficiency,
-    "autorestart": 0}
+    "autorestart": autorestart}
     
     with open(str(resources) + "/Miner_config.ini", "w") as configfile: # Write data to file
       config.write(configfile)
