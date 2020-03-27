@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ###################################################
-# Duino-Coin Arduino Miner (1.1) © revox 2020
+# Duino-Coin Arduino Miner (1.2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ###################################################
 import socket, subprocess, threading, time, random, configparser, getpass, sys, os, hashlib, datetime, signal, platform
@@ -23,7 +23,7 @@ except:
     print("✗ Serial.tools.list_ports is not installed. Please install it with pip install serial.tools.list_ports")
 
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
-ver = 1.1 # Version number
+ver = 1.2 # Version number
 resources = "ArduinoMiner_"+str(ver)+"_resources"
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
@@ -68,7 +68,7 @@ def hush():
      z = 0.56
  threading.Timer(1, hush).start()
 
-print("\n| Duino-Coin Arduino Miner ("+str(ver)+") © revox 2019-2020")
+print("\n| Duino-Coin © Arduino Miner ("+str(ver)+") 2019-2020")
 print("| https://github.com/revoxhere/duino-coin\n")
 
 try:
