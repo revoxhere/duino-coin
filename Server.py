@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Server (1.1) © revox 2020
-# https://github.com/revoxhere/duino-coin 
+# Duino-Coin Server (1.2) © revox 2020
+# https://github.com/revoxhere/duino-coin
 #############################################
 import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, os, psutil, string, json
 from pathlib import Path
@@ -9,29 +9,20 @@ from collections import OrderedDict
 from github import Github
 
 def ServerLog(whattolog):  # Serverlog section for debugging. Not used in proper pool to reduce disk usage. 
-  #Getting actual date and time
-  #now = datetime.datetime.now()
-  #Creating and opening today's log file
   #logfile = open(now.strftime("logs/%Y-%m-%d.txt"), "a")
-  #Time formating
   now = datetime.datetime.now()
   now = now.strftime("%H:%M:%S")
-  #Writing message and closing file
   #logfile.write(now + whattolog + "\n")
   #logfile.close()
   print(now, whattolog)
 
 def ServerLogHash(whattolog): # Separate serverlog section for mining section debugging. Not used in proper pool to reduce disk usage. 
-  #Getting actual date and time
-  #now = datetime.datetime.now()
-  #Creating and opening today's log file
   #logfile = open(now.strftime("logs/%Y-%m-%d.txt"), "a")
-  #Time formating
-  #now = now.strftime("[%Y-%m-%d %H:%M:%S] ")
-  #Writing message and closing file
+  now = datetime.datetime.now()
+  now = now.strftime("[%Y-%m-%d %H:%M:%S] ")
   #logfile.write(now + whattolog + "\n")
   #logfile.close()
-  #print(whattolog+"\n")
+  #print(now, whattolog)
   pass
 
 def search(myDict, search1):
@@ -39,84 +30,190 @@ def search(myDict, search1):
     for key, value in myDict.items():
         if search1 in value:
             search.a.append(key)
+
+def prepend_line(file_name, line):
+    dummy_file = file_name + '.bak'
+    with open(file_name, 'r') as read_obj, open(dummy_file, 'w') as write_obj:
+        write_obj.write(line + '\n')
+        for line in read_obj:
+            write_obj.write(line)
+    os.remove(file_name)
+    os.rename(dummy_file, file_name)
   
 def UpdateServerInfo(): ######################## API PROTOCOL ########################
-  global server_info, hashrates, threads, diff, update_count, gitrepo, miners, gitusername, rewardap, blocks, userinfo
+  global server_info, hashrates, xmgusd, threads, diff, update_count, gitrepo, miners, gitusername, rewardap, blocks, userinfo
   now = datetime.datetime.now()
-  now = now.strftime("%H:%M:%S")
-  # Null pool hashrate stat
+  now = now.strftime("%H:%M")
+  lastUpdate = str(now)
+
+  miners = []
   server_info['pool_hashrate'] = 0
-  # Count registered users
   server_info['users'] = len(os.listdir('users'))
-  # Add miners hashrate and update pool's hashrate
+
+
   for hashrate in hashrates:
     server_info['pool_hashrate'] += hashrates[hashrate]["hashrate"]
-  # Prepare json data for API
+
   data = {"pool_miners" : server_info["miners"], "pool_hashrate" : server_info["pool_hashrate"], "users" : server_info["users"], "miners" : {}}
-  # Add users to API's output
   for hashrate in hashrates:
     data["miners"][hashrate] = hashrates[hashrate]
-  # Write data to text API
-  file = open("config/api.txt", "w")
-  file.write(str("Pool hashrate: "))
-  file.write(str(int((server_info['pool_hashrate']) / 1000)))
-  file.write(str(" kH/s\n"))
-  miners = []
+
+  file = open("config/api.html", "w")
+  jsonfile = open("config/api.json", "w")
+
   for x in hashrates:
     miners.append(hashrates[x]["username"])
   res = []
   for i in miners: 
     if i not in res: 
         res.append(i)
-  file.write(str("Active workers: "))
-  file.write(str(len(res)))
-  file.write(str(" ("))
-  file.write(str(', '.join(map(str, res))))
-  file.write(str(")"))
-  file.write(str("\nRegistered users: "))
-  file.write(str(server_info["users"]))
+
+  poolHashrate = int((server_info['pool_hashrate']) / 1000)
+  workersNumber = str(len(res))
+  workersList = str(" (") + str(', '.join(map(str, res))) + str(")")
+  usersNumber = str(server_info["users"])
+
   blok = open("config/blocks", "r")
-  bloki = blok.readline()
+  minedBlocks = blok.readline()
   blok.close()
-  file.write(str("\nMined blocks: " + bloki))
-  file.write(str("\nLast block hash: "))
+
   lastblok = open("config/lastblock", "r+")
-  lastblokid = lastblok.readline().rstrip("\n\r ")[:16] + (lastblok.readline().rstrip("\n\r ")[16:] and '..')
-  file.write(str(lastblokid))
+  lastblokid = lastblok.readline().rstrip("\n\r ")[:10] + (lastblok.readline().rstrip("\n\r ")[10:] and '..')
+  lastblockHash = str(lastblokid)
   lastblok.close()
-  file.write(str("..."))
-  file.write(str("\nCurrent difficulty: "))
-  diff = math.ceil(int(bloki) / diff_incrase_per)
-  file.write(str(diff))
-  file.write(str("\nEstimated reward: 0.00025219 DUCO/block"))
-  file.write(str("\nLast updated: "))
-  file.write(str(now))
-  file.write(str(" (GMT+1) (updated every 90s)"))
-  file.close() # End of API file writing
+
+  difficulty = math.ceil(int(minedBlocks) / diff_incrase_per)
+
+  if workersList == " ()":
+    workersList = " (No active workers right now :c)"
+
+  rand = random.randint(1000,1090)
+  rand = rand / 1000
+  ducousdLong = float(xmgusd) * float(rand)
+  ducoPrice = round(float(ducousdLong) / float(8), 8)
+    
+  ########## JSON #########
+  jsonapi = json.dumps(
+    {'Pool hashrate': str(poolHashrate),
+     'Last update': str(lastUpdate),
+     'Duco price': str(ducoPrice),
+     'Current difficulty': str(difficulty),
+     'Registered users': str(usersNumber),
+     'Mined blocks': str(minedBlocks),
+     'Active workers': str(workersNumber) + str(workersList)}, sort_keys=True, indent=4)
+
+  ########## HTML #########
+  htmlapi = """<!DOCTYPE html>
+  <html>
+	<head>
+		<link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+		<style>
+			body {
+			   font-family: 'Open Sans', sans-serif;
+			}
+
+			img {
+				margin-top: 20px;
+			}
+
+			h1 {
+				color: #0d52bf;
+				font-size: 20px;
+			}
+			h2 {
+
+				font-size: 16px;
+				margin-top: 5px;
+			}
+			.statisticsDiv {
+			  display: inline-block;
+			  width: 150px;
+			}
+		</style>
+	</head>
+	<body>
+		<div style="text-align:center;">
+			<div class="statisticsDiv" align="center">
+				<img src="hashrate.png" width="64px" height="64px">
+				<h2>Pool hashrate:</h2>
+				<h1>"""+str(poolHashrate)+""" kH/s</h1>
+			</div>
+
+			<div class="statisticsDiv" align="center">
+				<img src="users.png" width="64px" height="64px">
+				<h2>Registered users:</h2>
+				<h1>"""+str(usersNumber)+"""</h1>
+			</div>
+
+			<div class="statisticsDiv" align="center">
+				<img src="blocks.png" width="64px" height="64px">
+				<h2>Mined blocks:</h2>
+				<h1>"""+str(minedBlocks)+"""</h1>
+			</div>
+
+			<br>
+
+			<div class="statisticsDiv" align="center">
+				<img src="hash.png" width="64px" height="64px">
+				<h2>Last block hash:</h2>
+				<h1>"""+str(lastblockHash)+"""...</h1>
+			</div>
+
+			<div class="statisticsDiv" align="center">
+				<img src="difficulty.png" width="64px" height="64px">
+				<h2>Current difficulty:</h2>
+				<h1>"""+str(difficulty)+"""</h1>
+			</div>
+
+			<div class="statisticsDiv" align="center">
+				<img src="clock.png" width="64px" height="64px">
+				<h2>Last API update</h2>
+				<h1>"""+str(lastUpdate)+""" GMT+1</h1>
+			</div>
+
+			<br>
+
+			<div align="center">
+				<img src="workers.png" width="64px" height="64px">
+				<h2>Active workers:</h2>
+				<h1>"""+str(workersNumber)+str(workersList)+"""</h1>
+			</div>
+		</div>
+	</body>
+  </html>"""
+  file.write(str(htmlapi))
+  jsonfile.write(str(jsonapi))
   threading.Timer(5, UpdateServerInfo).start()
 
+
   ######################## UPDATE API FILE ########################
-def UpdateAPIfile():
+def UpdateAPIfiles():
   global update_count
-  try: # Create new file if it doesn't exist
-    repo.create_file("api.txt", "test", "test", branch="master")
-    ServerLog("File didn't exist on GitHub repo, created it!")
-  except:
-    pass
-  file_contents = Path("config/api.txt").read_text() # Get api file contents
+  
   update_count = update_count + 1 # Increment update counter by 1
   repo = g.get_repo("revoxhere/"+gitrepo)
-  contents = repo.get_contents("api.txt") # Get contents of previous file for SHA verification
+
+  htmlfile_contents = Path("config/api.html").read_text() # Get api file contents
+  htmlcontents = repo.get_contents("api.html") # Get contents of previous file for SHA verification
+
   try:
-    repo.update_file(contents.path, "Statistics update #"+str(update_count), str(file_contents), contents.sha, branch="master") #Post statistics file into github
+    repo.update_file(htmlcontents.path, "Statistics update #"+str(update_count), str(htmlfile_contents), htmlcontents.sha, branch="master") #Post statistics file into github
     ServerLog("Updated statistics file on GitHub. Update count:"+str(update_count))
   except:
     ServerLog("Failed to update statistics file!")
-  # Run every 90s
-  threading.Timer(90, UpdateAPIfile).start()
+
+  jsonfile_contents = Path("config/api.json").read_text() # Get api file contents
+  jsoncontents = repo.get_contents("api.json") # Get contents of previous file for SHA verification
+
+  try:
+    repo.update_file(jsoncontents.path, "Statistics update #"+str(update_count), str(jsonfile_contents), jsoncontents.sha, branch="master") #Post statistics file into github
+    ServerLog("Updated statistics file on GitHub. Update count:"+str(update_count))
+  except:
+    ServerLog("Failed to update statistics file!")
+  # Run every 180s
+  threading.Timer(180, UpdateAPIfiles).start()
   
 def randomString(stringLength=10):
-    # Generate random string with specified length
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
   
@@ -124,11 +221,10 @@ class InputProc(threading.Thread): ######################## SERVER CONSOLE #####
   def run(self):
     proc = psutil.Process()
     while True:
-      # Wait for input command in server console
       cmd = input(">")
-      # Parse commands
       if cmd.find(" ") != -1:
         cmd = cmd.split(" ")
+
         if cmd[0] == "list":
           # List all registered users
           if cmd[1] == "users":
@@ -136,9 +232,11 @@ class InputProc(threading.Thread): ######################## SERVER CONSOLE #####
           # List all connected users
           elif cmd[1] == "miners":
             print(' '.join([hashrates[x]["username"] for x in hashrates]))
+
         if cmd[0] == "kick":
           # Kick (disconnect) specified user
           kicklist.append(cmd[1])
+
         if cmd[0] == "ban":
           # Ban and kick specified user
           kicklist.append(cmd[1])
@@ -149,11 +247,14 @@ class InputProc(threading.Thread): ######################## SERVER CONSOLE #####
       else:
         if cmd == "hashrates":
           print(hashrates)
+
         if cmd == "hash":
           print(str(' '.join(map(str, [hashrates[x]["hashrate"] for x in hashrates]))))
+
         if cmd == "kickall":
           # Kick (disconnect) all connected users
           kicklist.append(-1)
+
         if cmd == "serverinfo":
           # Display server info
           print("Duino-Coin server by revox & MrKris7100 from DUCO developers")
@@ -166,6 +267,7 @@ class InputProc(threading.Thread): ######################## SERVER CONSOLE #####
           print("\nConnected miners: " + str(server_info["miners"]))
           print("Server hashrate: " + str(server_info["pool_hashrate"]) + " H/s")
           print("Registered users count: " + str(server_info["users"]))
+
           with locker:
             file = open("config/blocks", "r")
             print("\nMined blocks count: " + file.readline())
@@ -173,6 +275,7 @@ class InputProc(threading.Thread): ######################## SERVER CONSOLE #####
             file = open("config/lastblock", "r+")
             print("Last block hash: " + file.readline())
             file.close()
+
         if cmd == "stop":
           # Shutting down server
           with locker:
@@ -185,21 +288,22 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
     self.ip = ip
     self.port = port
     self.clientsock = clientsock
+
     try:
       # Send server version to client
       clientsock.send(bytes(VER, encoding='utf8'))
     except socket.error as err:
       if err.errno == errno.ECONNRESET:
         err = True
+
   def run(self):
+    global server_info, hashrates, kicklist, thread_id, diff, data, users, miners
     conn.settimeout(60)
     err = False
-    global server_info, hashrates, kicklist, thread_id, diff, data, users, miners
-    # New user connected
     username = ""
-    # Get thread id for this connection
     thread_id = str(threading.current_thread().ident)
     ServerLog("New thread (" + thread_id + ") started, connection: " + self.ip + ":" + str(self.port))
+
     while True:
       # Check "kicklist" for "kickall" command
       if -1 in kicklist:
@@ -231,6 +335,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
         server_info['miners'] += 1
         hashrates[int(thread_id)] = {"username" : username, "hashrate" : 0}
         ServerLog("Client "+str(username)+" has requested account registration.")
+
         # Check username for unallowed characters
         if re.match(regex,username):
           # Check if user already exists
@@ -262,6 +367,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
         server_info['miners'] += 1
         hashrates[int(thread_id)] = {"username" : username, "hashrate" : 0}
         ServerLog("Client request logging in to account " + username)
+
         # Check username for unallowed characters (regex)
         if re.match(regex,username):
           # Check if that user exists
@@ -298,40 +404,47 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
 
       ######################## MINING PROTOCOL ########################
       elif username != "" and data[0] == "JOB":
-        time.sleep(0.2)
+        time.sleep(0.01)
         # Wait for unlocked files then lock them
         with locker:
           # Read blocks amount
           file = open("config/blocks", "r")
           blocks = int(file.readline())
           file.close()
+
           # Read lastblock's hash
           file = open("config/lastblock", "r+")
           lastblock = file.readline()
+
           # Calculate difficulty
           diff = math.ceil(blocks / diff_incrase_per)
           rand = random.randint(0, 100 * diff)
+
           # Generate next block hash
           hashing = hashlib.sha1(str(lastblock + str(rand)).encode("utf-8"))
           ServerLogHash("Sending target hash: " + hashing.hexdigest())
+
           try:
             # Send target hash to miner
             self.clientsock.send(bytes(lastblock + "," + hashing.hexdigest() + "," + str(diff), encoding='utf8'))
           except socket.error as err:
             if err.errno == errno.ECONNRESET:
               break
+
           # Update lastblock's hash
           file.seek(0)
           file.write(hashing.hexdigest())
           file.truncate()
           file.close()
+
         try:
           # Wait until client solves hash
           response = self.clientsock.recv(1024).decode()
         except socket.error as err:
           if err.errno == errno.ECONNRESET:
             break
-        # Ad miner hashrate to statistics
+
+        # Add miner hashrate to statistics
         try:
           if response.find(",") != -1:
             try:
@@ -341,7 +454,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
               hashrates[int(thread_id)]["hashrate"] = float(hashrate)
             except:
               pass
-          else: # Alpha 5 compatibility
+          else: # Arduino Miner compatibility
             try:
               result = response
               hashrates[int(thread_id)]["hashrate"] = 1000 #1kH/s
@@ -349,6 +462,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
               pass
         except:
           pass
+
         # Checking received result
         if result == str(rand):
           ServerLogHash("Received good result (" + str(result) + ")")
@@ -362,15 +476,15 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
             if float(balance) < 30: # New users will mine a bit faster
               reward = float(0.00025219)
             else:
-              if float(balance) < 50: # Lower than 50
+              if float(balance) < 50:
                 reward = float(0.00008219)
               else:
-                if float(balance) < 80: # Lower than 80
+                if float(balance) < 80:
                   reward = float(0.00001200)
                 else:
-                  if float(balance) < 100: # Lower than 100
+                  if float(balance) < 100:
                     reward = float(0.0000014439)
-                  else: # Higher than 100
+                  else:
                     reward = float(0.000000719)
               
             balance = float(balance) + float(reward)
@@ -379,11 +493,13 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
             bal.write(str(balance))
             bal.truncate()
             bal.close()
+
           try:
             self.clientsock.send(bytes("GOOD", encoding="utf8"))
           except socket.error as err:
             if err.errno == errno.ECONNRESET:
               break
+
           # Waiting fo unlocked files then lock them
           with locker:
             # Update amount of blocks
@@ -393,6 +509,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
             blo.write(str(blocks))
             blo.truncate()
             blo.close()
+
         else:
           # If result is bad send "BAD"
           ServerLogHash("Recived bad result!"+result)
@@ -405,14 +522,25 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
       elif username != "" and data[0] == "PoTr":
         time.sleep(44)
         ServerLog("Received PoTr request")
+
         with locker: # Using locker to fix problems when mining on many devices with one account
           bal = open("balances/" + username + ".txt", "r")
           balance = str(float(bal.readline())).rstrip("\n\r ")\
 
           if float(balance) < 60: # New users will mine a bit faster
-            reward = float(0.025219)
+              reward = float(0.025219)
           else:
-            reward = float(0.006219)
+              if float(balance) < 70:
+                reward = float(0.0122)
+              else:
+                if float(balance) < 90:
+                  reward = float(0.01)
+                else:
+                  if float(balance) < 100:
+                    reward = float(0.005)
+                  else:
+                    reward = float(0.002)
+
           balance = float(balance) + float(reward)
           bal = open("balances/" + username + ".txt", "w")
           bal.seek(0)
@@ -424,10 +552,12 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
       ######################## BALANCE CHECK PROTOCOL ########################
       elif username != "" and data[0] == "BALA":
         time.sleep(0.2)
-        ServerLog("Client request balance check")
+        ServerLog("Client requested balance check")
+
         file = open("balances/" + username + ".txt", "r")
         balance = file.readline()
         file.close()
+
         try:
           self.clientsock.send(bytes(balance, encoding='utf8'))
         except:
@@ -437,17 +567,18 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
       elif username != "" and data[0] == "STAT":
         ServerLog("Client requested user status check")
         file = open("users/" + username + ".txt", "r")
-        file = file.read()
-        filecont = file.splitlines()
+        filecont = file.readlines()
+        file.close()
+
         try:
                 userstatus = filecont[1]
-                print(userstatus)
                 self.clientsock.send(bytes(userstatus, encoding='utf8'))
         except:
                 self.clientsock.send(bytes("Regular Member", encoding='utf8'))
-        print("sentuserinfo")
+        
       ######################## CLIENT INFO PROTOCOL ########################
       elif username != "" and data[0] == "FROM":
+        ServerLog("Client sent informations")
         if data[1]:
           client = data[1]
         if data[2]:
@@ -457,7 +588,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
         if data[4]:
           platform = data[4]
         if data:
-          print(str(client), str(pcusername), str(ip), str(platform))
+          print(str(username), str(client), str(pcusername), str(ip), str(platform))
         time.sleep(0.1)
 
       ######################## CLOSE PROTOCOL ########################
@@ -485,6 +616,46 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
         except:
           ServerLog("Error closing connection (" + thread_id + ")!")
           time.sleep(1)
+
+      ######################## PASSWORD CHANGE PROTOCOL ########################
+      elif username != "" and data[0] == "CHGP":
+        time.sleep(0.2)
+        oldPassword = data[2]
+        newPassword = data[3]
+        print(data)
+        ServerLog("Client request changing password")
+        
+        try:
+          file = open("users/" + username + ".txt", "r")
+          lines = file.readlines()
+          serverOldPassword = lines[0]
+          serverOldPassword = serverOldPassword.replace("\n", "")
+          file.close()
+        except:
+          ServerLog("Can't check clients' username")
+        if str(serverOldPassword) == str(oldPassword):
+          file = open("users/" + username + ".txt", "r")
+          lines = file.readlines()
+          file.close
+          print(lines)
+
+          file = open("users/" + username + ".txt", "w")
+          lines[0] = str(newPassword+"\n")
+          print(lines)
+          file.writelines(lines)
+          file.close()
+          
+          try:
+            self.clientsock.send(bytes("Success! Your password has been changed.", encoding='utf8'))
+          except:
+            break
+        else:
+          try:
+            self.clientsock.send(bytes("Error! Your old password doesn't match!", encoding='utf8'))
+          except:
+            break
+        except:
+          ServerLog("Can't set clients' new password")
           
       ######################## SENDING PROTOCOL ########################
       elif username != "" and data[0] == "SEND":
@@ -493,18 +664,21 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
         receiver = data[2]
         amount = float(data[3])
         ServerLog("Client request transfer funds")
-        # Get current amount of funds in bank
+
+        # Get current amount of funds
         try:
           file = open("balances/" + sender + ".txt", "r+")
           balance = float(file.readline())
         except:
           ServerLog("Can't checks senders' (" + sender + ") balance")
+
         # Verify that the balance is higher or equal to transfered amount
         if amount > balance:
           try:
             self.clientsock.send(bytes("Error! Your balance is lower than amount you want to transfer!", encoding='utf8'))
           except:
             break
+
         else: # Check if recipient adress exists
           if Path("balances/" + receiver + ".txt").is_file():
             try:
@@ -512,36 +686,38 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
               balance -= amount
               file.seek(0)
               file.write(str(balance))
-              file.truncate()
               file.close()
+
               # Get receipents' balance and add transferred amount
               file = open("balances/" + receiver + ".txt", "r+")
               receiverbal = float(file.readline())
               receiverbal += amount
               file.seek(0)
               file.write(str(receiverbal))
-              file.truncate()
               file.close()
+
               try:
-                self.clientsock.send(bytes("Successfully transfered funds!!!", encoding='utf8'))
+                self.clientsock.send(bytes("Successfully transfered funds!", encoding='utf8'))
               except socket.error as err:
                 break
               ServerLog("Transferred " + str(amount) + " DUCO from " + sender + " to " + receiver)
+
             except:
               try:
                 self.clientsock.send(bytes("Unknown error occured while sending funds.", encoding='utf8'))
               except socket.error as err:
                 break
+
           else: # Send message if receipent doesn't exist
             ServerLog("The recepient "+receiver+" doesn't exist!")
             try:
               self.clientsock.send(bytes("Error! The recipient doesn't exist!", encoding='utf8'))
             except socket.error as err:
               break
+
     ServerLog("Thread (" + thread_id + ") and connection closed")
     # Close socket connection
     self.clientsock.close()
-    
     # Delete this miner from statistics
     try:
       del hashrates[int(thread_id)]
@@ -553,13 +729,11 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           del hashrates[thread_id]
         except:
           hashrates.pop(thread_id, None)
-    print(hashrates)
     try:
       users = users.replace(" "+str(username), "")
       server_info['miners'] -= 1
-      ServerLog("Del passed!")
     except:
-      ServerLog("Error removing from dict " + str(thread_id))
+      pass
     time.sleep(1)
       
 ######################## VARIABLES ########################
@@ -575,7 +749,8 @@ config = configparser.ConfigParser()
 locker = threading.Lock()
 update_count = 0
 users = ""
-VER = "1.1" # Version number
+xmgusd = 0.016124
+VER = "1.2" # Version number
 
 ######################## INITIAL FILE CREATION ########################
 if not Path("config").is_dir():
@@ -648,7 +823,7 @@ except:
 ServerLog("Listening for incoming connections...")
 # Start thread for updating server info api
 UpdateServerInfo()
-UpdateAPIfile()
+UpdateAPIfiles()
 while True:
   # Start thread for input procesing
   newthread = InputProc()
