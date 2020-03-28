@@ -67,17 +67,11 @@ Talk with us at our [Discord](https://discord.gg/KyADZT3). <br>
 ## Prerequisites
 
 ### Linux
-If you're using Linux, you need to have python installed:
-```bash
-sudo apt install python3
-```
+Latest [releases](https://github.com/revoxhere/duino-coin/releases) contain everything built-in into them.
 If you have some missing dependencies programs will display message about installing them.
 
 ### Windows
 Latest [releases](https://github.com/revoxhere/duino-coin/releases) contain everything built-in into them.
-
-***
-
 If you have some missing dependencies while running from source programs will display message about installing them.
 
 ## Getting Started
