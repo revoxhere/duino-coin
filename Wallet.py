@@ -1,5 +1,5 @@
 ###############################################
-# Duino-Coin Wallet (1.2) © revox 2020
+# Duino-Coin Wallet (v1.337) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 #############################################
 import time, socket, sys, os, subprocess, datetime, configparser, tkinter, getpass, platform, webbrowser, urllib.request, random # Import libraries
@@ -40,29 +40,34 @@ except:
     pass # Icon won't work on linux
 loadingScr.configure(background = str(colorA))
 
-label = tkinter.Label(loadingScr, text = "Duino-Coin Wallet", font=("Arial", 20, "bold"), bg = str(colorA), fg = str(colorHighlight)).pack()
+label = tkinter.Label(loadingScr, text = "Duino-Coin GUI Wallet", font=("Arial", 20, "bold"), bg = str(colorA), fg = str(colorHighlight)).pack()
 label = tkinter.Label(loadingScr, text = "LOADING", font=("Arial", 10, "bold"), bg = str(colorA), fg = str(colorHighlight)).pack()
 label = tkinter.Label(loadingScr, text = "Setting variables...", bg = str(colorA), fg = str(colorC), font=("Arial", 8)).place(relx = 0.01, rely = 0.8)  
 loadingScr.update()
 
 WalletResources = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 s = socket.socket()
-balanceusd = 0
+balancecurrency = 0
 balance = 0
 background = ""
 newbalance = 0
 sending = 0
-VER = "1.2" # Version number
+VER = "1.337" # Version number
 resources = "Wallet_"+str(VER)+"_resources/"
 debug += "Successfully set variables\n"
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
-cmd = "cd " + str(resources) + " & Wallet_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_wallet -p x -e 40 -s 4" # Miner command
 publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
 themes = [
   ("Light mode"),
   ("Dark mode"),
   ("Community mode"),
+]
+currencies = [
+  ("USD"),
+  ("PLN"),
+  ("RUB"),
+  ("EUR"),
 ]
 
 label = tkinter.Label(loadingScr, text = "Configuring theme..." + str(" ")*20, bg = str(colorA), fg = str(colorC), font=("Arial", 8)).place(relx = 0.01, rely = 0.8)  
@@ -74,11 +79,18 @@ def hasNumbers(inputString):
 def setTheme():
   global colorA, colorB, colorC, background, debug, wallet, settings
 
+  config.read(str(resources) + "Wallet_config.ini")
+  username = config["wallet"]["username"]
+  password = config["wallet"]["password"]
+  notificationSetting = config["wallet"]["notificationTreshold"]
+  currency = config["wallet"]["currency"]
+
   if v.get() == "0":
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str("0"),
-              "notificationTreshold": str(notificationSetting)}
+              "notificationTreshold": str(notificationSetting),
+              "currency": str(currency)}
     with open(str(resources) + "Wallet_config.ini", "w") as configfile:
       config.write(configfile)
     debug += "Using light mode\n"
@@ -90,7 +102,8 @@ def setTheme():
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str("1"),
-              "notificationTreshold": str(notificationSetting)}
+              "notificationTreshold": str(notificationSetting),
+              "currency": str(currency)}
     with open(str(resources) + "Wallet_config.ini", "w") as configfile:
       config.write(configfile)
     debug += "Using dark mode\n"
@@ -102,12 +115,71 @@ def setTheme():
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str("2"),
-              "notificationTreshold": str(notificationSetting)}
+              "notificationTreshold": str(notificationSetting),
+              "currency": str(currency)}
     with open(str(resources) + "Wallet_config.ini", "w") as configfile:
       config.write(configfile)
     debug += "Using community mode\n"
     background = str(resources) + "Wallet_background_dark.gif"
-    messagebox.showinfo("Information", "Wallet will be restarted to apply changes.\nThis versions' community background was made by Andreea Ch.") # Display info
+    messagebox.showinfo("Information", "Wallet will be restarted to apply changes.\nThis versions' community background was made by Max Lapteff.") # Display info
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+def setCurrency(event):
+  global currency, currencies, settings, cvariable, debug, theme
+  
+  config.read(str(resources) + "Wallet_config.ini")
+  username = config["wallet"]["username"]
+  password = config["wallet"]["password"]
+  theme = config["wallet"]["theme"]
+  notificationSetting = config["wallet"]["notificationTreshold"]
+      
+  print(theme)      
+  if event == "USD":
+    config['wallet'] = {"username": username,
+              "password": password,
+              "theme": str(theme),
+              "notificationTreshold": str(notificationSetting),
+              "currency": str("USD")}
+    with open(str(resources) + "Wallet_config.ini", "w") as configfile:
+      config.write(configfile)
+    debug += "Set currency\n"
+    messagebox.showinfo("Information", "Wallet will be restarted to apply changes.") # Display info
+    os.execl(sys.executable, sys.executable, *sys.argv)
+    
+  if event == "PLN":
+    config['wallet'] = {"username": username,
+              "password": password,
+              "theme": str(theme),
+              "notificationTreshold": str(notificationSetting),
+              "currency": str("PLN")}
+    with open(str(resources) + "Wallet_config.ini", "w") as configfile:
+      config.write(configfile)
+    debug += "Set currency\n"
+    messagebox.showinfo("Information", "Wallet will be restarted to apply changes.") # Display info
+    os.execl(sys.executable, sys.executable, *sys.argv)
+      
+  if event == "RUB":
+    config['wallet'] = {"username": username,
+              "password": password,
+              "theme": str(theme),
+              "notificationTreshold": str(notificationSetting),
+              "currency": str("RUB")}
+    with open(str(resources) + "Wallet_config.ini", "w") as configfile:
+      config.write(configfile)
+    debug += "Set currency\n"
+    messagebox.showinfo("Information", "Wallet will be restarted to apply changes.\n") # Display info
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+  if event == "EUR":
+    config['wallet'] = {"username": username,
+              "password": password,
+              "theme": str(theme),
+              "notificationTreshold": str(notificationSetting),
+              "currency": str("EUR")}
+    with open(str(resources) + "Wallet_config.ini", "w") as configfile:
+      config.write(configfile)
+    debug += "Set currency\n"
+    messagebox.showinfo("Information", "Wallet will be restarted to apply changes.\n") # Display info
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 
@@ -124,13 +196,14 @@ def selectWindow(): # First-time launch window
     window.configure(background = str(colorA))
     
     label = tkinter.Label(window, text = "", bg = str(colorA), fg = str(colorB)).pack()     
-    label = tkinter.Label(window, text = " Duino-Coin Wallet", font=("Verdana", 20, "bold"), bg = str(colorA), fg = str(colorHighlight)).pack()
+    label = tkinter.Label(window, text = " Duino-Coin GUI Wallet", font=("Verdana", 20, "bold"), bg = str(colorA), fg = str(colorHighlight)).pack()
     label = tkinter.Label(window, text = " It looks like it's your first time launching this program. ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).pack()
     label = tkinter.Label(window, text = " Do you have an Duino-Coin account?", bg = str(colorA), fg = str(colorB), font=("Arial", 12)).pack()
     label = tkinter.Label(window, text = "", fg = str(colorB), bg = str(colorA)).pack()
-    tkinter.Button(window, text = "Yes - I want to login!", activebackground = str(colorHighlight), width = 30, command = Login, bg = str(colorA), fg = str(colorB), font=("Arial", 10)).pack() 
-    tkinter.Button(window, text = "No - I want to register!", activebackground = str(colorHighlight), width = 30, command = Register, bg = str(colorA), fg = str(colorB), font=("Arial", 10)).pack()
+    loginButton = tkinter.Button(window, text = "Yes - I want to login!", activebackground = str(colorHighlight), width = 30, command = Login, bg = str(colorA), fg = str(colorB), font=("Arial", 10)).pack() 
+    registerButton = tkinter.Button(window, text = "No - I want to register!", activebackground = str(colorHighlight), width = 30, command = Register, bg = str(colorA), fg = str(colorB), font=("Arial", 10)).pack()
     label = tkinter.Label(window, text = "", bg = str(colorA), fg = str(colorB)).pack()
+    window.bind('<Return>', LoginCallback)
     window.mainloop()
  
 def Register(): #signup definition
@@ -138,7 +211,7 @@ def Register(): #signup definition
     global pwordconfirm 
     global nameE
     global register
-    #window.destroy()
+    
     register = Tk() #register window
     register.resizable(False, False)
     register.title('Register')
@@ -164,8 +237,12 @@ def Register(): #signup definition
 
     signupButton = Button(register, text='Register account', activebackground = str(colorHighlight), command = registerProtocol, bg = str(colorA), fg = str(colorB))
     signupButton.grid(row = 4, column = 1)
+    register.bind('<Return>', registerCallback)
     register.mainloop()
     selectWindow()
+
+def registerCallback(event):
+    registerProtocol()
  
 def registerProtocol(): #signup server communication section
     username = nameE.get()
@@ -173,7 +250,6 @@ def registerProtocol(): #signup server communication section
     password = pwordE.get()
     if password == passwordconfirm:
         s.send(bytes("REGI,"+username+","+password, encoding='utf8')) #send register request to server
-        #key = s.recv(3).decode()
         time.sleep(0.025)
         key = s.recv(2).decode()
         if key == "OK":
@@ -188,10 +264,14 @@ def registerProtocol(): #signup server communication section
     else:
         register.destroy()
         os.execl(sys.executable, sys.executable, *sys.argv)
+        
+def LoginCallback(event):
+    Login()
+
+def loginProCallback(event):
+    loginProtocol()
  
 def Login(): #login window
-    #window.destroy()
-
     global nameEL
     global pwordEL
     global rootA, host, port
@@ -217,6 +297,7 @@ def Login(): #login window
  
     loginB = Button(rootA, text='Login to account', activebackground = str(colorHighlight), command = loginProtocol, bg = str(colorA), fg = str(colorB))
     loginB.grid(row = 4, column = 1)
+    rootA.bind('<Return>', loginProCallback)
  
     rootA.mainloop()
     selectWindow()
@@ -235,7 +316,8 @@ def loginProtocol(): # First-time login protocol
         config['wallet'] = {"username": username,
                   "password": password,
                   "theme": str("1"),
-                  "notificationTreshold": str("1")}
+                  "notificationTreshold": str("0.5"),
+                  "currency": str("USD")}
         with open(str(resources) + "Wallet_config.ini", "w") as configfile:
             config.write(configfile)
         window.destroy()
@@ -250,7 +332,7 @@ def loginProtocol(): # First-time login protocol
         os.execl(sys.executable, sys.executable, *sys.argv)
     
 def loadConfig(): # Load config protocol
-    global username, password, debug, loadingScr, notificationSetting
+    global username, password, debug, loadingScr, notificationSetting, currency, rate
     global theme, background, colorA, colorB, colorC, colorHighlight
     global pcusername, publicip, platform, userstatus
     
@@ -262,6 +344,7 @@ def loadConfig(): # Load config protocol
     password = config["wallet"]["password"]
     theme = config["wallet"]["theme"]
     notificationSetting = config["wallet"]["notificationTreshold"]
+    currency = config["wallet"]["currency"]
     
     if str(theme) == "0": # Light mode
       debug += "Using light theme\n"
@@ -282,10 +365,22 @@ def loadConfig(): # Load config protocol
     if str(theme) == "2": # Community theme
       debug += "Using community theme\n"
       background = str(resources) + "Wallet_background_community.gif"
-      colorA = "white" #background
-      colorB = "black" #foreground
+      colorA = "#003530" #background
+      colorB = "white" #foreground
       colorC = "#7f8c8d"
-      colorHighlight = "#27ae60"
+      colorHighlight = "#FBC531"
+
+    if str(currency) == "USD": # Fiat currency exchange rates
+      rate = 1 # API is in USD
+
+    if str(currency) == "PLN":
+      rate = 4.25 # One USD is 4.75 PLN
+
+    if str(currency) == "RUB":
+      rate = 76.40 # And so on...
+      
+    if str(currency) == "EUR":
+      rate = 0.93
 
     while True: # Login
         time.sleep(0.025)
@@ -341,11 +436,14 @@ def Send():
     amount.grid(row = 2, column = 1)
 
     signupButton = Button(send, text='Send funds', activebackground = str(colorHighlight), command = sendProtocol, bg = str(colorA), fg = str(colorB)).grid(row = 4, column = 1)
-
+    send.bind('<Return>', sendCallback)
     send.mainloop()
 
+def sendCallback(event):
+    sendProtocol()
+
 def sendProtocol():
-    global receipent, amount, sendProtocol,  debug, balanceTimer
+    global receipent, amount, sendProtocol,  debug, balanceTimer, message
     receipent = receipent.get()
     amount = amount.get()
     debug += "Started sending funds protocol\n"
@@ -376,21 +474,19 @@ def sendProtocol():
                     debug += "Sending "+amount+" DUCO from: "+username+" to "+receipent+"\n"
                     balanceTimer.cancel()
                     
-                    try:
-                        s.send(bytes("SEND,"+username+","+receipent+","+amount, encoding='utf8')) #send sending funds request to server
-                    except:
-                        debug += "Fatal error while sending. Probably timeout.\n"
-                        
+                    s.send(bytes("SEND,"+username+","+receipent+","+amount, encoding='utf8')) # Sending funds request to server
                     time.sleep(0.025)
                     message = s.recv(128).decode('utf8')
+                    print(message)
                     while hasNumbers(message):
                         message = s.recv(128).decode('utf8')
-                        
+                        print(message)
+
                     debug += "Server returned: "+message+"\n"
                     messagebox.showinfo("Server message", message) # Display the server message
                     send.destroy()
 
-def Receive(): #receiving funds help dialog
+def Receive(): # Receiving funds dialog
     try:
         messagebox.showinfo("Receive funds", "To receive funds, instruct others to send money to your username ("+username+").")
     except:
@@ -430,7 +526,7 @@ def passchgProtocol():
                     
                 time.sleep(0.025)
                 message = s.recv(128).decode('utf8')
-                while hasNumbers(message):
+                if hasNumbers(message):
                     message = s.recv(128).decode('utf8')
                     
                 debug += "Server returned: "+message+"\n"
@@ -476,10 +572,11 @@ def Logout():
 def Settings():
     global settings, debug
     global v, val, themes, setTheme, theme
+    global c, cal, currency, setCurrency, currencies
     
     settings = tkinter.Tk() #settings window
     settings.resizable(False, False)
-    settings.geometry("400x450")
+    settings.geometry("400x480")
     settings.title('Advanced settings')
     try:
         settings.iconbitmap(str(resources) + "Wallet_icon.ico")
@@ -497,21 +594,36 @@ def Settings():
     if theme == "Community mode":
         v.set(int(2))
 
-    label = tkinter.Label(settings, text = "Duino-Coin Wallet "+str(VER), font=("Verdana", 20, "bold"), fg = str(colorHighlight), bg = str(colorA)).pack()
-    tkinter.Button(settings, text = "Duino-Coin GitHub", activebackground = str(colorHighlight), height = 1, command = GitHub, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=4)
-    tkinter.Button(settings, text = "Duino-Coin Discord", activebackground = str(colorHighlight), height = 1, command = Discord, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=3)
-    tkinter.Button(settings, text = "Support the project (Donate)", activebackground = str(colorHighlight), height = 1, command = Donate, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=4)
-    tkinter.Button(settings, text = "Change password", activebackground = str(colorHighlight), height = 1, command = changePass, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=4)
+    cvariable = StringVar(settings)
+    if currency == "USD":
+        cvariable.set(currencies[0])
+    if currency == "PLN":
+        cvariable.set(currencies[1])
+    if currency == "RUB":
+        cvariable.set(currencies[2])
+    if currency == "EUR":
+        cvariable.set(currencies[3])
+
+    label = tkinter.Label(settings, text = "Duino-Coin GUI Wallet v"+str(VER), font=("Verdana", 16, "bold"), fg = str(colorHighlight), bg = str(colorA)).pack()
+    tkinter.Button(settings, text = "Duino-Coin GitHub", activebackground = str(colorHighlight), height = 1, command = GitHub, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=1)
+    tkinter.Button(settings, text = "Duino-Coin Discord", activebackground = str(colorHighlight), height = 1, command = Discord, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=1)
+    tkinter.Button(settings, text = "Support the project (Donate)", activebackground = str(colorHighlight), height = 1, command = Donate, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=1)
+    tkinter.Button(settings, text = "Change password", activebackground = str(colorHighlight), height = 1, command = changePass, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=1)
     tkinter.Button(settings, text = "Logout", activebackground = str(colorHighlight), height = 1, command = Logout, width=35, fg = str(colorB), bg = str(colorA)).pack(pady=4)
-    label = tkinter.Label(settings, text = "", fg = str(colorB), bg = str(colorA)).pack()
 
     label = tkinter.Label(settings, text = "Select theme:", fg = str(colorB), bg = str(colorA)).pack()
     for val, theme in enumerate(themes):
       tkinter.Radiobutton(settings, text = theme, padx = 100, fg = str(colorC), bg = str(colorA), activebackground = str(colorA),
           activeforeground = str(colorHighlight), variable = v, command = setTheme, highlightthickness = 0, value = val).pack(anchor = W)
-    label = tkinter.Label(settings, text = "", fg = str(colorB), bg = str(colorA)).pack()
-   
-    label = tkinter.Label(settings, text = "Debug output:", fg = str(colorB), bg = str(colorA)).pack()
+
+    label = tkinter.Label(settings, text = "Select currency:", fg = str(colorB), bg = str(colorA)).pack()
+    w = OptionMenu(settings, cvariable, *currencies, command = setCurrency)
+    w.config(bg = str(colorA), fg = str(colorB), activebackground = str(colorHighlight))
+    w.pack()
+
+    label = tkinter.Label(settings, text = "", fg = str(colorHighlight), bg = str(colorA)).pack()
+        
+    label = tkinter.Label(settings, text = "Debug output:", bg = str(colorA), fg = str(colorB)).pack()
     S = tkinter.Scrollbar(settings)
     T = tkinter.Text(settings, height = 3, fg = str(colorB), bg = str(colorA), width = 50)
     S.pack(side = tkinter.RIGHT, fill = tkinter.Y)
@@ -538,7 +650,7 @@ def Notification():
     playsound(resources + "notification.mp3")
     
 def getBalance():
-    global balance, wallet, ducousd, balanceusd, debug, balanceTimer, notificationSetting
+    global balance, wallet, ducofiat, balancecurrency, debug, balanceTimer, notificationSetting
     
     transactions = open(resources + "Transactions.bin" ,"r+")
     oldcontent = (transactions).read()
@@ -561,8 +673,8 @@ def getBalance():
         transactions.seek(0, 0)
 
         balance = round(float(balance), 8) # Format balances
-        balanceusd = round(float(balance) * float(ducousd), 6)
-        ducousd = round(float(ducousd), 6)
+        balancecurrency = round(float(balance) * float(ducofiat) * float(rate), 6)
+        ducofiat = round(float(balancecurrency), 6)
         difference = round(float(balance) - float(oldbalance), 6)
         
         if difference != 0.0: # Check if balance has changed
@@ -582,15 +694,15 @@ def getBalance():
             pass
         else: # Animation
             label = tkinter.Label(wallet, text = "Balance: "+str(oldbalance)+" DUCO"+str(" ")*99, bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
-            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
-            transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = str(colorB), justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
+            label = tkinter.Label(wallet, text = "Estimated balance in "+str(currency)+": "+str(balancecurrency)+"       ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
+            transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = str(colorHighlight), justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
             time.sleep(0.03)
             label = tkinter.Label(wallet, text = "Balance: "+str(oldbalance)+" DUCO"+str(" ")*99, bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
-            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
+            label = tkinter.Label(wallet, text = "Estimated balance in "+str(currency)+": "+str(balancecurrency)+"       ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
             transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = "gray", justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
             time.sleep(0.05)
             label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO"+str(" ")*99, bg = str(colorA), fg = str(colorA), font=("Arial", 12)).place(relx=.1, rely=.15)
-            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorA), font=("Arial", 10)).place(relx=.1, rely=.27)
+            label = tkinter.Label(wallet, text = "Estimated balance in "+str(currency)+": "+str(balancecurrency)+"       ", bg = str(colorA), fg = str(colorA), font=("Arial", 10)).place(relx=.1, rely=.27)
             transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = str(colorA), justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
             wallet.title("Duino-Coin Wallet ("+str(VER)+") - "+str(round(float(balance), 6))+" DUCO")
             time.sleep(0.10)
@@ -598,48 +710,48 @@ def getBalance():
                 notify = threading.Thread(target=Notification)
                 notify.start()
             label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO"+str(" ")*99, bg = str(colorA), fg="gray", font=("Arial", 12)).place(relx=.1, rely=.15)
-            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
+            label = tkinter.Label(wallet, text = "Estimated balance in "+str(currency)+": "+str(balancecurrency)+"       ", bg = str(colorA), fg="gray", font=("Arial", 10)).place(relx=.1, rely=.27)
             transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = "gray", justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
             time.sleep(0.05)
             label = tkinter.Label(wallet, text = "Balance: "+str(balance)+" DUCO"+str(" ")*99, bg = str(colorA), fg = str(colorB), font=("Arial", 12)).place(relx=.1, rely=.15)
-            label = tkinter.Label(wallet, text = "Estimated balance in USD: "+str(balanceusd)+" $      ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
-            transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = str(colorB), justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
+            label = tkinter.Label(wallet, text = "Estimated balance in "+str(currency)+": "+str(balancecurrency)+"       ", bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.27)
+            transactionslabel = tkinter.Label(wallet, text = str(transactionslist), bg = str(colorA), fg = str(colorHighlight), justify=LEFT, font=("Arial", 9)).place(relx=.65, rely=.15)                        
 
     else:
         debug += "Error while receiving balance!\n"
         getBalance() # Try again
 
-    balanceTimer = threading.Timer(1, getBalance)
+    balanceTimer = threading.Timer(2, getBalance)
     balanceTimer.start()
 
 def getDucoPrice():
-    global debug, ducousd
+    global debug, ducofiat, rate
 
-    ducousd = 0.016124 # If json api request fails, wallet will use this value
+    ducofiat = 0.016124 * rate # If json api request fails, wallet will use this value
     
     try:
         jsonapi = requests.get("https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json", data = None) #Use request to grab data from raw github file
         if jsonapi.status_code == 200: #Check for reponse
             content = jsonapi.content.decode().splitlines() #Read content and split into lines
-            ducousd = content[3] #Line 4 = Duco price
-            ducousd = ducousd.split("\"")
-            ducousd = float(ducousd[3])
+            ducofiat = content[3] #Line 4 = Duco price
+            ducofiat = ducofiat.split("\"")
+            ducofiat = float(ducofiat[3]) * rate
         else:
             time.sleep(0.025)
     except:
         debug += "Error while receiving json data.\n"
     
-    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $"+str("   "), bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.213)
+    label = tkinter.Label(wallet, text = "Estimated DUCO/"+str(currency)+" price: "+str(ducofiat)+str("        "), bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.213)
     time.sleep(0.03)
-    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $"+str("   "), bg = str(colorA), fg = "gray", font=("Arial", 10)).place(relx=.1, rely=.213)
+    label = tkinter.Label(wallet, text = "Estimated DUCO/"+str(currency)+" price: "+str(ducofiat)+str("        "), bg = str(colorA), fg = "gray", font=("Arial", 10)).place(relx=.1, rely=.213)
     time.sleep(0.05)
-    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $"+str("   "), bg = str(colorA), fg = str(colorA), font=("Arial", 10)).place(relx=.1, rely=.213)
+    label = tkinter.Label(wallet, text = "Estimated DUCO/"+str(currency)+" price: "+str(ducofiat)+str("        "), bg = str(colorA), fg = str(colorA), font=("Arial", 10)).place(relx=.1, rely=.213)
     time.sleep(0.10)
-    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $"+str("   "), bg = str(colorA), fg = "gray", font=("Arial", 10)).place(relx=.1, rely=.213)
+    label = tkinter.Label(wallet, text = "Estimated DUCO/"+str(currency)+" price: "+str(ducofiat)+str("        "), bg = str(colorA), fg = "gray", font=("Arial", 10)).place(relx=.1, rely=.213)
     time.sleep(0.05)
-    label = tkinter.Label(wallet, text = "Estimated DUCO/USD price: "+str(ducousd)+" $"+str("   "), bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.213)
+    label = tkinter.Label(wallet, text = "Estimated DUCO/"+str(currency)+" price: "+str(ducofiat)+str("        "), bg = str(colorA), fg = str(colorB), font=("Arial", 10)).place(relx=.1, rely=.213)
 
-    DucoPrice = threading.Timer(90, getDucoPrice) # Run every 10s
+    DucoPrice = threading.Timer(30, getDucoPrice) # Run every 30s
     DucoPrice.start()
     
 def WalletWindow():
@@ -660,7 +772,7 @@ def WalletWindow():
     getDucoPrice()
     getBalance()
 
-    label = tkinter.Label(wallet, text = "Duino-Coin Wallet", bg = str(colorA), fg = str(colorHighlight), font=("Verdana", 22, "bold")).place(relx=.5, rely=.08, anchor="c")
+    label = tkinter.Label(wallet, text = "Duino-Coin GUI Wallet", bg = str(colorA), fg = str(colorHighlight), font=("Verdana", 22, "bold")).place(relx=.5, rely=.08, anchor="c")
     label = tkinter.Label(wallet, text = "Logged in as " + username + " (" + userstatus + ")", bg = str(colorA), fg = "gray", font=("Arial", 10)).place(relx = 0.1, rely = 0.325)    
     
     tkinter.Button(wallet, text = "Send funds", command = Send, activebackground = str(colorHighlight), bg = str(colorA), fg = str(colorB), font=("Arial", 10), height = 1, width = 30).place(relx = 0.1, rely = 0.42)
@@ -780,7 +892,7 @@ except SystemExit:
   loadingScr.destroy()
   serverMsg = tkinter.Tk()
   serverMsg.withdraw()
-  messagebox.showerror("Error","Server is down or under maintenance.\nPlease try again in a few hours.")
+  messagebox.showerror("Error","Server is under maintenance or offline.\nPlease try again in a few hours.")
   serverMsg.destroy()
   os._exit(0)
     
