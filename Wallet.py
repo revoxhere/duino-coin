@@ -825,7 +825,7 @@ except:
 if not Path(str(resources) + "Wallet_background_light.gif").is_file(): # Light mode background
     try:
         debug += "Downloading latest light background file\n"
-        url = 'https://i.imgur.com/yzO8YnZ.gif'
+        url = 'https://i.imgur.com/6axjtXU.gif'
         urllib.request.urlretrieve(url, str(resources) + 'Wallet_background_light.gif')
     except:
         debug += "Couldn't download background file!\n"
@@ -835,7 +835,7 @@ else:
 if not Path(str(resources) + "Wallet_background_dark.gif").is_file(): # Dark mode background
     try:
         debug += "Downloading latest dark background file\n"
-        url = 'https://i.imgur.com/HBkAi0Y.gif'
+        url = 'https://i.imgur.com/fDOmfrn.gif'
         urllib.request.urlretrieve(url, str(resources) + 'Wallet_background_dark.gif')
     except:
         debug += "Couldn't download background file!\n"
@@ -846,7 +846,7 @@ else:
 if not Path(str(resources) + "Wallet_background_community.gif").is_file(): # Community theme background
     try:
         debug += "Downloading latest community background file\n"
-        url = 'https://i.imgur.com/DdCaXDR.gif'
+        url = 'https://i.imgur.com/6VA4SKn.gif'
         urllib.request.urlretrieve(url, str(resources) + 'Wallet_background_community.gif')
     except:
         debug += "Couldn't download community background file!\n"
