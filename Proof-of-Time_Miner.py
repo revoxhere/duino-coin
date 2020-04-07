@@ -3,6 +3,9 @@
 # Duino-Coin PoT Miner (1.2) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ###############################################
+# PoT protocol is no longer supported.
+# It will return in a new form in next release.
+###############################################
 import socket, statistics, threading, time, re, configparser, sys, getpass, platform, datetime, os, signal, subprocess # Import libraries
 from decimal import Decimal
 from pathlib import Path
