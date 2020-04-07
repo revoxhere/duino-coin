@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Server (1.2) © revox 2020
+# Duino-Coin Server (v1.337) © revox 2020
 # https://github.com/revoxhere/duino-coin
 #############################################
 import socket, threading, time, random, hashlib, math, datetime, re, configparser, sys, errno, os, psutil, string, json
@@ -18,8 +18,8 @@ def ServerLog(whattolog):  # Serverlog section for debugging. Not used in proper
 
 def ServerLogHash(whattolog): # Separate serverlog section for mining section debugging. Not used in proper pool to reduce disk usage. 
   #logfile = open(now.strftime("logs/%Y-%m-%d.txt"), "a")
-  now = datetime.datetime.now()
-  now = now.strftime("[%Y-%m-%d %H:%M:%S] ")
+  #now = datetime.datetime.now()
+  #now = now.strftime("[%Y-%m-%d %H:%M:%S] ")
   #logfile.write(now + whattolog + "\n")
   #logfile.close()
   #print(now, whattolog)
@@ -100,7 +100,8 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
      'Current difficulty': str(difficulty),
      'Registered users': str(usersNumber),
      'Mined blocks': str(minedBlocks),
-     'Active workers': str(workersNumber) + str(workersList)}, sort_keys=True, indent=4)
+     'Active workers': str(workersNumber) + str(workersList)}
+     , sort_keys=True, indent=4)
 
   ########## HTML #########
   htmlapi = """<!DOCTYPE html>
@@ -182,36 +183,51 @@ def UpdateServerInfo(): ######################## API PROTOCOL ##################
 	</body>
   </html>"""
   file.write(str(htmlapi))
+  file.close()
   jsonfile.write(str(jsonapi))
+  jsonfile.close()
   threading.Timer(5, UpdateServerInfo).start()
 
 
   ######################## UPDATE API FILE ########################
 def UpdateAPIfiles():
   global update_count
-  
-  update_count = update_count + 1 # Increment update counter by 1
-  repo = g.get_repo("revoxhere/"+gitrepo)
+  ######################## GITHUB API ########################
+  try:
+    g = Github(gitusername, gitpassword)
+    ServerLog("Logged in to GitHub...")
+  except:
+    UpdateAPIfiles()
 
-  htmlfile_contents = Path("config/api.html").read_text() # Get api file contents
-  htmlcontents = repo.get_contents("api.html") # Get contents of previous file for SHA verification
+  try:
+    repo = g.get_repo("revoxhere/"+gitrepo)
+  except:
+    UpdateAPIfiles()
+  try:
+    htmlfile_contents = Path("config/api.html").read_text() # Get api file contents
+    htmlcontents = repo.get_contents("api.html") # Get contents of previous file for SHA verification
+  except:
+    UpdateAPIfiles()
 
   try:
     repo.update_file(htmlcontents.path, "Statistics update #"+str(update_count), str(htmlfile_contents), htmlcontents.sha, branch="master") #Post statistics file into github
-    ServerLog("Updated statistics file on GitHub. Update count:"+str(update_count))
+    update_count = update_count + 1 # Increment update counter by 1
   except:
-    ServerLog("Failed to update statistics file!")
+    UpdateAPIfiles()
 
-  jsonfile_contents = Path("config/api.json").read_text() # Get api file contents
-  jsoncontents = repo.get_contents("api.json") # Get contents of previous file for SHA verification
+  try:
+    jsonfile_contents = Path("config/api.json").read_text() # Get api file contents
+    jsoncontents = repo.get_contents("api.json") # Get contents of previous file for SHA verification
+  except:
+    UpdateAPIfiles()
 
   try:
     repo.update_file(jsoncontents.path, "Statistics update #"+str(update_count), str(jsonfile_contents), jsoncontents.sha, branch="master") #Post statistics file into github
-    ServerLog("Updated statistics file on GitHub. Update count:"+str(update_count))
+    ServerLog("Updated API files on GitHub. Update count:"+str(update_count))
   except:
-    ServerLog("Failed to update statistics file!")
-  # Run every 180s
-  threading.Timer(180, UpdateAPIfiles).start()
+    UpdateAPIfiles()
+  # Run every 200s
+  threading.Timer(200, UpdateAPIfiles).start()
   
 def randomString(stringLength=10):
     letters = string.ascii_lowercase
@@ -302,7 +318,6 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
     err = False
     username = ""
     thread_id = str(threading.current_thread().ident)
-    ServerLog("New thread (" + thread_id + ") started, connection: " + self.ip + ":" + str(self.port))
 
     while True:
       # Check "kicklist" for "kickall" command
@@ -334,7 +349,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
         password = data[2]
         server_info['miners'] += 1
         hashrates[int(thread_id)] = {"username" : username, "hashrate" : 0}
-        ServerLog("Client "+str(username)+" has requested account registration.")
+        ServerLog("Client "+str(username)+" requested account registration.")
 
         # Check username for unallowed characters
         if re.match(regex,username):
@@ -356,7 +371,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
             break
         else:
           # User used unallowed characters, disconnect
-          ServerLog("Unallowed characters!!!")
+          ServerLog("Unallowed characters!")
           self.clientsock.send(bytes("NO", encoding='utf8'))
           break
 
@@ -366,7 +381,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
         password = data[2]
         server_info['miners'] += 1
         hashrates[int(thread_id)] = {"username" : username, "hashrate" : 0}
-        ServerLog("Client request logging in to account " + username)
+        ServerLog("Client "+str(username)+" requested account login.")
 
         # Check username for unallowed characters (regex)
         if re.match(regex,username):
@@ -393,7 +408,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
               pass
           else:
             # Bad password, disconnect
-            ServerLog("Incorrect password")
+            ServerLog("Incorrect password!")
             self.clientsock.send(bytes("NO", encoding='utf8'))
             break
         else:
@@ -521,7 +536,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
       ######################## PROOF OF TIME PROTOCOL ########################
       elif username != "" and data[0] == "PoTr":
         time.sleep(44)
-        ServerLog("Received PoTr request")
+        ServerLogHash("Received PoTr request")
 
         with locker: # Using locker to fix problems when mining on many devices with one account
           bal = open("balances/" + username + ".txt", "r")
@@ -547,25 +562,10 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           bal.write(str(balance))
           bal.truncate()
           bal.close()
-        ServerLog("Added balance using PoTr")
-
-      ######################## BALANCE CHECK PROTOCOL ########################
-      elif username != "" and data[0] == "BALA":
-        time.sleep(0.2)
-        ServerLog("Client requested balance check")
-
-        file = open("balances/" + username + ".txt", "r")
-        balance = file.readline()
-        file.close()
-
-        try:
-          self.clientsock.send(bytes(balance, encoding='utf8'))
-        except:
-          break
+        ServerLogHash("Added balance using PoTr")
 
       ######################## CHECK USER STATUS PROTOCOL ########################
       elif username != "" and data[0] == "STAT":
-        ServerLog("Client requested user status check")
         file = open("users/" + username + ".txt", "r")
         filecont = file.readlines()
         file.close()
@@ -578,7 +578,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
         
       ######################## CLIENT INFO PROTOCOL ########################
       elif username != "" and data[0] == "FROM":
-        ServerLog("Client sent informations")
+        ServerLog("Client "+str(username)+" sent informations")
         if data[1]:
           client = data[1]
         if data[2]:
@@ -588,13 +588,12 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
         if data[4]:
           platform = data[4]
         if data:
-          print(str(username), str(client), str(pcusername), str(ip), str(platform))
+          ServerLog("Uname: " + str(username) + " Client: " + str(client) + " PC: " + str(pcusername) + " IP: " + str(ip) + " Platform: " + str(platform))
         time.sleep(0.1)
 
       ######################## CLOSE PROTOCOL ########################
       elif username != "" and data[0] == "CLOSE":
         try:
-          ServerLog("Client requested thread (" + thread_id + ") closing")
           # Close socket connection
           self.clientsock.close()
           # Decrease number of connected miners
@@ -614,9 +613,8 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           print(hashrates)
           time.sleep(1)
         except:
-          ServerLog("Error closing connection (" + thread_id + ")!")
-          time.sleep(1)
-
+          break
+	
       ######################## PASSWORD CHANGE PROTOCOL ########################
       elif username != "" and data[0] == "CHGP":
         time.sleep(0.2)
@@ -633,6 +631,7 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
           file.close()
         except:
           ServerLog("Can't check clients' username")
+
         if str(serverOldPassword) == str(oldPassword):
           file = open("users/" + username + ".txt", "r")
           lines = file.readlines()
@@ -654,12 +653,10 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
             self.clientsock.send(bytes("Error! Your old password doesn't match!", encoding='utf8'))
           except:
             break
-        except:
-          ServerLog("Can't set clients' new password")
           
       ######################## SENDING PROTOCOL ########################
       elif username != "" and data[0] == "SEND":
-        time.sleep(0.2)
+        time.sleep(0.001)
         sender = username
         receiver = data[2]
         amount = float(data[3])
@@ -698,24 +695,36 @@ class ClientThread(threading.Thread): ######################## USER THREAD #####
 
               try:
                 self.clientsock.send(bytes("Successfully transfered funds!", encoding='utf8'))
-              except socket.error as err:
+              except:
                 break
               ServerLog("Transferred " + str(amount) + " DUCO from " + sender + " to " + receiver)
 
             except:
               try:
                 self.clientsock.send(bytes("Unknown error occured while sending funds.", encoding='utf8'))
-              except socket.error as err:
+              except:
                 break
 
           else: # Send message if receipent doesn't exist
             ServerLog("The recepient "+receiver+" doesn't exist!")
             try:
               self.clientsock.send(bytes("Error! The recipient doesn't exist!", encoding='utf8'))
-            except socket.error as err:
+            except:
               break
+            
+      ######################## BALANCE CHECK PROTOCOL ########################
+      elif username != "" and data[0] == "BALA":
+        time.sleep(0.1)
 
-    ServerLog("Thread (" + thread_id + ") and connection closed")
+        file = open("balances/" + username + ".txt", "r")
+        balance = file.readline()
+        file.close()
+
+        try:
+          self.clientsock.send(bytes(balance, encoding='utf8'))
+        except:
+          break
+
     # Close socket connection
     self.clientsock.close()
     # Delete this miner from statistics
@@ -749,8 +758,8 @@ config = configparser.ConfigParser()
 locker = threading.Lock()
 update_count = 0
 users = ""
-xmgusd = 0.016124
-VER = "1.2" # Version number
+xmgusd = 0.014541
+VER = "1.337" # Version number
 
 ######################## INITIAL FILE CREATION ########################
 if not Path("config").is_dir():
@@ -810,14 +819,6 @@ except:
   time.sleep(5)
   sys.exit()
   
-######################## GITHUB API ########################
-try:
-  g = Github(gitusername, gitpassword)
-  ServerLog("Logged in to GitHub...")
-except:
-  ServerLog("Error logging in to GitHub!")
-  time.sleep(5)
-  sys.exit()
 
 ######################## MAIN LOOP ########################
 ServerLog("Listening for incoming connections...")
