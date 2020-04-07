@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin PC Miner (1.2) © revox 2020
+# Duino-Coin PC Miner (v1.337) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ##########################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
 from decimal import Decimal
 from pathlib import Path
 from signal import signal, SIGINT
+
+try: # Check if cpuinfo is installed
+    import cpuinfo
+except:
+  now = datetime.datetime.now()
+  print(now.strftime("%H:%M:%S ") + "✗ Cpuinfo is not installed. Please install it using: python3 -m pip install py-cpuinfo.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
+  time.sleep(15)
+  os._exit(1)
 
 try: # Check if colorama is installed
   from colorama import init, Fore, Back, Style
@@ -24,39 +32,61 @@ except:
   time.sleep(15)
   os._exit(1)
 
-# Setting variables
+# Global variables
+VER = "1.337" # Version number
+timeout = 5 # Socket timeout
+resources = "PCMiner_"+str(VER)+"_resources"
+
 shares = [0, 0]
 diff = 0
-res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 last_hash_count = 0
 khash_count = 0
 hash_count = 0
 hash_mean = []
+st = ""
+bytereturn = 0
+
+res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
-VER = "1.2" # Version number
-resources = "PCMiner_"+str(VER)+"_resources"
-timeout = 5 # Socket timeout
 autorestart = 0
-pcusername = getpass.getuser() # Get clients' username
-platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
-publicip = requests.get("https://api.ipify.org").text # Get clients' public IP
+donationlevel = 0
+
+pcusername = getpass.getuser() # Username
+platform = str(platform.system()) + " " + str(platform.release()) # Platform information
+publicip = requests.get("https://api.ipify.org").text # Public IP
+cpu = cpuinfo.get_cpu_info() # Processor info
+
+try:
+    os.mkdir(str(resources)) # Create resources folder if it doesn't exist
+except:
+    pass
+
 
 def title(title):
   if os.name == 'nt':
     os.system("title "+title)
+  else:
+    print('\33]0;'+title+'\a', end='')
+    sys.stdout.flush()
         
 def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
   now = datetime.datetime.now()
-  print(now.strftime(Style.DIM + "\n%H:%M:%S ") + Fore.YELLOW + "✓ SIGINT detected - Exiting gracefully. See you soon!")
+  print(now.strftime(Style.DIM + "\n%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "✓" + Style.RESET_ALL + Fore.YELLOW + " SIGINT detected - Exiting gracefully." + Style.BRIGHT + Fore.YELLOW +  " See you soon!")
   soc.send(bytes("CLOSE", encoding="utf8"))
   os._exit(0)
 
 signal(SIGINT, handler) # Enable signal handler
 
 def Greeting(): # Greeting message depending on time
-  global greeting, message
+  global greeting, message, autorestart, st, bytereturn
   print(Style.RESET_ALL)
-  
+
+  if float(autorestart) <= 0:
+    autorestart = 0
+    autorestartmessage = "disabled"
+  if float(autorestart) > 0:
+    autorestartmessage = "restarting every " + str(autorestart) + "s"
+    
   current_hour = time.strptime(time.ctime(time.time())).tm_hour
   
   if current_hour < 12 :
@@ -69,18 +99,22 @@ def Greeting(): # Greeting message depending on time
     greeting = "Good evening"
   else:
     greeting = "Welcome back"
-    
-  message     ="| Duino-Coin © PC Miner ("+str(VER)+") 2019-2020\n" # Startup message
-  message   += "| https://github.com/revoxhere/duino-coin\n"
-  message   += "| "+str(greeting)+", "+str(username)+"!\n\n"
   
-  for char in message:
-    sys.stdout.write(char)
-    sys.stdout.flush()
-    time.sleep(0.01)
+  print(" * " + Fore.YELLOW + Style.BRIGHT + "Duino-Coin © PC Miner " + Style.RESET_ALL + Fore.YELLOW+ "(v" + str(VER) + ") 2019-2020") # Startup message
+  time.sleep(0.15)
+  print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
+  time.sleep(0.15)
+  print(" * " + Fore.YELLOW + "CPU: " + Style.BRIGHT + str(cpu["brand"]))
+  time.sleep(0.15)
+  print(" * " + Fore.YELLOW + "Donation level: " +  Style.BRIGHT + str(donationlevel))
+  time.sleep(0.15)
+  print(" * " + Fore.YELLOW + "ST tuning: " + Style.BRIGHT + str(st))
+  time.sleep(0.15)
+  print(" * " + Fore.YELLOW + "Autorestarter: " + Style.BRIGHT + str(autorestartmessage))
+  time.sleep(0.15)
+  print(" * " + Fore.YELLOW + str(greeting) + ", " + Style.BRIGHT +  str(username) + "\n")
     
   if not Path(str(resources) + "/Miner_executable.exe").is_file(): # Initial miner executable section
-    
     url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
     r = requests.get(url)
     with open(str(resources) + '/Miner_executable.exe', 'wb') as f:
@@ -103,33 +137,43 @@ def hush(): # Hashes/sec calculation
   threading.Timer(1.0, hush).start() # Run this def every 1s
 
 def restart(): # Hashes/sec calculation
-  time.sleep(int(autorestart))
+  time.sleep(float(autorestart))
   print(Style.BRIGHT + "ⓘ　Restarting the miner")
   os.execl(sys.executable, sys.executable, * sys.argv)
   
 def loadConfig(): # Config loading section
-  global pool_address, pool_port, username, password, efficiency, autorestart
+  global pool_address, pool_port, username, password, efficiency, autorestart, donationlevel, st, bytereturn
   
   if not Path(str(resources) + "/Miner_config.ini").is_file(): # Initial configuration section
-    print(Style.BRIGHT + "Initial configuration, you can edit "+str(resources) + "/Miner_config.ini file later.")
-    print(Style.RESET_ALL + "Don't have an account? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register.\n")
+    print(Style.BRIGHT + "Duino-Coin basic configuration tool. Edit "+str(resources) + "/Miner_config.ini file later if you want to change it.")
+    print(Style.RESET_ALL + "Don't have an Duino-Coin account yet? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register on server.\n")
 
-    username = input("Enter your username: ")
-    password = input("Enter your password: ")
-    efficiency = input("Enter mining intensity (1-100)%: ")
-    autorestart = input("Enter after how many seconds miner should be restarted (0 - disable autorestarter): ")
+    username = input(Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT)
+    password = input(Style.RESET_ALL + Fore.YELLOW + "Enter your password: " + Style.BRIGHT)
+    efficiency = input(Style.RESET_ALL + Fore.YELLOW + "Set mining intensity (1-100)%: " + Style.BRIGHT)
+    autorestart = input(Style.RESET_ALL + Fore.YELLOW + "Set after how many seconds miner will restart (0 = disable autorestarter): " + Style.BRIGHT)
+    donationlevel = input(Style.RESET_ALL + Fore.YELLOW + "Set donation level (0-5): " + Style.BRIGHT)
     
     efficiency = re.sub("\D", "", efficiency)  # Check wheter efficiency is correct
-    if int(efficiency) > int(100):
+    if float(efficiency) > int(100):
       efficiency = 100
-    if int(efficiency) < int(1):
+    if float(efficiency) < int(1):
       efficiency = 1
+
+    donationlevel = re.sub("\D", "", donationlevel)  # Check wheter donationlevel is correct
+    if float(donationlevel) > int(5):
+      donationlevel = 5
+    if float(donationlevel) < int(0):
+      donationlevel = 0
       
     config['miner'] = { # Format data
     "username": username,
     "password": password,
     "efficiency": efficiency,
-    "autorestart": autorestart}
+    "autorestart": autorestart,
+    "donate": donationlevel,
+    "st": "D7",
+    "bytereturn": "1"}
     
     with open(str(resources) + "/Miner_config.ini", "w") as configfile: # Write data to file
       config.write(configfile)
@@ -140,7 +184,9 @@ def loadConfig(): # Config loading section
     password = config["miner"]["password"]
     efficiency = config["miner"]["efficiency"]
     autorestart = config["miner"]["autorestart"]
-
+    donationlevel = config["miner"]["donate"]
+    st = config["miner"]["st"]
+    bytereturn = config["miner"]["bytereturn"]
 
 def Connect(): # Connect to pool section
   global soc, connection_counter, res, pool_address, pool_port
@@ -163,7 +209,7 @@ def Connect(): # Connect to pool section
         
     except:
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Cannot receive pool address and IP.\nExiting in 15 seconds.")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ Cannot receive pool address and IP.\nExiting in 15 seconds.")
       time.sleep(15)
       os._exit(1)
       
@@ -188,7 +234,7 @@ def Connect(): # Connect to pool section
     
     except: # If it wasn't, display a message and exit
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Cannot connect to the server. It is probably under maintenance.\nRetrying in 15 seconds.")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ Cannot connect to the server. It is probably under maintenance.\nRetrying in 15 seconds.")
       time.sleep(15)
       Connect()
       
@@ -205,17 +251,17 @@ def checkVersion():
 
     if len(SERVER_VER) != 3:
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Cannot connect to the server. It is probably under maintenance.\nRetrying in 15 seconds.")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ Cannot connect to the server." + Style.RESET_ALL + Fore.RED + " It is probably under maintenance.\nRetrying in 15 seconds.")
       time.sleep(15)
       Connect()                      
       
     if SERVER_VER <= VER and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Connected to the Duino-Coin server (v"+str(SERVER_VER)+")")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "✓ Connected to the Duino-Coin server" + Style.RESET_ALL + Fore.YELLOW + " (v"+str(SERVER_VER)+")")
     
     else:
       now = datetime.datetime.now()
-      cont = input(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Miner is outdated (v"+VER+"), server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/ or type \'continue\' if you wish to continue anyway.\n")
+      cont = input(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ Miner is outdated (v"+VER+")," + Style.RESET_ALL + Fore.RED + " server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/ or type \'continue\' if you wish to continue anyway.\n")
       if cont != "continue": 
         os._exit(1)
     
@@ -241,13 +287,13 @@ def Login():
         soc.send(bytes("FROM," + "PC_Miner," + str(pcusername) + "," + str(publicip) + "," + str(platform), encoding="utf8")) # Send info to server about client
 
         now = datetime.datetime.now()
-        print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Logged in successfully")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "✓ Logged in successfully " + Style.RESET_ALL + Fore.YELLOW + "as " + str(username))
 
         break # If it was, continue
       
       if resp == "NO":
         now = datetime.datetime.now()
-        print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.RED + "✗ Error! Wrong credentials or account doesn't exist!\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ Error! Wrong credentials or account doesn't exist!" + Style.RESET_ALL + Fore.RED + "\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
 
         soc.close()
         time.sleep(15)
@@ -258,30 +304,38 @@ def Login():
     except:
       Connect() # Reconnect if pool down
 
-    time.sleep(0.025) # Try again if no response
-  
-  if int(autorestart) < 0:
-    autorestart = 0
-  if int(autorestart) > 0:
-    now = datetime.datetime.now()
-    print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Autorestarter is enabled (restarting every " + autorestart + " seconds)")
-    
+    time.sleep(0.025) # Try again if no response    
 
 def Mine(): # Mining section
-  global last_hash_count, hash_count, khash_count, efficiency
+  global last_hash_count, hash_count, khash_count, efficiency, donationlevel
 
   now = datetime.datetime.now()
-  print(now.strftime(Style.DIM + "%H:%M:%S ") + Fore.YELLOW + "✓ Miner thread started using SHA algorithm")
-  print(now.strftime(Style.DIM + "\n") + Fore.YELLOW + "ⓘ　Duino-Coin network is a completely free service and will always be. You can really help us maintain the server and low-fee payouts by donating - visit " + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Fore.YELLOW + " to learn more.\n")
+  print(Style.RESET_ALL + Fore.YELLOW + "\nⓘ　Duino-Coin network is a completely free service and will always be." + Style.BRIGHT + Fore.YELLOW + "\nYou can help us maintain the server and low-fee payouts by donating.\nVisit " + Style.RESET_ALL + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more.")
+  if int(donationlevel) > 0:
+      print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "   ❤️　Thank you for being an awesome donator! ❤")
 
-  efficiency = 100 - int(efficiency) # Calulate efficiency
-  efficiency = efficiency * 0.01
-  cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e "+str(efficiency)+" -s 4" # Miner command
-
-  try: # Network support           
+  if int(donationlevel) == int(5):  # Set donationlevel
+      cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 100 -s 4"
+  if int(donationlevel) == int(4):
+      cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 70 -s 4"
+  if int(donationlevel) == int(3):
+      cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 50 -s 4"
+  if int(donationlevel) == int(2):
+      cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 30 -s 4"
+  if int(donationlevel) == int(1):
+      cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 10 -s 4"
+  if int(donationlevel) == int(0):
+      cmd = "cd " + str(resources)
+  try:  # Start Miner executable according to donationlevel
     process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
   except:
     pass
+   
+  efficiency = 100 - int(efficiency) # Calulate efficiency
+  efficiency = efficiency * 0.01
+
+  now = datetime.datetime.now()
+  print(now.strftime(Style.DIM + "\n%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "✓ Mining thread started" + Style.RESET_ALL + Fore.YELLOW + " using DUCO-S1 algorithm")
   
   while True:
     time.sleep(int(efficiency)) # Sleep to achieve lower efficiency
@@ -309,7 +363,7 @@ def Mine(): # Mining section
       
       if job[1] == hash: # If result is even with job, send the result
         try:
-          soc.send(bytes(str(iJob) + "," + str(last_hash_count), encoding="utf8")) # Send result of hashing algorithm to pool
+          soc.send(bytes(str(iJob) + "," + str(last_hash_count) + "," + str(st) + "," + str(bytereturn), encoding="utf8")) # Send result of hashing algorithm to pool
         except:
           Connect() # Reconnect if pool down
           
@@ -321,63 +375,59 @@ def Mine(): # Mining section
           if feedback == "GOOD": # If result was good
             now = datetime.datetime.now()
             shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
-            title("Duino-Coin PC Miner ("+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
-            print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "⛏️ Accepted " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
+            title("Duino-Coin PC Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+            print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + "✓ Accepted "  + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + Fore.GREEN + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
             break # Repeat
           elif feedback == "BAD": # If result was bad
             now = datetime.datetime.now()
             shares[1] = shares[1] + 1 # Share rejected = increment bad shares counter by 1
-            print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ Rejected " + str(shares[1]) + "/" + str(shares[1] + shares[1]) + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + str(khash_count) + " kH/s "  + Style.BRIGHT + Fore.RED + "(boo!!!)")
+            title("Duino-Coin PC Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+            print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.RED + Fore.WHITE + "✗ Rejected " + str(shares[1]) + "/" + str(shares[1] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff: " + str(diff) + " • " + Style.BRIGHT + Fore.GREEN + str(khash_count) + " kH/s "  + Style.BRIGHT + Fore.RED + "(boo!!!)")
             break # Repeat
           time.sleep(0.025) # Try again if no response
         break # Repeat
-      
-try:
-    os.mkdir(str(resources)) # Create resources folder if it doesn't exist
-except:
-    pass
 
 init(autoreset=True) # Enable colorama
-hush() # Start hash calculator
+hush() # Start hashrate counter
 
 while True:
-  title("Duino-Coin PC Miner ("+str(VER)+")")
+  title("Duino-Coin PC Miner (v"+str(VER)+")")
   try:
-    loadConfig() # Load configfile
+      loadConfig() # Load configfile
   except:
-    print(Style.BRIGHT + Fore.RED + "✗ There was an error loading the configfile. Try removing it and re-running configuration."  + Style.RESET_ALL)
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error loading the configfile. Try removing it and re-running configuration."  + Style.RESET_ALL)
 
   try: # Setup autorestarter
-    if int(autorestart) > 0:
+    if float(autorestart) > 0:
       now = datetime.datetime.now()
       threading.Thread(target=restart).start() # Start autorestarter if enabled
   except:
-    print(Style.BRIGHT + Fore.RED + "✗ There was an error in autorestarter. Check configuration file." + Style.RESET_ALL)    
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error in autorestarter. Check configuration file." + Style.RESET_ALL)    
 
   try:
     Greeting() # Display greeting message
   except:
-    print(Style.BRIGHT + Fore.RED + "✗ You somehow managed to break the greeting message!"  + Style.RESET_ALL)
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ You somehow managed to break the greeting message!"  + Style.RESET_ALL)
 
   try:
     Connect() # Connect to pool
   except:
-    print(Style.BRIGHT + Fore.RED + "✗ There was an error connecting to pool. Check your config file." + Style.RESET_ALL)
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error connecting to pool. Check your config file." + Style.RESET_ALL)
 
   try:
     checkVersion() # Check version
   except:
-    print(Style.BRIGHT + Fore.RED + "✗ There was an error checking version. Restarting." + Style.RESET_ALL)
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error checking version. Restarting." + Style.RESET_ALL)
 
   try:
     Login() # Login
   except:
-    print(Style.BRIGHT + Fore.RED + "✗ There was an error while logging in. Restarting." + Style.RESET_ALL)
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error while logging in. Restarting." + Style.RESET_ALL)
 
   try:
     Mine() # Mine
   except:
-    print(Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
 
-  print(Style.RESET_ALL)
-  time.sleep(0.025) # Restart if error
+  print(Style.RESET_ALL + Style.RESET_ALL)
+  time.sleep(0.025) # Restart
