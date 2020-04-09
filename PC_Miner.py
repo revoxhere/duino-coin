@@ -43,7 +43,7 @@ last_hash_count = 0
 khash_count = 0
 hash_count = 0
 hash_mean = []
-st = ""
+st = "D7"
 bytereturn = 0
 
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
@@ -312,7 +312,7 @@ def Mine(): # Mining section
   now = datetime.datetime.now()
   print(Style.RESET_ALL + Fore.YELLOW + "\nⓘ　Duino-Coin network is a completely free service and will always be." + Style.BRIGHT + Fore.YELLOW + "\nYou can help us maintain the server and low-fee payouts by donating.\nVisit " + Style.RESET_ALL + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more.")
   if int(donationlevel) > 0:
-      print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "   ❤️　Thank you for being an awesome donator! ❤")
+      print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "   <3 Thank you for being an awesome donator! <3")
 
   if int(donationlevel) == int(5):  # Set donationlevel
       cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_pcminer -p x -e 100 -s 4"
