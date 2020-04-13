@@ -15,9 +15,9 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script>
             $.getJSON('https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json', function(data) {
-                var price = `${data["Duco price"]} USD`
+                var price = `${data["Duco price"]}`
                 var users = `${data["Registered users"]}`
-                $("#price")`.html`(price);
+                $("#price").html(price);
                 $("#users").html(users);
             });
         </script>
@@ -56,7 +56,7 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" href="index">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="whitepaper">Whitepaper</a></li>
                 <li class="nav-item"><a class="nav-link" href="https://revoxhere.github.io/duco-statistics/statistics">Network</a></li>
                 <li class="nav-item"><a class="nav-link" href="donate">Donate</a></li>
