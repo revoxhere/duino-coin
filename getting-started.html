@@ -1,96 +1,174 @@
 <!DOCTYPE html>
-<html>
+    <head>
+        <meta charset="utf-8" />
+        <html lang="en">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Duino-Coin | Getting started</title>
+        <link rel="icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+        <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js" integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha256-OUFW7hFO0/r5aEGTQOz9F/aXQOt+TwqI1Z4fbVvww04=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="/assets/js/app.4aa08d6dcc3080b4c008.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <style>
+            html {
+                scroll-behavior: smooth !important;
+            }
+            .btn-success {
+                background-color: #f39c12;
+                border-color: #f39c12;
+            }
+            .btn-success:hover, .btn-success:focus, .btc-success:active, .btc-success:visited {
+                background-color: #f1c40f;
+                border-color: #f1c40f;
+            }
+            ::-webkit-scrollbar
+            {
+              width: 8px;  /* for vertical scrollbars */
+              height: 8px; /* for horizontal scrollbars */
+            }
 
-<head>
-    <title>Duino-Coin | Getting Started</title>
-    <link rel="icon" href="https://raw.githubusercontent.com/revoxhere/duino-coin/master/Resources/duco.png">
-    <link rel="stylesheet" href="styles.css">
-</head>
+            ::-webkit-scrollbar-track
+            {
+              background: rgba(0, 0, 0, 0.1);
+            }
 
-<h3 style="text-align: left;">
-	<span style="color: #ffcc00;">&nbsp; &nbsp;
-		<a style="color: #ffcc00;" title="Duino-Coin" href="https://revoxhere.github.io/duino-coin/">
-			<em>
-				<img src="https://camo.githubusercontent.com/979d69f7ca7ec9bd446feb5e6990a1230b781eda/68747470733a2f2f692e696d6775722e636f6d2f30554a4b3835482e706e67" alt="Duino-Coin" width="139" height="21" />
-			</em>
-		</a>
-	</span>
-	<span style="float: right;">
-		<span style="color: #2c3e50;">
-			<a style="color: #2c3e50;" title="FAQ" href="https://revoxhere.github.io/duino-coin/faq">FAQ</a>&nbsp;&bull;
-			<a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/getting-started">Getting Started</a>&nbsp;&bull;
-			<a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/whitepaper.pdf">Whitepaper</a>&nbsp;&bull;
-			<a style="color: #2c3e50;" title="Donate" href="https://revoxhere.github.io/duino-coin/donate">Donate</a>&nbsp;&bull;
-			<a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/blog">Blog</a>&nbsp;&bull;&nbsp;<a style="color: #2c3e50;" title="Network Stats" href="https://revoxhere.github.io/duco-statistics/">Network Stats</a>&nbsp;&bull;
-			<a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/contact">Contact</a>
-		</span>&nbsp; &nbsp;<span style="font-size: 14px;">&nbsp;
-		</span>
-	</span>
-</h3>
+            ::-webkit-scrollbar-thumb
+            {
+              background: #f39c12;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="navbar navbar-expand navbar-light flex-column flex-md-row bg-light">
+            <a class="navbar-brand mr-0 mr-md-2" href="index.html"><img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" width="30" height="30" alt="Duino-Coin" title="Duino-Coin" class="d-inline-block align-top" /></a>
+            <div class="navbar-nav-scroll">
+                <ul class="navbar-nav bd-navbar-nav flex-row">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="whitepaper.html">Whitepaper</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://revoxhere.github.io/duco-statistics/statistics">Network</a></li>
+                    <li class="nav-item"><a class="nav-link" href="donate.html">Donate</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+                <li class="nav-item"><a class="nav-link p-2" href="https://twitter.com/CoinDuino/" target="_blank" title="Twitter"><i class="fab fa-lg fa-twitter"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://www.reddit.com/r/Duinocoin/" target="_blank" title="Reddit"><i class="fab fa-lg fa-reddit"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://discord.gg/KyADZT3" target="_blank" title="Discord"><i class="fab fa-lg fa-discord"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://github.com/revoxhere/duino-coin" target="_blank" title="GitHub"><i class="fab fa-lg fa-github"></i></a></li>
+            </ul>
+                <a class="btn btn-success d-none d-md-inline-block mb-3 mb-md-0 ml-md-3" href="getting-started.html"><svg class="bi bi-caret-right-fill" width="1em" height="100%" viewBox="0 0 18 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 011.659-.753l5.48 4.796a1 1 0 010 1.506z"/></svg><strong> Get started</strong></a></header>
 
-<br>
+        <main class="jumbotron" id="toc">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><i style="width:100%; height:100%; color:#6f4e37"class="fas fa-coffee"></i></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+                    <h1>Table of contents</h1>
+                    <p>Get yourself a cup of coffee or tea and follow these instructions to start your journey with Duino-Coins!</p>
+                    <ul align="left" class="smooth-scroll">
+                        <li><a href="#release">Downloading latest release</a></li>
+                        <li><a href="#register">Registering on the network</a></li>
+                        <li><a href="#wallet">Using the wallet</a></li>
+                        <li><a href="#pc">Mining on PC</a></li>
+                        <li><a href="#arduino">Mining on Arduino</a></li>
+                        <li><a href="#smartphone">Mining on Android Smartphone</a></li>
+                    </ul>
+                    <p style="color: #777777">All images were taken on version 1.337, in the future things may look a bit different and it will take some time until images will be updated.</p>
+                    <a class="btn btn-primary" href="#release" role="button">Let's go!</a>
+                </div>
+            </div>
+        </main>
 
-<h1 style="text-align: center;"><span style="color: #f39c12;">Getting started</span></h1>
 
-<h2 style="text-align: center;"><span style="color: #ff9900;"><span style="color: #ffcc00;"><span style="color: #333333;"><span style="color: #000000;">Download latest release</span></span></span></span></h2>
+        <main class="jumbotron" id="release">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><a href="https://github.com/revoxhere/duino-coin/releases/latest"><img class="img-fluid" src="https://i.imgur.com/OUIk251.png"/></a></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+    		        <h1>Let's get started!</h1>
+                    <p>Firstly, You need to download latest release for your OS.<br>Click on that big button below that will take you to the releases page.<br>Scroll down a bit and  you should see download links.<br>If you're using Windows - download Windows version. If Linux (or OSX) - Linux version.<br>Simple as that.</p>
+                    <a href="https://github.com/revoxhere/duino-coin/releases/latest" target="_blank" class="btn btn-lg btn-success"><i class="fas fa-download"></i> Latest release</a><br><br>
+                    <p>After you've downloaded latest release, unzip it for example to your Desktop.</p>
+                    <a class="btn btn-primary" href="#register" role="button">Next step</a>
+                </div>
+            </div>
+        </main>
 
-<p style="text-align: center;">Click&nbsp;<span style="color: #ffcc00;"><a style="color: #ffcc00;" href="https://github.com/revoxhere/duino-coin/releases">this link</a></span> to visit page containing releases with Wallet, PC Miner, Arduino Miner &amp; Code.</p>
+        <main class="jumbotron" id="register">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><img class="img-fluid" src="https://i.imgur.com/cOqmStK.png"/></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+                    <h1>Register on the Duino-Coin network</h1>
+                    <p>Open <button disabled type="button" class="btn btn-primary btn-sm">Wallet</button> found inside the release you just unzipped.<br>You're quite likely new here so click the <button type="button" disabled class="btn btn-outline-dark btn-sm">Register</button> button.<br>Create a cool username and a strong password.<br>Then register your account.</p>
+                    <p>After successful registration you can login.<br>Enter your account credentials, click <button type="button" disabled class="btn btn-outline-dark btn-sm">Login</button> and...</p>
+                    <a class="btn btn-primary" href="#wallet" role="button">Next step</a>
+                </div>
+            </div>
+        </main>
 
-<a style="color: #ffcc00;" href="https://github.com/revoxhere/duino-coin/releases">
-	<p style="text-align: center;"><img src="https://i.imgur.com/zX6gEH3.png" alt="" width="192" /></p></a>
-<p style="text-align: center; color: #999999; font-size: 14px;">(example release)</p>
+        <main class="jumbotron" id="wallet">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><img class="img-fluid" src="https://i.imgur.com/5ow1jxA.png"/></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+                    <h1>Using the Wallet</h1>
+                    <p>You should now see your Wallet window.<br>From here you can watch your balance grow, monitor DUCO price, <button type="button" disabled class="btn btn-outline-dark btn-sm">Exchange</button> your funds to another cryptocurrency, tweak some <button type="button" disabled class="btn btn-outline-dark btn-sm">Settings</button>, <button type="button" disabled class="btn btn-outline-dark btn-sm">Receive funds</button> and <button type="button" disabled class="btn btn-outline-dark btn-sm">Send funds</button> to someone.</p>
+                    <a class="btn btn-primary" href="#pc" role="button">Next step</a>
+                </div>
+            </div>
+        </main>
 
+        <main class="jumbotron" id="pc">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><img class="img-fluid" src="https://raw.githubusercontent.com/revoxhere/duino-coin/master/Resources/NewPCminer.ico"/></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+                    <h1>Mine using PC</h1>
+                    <p>Let's start making some money.<br>Launch <button disabled type="button" class="btn btn-primary btn-sm">PC Miner</button> from your Duino-Coin directory.<br><strong>Miner will show you everything you need to know and guide you through basic configuration.</strong><br>After you'll set it up, it'll remember the settings and will automatically mine every time you open it again.<br>You can open your Wallet to check how much you're getting rewarded for accepted shares.<br>If your balance is rising, GG! Your PC is now making money! 🎉</p>
+                    <a class="btn btn-primary" href="#arduino" role="button">Next step</a>
+                </div>
+            </div>
+        </main>
 
-<p style="text-align: center;">Locate version suited for your OS (probably Windows) and click on it to download.</p>
+        <main class="jumbotron" id="arduino">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><img class="img-fluid" src="https://i.imgur.com/R4LwMoy.png"/></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+                    <h1>Mine using Arduino</h1>
+                    <p>Mining using Arduino board is a bit trickier but still very easy.<br>Open <button disabled type="button" class="btn btn-success btn-sm">Arduino Code</button> folder in which you should find <button disabled type="button" class="btn btn-success btn-sm">Arduino Code.ino</button> file.<br>Open it using Arduino IDE and upload to your board just like you've uploaded your LED Blink codes in the past.<br></p>
+                    <p>After successfuly uploading the code, launch <button disabled type="button" class="btn btn-primary btn-sm">Arduino Miner</button> found inside your Duino-Coin directory.<br>
+                        <strong>Miner will show you everything you need to know and guide you through basic configuration.</strong><br>After you'll set it up, it'll remember the settings and will automatically mine every time you open it again.<br>You can open your <button disabled type="button" class="btn btn-primary btn-sm">Wallet</button> to check how much you're getting rewarded for accepted shares.<br>If your balance is rising, GG! Your Arduino is now making money! 🎉</p>
+                    <a class="btn btn-primary" href="#smartphone" role="button">Next step</a>
+                </div>
+            </div>
+        </main>
 
-<p style="text-align: center;">After downloading, right click on the .zip file and click on an option that says something like "<span style="color: #ff6600;">Extract</span>".</p>
+        <main class="jumbotron" id="smartphone">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><img class="img-fluid" src="https://i.imgur.com/RIA0eDK.png"/></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+                    <h1>Mine using Android smartphone</h1>
+                    <p>Mining using Smartphone is the hardest to set-up but after following these steps you should be able to achieve it.</p>
+                    <p>Firstly, download an app called <a type="button" class="btn btn-success btn-sm" href="https://play.google.com/store/apps/details?id=ru.iiec.pydroid3">PyDroid3 from Google Play</a> which we'll use to run Python.<br>Then you need to download 
+                        <a type="button" class="btn btn-success btn-sm" href="https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py">Minimal-PC_Miner</a> and open it with PyDroid.</p>
+                    <p>You'll need to replace username and password lines near the top of the file with your credentials.<br>
+                    <img class="img-fluid" src="https://i.imgur.com/KO1Fy7N.png"/><br>After changing them, click the yellow arrow on bottom of the screen.<br>If you've entered everything correctly your smartphone will now be mining Duino-Coins! 🎉</p>
+                </div>
+            </div>
+        </main>
 
-<h2 style="text-align: center;">Register using wallet</h2>
+        <h3 align="center">🎉 Congratulations! 🎉</h3><p align="center">You've completed the tutorial.<br>It wasn't hard, was it?<br>
+        </p><p align="center">Now that you know how to use DUCO you should join our Discord!<br>It might also be a good idea to tell your friends about Duino-Coin!</p>
+        <br><hr><br>
 
-<p style="text-align: center;">To start doing anything with Duino-Coins, you need to firstly register on network.</p>
-
-<p style="text-align: center;">Launch <span style="color: #ff6600;">Wallet</span> and proceed to register&nbsp;proceed to register by following program tips.</p>
-
-<p style="text-align: center;">After successfull registration you will be able to login. You will also receive <span style="color: #ff6600;">0.5 DUCO</span> as a bonus for signing up!</p>
-
-<h2 style="text-align: center;">Mine using PC</h2>
-
-<p style="text-align: center;">To mine with your computer, launch <span style="color: #ff6600;">PC Miner&nbsp;<span style="color: #000000;">, enter your account credentials and set CPU usage in %.</span></span></p>
-
-<p style="text-align: center;"><span style="color: #ff6600;"><span style="color: #000000;">If you enter everything correctly, miner will remember the settings and automatically start mining Duino-Coins when you launch it.</span></span></p>
-<br>
-
-<p style="text-align: center;">You can also use <span style="color: #ff6600;">PoT Miner&nbsp;<span style="color: #000000;"> to mine passively and get rewarded after some amount of time.</span></span></p>
-<p style="text-align: center;"><span style="color: #ff6600;"><span style="color: #000000;">Steps in launching it are the same as in PC Miner.</span></span></p>
-
-<h2 style="text-align: center;"><span style="color: #ff6600;"><span style="color: #000000;">Mine using Arduino</span></span></h2>
-<p style="text-align: center;">To mine using Arduino (or compatible) board, locate <span style="color: #ff9900;">Arduino_code</span> folder and <span style="color: #ff9900;">Arduino_code.ino</span> file in it.</p>
-<p style="text-align: center;">Open this file with<span style="color: #ff9900;"> Arduino IDE</span> and upload it to your board just like LED blinker codes you were uploading in the past. No need to change anything here.</p>
-<p style="text-align: center;">After you've uploaded the code, launch <span style="color: #ff9900;">Arduino_Miner</span> and&nbsp;enter your account credentials and Arduino COM port (the same your board is on, e.g. COM8).</p>
-<p style="text-align: center;">If you've entered everything correctly, good job! Your Arduino will now start making some money - mining Duino-Coins.</p>
-<h2 style="text-align: center;">Mine using Android phone</h2>
-<p style="text-align: center;">Download <a style="color: #ffcc00;" href="https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py">Minimal-PC_Miner</a> onto your phone.</p>
-<p style="text-align: center;">Then open it using an app called <a href="https://play.google.com/store/apps/details?id=ru.iiec.pydroid3"><span style="color: #ffcc00;">PyDroid3</span></a> that you can download from Google Play.</p>
-<p style="text-align: center;">You will need to change username and password lines near the top. When you're done, just launch it.</p>
-<h2 style="text-align: center;">Need more help?</h2>
-<p style="text-align: center;">If you need more detailed guide, ask for help at our <span style="color: #ffcc00;"><a style="color: #ffcc00;" href="https://discord.gg/KyADZT3">Discord</a></span> - we're friendly! :)</p>
-<p style="text-align: center;">&nbsp;</p>
-</div>
-
-<hr>
-
-<p style="text-align: center;">&nbsp;<a href="https://discord.gg/KyADZT3"><img src="discord.png" alt="" width="30" height="30" /></a>&nbsp; &nbsp;&nbsp;<a href="mailto:robik123.345@gmail.com"><img src="email.png" alt="" width="30" height="30" /></a>&nbsp;&nbsp; &nbsp;<a href="https://github.com/revoxhere/duino-coin/"><img src="github.png" alt="" width="30" height="30" /></a>&nbsp; &nbsp;&nbsp;<a href="https://www.youtube.com/channel/UCgqCK9yt-ajwi4XBu4-jIvA"><img src="youtube.png" alt="" width="30" height="30" /></a></p>
-
-<p align="center">
-	&trade; 2020 Duino-Coin project<br>
-	This service runs on donations. If you'd like to help visit
-	<span style="color: #f39c12">
-	<a style="color: #f39c12" href="https://revoxhere.github.io/duino-coin/donate">Donate</a>
-	</span> page.
-	<br><span style="color: #808080;">
-	website made by revox, hosted using GitHub Pages
-</span>
-</p>
-
-</body>
+        <p style="color: #777777" align="center" class="mb">
+            Website made by Furim & revox <br> 2019-2020 Duino-Coin community</p>
+    </body>
 </html>
