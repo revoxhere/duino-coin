@@ -1,78 +1,153 @@
 <!DOCTYPE html>
-<html>
+    <head>
+        <meta charset="utf-8" />
+        <html lang="en">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Duino-Coin</title>
+        <link rel="icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+        <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js" integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha256-OUFW7hFO0/r5aEGTQOz9F/aXQOt+TwqI1Z4fbVvww04=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="/assets/js/app.4aa08d6dcc3080b4c008.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script>
+            $.getJSON('https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json', function(data) {
+                var price = `${data["Duco price"]} USD`
+                var users = `${data["Registered users"]}`
+                $("#price").html(price);
+                $("#users").html(users);
+            });
+        </script>
+        <style>
+            .btn-success {
+                background-color: #f39c12;
+                border-color: #f39c12;
+            }
+            .btn-success:hover, .btn-success:focus, .btc-success:active, .btc-success:visited {
+                background-color: #f1c40f;
+                border-color: #f1c40f;
+            }
+            ::-webkit-scrollbar
+            {
+              width: 8px;  /* for vertical scrollbars */
+              height: 8px; /* for horizontal scrollbars */
+            }
 
-<head>
-    <title>Duino-Coin | Homepage</title>
-    <link rel="icon" href="https://raw.githubusercontent.com/revoxhere/duino-coin/master/Resources/duco.png">
-    <link rel="stylesheet" href="styles.css">
-</head>
+            ::-webkit-scrollbar-track
+            {
+              background: rgba(0, 0, 0, 0.1);
+            }
 
-<h3 style="text-align: left;">
-	<span style="color: #ffcc00;">&nbsp; &nbsp;
-		<a style="color: #ffcc00;" title="Duino-Coin" href="https://revoxhere.github.io/duino-coin/">
-			<em>
-				<img src="https://camo.githubusercontent.com/979d69f7ca7ec9bd446feb5e6990a1230b781eda/68747470733a2f2f692e696d6775722e636f6d2f30554a4b3835482e706e67" alt="Duino-Coin" width="139" height="21" />
-			</em>
-		</a>
-	</span>
-	<span style="float: right;">
-		<span style="color: #2c3e50;">
-			<a style="color: #2c3e50;" title="FAQ" href="https://revoxhere.github.io/duino-coin/faq">FAQ</a>&nbsp;&bull;
-			<a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/getting-started">Getting Started</a>&nbsp;&bull;
-			<a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/whitepaper.pdf">Whitepaper</a>&nbsp;&bull;
-			<a style="color: #2c3e50;" title="Donate" href="https://revoxhere.github.io/duino-coin/donate">Donate</a>&nbsp;&bull;
-			<a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/blog">Blog</a>&nbsp;&bull;&nbsp;<a style="color: #2c3e50;" title="Network Stats" href="https://revoxhere.github.io/duco-statistics/">Network Stats</a>&nbsp;&bull;
-			<a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/contact">Contact</a>
-		</span>&nbsp; &nbsp;<span style="font-size: 14px;">&nbsp;
-		</span>
-	</span>
-</h3>
+            ::-webkit-scrollbar-thumb
+            {
+              background: #f39c12;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="navbar navbar-expand navbar-light flex-column flex-md-row bd-navbar">
+            <a class="navbar-brand mr-0 mr-md-2" href="index.html"><img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" width="30" height="30" alt="Duino-Coin" title="Duino-Coin" class="d-inline-block align-top" /></a>
+            <div class="navbar-nav-scroll">
+                <ul class="navbar-nav bd-navbar-nav flex-row navbar-nav-scroll">
+                    <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="whitepaper.html">Whitepaper</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://revoxhere.github.io/duco-statistics/statistics">Network</a></li>
+                    <li class="nav-item"><a class="nav-link" href="donate.html">Donate</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+                <li class="nav-item"><a class="nav-link p-2" href="https://twitter.com/CoinDuino/" target="_blank" title="Twitter"><i class="fab fa-lg fa-twitter"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://www.reddit.com/r/Duinocoin/" target="_blank" title="Reddit"><i class="fab fa-lg fa-reddit"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://discord.gg/KyADZT3" target="_blank" title="Discord"><i class="fab fa-lg fa-discord"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://github.com/revoxhere/duino-coin" target="_blank" title="GitHub"><i class="fab fa-lg fa-github"></i></a></li>
+            </ul>
+                <a class="btn btn-success d-none d-md-inline-block mb-3 mb-md-0 ml-md-3" href="getting-started.html"><svg class="bi bi-caret-right-fill" width="1em" height="100%" viewBox="0 0 18 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 011.659-.753l5.48 4.796a1 1 0 010 1.506z"/></svg> Get started</a></header>
+        <main class="jumbotron" id="content">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><img class="img-fluid mb-3 mb-md-0" src="https://i.imgur.com/aNHSeuh.png" alt="Duino-Coin" /></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+    		        <img src="https://camo.githubusercontent.com/979d69f7ca7ec9bd446feb5e6990a1230b781eda/68747470733a2f2f692e696d6775722e636f6d2f30554a4b3835482e706e67" alt="Duino-Coin" width="70% height="auto"></img>
+                    <p class="lead mb-4">A cryptocurrency that can be mined with Arduino boards.</p>
 
-<div>
-<p style="text-align: center;"><a href="https://revoxhere.github.io/duino-coin/getting-started"><img src="https://i.imgur.com/N5hPpxj.png" width="100%&quot;" height="auto" /></a></p>
-</div>
-<div>
-<h1 style="text-align: center;"><span style="color: #f39c12;">About Duino-Coin</span></h1>
-<p style="padding-left: 90px; text-align: left;">There are many cryptocurrencies available. Most of them can be mined, but only using powerful CPUs, GPUs or ASICs. <br />I've wanted to do something related to cryptocurrencies with Arduino because nobody has done that yet. That's why Duino-Coin was created. <br /><span style="color: #f39c12;"><strong>A cryptocurrency that can be mined with regular home computers, smartphones, Arduino boards and many other platforms.</strong></span></p>
-<p style="text-align: center;">&nbsp;</p>
-<h2 style="text-align: center;"><span style="color: #f39c12;">Duino-Coin is:</span></h2>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;"><strong>&bull; available worldwide</strong></span> - all you need is internet access</p>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;"><strong>&bull; cost effective</strong></span> - explained in <span style="color: #f39c12;"><a style="color: #f39c12;" href="https://revoxhere.github.io/duino-coin/blog#1102019-why-its-the-best-time-to-mine-duino-coins">this blog post</a></span></p>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;"><strong>&bull; open-source</strong></span> - anyone can contribute - <span style="color: #f39c12;"><a style="color: #f39c12;" title="Duino-Coin GitHub" href="https://github.com/revoxhere/duino-coin/">Duino-Coin GitHub</a></span></p>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;"><strong>&bull; centralized</strong></span> - no need to download gigabytes of stuff, you won't lose your coins</p>
-<p style="text-align: center;">&nbsp;</p>
-<h2 style="text-align: center;"><span style="color: #f39c12;">Why should you mine it?</span></h2>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;">&bull;</span> DUCO (Duino-Coin) is worth ~0.1 XMG (Coin Magi), exchange&nbsp;<span style="color: #f39c12;"><a style="color: #f39c12;" href="https://revoxhere.github.io/duco-exchange/" rel="nofollow">here</a></span></p>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;">&bull;</span> mining Duino-Coins isn't very CPU intensive</p>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;">&bull;</span> it can be mined using various platforms</p>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;">&bull;</span> mining on regular computers, smartphones is profitable</p>
-<p style="text-align: center;">&nbsp;</p>
-<h2 style="text-align: center;"><span style="color: #f39c12;">Why would you want to mine on Arduino?</span></h2>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;">&bull;</span> you may have some Arduino boards that don't do anything</p>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;">&bull;</span> watching Arduino do something that produces money is quite satisfying</p>
-<p style="text-align: left; padding-left: 90px;"><span style="color: #f39c12;">&bull;</span> because now you can!</p>
-<h2 style="text-align: center;">&nbsp;</h2>
-<h2 style="text-align: center;"><span style="color: #f39c12;">Still not convinced?</span></h2>
-<p style="text-align: center;">Read these opinions from <span style="color: #d35400;">real</span> Duino-Coin users:</p>
-<p style="text-align: center;">
-	<img src="https://i.imgur.com/EQKZwP2.png"/>
-</p>
+                    <ul align="left">
+                        <li>supported by large number of platforms</li>
+                        <li>friendly & growing community</li>
+                        <li>easy to use & exchange</li>
+                        <li>available everywhere</li>
+                        <li>cost-effective</li>
+                        <li>open-source</li>
+    	            </ul>
 
-<hr>
+                    <div class="d-flex flex-column flex-md-row lead mb-3">
+                        <a href="https://revoxhere.github.io/duino-coin/whitepaper.pdf" class="btn btn-lg btn-secondary mr-2">
+                            <i class="fas fa-book"></i> Whitepaper</a>
+                        <a href="https://github.com/revoxhere/duino-coin/releases/latest" class="btn btn-lg btn-success">
+                            <i class="fas fa-download"></i> Latest release</a>
+                        <a href="getting-started.html" class="btn btn-lg btn-success ml-2">
+                            <svg class="bi bi-caret-right-fill" width="1.5em" height="100%" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 011.659-.753l5.48 4.796a1 1 0 010 1.506z"/></svg> Get started</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+        <br><h2 align="center">TL;DR - Why should you use Duino-Coin</h2>
+        <div class="container">
+            <p>You can mine it on Arduino Boards, Smartphones, Computers and Single-Board Computers and it does many things differently than other cryptos.<br>Mining 1 DUCO (Duino-Coin) takes ~10 minutes on typical PC.<br>And most importantly, it is still developing. This means that <strong>the price may go up in the future. Why not to try if it's free?</strong></p></div>
 
-<p style="text-align: center;">&nbsp;<a href="https://discord.gg/KyADZT3"><img src="discord.png" alt="" width="30" height="30" /></a>&nbsp; &nbsp;&nbsp;<a href="mailto:robik123.345@gmail.com"><img src="email.png" alt="" width="30" height="30" /></a>&nbsp;&nbsp; &nbsp;<a href="https://github.com/revoxhere/duino-coin/"><img src="github.png" alt="" width="30" height="30" /></a>&nbsp; &nbsp;&nbsp;<a href="https://www.youtube.com/channel/UCgqCK9yt-ajwi4XBu4-jIvA"><img src="youtube.png" alt="" width="30" height="30" /></a></p>
+        <br><h2 align="center">Technical specifications</h2>
+        <div class="container">
+            <p style="text-align:left;">Block supply<span style="float:right;">35 million (~ 26 million left)</span>
+            <div class="progress"style="height: 0.3em;"><div class="progress-bar bg-warning" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div></div></p>
 
-<p align="center">
-	&trade; 2020 Duino-Coin project<br>
-	This service runs on donations. If you'd like to help visit
-	<span style="color: #f39c12">
-	<a style="color: #f39c12" href="https://revoxhere.github.io/duino-coin/donate">Donate</a>
-	</span> page.
-	<br><span style="color: #808080;">
-	website made by revox, hosted using GitHub Pages
-</span>
-</p>
+            <p style="text-align:left;">Premine<span style="float:right;">~ 5k blocks</span>
+            <div class="progress"style="height: 0.3em;"><div class="progress-bar bg-warning" role="progressbar" style="width: 1%" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100"></div></div></p>
 
+            <p style="text-align:left;">Block time<span style="float:right;">Instant ⚡</span>
+            <div class="progress"style="height: 0.22em;"><div class="progress-bar bg-warning" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div></div></p>
 
-</body>
+            <p style="text-align:left;">Current price/1 DUCO<span style="float:right;" id="price"></span>
+            <div class="progress"style="height: 0.3em;"><div class="progress-bar bg-warning" role="progressbar" style="width: 45%" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div></div></p>
+
+            <p style="text-align:left;">Ticker<span style="float:right;">DUCO (ᕲ)</span>
+            <div class="progress"style="height: 0.22em;"><div class="progress-bar bg-warning" role="progressbar" style="width: 100%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div></div></p>
+
+            <p style="text-align:left;">Users registered on network<span style="float:right;" id="users"></span>
+            <div class="progress"style="height: 0.3em;"><div class="progress-bar bg-warning" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div></div></p>
+
+            <p style="text-align:left;">Algorithms<span style="float:right;">DUCO-S1, DUCO-S1A; PoT</span>
+            <div class="progress"style="height: 0.22em;"><div class="progress-bar bg-warning" role="progressbar" style="width: 100%" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div></div></p></div>
+
+        <br><h2 align="center">What users say</h2>
+        <div class="container">
+            <h4><svg class="bi bi-person" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M13 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM3.022 13h9.956a.274.274 0 00.014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 00.022.004zm9.974.056v-.002.002zM8 7a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0z" clip-rule="evenodd"/>
+            </svg> Designer91</h4>
+            <p><i>"Duino coin has potential to be a great coin with a huge advantage for education and understanding of block chain, it's the only coin with a $5-10 entry to mine with an Arduino. It's what drew me to the project."</i></p>
+
+            <h4><svg class="bi bi-person" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M13 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM3.022 13h9.956a.274.274 0 00.014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 00.022.004zm9.974.056v-.002.002zM8 7a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0z" clip-rule="evenodd"/>
+            </svg> Punixz</h4>
+            <p><i>"Its a good project for people with small resources and interest in crypto world."</i></p>
+
+            <h4><svg class="bi bi-person" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M13 14s1 0 1-1-1-4-6-4-6 3-6 4 1 1 1 1h10zm-9.995-.944v-.002.002zM3.022 13h9.956a.274.274 0 00.014-.002l.008-.002c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664a1.05 1.05 0 00.022.004zm9.974.056v-.002.002zM8 7a2 2 0 100-4 2 2 0 000 4zm3-2a3 3 0 11-6 0 3 3 0 016 0z" clip-rule="evenodd"/>
+            </svg> Rogerina</h4>
+            <p><i>"Good crypto to mine if you're interested in avr and pc mining."</i></p>
+            <p align="right" style="color: #777777; font-size:0.8em">Submit your own opinion on our <a style="color: #f39c12" href="https://discord.gg/KyADZT3">Discord</a></p></div>
+
+        <br><h2 align="center">What is the point of Mining on Arduino?</h2>
+            <div class="container">
+                <p>Simply saying - because now you can. Many people have Arduinos that are just laying around waiting for better days. These days now came and watching AVR boards make money is quite satisfying.<br>Arduino Mining, even though significantly slower, is still profitable even when compared to PC Mining.</p>
+
+        <br><h2 align="center">Interested?</h2>
+        <div align="center">
+            <a href="getting-started.html" class="btn btn-lg btn-success"><svg class="bi bi-caret-right-fill" width="1.5em" height="100%" viewBox="0 0 18 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 011.659-.753l5.48 4.796a1 1 0 010 1.506z"/></svg> Get started</a><br>
+
+        <br><hr><br>
+
+        <p style="color: #777777" align="center" class="mb">
+            Website made by Furim & revox <br> 2019-2020 Duino-Coin community</p>
+    </body>
 </html>
