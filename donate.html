@@ -1,61 +1,245 @@
 <!DOCTYPE html>
-<html>
+    <head>
+        <meta charset="utf-8" />
+        <html lang="en">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Duino-Coin | Donate</title>
+        <link rel="icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+        <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js" integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha256-OUFW7hFO0/r5aEGTQOz9F/aXQOt+TwqI1Z4fbVvww04=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="/assets/js/app.4aa08d6dcc3080b4c008.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <style>
+            .btn-success {
+                background-color: #f39c12;
+                border-color: #f39c12;
+            }
+            .btn-success:hover, .btn-success:focus, .btc-success:active, .btc-success:visited {
+                background-color: #f1c40f;
+                border-color: #f1c40f;
+            }
+            .btn-btc, .btn-btc:hover, .btn-btc:active, .btn-btc:visited {
+                background-color: #f7931a !important;
+                color:#ffffff;
+            }
+            .btn-bch, .btn-bch:hover, .btn-bch:active, .btn-bch:visited {
+                background-color: #4cca47 !important;
+                color:#ffffff;
+            }
+            .btn-ltc, .btn-ltc:hover, .btn-ltc:active, .btn-ltc:visited {
+                background-color: #4d4d4d !important;
+                color:#ffffff;
+            }
+            .btn-xmr, .btn-xmr:hover, .btn-xmr:active, .btn-xmr:visited {
+                background-color: #ff6600 !important;
+                color:#ffffff;
+            }
+            .btn-xmg, .btn-xmg:hover, .btn-xmg:active, .btn-xmg:visited {
+                background-color: #1d62f0 !important;
+                color:#ffffff;
+            }
+            .btn-duco, .btn-duco:hover, .btn-duco:active, .btn-duco:visited {
+                background-color: #f39c12 !important;
+                color:#ffffff;
+            }
+            ::-webkit-scrollbar
+            {
+              width: 8px;  /* for vertical scrollbars */
+              height: 8px; /* for horizontal scrollbars */
+            }
 
-<head>
-    <title>Duino-Coin | Donate</title>
-    <link rel="icon" href="https://raw.githubusercontent.com/revoxhere/duino-coin/master/Resources/duco.png">
-    <link rel="stylesheet" href="styles.css">
-</head>
+            ::-webkit-scrollbar-track
+            {
+              background: rgba(0, 0, 0, 0.1);
+            }
 
-<h3 style="text-align: left;">
-    <span style="color: #ffcc00;">&nbsp; &nbsp;
-        <a style="color: #ffcc00;" title="Duino-Coin" href="https://revoxhere.github.io/duino-coin/">
-            <em>
-                <img src="https://camo.githubusercontent.com/979d69f7ca7ec9bd446feb5e6990a1230b781eda/68747470733a2f2f692e696d6775722e636f6d2f30554a4b3835482e706e67" alt="Duino-Coin" width="139" height="21" />
-            </em>
-        </a>
-    </span>
-    <span style="float: right;">
-        <span style="color: #2c3e50;">
-            <a style="color: #2c3e50;" title="FAQ" href="https://revoxhere.github.io/duino-coin/faq">FAQ</a>&nbsp;&bull;
-            <a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/getting-started">Getting Started</a>&nbsp;&bull;
-            <a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/whitepaper.pdf">Whitepaper</a>&nbsp;&bull;
-            <a style="color: #2c3e50;" title="Donate" href="https://revoxhere.github.io/duino-coin/donate">Donate</a>&nbsp;&bull;
-            <a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/blog">Blog</a>&nbsp;&bull;&nbsp;<a style="color: #2c3e50;" title="Network Stats" href="https://revoxhere.github.io/duco-statistics/">Network Stats</a>&nbsp;&bull;
-            <a style="color: #2c3e50;" href="https://revoxhere.github.io/duino-coin/contact">Contact</a>
-        </span>&nbsp; &nbsp;<span style="font-size: 14px;">&nbsp;
-        </span>
-    </span>
-</h3>
-<div>
-<p style="text-align: center;">&nbsp;</p>
-</div>
-<div>
-<h1 style="text-align: center;"><span style="color: #f39c12;">Support us</span></h1>
-<p style="padding-left: 90px; text-align: left;">Duino-Coin network is a completely free service and will always be. <br> You can really help us maintain the server and low-fee payouts by donating to one of the adresses listed below.</p>
-<p style="padding-left: 90px; text-align: left;"><strong><span style="color: #ff6600;">XMG:&nbsp;<span style="color: #333333;">93qJ8j93ibCye7pTWKTu88pr6a8xy7EUqC</span></span></strong></p>
-<p style="padding-left: 90px; text-align: left;"><strong><span style="color: #ff6600;">BTC:&nbsp;<span style="color: #333333;">39GpTtgCNNwFbPnhEbCCBzNBewG3bA7oso</span></span></strong></p>
-<p style="padding-left: 90px; text-align: left;"><strong><span style="color: #ff6600;">LTC:&nbsp;<span style="color: #333333;">LUgz5FArRpjma52jjEQAYjBK9VVV2Z9d3D</span></span></strong></p>
-<p style="padding-left: 90px; text-align: left;"><strong><span style="color: #ff6600;">BCH:&nbsp;<span style="color: #333333;">bitcoincash:qquxqfrq78xp4n98m86ex26j3g54pfs8cvqj7dwaa9</span></span></strong></p>
-<p style="padding-left: 90px; text-align: left;"><strong><span style="color: #ff6600;">XMR:&nbsp;<span style="color: #333333;">86Y4ZYjN8KP5JUzTSWZjtYBrh9EaL2Z7yCSPmcrZHibX6gNaQBrN3eeRdL6HEyETyk5KkGsPLtg1fGW8rv3tRwY6FNmJvm5</span></span></strong></p>
-<p style="padding-left: 90px; text-align: left;"><strong><span style="color: #ff6600;">Other: <span style="color: #333333;">contact us</span></span></strong></p>
-<p style="padding-left: 90px; text-align: left;">Any help is very appreciated and will allow us to keep going with our project. Thanks in advance&nbsp;😊&nbsp;</p>
-<p style="text-align: center;">&nbsp;</p>
-<p style="text-align: center;">&nbsp;</p>
-<hr>
+            ::-webkit-scrollbar-thumb
+            {
+              background: #f39c12;
+            }
+            .modal-body {
+              word-wrap: break-word;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="navbar navbar-expand navbar-light flex-column flex-md-row bg-light">
+            <a class="navbar-brand mr-0 mr-md-2" href="index.html"><img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" width="30" height="30" alt="Duino-Coin" title="Duino-Coin" class="d-inline-block align-top" /></a>
+            <div class="navbar-nav-scroll">
+                <ul class="navbar-nav bd-navbar-nav flex-row">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="whitepaper.html">Whitepaper</a></li>
+                    <li class="nav-item"><a class="nav-link" href="https://revoxhere.github.io/duco-statistics/statistics">Network</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="donate.html">Donate</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+                <li class="nav-item"><a class="nav-link p-2" href="https://twitter.com/CoinDuino/" target="_blank" title="Twitter"><i class="fab fa-lg fa-twitter"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://www.reddit.com/r/Duinocoin/" target="_blank" title="Reddit"><i class="fab fa-lg fa-reddit"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://discord.gg/KyADZT3" target="_blank" title="Discord"><i class="fab fa-lg fa-discord"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://github.com/revoxhere/duino-coin" target="_blank" title="GitHub"><i class="fab fa-lg fa-github"></i></a></li>
+            </ul>
+                <a class="btn btn-success d-none d-md-inline-block mb-3 mb-md-0 ml-md-3" href="getting-started.html"><svg class="bi bi-caret-right-fill" width="1em" height="100%" viewBox="0 0 18 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 011.659-.753l5.48 4.796a1 1 0 010 1.506z"/></svg> Get started</a></header>
+        <main class="jumbotron" id="content">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><svg class="bi bi-heart-fill" width="100%" height="100%" viewBox="0 0 16 16" fill="#e74c3c" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" clip-rule="evenodd"/></svg></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+    		        <h1>Buy us a coffee</h1>
+                    <p>Maintaining the server costs a bit.<br>We'd be very happy to receive even a small donation.<br>Thank You in advance ❤️</p>
 
-<p style="text-align: center;">&nbsp;<a href="https://discord.gg/KyADZT3"><img src="discord.png" alt="" width="30" height="30" /></a>&nbsp; &nbsp;&nbsp;<a href="mailto:robik123.345@gmail.com"><img src="email.png" alt="" width="30" height="30" /></a>&nbsp;&nbsp; &nbsp;<a href="https://github.com/revoxhere/duino-coin/"><img src="github.png" alt="" width="30" height="30" /></a>&nbsp; &nbsp;&nbsp;<a href="https://www.youtube.com/channel/UCgqCK9yt-ajwi4XBu4-jIvA"><img src="youtube.png" alt="" width="30" height="30" /></a></p>
+                    <!-- Button trigger modal -->
+                    <button style="width:15em" type="button" class="btn btn-btc" data-toggle="modal" data-target="#btcModal">
+                      ₿ Donate Bitcoin (BTC)
+                    </button><br>
+                    <button style="width:15em" type="button" class="btn btn-bch" data-toggle="modal" data-target="#bchModal">
+                      ₿ Donate Bitcoin Cash (BCH)
+                    </button><br>
+                    <button style="width:15em" type="button" class="btn btn-ltc" data-toggle="modal" data-target="#ltcModal">
+                      Ł Donate Litecoin (LTC)
+                    </button><br>
+                    <button style="width:15em" type="button" class="btn btn-xmr" data-toggle="modal" data-target="#xmrModal">
+                      ɱ Donate Monero (XMR)
+                    </button><br>
+                    <button style="width:15em" type="button" class="btn btn-xmg" data-toggle="modal" data-target="#xmgModal">
+                      Σ Donate Coin Magi (XMG)
+                    </button><br>
+                    <button style="width:15em" type="button" class="btn btn-duco" data-toggle="modal" data-target="#ducoModal">
+                      ᕲ Donate Duino-Coin (DUCO)
+                    </button><br><br>
 
-<p align="center">
-    &trade; 2020 Duino-Coin project<br>
-    This service runs on donations. If you'd like to help visit
-    <span style="color: #f39c12">
-    <a style="color: #f39c12" href="https://revoxhere.github.io/duino-coin/donate">Donate</a>
-    </span> page.
-    <br><span style="color: #808080;">
-    website made by revox, hosted using GitHub Pages
-</span>
-</p>
+                    <p>If you'd like to donate in other way, feel free to <a style="color: #f39c12" href="contact.html">contact us</a>.</p>
 
-</body>
+                    <!-- Modals -->
+                    <div class="modal fade" id="btcModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Donate in BTC</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            Bitcoin address: 39GpTtgCNNwFbPnhEbCCBzNBewG3bA7oso
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Got it</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="modal fade" id="bchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Donate in BCH</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            Bitcoin Cash address: bitcoincash:qquxqfrq78xp4n98m86ex26j3g54pfs8cvqj7dwaa9
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Got it</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="modal fade" id="ltcModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Donate in LTC</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            Litecoin address: LUgz5FArRpjma52jjEQAYjBK9VVV2Z9d3D
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Got it</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="modal fade" id="xmrModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Donate in XMR</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            Monero address: 86Y4ZYjN8KP5JUzTSWZjtYBrh9EaL2Z7yCSPmcrZHibX6gNaQBrN3eeRdL6HEyETyk5KkGsPLtg1fGW8rv3tRwY6FNmJvm5
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Got it</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="modal fade" id="xmgModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Donate in XMG</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            Coin Magi address: 93qJ8j93ibCye7pTWKTu88pr6a8xy7EUqC
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Got it</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="modal fade" id="ducoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Donate in DUCO</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            Duino-Coin usernames: 
+                            <ul align="left">
+                                <li>revox</li>
+                                <li>Bilaboz</li>
+                            </ul>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Got it</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <br><hr><br>
+
+        <p style="color: #777777" align="center" class="mb">
+            Website made by Furim & revox <br> 2019-2020 Duino-Coin community</p>
+    </body>
 </html>
