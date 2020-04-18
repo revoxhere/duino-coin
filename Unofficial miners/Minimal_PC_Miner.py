@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Minimal version of Duino-Coin PC Miner, useful for developing own apps. Created by revox 2020
-import socket, hashlib, os, urllib.request # Only python3 included libraries
+import socket, hashlib, os, urllib.request, time # Only python3 included libraries
 
 username = "enter your username here"
 password = "enter your password here"
@@ -10,8 +10,8 @@ soc = socket.socket()
 # This sections grabs pool adress and port from Duino-Coin GitHub file
 while True: # Grab data grom GitHub section
     serverip = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
-    serverip = urllib.request.urlopen(serverip) #Use request to grab data from raw github file
-    content = serverip.read().decode().splitlines() #Read content and split into lines
+    with urllib.request.urlopen(serverip) as content:
+        content = content.read().decode().splitlines() #Read content and split into lines
     pool_address = content[0] #Line 1 = pool address
     pool_port = content[1] #Line 2 = pool port
     break # Continue
@@ -25,7 +25,7 @@ while True:
     print("Server is on version", server_version)
     
     response = soc.recv(2).decode() # Get server feedback about logging in                
-    if response == "NO": 
+    if response == "NO":
         print("Error loging in - check account credentials!")
         soc.close()
         time.sleep(15)
@@ -45,8 +45,8 @@ while True:
     job = job.split(",") # Split received data to job (job and difficulty)
     difficulty = job[2]
     for result in range(100 * int(difficulty) + 1): # Calculate hash with difficulty
-            hash = hashlib.sha1(str(job[0] + str(result)).encode("utf-8")).hexdigest() # Generate hash
-            if job[1] == hash: # If result is even with job
+            ducos1 = hashlib.sha1(str(job[0] + str(result)).encode("utf-8")).hexdigest() # Generate hash
+            if job[1] == ducos1: # If result is even with job
                 soc.send(bytes(str(result), encoding="utf8")) # Send result of hashing algorithm to pool
                 while True:
                     feedback = soc.recv(1024).decode() # Get feedback about the result
