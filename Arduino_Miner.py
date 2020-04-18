@@ -3,7 +3,7 @@
 # Duino-Coin Arduino Miner (v1.337) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ###################################################
-import socket, subprocess, statistics, re, threading, time, random, configparser, getpass, sys, os, hashlib, datetime, signal, platform
+import socket, subprocess, statistics, re, threading, time, configparser, getpass, sys, os, hashlib, datetime, platform
 from pathlib import Path
 from signal import signal, SIGINT
 
@@ -51,6 +51,7 @@ last_hash_count = 0
 khash_count = 0
 hash_count = 0
 Ardu = True
+data = []
 hash_mean = []
 
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
@@ -268,10 +269,6 @@ try:  # Start Miner executable according to donationlevel
 except:
     pass
 
-
-def Arduino(bytes):
-    pass
-
 def hush():
   global last_hash_count, hash_count, khash_count, hash_mean
   
@@ -282,6 +279,9 @@ def hush():
   hash_count = 0 # Reset counter
   
   threading.Timer(1.0, hush).start() # Run this def every 1s
+
+def Arduino(data):
+  data.append(data)
 
 hush()
 if int(autorestart) > 0:
@@ -300,8 +300,8 @@ while True:
  diff = job[2]
  for iJob in range(100 * int(job[2]) + 1):
   hash_count += 1
-  hash = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest()
-  if job[1] == hash:
+  ducos1a = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest()
+  if job[1] == ducos1a:
    soc.send(bytes(str(iJob) + "," + str(khash_count) + ",ARDU", encoding="utf8"))
    while Ardu:
     feedback = soc.recv(1024).decode()
