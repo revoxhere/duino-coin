@@ -33,15 +33,14 @@
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
 
-* [About Duino-Coin](#about-the-project)
-* [Useful links](#useful-links)
-* [Prerequisites](#prerequisites)
-* [Getting Started](#getting-started)
-* [Contributing](#contributing)
-* [License](#license)
-* [Built With](#built-with)
-* [Our Team](#our-team)
-
+  * [About Duino-Coin](#about-the-project)
+  * [Useful links](#useful-links)
+  * [Prerequisites](#prerequisites)
+  * [Getting Started](#getting-started)
+  * [Contributing](#contributing)
+  * [License](#license)
+  * [Built With](#built-with)
+  * [Our Team](#our-team)
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -53,10 +52,10 @@
   Duino-Coin is a cryptocurrency that can be mined with computers, smartphones, Arduino boards and many other platforms.<br>
 
 **Duino-Coin is:**
-* **centralized ⇒ lightweight** - no need to download gigabytes of stuff
-* **available worldwide** - all you need is internet access
-* **cost effective** - read [this blog post](https://revoxhere.github.io/duino-coin/blog#1102019-why-its-the-best-time-to-mine-duino-coins)
-* **open-source** - anyone can contribute
+  * **centralized ⇒ lightweight** - no need to download gigabytes of stuff
+  * **available worldwide** - all you need is internet access
+  * **cost effective** - read [this blog post](https://revoxhere.github.io/duino-coin/blog#1102019-why-its-the-best-time-to-mine-duino-coins)
+  * **open-source** - anyone can contribute
 
 ## Useful links
 
@@ -88,11 +87,11 @@ If you can't find what you need, open an [Issue](https://github.com/revoxhere/du
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. 
 Any contributions you make are greatly appreciated.
 
-1. Fork the Project
-2. Create your feature branch
-3. Commit your changes
-5. Make sure everything works as intended
-6. Open a pull request
+ 1. Fork the Project
+ 2. Create your feature branch
+ 3. Commit your changes
+ 4. Make sure everything works as intended
+ 5. Open a pull request
 
 <!-- LICENSE -->
 ## License
@@ -101,24 +100,25 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ### Built With
 This section briefly lists major frameworks that Duino-Coin uses:
-* [Python and IDLE](https://www.python.org) - programming
-* [pySerial](https://pythonhosted.org/pyserial/) - Arduino and Python communication
-* [Arduino IDE](https://www.arduino.cc) - Arduino programming and debugging
-* [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) - creating executables
-* [PyGithub](https://github.com/PyGithub/PyGithub) - pool statistics API integration
-* [m-cpuminer-v2](https://github.com/m-pays/m-cpuminer-v2/) - Proof-of-Time rewards
+  * [Python and IDLE](https://www.python.org) - programming
+  * [pySerial](https://pythonhosted.org/pyserial/) - Arduino and Python communication
+  * [Arduino IDE](https://www.arduino.cc) - Arduino programming and debugging
+  * [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) - creating executables
+  * [PyGithub](https://github.com/PyGithub/PyGithub) - pool statistics API integration
+  * [m-cpuminer-v2](https://github.com/m-pays/m-cpuminer-v2/) - Proof-of-Time rewards
 
 <!-- AUTHORS -->
 ## Our Team
 
-* **Lead developer:** [Robert "revox" Piotrowski](https://github.com/revoxhere/) - [YouTube](https://youtube.com/c/reVox96) - robik123.345@gmail.com
-* **Social manager:** [Jan "Furim" Malewski](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
-* **Designer:** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
-* **SHA algorithm implementation made by** [MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) 
+  * **Lead developer:** [Robert "revox" Piotrowski](https://github.com/revoxhere/) - [YouTube](https://youtube.com/c/reVox96) - robik123.345@gmail.com
+  * **Developer:** [Bilaboz](https://github.com/bilaboz/)
+  * **Social manager:** [Jan "Furim" Malewski](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
+  * **Designer:** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
+  * **SHA algorithm implementation made by** [MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) 
 
 <!-- DONATIONS -->
 ## Donate
 
 If you want to support the project, visit [Donate page](https://revoxhere.github.io/duino-coin/donate) on our website.
 
-<sup><sub>Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/) <br> <br> SEO tags (ignore): Duino Coin Coin Magi XMG DUCO Cryptocurrency Exchange Website Stocks Bitcoin Ethereum Litecoin Arduino AVR Rate Digital Cryptocoins Cryptocurrencies pyserial python idle auto py to exe pygithub serveo
+Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/) <br> <br> <sup> <sub>SEO tags (ignore): Duino Coin Coin Magi XMG DUCO Cryptocurrency Exchange Website Stocks Bitcoin Ethereum Litecoin Arduino AVR Rate Digital Cryptocoins Cryptocurrencies pyserial python idle auto py to exe pygithub serveo</sup></sub>
