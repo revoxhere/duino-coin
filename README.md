@@ -23,6 +23,7 @@
   </p>
 </p>
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a995acf7cd4c4211af6da874fe549ee5)](https://app.codacy.com/manual/revoxhere/duino-coin?utm_source=github.com&utm_medium=referral&utm_content=revoxhere/duino-coin&utm_campaign=Badge_Grade_Dashboard)
 [![Python](https://img.shields.io/badge/Python-3-green.svg?style=flat&logo=python)](https://github.com/revoxhere/duino-coin/search?l=py)
 [![License: MIT](https://img.shields.io/badge/License-MIT-important.svg?style=flat)](https://opensource.org/licenses/MIT)
 [![Release: 1.337](https://img.shields.io/badge/Release-1.337-critical.svg?style=flat)](https://github.com/revoxhere/duino-coin/releases/tag/1.337)
