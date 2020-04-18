@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ###################################################
 # Duino-Coin Arduino Miner (v1.337) © revox 2020
-# https://github.com/revoxhere/duino-coin 
+# https://github.com/revoxhere/duino-coin
 ###################################################
 import socket, subprocess, statistics, re, threading, time, configparser, getpass, sys, os, hashlib, datetime, platform
 from pathlib import Path
@@ -117,10 +117,10 @@ if not Path(str(resources)+"/Arduino_config.ini").is_file():
     "password":str(l),
     "autorestart": autorestart,
     "donate": donationlevel}
- 
+
  with open(str(resources)+"/Arduino_config.ini","w") as configfile:
   config.write(configfile)
-  
+
 else:
  config.read(str(resources)+"/Arduino_config.ini")
  y = config["arduinominer"]["arduino"]
@@ -187,7 +187,7 @@ while True:
   time.sleep(15)
  time.sleep(0.025)
 
- 
+
 while True:
   soc = socket.socket()
   p = pool_address
@@ -199,15 +199,15 @@ while True:
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ Cannot connect to the server." + Style.RESET_ALL + Fore.RED + " It is probably under maintenance.\nExiting in 15 seconds.")
       time.sleep(15)
-      os._exit(1)  
+      os._exit(1)
   now = datetime.datetime.now()
   SERVER_VER = soc.recv(3).decode()
   if len(SERVER_VER) != 3:
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ Cannot connect to the server." + Style.RESET_ALL + Fore.RED + " It is probably under maintenance.\nExiting in 15 seconds.")
       time.sleep(15)
-      os._exit(1)                     
-      
+      os._exit(1)
+
   if float(SERVER_VER) <= float(VER) and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "✓ Connected to the Duino-Coin server" + Style.RESET_ALL + Fore.YELLOW + " (v"+str(SERVER_VER)+")")
@@ -215,10 +215,10 @@ while True:
   else:
       now = datetime.datetime.now()
       cont = input(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ Miner is outdated (v"+VER+")," + Style.RESET_ALL + Fore.RED + " server is on v"+SERVER_VER+" please download latest version from https://github.com/revoxhere/duino-coin/releases/ or type \'continue\' if you wish to continue anyway.\n")
-      if cont != "continue": 
+      if cont != "continue":
         os._exit(1)
       break
- 
+
 while True:
  try:
   w = serial.Serial(y, 115200)
@@ -231,7 +231,7 @@ while True:
   sys.exit()
  time.sleep(0.025)
 
- 
+
 soc.send(bytes("LOGI," + M + "," + l, encoding="utf8"))
 while True:
  F = soc.recv(1024).decode()
@@ -246,7 +246,7 @@ while True:
   soc.close()
  time.sleep(0.025)
 
- 
+
 now = datetime.datetime.now()
 print(Style.RESET_ALL + Fore.YELLOW + "\nⓘ　Duino-Coin network is a completely free service and will always be." + Style.BRIGHT + Fore.YELLOW + "\nYou can help us maintain the server and low-fee payouts by donating.\nVisit " + Style.RESET_ALL + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more.")
 if int(donationlevel) > 0:
@@ -271,13 +271,13 @@ except:
 
 def hush():
   global last_hash_count, hash_count, khash_count, hash_mean
-  
+
   last_hash_count = int(hash_count)
   ahash_count = last_hash_count * 0.01
   hash_mean.append(ahash_count) # Calculate average hashrate
   khash_count = int(statistics.mean(hash_mean))
   hash_count = 0 # Reset counter
-  
+
   threading.Timer(1.0, hush).start() # Run this def every 1s
 
 def Arduino(data):
