@@ -14,7 +14,7 @@
   <p align="center"> 
     <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>Watch demo »</strong></a>
     <br>
-    <a href="https://revoxhere.github.io/duino-coin/whitepaper.pdf">Whitepaper</a>
+    <a href="https://revoxhere.github.io/duino-coin/whitepaper">Whitepaper</a>
     •
     <a href="https://revoxhere.github.io/duco-statistics/">Network statistics</a>
     •
@@ -24,11 +24,10 @@
 </p>
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a995acf7cd4c4211af6da874fe549ee5)](https://app.codacy.com/manual/revoxhere/duino-coin?utm_source=github.com&utm_medium=referral&utm_content=revoxhere/duino-coin&utm_campaign=Badge_Grade_Dashboard)
-[![Python](https://img.shields.io/badge/Python-3-green.svg?style=flat&logo=python)](https://github.com/revoxhere/duino-coin/search?l=py)
 [![License: MIT](https://img.shields.io/badge/License-MIT-important.svg?style=flat)](https://opensource.org/licenses/MIT)
-[![Release: 1.337](https://img.shields.io/badge/Release-1.337-critical.svg?style=flat)](https://github.com/revoxhere/duino-coin/releases/tag/1.337)
+[![Latest release: 1.337](https://img.shields.io/badge/Latest_release-1.337-critical.svg?style=flat)](https://github.com/revoxhere/duino-coin/releases/tag/1.337)
 [![Discord](https://img.shields.io/discord/677615191793467402.svg?color=Blue&label=Discord&logo=Discord?style=flat)](https://discord.gg/KyADZT3)
-[![Bitcointalk](https://img.shields.io/badge/Bitcointalk-Duino_Coin-gold.svg?style=flat)](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
+[![Bitcointalk thread](https://img.shields.io/badge/Bitcointalk_thread-Duino_Coin-gold.svg?style=flat)](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
 
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
@@ -46,24 +45,18 @@
 ## About The Project
 
  <a href="https://revoxhere.github.io/duino-coin/">
-  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" alt="Logo" width="70">
+  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" alt="Duino-Coin" width="70">
  </a>
+ A cryptocurrency that can be mined with Arduino boards.<br>
 
-  Duino-Coin is a cryptocurrency that can be mined with computers, smartphones, Arduino boards and many other platforms.<br>
+*   supported by large number of platforms
+*   friendly & growing community
+*   easy to use & exchange
+*   available everywhere
+*   cost-effective
+*   open-source
 
-**Duino-Coin is:**
-*   **centralized ⇒ lightweight** - no need to download gigabytes of stuff
-*   **available worldwide** - all you need is internet access
-*   **cost effective** - read [this blog post](https://revoxhere.github.io/duino-coin/blog#1102019-why-its-the-best-time-to-mine-duino-coins)
-*   **open-source** - anyone can contribute
-
-## Useful links
-
-Official Duino-Coin website: [https://revoxhere.github.io/duino-coin/](https://revoxhere.github.io/duino-coin/)<br>
-Network statistics: [https://revoxhere.github.io/duco-statistics/](https://revoxhere.github.io/duco-statistics/).<br>
-Exchange Duino-Coins to other cryptocurrencies at the [DUCO Exchange](https://revoxhere.github.io/duco-exchange/). <br>
-Talk with us at our [Discord](https://discord.gg/KyADZT3). <br>
-
+<!-- PRERESQUISITES -->
 ## Prerequisites
 
 ### Linux
@@ -74,12 +67,18 @@ If you have some missing dependencies programs will display message about instal
 Latest [releases](https://github.com/revoxhere/duino-coin/releases) contain everything built-in into them.
 If you have some missing dependencies while running from source programs will display message about installing them.
 
+<!-- GETTING STARTED -->
 ## Getting Started
 
 Getting started guide is available [here](https://revoxhere.github.io/duino-coin/getting-started)
 
-If you need detailed help about usage, installation or configuration, see our [Wikis](https://github.com/revoxhere/duino-coin/wiki). <br>
-If you can't find what you need, open an [Issue](https://github.com/revoxhere/duino-coin/issues) asking for more documentation or better, ask for help at our [Discord](https://discord.gg/XJpT3UQ).
+<!-- USEFUL LINKS -->
+## Useful links
+
+Official Duino-Coin website: [https://revoxhere.github.io/duino-coin/](https://revoxhere.github.io/duino-coin/)<br>
+Network statistics: [https://revoxhere.github.io/duco-statistics/](https://revoxhere.github.io/duco-statistics/).<br>
+Exchange Duino-Coins to other cryptocurrencies at the [DUCO Exchange](https://revoxhere.github.io/duco-exchange/). <br>
+Talk with us at our [Discord](https://discord.gg/KyADZT3). <br>
 
 <!-- CONTRIBUTING -->
 ## Contributing
