@@ -356,14 +356,17 @@ def Mine(): # Mining section
       diff = job[2]
     except:
       Connect() # Reconnect if pool down
-      
-    for iJob in range(100 * int(job[2]) + 1): # Calculate hash with difficulty
-      hash = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest() # Generate hash
+    
+	shares = [*range(100 * int(job[2]) + 1)]
+	random.shuffle(shares) #Little randomization
+	
+    for iJob in shares: # Calculate hash with difficulty
+      hash = hashlib.sha1(str(job[0] + str(shares[iJob])).encode("utf-8")).hexdigest() # Generate hash
       hash_count = hash_count + 1 # Increment hash counter
       
       if job[1] == hash: # If result is even with job, send the result
         try:
-          soc.send(bytes(str(iJob) + "," + str(last_hash_count) + "," + str(st) + "," + str(bytereturn), encoding="utf8")) # Send result of hashing algorithm to pool
+          soc.send(bytes(str(shares[iJob]) + "," + str(last_hash_count) + "," + str(st) + "," + str(bytereturn), encoding="utf8")) # Send result of hashing algorithm to pool
         except:
           Connect() # Reconnect if pool down
           
