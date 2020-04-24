@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////
-//file DUCO-S1A.h
-//date 5.04.2020
+//file Hash.h
+//date 24.04.2020
 //author Markus Sattler
 //edits revox
 //////////////////////////////////////////////////////////
@@ -12,7 +12,14 @@
 //version 2.1 of the License, or (at your option) any later version.
 //////////////////////////////////////////////////////////
 
-#ifndef HASH_H_ 
-#define HASH_H_ 
-void sha1(const uint8_t* data, uint32_t size, uint8_t hash[20]);void sha1(const char* data, uint32_t size, uint8_t hash[20]);void sha1(const String& data, uint8_t hash[20]);String sha1(const uint8_t* data, uint32_t size);String sha1(const char* data, uint32_t size);String sha1(const String& data);
+#ifndef HASH_H_
+#define HASH_H_
+void sha1(const uint8_t* data, uint32_t size, uint8_t hash[20]);
+void sha1(const char* data, uint32_t size, uint8_t hash[20]);
+void sha1(const String& data, uint8_t hash[20]);
+
+String sha1(const uint8_t* data, uint32_t size);
+String sha1(const char* data, uint32_t size);
+String sha1(const String& data);
+
 #endif
