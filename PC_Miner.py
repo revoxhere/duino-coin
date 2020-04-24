@@ -299,7 +299,7 @@ def checkVersion():
       
     if float(SERVER_VER) <= float(VER) and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.YELLOW + " Connected" + Style.RESET_ALL + Fore.YELLOW + " to master Duino-Coin server"" (v"+str(SERVER_VER)+")")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.YELLOW + " Connected" + Style.RESET_ALL + Fore.YELLOW + " to master Duino-Coin server (v"+str(SERVER_VER)+")")
     
     else:
       now = datetime.datetime.now()
@@ -429,6 +429,7 @@ def Mine(): # Mining section
             now = datetime.datetime.now()
             computetime = now - computestart # Time from start of hash computing to finding the result
             computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
+
             shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
             title("Duino-Coin PC Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
             print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " cpu " + Back.RESET + Fore.GREEN + " Accepted " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(diff) + " • " + Style.BRIGHT + Fore.WHITE + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!) " + Style.DIM + Fore.BLUE + "[" + computetime + "ms]")
@@ -437,6 +438,7 @@ def Mine(): # Mining section
             now = datetime.datetime.now()
             computetime = now - computestart # Time from start of hash computing to finding the result
             computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
+            
             shares[1] = shares[1] + 1 # Share rejected = increment bad shares counter by 1
             title("Duino-Coin PC Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
             print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " cpu " + Back.RESET + Fore.RED + " Rejected " + Fore.YELLOW + str(shares[1]) + "/" + str(shares[1] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(diff) + " • " + Style.BRIGHT + Fore.WHITE + str(khash_count) + " kH/s "  + Style.BRIGHT + Fore.RED + "(boo!!!) " + Style.DIM + Fore.BLUE + "[" + computetime + "ms]")
