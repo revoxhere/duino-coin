@@ -45,9 +45,9 @@
 ## About The Project
 
  <a href="https://revoxhere.github.io/duino-coin/">
-  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" alt="Duino-Coin" width="70">
+  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" alt="Duino-Coin" width="130">
  </a>
- A cryptocurrency that can be mined with Arduino boards.<br>
+<br>**A cryptocurrency that can be mined with Arduino boards.**<br>
 
 *   supported by large number of platforms
 *   friendly & growing community
