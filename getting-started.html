@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
     <head>
         <meta charset="utf-8" />
@@ -79,7 +80,9 @@
                         <li><a href="#register">Registering on the network</a></li>
                         <li><a href="#wallet">Using the wallet</a></li>
                         <li><a href="#pc">Mining on PC</a></li>
+                        <li><a href="#rpi">Mining on Raspberry Pi</a></li>
                         <li><a href="#arduino">Mining on Arduino</a></li>
+                        <li><a href="#esp">Mining on ESP8266/32</a></li>
                         <li><a href="#smartphone">Mining on Android Smartphone</a></li>
                     </ul>
                     <p style="color: #777777">All images were taken on version 1.337, in the future things may look a bit different and it will take some time until images will be updated.</p>
@@ -135,7 +138,20 @@
                     <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
                     <h1>Mine using PC</h1>
                     <p>Let's start making some money.<br>Launch <button disabled type="button" class="btn btn-primary btn-sm">PC Miner</button> from your Duino-Coin directory.<br><strong>Miner will show you everything you need to know and guide you through basic configuration.</strong><br>After you'll set it up, it'll remember the settings and will automatically mine every time you open it again.<br>You can open your Wallet to check how much you're getting rewarded for accepted shares.<br>If your balance is rising, GG! Your PC is now making money! 🎉</p>
+                    <a class="btn btn-primary" href="#rpi" role="button">Next step</a>
+                </div>
+            </div>
+        </main>
+
+        <main class="jumbotron" id="rpi">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><img class="img-fluid" src="https://p1.pxfuel.com/preview/275/487/647/raspberry-pi-technology-tech-electronic-device.jpg"/></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+                    <h1>Mine using Raspberry Pi</h1>
+                    <p>To mine with this small computer you'll need to download latest release for Linux.<br>Unpack it to a safe place.<br><br>Open Terminal and navigate to your Duino-Coin directory using <strong>cd</strong> command.<br>After successfully navigating to it, launch PC Miner using <strong>python3 PC_Miner.py</strong>.<br><br>The rest is the same as you would use PC Miner on typical computer.<br><strong>Miner will show you everything you need to know and guide you through basic configuration.</strong><br>After you'll set it up, it'll remember the settings and will automatically mine every time you open it again.<br>You can open your Wallet to check how much you're getting rewarded for accepted shares.<br>If your balance is rising, GG! Your PC is now making money! 🎉</p>
                     <a class="btn btn-primary" href="#arduino" role="button">Next step</a>
+                </div>
                 </div>
             </div>
         </main>
@@ -149,6 +165,20 @@
                     <p>Mining using Arduino board is a bit trickier but still very easy.<br>Open <button disabled type="button" class="btn btn-success btn-sm">Arduino Code</button> folder in which you should find <button disabled type="button" class="btn btn-success btn-sm">Arduino Code.ino</button> file.<br>Open it using Arduino IDE and upload to your board just like you've uploaded your LED Blink codes in the past.<br></p>
                     <p>After successfuly uploading the code, launch <button disabled type="button" class="btn btn-primary btn-sm">Arduino Miner</button> found inside your Duino-Coin directory.<br>
                         <strong>Miner will show you everything you need to know and guide you through basic configuration.</strong><br>After you'll set it up, it'll remember the settings and will automatically mine every time you open it again.<br>You can open your <button disabled type="button" class="btn btn-primary btn-sm">Wallet</button> to check how much you're getting rewarded for accepted shares.<br>If your balance is rising, GG! Your Arduino is now making money! 🎉</p>
+                    <a class="btn btn-primary" href="#esp" role="button">Next step</a>
+                </div>
+            </div>
+        </main>
+
+        <main class="jumbotron" id="esp">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-4 mx-auto col-md-3 order-md-2 text-right"><img class="img-fluid" src="https://c0.wallpaperflare.com/preview/294/538/414/esp-esp8266-microcontroller-chip.jpg"/></div>
+                    <div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+                    <h1>Mine using ESP8266/32</h1>
+                    <p>Using ESP boards you can mine without need of a computer.<br>Open <button disabled type="button" class="btn btn-success btn-sm">ESP Code</button> folder in which you should find <button disabled type="button" class="btn btn-success btn-sm">ESP Code.ino</button> file.<br>Open it using Arduino IDE.<br>Near the top you should see WiFi and Duino-Coin credentials fields.<br><img src="https://i.imgur.com/6RhuIe9.png" class="img-fluid"><br>Fill them according to your WiFi network and Duino-Coin account.<br>Upload the code to your board just like you've uploaded your LED Blink codes in the past.<br></p>
+                    <p>After successfuly uploading the code, you can open<button disabled type="button" class="btn btn-primary btn-sm">Serial Monitor</button> in Arduino IDE to check if everything is working.<br><img src="https://i.imgur.com/RdqVTuG.png" class="img-fluid">
+                    <br>When ESP finds a share, It'll blink its built-in LED two times.<br>You can open your <button disabled type="button" class="btn btn-primary btn-sm">Wallet</button> to check how much you're getting rewarded for accepted shares.<br>If your balance is rising, GG! Your ESP is now making money! 🎉</p>
                     <a class="btn btn-primary" href="#smartphone" role="button">Next step</a>
                 </div>
             </div>
@@ -170,7 +200,7 @@
         </main>
 
         <h3 align="center">🎉 Congratulations! 🎉</h3><p align="center">You've completed the tutorial.<br>It wasn't hard, was it?<br>
-        </p><p align="center">Now that you know how to use DUCO you should join our Discord!<br>It might also be a good idea to tell your friends about Duino-Coin!</p>
+        </p><p align="center">Now that you know how to use DUCO you should join our Discord!<br>Tell your friends about Duino-Coin!</p>
         <br><hr><br>
 
         <p style="color: #777777" align="center" class="mb">
