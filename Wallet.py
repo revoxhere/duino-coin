@@ -202,9 +202,9 @@ def Register(): #signup definition
         pass # Icon won't work on linux
     register.configure(background = str(colorA))
 
-    tkinter.Label(register, text='Username: ', bg = str(colorA), fg = str(colorB))
-    tkinter.Label(register, text='Password: ', bg = str(colorA), fg = str(colorB))
-    tkinter.Label(register, text='Confirm Password: ', bg = str(colorA), fg = str(colorB))
+    nameL = tkinter.Label(register, text='Username: ', bg = str(colorA), fg = str(colorB))
+    pwordL =tkinter.Label(register, text='Password: ', bg = str(colorA), fg = str(colorB))
+    pwordconfirm = tkinter.Label(register, text='Confirm Password: ', bg = str(colorA), fg = str(colorB))
     nameL.grid(row = 1, column = 0, sticky = W) 
     pwordL.grid(row = 2, column = 0, sticky = W)
     pwordconfirm.grid(row = 3, column = 0, sticky = W)
@@ -216,7 +216,7 @@ def Register(): #signup definition
     pwordE.grid(row = 2, column = 1)
     pwordconfirm.grid(row = 3, column = 1)
 
-    tkinter.Button(register, text='Register account', activebackground = str(colorHighlight), command = registerProtocol, bg = str(colorA), fg = str(colorB))
+    signupButton = tkinter.Button(register, text='Register account', activebackground = str(colorHighlight), command = registerProtocol, bg = str(colorA), fg = str(colorB))
     signupButton.grid(row = 4, column = 1)
     register.bind('<Return>', registerCallback)
     register.mainloop()
@@ -530,7 +530,7 @@ def getBalance():
 
         else:
             singletransaction = content[0] + "        \n\n\n\n\n\n"
-            transactionslist = "Last transactions list\n" + content[0] + " DUCO \n" + content[1] + " DUCO \n" + content[2] + " DUCO \n" + content[3] + " DUCO \n" + content[4] + " DUCO \n" + content[5] + " DUCO \n" + content[6] + " DUCO \n" + content[7] + " DUCO \n" + content[8] + " DUCO \n" + content[9] + " DUCO \n" + content[10] + " DUCO \n"
+            transactionslist = "Last transactions list\n" + content[0] + " DUCO \n" + content[1] + " DUCO \n" + content[2] + " DUCO \n" + content[3] + " DUCO \n" + content[4] + " DUCO \n" + content[5] + " DUCO \n" + content[6] + " DUCO \n" + content[7] + " DUCO \n" + content[8] + " DUCO \n" + content[9] + " DUCO \n"
 
         if balance == oldbalance: # Don't play animation if no change in balance
             pass
@@ -564,7 +564,7 @@ def getBalance():
         debug += "Error while receiving balance!\n"
         getBalance() # Try again
 
-    balanceTimer = threading.Timer(2, getBalance)
+    balanceTimer = threading.Timer(1, getBalance)
     balanceTimer.start()
 
 def getDucoPrice():
@@ -651,6 +651,7 @@ def sendProtocol():
 
                     receipent.delete(0, 'end')
                     amount.delete(0, 'end')
+                    getBalance()
 
 def EditFile():
     webbrowser.open(str(resources)+"Wallet_config.ini")
@@ -691,19 +692,19 @@ def WalletWindow():
     filename = PhotoImage(file = str(background))
     Label(OVERVIEW, image = filename).place(x = 0, y = 0, relwidth = 1, relheight = 1)
 
-    duco = PhotoImage(file = r"duco.png")
+    duco = PhotoImage(file = str(resources) + '/icons/duco.png') 
     Label(OVERVIEW, image = duco, compound = CENTER, bg=str(colorA)).place(relx=0.03, rely=0.02)
     label = tkinter.Label(OVERVIEW, text = str(username)+"'s balance", bg = str(colorA), fg = str(colorC), font=("Arial", 13)).place(relx = 0.17, rely = 0.03)
 
-    money = PhotoImage(file = r"money.png")
+    money = PhotoImage(file = str(resources) + '/icons/money.png') 
     Label(OVERVIEW, image = money, compound = CENTER, bg=str(colorA)).place(relx=0.03, rely=0.25)
     label = tkinter.Label(OVERVIEW, text = str(username)+"'s fiat balance", bg = str(colorA), fg = str(colorC), font=("Arial", 13)).place(relx = 0.17, rely = 0.27)
     
-    exchange = PhotoImage(file = r"convert.png")
+    exchange = PhotoImage(file = str(resources) + '/icons/exchange.png') 
     Label(OVERVIEW, image = exchange, compound = CENTER, bg=str(colorA)).place(relx=0.03, rely=0.48)
     label = tkinter.Label(OVERVIEW, text = "DUCO/"+str(currency)+" price ", bg = str(colorA), fg = str(colorC), font=("Arial", 13)).place(relx = 0.17, rely = 0.5)
 
-    time = PhotoImage(file = r"clock.png")
+    time = PhotoImage(file = str(resources) + '/icons/clock.png') 
     Label(OVERVIEW, image = time, compound = CENTER, bg=str(colorA)).place(relx=0.038, rely=0.75)
     label = tkinter.Label(OVERVIEW, text = "Last transaction", bg = str(colorA), fg = str(colorC), font=("Arial", 13)).place(relx = 0.17, rely = 0.74)
    
@@ -724,7 +725,7 @@ def WalletWindow():
     amount = Entry(SEND, fg = str(colorB), bg = str(colorA), font=("Arial", 13), width=47)
     amount.place(relx=.1, rely=.35)
 
-    send = PhotoImage(file = r"send.png") 
+    send = PhotoImage(file = str(resources) + '/icons/send.png') 
     sendButton = Button(SEND, image = send, compound = LEFT, text='Send funds', activebackground = str(colorHighlight), command = sendProtocol, bg = str(colorA), fg = str(colorB), font=("Arial", 13)).place(relx=.5, rely=.7, anchor="c")
     
     SEND.bind('<Return>', sendCallback)
@@ -836,6 +837,11 @@ try:
 except:
     pass
 
+try:
+    os.mkdir(str(resources) + "/icons") # Create icons folder if it doesn't exist
+except:
+    pass
+
 if not os.path.isfile(str(resources) + "Transactions.bin"):
     f = open(str(resources) + "Transactions.bin" ,"w+") # Create transactions file if it doesn't exist
     for i in range(10):
@@ -869,7 +875,7 @@ except:
 if not Path(str(resources) + "Wallet_background_light.gif").is_file(): # Light mode background
     try:
         debug += "Downloading latest light background file\n"
-        url = 'https://i.imgur.com/6axjtXU.gif'
+        url = 'https://i.imgur.com/lbQbVzx.gif'
         urllib.request.urlretrieve(url, str(resources) + 'Wallet_background_light.gif')
     except:
         debug += "Couldn't download background file!\n"
@@ -879,7 +885,7 @@ else:
 if not Path(str(resources) + "Wallet_background_dark.gif").is_file(): # Dark mode background
     try:
         debug += "Downloading latest dark background file\n"
-        url = 'https://i.imgur.com/fDOmfrn.gif'
+        url = 'https://i.imgur.com/nISni6J.gif'
         urllib.request.urlretrieve(url, str(resources) + 'Wallet_background_dark.gif')
     except:
         debug += "Couldn't download background file!\n"
@@ -905,6 +911,49 @@ if not Path(str(resources) + "notification.mp3").is_file():
         debug += "Couldn't download notification sound!\n"
 else:
     debug += "Notification sound already downloaded\n"
+
+
+
+if not Path(str(resources) + "/icons/exchange.png").is_file():
+    try:
+        debug += "Downloading latest icon\n"
+        url = 'https://i.imgur.com/ujKAjLh.png'
+        urllib.request.urlretrieve(url, str(resources) + '/icons/exchange.png')
+    except:
+        debug += "Couldn't download icon!\n"
+
+if not Path(str(resources) + "/icons/duco.png").is_file():
+    try:
+        debug += "Downloading latest icon\n"
+        url = 'https://i.imgur.com/wFZX2Fq.png'
+        urllib.request.urlretrieve(url, str(resources) + '/icons/duco.png')
+    except:
+        debug += "Couldn't download icon!\n"
+
+if not Path(str(resources) + "/icons/send.png").is_file():
+    try:
+        debug += "Downloading latest icon\n"
+        url = 'https://i.imgur.com/7pNAz2M.png'
+        urllib.request.urlretrieve(url, str(resources) + '/icons/send.png')
+    except:
+        debug += "Couldn't download icon!\n"
+
+if not Path(str(resources) + "/icons/money.png").is_file():
+    try:
+        debug += "Downloading latest icon\n"
+        url = 'https://i.imgur.com/iMuz8PM.png'
+        urllib.request.urlretrieve(url, str(resources) + '/icons/money.png')
+    except:
+        debug += "Couldn't download icon!\n"
+
+if not Path(str(resources) + "/icons/clock.png").is_file():
+    try:
+        debug += "Downloading latest icon\n"
+        url = 'https://i.imgur.com/s72e9Mb.png'
+        urllib.request.urlretrieve(url, str(resources) + '/icons/clock.png')
+    except:
+        debug += "Couldn't download icon!\n"
+
 
 
 label = tkinter.Label(loadingScr, text = "Authenticating user..." + str(" ")*20, bg = str(colorA), fg = str(colorC), font=("Arial", 8)).place(relx = 0.01, rely = 0.8)  
