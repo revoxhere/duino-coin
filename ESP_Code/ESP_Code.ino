@@ -93,12 +93,12 @@ void loop()
   String SERVER_VER = client.readStringUntil('\n'); // Server sends SERVER_VERSION after connecting
   Serial.print("\nServer is on version: ");
   Serial.println(SERVER_VER);
-  delay(250); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
+  delay(150); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
 
   Serial.print("Loging-in user: ");
   Serial.println(ducouser);
   client.print("LOGI," + String(ducouser) + "," + String(ducopass)); // Ask for login
-  delay(250); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
+  delay(150); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
 
   String feedback = client.readStringUntil('\n'); // Server sends NO or OK if login successful or failed
   Serial.print("Login feedback: ");
@@ -107,8 +107,8 @@ void loop()
 
   while (var < maxshares) { // While remaining shares is less than max shares
     Serial.println("Asking for a new job");
-    client.print("JOB2"); // Ask for new job
-    delay(250); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
+    client.print("Job"); // Ask for new job
+    delay(150); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
     
     String hash = client.readStringUntil(','); // Read hash
     String job = client.readStringUntil(','); // Read job
@@ -121,7 +121,7 @@ void loop()
         Serial.print("Share found: ");
         Serial.println(iJob); // Print the result
         client.print(iJob); // Send result to server
-        delay(250); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
+        delay(150); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
 
         String accepted = client.readStringUntil('\n'); // Receive feedback
         Serial.print("Share feedback: ");
