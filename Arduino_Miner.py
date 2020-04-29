@@ -224,7 +224,7 @@ def Connect(): # Connect to pool section
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot connect to the server. It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
       time.sleep(15)
-      Connect()
+      os.execl(sys.executable, sys.executable, *sys.argv)
       
     Connect()  
     time.sleep(0.025)
@@ -241,7 +241,7 @@ def checkVersion():
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot connect to the server." + Style.RESET_ALL + Fore.RED + " It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
       time.sleep(15)
-      Connect()                      
+      os.execl(sys.executable, sys.executable, *sys.argv)                     
       
     if float(SERVER_VER) <= float(VER) and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
@@ -305,10 +305,10 @@ def Login():
         time.sleep(15)
         os._exit(1) # If it wasn't, display a message and exit
       else:
-        Connect()
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
     except:
-      Connect() # Reconnect if pool down
+      os.execl(sys.executable, sys.executable, *sys.argv) # Reconnect if pool down
 
     time.sleep(0.025) # Try again if no response 
 
@@ -346,7 +346,7 @@ def ArduinoMine(): # Mining section
   
   while True:
     try:
-      soc.send(bytes("JOB2",encoding="utf8")) # Send job request to server
+      soc.send(bytes("Job",encoding="utf8")) # Send job request to server
       time.sleep(0.025)
       job = soc.recv(1024).decode().split(",") # Split received job
     except:
