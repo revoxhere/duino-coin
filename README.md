@@ -7,9 +7,10 @@
 <!-- LOGO -->
 <br />
 <p align="center">
+  
   <a href="https://revoxhere.github.io/duino-coin/">
-    <img src="https://i.imgur.com/0UJK85H.png">
-  </a>
+    <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" alt="Duino-Coin" width="130">
+  </a><br>
 
   <p align="center"> 
     <a href="https://www.youtube.com/watch?v=9yHtVmlm4oI"><strong>Watch demo »</strong></a>
@@ -44,11 +45,11 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
- <a href="https://revoxhere.github.io/duino-coin/">
-  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" alt="Duino-Coin" width="130">
- </a><br>
+<a href="https://revoxhere.github.io/duino-coin/">
+    <img src="https://i.imgur.com/0UJK85H.png">
+</a>
  
-**A cryptocurrency that can be mined with Arduino boards.** <br>
+**A cryptocurrency that can be mined with AVR boards.** <br>
 
 *   supported by large number of platforms
 *   friendly & growing community
