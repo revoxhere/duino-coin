@@ -1,5 +1,5 @@
 ###############################################
-# Duino-Coin Wallet (v1.4) © revox 2020
+# Duino-Coin Wallet (v1.4) © MrKris7100, revox 2020
 # https://github.com/revoxhere/duino-coin 
 #############################################
 import time, socket, sys, os, datetime, configparser, tkinter, getpass, platform, webbrowser, urllib.request, json # Import libraries
