@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ###############################################
-# Duino-Coin Arduino Miner (v1.4) © revox 2020
+# Duino-Coin Arduino Miner (v1.4) © MrKris7100, revox 2020
 # https://github.com/revoxhere/duino-coin 
 ###############################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
