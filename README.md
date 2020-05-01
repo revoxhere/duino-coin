@@ -116,7 +116,7 @@ This section briefly lists major frameworks that Duino-Coin uses:
 *   **Social manager:** [@Furim](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
 *   **Designer:** [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
 *   **SHA algorithm implementation made by** [@MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) 
-*   **Help with Arduino SHA1 library** [@daknuett][https://github.com/daknuett/]
+*   **Help with Arduino SHA1 library** [@daknuett](https://github.com/daknuett/)
 
 <!-- DONATIONS -->
 ## Donate
