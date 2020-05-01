@@ -5,20 +5,24 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Arduino Code remastered - v1.4 © revox 2019-2020
+//  Arduino Code remastered - v1.4.8 © revox 2019-2020
+//  Big thanks to daknuett for help in library migration!
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
 //  https://github.com/revoxhere/duino-coin - GitHub
 //  https://revoxhere.github.io/duino-coin/ - Website
 //  https://discord.gg/KyADZT3 - Discord
+//  https://github.com/daknuett - @daknuett
 //////////////////////////////////////////////////////////
 //  If you don't know how to start, visit official website
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
 // Include crypto library
-#include "Hash.h"
-//#define LED_BUILTIN 16 // Uncomment this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
+#include "sha1.h"
+
+String result; // Create globals
+char buffer[64];
 
 void setup() {
   Serial.begin(115200); // Open serial port
@@ -36,7 +40,17 @@ void DUCOS1A() {
     unsigned int diff = Serial.readStringUntil('\n').toInt(); // Read difficulty
     for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
       yield(); // Let Arduino/ESP do background tasks - else watchdog will trigger
-      String result = sha1(String(hash) + String(iJob)); // Hash previous block hash and current iJob
+      Sha1.init(); // Create sha1 hasher
+      Sha1.print(String(hash) + String(iJob)); // Send data to hasher
+      uint8_t * hash_bytes = Sha1.result(); // Get result
+      for (int i = 0; i < 10; i++) { // Cast result to array
+        for (int i = 0; i < 32; i++) {
+          buffer[2 * i] = "0123456789abcdef"[hash_bytes[i] >> 4];
+          buffer[2 * i + 1] = "0123456789abcdef"[hash_bytes[i] & 0xf];
+        }
+      }
+      result = String(buffer); // Convert and prepare array
+      result.remove(40, 150);
       if (result == job) { // If result is found
         Serial.println(iJob); // Send result back to Arduino Miner
         digitalWrite(LED_BUILTIN, HIGH);   // Turn on built-in led
