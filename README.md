@@ -101,9 +101,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ### Built With
 This section briefly lists major frameworks that Duino-Coin uses:
-*   [Python and IDLE](https://www.python.org) - programming
+*   [cryptosuite2](https://github.com/daknuett/cryptosuite2) - Arduino SHA1 hashing
+*   [Hash.h library](https://github.com/esp8266/Arduino/blob/master/libraries/Hash/src/Hash.h) - ESP8266 SHA1 hashing
 *   [pySerial](https://pythonhosted.org/pyserial/) - Arduino and Python communication
-*   [Arduino IDE](https://www.arduino.cc) - Arduino programming and debugging
 *   [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) - creating executables
 *   [PyGithub](https://github.com/PyGithub/PyGithub) - pool statistics API integration
 *   [m-cpuminer-v2](https://github.com/m-pays/m-cpuminer-v2/) - Developer donation
@@ -111,11 +111,12 @@ This section briefly lists major frameworks that Duino-Coin uses:
 <!-- AUTHORS -->
 ## Our Team
 
-*   **Lead developer:** [Robert "revox" Piotrowski](https://github.com/revoxhere/) - [YouTube](https://youtube.com/c/reVox96) - robik123.345@gmail.com
-*   **Developer:** [Bilaboz](https://github.com/bilaboz/)
-*   **Social manager:** [Jan "Furim" Malewski](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
-*   **Designer:** [ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
-*   **SHA algorithm implementation made by** [MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) 
+*   **Lead developer:** [@revox](https://github.com/revoxhere/) - [YouTube](https://youtube.com/c/reVox96) - robik123.345@gmail.com
+*   **Developer:** [@Bilaboz](https://github.com/bilaboz/)
+*   **Social manager:** [@Furim](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
+*   **Designer:** [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
+*   **SHA algorithm implementation made by** [@MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) 
+*   **Help with Arduino SHA1 library** [@daknuett][https://github.com/daknuett/]
 
 <!-- DONATIONS -->
 ## Donate
