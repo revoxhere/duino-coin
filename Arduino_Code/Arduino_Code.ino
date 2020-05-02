@@ -27,12 +27,13 @@ unsigned int iJob = 0;
 
 void setup() {
   Serial.begin(115200); // Open serial port
+  Serial.println("ready"); // Send feedback to miner
   pinMode(LED_BUILTIN, OUTPUT); // Prepare built-in led pin as output
 }
 
 void loop() {
-  String start = Serial.readStringUntil('\n');
-  if (start == "start") { // Wait for start word, serial.available caused problems
+  String startStr = Serial.readStringUntil('\n');
+  if (startStr == "start") { // Wait for start word, serial.available caused problems
     String hash = Serial.readStringUntil('\n'); // Read hash
     String job = Serial.readStringUntil('\n'); // Read job
     unsigned int diff = Serial.parseInt(); // Read difficulty
