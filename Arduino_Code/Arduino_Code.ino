@@ -23,6 +23,7 @@
 
 String result; // Create globals
 char buffer[64];
+unsigned int iJob = 0;
 
 void setup() {
   Serial.begin(115200); // Open serial port
@@ -30,18 +31,15 @@ void setup() {
 }
 
 void loop() {
-  DUCOS1A(); // Run DUCO-S1A algorithm
-}
-
-void DUCOS1A() {
-  if (Serial.available() > 0) { // Wait for serial to become available
+  String start = Serial.readStringUntil('\n');
+  if (start == "start") { // Wait for start word, serial.available caused problems
     String hash = Serial.readStringUntil('\n'); // Read hash
     String job = Serial.readStringUntil('\n'); // Read job
-    unsigned int diff = Serial.readStringUntil('\n').toInt(); // Read difficulty
+    unsigned int diff = Serial.parseInt(); // Read difficulty
     for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
       yield(); // Let Arduino/ESP do background tasks - else watchdog will trigger
       Sha1.init(); // Create sha1 hasher
-      Sha1.print(String(hash) + String(iJob)); // Send data to hasher
+      Sha1.print(String(hash) + String(iJob));
       uint8_t * hash_bytes = Sha1.result(); // Get result
       for (int i = 0; i < 10; i++) { // Cast result to array
         for (int i = 0; i < 32; i++) {
@@ -50,9 +48,9 @@ void DUCOS1A() {
         }
       }
       result = String(buffer); // Convert and prepare array
-      result.remove(40, 150);
-      if (result == job) { // If result is found
-        Serial.println(iJob); // Send result back to Arduino Miner
+      result.remove(40, 28); // First 40 characters are good, rest is garbage
+      if (String(result) == String(job)) { // If result is found
+        Serial.println(String(iJob)); // Send result back to Arduino Miner
         digitalWrite(LED_BUILTIN, HIGH);   // Turn on built-in led
         delay(50); // Wait a bit
         digitalWrite(LED_BUILTIN, LOW); // Turn off built-in led
