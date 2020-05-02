@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ###############################################
-# Duino-Coin Arduino Miner (v1.4) © MrKris7100, revox 2020
+# Duino-Coin Arduino Miner (v1.4.8) © revox 2020
 # https://github.com/revoxhere/duino-coin 
 ###############################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
@@ -25,7 +25,7 @@ except:
   os._exit(1)
 
 try:
-    import serial
+  import serial
 except:
   now = datetime.datetime.now()
   print(now.strftime("%H:%M:%S ") + "Pyserial is not installed. Please install it using: python3 -m pip install pyserial.\nExiting in 15s.")
@@ -33,7 +33,7 @@ except:
   os._exit(1)
 
 try:
-    import serial.tools.list_ports
+  import serial.tools.list_ports
 except:
   now = datetime.datetime.now()
   print(now.strftime("%H:%M:%S ") + "Serial tools is not installed. Please install it using: python3 -m pip install serial.tools.list_ports.\nExiting in 15s.")
@@ -49,6 +49,7 @@ shares = [0, 0]
 diff = 0
 donatorrunning = False
 balance = 0
+job = ""
 
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
@@ -106,7 +107,7 @@ def Greeting(): # Greeting message depending on time
   else:
     greeting = "Welcome back"
   
-  print(" * " + Fore.YELLOW + Style.BRIGHT + "Duino-Coin © Arduino Miner " + Style.RESET_ALL + Fore.YELLOW+ "(v" + str(VER) + ") 2019-2020") # Startup message
+  print(" * " + Fore.YELLOW + Style.BRIGHT + "Duino-Coin © Arduino Miner " + Style.RESET_ALL + Fore.YELLOW+ "(v" + str(VER) +".8" + ") 2019-2020") # Startup message
   time.sleep(0.15)
   print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
   time.sleep(0.15)
@@ -257,7 +258,7 @@ def checkVersion():
     Connect() # Reconnect if pool down
 
 def ConnectToArduino():
-  global com
+  global com, arduinoport
   try:
     com = serial.Serial(arduinoport, 115200)
     now = datetime.datetime.now()
@@ -314,7 +315,7 @@ def Login():
 
 def ArduinoMine(): # Mining section
   global donationlevel, donatorrunning
-
+  
   if int(donationlevel) > 0:
     now = datetime.datetime.now()
     print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Thank You for being an awesome donator! <3")
@@ -344,21 +345,20 @@ def ArduinoMine(): # Mining section
   now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Arduino mining thread started" + Style.RESET_ALL + Fore.YELLOW + " using DUCO-S1A algorithm")
   
+  
   while True:
-    try:
-      soc.send(bytes("Job",encoding="utf8")) # Send job request to server
-      time.sleep(0.025)
-      job = soc.recv(1024).decode().split(",") # Split received job
-    except:
-      Connect()
+    soc.send(bytes("Job",encoding="utf8")) # Send job request to server
+    time.sleep(0.025)
+    job = soc.recv(1024).decode().split(",") # Split received job
 
+    com.write(bytes("start\n", encoding="utf8")) # s
     com.write(bytes(str(job[0])+"\n", encoding="utf8")) # hash
     com.write(bytes(str(job[1])+"\n", encoding="utf8")) # job
     com.write(bytes(str(job[2])+"\n", encoding="utf8")) # diff
 
     computestart = datetime.datetime.now() # Get timestamp of start of the computing
     result = com.readline().decode().rstrip().lstrip() # Send hash, job and difficulty to the board using serial
-
+    print(result)
     soc.send(bytes(str(result), encoding="utf8")) # Send result of hashing algorithm to pool
 
     while True:
