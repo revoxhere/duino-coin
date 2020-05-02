@@ -343,22 +343,24 @@ def ArduinoMine(): # Mining section
       pass
 
   now = datetime.datetime.now()
-  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Arduino mining thread started" + Style.RESET_ALL + Fore.YELLOW + " using DUCO-S1A algorithm")
+  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Arduino mining thread started" + Style.RESET_ALL + Fore.YELLOW + " using DUCO-S1A algorithm, be aware that finding first share may take a while")
   
-  
+  ready = com.readline().decode().rstrip().lstrip() # Arduino will send ready signal
   while True:
+    com.write(bytes("start\n", encoding="utf8")) # hash
+
     soc.send(bytes("Job",encoding="utf8")) # Send job request to server
     time.sleep(0.025)
     job = soc.recv(1024).decode().split(",") # Split received job
-
-    com.write(bytes("start\n", encoding="utf8")) # s
+    
     com.write(bytes(str(job[0])+"\n", encoding="utf8")) # hash
+    time.sleep(0.1)
     com.write(bytes(str(job[1])+"\n", encoding="utf8")) # job
+    time.sleep(0.1)
     com.write(bytes(str(job[2])+"\n", encoding="utf8")) # diff
 
     computestart = datetime.datetime.now() # Get timestamp of start of the computing
     result = com.readline().decode().rstrip().lstrip() # Send hash, job and difficulty to the board using serial
-    print(result)
     soc.send(bytes(str(result), encoding="utf8")) # Send result of hashing algorithm to pool
 
     while True:
@@ -436,10 +438,10 @@ while True:
     time.sleep(15)
     os._exit(1)
 
-  try:
-    ArduinoMine()
-  except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
+  #try:
+  ArduinoMine()
+  #except:
+    #print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
 
   print(Style.RESET_ALL + Style.RESET_ALL)
   time.sleep(0.025) # Restart
