@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin PC Miner (v1.4) © MrKris7100, revox 2020
+# Duino-Coin PC Miner (v1.5) 
 # https://github.com/revoxhere/duino-coin 
+# Distributed under MIT license
+# © revox, MrKris7100 2020
 ##########################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
 from decimal import Decimal
@@ -42,7 +44,7 @@ except:
   os._exit(1) 
 
 # Global variables
-VER = "1.4" # Version number
+VER = "1.5" # Version number
 timeout = 5 # Socket timeout
 resources = "PCMiner_"+str(VER)+"_resources"
 
@@ -327,6 +329,7 @@ def Login():
         
       if resp == "OK": # Check wheter login information was correct
         soc.send(bytes("FROM," + "PC_Miner," + str(pcusername) + "," + str(publicip) + "," + str(platform), encoding="utf8")) # Send info to server about client
+        time.sleep(0.05)
 
         now = datetime.datetime.now()
         print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.YELLOW + " Logged in successfully " + Style.RESET_ALL + Fore.YELLOW + "as " + str(username))
@@ -399,7 +402,7 @@ def Mine(): # Mining section
       try:
         job = soc.recv(1024).decode() # Get work from pool
       except:
-        Connect() # Reconnect if pool down
+        os.execl(sys.executable, sys.executable, *sys.argv)
       if job:
         break # If job received, continue to hashing algo
       time.sleep(0.025) # Try again if no response
@@ -407,7 +410,7 @@ def Mine(): # Mining section
       job = job.split(",") # Split received data to job and difficulty
       diff = job[2]
     except:
-      Connect() # Reconnect if pool down
+      os.execl(sys.executable, sys.executable, *sys.argv)
     
     computestart = datetime.datetime.now()
     for iJob in range(100 * int(job[2]) + 1): # Calculate hash with difficulty
@@ -434,6 +437,17 @@ def Mine(): # Mining section
             title("Duino-Coin PC Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
             print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " cpu " + Back.RESET + Fore.GREEN + " Accepted " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(diff) + " • " + Style.BRIGHT + Fore.WHITE + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!) " + Style.DIM + Fore.BLUE + "[" + computetime + "ms]")
             break # Repeat
+
+          elif feedback == "BLOCK": # If big block was found
+            now = datetime.datetime.now()
+            computetime = now - computestart # Time from start of hash computing to finding the result
+            computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
+
+            shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
+            title("Duino-Coin PC Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+            print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " cpu " + Back.RESET + Fore.GREEN + " Block accepted ("+str(job[0])[:8]+") " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(diff) + " • " + Style.BRIGHT + Fore.WHITE + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!) " + Style.DIM + Fore.BLUE + "[" + computetime + "ms]")
+            break # Repeat
+
           elif feedback == "BAD": # If result was bad
             now = datetime.datetime.now()
             computetime = now - computestart # Time from start of hash computing to finding the result
@@ -528,6 +542,17 @@ def MineRandom(): # Alternate mining method using randomness by MrKris7100
             title("Duino-Coin PC Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
             print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " cpu " + Back.RESET + Fore.GREEN + " Accepted " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(diff) + " • " + Style.BRIGHT + Fore.WHITE + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!) " + Style.DIM + Fore.BLUE + "[" + computetime + "ms]")
             break # Repeat
+
+          elif feedback == "BLOCK": # If big block was found
+            now = datetime.datetime.now()
+            computetime = now - computestart # Time from start of hash computing to finding the result
+            computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
+
+            shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
+            title("Duino-Coin PC Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+            print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " cpu " + Back.RESET + Fore.GREEN + " Block accepted ("+str(job[0])[:8]+") " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(diff) + " • " + Style.BRIGHT + Fore.WHITE + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!) " + Style.DIM + Fore.BLUE + "[" + computetime + "ms]")
+            break # Repeat
+
           elif feedback == "BAD": # If result was bad
             now = datetime.datetime.now()
             computetime = now - computestart # Time from start of hash computing to finding the result
@@ -589,13 +614,13 @@ while True:
   except:
     pass
 
-  try:
-    if int(miningmethod) == 2:
-      MineRandom() # Mine using random method
-    else:
-      Mine() # Mine using standard method
-  except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
+
+  if int(miningmethod) == 2:
+    MineRandom() # Mine using random method
+  else:
+    Mine() # Mine using standard method
+  #except:
+    #print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
 
   print(Style.RESET_ALL + Style.RESET_ALL)
   time.sleep(0.025) # Restart
