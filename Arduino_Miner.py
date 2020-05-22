@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-###############################################
-# Duino-Coin Arduino Miner (v1.4.8) © revox 2020
+##########################################
+# Duino-Coin PC Miner (v1.5) 
 # https://github.com/revoxhere/duino-coin 
-###############################################
+# Distributed under MIT license
+# © revox, MrKris7100 2020
+##########################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
 from decimal import Decimal
 from pathlib import Path
@@ -259,16 +261,7 @@ def checkVersion():
 
 def ConnectToArduino():
   global com, arduinoport
-  try:
-    com = serial.Serial(arduinoport, 115200)
-    now = datetime.datetime.now()
-    print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.YELLOW + " Connected" + Style.RESET_ALL + Fore.YELLOW + " to AVR board on serial port "+str(arduinoport))
-  except:
-    now = datetime.datetime.now()
-    print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.RED + " Error connecting to board" + Style.RESET_ALL + Fore.YELLOW + " on serial port "+str(arduinoport) + "! Check your configfile. Exiting in 15s.")
-    time.sleep(15)
-    os._exit(1)
-
+  com = serial.Serial(arduinoport, 115200)
 
 def Login():
   global autorestart
@@ -350,13 +343,12 @@ def ArduinoMine(): # Mining section
     com.write(bytes("start\n", encoding="utf8")) # hash
 
     soc.send(bytes("Job",encoding="utf8")) # Send job request to server
-    time.sleep(0.025)
     job = soc.recv(1024).decode().split(",") # Split received job
     
     com.write(bytes(str(job[0])+"\n", encoding="utf8")) # hash
-    time.sleep(0.1)
+    time.sleep(0.05)
     com.write(bytes(str(job[1])+"\n", encoding="utf8")) # job
-    time.sleep(0.1)
+    time.sleep(0.05)
     com.write(bytes(str(job[2])+"\n", encoding="utf8")) # diff
 
     computestart = datetime.datetime.now() # Get timestamp of start of the computing
@@ -374,6 +366,16 @@ def ArduinoMine(): # Mining section
         shares[0] = shares[0] + 1 # Share rejected = increment correct shares counter by 1
         title("Duino-Coin Arduino Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
         print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.GREEN + " Accepted " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(job[2]) + " • " + Style.BRIGHT + Fore.BLUE + computetime + "ms avr time " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
+        break # Repeat
+
+      elif feedback == "GOOD": # If result was good
+        now = datetime.datetime.now()
+        computetime = now - computestart # Time from start of hash computing to finding the result
+        computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
+
+        shares[0] = shares[0] + 1 # Share rejected = increment correct shares counter by 1
+        title("Duino-Coin Arduino Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.GREEN + " Block accepted ("+str(job[0])[:8]+") " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(job[2]) + " • " + Style.BRIGHT + Fore.BLUE + computetime + "ms avr time " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
         break # Repeat
 
       elif feedback == "BAD": # If result was bad
@@ -412,36 +414,15 @@ while True:
   except:
     pass
 
-  try:
-    Connect() # Connect to pool
-  except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error connecting to pool. Check your config file. Exiting in 15s." + Style.RESET_ALL)
-    time.sleep(15)
-    os._exit(1)
+  Connect() # Connect to pool
 
-  try:
-    checkVersion() # Check version
-  except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error checking version. Restarting." + Style.RESET_ALL)
-    os.execl(sys.executable, sys.executable, *sys.argv)
+  checkVersion() # Check version
 
-  try:
-    Login() # Login
-  except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while logging in. Restarting." + Style.RESET_ALL)
-    os.execl(sys.executable, sys.executable, *sys.argv)
+  Login() # Login
 
-  try:
-    ConnectToArduino() # Connect to AVR board
-  except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while connectign to arduino. Check your config file. Exiting in 15s." + Style.RESET_ALL)
-    time.sleep(15)
-    os._exit(1)
+  ConnectToArduino() # Connect to AVR board
 
-  #try:
   ArduinoMine()
-  #except:
-    #print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
 
   print(Style.RESET_ALL + Style.RESET_ALL)
   time.sleep(0.025) # Restart
