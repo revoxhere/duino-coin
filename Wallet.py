@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
 ###############################################
-# Duino-Coin Wallet (v1.4) © MrKris7100, revox 2020
+# Duino-Coin Wallet (v1.5)
 # https://github.com/revoxhere/duino-coin 
+# Distributed under MIT license
+# © revox, MrKris7100 2020
 #############################################
 import time, socket, sys, os, datetime, configparser, tkinter, getpass, platform, webbrowser, urllib.request, json # Import libraries
 import threading
@@ -38,7 +41,7 @@ balance = 0
 background = ""
 newbalance = 0
 sending = 0
-VER = "1.4" # Version number
+VER = "1.5" # Version number
 resources = "Wallet_"+str(VER)+"_resources/"
 debug += "Successfully set variables\n"
 pcusername = getpass.getuser() # Get clients' username
@@ -191,7 +194,7 @@ def selectWindow(): # First-time launch window
     window.mainloop()
  
 def Register(): #signup definition
-    global pwordE, pwordconfirm, nameE, register
+    global pwordE, pwordconfirm, nameE, register, emailE
     
     register = tkinter.Tk() #register window
     register.resizable(False, False)
@@ -203,21 +206,27 @@ def Register(): #signup definition
     register.configure(background = str(colorA))
 
     nameL = tkinter.Label(register, text='Username: ', bg = str(colorA), fg = str(colorB))
+    emailL =tkinter.Label(register, text='E-mail: ', bg = str(colorA), fg = str(colorB))
     pwordL =tkinter.Label(register, text='Password: ', bg = str(colorA), fg = str(colorB))
     pwordconfirm = tkinter.Label(register, text='Confirm Password: ', bg = str(colorA), fg = str(colorB))
-    nameL.grid(row = 1, column = 0, sticky = W) 
-    pwordL.grid(row = 2, column = 0, sticky = W)
-    pwordconfirm.grid(row = 3, column = 0, sticky = W)
+
+    nameL.grid(row = 1, column = 0, sticky = W)
+    emailL.grid(row = 2, column = 0, sticky = W)
+    pwordL.grid(row = 3, column = 0, sticky = W)
+    pwordconfirm.grid(row = 4, column = 0, sticky = W)
      
     nameE = Entry(register, fg = str(colorB), bg = str(colorA)) 
+    emailE = Entry(register, fg=str(colorB), bg = str(colorA))
     pwordE = Entry(register, show='*', fg = str(colorB), bg = str(colorA)) 
     pwordconfirm = Entry(register, show='*', fg = str(colorB), bg = str(colorA))
+
     nameE.grid(row = 1, column = 1)
-    pwordE.grid(row = 2, column = 1)
-    pwordconfirm.grid(row = 3, column = 1)
+    emailE.grid(row=2, column = 1)
+    pwordE.grid(row = 3, column = 1)
+    pwordconfirm.grid(row = 4, column = 1)
 
     signupButton = tkinter.Button(register, text='Register account', activebackground = str(colorHighlight), command = registerProtocol, bg = str(colorA), fg = str(colorB))
-    signupButton.grid(row = 4, column = 1)
+    signupButton.grid(row = 5, column = 1)
     register.bind('<Return>', registerCallback)
     register.mainloop()
     selectWindow()
@@ -227,23 +236,24 @@ def registerCallback(event):
  
 def registerProtocol(): #signup server communication section
     username = nameE.get()
+    email = emailE.get()
     passwordconfirm = pwordconfirm.get()
     password = pwordE.get()
     if password == passwordconfirm:
         while True:
-            s.send(bytes("REGI,"+username+","+password, encoding='utf8')) #send register request to server
-            key = s.recv(2).decode()
-            if key == "OK":
-                messagebox.showinfo("Success!", "Successfully registered user "+username+".\nNow you can login.")
+            s.send(bytes("REGI,"+str(username)+","+str(password)+","+str(email), encoding='utf8')) #send register request to server
+            key = s.recv(32).decode()
+            key = key.split(",")
+            if key[0] == "OK":
+                messagebox.showinfo("Success!", "Registered user "+username+".\nCheck your e-mail for welcome message.")
                 window.destroy()
                 register.destroy()
                 os.execl(sys.executable, sys.executable, *sys.argv)
-            if key == "NO":
-                messagebox.showerror("Error!", "User "+username+" is already registered or you've used non-allowed characters!\nPlease try again!")
+            if key[0] == "NO":
+                messagebox.showerror("Error!", str(key[1]))
                 register.destroy()
                 os.execl(sys.executable, sys.executable, *sys.argv)
     else:
-
         register.destroy()
         os.execl(sys.executable, sys.executable, *sys.argv)
         
@@ -289,10 +299,11 @@ def loginProtocol(): # First-time login protocol
     password = pwordEL.get()
     
     while True:
+
         s.send(bytes("LOGI,"+str(username)+","+str(password), encoding='utf8')) # Send login request to server
-        key = s.recv(2).decode()
-        
-        if key == "OK": # If data is correct, remember user
+        key = s.recv(64).decode()
+        key = key.split(',')
+        if key[0] == "OK": # If data is correct, remember user
             config['wallet'] = {"username": username,
                       "password": password,
                       "theme": str("1"),
@@ -304,12 +315,42 @@ def loginProtocol(): # First-time login protocol
             rootA.destroy()
             loadConfig()
             
-        if key == "NO": # If not, go back
-            messagebox.showerror("Error!", "Incorrect credentials!\n Please try again!")
+        if key[0] == "NO": # If not, go back
+            messagebox.showerror("Error!", str(key[1]))
             rootA.destroy()
             os.execl(sys.executable, sys.executable, *sys.argv)
         else: # If error, fallback
             os.execl(sys.executable, sys.executable, *sys.argv)
+
+def sendEmailProtocol():
+  email = emailE.get()
+  balanceTimer.cancel()
+  s.send(bytes("ADDEMAIL,"+str(username)+","+str(password)+","+str(email), encoding='utf8')) # Send login request to server
+  time.sleep(0.025)
+  resp = s.recv(1024).decode()
+  messagebox.showinfo("Server message", str(resp))
+  emailWindow.destroy()
+
+def addEmail():
+  global emailE, emailWindow
+
+  emailWindow = tkinter.Tk() #email window
+  emailWindow.resizable(False, False)
+  emailWindow.title('Add e-mail to account')
+  try:
+      rootA.iconbitmap(str(resources) + "Wallet_icon.ico")
+  except:
+      pass # Icon won't work on linux
+  emailWindow.configure(background = str(colorA))
+
+  nameL = Label(emailWindow, text="There is no e-mail associated with your account.\nWithout it you won\'t be able to exchange funds.\nWe won't send spam.\nPlease add e-mail to your account:", bg = str(colorA), fg = str(colorB))
+  nameL.pack()
+
+  emailE = Entry(emailWindow, fg = str(colorB), bg = str(colorA), width=30)
+  emailE.pack()
+
+  emailB = Button(emailWindow, text='Add e-mail', activebackground = str(colorHighlight), command = sendEmailProtocol, bg = str(colorA), fg = str(colorB))
+  emailB.pack()
     
 def loadConfig(): # Load config protocol
     global username, password, debug, loadingScr, notificationSetting, currency, rate
@@ -365,30 +406,40 @@ def loadConfig(): # Load config protocol
             os._exit(1)
 
     while True: # Receive server key
-        key = s.recv(2).decode()
+        key = s.recv(64).decode()
+        key = key.split(',')
+
         debug += "Received server keys\n"
-        if key == "OK":
+        if key[0] == "OK":
             label = tkinter.Label(loadingScr, text = "Launching..." + str(" ")*20, bg = "#23272a", fg = "#EEEEEE", font=("Arial", 8)).place(relx = 0.01, rely = 0.8)  
             loadingScr.update()
-            s.send(bytes("FROM," + "Wallet," + str(pcusername) + "," + str(publicip) + "," + str(platform), encoding="utf8")) # Send info to server settings client
+
+            s.send(bytes("FROM," + "Wallet," + str(pcusername).rstrip() + "," + str(publicip).rstrip() + "," + str(platform).rstrip(), encoding="utf8")) # Send info to server settings client
             debug += "Sent client information\n"
-            time.sleep(0.1)
+            time.sleep(0.045)
             
             while True:   
                 s.send(bytes("STAT", encoding='utf8'))
                 try:
                     userstatus = s.recv(1024).decode('utf8')
-                    break
-                except:
-                    pass
+                    userstatus = userstatus.split(',')
 
-            
+                    if userstatus[1] == "NoEmail":
+                      addEmail()
+                      s.send(bytes("STAT", encoding='utf8'))
+                      userstatus = s.recv(1024).decode('utf8')
+                      userstatus = userstatus.split(',')
+                    break
+
+                except:
+                    break
+
             loadingScr.destroy()
             WalletWindow()
             os._exit(0)
-        if key == "NO":
+        if key[0] == "NO":
             loadingScr.destroy()
-            messagebox.showerror("Error","Error in configfile (Wallet_config.ini)!\nRemove it and restart the wallet.")
+            messagebox.showerror("Error",str(key[1]))
             os._exit(0)
         else:
             loadConfig()
@@ -912,8 +963,6 @@ if not Path(str(resources) + "notification.mp3").is_file():
 else:
     debug += "Notification sound already downloaded\n"
 
-
-
 if not Path(str(resources) + "/icons/exchange.png").is_file():
     try:
         debug += "Downloading latest icon\n"
@@ -954,14 +1003,11 @@ if not Path(str(resources) + "/icons/clock.png").is_file():
     except:
         debug += "Couldn't download icon!\n"
 
-
-
 label = tkinter.Label(loadingScr, text = "Authenticating user..." + str(" ")*20, bg = str(colorA), fg = str(colorC), font=("Arial", 8)).place(relx = 0.01, rely = 0.8)  
 loadingScr.update()
 
 try:
   s.connect((str(host), int(port)))
-  s.settimeout(10)
   debug += "Connected to the server\n"
   SERVER_VER = s.recv(3).decode() # Server version
   if float(VER) < float(SERVER_VER):
@@ -970,7 +1016,7 @@ try:
     messagebox.showwarning("Warning","Your wallet is outdated, please install latest version to be up-to-date.")
     serverMsg.destroy()
 
-except SystemExit:
+except:
   loadingScr.destroy()
   serverMsg = tkinter.Tk()
   serverMsg.withdraw()
