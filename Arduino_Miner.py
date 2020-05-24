@@ -43,7 +43,7 @@ except:
   os._exit(1)
 
 # Global variables
-VER = "1.4" # Version number
+VER = "1.5" # Version number
 timeout = 5 # Socket timeout
 resources = "ArduinoMiner_"+str(VER)+"_resources"
 
