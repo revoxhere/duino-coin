@@ -40,7 +40,8 @@
 *   [Contributing](#contributing)
 *   [License](#license)
 *   [Built With](#built-with)
-*   [Our Team](#our-team)
+*   [Dev Team](#dev-team)
+*   [Special thanks](#special-thanks)
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
@@ -109,14 +110,17 @@ This section briefly lists major frameworks that Duino-Coin uses:
 *   [m-cpuminer-v2](https://github.com/m-pays/m-cpuminer-v2/) - Developer donation
 
 <!-- AUTHORS -->
-## Our Team
+## Dev Team
 
 *   **Lead developer:** [@revox](https://github.com/revoxhere/) - [YouTube](https://youtube.com/c/reVox96) - robik123.345@gmail.com
 *   **Developer:** [@Bilaboz](https://github.com/bilaboz/)
 *   **Social manager:** [@Furim](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
-*   **Designer:** [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg)
-*   **SHA algorithm implementation made by** [@MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) 
-*   **Help with Arduino SHA1 library** [@daknuett](https://github.com/daknuett/)
+
+## Special thanks
+*   [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg) for designing logos
+*   [@Tech1k](https://github.com/Tech1k) for providing us [duinocoin.com](https://duinocoin.com) domain
+*   [@MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) for help with implementing SHA1 algorithm
+*   [@daknuett](https://github.com/daknuett) for help with Arduino SHA1 library
 
 <!-- DONATIONS -->
 ## Donate
