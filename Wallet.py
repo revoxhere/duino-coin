@@ -522,7 +522,7 @@ def Logout():
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 def Discord():
-    webbrowser.open_new_tab("https://discord.gg/KyADZT3")
+    webbrowser.open_new_tab("https://discord.gg/kvBkccy")
 
 def GitHub():
     webbrowser.open_new_tab("https://github.com/revoxhere/duino-coin/")
