@@ -10,7 +10,7 @@
 //////////////////////////////////////////////////////////
 //  https://github.com/revoxhere/duino-coin - GitHub
 //  https://revoxhere.github.io/duino-coin/ - Website
-//  https://discord.gg/KyADZT3 - Discord
+//  https://discord.gg/kvBkccy - Discord
 //////////////////////////////////////////////////////////
 //  If you don't know how to start, visit official website
 //  and navigate to Getting Started page. Happy mining!
