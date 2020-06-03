@@ -14,7 +14,7 @@ permalink: /faq/
 
 ## Frequently Asked Questions
 
-FAQ has been moved to our [Discord](https://discord.gg/KyADZT3).
+FAQ has been moved to our [Discord](https://discord.gg/kvBkccy).
 
 * * **Q:** What is Duino-Coin? <br>
    * **A:** A new cryptocurrency that can be mined in various ways on many platforms. You can learn more about it on the [official website](https://revoxhere.github.io/duino-coin/).
@@ -33,7 +33,7 @@ FAQ has been moved to our [Discord](https://discord.gg/KyADZT3).
 ***
 
 * * **Q:** Is there a Discord server? <br>
-   * **A:** Yes! Come and talk with us: [https://discord.gg/KyADZT3](https://discord.gg/KyADZT3) <br>
+   * **A:** Yes! Come and talk with us: [https://discord.gg/kvBkccy](https://discord.gg/kvBkccy) <br>
 You will find there general chat, benchmarking room and much more to come in the future!
 
 ***
