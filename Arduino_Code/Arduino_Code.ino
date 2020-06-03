@@ -11,7 +11,7 @@
 //////////////////////////////////////////////////////////
 //  https://github.com/revoxhere/duino-coin - GitHub
 //  https://revoxhere.github.io/duino-coin/ - Website
-//  https://discord.gg/KyADZT3 - Discord
+//  https://discord.gg/kvBkccy - Discord
 //  https://github.com/daknuett - @daknuett
 //////////////////////////////////////////////////////////
 //  If you don't know how to start, visit official website
