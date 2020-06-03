@@ -43,7 +43,7 @@ Download Beta 2 here: [releases/tag/beta-2](https://github.com/revoxhere/duino-c
 ***
 
 ## 11.01.2020: Beta 1 (almost) done
-Beta 1 is probably going to be one of the most exciting updates so far! We've tried to fix almost every bug and added features that were asked on our Discord server. It will be released in a few hours. <br>
+Beta 1 is probably going to be one of the most exciting updates so far! We've tried to fix almost every bug and added features that were asked on our [Discord](https://discord.gg/kvBkccy) server. It will be released in a few hours. <br>
 <br>
 Download Beta 1 here: [releases/tag/beta-1](https://github.com/revoxhere/duino-coin/releases/tag/beta-1)
 
@@ -70,7 +70,7 @@ But a few more weeks until this happens.
 ## 18.12.2019: Christmas artwork contest!
 Ready to compete and win some coins? <br>
 Your job is to create one of the following Duino-Coin themed artworks.<br>
-Voting will happen on [Duino-Coin Discord server](https://discord.gg/XJpT3UQ). <br>
+Voting will happen on [Duino-Coin Discord server](https://discord.gg/kvBkccy). <br>
 Multiple entries are allowed.
 
 * **Wallet background** - 5:3 ratio (e.g. 500x300px), make sure the artwork isn't NSFW and buttons won't cover important parts, doesn't need to be christmas themed, rest is up to you. 
@@ -171,7 +171,7 @@ Sorry for inconvenience, but we can't do anything about it.
 ## 20.10.2019: Plans for 0.6.4
 ![](https://media.discordapp.net/attachments/634115103037325313/635391774030037004/Screenshot_20191020-101953.png?width=300&height=600) <br>
 Do you have something you'd like to see in future release? <br>
-Let's talk about it at our [Discord](https://discord.gg/XJpT3UQ)! <br>
+Let's talk about it at our [Discord](https://discord.gg/kvBkccy)! <br>
 
 ~~Versions **0.6.2** and/or **0.6.3** will be released in a few hours. <br>
 **Happy mining!**
@@ -180,7 +180,7 @@ Let's talk about it at our [Discord](https://discord.gg/XJpT3UQ)! <br>
 
 ## 16.10.2019: Status update
 Welcome back Duino-Miners! Long time no see, huh? <br>
-Main reason I created this post is that now we have a [Discord server](https://discord.gg/XJpT3UQ)! <br>
+Main reason I created this post is that now we have a [Discord server](https://discord.gg/kvBkccy)! <br>
 Come and talk with us, we will also try to solve any issues with Duino-Coin :) <br>
 Other than that, Duino-Coin is now so popular that we went from 400 to 670 difficulty in less than two weeks! <br>
 We have 46 registered users and many of them are active daily. <br>
