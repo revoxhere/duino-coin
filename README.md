@@ -27,7 +27,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a995acf7cd4c4211af6da874fe549ee5)](https://app.codacy.com/manual/revoxhere/duino-coin?utm_source=github.com&utm_medium=referral&utm_content=revoxhere/duino-coin&utm_campaign=Badge_Grade_Dashboard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-important.svg?style=flat)](https://opensource.org/licenses/MIT)
 [![Latest release: 1.5](https://img.shields.io/badge/Latest_release-1.5-critical.svg?style=flat)](https://github.com/revoxhere/duino-coin/releases/tag/1.5)
-[![Discord](https://img.shields.io/discord/677615191793467402.svg?color=Blue&label=Discord&logo=Discord?style=flat)](https://discord.gg/KyADZT3)
+[![Discord](https://img.shields.io/discord/677615191793467402.svg?color=Blue&label=Discord&logo=Discord?style=flat)](https://discord.gg/kvBkccy)
 [![Bitcointalk thread](https://img.shields.io/badge/Bitcointalk_thread-Duino_Coin-gold.svg?style=flat)](https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015)
 
 <!-- TABLE OF CONTENTS -->
