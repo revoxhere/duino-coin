@@ -15,7 +15,7 @@ permalink: /blog/
 
 # Official Duino-Coin Blog
 
-Blog has been moved to our [Discord](https://discord.gg/KyADZT3)
+Blog has been moved to our [Discord](https://discord.gg/kvBkccy)
 
 ***
 
