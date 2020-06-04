@@ -1,5 +1,5 @@
-serveo.net
-14808
+0.tcp.ngrok.io
+16198
 =================
 First line represents the pool IP address.
 Second line is the pool port.
