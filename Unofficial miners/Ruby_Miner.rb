@@ -41,8 +41,10 @@ while 1 # Mining loop
 			SHAREFEED = s.read(4) # And receive result feedback
 			if SHAREFEED == "GOOD" # Check wheter it was accepted or not
 				puts "Accepted share " + String(result) + " (Difficulty " + String(difficulty) + ")"
+				break
 			else
 				puts "Rejected share " + String(result) + " (Difficulty " + String(difficulty) + ")"
+				break
 			end
 		end
 	end
