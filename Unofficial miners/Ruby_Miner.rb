@@ -39,7 +39,11 @@ while 1 # Mining loop
 		if sha1 == String(job[1]) # If result is found
 			s.write(result) # Send numeric result to the server
 			SHAREFEED = s.read(4) # And receive result feedback
-			puts "Accepted share " + String(result) + " (Difficulty " + String(difficulty) + ")"
+			if SHAREFEED == "GOOD" # Check wheter it was accepted or not
+				puts "Accepted share " + String(result) + " (Difficulty " + String(difficulty) + ")"
+			else
+				puts "Rejected share " + String(result) + " (Difficulty " + String(difficulty) + ")"
+			end
 		end
 	end
 end
