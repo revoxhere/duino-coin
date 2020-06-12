@@ -36,7 +36,8 @@ Key features:
 *   open-source
 
 Technical specifications:
-*   Block supply: 35 million
+*   Coin supply: ~ 350k
+*   Block supply: ~ 35 million
 *   Premine: ~ 5k blocks
 *   Block time: Instant ⚡
 *   Ticker: DUCO (ᕲ)
