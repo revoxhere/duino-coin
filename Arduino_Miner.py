@@ -44,7 +44,7 @@ except:
 
 # Global variables
 VER = "1.5" # Version number
-timeout = 5 # Socket timeout
+timeout = 20 # Socket timeout
 resources = "ArduinoMiner_"+str(VER)+"_resources"
 
 shares = [0, 0]
