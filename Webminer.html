@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WebSocket demo</title>
+        <style>
+        	.login {
+                color: blue;
+            }
+            .balance {
+                color: yellow;
+            }
+            .buttons {
+                font-size: 4em;
+                display: flex;
+                justify-content: center;
+            }
+            .button, .value {
+                line-height: 1;
+                padding: 2rem;
+                margin: 2rem;
+                border: medium solid;
+                min-height: 1em;
+                min-width: 1em;
+            }
+            .button {
+                cursor: pointer;
+                user-select: none;
+            }
+        </style>
+    </head>
+    <script src="http://cdn.rawgit.com/h2non/jsHashes/master/hashes.js"></script>
+    <body>
+    	<div class="buttons">
+            <div class="login button">login</div>
+            <div class="balance button">balance</div>
+        </div>
+        <script>
+        	var SHA1 = new Hashes.SHA1
+        	var login = document.querySelector('.login');
+        	var balance = document.querySelector('.balance'); 
+            var ws = new WebSocket("ws://127.0.0.1:6789/"),
+                messages = document.createElement('ul');
+                message = "";
+            ws.onmessage = function (event) {
+                var messages = document.getElementsByTagName('ul')[0],
+                    message = document.createElement('li'),
+                    content = document.createTextNode(event.data);
+                message.appendChild(content);
+                messages.appendChild(message);
+                if ("," in message) {
+                	console.log("ye")
+                }
+            };
+            document.body.appendChild(messages);
+            console.log(message)
+            login.onclick = function (event) {
+                ws.send("LOGI,usr,pass"); // DUCO USERNAME AND PASSWORD
+            }
+            balance.onclick = function (event) {
+                ws.send("JOB");
+                //message = "a9993e364706816aba3e25717850c26c9cd0d89d,c6a039c19f32a6b9c76055013f4346d4c9828c96,123"
+                console.log("HASHER HAS" + message)
+    			var job = message.split(',');
+    			var difficulty = job[2]
+
+    			var result;
+    			for(result = 0 ; result < (100 * difficulty + 1) ; result++){
+        			var ducos1 = SHA1.hex(job[0]+result);
+        			if(job[1] == ducos1){
+            			ws.send(result);
+            			console.log("SHARE : " + result);
+            			break
+        			}
+   				 }
+			}
+           
+        </script>
+    </body>
+</html>
