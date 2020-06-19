@@ -340,11 +340,16 @@ def ArduinoMine(): # Mining section
   
   ready = com.readline().decode().rstrip().lstrip() # Arduino will send ready signal
   while True:
-    com.write(bytes("start\n", encoding="utf8")) # hash
-
-    soc.send(bytes("Job",encoding="utf8")) # Send job request to server
-    job = soc.recv(1024).decode().split(",") # Split received job
-    
+    com.write(bytes("start\n", encoding="utf8")) # start
+    try:
+      soc.send(bytes("Job",encoding="utf8")) # Send job request to server
+      job = soc.recv(1024).decode().split(",") # Split received job
+    except:
+      now = datetime.datetime.now()
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot connect to the server." + Style.RESET_ALL + Fore.RED + " It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
+      time.sleep(15)
+      os.execl(sys.executable, sys.executable, *sys.argv)
+      
     com.write(bytes(str(job[0])+"\n", encoding="utf8")) # hash
     time.sleep(0.05)
     com.write(bytes(str(job[1])+"\n", encoding="utf8")) # job
@@ -353,7 +358,13 @@ def ArduinoMine(): # Mining section
 
     computestart = datetime.datetime.now() # Get timestamp of start of the computing
     result = com.readline().decode().rstrip().lstrip() # Send hash, job and difficulty to the board using serial
-    soc.send(bytes(str(result), encoding="utf8")) # Send result of hashing algorithm to pool
+    try:
+      soc.send(bytes(str(result), encoding="utf8")) # Send result of hashing algorithm to pool
+    except:
+      now = datetime.datetime.now()
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot connect to the server." + Style.RESET_ALL + Fore.RED + " It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
+      time.sleep(15)
+      os.execl(sys.executable, sys.executable, *sys.argv)
 
     while True:
       feedback = soc.recv(1024).decode() # Get feedback
@@ -409,11 +420,8 @@ while True:
     time.sleep(15)
     os._exit(1)
 
-  try:
-    Greeting() # Display greeting message
-  except:
-    pass
-
+  Greeting() # Display greeting message
+  
   Connect() # Connect to pool
 
   checkVersion() # Check version
