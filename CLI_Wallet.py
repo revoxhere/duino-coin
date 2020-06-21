@@ -69,7 +69,7 @@ while True: # Grab data grom GitHub section
 					contentjson = json.loads(content)
 					ducofiat = float(contentjson["Duco price"])
 				else:
-					ducofiat = 0.0024847 * rate # If json api request fails, wallet will use this value
+					ducofiat = 0.0025 # If json api request fails, wallet will use this value
 				break # If connection was established, continue
     
 			except: # If it wasn't, display a message
