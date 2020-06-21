@@ -5,8 +5,8 @@ require 'digest'
 require 'net/http'
 require 'json' # Only default ruby libraries
 
-username = "your username here" 
-password = "your password here"
+username = "username" # Replace these with your credentials
+password = "password"
 
 $VERBOSE = nil # Disable debug output
 url = 'https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt'
@@ -23,13 +23,13 @@ puts "Server is on version " + SERVER_VER
 s.puts("LOGI,"+String(username)+","+String(password)) # Send login request
 FEEDBACK = s.gets(2) # Receive login feedback
 if FEEDBACK == "OK"
-	puts "Loged in"
+	puts "Logged in"
 else
 	puts "Error loging in - check account credentials!"
 	exit # Exit if credentials are incorrect
 end
 
-while 1 # Mining loop
+loop do # Mining loop
 	s.puts("JOB") # Send job request
 	job = s.read(86) # Read job
 	job = job.split(',') # Split into previous block hash, result hash and difficulty
