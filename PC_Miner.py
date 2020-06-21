@@ -35,14 +35,6 @@ except:
   time.sleep(15)
   os._exit(1)
 
-try: # Check if pyspectator is installed
-  from pyspectator.processor import Cpu
-except:
-  now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "Pyspectator is not installed. Please install it using: python3 -m pip install pyspectator.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
-  time.sleep(15)
-  os._exit(1) 
-
 # Global variables
 VER = "1.5" # Version number
 timeout = 5 # Socket timeout
@@ -74,7 +66,6 @@ try:
     os.mkdir(str(resources)) # Create resources folder if it doesn't exist
 except:
     pass
-
 
 def title(title):
   if os.name == 'nt':
@@ -126,13 +117,14 @@ def Greeting(): # Greeting message depending on time
   time.sleep(0.15)
   print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
   time.sleep(0.15)
-  print(" * " + Fore.YELLOW + "CPU: " + Style.BRIGHT + str(cpu["brand"]))
-  time.sleep(0.15)
+  try:
+    print(" * " + Fore.YELLOW + "CPU: " + Style.BRIGHT + str(cpu["brand_raw"]))
+    time.sleep(0.15)
+  except:
+    pass
   print(" * " + Fore.YELLOW + "Donation level: " +  Style.BRIGHT + str(donationlevel))
   time.sleep(0.15)
-  print(" * " + Fore.YELLOW + "ST tuning: " + Style.BRIGHT + str(st))
-  time.sleep(0.15)
-  print(" * " + Fore.YELLOW + "Algo variant: " + Style.BRIGHT + str(miningmethodlabel))
+  print(" * " + Fore.YELLOW + "DUCO-S1 variant: " + Style.BRIGHT + str(miningmethodlabel))
   time.sleep(0.15)
   print(" * " + Fore.YELLOW + "Autorestarter: " + Style.BRIGHT + str(autorestartmessage))
   time.sleep(0.15)
@@ -168,13 +160,6 @@ def autorestarter(): # Autorestarter
 
   os.execl(sys.executable, sys.executable, *sys.argv)
 
-def temp(): # Temperature monitor
-  cputemp = Cpu(monitoring_latency=1)
-
-  now = datetime.datetime.now()
-  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Style.NORMAL + Fore.YELLOW + " CPU ("+cpu["brand"]+")" + Style.BRIGHT + " temperature: " + str(cputemp.temperature) + "°C")
-
-  threading.Timer(float(temp_print_time), temp).start()
 
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, password, efficiency, autorestart, donationlevel, st, bytereturn, miningmethod, temp_print_time
@@ -328,8 +313,8 @@ def Login():
         Connect() # Reconnect if pool down
         
       if resp == "OK": # Check wheter login information was correct
-        soc.send(bytes("FROM," + "PC_Miner," + str(pcusername) + "," + str(publicip) + "," + str(platform), encoding="utf8")) # Send info to server about client
-        time.sleep(0.05)
+        soc.send(bytes("FROM," + "PC_Miner," + str(pcusername) + "," + str(publicip) + "," + str(platform) + "\n", encoding="utf8")) # Send info to server about client
+        time.sleep(0.25)
 
         now = datetime.datetime.now()
         print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.YELLOW + " Logged in successfully " + Style.RESET_ALL + Fore.YELLOW + "as " + str(username))
@@ -358,7 +343,7 @@ def Login():
     time.sleep(0.025) # Try again if no response 
 
 def Mine(): # Mining section
-  global last_hash_count, hash_count, khash_count, efficiency, donationlevel, donatorrunning
+  global last_hash_count, hash_count, khash_count, donationlevel, donatorrunning, efficiency
 
   if int(donationlevel) > 0:
     now = datetime.datetime.now()
@@ -414,10 +399,10 @@ def Mine(): # Mining section
     
     computestart = datetime.datetime.now()
     for iJob in range(100 * int(job[2]) + 1): # Calculate hash with difficulty
-      hash = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest() # Generate hash
+      ducos1 = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest() # Generate hash
       hash_count = hash_count + 1 # Increment hash counter
       
-      if job[1] == hash: # If result is even with job, send the result
+      if job[1] == ducos1: # If result is even with job, send the result
         try:
           soc.send(bytes(str(iJob) + "," + str(last_hash_count) + "," + str(st) + "," + str(bytereturn), encoding="utf8")) # Send result of hashing algorithm to pool
         except:
@@ -520,10 +505,10 @@ def MineRandom(): # Alternate mining method using randomness by MrKris7100
     
     computestart = datetime.datetime.now()
     for iJob in jobs: # Calculate hash with difficulty
-      hash = hashlib.sha1(str(job[0] + str(jobs[iJob])).encode("utf-8")).hexdigest() # Generate hash
+      ducos1 = hashlib.sha1(str(job[0] + str(jobs[iJob])).encode("utf-8")).hexdigest() # Generate hash
       hash_count = hash_count + 1 # Increment hash counter
       
-      if job[1] == hash: # If result is even with job, send the result
+      if job[1] == ducos1: # If result is even with job, send the result
         try:
           soc.send(bytes(str(jobs[iJob]) + "," + str(last_hash_count) + "," + str(st) + "," + str(bytereturn), encoding="utf8")) # Send result of hashing algorithm to pool
         except:
@@ -610,17 +595,12 @@ while True:
     os.execl(sys.executable, sys.executable, *sys.argv)
 
   try:
-    temp() # Start CPU temperature measurement
+    if int(miningmethod) == 2:
+      MineRandom() # Mine using random method
+    else:
+      Mine() # Mine using standard method
   except:
-    pass
-
-
-  if int(miningmethod) == 2:
-    MineRandom() # Mine using random method
-  else:
-    Mine() # Mine using standard method
-  #except:
-    #print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "✗ There was an error while mining. Restarting." + Style.RESET_ALL)
 
   print(Style.RESET_ALL + Style.RESET_ALL)
   time.sleep(0.025) # Restart
