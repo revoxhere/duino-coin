@@ -6,7 +6,6 @@
 # © revox, MrKris7100 2020
 ##########################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
-from decimal import Decimal
 from pathlib import Path
 from signal import signal, SIGINT
 
@@ -260,7 +259,7 @@ def checkVersion():
     Connect() # Reconnect if pool down
 
 def ConnectToArduino():
-  global com, arduinoport
+  global com
   com = serial.Serial(arduinoport, 115200)
 
 def Login():
@@ -330,7 +329,7 @@ def ArduinoMine(): # Mining section
     if int(donationlevel) == int(0):
         cmd = "cd " + str(resources)
     try:  # Start cmd set above
-      process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
+      subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
       donatorrunning = True
     except:
       pass
@@ -340,16 +339,11 @@ def ArduinoMine(): # Mining section
   
   ready = com.readline().decode().rstrip().lstrip() # Arduino will send ready signal
   while True:
-    com.write(bytes("start\n", encoding="utf8")) # start
-    try:
-      soc.send(bytes("Job",encoding="utf8")) # Send job request to server
-      job = soc.recv(1024).decode().split(",") # Split received job
-    except:
-      now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot connect to the server." + Style.RESET_ALL + Fore.RED + " It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
-      time.sleep(15)
-      os.execl(sys.executable, sys.executable, *sys.argv)
-      
+    com.write(bytes("start\n", encoding="utf8")) # hash
+
+    soc.send(bytes("Job",encoding="utf8")) # Send job request to server
+    job = soc.recv(1024).decode().split(",") # Split received job
+    
     com.write(bytes(str(job[0])+"\n", encoding="utf8")) # hash
     time.sleep(0.05)
     com.write(bytes(str(job[1])+"\n", encoding="utf8")) # job
@@ -358,13 +352,7 @@ def ArduinoMine(): # Mining section
 
     computestart = datetime.datetime.now() # Get timestamp of start of the computing
     result = com.readline().decode().rstrip().lstrip() # Send hash, job and difficulty to the board using serial
-    try:
-      soc.send(bytes(str(result), encoding="utf8")) # Send result of hashing algorithm to pool
-    except:
-      now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot connect to the server." + Style.RESET_ALL + Fore.RED + " It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
-      time.sleep(15)
-      os.execl(sys.executable, sys.executable, *sys.argv)
+    soc.send(bytes(str(result), encoding="utf8")) # Send result of hashing algorithm to pool
 
     while True:
       feedback = soc.recv(1024).decode() # Get feedback
@@ -420,17 +408,38 @@ while True:
     time.sleep(15)
     os._exit(1)
 
-  Greeting() # Display greeting message
+  try:
+    Greeting() # Display greeting message
+  except:
+    pass
   
-  Connect() # Connect to pool
+  try:
+    Connect() # Connect to pool
+  except:
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while connecting to the server. Restarting in 15 seconds." + Style.RESET_ALL)
+    time.sleep(15)
+    os.execl(sys.executable, sys.executable, *sys.argv)
+    
+  try:
+    checkVersion() # Check version
+  except:
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while connecting to the server. Restarting in 15 seconds." + Style.RESET_ALL)
+    time.sleep(15)
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
-  checkVersion() # Check version
-
-  Login() # Login
+  try:
+    Login() # Login
+  except:
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while logging-in. Restarting." + Style.RESET_ALL)
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
   ConnectToArduino() # Connect to AVR board
 
-  ArduinoMine()
+  try:
+    ArduinoMine()
+  except:
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining. Restarting." + Style.RESET_ALL)
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
   print(Style.RESET_ALL + Style.RESET_ALL)
   time.sleep(0.025) # Restart
