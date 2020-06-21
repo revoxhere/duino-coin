@@ -42,7 +42,7 @@ server_version = soc.recv(3).decode() # Get server version
 print("Server is on version", server_version)
 
 soc.send(bytes("LOGI," + username + "," + password, encoding="utf8")) # Send login data
-response = soc.recv(2).decode() # Get server feedback about logging in                
+response = soc.recv(2).decode() # Get server feedback about logging in
 if response == "OK":
     print("Loged in")
 else:
@@ -50,7 +50,7 @@ else:
     soc.close()
     os._exit(1)
 
-#@jit()
+@jit()
 def doHash(hash, prevHash, diff):
     for result in range(100 * int(diff) + 1): # Calculate hash with difficulty
         ducos1 = hashlib.sha1(str((hash) + str(result)).encode("utf-8")).hexdigest() # Generate hash
