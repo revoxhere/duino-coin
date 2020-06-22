@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Webminer tech demo</title>
-        <style>
-            .button {
-                cursor: pointer;
-                user-select: none;
-            }
+	<head>
+		<title>Webminer tech demo</title>
+		<style>
+			.button {
+				cursor: pointer;
+				user-select: none;
+			}
 		body {
-			background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+			background: linear-gradient(-45deg, #d35400, #d35400, #f1c40f, #f1c40f);
 			background-size: 400% 400%;
-			animation: gradient 15s ease infinite;
+			animation: gradient 5s ease infinite;
 		}
 
 		p, h1, h3 {
@@ -28,130 +28,131 @@
 				background-position: 0% 50%;
 			}
 		}
-        </style>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js" integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha256-OUFW7hFO0/r5aEGTQOz9F/aXQOt+TwqI1Z4fbVvww04=" crossorigin="anonymous"></script>
-    </head>
-    <script src="http://cdn.rawgit.com/h2non/jsHashes/master/hashes.js"></script>
+		</style>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js" integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha256-OUFW7hFO0/r5aEGTQOz9F/aXQOt+TwqI1Z4fbVvww04=" crossorigin="anonymous"></script>
+	</head>
+	<script src="http://cdn.rawgit.com/h2non/jsHashes/master/hashes.js"></script>
 
-    <body>
+	<body>
 
-    	<div class="container">
-    		<br><br>
-    		<h1>Duino-Coin Webminer Tech Demo</h1>
-    		<input id="username" type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"><br>
-    		<input id="password" type="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1"><br>
-        	<div class="login button btn btn-primary">Login and start mining</div>
-       	</div>
-       	<div class="container">
-       		<br>
-       		<h3 id="miningstatus">Status</h3>
-	        <p id="loginstatus">Connecting... If you're seeing this message for more than few seconds that means proxy server is offline.</h2>
-	        <p id="sharecount">Start mining to see shares info</p>
-	    </div>
+		<div class="container">
+			<br><br>
+			<h1>Duino-Coin Webminer Tech Demo</h1>
+			<p>I haven't decided on the style yet but leave that for me please. This is a working proof of concept and probably needs some code optimizations.</p>
+			<input id="username" type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1"><br>
+			<input id="password" type="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1"><br>
+			<div class="login button btn btn-primary">Login and start mining</div>
+		 	</div>
+		 	<div class="container">
+		 		<br>
+		 		<h3 id="miningstatus">Status</h3>
+			<p id="loginstatus">Connecting... If you're seeing this message for more than few seconds that means proxy server is offline.</h2>
+			<p id="sharecount">Start mining to see shares info</p>
+		</div>
 
 
-	    <div class="container">
+		<div class="container">
 			<div id="loginfail" class="alert alert-danger" role="alert">
-  			Couldn't login because this user doesn't exist or you've entered wrong password.
+				Couldn't login because this user doesn't exist or you've entered wrong password.
 			</div>
 			<div id="loginsuccess" class="alert alert-success" role="alert">
-  			Logged-in successfully.
+				Logged-in successfully.
 			</div>
 		</div>
 
-        <script>
-        	$('#loginfail').hide();
-        	$('#loginsuccess').hide();
-        	let SHA1 = new Hashes.SHA1
-        	let sharecounter = 0;
-        	var hash_count = 0;
-        	let badsharecounter = 0;
-        	let message;
+		<script>
+			$('#loginfail').hide();
+			$('#loginsuccess').hide();
+			let SHA1 = new Hashes.SHA1
+			let sharecounter = 0;
+			var hash_count = 0;
+			let badsharecounter = 0;
+			let message;
 
-        	let login = document.querySelector('.login');
-        	let algo = document.querySelector('.algo'); 
+			let login = document.querySelector('.login');
+			let algo = document.querySelector('.algo'); 
 
-            let ws = new WebSocket("ws://127.0.0.1:14808/");
+			let ws = new WebSocket("ws://127.0.0.1:14808/");
 
-            const sleep = (milliseconds) => {
-  				return new Promise(resolve => setTimeout(resolve, milliseconds))
+			const sleep = (milliseconds) => {
+					return new Promise(resolve => setTimeout(resolve, milliseconds))
 			}
 
-            ws.onmessage = function (event) {
-	            let server_message = event.data;
-	            console.log("Server: " + server_message)
+			ws.onmessage = function (event) {
+				let server_message = event.data;
+				console.log("Server: " + server_message)
 
-	            if (server_message == "OK") {
-	            	$('#loginsuccess').show();
-	            }
+				if (server_message == "OK") {
+					$('#loginsuccess').show();
+				}
 
-	            else if (server_message.includes("NO")) {
-	            	$('#loginfail').show();
-	            }
+				else if (server_message.includes("NO")) {
+					$('#loginfail').show();
+				}
 
-	            else if (server_message.includes("1.")) {
-	            	document.getElementById("loginstatus").innerHTML = "Proxy server is online";
-	            }
+				else if (server_message.includes("1.")) {
+					document.getElementById("loginstatus").innerHTML = "Proxy server is online";
+				}
 
-	            else if (server_message == "BAD") {
-	            	badsharecounter++;
+				else if (server_message == "BAD") {
+					badsharecounter++;
 
 
-	            	hash_count = hash_count / 1000;
-	            	document.getElementById("sharecount").innerHTML = "Accepted: " + sharecounter + "<br> Rejected: " + badsharecounter + "<br> Hashrate: " + hash_count + " kH/s (not precise - not even calculated properly, can someone take a look?)";
+					hash_count = hash_count / 1000;
+					document.getElementById("sharecount").innerHTML = "Accepted: " + sharecounter + "<br> Rejected: " + badsharecounter + "<br> Hashrate: " + hash_count + " kH/s (not precise - not even calculated properly, can someone take a look?)";
 
-	            	hash_count = 0;
+					hash_count = 0;
 
-	            	sleep(50).then(() => {
-		            	ws.send("JOB");
+					sleep(50).then(() => {
+						ws.send("JOB");
 					})
-	            }
+				}
 
-	            else if (server_message == "GOOD") {
-	            	sharecounter++;
-	            	hash_count = hash_count / 1000;
-	                document.getElementById("sharecount").innerHTML = "Accepted: " + sharecounter + "<br> Rejected: " + badsharecounter + "<br> Hashrate: " + hash_count + " kH/s (not precise - not even calculated properly, can someone take a look?)";
+				else if (server_message == "GOOD") {
+					sharecounter++;
+					hash_count = hash_count / 1000;
+					document.getElementById("sharecount").innerHTML = "Accepted: " + sharecounter + "<br> Rejected: " + badsharecounter + "<br> Hashrate: " + hash_count + " kH/s (not precise - not even calculated properly, can someone take a look?)";
 
-	                hash_count = 0;
+					hash_count = 0;
 
-	            	sleep(50).then(() => {
-		            	ws.send("JOB");
+					sleep(50).then(() => {
+						ws.send("JOB");
 					})
-	            }
+				}
 
-	            else if (server_message.length > 64) { // If we receive long data which means its job
-	                content = String(server_message)
-		    	    let job = content.split(',');
-		    		let difficulty = job[2];
-		    		let result;
+				else if (server_message.length > 64) { // If we receive long data which means its job
+					content = String(server_message)
+					let job = content.split(',');
+					let difficulty = job[2];
+					let result;
 
-		    		for(result = 0; result < (100 * difficulty + 1); result++){
-		        		let ducos1 = SHA1.hex(job[0] + result); // calculate sha1 hash
-		        		hash_count++;
-		        		if(job[1] == ducos1){ // and if correct result is found
-		        			
-		        			console.log("Miner: Share found: " + result);
-		            		ws.send(result); // send the result to the server
-		            		break;
-		        		}
-		   			}
-		   		}
-            }
-            
-            login.onclick = function (event) {
-            	var username = document.getElementById("username").value;
-  				var password = document.getElementById("password").value;
-                ws.send("LOGI,"+username+","+password);
-	            sleep(250).then(() => {
-		            document.getElementById("miningstatus").innerHTML = "You are now mining.";
-                	ws.send("JOB");;
+					for(result = 0; result < (100 * difficulty + 1); result++){
+						let ducos1 = SHA1.hex(job[0] + result); // calculate sha1 hash
+						hash_count++;
+						if(job[1] == ducos1){ // and if correct result is found
+							
+							console.log("Miner: Share found: " + result);
+							ws.send(result); // send the result to the server
+							break;
+						}
+			 		}
+			 	}
+			}
+			
+			login.onclick = function (event) {
+				var username = document.getElementById("username").value;
+				var password = document.getElementById("password").value;
+				ws.send("LOGI,"+username+","+password);
+
+				sleep(250).then(() => {
+					document.getElementById("miningstatus").innerHTML = "You are now mining.";
+					ws.send("JOB");;
 				})
-
-            }
-        </script>
-    </body>
+			}
+		</script>
+	</body>
 </html>
