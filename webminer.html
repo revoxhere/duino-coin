@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+    <head>
+        <meta charset="utf-8" />
+        <html lang="en">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>Duino-Coin | Webminer</title>
+        <link rel="icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+        <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js" integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha256-OUFW7hFO0/r5aEGTQOz9F/aXQOt+TwqI1Z4fbVvww04=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="/assets/js/app.4aa08d6dcc3080b4c008.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="http://cdn.rawgit.com/h2non/jsHashes/master/hashes.js"></script>
+        <style>
+            .btn-success {
+                background-color: #f39c12;
+                border-color: #f39c12;
+            }
+            .btn-success:hover, .btn-success:focus, .btc-success:active, .btc-success:visited {
+                background-color: #f1c40f;
+                border-color: #f1c40f;
+            }
+            ::-webkit-scrollbar
+            {
+              width: 8px;  /* for vertical scrollbars */
+              height: 8px; /* for horizontal scrollbars */
+            }
+
+            ::-webkit-scrollbar-track
+            {
+              background: rgba(0, 0, 0, 0.1);
+            }
+
+            ::-webkit-scrollbar-thumb
+            {
+              background: #f39c12;
+            }
+			.login {
+			  height:2.29em;
+			}
+        </style>
+        		<script>
+        		window.onload = function(){
+				let SHA1 = new Hashes.SHA1
+				let sharecounter = 0;
+				var hash_count = 0;
+				let badsharecounter = 0;
+				let message;
+
+				let login = document.querySelector('.login');
+				let algo = document.querySelector('.algo'); 
+
+				let ws = new WebSocket("ws://108.61.177.134:14808/");
+
+				const sleep = (milliseconds) => {
+						return new Promise(resolve => setTimeout(resolve, milliseconds))
+				}
+
+				ws.onmessage = function (event) {
+					let server_message = event.data;
+					console.log("Server: " + server_message)
+
+					if (server_message == "OK") {
+						document.getElementById("loginstatus").innerHTML = "Logged-in successfully.";
+					}
+
+					else if (server_message.includes("NO")) {
+						document.getElementById("loginstatus").innerHTML = "Couldn't login because this user doesn't exist or you've entered wrong password. Refresh the page and try again.";
+					}
+
+					else if (server_message.includes("1.")) {
+						document.getElementById("loginstatus").innerHTML = "Proxy server is online";
+					}
+
+					else if (server_message == "BAD") {
+						badsharecounter++;
+						hash_count = hash_count / 1000;
+
+						hash_count = hash_count / 1000;
+						document.getElementById("sharecount").innerHTML = "Accepted: " + sharecounter + "<br> Rejected: " + badsharecounter + "<br> Hashrate: " + hash_count + " kH/s (not precise - not even calculated properly, can someone take a look?)";
+
+						hash_count = 0;
+
+						sleep(50).then(() => {
+							ws.send("JOB");
+						})
+					}
+
+					else if (server_message == "GOOD") {
+						sharecounter++;
+						hash_count = hash_count / 1000;
+						
+						document.getElementById("sharecount").innerHTML = "Accepted: " + sharecounter + "<br> Rejected: " + badsharecounter + "<br> Hashrate: " + hash_count + " kH/s (not precise - not even calculated properly, can someone take a look?)";
+
+						hash_count = 0;
+
+						sleep(50).then(() => {
+							ws.send("JOB");
+						})
+					}
+
+					else if (server_message.length > 64) { // If we receive long data which means its job
+						content = String(server_message)
+						let job = content.split(',');
+						let difficulty = job[2];
+						let result;
+
+						for(result = 0; result < (100 * difficulty + 1); result++){
+							let ducos1 = SHA1.hex(job[0] + result); // calculate sha1 hash
+							hash_count++;
+							if(job[1] == ducos1){ // and if correct result is found
+								
+								console.log("Miner: Share found: " + result);
+								ws.send(result); // send the result to the server
+								break;
+							}
+				 		}
+				 	}
+				}
+				
+				login.onclick = function (event) {
+					var username = document.getElementById("username").value;
+					var password = document.getElementById("password").value;
+					ws.send("LOGI,"+username+","+password);
+
+					sleep(50).then(() => {
+						ws.send("JOB");;
+					})
+				}}
+		</script>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <a class="navbar-brand mr-0 mr-md-2" href="index"><img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" width="30" height="30" alt="Duino-Coin" title="Duino-Coin" class="d-inline-block align-top" /></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item"><a class="nav-link" href="index">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="whitepaper">Whitepaper</a></li>
+                <li class="nav-item"><a class="nav-link" href="https://revoxhere.github.io/duco-statistics/statistics">Network</a></li>
+                <li class="nav-item"><a class="nav-link" href="donate">Donate</a></li>
+                <li class="nav-item"><a class="nav-link" href="contact">Contact</a></li>
+            </ul>
+                <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+                <li class="nav-item"><a class="nav-link p-2" href="https://twitter.com/CoinDuino/" target="_blank" title="Twitter"><i class="fab fa-lg fa-twitter"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://www.reddit.com/r/Duinocoin/" target="_blank" title="Reddit"><i class="fab fa-lg fa-reddit"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://discord.gg/KyADZT3" target="_blank" title="Discord"><i class="fab fa-lg fa-discord"></i></a></li>
+                <li class="nav-item"><a class="nav-link p-2" href="https://github.com/revoxhere/duino-coin" target="_blank" title="GitHub"><i class="fab fa-lg fa-github"></i></a></li>
+            </ul>
+                <a class="btn btn-success d-none d-md-inline-block mb-3 mb-md-0 ml-md-3" href="getting-started"><svg class="bi bi-caret-right-fill" width="1em" height="100%" viewBox="0 0 18 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12.14 8.753l-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 011.659-.753l5.48 4.796a1 1 0 010 1.506z"/></svg> Get started</a>
+          </div>
+        </nav>
+        
+        <main class="jumbotron" id="content">
+            <div class="container">
+                <div class="row align-items-center">
+                	<div class="col-4 mx-auto col-md-3 order-md-2 text-right">
+                		<img width="100%" height="100%" src="https://i.imgur.com/8fD3Izu.png" viewBox="0 0 16 16"></img>
+                		<p style="color:grey;"><sub>Webminer version 1.5</sub></p>
+                	</div>
+
+                	<div class="col-md-8 order-md-1 text-center text-md-left pr-md-5">
+						<h1>DUCO Webminer (tech demo)</h1><span>
+						<p>This is a working proof of concept. It probably needs some improvements along design and overall code optimizations. If you're experienced in HTML/CSS/JS <a href="">feel free to improve this miner.</a></p><span>
+
+						<table>
+							<td><input id="username" type="text" class="form-control" placeholder="DUCO Username" aria-label="DUCO Username" aria-describedby="basic-addon1"></td>
+							<td><input id="password" type="password" class="form-control" placeholder="DUCO Password" aria-label="DUCO Password" aria-describedby="basic-addon1"></td>
+							<td><div id=".login" class="login button btn btn-success m10">Start</div></td>
+						</table>
+						
+						<br>
+
+						<h3 id="miningstatus">Status</h3>
+						<p id="loginstatus">Connecting... (If you're seeing this message for more than few seconds that means the proxy server is offline)</p>
+						<p id="sharecount"></p>
+					</div>
+				</div>
+			</div>
+            
+            </div>
+		</div>
+        </main>
+
+        <br><hr><br>
+
+        <p style="color: #777777" align="center" class="mb">
+            Website made by Furim & revox <br> 2019-2020 Duino-Coin community</p>
+    </body>
+</html>
