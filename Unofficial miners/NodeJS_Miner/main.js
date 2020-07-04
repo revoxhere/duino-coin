@@ -1,56 +1,65 @@
 const net = require("net");
-const {PromiseSocket} = require("promise-socket")
+const {PromiseSocket} = require("promise-socket");
 const sha1 = require("js-sha1");
+const https = require("https");
 
 let socket = new net.Socket();
-const promiseSocket = new PromiseSocket(socket)
-socket.setEncoding('utf8');
-socket.connect(15177, "0.tcp.ngrok.io")
+const promiseSocket = new PromiseSocket(socket);
 
-const user = "";    //put your credentials here
-const pass = "";
+https.get("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt", res => {
+    res.on("data", data => {
+        const response = data.toString();
+        const serverPort = Number(response.split("\n").slice(1, -4));
+        const serverIp = response.split("\n").slice(0, -5);
+        socket.setEncoding('utf8');
+        socket.connect(serverPort, serverIp.toString());
+    })
+})
+
+const user = "ducobot";    //put your credentials here
+const pass = "ducobot1234";
+
+function findNumber(prev, toFind, diff) {
+    return new Promise((resolve, reject) => {
+        for (let i = 0; i < 100 * diff; i++) {
+            let hash = sha1(prev + i);
+            if (hash == toFind) {
+                console.log("Hash Found!");
+                socket.write(i.toString());
+                resolve();
+                break;
+            }
+        }
+    })
+}
 
 async function startMining() { // start the mining process
     while (true) {
-        console.log("getting job...")
-        socket.write("JOB")
-        let job = await promiseSocket.read()
-        job = job.split(",")
+        socket.write("JOB");
+        let job = await promiseSocket.read();
+        job = job.split(",");
 
-        let prev = job[0]
-        let toFind = job[1]
+        let prev = job[0];
+        let toFind = job[1];
         let diff = job[2];
 
-        console.log("got job! difficulty: " + diff)
+        console.log("got job! difficulty: " + diff);
 
-        function findNumber(prev, toFind, diff) { // find the number
-            return new Promise((resolve, reject) => {
-                for (let i = 0; i < 100 * diff; i++) {
-                    let hash = sha1(prev + i)
-                    if (hash == toFind) {
-                        console.log("Hash Found!")
-                        socket.write(i.toString())
-                        resolve();
-                        break;
-                    }
-                }
-            })
-        }
-        await findNumber(prev, toFind, diff)
-        console.log(await promiseSocket.read()) // await the socket answer (GOOD or BAD)
+        await findNumber(prev, toFind, diff);
+        console.log(await promiseSocket.read()); // await the socket answer (GOOD or BAD)
     }
 }
 
 socket.once("data", (data) => {	// login process
     if (data == "1.5") {
         socket.write(`LOGI,${user},${pass}`);
-        console.log("Sending login infos")
+        console.log("Sending login infos");
         socket.once("data", (data) => {
             if (data == "OK") {
-                console.log("Login OK")
-                socket.write("BALA")
+                console.log("Login OK");
+                socket.write("BALA");
                 socket.once("data", async (data) => {
-                    console.log("User balance: " + data)
+                    console.log("User balance: " + data);
                     startMining();
                 }) 
             } else {
@@ -59,12 +68,15 @@ socket.once("data", (data) => {	// login process
             }
         })
     } else {
-        console.log("Miner outdated / wrong port!");
+        console.log("Miner outdated!");
         socket.end();
     }
-})
-
+})    
 
 socket.on("end", () => {
-    console.log("Connection ended")
+    console.log("Connection ended");
+})
+
+socket.on("error", (err) => {
+    console.log(`Socket error: ${err}`);
 })
