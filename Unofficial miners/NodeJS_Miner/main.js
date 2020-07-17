@@ -16,8 +16,8 @@ https.get("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serve
     })
 })
 
-const user = "ducobot";    //put your credentials here
-const pass = "ducobot1234";
+const user = "username";    //put your credentials here
+const pass = "password";
 
 function findNumber(prev, toFind, diff) {
     return new Promise((resolve, reject) => {
