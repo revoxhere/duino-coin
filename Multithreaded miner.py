@@ -1,4 +1,4 @@
-# Duino-Coin Multithreaded miner © Bilaboz 2020
+# Duino-Coin Multithreaded miner © Bilaboz 2020 & thanks to revox for the minimal miner code
 
 # ---------------------------- CONFIG --------------------------- #
 
