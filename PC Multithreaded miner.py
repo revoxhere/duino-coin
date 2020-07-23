@@ -65,6 +65,7 @@ def hashrateCalculator():
   
     threading.Timer(1.0, hashrateCalculator).start()
 
+
 def start_thread(arr, i, username, password, accepted_shares, bad_shares):
     global hash_count, khash_count
     soc = socket.socket()
@@ -87,6 +88,7 @@ def start_thread(arr, i, username, password, accepted_shares, bad_shares):
         soc.close()
         os._exit(1)
 
+        
     hashrateCalculator()
     while True:
         try:
@@ -112,6 +114,7 @@ def start_thread(arr, i, username, password, accepted_shares, bad_shares):
             print("Thread #{}: exiting...".format(i))
             os._exit(0)
 
+            
 def getBalance():
     global pool_address, pool_port
     soc = socket.socket()
@@ -130,6 +133,7 @@ def getBalance():
     soc.close()
 
     return float(balance)
+
 
 def calculateProfit(start_bal):
     global curr_bal, profit_array
@@ -177,15 +181,18 @@ def showOutput():
 
     threading.Timer(float(refresh_time), showOutput).start()     
 
+    
 def clear():
     os.system('cls' if os.name=='nt' else 'clear')
 
+    
 def totalHashrate(khash):
     if khash / 1000 >= 1:
         return str(round(khash / 1000, 2)) + " MH/s"
     else:
         return str(round(khash, 2)) + " kH/s"
 
+    
 if __name__ == '__main__':
 
     if os.name == 'nt':
