@@ -6,6 +6,7 @@ username = "" # put your username here
 password = "" # put your password here
 
 refresh_time = 3.5 # refresh time in seconds for the output (recommended: 3.5)
+autorestart_time = 600 # autorestart time in seconds. 0 = disabled
 
 discord_key = "" # comming soon
 
@@ -66,7 +67,7 @@ def hashrateCalculator():
     threading.Timer(1.0, hashrateCalculator).start()
 
 
-def start_thread(arr, i, username, password, accepted_shares, bad_shares):
+def start_thread(arr, i, username, password, accepted_shares, bad_shares, thread_number):
     global hash_count, khash_count
     soc = socket.socket()
 
@@ -88,14 +89,17 @@ def start_thread(arr, i, username, password, accepted_shares, bad_shares):
         soc.close()
         os._exit(1)
 
-        
     hashrateCalculator()
     while True:
         try:
             soc.send(bytes("JOB", encoding="utf8"))
             job = soc.recv(1024).decode()
             job = job.split(",")
-            difficulty = job[2]
+            try:
+                difficulty = job[2]
+            except:
+                sys.argv.append(str(thread_number))
+                os.execl(sys.executable, sys.executable, *sys.argv)
 
             for result in range(100 * int(difficulty) + 1):
                 hash_count = hash_count + 1
@@ -114,7 +118,13 @@ def start_thread(arr, i, username, password, accepted_shares, bad_shares):
             print("Thread #{}: exiting...".format(i))
             os._exit(0)
 
-            
+
+def autorestarter():
+    time.sleep(autorestart_time)
+    sys.argv.append(str(thread_number))
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+
 def getBalance():
     global pool_address, pool_port
     soc = socket.socket()
@@ -137,11 +147,9 @@ def getBalance():
 
 def calculateProfit(start_bal):
     global curr_bal, profit_array
-    try:
-        prev_bal = curr_bal
-    except:
-        prev_bal = start_bal
     
+    prev_bal = curr_bal
+
     curr_bal = getBalance()
     session = curr_bal - start_bal
     minute = curr_bal - prev_bal
@@ -179,21 +187,22 @@ def showOutput():
     else:
         print(bcolors.back_red + "{:<9} {:<13} {:<10} {:<10}".format("TOTAL", totalHashrate(sum(hashrate_array)), sum(accepted_shares), sum(bad_shares)) + bcolors.endc)
 
-    threading.Timer(float(refresh_time), showOutput).start()     
+    threading.Timer(float(refresh_time), showOutput).start()
+        
 
-    
 def clear():
     os.system('cls' if os.name=='nt' else 'clear')
 
-    
+
 def totalHashrate(khash):
     if khash / 1000 >= 1:
         return str(round(khash / 1000, 2)) + " MH/s"
     else:
         return str(round(khash, 2)) + " kH/s"
 
-    
+
 if __name__ == '__main__':
+    global thread_number, curr_bal
 
     if os.name == 'nt':
         os.system("title " + "Duino-Coin multithreaded miner")
@@ -205,34 +214,32 @@ if __name__ == '__main__':
         print(Fore.RED + "The profit is refreshed every 60 seconds" + Style.RESET_ALL)
     else:
         print(bcolors.red + "The profit is refreshed every 60 seconds" + bcolors.endc)
+    
+    if (autorestart_time) > 0:
+        threading.Thread(target=autorestarter).start()
 
     with urllib.request.urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as content:
         content = content.read().decode().splitlines() # doing this here because can't access pool_address and pool_port in the threads
     pool_address = content[0]
     pool_port = content[1]
     
-    thread_number = int(input("Number of threads: "))
+    try:
+        thread_number = int(sys.argv[1])
+        print(f"Miner started with {thread_number} threads")
+    except:
+        thread_number = int(input("Number of threads: "))
 
     hashrate_array = multiprocessing.Array("d", thread_number)
     accepted_shares = multiprocessing.Array("i", thread_number)
     bad_shares = multiprocessing.Array("i", thread_number)
 
     start_balance = getBalance()
+    curr_bal = start_balance
     calculateProfit(start_balance)
     showOutput()
 
     for i in range(thread_number):
-        p = multiprocessing.Process(target=start_thread, args=(hashrate_array, i, username, password, accepted_shares, bad_shares))
+        p = multiprocessing.Process(target=start_thread, args=(hashrate_array, i, username, password, accepted_shares, bad_shares, thread_number))
         p.start()
         time.sleep(0.5)
     time.sleep(1)
-
-
-    
-    
-
-
-    
-
-
-    
