@@ -6,7 +6,7 @@ username = "" # put your username here
 password = "" # put your password here
 
 refresh_time = 3.5 # refresh time in seconds for the output (recommended: 3.5)
-autorestart_time = 600 # autorestart time in seconds. 0 = disabled
+autorestart_time = 0 # DONT ACTIVATE AUTORESTARTER FOR NOW ITS BUGGY autorestart time in seconds. 0 = disabled
 
 discord_key = "" # comming soon
 
