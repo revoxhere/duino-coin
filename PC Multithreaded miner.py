@@ -6,7 +6,7 @@ username = "" # put your username here
 password = "" # put your password here
 
 refresh_time = 3.5 # refresh time in seconds for the output (recommended: 3.5)
-autorestart_time = 0 # DONT ACTIVATE AUTORESTARTER FOR NOW ITS BUGGY autorestart time in seconds. 0 = disabled
+autorestart_time = 600 # autorestart time in seconds. 0 = disabled
 
 discord_key = "" # comming soon
 
@@ -98,6 +98,9 @@ def start_thread(arr, i, username, password, accepted_shares, bad_shares, thread
             try:
                 difficulty = job[2]
             except:
+                for p in multiprocessing.active_children():
+                    p.terminate()
+                time.sleep(1)
                 sys.argv.append(str(thread_number))
                 os.execl(sys.executable, sys.executable, *sys.argv)
 
@@ -121,6 +124,10 @@ def start_thread(arr, i, username, password, accepted_shares, bad_shares, thread
 
 def autorestarter():
     time.sleep(autorestart_time)
+    
+    for p in multiprocessing.active_children():
+        p.terminate()
+    time.sleep(1)
     sys.argv.append(str(thread_number))
     os.execl(sys.executable, sys.executable, *sys.argv)
 
@@ -243,3 +250,4 @@ if __name__ == '__main__':
         p.start()
         time.sleep(0.5)
     time.sleep(1)
+    
