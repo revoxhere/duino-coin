@@ -1,4 +1,10 @@
-# Duino-Coin Multithreaded miner © Bilaboz 2020 & thanks to revox for the minimal miner code
+#!/usr/bin/env python3
+##########################################
+# Duino-Coin PC Miner (v1.6) 
+# https://github.com/revoxhere/duino-coin 
+# Distributed under MIT license
+# © Bilaboz, revox, MrKris7100 2020
+##########################################
 
 # ---------------------------- CONFIG --------------------------- #
 
@@ -8,7 +14,7 @@ password = "" # put your password here
 refresh_time = 3.5 # refresh time in seconds for the output (recommended: 3.5)
 autorestart_time = 600 # autorestart time in seconds. 0 = disabled
 
-discord_key = "" # comming soon
+discord_key = "" # coming soon
 
 # --------------------------------------------------------------- #
 
@@ -56,7 +62,7 @@ def hashrateCalculator():
     last_hash_count = hash_count
     khash_count = last_hash_count / 1000
     if khash_count == 0:
-        khash_count = random.uniform(0, 2)
+        khash_count = random.uniform(0, 1)
     
     hash_mean.append(khash_count)
     khash_count = statistics.mean(hash_mean)
@@ -66,7 +72,7 @@ def hashrateCalculator():
   
     threading.Timer(1.0, hashrateCalculator).start()
 
-
+    
 def start_thread(arr, i, username, password, accepted_shares, bad_shares, thread_number):
     global hash_count, khash_count
     soc = socket.socket()
