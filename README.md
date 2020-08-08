@@ -8,8 +8,8 @@
     <img width="80%" src="https://i.imgur.com/joK2FaA.png" /></a><br /><br />
   <a href="https://duinocoin.com">
     <img src="https://img.shields.io/badge/duinocoin.com-555555.svg?style=for-the-badge&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAmklEQVQ4T7WUQQ6AIAwEIcaX%2BALj0fdz9gM%2BxMRESQ8ktSllrciZTneX0hg6n8h5Z5pvhD%2Bu26OO17iABaCBPwEJLKFV6ZZ1GQ2HwgqlEg51ATV7GhSyXFPjBpK6UsztdQdqjSDLNYVu4JGWaQjXLh%2BmaRn5eq8ybAGRWfx3sJFNo7lw%2FxStobkcWhlKYJf1ZS1XaggPNpIv3cls33EVXWotfwAAAABJRU5ErkJggg%3D%3D" /></a>
-  <a href="https://revoxhere.github.io/duco-statistics/statistics">
-    <img src="https://img.shields.io/badge/Network stats-555555.svg?style=for-the-badge" /></a>
+  <a href="http://revoxhere.ct8.pl/webwallet.html">
+    <img src="https://img.shields.io/badge/Online Wallet-555555.svg?style=for-the-badge" /></a>
   <a href="https://duinocoin.com/whitepaper">
     <img src="https://img.shields.io/badge/whitepaper-555555.svg?style=for-the-badge&logo=Academia" /></a>
   <a href="https://app.codacy.com/manual/revoxhere/duino-coin?utm_source=github.com&utm_medium=referral&utm_content=revoxhere/duino-coin">
