@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
-##########################################
-# Duino-Coin PC Miner (v1.6) 
+# ---------- Duino-Coin Multithreaded PC Miner (v1.6) ----------- #
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
 # © Bilaboz, revox, MrKris7100 2020
-##########################################
+# --------------------------------------------------------------- #
 
-# ---------------------------- CONFIG --------------------------- #
-
-username = "" # put your username here
-password = "" # put your password here
+username = "revox" # put your username here
+password = "1337" # put your password here
 
 refresh_time = 3.5 # refresh time in seconds for the output (recommended: 3.5)
 autorestart_time = 600 # autorestart time in seconds. 0 = disabled
@@ -73,7 +70,7 @@ def hashrateCalculator():
     threading.Timer(1.0, hashrateCalculator).start()
 
     
-def start_thread(arr, i, username, password, accepted_shares, bad_shares, thread_number):
+def start_thread(arr, i, username, accepted_shares, bad_shares, thread_number):
     global hash_count, khash_count
     soc = socket.socket()
 
@@ -86,19 +83,10 @@ def start_thread(arr, i, username, password, accepted_shares, bad_shares, thread
     soc.connect((str(pool_address), int(pool_port)))
     soc.recv(3).decode()
 
-    soc.send(bytes("LOGI," + username + "," + password, encoding="utf8"))
-    response = soc.recv(2).decode()           
-    if response == "OK":
-        print(f"Thread #{i+1}: Logged in")
-    else:
-        print("Error loging in - check account credentials!")
-        soc.close()
-        os._exit(1)
-
     hashrateCalculator()
     while True:
         try:
-            soc.send(bytes("JOB", encoding="utf8"))
+            soc.send(bytes("JOB,"+str(username), encoding="utf8"))
             job = soc.recv(1024).decode()
             job = job.split(",")
             try:
@@ -117,12 +105,14 @@ def start_thread(arr, i, username, password, accepted_shares, bad_shares, thread
                     soc.send(bytes(str(result), encoding="utf8"))
                     feedback = soc.recv(1024).decode()
                     arr[i] = khash_count
-                    if feedback == "GOOD":
+                    if feedback == "GOOD" or feedback == "BLOCK":
                         accepted_shares[i] += 1
                         break
                     elif feedback == "BAD":
                         bad_shares[i] += 1
                         break
+                    elif feedback == "INVU":
+                        print("Entered username is incorrect!")
         except (KeyboardInterrupt, SystemExit):
             print("Thread #{}: exiting...".format(i))
             os._exit(0)
@@ -150,11 +140,13 @@ def getBalance():
         print("Error loging in - check account credentials!")
         soc.close()
         os._exit(1)
+    else:
+        soc.send(bytes("FROM,Multithreaded PC Miner,"+str(username), encoding="utf8")) # Metrics
 
     soc.send(bytes("BALA", encoding="utf8"))
     balance = soc.recv(1024).decode()
     soc.close()
-
+    
     return float(balance)
 
 
@@ -252,7 +244,7 @@ if __name__ == '__main__':
     showOutput()
 
     for i in range(thread_number):
-        p = multiprocessing.Process(target=start_thread, args=(hashrate_array, i, username, password, accepted_shares, bad_shares, thread_number))
+        p = multiprocessing.Process(target=start_thread, args=(hashrate_array, i, username, accepted_shares, bad_shares, thread_number))
         p.start()
         time.sleep(0.5)
     time.sleep(1)
