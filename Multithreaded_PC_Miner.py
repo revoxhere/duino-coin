@@ -5,8 +5,8 @@
 # © Bilaboz, revox, MrKris7100 2020
 # --------------------------------------------------------------- #
 
-username = "revox" # put your username here
-password = "1337" # put your password here
+username = "username" # put your username here
+password = "password" # put your password here
 
 refresh_time = 3.5 # refresh time in seconds for the output (recommended: 3.5)
 autorestart_time = 600 # autorestart time in seconds. 0 = disabled
