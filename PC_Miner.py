@@ -396,7 +396,7 @@ while True:
   try:
     loadConfig() # Load configfile
   except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error loading the configfile (Miner_config.cfg). Try removing it and re-running configuration. Exiting in 15s."  + Style.RESET_ALL)
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error loading the config file (Miner_config.cfg). Try removing it and re-running configuration. Exiting in 15s."  + Style.RESET_ALL)
     time.sleep(15)
     os._exit(1)
 
@@ -404,7 +404,7 @@ while True:
     if float(autorestart) > 0:
       threading.Thread(target=autorestarter).start()
   except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)    
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in while autorestarting. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)    
     time.sleep(15)
     os._exit(1)
 
