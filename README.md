@@ -84,7 +84,7 @@ After loging-in you have access to the following commands:
 *   `JOB` - Server will return job for mining - you can also use `JOB,username` to mine without loging-in
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
 *   `CHGP,oldPassword,newPassword` - Change password of current user
-*   `FROM,Program Name,Other info` - Send metrics data to the server
+*   `FROM,Program Name,username,Other info` - Send metrics data to the server
 *   `STAT` - Server will return rank and e-mail of the user
 
 <h2 align="center">License</h2><br>
