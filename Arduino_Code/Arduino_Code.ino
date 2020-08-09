@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Arduino Code remastered - v1.4.8 © revox 2019-2020
+//  Arduino Code remastered - v1.6 © revox 2019-2020
 //  Big thanks to daknuett for help in library migration!
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -19,6 +19,7 @@
 //////////////////////////////////////////////////////////
 
 // Include crypto library
+#define SHA256_DISABLE_WRAPPER // Disable sha256 wrapper
 #include "sha1.h"
 
 String result; // Create globals
@@ -33,12 +34,11 @@ void setup() {
 
 void loop() {
   String startStr = Serial.readStringUntil('\n');
-  if (startStr == "start") { // Wait for start word, serial.available caused problems
+  if (startStr == "start") { // Wait for start instruction
     String hash = Serial.readStringUntil('\n'); // Read hash
     String job = Serial.readStringUntil('\n'); // Read job
     unsigned int diff = Serial.parseInt(); // Read difficulty
     for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
-      yield(); // Let Arduino/ESP do background tasks - else watchdog will trigger
       Sha1.init(); // Create sha1 hasher
       Sha1.print(String(hash) + String(iJob));
       uint8_t * hash_bytes = Sha1.result(); // Get result
@@ -53,7 +53,7 @@ void loop() {
       if (String(result) == String(job)) { // If result is found
         Serial.println(String(iJob)); // Send result back to Arduino Miner
         digitalWrite(LED_BUILTIN, HIGH);   // Turn on built-in led
-        delay(50); // Wait a bit
+        delay(25); // Wait a bit
         digitalWrite(LED_BUILTIN, LOW); // Turn off built-in led
         break; // Stop and wait for more work
       }
