@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin PC Miner (v1.5) 
+# Duino-Coin Arduino Miner (v1.6) 
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
-# © revox, MrKris7100 2020
+# © Duino-Coin Community 2020
 ##########################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
 from pathlib import Path
@@ -42,7 +42,7 @@ except:
   os._exit(1)
 
 # Global variables
-VER = "1.5" # Version number
+VER = "1.6" # Version number
 timeout = 5 # Socket timeout
 resources = "ArduinoMiner_"+str(VER)+"_resources"
 
@@ -98,26 +98,20 @@ def Greeting(): # Greeting message depending on time
   current_hour = time.strptime(time.ctime(time.time())).tm_hour
   
   if current_hour < 12 :
-    greeting = "Good morning"
+    greeting = "We hope you're having a great morning"
   elif current_hour == 12 :
-    greeting = "Good noon"
+    greeting = "We hope you're having a great noon"
   elif current_hour > 12 and current_hour < 18 :
-    greeting = "Good afternoon"
+    greeting = "We hope you're having a great afternoon"
   elif current_hour >= 18 :
-    greeting = "Good evening"
+    greeting = "We hope you're having a great evening"
   else:
     greeting = "Welcome back"
   
-  print(" * " + Fore.YELLOW + Style.BRIGHT + "Duino-Coin © Arduino Miner " + Style.RESET_ALL + Fore.YELLOW+ "(v" + str(VER) +".8" + ") 2019-2020") # Startup message
-  time.sleep(0.15)
-  print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
-  time.sleep(0.15)
-  print(" * " + Fore.YELLOW + "Arduino on port: " + Style.BRIGHT + str(arduinoport))
-  time.sleep(0.15)
+  print(" * " + Fore.YELLOW + Style.BRIGHT + "Duino-Coin © Arduino Miner " + Style.RESET_ALL + Fore.YELLOW+ "(v" + str(VER) + ") 2019-2020") # Startup message  print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
+  print(" * " + Fore.YELLOW + "AVR board on port: " + Style.BRIGHT + str(arduinoport))
   print(" * " + Fore.YELLOW + "Donation level: " +  Style.BRIGHT + str(donationlevel))
-  time.sleep(0.15)
   print(" * " + Fore.YELLOW + "Autorestarter: " + Style.BRIGHT + str(autorestartmessage))
-  time.sleep(0.15)
   print(" * " + Fore.YELLOW + str(greeting) + ", " + Style.BRIGHT +  str(username) + "\n")
     
   if not Path(str(resources) + "/Miner_executable.exe").is_file(): # Initial miner executable section
@@ -137,22 +131,24 @@ def autorestarter(): # Autorestarter
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, password, autorestart, donationlevel, arduinoport
   
-  if not Path(str(resources) + "/Miner_config.ini").is_file(): # Initial configuration section
-    print(Style.BRIGHT + "Duino-Coin basic configuration tool.\nEdit "+str(resources) + "/Miner_config.ini file later if you want to change it.")
+  if not Path(str(resources) + "/Miner_config.cfg").is_file(): # Initial configuration section
+    print(Style.BRIGHT + "Duino-Coin basic configuration tool.\nEdit "+str(resources) + "/Miner_config.cfg file later if you want to change it.")
     print(Style.RESET_ALL + "Don't have an Duino-Coin account yet? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register on server.\n")
 
     username = input(Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT)
     password = input(Style.RESET_ALL + Fore.YELLOW + "Enter your password: " + Style.BRIGHT)
 
     print(Style.RESET_ALL + Fore.YELLOW + "Configuration tool has found the following ports:")
+    print(Style.RESET_ALL + Fore.YELLOW + "----")
     portlist = serial.tools.list_ports.comports()
     for port in portlist:
       print(Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "  " + str(port))
-    print(Style.RESET_ALL + Fore.YELLOW + "If you can't see your board port, make sure the board is properly connected and Miner has access to it.")
+    print(Style.RESET_ALL + Fore.YELLOW + "----")
+    print(Style.RESET_ALL + Fore.YELLOW + "If you can't see your board here, make sure the it is properly connected and the program has access to it (admin/sudo rights).")
 
     arduinoport = input(Style.RESET_ALL + Fore.YELLOW + "Enter your board serial port (e.g. COM1 or /dev/ttyUSB1): " + Style.BRIGHT)
-    autorestart = input(Style.RESET_ALL + Fore.YELLOW + "Set after how many seconds miner shall restart (0 = disable autorestarter): " + Style.BRIGHT)
-    donationlevel = input(Style.RESET_ALL + Fore.YELLOW + "Set donation level (0-5): " + Style.BRIGHT)
+    autorestart = input(Style.RESET_ALL + Fore.YELLOW + "Set after how many seconds miner will restart (recommended: 60): " + Style.BRIGHT)
+    donationlevel = input(Style.RESET_ALL + Fore.YELLOW + "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: " + Style.BRIGHT)
 
     donationlevel = re.sub("\D", "", donationlevel)  # Check wheter donationlevel is correct
     if float(donationlevel) > int(5):
@@ -167,11 +163,11 @@ def loadConfig(): # Config loading section
     "autorestart": autorestart,
     "donate": donationlevel}
     
-    with open(str(resources) + "/Miner_config.ini", "w") as configfile: # Write data to file
+    with open(str(resources) + "/Miner_config.cfg", "w") as configfile: # Write data to file
       config.write(configfile)
 
   else: # If config already exists, load from it
-    config.read(str(resources) + "/Miner_config.ini")
+    config.read(str(resources) + "/Miner_config.cfg")
     username = config["arduminer"]["username"]
     password = config["arduminer"]["password"]
     arduinoport = config["arduminer"]["arduinoport"]
@@ -277,7 +273,7 @@ def Login():
         Connect() # Reconnect if pool down
         
       if resp == "OK": # Check wheter login information was correct
-        soc.send(bytes("FROM," + "Arduino_Miner," + str(pcusername) + "," + str(publicip) + "," + str(platform), encoding="utf8")) # Send info to server about client
+        soc.send(bytes("FROM," + "Arduino Miner," + str(username) + "," + str(publicip) + "," + str(platform), encoding="utf8")) # Send metrics to server about client
 
         now = datetime.datetime.now()
         print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.YELLOW + " Logged in successfully " + Style.RESET_ALL + Fore.YELLOW + "as " + str(username))
@@ -308,34 +304,35 @@ def Login():
 def ArduinoMine(): # Mining section
   global donationlevel, donatorrunning
   
-  if int(donationlevel) > 0:
-    now = datetime.datetime.now()
-    print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Thank You for being an awesome donator! <3")
-  else:
-    now = datetime.datetime.now()
-    print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Duino-Coin network is a completely free service and will always be." + Style.BRIGHT + Fore.YELLOW + "\n  You can help us maintain the server and low-fee payouts by donating.\n  Visit " + Style.RESET_ALL + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more.")
+  if os.name == 'nt':
+    if int(donationlevel) > 0:
+      now = datetime.datetime.now()
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Thank You for being an awesome donator! <3")
+    else:
+      now = datetime.datetime.now()
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Duino-Coin network is a completely free service and will always be." + Style.BRIGHT + Fore.YELLOW + "\n  You can help us maintain the server and low-fee payouts by donating.\n  Visit " + Style.RESET_ALL + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more.")
 
-  if not donatorrunning: # Check wheter donation was already started
-    if int(donationlevel) == int(5):  # Check donationlevel and if it's more than 0 launch Magi Miner as donation
-        cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 100 -s 4"
-    if int(donationlevel) == int(4):
-        cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 70 -s 4"
-    if int(donationlevel) == int(3):
-        cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 50 -s 4"
-    if int(donationlevel) == int(2):
-        cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 30 -s 4"
-    if int(donationlevel) == int(1):
-        cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 10 -s 4"
-    if int(donationlevel) == int(0):
-        cmd = "cd " + str(resources)
-    try:  # Start cmd set above
-      subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
-      donatorrunning = True
-    except:
-      pass
+    if not donatorrunning: # Check wheter donation was already started
+      if int(donationlevel) == int(5):  # Check donationlevel and if it's more than 0 launch Magi Miner as donation
+          cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 100 -s 4"
+      if int(donationlevel) == int(4):
+          cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 70 -s 4"
+      if int(donationlevel) == int(3):
+          cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 50 -s 4"
+      if int(donationlevel) == int(2):
+          cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 30 -s 4"
+      if int(donationlevel) == int(1):
+          cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 10 -s 4"
+      if int(donationlevel) == int(0):
+          cmd = ""
+      try:  # Start cmd set above
+        subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
+        donatorrunning = True
+      except:
+        pass
 
   now = datetime.datetime.now()
-  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Arduino mining thread started" + Style.RESET_ALL + Fore.YELLOW + " using DUCO-S1A algorithm, be aware that finding first share may take a while")
+  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Arduino mining thread started" + Style.RESET_ALL + Fore.YELLOW + " using DUCO-S1A algorithm, please wait until Arduino will create a stable connection with the miner")
   
   ready = com.readline().decode().rstrip().lstrip() # Arduino will send ready signal
   while True:
@@ -367,7 +364,7 @@ def ArduinoMine(): # Mining section
         print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.GREEN + " Accepted " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(job[2]) + " • " + Style.BRIGHT + Fore.BLUE + computetime + "ms avr time " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
         break # Repeat
 
-      elif feedback == "GOOD": # If result was good
+      elif feedback == "BLOCK": # If result was good
         now = datetime.datetime.now()
         computetime = now - computestart # Time from start of hash computing to finding the result
         computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
