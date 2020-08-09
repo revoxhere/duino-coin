@@ -110,15 +110,18 @@ def Greeting(): # Greeting message depending on time
   
   print(" * " + Fore.YELLOW + Style.BRIGHT + "Duino-Coin © Arduino Miner " + Style.RESET_ALL + Fore.YELLOW+ "(v" + str(VER) + ") 2019-2020") # Startup message  print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
   print(" * " + Fore.YELLOW + "AVR board on port: " + Style.BRIGHT + str(arduinoport))
-  print(" * " + Fore.YELLOW + "Donation level: " +  Style.BRIGHT + str(donationlevel))
+  if os.name == 'nt':
+    print(" * " + Fore.YELLOW + "Donation level: " +  Style.BRIGHT + str(donationlevel))
+  print(" * " + Fore.YELLOW + "Algorithm: " + Style.BRIGHT + "DUCO-S1A")
   print(" * " + Fore.YELLOW + "Autorestarter: " + Style.BRIGHT + str(autorestartmessage))
   print(" * " + Fore.YELLOW + str(greeting) + ", " + Style.BRIGHT +  str(username) + "\n")
-    
-  if not Path(str(resources) + "/Miner_executable.exe").is_file(): # Initial miner executable section
-    url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
-    r = requests.get(url)
-    with open(str(resources) + '/Miner_executable.exe', 'wb') as f:
-      f.write(r.content)
+  
+  if os.name == 'nt':
+    if not Path(str(resources) + "/Miner_executable.exe").is_file(): # Initial miner executable section
+      url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
+      r = requests.get(url)
+      with open(str(resources) + '/Miner_executable.exe', 'wb') as f:
+        f.write(r.content)
 
 def autorestarter(): # Autorestarter
   time.sleep(float(autorestart))
@@ -147,8 +150,10 @@ def loadConfig(): # Config loading section
     print(Style.RESET_ALL + Fore.YELLOW + "If you can't see your board here, make sure the it is properly connected and the program has access to it (admin/sudo rights).")
 
     arduinoport = input(Style.RESET_ALL + Fore.YELLOW + "Enter your board serial port (e.g. COM1 or /dev/ttyUSB1): " + Style.BRIGHT)
-    autorestart = input(Style.RESET_ALL + Fore.YELLOW + "Set after how many seconds miner will restart (recommended: 60): " + Style.BRIGHT)
-    donationlevel = input(Style.RESET_ALL + Fore.YELLOW + "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: " + Style.BRIGHT)
+    autorestart = input(Style.RESET_ALL + Fore.YELLOW + "Set after how many seconds miner will restart (recommended: 360): " + Style.BRIGHT)
+    donationlevel = "0"
+    if os.name == 'nt':
+      donationlevel = input(Style.RESET_ALL + Fore.YELLOW + "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: " + Style.BRIGHT)
 
     donationlevel = re.sub("\D", "", donationlevel)  # Check wheter donationlevel is correct
     if float(donationlevel) > int(5):
@@ -342,9 +347,9 @@ def ArduinoMine(): # Mining section
     job = soc.recv(1024).decode().split(",") # Split received job
     
     com.write(bytes(str(job[0])+"\n", encoding="utf8")) # hash
-    time.sleep(0.05)
+    time.sleep(0.025)
     com.write(bytes(str(job[1])+"\n", encoding="utf8")) # job
-    time.sleep(0.05)
+    time.sleep(0.025)
     com.write(bytes(str(job[2])+"\n", encoding="utf8")) # diff
 
     computestart = datetime.datetime.now() # Get timestamp of start of the computing
