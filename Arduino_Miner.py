@@ -5,7 +5,7 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2020
 ##########################################
-import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os # Import libraries
+import socket, threading, time, random, re, subprocess, platform, getpass, configparser, sys, datetime, os # Import libraries
 from pathlib import Path
 from signal import signal, SIGINT
 
@@ -274,10 +274,11 @@ def Login():
         
       try:
         resp = soc.recv(1024).decode()
+        resp = resp.split(",")
       except:
         Connect() # Reconnect if pool down
         
-      if resp == "OK": # Check wheter login information was correct
+      if resp[0] == "OK": # Check wheter login information was correct
         soc.send(bytes("FROM," + "Arduino Miner," + str(username) + "," + str(publicip) + "," + str(platform), encoding="utf8")) # Send metrics to server about client
 
         now = datetime.datetime.now()
@@ -291,7 +292,7 @@ def Login():
 
         break # If it was, continue
       
-      if resp == "NO":
+      if resp[0] == "NO":
         now = datetime.datetime.now()
         print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Error! Wrong credentials or account doesn't exist!" + Style.RESET_ALL + Fore.RED + "\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
 
