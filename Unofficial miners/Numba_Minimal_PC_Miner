@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Minimal version of Duino-Coin PC Miner, useful for developing own apps. Created by revox and aSOVIET 2020
+# Minimal version of Duino-Coin PC Miner, using Numba to speed up hashing process. Created by revox and aSOVIET 2020
 import socket, hashlib, os, urllib.request, random, statistics, threading # Only python3 included libraries
 soc = socket.socket()
 from numba import jit
