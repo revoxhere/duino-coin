@@ -106,6 +106,7 @@ Major frameworks used by Duino-Coin:
     *   [@Bilaboz](https://github.com/bilaboz/)
 *   **Developers:**
     *   [@IdotMaster1](https://github.com/IdotMaster1)
+    *   [@kyngs](https://github.com/kyngs)
 *   **Social manager:** [@Furim](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
 
 <h2 align="center">Special thanks</h2><br>
