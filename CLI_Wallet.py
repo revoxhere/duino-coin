@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Console Wallet (v1.5) 
+# Duino-Coin CLI Wallet (v1.6)
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
-# © revox 2020
+# © Duino-Coin Community 2020
 ##########################################
-
 import socket, configparser, getpass, os, platform, sys, time, json
 from signal import signal, SIGINT
 from pathlib import Path
@@ -27,7 +26,7 @@ except:
 	os._exit(1)
 
 timeout = 5 # Socket timeout
-VER = 1.5
+VER = 1.6
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
 pcusername = getpass.getuser() # Username
@@ -87,7 +86,7 @@ while True: # Grab data grom GitHub section
 
 while True:
 	title("Duino-Coin CLI Wallet")
-	if not Path("WalletCLI_config.ini").is_file(): # Initial configuration section
+	if not Path("CLIWallet_config.cfg").is_file(): # Initial configuration section
 		print(Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "Duino-Coin CLI Wallet first-run\n")
 		print(Style.RESET_ALL + "Select an option")
 
@@ -103,7 +102,7 @@ while True:
 
 				config['wallet'] = {"username": username, "password": password}
 	
-				with open("WalletCLI_config.ini", "w") as configfile: # Write data to file
+				with open("CLIWallet_config.cfg", "w") as configfile: # Write data to file
 					config.write(configfile)
 			else:
 				print(Style.RESET_ALL + Fore.RED + "Couldn't login, reason: " + Style.BRIGHT + str(loginFeedback[1]))
@@ -134,7 +133,7 @@ while True:
 
 	else: # If config already exists, load from it
 		while True:
-			config.read("WalletCLI_config.ini")
+			config.read("CLIWallet_config.cfg")
 			username = config["wallet"]["username"]
 			password = config["wallet"]["password"]
 
@@ -152,7 +151,7 @@ while True:
 				s.send(bytes("BALA", encoding="utf8"))
 				try:
 					balance = round(float(s.recv(256).decode()), 8)
-					balanceusd = round(float(balance) * float(ducofiat), 4)
+					balanceusd = round(float(balance) * float(ducofiat), 6)
 					break
 				except:
 					pass
@@ -205,7 +204,7 @@ while True:
 				print(Style.RESET_ALL + Fore.WHITE + "Stay safe everyone!")
 
 			elif command == "logout":
-				os.remove("WalletCLI_config.ini")
+				os.remove("CLIWallet_config.cfg")
 				os.execl(sys.executable, sys.executable, *sys.argv)
 
 			else:
