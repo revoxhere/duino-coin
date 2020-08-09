@@ -5,7 +5,7 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2020
 ##########################################
-import socket, threading, time, random, re, subprocess, platform, getpass, configparser, sys, datetime, os # Import libraries
+import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os # Import libraries
 from pathlib import Path
 from signal import signal, SIGINT
 
