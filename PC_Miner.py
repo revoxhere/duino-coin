@@ -6,7 +6,6 @@
 # © revox, MrKris7100 2020
 ##########################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
-from decimal import Decimal
 from pathlib import Path
 from signal import signal, SIGINT
 
@@ -303,7 +302,7 @@ def Mine(): # Mining section
       if int(donationlevel) == int(0):
           cmd = ""
       try:  # Start cmd set above
-        process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
+        subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
         donatorrunning = True
       except:
         pass
