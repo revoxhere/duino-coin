@@ -98,13 +98,15 @@ def Greeting(): # Greeting message depending on time
   current_hour = time.strptime(time.ctime(time.time())).tm_hour
   
   if current_hour < 12 :
-    greeting = "We hope you're having a great morning"
+    greeting = "We hope you're having a great morning!"
   elif current_hour == 12 :
-    greeting = "We hope you're having a great noon"
+    greeting = "We hope you're having a great noon!"
   elif current_hour > 12 and current_hour < 18 :
-    greeting = "We hope you're having a great afternoon"
+    greeting = "We hope you're having a great afternoon!"
   elif current_hour >= 18 :
-    greeting = "We hope you're having a great evening"
+    greeting = "We hope you're having a great evening!"
+    elif current_hour > 19 and current_hour < 01 :
+    greeting = "We hope you are having a great night!"
   else:
     greeting = "Welcome back"
   
