@@ -105,7 +105,7 @@ def Greeting(): # Greeting message depending on time
     greeting = "We hope you're having a great afternoon!"
   elif current_hour >= 18 :
     greeting = "We hope you're having a great evening!"
-    elif current_hour > 19 and current_hour < 01 :
+  elif current_hour > 19 and current_hour < 01 :
     greeting = "We hope you are having a great night!"
   else:
     greeting = "Welcome back"
