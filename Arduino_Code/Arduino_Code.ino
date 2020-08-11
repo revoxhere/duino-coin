@@ -27,18 +27,19 @@ char buffer[64];
 unsigned int iJob = 0;
 
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT); // Prepare built-in led pin as output
   Serial.begin(115200); // Open serial port
   Serial.println("ready"); // Send feedback to miner
-  pinMode(LED_BUILTIN, OUTPUT); // Prepare built-in led pin as output
 }
 
 void loop() {
   String startStr = Serial.readStringUntil('\n');
-  if (startStr == "start") { // Wait for start instruction
+  if (startStr == "start") { // Wait for start word, serial.available caused problems
     String hash = Serial.readStringUntil('\n'); // Read hash
     String job = Serial.readStringUntil('\n'); // Read job
     unsigned int diff = Serial.parseInt(); // Read difficulty
     for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
+      yield(); // Let Arduino/ESP do background tasks - else watchdog will trigger
       Sha1.init(); // Create sha1 hasher
       Sha1.print(String(hash) + String(iJob));
       uint8_t * hash_bytes = Sha1.result(); // Get result
@@ -52,9 +53,9 @@ void loop() {
       result.remove(40, 28); // First 40 characters are good, rest is garbage
       if (String(result) == String(job)) { // If result is found
         Serial.println(String(iJob)); // Send result back to Arduino Miner
-        digitalWrite(LED_BUILTIN, HIGH);   // Turn on built-in led
-        delay(25); // Wait a bit
-        digitalWrite(LED_BUILTIN, LOW); // Turn off built-in led
+        PORTB = PORTB | B00100000;   // Turn on built-in led
+        delay(40); // Wait a bit
+        PORTB = PORTB & B11011111; // Turn off built-in led
         break; // Stop and wait for more work
       }
     }

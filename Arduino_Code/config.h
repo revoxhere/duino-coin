@@ -18,7 +18,6 @@
 
 // include the module config first, 
 // overwrite it in the arduino interface config.
-#include "sha256/default.h"
 #include "sha1/default.h"
 
 #ifndef SHA_CONFIG_H_

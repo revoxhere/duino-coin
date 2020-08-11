@@ -16,17 +16,9 @@
 
 #include "config.h"
 
-#ifndef SHA256_DISABLED
-#include "sha256/constants.c"
-#include "sha256/hash.c"
-#include "sha256/types.c"
-#include "sha256/sha256.c"
-#endif
-
 #ifndef SHA1_DISABLED
 #include "sha1/constants.c"
 #include "sha1/hash.c"
 #include "sha1/types.c"
 #include "sha1/sha1.c"
 #endif
-
