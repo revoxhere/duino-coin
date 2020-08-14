@@ -47,10 +47,19 @@ Technical specifications:
 <h2 align="center">Get started</h2><br>
 
 | Official Wallet | Official Miners |
-:-------------------------:|:-------------------------:
+:----------------:|:----------------:
 [<img src="https://media.discordapp.net/attachments/691626288376709140/719828194319925298/WALLET.gif">](https://duinocoin.com/getting-started#register)  |  [<img src="https://media.discordapp.net/attachments/691626288376709140/719828166478266398/MINER.gif">](https://duinocoin.com/getting-started#pc)
 
 Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a>.
+
+<h3 align="center">Community-made software</h3><br>
+
+*   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
+*   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
+*   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners) by various authors
+*   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz
+
+This list will be actively updated
 
 <h2 align="center">Contributing</h2><br>
 
