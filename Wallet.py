@@ -47,6 +47,9 @@ currencies = [
   ("PLN"),
   ("RUB"),
   ("EUR"),
+  ("BRL"),
+  ("JPY"),
+  ("GBP"),
 ]
 
 # Loading window
@@ -116,7 +119,7 @@ def setCurrency(event):
     messagebox.showinfo("Information", "Wallet will be restarted to apply changes.") # Display info
     os.execl(sys.executable, sys.executable, *sys.argv)
     
-  if event == "PLN":
+  elif event == "PLN":
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str(theme),
@@ -126,7 +129,7 @@ def setCurrency(event):
     messagebox.showinfo("Information", "Wallet will be restarted to apply changes.") # Display info
     os.execl(sys.executable, sys.executable, *sys.argv)
       
-  if event == "RUB":
+  elif event == "RUB":
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str(theme),
@@ -136,7 +139,7 @@ def setCurrency(event):
     messagebox.showinfo("Information", "Wallet will be restarted to apply changes.\n") # Display info
     os.execl(sys.executable, sys.executable, *sys.argv)
 
-  if event == "EUR":
+  elif event == "EUR":
     config['wallet'] = {"username": username,
               "password": password,
               "theme": str(theme),
@@ -146,6 +149,35 @@ def setCurrency(event):
     messagebox.showinfo("Information", "Wallet will be restarted to apply changes.\n") # Display info
     os.execl(sys.executable, sys.executable, *sys.argv)
 
+  elif event == "BRL":
+    config['wallet'] = {"username": username,
+              "password": password,
+              "theme": str(theme),
+              "currency": str("BRL")}
+    with open(str(resources) + "Wallet_config.cfg", "w") as configfile:
+      config.write(configfile)
+    messagebox.showinfo("Information", "Wallet will be restarted to apply changes.\n") # Display info
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+  elif event == "JPY":
+    config['wallet'] = {"username": username,
+              "password": password,
+              "theme": str(theme),
+              "currency": str("JPY")}
+    with open(str(resources) + "Wallet_config.cfg", "w") as configfile:
+      config.write(configfile)
+    messagebox.showinfo("Information", "Wallet will be restarted to apply changes.\n") # Display info
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+  elif event == "GBP":
+    config['wallet'] = {"username": username,
+              "password": password,
+              "theme": str(theme),
+              "currency": str("GBP")}
+    with open(str(resources) + "Wallet_config.cfg", "w") as configfile:
+      config.write(configfile)
+    messagebox.showinfo("Information", "Wallet will be restarted to apply changes.\n") # Display info
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
 def selectWindow(): # First-time launch window
     global window
@@ -276,7 +308,6 @@ def loginProtocol(): # First-time login protocol
     password = pwordEL.get()
     
     while True:
-
         s.send(bytes("LOGI,"+str(username)+","+str(password), encoding='utf8')) # Send login request to server
         key = s.recv(64).decode()
         key = key.split(',')
@@ -297,41 +328,11 @@ def loginProtocol(): # First-time login protocol
             os.execl(sys.executable, sys.executable, *sys.argv)
         else: # If error, fallback
             os.execl(sys.executable, sys.executable, *sys.argv)
-
-def sendEmailProtocol():
-  email = emailE.get()
-  balanceTimer.cancel()
-  s.send(bytes("ADDEMAIL,"+str(username)+","+str(password)+","+str(email), encoding='utf8')) # Send login request to server
-  time.sleep(0.025)
-  resp = s.recv(1024).decode()
-  messagebox.showinfo("Server message", str(resp))
-  emailWindow.destroy()
-
-def addEmail():
-  global emailE, emailWindow
-
-  emailWindow = tkinter.Tk() #email window
-  emailWindow.resizable(False, False)
-  emailWindow.title('Add e-mail to account')
-  try:
-      rootA.iconbitmap(str(resources) + "Wallet_icon.ico")
-  except:
-      pass # Icon won't work on linux
-  emailWindow.configure(background = str(colorA))
-
-  nameL = Label(emailWindow, text="There is no e-mail associated with your account.\nWithout it you won\'t be able to exchange funds.\nWe won't send spam.\nPlease add e-mail to your account:", bg = str(colorA), fg = str(colorB))
-  nameL.pack()
-
-  emailE = Entry(emailWindow, fg = str(colorB), bg = str(colorA), width=30)
-  emailE.pack()
-
-  emailB = Button(emailWindow, text='Add e-mail', activebackground = str(colorHighlight), command = sendEmailProtocol, bg = str(colorA), fg = str(colorB))
-  emailB.pack()
     
 def loadConfig(): # Load config protocol
     global username, password, loadingScr, currency, rate
     global theme, background, colorA, colorB, colorC, colorHighlight
-    global pcusername, publicip, platform, userstatus
+    global pcusername, publicip, platform
     
     label = tkinter.Label(loadingScr, text = "Parsing configfile..." + str(" ")*20, bg = str(colorA), fg = str(colorC), font=("Arial", 8)).place(relx = 0.01, rely = 0.8)  
     loadingScr.update()
@@ -349,7 +350,7 @@ def loadConfig(): # Load config protocol
       colorC = "gray"
       colorHighlight = "#FBC531" #ducogold - #FBC531
       
-    if str(theme) == "1": # Dark theme
+    elif str(theme) == "1": # Dark theme
       background = str(resources) + "Wallet_background_dark.gif"
       colorA = "#23272a" #background
       colorB = "#fafafa" #foreground
@@ -359,14 +360,23 @@ def loadConfig(): # Load config protocol
     if str(currency) == "USD": # Fiat currency exchange rates
       rate = 1 # API is in USD
 
-    if str(currency) == "PLN":
-      rate = 4.25 # One USD is 4.75 PLN
+    elif str(currency) == "PLN":
+      rate = 4.75 # One USD is 4.75 PLN
 
-    if str(currency) == "RUB":
-      rate = 76.40 # And so on...
+    elif str(currency) == "RUB":
+      rate = 76.45 # And so on...
       
-    if str(currency) == "EUR":
-      rate = 0.93
+    elif str(currency) == "EUR":
+      rate = 0.95
+
+    elif str(currency) == "BRL":
+      rate = 5.45
+
+    elif str(currency) == "JPY":
+      rate = 106
+
+    elif str(currency) == "GBP":
+      rate = 1.31
 
     while True: # Login
         time.sleep(0.025)
@@ -374,7 +384,7 @@ def loadConfig(): # Load config protocol
             s.send(bytes("LOGI,"+username+","+password, encoding='utf8'))
             break
         except:
-            os._exit(1)
+            pass
 
     while True: # Receive server key
         key = s.recv(64).decode()
@@ -384,23 +394,6 @@ def loadConfig(): # Load config protocol
             loadingScr.update()
 
             s.send(bytes("FROM," + "Wallet," + str(pcusername).rstrip() + "," + str(publicip).rstrip() + "," + str(platform).rstrip(), encoding="utf8")) # Send info to server settings client
-            time.sleep(0.045)
-            
-            while True:   
-                s.send(bytes("STAT", encoding='utf8'))
-                try:
-                    userstatus = s.recv(1024).decode('utf8')
-                    userstatus = userstatus.split(',')
-
-                    if userstatus[1] == "NoEmail":
-                      addEmail()
-                      s.send(bytes("STAT", encoding='utf8'))
-                      userstatus = s.recv(1024).decode('utf8')
-                      userstatus = userstatus.split(',')
-                    break
-
-                except:
-                    pass
 
             loadingScr.destroy()
             WalletWindow()
@@ -490,7 +483,7 @@ def Exchange():
     webbrowser.open_new_tab("https://revoxhere.github.io/duco-exchange/")
 
 def Website():
-    webbrowser.open_new_tab("https://revoxhere.github.io/duino-coin/")
+    webbrowser.open_new_tab("https://duinocoin.com/")
     
 def getBalance():
     global balance, wallet, ducofiat, balancecurrency, balanceTimer
@@ -517,7 +510,7 @@ def getBalance():
         transactions.seek(0, 0)
 
         balance = round(float(balance), 8) # Format balances
-        balancecurrency = round(float(oldbalance) * float(ducofiat) * float(rate), 6)
+        balancecurrency = round(float(ducofiat) * float(oldbalance), 6)
         difference = round(float(balance) - float(oldbalance), 8)
         
         if difference != 0.0: # Check if balance has changed
@@ -667,7 +660,7 @@ def EditFile():
     webbrowser.open(str(resources)+"Wallet_config.cfg")
     
 def WalletWindow():
-    global wallet, label, userstatus, OVERVIEW, receipent, amount, TRANSACTIONS, footer
+    global wallet, label, OVERVIEW, receipent, amount, TRANSACTIONS, footer
 
     wallet = tkinter.Tk()	
     wallet.geometry("610x360")
@@ -676,7 +669,6 @@ def WalletWindow():
     wallet.title("Duino-Coin GUI Wallet ("+str(VER)+")")
 
     style = ttk.Style()
-
     style.theme_create( "coloredTabs", parent="alt", settings={
         "TNotebook": {
             "configure": {
@@ -689,11 +681,12 @@ def WalletWindow():
 
     style.theme_use("coloredTabs")
     TAB_CONTROL = ttk.Notebook(wallet)
-    Label(wallet, text = "Duino-Coin GUI Wallet "+str(VER), bg = str(colorA), fg = str(colorHighlight), font=("Arial", 13, "bold"), padx=5).pack(anchor = W)
+    Label(wallet, text = "Duino-Coin GUI Wallet "+str(VER), bg = str(colorA), fg = str(colorHighlight), font=("Verdana", 13, "bold"), padx=5).pack(anchor = W)
 
     footer = tkinter.Frame(wallet, bg=str(colorA), height=20)
     footer.pack(fill='both', side='bottom')
     FooterUpdate()
+
 
     #OVERVIEW
     OVERVIEW = ttk.Frame(TAB_CONTROL)
@@ -818,6 +811,12 @@ def WalletWindow():
         cvariable.set(currencies[2])
     if currency == "EUR":
         cvariable.set(currencies[3])
+    if currency == "BRL":
+        cvariable.set(currencies[4])
+    if currency == "JPY":
+        cvariable.set(currencies[5])
+    if currency == "GBP":
+        cvariable.set(currencies[6])
 
     tkinter.Button(SETTINGS, text = "Change password", activebackground = str(colorHighlight), height = 1, command = changePass, width=23, font=("Arial", 13), fg = str(colorB), bg = str(colorA)).place(relx=0.03, rely=0.03)
     tkinter.Button(SETTINGS, text = "Logout", activebackground = str(colorHighlight), height = 1, command = Logout, width=23, font=("Arial", 13), fg = str(colorB), bg = str(colorA)).place(relx=0.53, rely=0.03)
@@ -834,8 +833,6 @@ def WalletWindow():
 
     tkinter.Label(SETTINGS, text = "\n\n\n\n\n\n\n", fg = str(colorB), bg = str(colorA), font=("Arial", 13)).pack()
     tkinter.Label(SETTINGS, text = "Remember that you don't need to have your wallet open 24/7 to receive funds. Duino-Coin master server takes care of all transactions and your wallet data is securely stored on the main server.", fg = str(colorB), bg = str(colorA), wraplength=600, font=("Arial", 13)).pack()
-
-
 
     getDucoPrice()
     getBalance()
