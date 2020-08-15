@@ -681,7 +681,7 @@ def WalletWindow():
 
     style.theme_use("coloredTabs")
     TAB_CONTROL = ttk.Notebook(wallet)
-    Label(wallet, text = "Duino-Coin GUI Wallet "+str(VER), bg = str(colorA), fg = str(colorHighlight), font=("Verdana", 13, "bold"), padx=5).pack(anchor = W)
+    Label(wallet, text = "Duino-Coin GUI Wallet "+str(VER), bg = str(colorA), fg = str(colorHighlight), font=("Verdana", 13, "bold"), padx=5).pack(anchor = N)
 
     footer = tkinter.Frame(wallet, bg=str(colorA), height=20)
     footer.pack(fill='both', side='bottom')
