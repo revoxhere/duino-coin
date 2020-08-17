@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for WiFi ESP boards - v1.0 © revox 2019-2020
+//  Code for WiFi ESP boards - v1.6 © revox 2019-2020
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
 //  https://github.com/revoxhere/duino-coin - GitHub
@@ -16,29 +16,23 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 const char* ssid     = "WiFi Name"; // Change this to your WiFi SSID
-const char* password = "WiFi Pass"; // Change this to your WiFi password
-const char* ducouser = "Username"; // Change this to your Duino-Coin username
-const char* ducopass = "Password"; // Change this to your Duino-Coin password
+const char* password = "WiFi Password"; // Change this to your WiFi password
+const char* ducouser = "Duino-Coin Username"; // Change this to your Duino-Coin username
 
-#define LED_BUILTIN 2 // Uncomment this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
-int maxshares = 100; // Restart every 100 shares, you can change it if you want
+#define LED_BUILTIN 2 // Uncomment this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)t
 
 #include <ESP8266WiFi.h> // Include WiFi library
 #include <ESP8266HTTPClient.h> // Include HTTP library
-#include "Hash.h" // Include crypto library
+#include <Hash.h> // Include crypto library
 
-const uint8_t fingerprint[20] = {0x70, 0x94, 0xDE, 0xDD, 0xE6, 0xC4, 0x69, 0x48, 0x3A, 0x92, 0x70, 0xA1, 0x48, 0x56, 0x78, 0x2D, 0x18, 0x64, 0xE0, 0xB7}; // GitHub SHA1 fingerprint to access HTTPS
-
-int var = 0; // Global variable
 String port = ""; // Global variable
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Define built-in led as output
   Serial.begin(115200); // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP Miner v1.0 by revox");
+  Serial.println("\n\nDuino-Coin ESP Miner v1.6");
 
-  Serial.print("Connecting to: ");
-  Serial.println(ssid);
+  Serial.println("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
   WiFi.begin(ssid, password); // Connect to wifi
 
@@ -48,13 +42,12 @@ void setup() {
   }
 
   Serial.println("\nConnected to WiFi!");
-  Serial.print("Local IP address: ");
-  Serial.println(WiFi.localIP()); // Print local IP address
+  Serial.println("Local IP address: " + WiFi.localIP().toString());
 }
 
 void serverport() { // Grab server port from GitHub file function
-  std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure); // Prepare HTTPS
-  client->setFingerprint(fingerprint); // Prepare fingerprint
+  std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
+  client->setInsecure();
   HTTPClient https;
 
   if (https.begin(*client, "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt")) {  // Server IP file
@@ -65,8 +58,7 @@ void serverport() { // Grab server port from GitHub file function
         port.remove(0, 14); // Remove unwanted characters
         port.remove(6, 600); // Remove unwanted characters
         port.toInt(); // Convert to int
-        Serial.print("\nGitHub port: ");
-        Serial.println(port);
+        Serial.println("\nGitHub port: " + String(port));
       }
     } else { // If error
       Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
@@ -86,58 +78,38 @@ void loop()
   WiFiClient client;
   if (!client.connect(host, port.toInt())) {
     Serial.println("Connection failed.");
-    Serial.println("Waiting 5 seconds before retrying...");
-    delay(5000);
+    Serial.println("Waiting 15 seconds before retrying...");
+    delay(15000);
     return;
   }
 
-  String SERVER_VER = client.readStringUntil('\n'); // Server sends SERVER_VERSION after connecting
-  Serial.print("\nServer is on version: ");
-  Serial.println(SERVER_VER);
-  delay(150); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
+  String SERVER_VER = client.readString(); // Server sends SERVER_VERSION after connecting
+  Serial.print("\nServer version: " + String(SERVER_VER));
+  client.print("FROM,ESP Miner," + String(ducouser)); // Metrics for the server
 
-  Serial.print("Loging-in user: ");
-  Serial.println(ducouser);
-  client.print("LOGI," + String(ducouser) + "," + String(ducopass)); // Ask for login
-  delay(150); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
+  while (1) {
+    Serial.println("Asking for a new job for user: " + String(ducouser));
+    client.print("Job," + String(ducouser)); // Ask for new job
 
-  String feedback = client.readStringUntil('\n'); // Server sends NO or OK if login successful or failed
-  Serial.print("Login feedback: ");
-  Serial.println(feedback); // Print the feedback
-  Serial.print("\n");
-
-  while (var < maxshares) { // While remaining shares is less than max shares
-    Serial.println("Asking for a new job");
-    client.print("Job"); // Ask for new job
-    delay(150); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
-    
     String hash = client.readStringUntil(','); // Read hash
     String job = client.readStringUntil(','); // Read job
-    unsigned int diff = client.readStringUntil('\n').toInt(); // Read difficulty
+    unsigned int diff =  3500; // Fixed difficulty - no need to read it from the server because no termination character causes a lot of network lag
+    Serial.println("Job received: " + String(hash) + " " + String(job));
 
     for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
-      yield(); // Let Arduino/ESP do background tasks - else watchdog will trigger
+      yield(); // Let ESP do background tasks - else watchdog will trigger
       String result = sha1(String(hash) + String(iJob)); // Hash previous block hash and current iJob
       if (result == job) { // If result is found
-        Serial.print("Share found: ");
-        Serial.println(iJob); // Print the result
+        Serial.println("Share found: " + String(iJob));
         client.print(iJob); // Send result to server
-        delay(150); // Small delays are used to make connection with the server more stable, without them ESP likes to timeout
 
-        String accepted = client.readStringUntil('\n'); // Receive feedback
-        Serial.print("Share feedback: ");
-        Serial.println(accepted);
-
+        String feedback = client.readStringUntil('D'); // Receive feedback
         digitalWrite(LED_BUILTIN, HIGH);   // Turn on built-in led
-        delay(100); // Wait a bit
+        delay(50); // Wait a bit
         digitalWrite(LED_BUILTIN, LOW); // Turn off built-in led
-        delay(100); // Wait a bit
-        digitalWrite(LED_BUILTIN, HIGH); // Turn off built-in led
-        delay(100); // Wait a bit
-        digitalWrite(LED_BUILTIN, LOW); // Turn off built-in led
-        
+        delay(50); // Wait a bit
+
         Serial.println("-----");
-        var++; // Increase share counter
         break; // Stop and wait for more work
       }
     }
