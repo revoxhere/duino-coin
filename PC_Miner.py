@@ -3,9 +3,10 @@
 # Duino-Coin PC Miner (v1.6) 
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
-# © revox, MrKris7100 2020
+# © Duino-Coin Community 2020
 ##########################################
 import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
+from decimal import Decimal
 from pathlib import Path
 from signal import signal, SIGINT
 
@@ -66,6 +67,10 @@ try:
 except:
     pass
 
+def debugOutput(text):
+  if debug == "true":
+    print("DEBUG: " + text)
+
 def title(title):
   if os.name == 'nt':
     os.system("title "+title)
@@ -77,8 +82,10 @@ def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE 
   now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "\n%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " SIGINT detected - Exiting gracefully." + Style.NORMAL + " See you soon!")
   try:
-    soc.send(bytes("CLOSE", encoding="utf8"))
+    soc.send(bytes("CLOSE", encoding="utf8")) # Try sending a close connection request to the server
   except:
+    if debug == "true":
+      raise
     pass
   os._exit(0)
 
@@ -114,6 +121,8 @@ def Greeting(): # Greeting message depending on time
   try:
     print(" * " + Fore.YELLOW + "CPU: " + Style.BRIGHT + str(cpu["brand_raw"]))
   except:
+    if debug == "true":
+      raise
     pass
   if os.name == 'nt':
     print(" * " + Fore.YELLOW + "Donation level: " +  Style.BRIGHT + str(donationlevel))
@@ -123,10 +132,12 @@ def Greeting(): # Greeting message depending on time
   
   if os.name == 'nt':
     if not Path(str(resources) + "/Miner_executable.exe").is_file(): # Initial miner executable section
+      debugOutput("OS is Windows, downloading developer donation executable")
       url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
       r = requests.get(url)
       with open(str(resources) + '/Miner_executable.exe', 'wb') as f:
         f.write(r.content)
+    debugOutput("OS is Windows, donation executable already downloaded")
 
 def hashrateCalculator(): # Hashes/sec calculation
   global last_hash_count, hash_count, khash_count, hash_mean
@@ -154,7 +165,7 @@ def autorestarter(): # Autorestarter
 
 
 def loadConfig(): # Config loading section
-  global pool_address, pool_port, username, efficiency, autorestart, donationlevel, st, bytereturn, temp_print_time
+  global pool_address, pool_port, username, efficiency, autorestart, donationlevel, st, bytereturn, debug
   
   if not Path(str(resources) + "/Miner_config.cfg").is_file(): # Initial configuration section
     print(Style.BRIGHT + "Duino-Coin basic configuration tool.\nEdit "+str(resources) + "/Miner_config.cfg file later if you want to change it.")
@@ -162,7 +173,7 @@ def loadConfig(): # Config loading section
 
     username = input(Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT)
     efficiency = input(Style.RESET_ALL + Fore.YELLOW + "Set mining intensity (1-100)% (recommended: 100): " + Style.BRIGHT)
-    autorestart = input(Style.RESET_ALL + Fore.YELLOW + "Set after how many seconds miner will restart (recommended: 600): " + Style.BRIGHT)
+    autorestart = input(Style.RESET_ALL + Fore.YELLOW + "Set after how many seconds miner will restart (recommended: 360): " + Style.BRIGHT)
     donationlevel = "0"
     if os.name == 'nt':
       donationlevel = input(Style.RESET_ALL + Fore.YELLOW + "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: " + Style.BRIGHT)
@@ -185,7 +196,8 @@ def loadConfig(): # Config loading section
     "autorestart": autorestart,
     "donate": donationlevel,
     "st": "A1",
-    "bytereturn": "0"}
+    "bytereturn": "0",
+    "debug": "false"}
     
     with open(str(resources) + "/Miner_config.cfg", "w") as configfile: # Write data to file
       config.write(configfile)
@@ -199,6 +211,7 @@ def loadConfig(): # Config loading section
     donationlevel = config["miner"]["donate"]
     st = config["miner"]["st"]
     bytereturn = config["miner"]["bytereturn"]
+    debug = config["miner"]["debug"]
 
 def Connect(): # Connect to pool section
   global soc, connection_counter, res, pool_address, pool_port
@@ -220,6 +233,8 @@ def Connect(): # Connect to pool section
     except:
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot receive pool address and IP.\nExiting in 15 seconds.")
+      if debug == "true":
+        raise
       time.sleep(15)
       os._exit(1)
       
@@ -230,11 +245,13 @@ def Connect(): # Connect to pool section
       soc.shutdown(socket.SHUT_RDWR)
       soc.close()
     except:
+      debugOutput("No previous connections to close")
       pass
     
     try:
       soc = socket.socket()
     except:
+      debugOutput("Reconnecting")
       Connect() # Reconnect if pool down
     
     try: # Try to connect
@@ -245,6 +262,8 @@ def Connect(): # Connect to pool section
     except: # If it wasn't, display a message
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot connect to the server. It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
+      if debug == "true":
+          raise
       time.sleep(15)
       os.execl(sys.executable, sys.executable, *sys.argv)
       
@@ -255,6 +274,7 @@ def checkVersion():
     try:
       SERVER_VER = soc.recv(1024).decode() # Check server version
     except:
+      debugOutput("Error checking server version, reconnecting")
       Connect() # Reconnect if pool down
 
     if len(SERVER_VER) != 3:
@@ -281,6 +301,7 @@ def Mine(): # Mining section
   global last_hash_count, hash_count, khash_count, donationlevel, donatorrunning, efficiency
 
   if os.name == 'nt':
+    debugOutput("OS is Windows, displaying donation message")
     if int(donationlevel) > 0:
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Thank You for being an awesome donator! <3")
@@ -302,9 +323,12 @@ def Mine(): # Mining section
       if int(donationlevel) == int(0):
           cmd = ""
       try:  # Start cmd set above
-        subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
+        debugOutput("Starting donation process")
+        process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
         donatorrunning = True
       except:
+        if debug == "true":
+          raise
         pass
 
   efficiency = 100 - float(efficiency) # Calulate efficiency
@@ -318,19 +342,23 @@ def Mine(): # Mining section
     try:
       soc.send(bytes("JOB," + str(username), encoding="utf8")) # Send job request
     except:
+      debugOutput("Reconnecting")
       Connect() # Reconnect if pool down
     while True:
       try:
         job = soc.recv(1024).decode() # Get work from pool
       except:
+        debugOutput("Error receiving job, restarting")
         os.execl(sys.executable, sys.executable, *sys.argv)
       if job:
+        debugOutput("Job received: " +str(job))
         break # If job received, continue to hashing algo
       time.sleep(0.025) # Try again if no response
     try:
       job = job.split(",") # Split received data to job and difficulty
       diff = job[2]
     except:
+      debugOutput("Error splitting job, restarting")
       os.execl(sys.executable, sys.executable, *sys.argv)
     
     computestart = datetime.datetime.now()
@@ -395,42 +423,63 @@ while True:
 
   try:
     loadConfig() # Load configfile
+    debugOutput("Config file loaded")
   except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error loading the config file (Miner_config.cfg). Try removing it and re-running configuration. Exiting in 15s."  + Style.RESET_ALL)
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error loading the configfile (Miner_config.cfg). Try removing it and re-running configuration. Exiting in 15s."  + Style.RESET_ALL)
+    if debug == "true":
+      raise
     time.sleep(15)
     os._exit(1)
 
   try: # Setup autorestarter
     if float(autorestart) > 0:
+      debugOutput("Enabled autorestarter for " + str(autorestart) + " seconds")
       threading.Thread(target=autorestarter).start()
+    else:
+      debugOutput("Autorestarted is disabled")
   except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in while autorestarting. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)    
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)    
+    if debug == "true":
+      raise
     time.sleep(15)
     os._exit(1)
 
   try:
     Greeting() # Display greeting message
+    debugOutput("Greeting displayed")
   except:
-    pass
+    if debug == "true":
+      raise
 
   try:
     Connect() # Connect to pool
+    debugOutput("Connected to master server")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error connecting to pool. Check your config file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
+    if debug == "true":
+      raise
     time.sleep(15)
     os._exit(1)
 
   try:
     checkVersion() # Check version
+    debugOutput("Version check complete")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error checking server version. Restarting." + Style.RESET_ALL)
+    if debug == "true":
+      raise
     os.execl(sys.executable, sys.executable, *sys.argv)
 
   try:
+    debugOutput("Mining started")
     Mine() # Launch mining thread
+    debugOutput("Mining ended")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining. Restarting." + Style.RESET_ALL)
+    if debug == "true":
+      raise
     os.execl(sys.executable, sys.executable, *sys.argv)
 
   print(Style.RESET_ALL + Style.RESET_ALL)
   time.sleep(0.025) # Restart
+  debugOutput("Restarting")
