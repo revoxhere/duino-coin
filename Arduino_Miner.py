@@ -51,6 +51,7 @@ diff = 0
 donatorrunning = False
 balance = 0
 job = ""
+debug = "false"
 
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
@@ -66,6 +67,9 @@ try:
 except:
     pass
 
+def debugOutput(text):
+  if debug == "true":
+    print("DEBUG: " + text)
 
 def title(title):
   if os.name == 'nt':
@@ -78,7 +82,7 @@ def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE 
   now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "\n%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " SIGINT detected - Exiting gracefully." + Style.NORMAL + " See you soon!")
   try:
-    soc.send(bytes("CLOSE", encoding="utf8"))
+    soc.send(bytes("CLOSE", encoding="utf8")) # Try sending a close connection request to the server
   except:
     pass
   os._exit(0)
@@ -98,20 +102,18 @@ def Greeting(): # Greeting message depending on time
   current_hour = time.strptime(time.ctime(time.time())).tm_hour
   
   if current_hour < 12 :
-    greeting = "We hope you're having a great morning!"
+    greeting = "We hope you're having a great morning"
   elif current_hour == 12 :
-    greeting = "We hope you're having a great noon!"
+    greeting = "We hope you're having a great noon"
   elif current_hour > 12 and current_hour < 18 :
-    greeting = "We hope you're having a great afternoon!"
+    greeting = "We hope you're having a great afternoon"
   elif current_hour >= 18 :
-    greeting = "We hope you're having a great evening!"
-  elif current_hour > 19 and current_hour < 01 :
-    greeting = "We hope you are having a great night!"
+    greeting = "We hope you're having a great evening"
   else:
     greeting = "Welcome back"
   
   print(" * " + Fore.YELLOW + Style.BRIGHT + "Duino-Coin © Arduino Miner " + Style.RESET_ALL + Fore.YELLOW+ "(v" + str(VER) + ") 2019-2020") # Startup message  print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
-  print(" * " + Fore.YELLOW + "AVR board on port: " + Style.BRIGHT + str(arduinoport))
+  print(" * " + Fore.YELLOW + "AVR board on port: " + Style.BRIGHT + str(avrport))
   if os.name == 'nt':
     print(" * " + Fore.YELLOW + "Donation level: " +  Style.BRIGHT + str(donationlevel))
   print(" * " + Fore.YELLOW + "Algorithm: " + Style.BRIGHT + "DUCO-S1A")
@@ -134,7 +136,7 @@ def autorestarter(): # Autorestarter
   os.execl(sys.executable, sys.executable, *sys.argv)
 
 def loadConfig(): # Config loading section
-  global pool_address, pool_port, username, password, autorestart, donationlevel, arduinoport
+  global pool_address, pool_port, username, password, autorestart, donationlevel, avrport, debug
   
   if not Path(str(resources) + "/Miner_config.cfg").is_file(): # Initial configuration section
     print(Style.BRIGHT + "Duino-Coin basic configuration tool.\nEdit "+str(resources) + "/Miner_config.cfg file later if you want to change it.")
@@ -151,7 +153,7 @@ def loadConfig(): # Config loading section
     print(Style.RESET_ALL + Fore.YELLOW + "----")
     print(Style.RESET_ALL + Fore.YELLOW + "If you can't see your board here, make sure the it is properly connected and the program has access to it (admin/sudo rights).")
 
-    arduinoport = input(Style.RESET_ALL + Fore.YELLOW + "Enter your board serial port (e.g. COM1 or /dev/ttyUSB1): " + Style.BRIGHT)
+    avrport = input(Style.RESET_ALL + Fore.YELLOW + "Enter your board serial port (e.g. COM1 or /dev/ttyUSB1): " + Style.BRIGHT)
     autorestart = input(Style.RESET_ALL + Fore.YELLOW + "Set after how many seconds miner will restart (recommended: 360): " + Style.BRIGHT)
     donationlevel = "0"
     if os.name == 'nt':
@@ -166,9 +168,10 @@ def loadConfig(): # Config loading section
     config['arduminer'] = { # Format data
     "username": username,
     "password": password,
-    "arduinoport": arduinoport,
+    "avrport": avrport,
     "autorestart": autorestart,
-    "donate": donationlevel}
+    "donate": donationlevel,
+    "debug": "false"}
     
     with open(str(resources) + "/Miner_config.cfg", "w") as configfile: # Write data to file
       config.write(configfile)
@@ -177,9 +180,10 @@ def loadConfig(): # Config loading section
     config.read(str(resources) + "/Miner_config.cfg")
     username = config["arduminer"]["username"]
     password = config["arduminer"]["password"]
-    arduinoport = config["arduminer"]["arduinoport"]
+    avrport = config["arduminer"]["avrport"]
     autorestart = config["arduminer"]["autorestart"]
     donationlevel = config["arduminer"]["donate"]
+    debug = config["arduminer"]["debug"]
 
 def Connect(): # Connect to pool section
   global soc, connection_counter, res, pool_address, pool_port
@@ -263,7 +267,7 @@ def checkVersion():
 
 def ConnectToArduino():
   global com
-  com = serial.Serial(arduinoport, 115200)
+  com = serial.Serial(avrport, 115200)
 
 def Login():
   global autorestart
@@ -313,6 +317,7 @@ def ArduinoMine(): # Mining section
   global donationlevel, donatorrunning
   
   if os.name == 'nt':
+    debugOutput("OS is Windows, displaying donation message")
     if int(donationlevel) > 0:
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Thank You for being an awesome donator! <3")
@@ -334,29 +339,36 @@ def ArduinoMine(): # Mining section
       if int(donationlevel) == int(0):
           cmd = ""
       try:  # Start cmd set above
+        debugOutput("Starting donation process")
         subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
         donatorrunning = True
       except:
+        if debug == "true":
+          raise
         pass
 
   now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Arduino mining thread started" + Style.RESET_ALL + Fore.YELLOW + " using DUCO-S1A algorithm, please wait until Arduino will create a stable connection with the miner")
   
   ready = com.readline().decode().rstrip().lstrip() # Arduino will send ready signal
+  debugOutput("Received ready word ("+str(ready)+")")
   while True:
-    com.write(bytes("start\n", encoding="utf8")) # hash
-
     soc.send(bytes("Job",encoding="utf8")) # Send job request to server
     job = soc.recv(1024).decode().split(",") # Split received job
-    
+    debugOutput("Job received: " + str(job[0]))
+
+    com.write(bytes("start\n", encoding="utf8")) # start
+    debugOutput("Written start word")
     com.write(bytes(str(job[0])+"\n", encoding="utf8")) # hash
-    time.sleep(0.025)
+    debugOutput("Written hash")
     com.write(bytes(str(job[1])+"\n", encoding="utf8")) # job
-    time.sleep(0.025)
+    debugOutput("Written job")
     com.write(bytes(str(job[2])+"\n", encoding="utf8")) # diff
+    debugOutput("Written diff")
 
     computestart = datetime.datetime.now() # Get timestamp of start of the computing
     result = com.readline().decode().rstrip().lstrip() # Send hash, job and difficulty to the board using serial
+    debugOutput("Received result ("+str(result)+")")
     soc.send(bytes(str(result), encoding="utf8")) # Send result of hashing algorithm to pool
 
     while True:
@@ -402,33 +414,49 @@ while True:
     loadConfig() # Load configfile
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error loading the configfile. Try removing it and re-running configuration. Exiting in 15s."  + Style.RESET_ALL)
+    if debug == "true":
+      raise
     time.sleep(15)
     os._exit(1)
 
   try: # Setup autorestarter
     if float(autorestart) > 0:
+      debugOutput("Enabled autorestarter for " + str(autorestart) + " seconds")
       threading.Thread(target=autorestarter).start()
+    else:
+      debugOutput("Autorestarted is disabled")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file. Exiting in 15s." + Style.RESET_ALL)    
+    if debug == "true":
+      raise
     time.sleep(15)
     os._exit(1)
 
   try:
     Greeting() # Display greeting message
+    debugOutput("Greeting displayed")
   except:
+    if debug == "true":
+      raise
     pass
   
   try:
     Connect() # Connect to pool
+    debugOutput("Connected to master server")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while connecting to the server. Restarting in 15 seconds." + Style.RESET_ALL)
+    if debug == "true":
+      raise
     time.sleep(15)
     os.execl(sys.executable, sys.executable, *sys.argv)
     
   try:
     checkVersion() # Check version
+    debugOutput("Version check complete")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while connecting to the server. Restarting in 15 seconds." + Style.RESET_ALL)
+    if debug == "true":
+      raise
     time.sleep(15)
     os.execl(sys.executable, sys.executable, *sys.argv)
 
@@ -436,15 +464,22 @@ while True:
     Login() # Login
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while logging-in. Restarting." + Style.RESET_ALL)
+    if debug == "true":
+      raise
     os.execl(sys.executable, sys.executable, *sys.argv)
 
   ConnectToArduino() # Connect to AVR board
 
   try:
+    debugOutput("Mining started")
     ArduinoMine()
+    debugOutput("Mining ended")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining. Restarting." + Style.RESET_ALL)
+    if debug == "true":
+      raise
     os.execl(sys.executable, sys.executable, *sys.argv)
 
   print(Style.RESET_ALL + Style.RESET_ALL)
   time.sleep(0.025) # Restart
+  debugOutput("Restarting")
