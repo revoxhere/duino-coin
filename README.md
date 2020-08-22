@@ -118,7 +118,7 @@ Major frameworks used by Duino-Coin:
 *   **Contributors:**
     *   [@IdotMaster1](https://github.com/IdotMaster1)
     *   JoyBed
-*   **Social manager:** [@Furim](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
+*   **Former social manager:** [@Furim](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
 
 <h2 align="center">Special thanks</h2><br>
 
