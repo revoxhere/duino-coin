@@ -19,8 +19,8 @@
     <img src="https://img.shields.io/codacy/grade/a995acf7cd4c4211af6da874fe549ee5?color=ffa502&style=for-the-badge" /></a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-ffa502.svg?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/releases/tag/1.5">
-    <img src="https://img.shields.io/badge/release-1.5-ffa502.svg?style=for-the-badge" /></a>
+  <a href="https://github.com/revoxhere/duino-coin/releases/tag/1.6">
+    <img src="https://img.shields.io/badge/release-1.6-ffa502.svg?style=for-the-badge" /></a>
   <a href="https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015">
     <img src="https://img.shields.io/badge/Bitcointalk-555555.svg?style=for-the-badge&logo=bitcoin" /></a>
 </p>
