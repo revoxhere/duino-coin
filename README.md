@@ -42,7 +42,7 @@ Technical specifications:
 *   Premine: ~ 5k blocks
 *   Block time: Instant ⚡
 *   Ticker: DUCO (ᕲ)
-*   Algorithms: DUCO-S1, DUCO-S1A; PoT
+*   Algorithms: DUCO-S1, DUCO-S1A
 
 <h2 align="center">Get started</h2><br>
 
