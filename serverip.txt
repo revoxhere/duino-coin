@@ -1,5 +1,5 @@
-0.tcp.ngrok.io
-17828
+163.172.179.54
+14808
 =================
 First line represents the pool IP address.
 Second line is the pool port.
