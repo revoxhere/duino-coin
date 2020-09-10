@@ -70,7 +70,7 @@ void serverport() { // Grab server port from GitHub file function
 void loop()
 {
   serverport(); // Grab server port
-  const char * host = "0.tcp.ngrok.io"; // Server IP
+  const char * host = "163.172.179.54"; // Server IP
 
   Serial.println("\nConnecting to Duino-Coin server...");
 
