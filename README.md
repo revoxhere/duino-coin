@@ -52,12 +52,13 @@ Technical specifications:
 
 Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a>.
 
-<h3 align="center">Community-made software</h3><br>
+<h3 align="center">Community-made (mostly) software</h3><br>
 
 *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
 *   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
 *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners) by various authors
 *   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz
+*   [RSS Feed (to use you have to use a RSS reader)](https://idotmaster1.github.io/rss.txt)
 
 This list will be actively updated
 
