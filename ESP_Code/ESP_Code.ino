@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for WiFi ESP boards - v1.6 © revox 2019-2020
+//  Code for WiFi ESP boards - v1.7 © revox 2019-2020
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
 //  https://github.com/revoxhere/duino-coin - GitHub
@@ -15,22 +15,24 @@
 //  If you don't know how to start, visit official website
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
-const char* ssid     = "WiFi Name"; // Change this to your WiFi SSID
-const char* password = "WiFi Password"; // Change this to your WiFi password
-const char* ducouser = "Duino-Coin Username"; // Change this to your Duino-Coin username
+const char* ssid     = "Dom"; // Change this to your WiFi SSID
+const char* password = "07251498"; // Change this to your WiFi password
+const char* ducouser = "revox"; // Change this to your Duino-Coin username
+const int restart_every_n_shares = 150; // Restart ESP every 150 shares
 
-#define LED_BUILTIN 2 // Uncomment this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)t
+#define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
 #include <ESP8266HTTPClient.h> // Include HTTP library
 #include <Hash.h> // Include crypto library
 
-String port = ""; // Global variable
+String port = ""; // Global variables
+int shareCount = 0;
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Define built-in led as output
   Serial.begin(115200); // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP Miner v1.6");
+  Serial.println("\n\nDuino-Coin ESP Miner v1.7");
 
   Serial.println("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
@@ -84,10 +86,14 @@ void loop()
   }
 
   String SERVER_VER = client.readString(); // Server sends SERVER_VERSION after connecting
-  Serial.print("\nServer version: " + String(SERVER_VER));
+  Serial.println("\nServer version: " + String(SERVER_VER));
   client.print("FROM,ESP Miner," + String(ducouser)); // Metrics for the server
 
   while (1) {
+    if(shareCount >= restart_every_n_shares) {
+      Serial.println("Restarting ESP");
+      ESP.restart();
+    }
     Serial.println("Asking for a new job for user: " + String(ducouser));
     client.print("Job," + String(ducouser)); // Ask for new job
 
@@ -108,6 +114,7 @@ void loop()
         delay(50); // Wait a bit
         digitalWrite(LED_BUILTIN, LOW); // Turn off built-in led
         delay(50); // Wait a bit
+        shareCount++;
 
         Serial.println("-----");
         break; // Stop and wait for more work
