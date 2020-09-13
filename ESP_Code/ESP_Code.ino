@@ -15,9 +15,9 @@
 //  If you don't know how to start, visit official website
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
-const char* ssid     = "Dom"; // Change this to your WiFi SSID
-const char* password = "07251498"; // Change this to your WiFi password
-const char* ducouser = "revox"; // Change this to your Duino-Coin username
+const char* ssid     = "ENTER WIFI NAME"; // Change this to your WiFi SSID
+const char* password = "ENTER WIFI PASSWORD"; // Change this to your WiFi password
+const char* ducouser = "ENTER DUINOCOIN USERNAME"; // Change this to your Duino-Coin username
 const int restart_every_n_shares = 150; // Restart ESP every 150 shares
 
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
