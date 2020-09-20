@@ -19,7 +19,6 @@
 //////////////////////////////////////////////////////////
 
 // Include crypto library
-#define SHA256_DISABLE_WRAPPER // Disable sha256 wrapper
 #include "sha1.h"
 
 String result; // Create globals
