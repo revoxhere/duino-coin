@@ -50,6 +50,7 @@ st = "A1"
 donatorrunning = False
 bytereturn = 0
 balance = 0
+debug = "false"
 
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
