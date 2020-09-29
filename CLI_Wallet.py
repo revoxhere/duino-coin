@@ -5,7 +5,7 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2020
 ##########################################
-import socket, configparser, getpass, os, platform, sys, time, json
+import socket, configparser, getpass, os, platform, sys, time, json, datetime
 from signal import signal, SIGINT
 from pathlib import Path
 
