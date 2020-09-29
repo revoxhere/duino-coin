@@ -58,6 +58,10 @@ Official getting started guides for creating an account and setting up miners on
 *   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
 *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners) by various authors
 *   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz
+*   [Duino DogeRock GUI Wallet](https://github.com/DogeRock/Duino-Coin-Gui-Wallet) by DogeRock
+*   [Duino DogeRock CLI Wallet](https://github.com/DogeRock/DogeRock-Duino-Coin-cmd-line-wallet) by DogeRock
+*   [Duino DogeRock GUI Miner](https://github.com/DogeRock/Duino-Coin-Gui-Miner) by DogeRock
+
 
 This list will be actively updated
 
