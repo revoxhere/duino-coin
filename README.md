@@ -80,8 +80,8 @@ Any contributions you make are greatly appreciated.
 
 To build your own Duino-Coin apps, here's a list of of commands the master server accepts.
 To start communication however, firstly you need to connect to the server. For now you have two options:
-*   TCP connection (recommended) - server IP and port are dynamic and can be found [here](https://github.com/revoxhere/duino-coin/blob/gh-pages/serverip.txt)
-*   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static and are `revoxhere.ct8.pl:14808`
+*   TCP connection (recommended) - server IP and port are now static (but can change) and can be found [here](https://github.com/revoxhere/duino-coin/blob/gh-pages/serverip.txt)
+*   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static and are `ws://163.172.179.54:15808`
 
 After connecting, the server will send version number it's currently on (1.6).
 At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
