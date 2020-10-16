@@ -83,7 +83,7 @@ To start communication however, firstly you need to connect to the server. For n
 *   TCP connection (recommended) - server IP and port are now static (but can change) and can be found [here](https://github.com/revoxhere/duino-coin/blob/gh-pages/serverip.txt)
 *   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static and are `ws://163.172.179.54:15808`
 
-After connecting, the server will send version number it's currently on (1.6).
+After connecting, the server will send version number it's currently on 1.6.
 At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
 To login, send `LOGI,username,password` - replace username and password with credentials. After sucessfull login server will send `OK`.
 If login fails, server will send `NO,Reason of failed login`. 
