@@ -5,21 +5,23 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for WiFi ESP boards - v1.7 © revox 2019-2020
+//  Code for ESP8266 boards v1.7 
+//  © Duino-Coin Community 2019-2020
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
 //  https://github.com/revoxhere/duino-coin - GitHub
-//  https://revoxhere.github.io/duino-coin/ - Website
-//  https://discord.gg/kvBkccy - Discord
+//  https://duinocoin.com - Official Website
+//  https://discord.gg/k48Ht5y - Discord
+//  https://github.com/revoxhere - @revox
+//  https://github.com/JoyBed - @JoyBed
 //////////////////////////////////////////////////////////
-//  If you don't know how to start, visit official website
+//  If you don't know what to do, visit official website
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
-const char* ssid     = "ENTER WIFI NAME"; // Change this to your WiFi SSID
-const char* password = "ENTER WIFI PASSWORD"; // Change this to your WiFi password
-const char* ducouser = "ENTER DUINOCOIN USERNAME"; // Change this to your Duino-Coin username
-const int restart_every_n_shares = 150; // Restart ESP every 150 shares
 
+const char* ssid     = "Dom"; // Change this to your WiFi SSID
+const char* password = "07251498"; // Change this to your WiFi password
+const char* ducouser = "revox"; // Change this to your Duino-Coin username
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
@@ -27,7 +29,6 @@ const int restart_every_n_shares = 150; // Restart ESP every 150 shares
 #include <Hash.h> // Include crypto library
 
 String port = ""; // Global variables
-int shareCount = 0;
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Define built-in led as output
@@ -72,7 +73,7 @@ void serverport() { // Grab server port from GitHub file function
 void loop()
 {
   serverport(); // Grab server port
-  const char * host = "163.172.179.54"; // Server IP
+  const char * host = "163.172.179.54"; // Static server IP
 
   Serial.println("\nConnecting to Duino-Coin server...");
 
@@ -90,10 +91,6 @@ void loop()
   client.print("FROM,ESP Miner," + String(ducouser)); // Metrics for the server
 
   while (1) {
-    if(shareCount >= restart_every_n_shares) {
-      Serial.println("Restarting ESP");
-      ESP.restart();
-    }
     Serial.println("Asking for a new job for user: " + String(ducouser));
     client.print("Job," + String(ducouser)); // Ask for new job
 
@@ -114,7 +111,6 @@ void loop()
         delay(50); // Wait a bit
         digitalWrite(LED_BUILTIN, LOW); // Turn off built-in led
         delay(50); // Wait a bit
-        shareCount++;
 
         Serial.println("-----");
         break; // Stop and wait for more work
