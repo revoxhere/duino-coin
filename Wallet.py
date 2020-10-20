@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin GUI Wallet (v1.6)
+# Duino-Coin GUI Wallet (v1.7)
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -33,7 +33,7 @@ background = ""
 newbalance = 0
 Updated = False
 sending = 0
-VER = "1.6" # Version number
+VER = "1.7" # Version number
 resources = "Wallet_"+str(VER)+"_resources/"
 pcusername = getpass.getuser() # Get clients' username
 platform = str(platform.system()) + " " + str(platform.release()) # Get clients' platform information
@@ -554,38 +554,42 @@ def getBalance():
 
 def getDucoPrice():
     global ducofiat, rate, Updated
-    try:
-      jsonapi = requests.get("https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json", data = None) #Use request to grab data from raw github file
-      if jsonapi.status_code == 200: #Check for reponse
-          content = jsonapi.content.decode() #Read content and split into lines
-          contentjson = json.loads(content)
-          ducofiat = float(contentjson["Duco price"]) * float(rate)
-          ducofiat = round(ducofiat, 8)
-          bigblocks = contentjson["Big blocks and finders"]
-          bigblocks = bigblocks.split(",")
-          workers = contentjson["Active workers"]
-          richestMiners = contentjson["Top 10 richest miners"]
-          richestMiners = richestMiners.split(",")
-          if Updated == False:
-            for bigblock in bigblocks:
-              if username in bigblock:
-                ownblocks.configure(state ='normal')
-                bigblock = bigblock.lstrip(" ")
-                ownblocks.insert(INSERT, bigblock + "\n-----------------\n")
-                ownblocks.configure(state ='disabled')
-            Label(STATISTICS, text="", fg = str(colorB), bg = str(colorA), font=("Arial", 9)).pack()
-            Label(STATISTICS, text="Active workers: "+str(workers), fg = str(colorB), bg = str(colorA), font=("Arial", 13), wraplength=600).pack()
-            Label(STATISTICS, text="", fg = str(colorB), bg = str(colorA), font=("Arial", 9)).pack()
-            Label(STATISTICS, text="Rich list (Top 5): "+str(richestMiners[0])+", "+str(richestMiners[1])+", "+str(richestMiners[2])+", "+str(richestMiners[3])+", "+str(richestMiners[4]), fg = str(colorB), bg = str(colorA), font=("Arial", 13), wraplength=600).pack()
-            Updated = True
+    #try:
+    jsonapi = requests.get("https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json", data = None) #Use request to grab data from raw github file
+    if jsonapi.status_code == 200: #Check for reponse
+        content = jsonapi.content.decode() #Read content and split into lines
+        contentjson = json.loads(content)
+        ducofiat = float(contentjson["Duco price"]) * float(rate)
+        ducofiat = round(ducofiat, 8)
 
-      else:
-          ducofiat = 0.0015 * rate # If json api request fails, wallet will use this value
-          ducofiat = round(ducofiat, 8)
-          Label(STATISTICS, text="Error fetching data", fg = str(colorB), bg = str(colorA), font=("Arial", 9)).pack()
-    except:
+        blockapi = requests.get("https://raw.githubusercontent.com/revoxhere/duco-statistics/master/BigBlocks.json", data = None) #Use request to grab data from raw github file
+        if blockapi.status_code == 200: #Check for reponse
+          blockcontent = blockapi.content.decode() #Read content and split into lines
+          bigblocks = blockcontent.split("\n")
+
+        workers = contentjson["Active workers"]
+        richestMiners = contentjson["Top 10 richest miners"]
+        richestMiners = richestMiners.split(",")
+        if Updated == False:
+          for bigblock in bigblocks:
+            if username in bigblock:
+              ownblocks.configure(state ='normal')
+              bigblock = bigblock.lstrip(" ")
+              ownblocks.insert(INSERT, bigblock + "\n-----------------\n")
+              ownblocks.configure(state ='disabled')
+          Label(STATISTICS, text="", fg = str(colorB), bg = str(colorA), font=("Arial", 9)).pack()
+          Label(STATISTICS, text="Active workers: "+str(workers), fg = str(colorB), bg = str(colorA), font=("Arial", 13), wraplength=600).pack()
+          Label(STATISTICS, text="", fg = str(colorB), bg = str(colorA), font=("Arial", 9)).pack()
+          Label(STATISTICS, text="Rich list (Top 5): "+str(richestMiners[0])+", "+str(richestMiners[1])+", "+str(richestMiners[2])+", "+str(richestMiners[3])+", "+str(richestMiners[4]), fg = str(colorB), bg = str(colorA), font=("Arial", 13), wraplength=600).pack()
+          Updated = True
+
+    else:
         ducofiat = 0.0015 * rate # If json api request fails, wallet will use this value
+        ducofiat = round(ducofiat, 8)
         Label(STATISTICS, text="Error fetching data", fg = str(colorB), bg = str(colorA), font=("Arial", 9)).pack()
+    #except:
+        #ducofiat = 0.0015 * rate # If json api request fails, wallet will use this value
+        #Label(STATISTICS, text="Error fetching data", fg = str(colorB), bg = str(colorA), font=("Arial", 9)).pack()
 
     
     label = tkinter.Label(OVERVIEW, text = str(ducofiat)+" "+str(currency)+str("           "), bg = str(colorA), fg = str(colorB), font=("Arial", 16)).place(relx=.2, rely=.58)
