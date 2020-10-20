@@ -19,9 +19,9 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-const char* ssid     = "Your Wifi SSID (Name)"; // Change this to your WiFi SSID
-const char* password = "Your Wifi password"; // Change this to your WiFi password
-const char* ducouser = "Your Duinicoin username"; // Change this to your Duino-Coin username
+const char* ssid     = "Dom"; // Change this to your WiFi SSID
+const char* password = "07251498"; // Change this to your WiFi password
+const char* ducouser = "revox"; // Change this to your Duino-Coin username
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
@@ -90,7 +90,7 @@ void loop()
   Serial.println("\nServer version: " + String(SERVER_VER));
   client.print("FROM,ESP Miner," + String(ducouser)); // Metrics for the server
 
-  while (1) {
+  while (client.connected()) {
     Serial.println("Asking for a new job for user: " + String(ducouser));
     client.print("Job," + String(ducouser)); // Ask for new job
 
@@ -117,4 +117,6 @@ void loop()
       }
     }
   }
+  Serial.println("Not connected. Restarting ESP");
+  ESP.restart();
 }
