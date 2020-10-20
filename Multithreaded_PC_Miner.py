@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
-# ---------- Duino-Coin Multithreaded PC Miner (v1.6) ----------- #
+# ---------- Duino-Coin Multithreaded PC Miner (v1.7) ----------- #
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
-# © Bilaboz, revox, MrKris7100 2020
+# © Duino-Coin Community 2020
 # --------------------------------------------------------------- #
 
-username = "username" # put your username here
-password = "password" # put your password here
-
 refresh_time = 3.5 # refresh time in seconds for the output (recommended: 3.5)
-autorestart_time = 600 # autorestart time in seconds. 0 = disabled
+autorestart_time = 360 # autorestart time in seconds. 0 = disabled
 
 discord_key = "" # coming soon
 
@@ -17,17 +14,13 @@ discord_key = "" # coming soon
 
 import multiprocessing, threading, socket, hashlib, os, urllib.request, statistics, random, sys, time
 
-if not username or not password:
-    print("Please set your credentials first!")
-    time.sleep(5)
-    os._exit(1)
 
 if sys.platform == "win32":
     try:
         from colorama import init, Fore, Back, Style
         init()
     except:
-        print("You don't have colorama installed. Install it now?")
+        print("You don't have colorama installed. Try to install it now?")
         choice = input("(y/n): ")
         if choice == "y":
             os.system("pip install colorama")
@@ -102,7 +95,7 @@ def start_thread(arr, i, username, accepted_shares, bad_shares, thread_number):
                 hash_count = hash_count + 1
                 ducos1 = hashlib.sha1(str(job[0] + str(result)).encode("utf-8")).hexdigest()
                 if job[1] == ducos1:
-                    soc.send(bytes(str(result), encoding="utf8"))
+                    soc.send(bytes(str(result) + "," + str(last_hash_count), encoding="utf8"))
                     feedback = soc.recv(1024).decode()
                     arr[i] = khash_count
                     if feedback == "GOOD" or feedback == "BLOCK":
@@ -137,7 +130,7 @@ def getBalance():
     soc.send(bytes("LOGI," + username + "," + password, encoding="utf8"))
     response = soc.recv(2).decode()           
     if response != "OK":
-        print("Error loging in - check account credentials!")
+        print("Error logging in - check account credentials!")
         soc.close()
         os._exit(1)
     else:
@@ -166,6 +159,12 @@ def calculateProfit(start_bal):
 
 def showOutput():
     clear()
+
+    if colorama_choice:
+        print(Back.CYAN + Fore.YELLOW + "Duino-Coin Multithreaded PC Miner" + Style.RESET_ALL + "\n")
+    else:
+        print(bcolors.back_cyan + bcolors.yellow + "Duino-Coin Multithreaded PC Miner" + bcolors.endc + "\n")
+    
     
     if colorama_choice:
         print(Back.YELLOW + Fore.BLACK + "Profit: " + str(profit_array[1]) + "/min   " + str(profit_array[2]) + "/h" + "\nTotal session: " + str(profit_array[0]) + Style.RESET_ALL + "\n")
@@ -228,11 +227,23 @@ if __name__ == '__main__':
     pool_address = content[0]
     pool_port = content[1]
     
-    try:
-        thread_number = int(sys.argv[1])
-        print(f"Miner started with {thread_number} threads")
-    except:
-        thread_number = int(input("Number of threads: "))
+    arguments = len(sys.argv)
+    if arguments <= 3:
+        if colorama_choice:
+            print(Fore.RED + "Provide username, password and thread count!" + Style.RESET_ALL)
+            print(Fore.YELLOW + "Example: python3 Multithreaded_PC_Miner.py username password 4" + Style.RESET_ALL)
+            print(Fore.RED + "Exiting in 15s." + Style.RESET_ALL)
+        else:
+            print(bcolors.red + "Provide username, password and thread count!" + bcolors.endc)
+            print(bcolors.yellow + "Example: python3 Multithreaded_PC_Miner.py username password 4" + bcolors.endc)
+            print(bcolors.red + "Exiting in 15s." + bcolors.endc)
+        time.sleep(15)
+        os._exit(0)
+
+    username = str(sys.argv[1])
+    password = str(sys.argv[2])
+    thread_number = int(sys.argv[3])
+    print(f"Miner for user {username} started with {thread_number} threads")
 
     hashrate_array = multiprocessing.Array("d", thread_number)
     accepted_shares = multiprocessing.Array("i", thread_number)
