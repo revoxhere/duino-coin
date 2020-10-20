@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Arduino Miner (v1.6) 
+# Duino-Coin Arduino Miner (v1.7) 
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -42,7 +42,7 @@ except:
   os._exit(1)
 
 # Global variables
-VER = "1.6" # Version number
+VER = "1.7" # Version number
 timeout = 5 # Socket timeout
 resources = "ArduinoMiner_"+str(VER)+"_resources"
 
@@ -69,7 +69,8 @@ except:
 
 def debugOutput(text):
   if debug == "true":
-    print("DEBUG: " + text)
+    now = datetime.datetime.now()
+    print(now.strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
 
 def title(title):
   if os.name == 'nt':
@@ -143,7 +144,6 @@ def loadConfig(): # Config loading section
     print(Style.RESET_ALL + "Don't have an Duino-Coin account yet? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register on server.\n")
 
     username = input(Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT)
-    password = input(Style.RESET_ALL + Fore.YELLOW + "Enter your password: " + Style.BRIGHT)
 
     print(Style.RESET_ALL + Fore.YELLOW + "Configuration tool has found the following ports:")
     print(Style.RESET_ALL + Fore.YELLOW + "----")
@@ -167,7 +167,6 @@ def loadConfig(): # Config loading section
 
     config['arduminer'] = { # Format data
     "username": username,
-    "password": password,
     "avrport": avrport,
     "autorestart": autorestart,
     "donate": donationlevel,
@@ -179,7 +178,6 @@ def loadConfig(): # Config loading section
   else: # If config already exists, load from it
     config.read(str(resources) + "/Miner_config.cfg")
     username = config["arduminer"]["username"]
-    password = config["arduminer"]["password"]
     avrport = config["arduminer"]["avrport"]
     autorestart = config["arduminer"]["autorestart"]
     donationlevel = config["arduminer"]["donate"]
@@ -269,50 +267,6 @@ def ConnectToArduino():
   global com
   com = serial.Serial(avrport, 115200)
 
-def Login():
-  global autorestart
-  while True:
-    try:
-      try:
-        soc.send(bytes("LOGI," + username + "," + password, encoding="utf8")) # Send login data
-      except:
-        Connect() # Reconnect if pool down
-        
-      try:
-        resp = soc.recv(1024).decode()
-        resp = resp.split(",")
-      except:
-        Connect() # Reconnect if pool down
-        
-      if resp[0] == "OK": # Check wheter login information was correct
-        soc.send(bytes("FROM," + "Arduino Miner," + str(username) + "," + str(publicip) + "," + str(platform), encoding="utf8")) # Send metrics to server about client
-
-        now = datetime.datetime.now()
-        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.YELLOW + " Logged in successfully " + Style.RESET_ALL + Fore.YELLOW + "as " + str(username))
-
-        soc.send(bytes("BALA", encoding="utf8")) # Get and round balance from the server
-        balance = round(float(soc.recv(1024).decode()), 6)
-
-        now = datetime.datetime.now()
-        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Style.NORMAL + Fore.YELLOW + " Your account balance is " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + str(balance) + " DUCO")
-
-        break # If it was, continue
-      
-      if resp[0] == "NO":
-        now = datetime.datetime.now()
-        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Error! Wrong credentials or account doesn't exist!" + Style.RESET_ALL + Fore.RED + "\nIf you don't have an account, register using Wallet!\nExiting in 15 seconds.")
-
-        soc.close()
-        time.sleep(15)
-        os._exit(1) # If it wasn't, display a message and exit
-      else:
-        os.execl(sys.executable, sys.executable, *sys.argv)
-
-    except:
-      os.execl(sys.executable, sys.executable, *sys.argv) # Reconnect if pool down
-
-    time.sleep(0.025) # Try again if no response 
-
 def ArduinoMine(): # Mining section
   global donationlevel, donatorrunning
   
@@ -351,9 +305,9 @@ def ArduinoMine(): # Mining section
   print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Arduino mining thread started" + Style.RESET_ALL + Fore.YELLOW + " using DUCO-S1A algorithm, please wait until Arduino will create a stable connection with the miner")
   
   ready = com.readline().decode().rstrip().lstrip() # Arduino will send ready signal
-  debugOutput("Received ready word ("+str(ready)+")")
+  debugOutput("Received start word ("+str(ready)+")")
   while True:
-    soc.send(bytes("Job",encoding="utf8")) # Send job request to server
+    soc.send(bytes("Job,"+str(username),encoding="utf8")) # Send job request to server
     job = soc.recv(1024).decode().split(",") # Split received job
     debugOutput("Job received: " + str(job[0]))
 
@@ -458,14 +412,6 @@ while True:
     if debug == "true":
       raise
     time.sleep(15)
-    os.execl(sys.executable, sys.executable, *sys.argv)
-
-  try:
-    Login() # Login
-  except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while logging-in. Restarting." + Style.RESET_ALL)
-    if debug == "true":
-      raise
     os.execl(sys.executable, sys.executable, *sys.argv)
 
   ConnectToArduino() # Connect to AVR board
