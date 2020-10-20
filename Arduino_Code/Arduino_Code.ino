@@ -5,20 +5,25 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Arduino Code remastered - v1.6 © revox 2019-2020
-//  Big thanks to daknuett for help in library migration!
+//  Code for Arduino boards v1.7 
+//  © Duino-Coin Community 2019-2020
+//
+//  Big thanks to JoyBed for optimizations!
+//  Thanks to daknuett for help in library migration!
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
 //  https://github.com/revoxhere/duino-coin - GitHub
-//  https://revoxhere.github.io/duino-coin/ - Website
+//  https://duinocoin.com - Official Website
 //  https://discord.gg/k48Ht5y - Discord
+//  https://github.com/revoxhere - @revox
 //  https://github.com/daknuett - @daknuett
+//  https://github.com/JoyBed - @JoyBed
 //////////////////////////////////////////////////////////
 //  If you don't know what to do, visit official website
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-// Include crypto library
+// Include SHA1 part of cryptosuite2 library
 #include "sha1.h"
 
 String result; // Create globals
@@ -28,7 +33,7 @@ unsigned int iJob = 0;
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Prepare built-in led pin as output
   Serial.begin(115200); // Open serial port
-  Serial.println("ready"); // Send feedback to miner
+  Serial.println("ready"); // Send start word to miner program
 }
 
 void loop() {
@@ -38,7 +43,6 @@ void loop() {
     String job = Serial.readStringUntil('\n'); // Read job
     unsigned int diff = Serial.parseInt(); // Read difficulty
     for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
-      yield(); // Let Arduino/ESP do background tasks - else watchdog will trigger
       Sha1.init(); // Create sha1 hasher
       Sha1.print(String(hash) + String(iJob));
       uint8_t * hash_bytes = Sha1.result(); // Get result
@@ -53,7 +57,7 @@ void loop() {
       if (String(result) == String(job)) { // If result is found
         Serial.println(String(iJob)); // Send result back to Arduino Miner
         PORTB = PORTB | B00100000;   // Turn on built-in led
-        delay(40); // Wait a bit
+        delay(50); // Wait a bit
         PORTB = PORTB & B11011111; // Turn off built-in led
         break; // Stop and wait for more work
       }
