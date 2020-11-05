@@ -6,9 +6,9 @@
 # © Duino-Coin Community 2020
 ##########################################
 
-from tkinter import Tk, Label, Canvas, Frame, Entry, StringVar, IntVar, Button, PhotoImage, Listbox, Scrollbar, Checkbutton
+from tkinter import Tk, Label, Frame, Entry, StringVar, IntVar, Button, PhotoImage, Listbox, Scrollbar, Checkbutton
 from tkinter.font import Font
-from tkinter import CENTER, LEFT, BOTH, RIGHT, END, BOTTOM, TOP, N, E, S, W
+from tkinter import LEFT, BOTH, RIGHT, END, BOTTOM, TOP, N, E, S, W
 from webbrowser import open_new_tab
 from urllib.request import urlopen, urlretrieve
 from pathlib import Path
@@ -27,6 +27,11 @@ config = ConfigParser()
 resources = "res/"
 backgroundColor = "#FEEEDA"
 foregroundColor = "#212121"
+
+try:
+	mkdir(resources)
+except FileExistsError:
+	pass
 
 with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as content:
 	content = content.read().decode().splitlines()
@@ -240,21 +245,6 @@ class LoginFrame(Frame):
 										font=textFont2)
 		self.logbtn.grid(columnspan=2, sticky="nswe", padx=(5, 5), pady=(5,0))
 
-
-if not Path(resources + "userdata.bin").is_file():
-	root = Tk()
-	lf = LoginFrame(root)
-	root.mainloop()
-else:
-	config.read(resources + "userdata.bin")
-	username = config["wallet"]["username"]
-	passwordEnc = config["wallet"]["password"]
-	password = b64decode(passwordEnc[2:-1]).decode("utf8")
-
-try:
-	mkdir(resources)
-except FileExistsError:
-	pass
 if not Path(resources + "transactions.bin").is_file():
 	open(resources + 'transactions.bin', 'w+')
 if not Path(resources + "duco.png").is_file():
@@ -275,6 +265,16 @@ if not Path(resources + "settings.png").is_file():
 	urlretrieve('https://i.imgur.com/vQitW9M.png', resources + 'settings.png')
 if not Path(resources + "transactions.png").is_file():
 	urlretrieve('https://i.imgur.com/lR8ZCwA.png', resources + 'transactions.png')
+
+if not Path(resources + "userdata.bin").is_file():
+	root = Tk()
+	lf = LoginFrame(root)
+	root.mainloop()
+else:
+	config.read(resources + "userdata.bin")
+	username = config["wallet"]["username"]
+	passwordEnc = config["wallet"]["password"]
+	password = b64decode(passwordEnc[2:-1]).decode("utf8")
 
 def openWebsite(handler):
 	open_new_tab("https://duinocoin.com")
