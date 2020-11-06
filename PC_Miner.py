@@ -5,8 +5,7 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2020
 ##########################################
-import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os, signal # Import libraries
-from decimal import Decimal
+import socket, statistics, threading, time, random, re, subprocess, hashlib, platform, getpass, configparser, sys, datetime, os # Import libraries
 from pathlib import Path
 from signal import signal, SIGINT
 
@@ -36,7 +35,7 @@ except:
   os._exit(1)
 
 # Global variables
-VER = "1.7" # Version number
+VER = "1.6" # Version number
 timeout = 5 # Socket timeout
 resources = "PCMiner_"+str(VER)+"_resources"
 
@@ -47,6 +46,7 @@ khash_count = 0
 hash_count = 0
 hash_mean = []
 donatorrunning = False
+debug = False
 
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
@@ -64,7 +64,7 @@ except:
     pass
 
 def debugOutput(text):
-  if debug == "true":
+  if debug == True:
     now = datetime.datetime.now()
     print(now.strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
 
@@ -81,7 +81,7 @@ def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE 
   try:
     soc.send(bytes("CLOSE", encoding="utf8")) # Try sending a close connection request to the server
   except:
-    if debug == "true":
+    if debug == True:
       raise
     pass
   os._exit(0)
@@ -118,7 +118,7 @@ def Greeting(): # Greeting message depending on time
   try:
     print(" * " + Fore.YELLOW + "CPU: " + Style.BRIGHT + str(cpu["brand_raw"]))
   except:
-    if debug == "true":
+    if debug == True:
       raise
     pass
   if os.name == 'nt':
@@ -192,7 +192,7 @@ def loadConfig(): # Config loading section
     "efficiency": efficiency,
     "autorestart": autorestart,
     "donate": donationlevel,
-    "debug": "false"}
+    "debug": False}
     
     with open(str(resources) + "/Miner_config.cfg", "w") as configfile: # Write data to file
       config.write(configfile)
@@ -226,7 +226,7 @@ def Connect(): # Connect to pool section
     except:
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot receive pool address and IP.\nExiting in 15 seconds.")
-      if debug == "true":
+      if debug == True:
         raise
       time.sleep(15)
       os._exit(1)
@@ -255,7 +255,7 @@ def Connect(): # Connect to pool section
     except: # If it wasn't, display a message
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot connect to the server. It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
-      if debug == "true":
+      if debug == True:
           raise
       time.sleep(15)
       os.execl(sys.executable, sys.executable, *sys.argv)
@@ -317,10 +317,10 @@ def Mine(): # Mining section
           cmd = ""
       try:  # Start cmd set above
         debugOutput("Starting donation process")
-        process = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
+        subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
         donatorrunning = True
       except:
-        if debug == "true":
+        if debug == True:
           raise
         pass
 
@@ -419,7 +419,7 @@ while True:
     debugOutput("Config file loaded")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error loading the configfile (Miner_config.cfg). Try removing it and re-running configuration. Exiting in 15s."  + Style.RESET_ALL)
-    if debug == "true":
+    if debug == True:
       raise
     time.sleep(15)
     os._exit(1)
@@ -432,7 +432,7 @@ while True:
       debugOutput("Autorestarted is disabled")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)    
-    if debug == "true":
+    if debug == True:
       raise
     time.sleep(15)
     os._exit(1)
@@ -441,7 +441,7 @@ while True:
     Greeting() # Display greeting message
     debugOutput("Greeting displayed")
   except:
-    if debug == "true":
+    if debug == True:
       raise
 
   try:
@@ -449,7 +449,7 @@ while True:
     debugOutput("Connected to master server")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error connecting to pool. Check your config file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
-    if debug == "true":
+    if debug == True:
       raise
     time.sleep(15)
     os._exit(1)
@@ -459,7 +459,7 @@ while True:
     debugOutput("Version check complete")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error checking server version. Restarting." + Style.RESET_ALL)
-    if debug == "true":
+    if debug == True:
       raise
     os.execl(sys.executable, sys.executable, *sys.argv)
 
@@ -469,7 +469,7 @@ while True:
     debugOutput("Mining ended")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining. Restarting." + Style.RESET_ALL)
-    #if debug == "true":
+    #if debug == True:
       #raise
     os.execl(sys.executable, sys.executable, *sys.argv)
 
