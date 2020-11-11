@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Minimal version of Duino-Coin PC Miner, useful for developing own apps. Created by revox 2020
-import socket, hashlib, os, urllib.request # Only python3 included libraries
+import socket, hashlib, urllib.request # Only python3 included libraries
 soc = socket.socket()
 
 username = "your username here"
