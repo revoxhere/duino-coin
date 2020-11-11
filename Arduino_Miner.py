@@ -5,7 +5,7 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2020
 ##########################################
-import socket, threading, time, random, re, subprocess, platform, getpass, configparser, sys, datetime, os # Import libraries
+import socket, threading, time, re, subprocess, platform, getpass, configparser, sys, datetime, os # Import libraries
 from pathlib import Path
 from signal import signal, SIGINT
 
@@ -42,7 +42,7 @@ except:
   os._exit(1)
 
 # Global variables
-VER = "1.7" # Version number
+VER = "1.6" # Version number
 timeout = 5 # Socket timeout
 resources = "ArduinoMiner_"+str(VER)+"_resources"
 
@@ -91,7 +91,7 @@ def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE 
 signal(SIGINT, handler) # Enable signal handler
 
 def Greeting(): # Greeting message depending on time
-  global greeting, message, autorestart, st, bytereturn, miningmethod
+  global greeting, message, autorestart, st, bytereturn
   print(Style.RESET_ALL)
 
   if float(autorestart) <= 0:
@@ -137,7 +137,7 @@ def autorestarter(): # Autorestarter
   os.execl(sys.executable, sys.executable, *sys.argv)
 
 def loadConfig(): # Config loading section
-  global pool_address, pool_port, username, password, autorestart, donationlevel, avrport, debug
+  global pool_address, pool_port, username, autorestart, donationlevel, avrport, debug
   
   if not Path(str(resources) + "/Miner_config.cfg").is_file(): # Initial configuration section
     print(Style.BRIGHT + "Duino-Coin basic configuration tool.\nEdit "+str(resources) + "/Miner_config.cfg file later if you want to change it.")
@@ -184,7 +184,7 @@ def loadConfig(): # Config loading section
     debug = config["arduminer"]["debug"]
 
 def Connect(): # Connect to pool section
-  global soc, connection_counter, res, pool_address, pool_port
+  global soc, res, pool_address, pool_port
   
   while True: # Grab data grom GitHub section
     try:
@@ -299,7 +299,6 @@ def ArduinoMine(): # Mining section
       except:
         if debug == "true":
           raise
-        pass
 
   now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Arduino mining thread started" + Style.RESET_ALL + Fore.YELLOW + " using DUCO-S1A algorithm, please wait until Arduino will create a stable connection with the miner")
@@ -392,7 +391,6 @@ while True:
   except:
     if debug == "true":
       raise
-    pass
   
   try:
     Connect() # Connect to pool
