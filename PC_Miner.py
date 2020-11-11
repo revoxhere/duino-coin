@@ -83,13 +83,12 @@ def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE 
   except:
     if debug == True:
       raise
-    pass
   os._exit(0)
 
 signal(SIGINT, handler) # Enable signal handler
 
 def Greeting(): # Greeting message depending on time
-  global greeting, message, autorestart
+  global greeting, autorestart
   print(Style.RESET_ALL)
 
   if float(autorestart) <= 0:
@@ -120,7 +119,6 @@ def Greeting(): # Greeting message depending on time
   except:
     if debug == True:
       raise
-    pass
   if os.name == 'nt':
     print(" * " + Fore.YELLOW + "Donation level: " +  Style.BRIGHT + str(donationlevel))
   print(" * " + Fore.YELLOW + "Algorithm: " + Style.BRIGHT + str(miningmethodlabel))
@@ -141,8 +139,6 @@ def hashrateCalculator(): # Hashes/sec calculation
   
   last_hash_count = hash_count
   khash_count = last_hash_count / 1000
-  if khash_count == 0:
-    khash_count = random.uniform(0, 1)
     
   hash_mean.append(khash_count) # Calculate average hashrate
   khash_count = statistics.mean(hash_mean)
@@ -207,7 +203,7 @@ def loadConfig(): # Config loading section
     debug = config["miner"]["debug"]
 
 def Connect(): # Connect to pool section
-  global soc, connection_counter, res, pool_address, pool_port
+  global soc, res, pool_address, pool_port
   
   while True: # Grab data grom GitHub section
     try:
@@ -239,7 +235,6 @@ def Connect(): # Connect to pool section
       soc.close()
     except:
       debugOutput("No previous connections to close")
-      pass
     
     try:
       soc = socket.socket()
@@ -322,7 +317,6 @@ def Mine(): # Mining section
       except:
         if debug == True:
           raise
-        pass
 
   efficiency = 100 - float(efficiency) # Calulate efficiency
   efficiency = efficiency * 0.01
@@ -351,7 +345,8 @@ def Mine(): # Mining section
       diff = job[2]
     except:
       debugOutput("Error splitting job, restarting")
-      raise
+      if debug == True:
+        raise
       os.execl(sys.executable, sys.executable, *sys.argv)
     
     computestart = datetime.datetime.now()
@@ -369,6 +364,7 @@ def Mine(): # Mining section
         while True:
           try:
             feedback = soc.recv(1024).decode() # Get feedback
+            feedbrecv = datetime.datetime.now()
           except:
             os.execl(sys.executable, sys.executable, *sys.argv) # Reconnect if pool down
           if feedback == "GOOD": # If result was good
@@ -376,6 +372,9 @@ def Mine(): # Mining section
             computetime = computestop - computestart # Time from start of hash computing to finding the result
             computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
 
+            ping = feedbrecv - computestop # Time from start of hash computing to finding the result
+            ping = str(int(ping.microseconds / 1000)) # Convert to ms
+            print(ping)
             shares[0] = shares[0] + 1 # Share accepted = increment feedback shares counter by 1
             title("Duino-Coin PC Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
             print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " cpu " + Back.RESET + Fore.GREEN + " Accepted " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(diff) + " • " + Style.BRIGHT + Fore.WHITE + str(khash_count) + " kH/s " + Style.BRIGHT + Fore.YELLOW + "(yay!!!) " + Style.DIM + Fore.BLUE + "[" + computetime + "ms]")
@@ -469,8 +468,6 @@ while True:
     debugOutput("Mining ended")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining. Restarting." + Style.RESET_ALL)
-    #if debug == True:
-      #raise
     os.execl(sys.executable, sys.executable, *sys.argv)
 
   print(Style.RESET_ALL + Style.RESET_ALL)
