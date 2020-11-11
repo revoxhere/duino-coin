@@ -4,7 +4,6 @@ import socket, hashlib, os, urllib.request # Only python3 included libraries
 soc = socket.socket()
 
 username = "your username here"
-password = "your password here"
 
 # This sections grabs pool adress and port from Duino-Coin GitHub file
 serverip = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
@@ -18,18 +17,9 @@ soc.connect((str(pool_address), int(pool_port))) # Connect to the server
 server_version = soc.recv(3).decode() # Get server version
 print("Server is on version", server_version)
 
-soc.send(bytes("LOGI," + username + "," + password, encoding="utf8")) # Send login data
-response = soc.recv(2).decode() # Get server feedback about logging in                
-if response == "OK":
-    print("Loged in")
-else:
-    print("Error loging in - check account credentials!")
-    soc.close()
-    os._exit(1)
-
 # Mining section
 while True:
-    soc.send(bytes("JOB", encoding="utf8")) # Send job request
+    soc.send(bytes("JOB,"+str(username), encoding="utf8")) # Send job request
     job = soc.recv(1024).decode() # Get work from pool
     job = job.split(",") # Split received data to job (job and difficulty)
     difficulty = job[2]
