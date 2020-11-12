@@ -54,13 +54,18 @@ Official getting started guides for creating an account and setting up miners on
 
 <h3 align="center">Community-made software</h3><br>
 
+**Miners:**
+*   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) by phantom32
 *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
-*   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
 *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners) by various authors
+*   [Duino DogeRock GUI Miner](https://github.com/DogeRock/Duino-Coin-Gui-Miner) by DogeRock
+
+**Other tools:**
+*   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
 *   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz
 *   [Duino DogeRock GUI Wallet](https://github.com/DogeRock/Duino-Coin-Gui-Wallet) by DogeRock
 *   [Duino DogeRock CLI Wallet](https://github.com/DogeRock/DogeRock-Duino-Coin-cmd-line-wallet) by DogeRock
-*   [Duino DogeRock GUI Miner](https://github.com/DogeRock/Duino-Coin-Gui-Miner) by DogeRock
+
 
 
 This list will be actively updated
