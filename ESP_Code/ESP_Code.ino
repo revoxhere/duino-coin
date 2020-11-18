@@ -49,6 +49,8 @@ void loop()
 {
   const char * host = "163.172.179.54"; // Static server IP
   const int port = 14808;
+  unsigned int acceptedShares = 0; // Shares variables
+  unsigned int rejectedShares = 0;
 
   Serial.println("\nConnecting to Duino-Coin server...");
   // Use WiFiClient class to create TCP connection
@@ -73,19 +75,17 @@ void loop()
     unsigned int diff =  1500; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
     //Serial.println("Job received: " + String(hash) + " " + String(job));
 
-    unsigned int acceptedShares = 0; // Shares variables
-    unsigned int rejectedShares = 0;
-
     for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
+      //yield(); // uncomment if ESP watchdog triggers
       String result = sha1(String(hash) + String(iJob)); // Hash previous block hash and current iJob
       if (result == job) { // If result is found
         client.print(iJob); // Send result to server
 
         String feedback = client.readStringUntil('D'); // Receive feedback
-        if (feedback == "GOOD") {
+        if (feedback.indexOf("GOOD")) {
           acceptedShares++;
           Serial.println("Accepted share #" + String(acceptedShares) + " (" + String(iJob) + ")");
-        } else if (feedback == "BAD") {
+        } else {
           rejectedShares++;
           Serial.println("Rejected share #" + String(acceptedShares) + " (" + String(iJob) + ")");
         }
@@ -94,8 +94,7 @@ void loop()
         digitalWrite(LED_BUILTIN, LOW); // Turn off built-in led
         delay(50); // Wait a bit
 
-        Serial.println("-----");
-        break; // Stop and wait for more work
+        break; // Stop and ask for more work
       }
     }
   }
