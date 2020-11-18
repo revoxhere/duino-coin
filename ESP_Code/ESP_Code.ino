@@ -19,16 +19,14 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-const char* ssid     = "WIFI SSID (name)"; // Change this to your WiFi SSID
-const char* password = "WIFI PASSWORD"; // Change this to your WiFi password
-const char* ducouser = "DUCO USERNAME"; // Change this to your Duino-Coin username
+const char* ssid     = "Dom"; // Change this to your WiFi SSID
+const char* password = "07251498"; // Change this to your WiFi password
+const char* ducouser = "revox"; // Change this to your Duino-Coin username
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
 #include <ESP8266HTTPClient.h> // Include HTTP library
 #include <Hash.h> // Include crypto library
-
-String port = ""; // Global variables
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Define built-in led as output
@@ -43,43 +41,19 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
-
   Serial.println("\nConnected to WiFi!");
   Serial.println("Local IP address: " + WiFi.localIP().toString());
 }
 
-void serverport() { // Grab server port from GitHub file function
-  std::unique_ptr<BearSSL::WiFiClientSecure>client(new BearSSL::WiFiClientSecure);
-  client->setInsecure();
-  HTTPClient https;
-
-  if (https.begin(*client, "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt")) {  // Server IP file
-    int httpCode = https.GET(); // Get HTTP code
-    if (httpCode > 0) {
-      if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
-        port = https.getString(); // Get data
-        port.remove(0, 14); // Remove unwanted characters
-        port.remove(6, 600); // Remove unwanted characters
-        port.toInt(); // Convert to int
-        Serial.println("\nGitHub port: " + String(port));
-      }
-    } else { // If error
-      Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
-    } // Free the resources
-    https.end();
-  }
-}
-
 void loop()
 {
-  serverport(); // Grab server port
   const char * host = "163.172.179.54"; // Static server IP
+  const int port = 14808;
 
   Serial.println("\nConnecting to Duino-Coin server...");
-
   // Use WiFiClient class to create TCP connection
   WiFiClient client;
-  if (!client.connect(host, port.toInt())) {
+  if (!client.connect(host, port)) {
     Serial.println("Connection failed.");
     Serial.println("Waiting 15 seconds before retrying...");
     delay(15000);
@@ -91,22 +65,31 @@ void loop()
   client.print("FROM,ESP Miner," + String(ducouser)); // Metrics for the server
 
   while (client.connected()) {
-    Serial.println("Asking for a new job for user: " + String(ducouser));
+    //Serial.println("Asking for a new job for user: " + String(ducouser));
     client.print("Job," + String(ducouser)); // Ask for new job
 
-    String hash = client.readStringUntil(','); // Read hash
-    String job = client.readStringUntil(','); // Read job
-    unsigned int diff =  3500; // Fixed difficulty - no need to read it from the server because no termination character causes a lot of network lag
-    Serial.println("Job received: " + String(hash) + " " + String(job));
+    String hash = client.readStringUntil(','); // Read last block hash
+    String job = client.readStringUntil(','); // Read expected hash
+    unsigned int diff =  1500; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
+    //Serial.println("Job received: " + String(hash) + " " + String(job));
+
+    unsigned int acceptedShares = 0; // Shares variables
+    unsigned int rejectedShares = 0;
 
     for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
       yield(); // Let ESP do background tasks - else watchdog will trigger
       String result = sha1(String(hash) + String(iJob)); // Hash previous block hash and current iJob
       if (result == job) { // If result is found
-        Serial.println("Share found: " + String(iJob));
         client.print(iJob); // Send result to server
 
         String feedback = client.readStringUntil('D'); // Receive feedback
+        if (feedback == "GOOD") {
+          acceptedShares++;
+          Serial.println("Accepted share #" + String(acceptedShares) + " (" + String(iJob) + ")");
+        } else if (feedback == "BAD") {
+          rejectedShares++;
+          Serial.println("Rejected share #" + String(acceptedShares) + " (" + String(iJob) + ")");
+        }
         digitalWrite(LED_BUILTIN, HIGH);   // Turn on built-in led
         delay(50); // Wait a bit
         digitalWrite(LED_BUILTIN, LOW); // Turn off built-in led
@@ -118,5 +101,6 @@ void loop()
     }
   }
   Serial.println("Not connected. Restarting ESP");
+  ESP.reset();
   ESP.restart();
 }
