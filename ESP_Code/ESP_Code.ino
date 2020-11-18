@@ -100,7 +100,6 @@ void loop()
     Serial.println("Job received: " + String(hash) + " " + String(job));
 
     for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
-      yield(); // Let ESP do background tasks - else watchdog will trigger
       String result = sha1(String(hash) + String(iJob)); // Hash previous block hash and current iJob
       if (result == job) { // If result is found
         Serial.println("Share found: " + String(iJob));
