@@ -1,0 +1,5 @@
+py-cpuinfo
+colorama
+requests
+pyserial
+serial.tools.list_ports
