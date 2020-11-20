@@ -19,9 +19,9 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-const char* ssid     = "WIFI NAME HERE"; // Change this to your WiFi SSID
-const char* password = "WIF PASSWORD HERE"; // Change this to your WiFi password
-const char* ducouser = "DUCO USERNAME HERE"; // Change this to your Duino-Coin username
+const char* ssid     = "Dom"; // Change this to your WiFi SSID
+const char* password = "07251498"; // Change this to your WiFi password
+const char* ducouser = "revox"; // Change this to your Duino-Coin username
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
@@ -43,10 +43,20 @@ void setup() {
   }
   Serial.println("\nConnected to WiFi!");
   Serial.println("Local IP address: " + WiFi.localIP().toString());
+  blink(2); // Blink 2 times - indicate sucessfull connection with wifi network
 }
 
-void loop()
-{
+void blink(int times) {
+  for (int i = 0; i < times; i++) {
+    digitalWrite(LED_BUILTIN, HIGH);   // Turn off built-in led
+    delay(150);
+    digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
+    delay(150);
+    digitalWrite(LED_BUILTIN, HIGH);   // Turn off built-in led
+  }
+}
+
+void loop() {
   const char * host = "163.172.179.54"; // Static server IP
   const int port = 14808;
   unsigned int acceptedShares = 0; // Shares variables
@@ -57,14 +67,17 @@ void loop()
   WiFiClient client;
   if (!client.connect(host, port)) {
     Serial.println("Connection failed.");
-    Serial.println("Waiting 15 seconds before retrying...");
-    delay(15000);
-    return;
+    Serial.println("Retrying...");
+    blink(7); // Blink 7 times indicating connection error
+    ESP.reset(); // Restart the board
+    ESP.restart();
   }
   client.setTimeout(5000);
   String SERVER_VER = client.readString(); // Server sends SERVER_VERSION after connecting
-  Serial.println("\nServer version: " + String(SERVER_VER));
+  Serial.println("Connected to the server. Server version: " + String(SERVER_VER));
   client.print("FROM,ESP Miner," + String(ducouser)); // Metrics for the server
+
+  blink(3); // Blink 3 times - indicate sucessfull connection with the server
 
   while (client.connected()) {
     //Serial.println("Asking for a new job for user: " + String(ducouser));
@@ -89,16 +102,15 @@ void loop()
           rejectedShares++;
           Serial.println("Rejected share #" + String(acceptedShares) + " (" + String(iJob) + ")");
         }
-        digitalWrite(LED_BUILTIN, HIGH);   // Turn on built-in led
-        delay(50); // Wait a bit
-        digitalWrite(LED_BUILTIN, LOW); // Turn off built-in led
-        delay(50); // Wait a bit
-
+        digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
+        delay(3); // Wait shortly so LED flash isn't distracting
+        digitalWrite(LED_BUILTIN, HIGH); // Turn off built-in led
         break; // Stop and ask for more work
       }
     }
   }
   Serial.println("Not connected. Restarting ESP");
-  ESP.reset();
+  blink(7); // Blink 7 times indicating connection error
+  ESP.reset(); // Restart the board
   ESP.restart();
 }
