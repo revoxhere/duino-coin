@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Arduino Miner (v1.7) 
+# Duino-Coin AVR Miner (v1.7) 
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -42,25 +42,22 @@ except:
   os._exit(1)
 
 # Global variables
-VER = "1.6" # Version number
+VER = "1.7" # Version number
 timeout = 5 # Socket timeout
-resources = "ArduinoMiner_"+str(VER)+"_resources"
+resources = "AVRMiner_"+str(VER)+"_resources"
 
 shares = [0, 0]
 diff = 0
 donatorrunning = False
 balance = 0
 job = ""
-debug = "false"
+debug = False
+platform = str(platform.system()) + " " + str(platform.release()) # Platform information
 
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
 autorestart = 0
 donationlevel = 0
-
-pcusername = getpass.getuser() # Username
-platform = str(platform.system()) + " " + str(platform.release()) # Platform information
-publicip = requests.get("https://api.ipify.org").text # Public IP
 
 try:
     os.mkdir(str(resources)) # Create resources folder if it doesn't exist
@@ -68,7 +65,7 @@ except:
     pass
 
 def debugOutput(text):
-  if debug == "true":
+  if debug == True:
     now = datetime.datetime.now()
     print(now.strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
 
@@ -81,7 +78,7 @@ def title(title):
         
 def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
   now = datetime.datetime.now()
-  print(now.strftime(Style.DIM + "\n%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " SIGINT detected - Exiting gracefully." + Style.NORMAL + " See you soon!")
+  print(now.strftime(Style.DIM + "\n%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " SIGINT detected - Exiting gracefully." + Style.NORMAL + Fore.WHITE + " See you soon!")
   try:
     soc.send(bytes("CLOSE", encoding="utf8")) # Try sending a close connection request to the server
   except:
@@ -103,29 +100,30 @@ def Greeting(): # Greeting message depending on time
   current_hour = time.strptime(time.ctime(time.time())).tm_hour
   
   if current_hour < 12 :
-    greeting = "We hope you're having a great morning"
+    greeting = "Have a wonderful morning"
   elif current_hour == 12 :
-    greeting = "We hope you're having a great noon"
+    greeting = "Have a tasty noon"
   elif current_hour > 12 and current_hour < 18 :
-    greeting = "We hope you're having a great afternoon"
+    greeting = "Have a peaceful afternoon"
   elif current_hour >= 18 :
-    greeting = "We hope you're having a great evening"
+    greeting = "Have a cozy evening"
   else:
     greeting = "Welcome back"
   
-  print(" * " + Fore.YELLOW + Style.BRIGHT + "Duino-Coin © Arduino Miner " + Style.RESET_ALL + Fore.YELLOW+ "(v" + str(VER) + ") 2019-2020") # Startup message  print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
-  print(" * " + Fore.YELLOW + "AVR board on port: " + Style.BRIGHT + str(avrport))
+  print(" * " + Fore.YELLOW + Style.BRIGHT + "Official Duino-Coin © AVR Miner" + Style.RESET_ALL + Fore.WHITE + " (v" + str(VER) + ") 2019-2020") # Startup message  print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
+  print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
+  print(" * " + Fore.WHITE + "AVR board on port: " + Style.BRIGHT + Fore.YELLOW + str(avrport))
   if os.name == 'nt':
-    print(" * " + Fore.YELLOW + "Donation level: " +  Style.BRIGHT + str(donationlevel))
-  print(" * " + Fore.YELLOW + "Algorithm: " + Style.BRIGHT + "DUCO-S1A")
-  print(" * " + Fore.YELLOW + "Autorestarter: " + Style.BRIGHT + str(autorestartmessage))
-  print(" * " + Fore.YELLOW + str(greeting) + ", " + Style.BRIGHT +  str(username) + "\n")
+    print(" * " + Fore.WHITE + "Donation level: " +  Style.BRIGHT + Fore.YELLOW + str(donationlevel))
+  print(" * " + Fore.WHITE + "Algorithm: " + Style.BRIGHT + Fore.YELLOW + "DUCO-S1A")
+  print(" * " + Fore.WHITE + "Autorestarter: " + Style.BRIGHT + Fore.YELLOW + str(autorestartmessage))
+  print(" * " + Fore.WHITE + str(greeting) + ", " + Style.BRIGHT + Fore.YELLOW + str(username) + "!\n")
   
   if os.name == 'nt':
-    if not Path(str(resources) + "/Miner_executable.exe").is_file(): # Initial miner executable section
+    if not Path(str(resources) + "/Donate_executable.exe").is_file(): # Initial miner executable section
       url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
       r = requests.get(url)
-      with open(str(resources) + '/Miner_executable.exe', 'wb') as f:
+      with open(str(resources) + '/Donate_executable.exe', 'wb') as f:
         f.write(r.content)
 
 def autorestarter(): # Autorestarter
@@ -140,7 +138,7 @@ def loadConfig(): # Config loading section
   global pool_address, pool_port, username, autorestart, donationlevel, avrport, debug
   
   if not Path(str(resources) + "/Miner_config.cfg").is_file(): # Initial configuration section
-    print(Style.BRIGHT + "Duino-Coin basic configuration tool.\nEdit "+str(resources) + "/Miner_config.cfg file later if you want to change it.")
+    print(Style.BRIGHT + "Duino-Coin basic configuration tool\nEdit "+str(resources) + "/Miner_config.cfg file later if you want to change it.")
     print(Style.RESET_ALL + "Don't have an Duino-Coin account yet? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register on server.\n")
 
     username = input(Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT)
@@ -170,10 +168,11 @@ def loadConfig(): # Config loading section
     "avrport": avrport,
     "autorestart": autorestart,
     "donate": donationlevel,
-    "debug": "false"}
+    "debug": False}
     
     with open(str(resources) + "/Miner_config.cfg", "w") as configfile: # Write data to file
       config.write(configfile)
+    print(Style.RESET_ALL + "Config saved! Launching...")
 
   else: # If config already exists, load from it
     config.read(str(resources) + "/Miner_config.cfg")
@@ -204,9 +203,9 @@ def Connect(): # Connect to pool section
         
     except:
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot receive pool address and IP.\nExiting in 15 seconds.")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Connection error!\nRestarting in 15 seconds.")
       time.sleep(15)
-      os._exit(1)
+      os.execl(sys.executable, sys.executable, *sys.argv)
       
     time.sleep(0.025)
     
@@ -229,7 +228,7 @@ def Connect(): # Connect to pool section
     
     except: # If it wasn't, display a message and exit
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot connect to the server. It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Connection error!\nMaster server is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
       time.sleep(15)
       os.execl(sys.executable, sys.executable, *sys.argv)
       
@@ -242,18 +241,12 @@ def checkVersion():
     try:
       SERVER_VER = soc.recv(1024).decode() # Check server version
     except:
-      Connect() # Reconnect if pool down
-
-    if len(SERVER_VER) != 3:
-      now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Cannot connect to the server." + Style.RESET_ALL + Fore.RED + " It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
-      time.sleep(15)
-      os.execl(sys.executable, sys.executable, *sys.argv)                     
+      Connect() # Reconnect if pool down                    
       
     if float(SERVER_VER) <= float(VER) and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.YELLOW + " Connected" + Style.RESET_ALL + Fore.YELLOW + " to master Duino-Coin server (v"+str(SERVER_VER)+")")
-    
+      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.YELLOW + " Connected" + Style.RESET_ALL + Fore.WHITE + " to master Duino-Coin server (v"+str(SERVER_VER)+")")
+      soc.send(bytes("FROM," + "Arduino Miner," + str(username) + "," + str(platform), encoding="utf8")) # Send metrics to server about client
     else:
       now = datetime.datetime.now()
       cont = input(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Miner is outdated (v"+VER+")," + Style.RESET_ALL + Fore.RED + " server is on v"+SERVER_VER+", please download latest version from https://github.com/revoxhere/duino-coin/releases/ or type \'continue\' if you wish to continue anyway.\n")
@@ -263,11 +256,11 @@ def checkVersion():
   except:
     Connect() # Reconnect if pool down
 
-def ConnectToArduino():
+def ConnectToAVR():
   global com
-  com = serial.Serial(avrport, 115200)
+  com = serial.Serial(avrport, 115200, timeout=5)
 
-def ArduinoMine(): # Mining section
+def AVRMine(): # Mining section
   global donationlevel, donatorrunning
   
   if os.name == 'nt':
@@ -281,15 +274,15 @@ def ArduinoMine(): # Mining section
 
     if not donatorrunning: # Check wheter donation was already started
       if int(donationlevel) == int(5):  # Check donationlevel and if it's more than 0 launch Magi Miner as donation
-          cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 100 -s 4"
+          cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://eu.npc-mining.net:3002 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p c=XMG -e 100 -s 4"
       if int(donationlevel) == int(4):
-          cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 70 -s 4"
+          cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://eu.npc-mining.net:3002 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p c=XMG -e 70 -s 4"
       if int(donationlevel) == int(3):
-          cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 50 -s 4"
+          cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://eu.npc-mining.net:3002 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p c=XMG -e 50 -s 4"
       if int(donationlevel) == int(2):
-          cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 30 -s 4"
+          cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://eu.npc-mining.net:3002 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p c=XMG -e 35 -s 4"
       if int(donationlevel) == int(1):
-          cmd = "cd " + str(resources) + " & Miner_executable.exe -o stratum+tcp://mining.m-hash.com:3334 -u revox.duinocoin_arduino -p x -e 10 -s 4"
+          cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://eu.npc-mining.net:3002 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p c=XMG -e 20 -s 4"
       if int(donationlevel) == int(0):
           cmd = ""
       try:  # Start cmd set above
@@ -297,16 +290,16 @@ def ArduinoMine(): # Mining section
         subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
         donatorrunning = True
       except:
-        if debug == "true":
+        if debug == True:
           raise
 
   now = datetime.datetime.now()
-  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Arduino mining thread started" + Style.RESET_ALL + Fore.YELLOW + " using DUCO-S1A algorithm, please wait until Arduino will create a stable connection with the miner")
+  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " AVR mining thread is starting" + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1A algorithm, please wait...")
   
-  ready = com.readline().decode().rstrip().lstrip() # Arduino will send ready signal
+  ready = com.readline().decode().rstrip().lstrip() # AVR will send ready signal
   debugOutput("Received start word ("+str(ready)+")")
   while True:
-    soc.send(bytes("Job,"+str(username),encoding="utf8")) # Send job request to server
+    soc.send(bytes("JOBAVR,"+str(username),encoding="utf8")) # Send job request to server
     job = soc.recv(1024).decode().split(",") # Split received job
     debugOutput("Job received: " + str(job[0]))
 
@@ -319,55 +312,53 @@ def ArduinoMine(): # Mining section
     com.write(bytes(str(job[2])+"\n", encoding="utf8")) # diff
     debugOutput("Written diff")
 
-    computestart = datetime.datetime.now() # Get timestamp of start of the computing
     result = com.readline().decode().rstrip().lstrip() # Send hash, job and difficulty to the board using serial
-    debugOutput("Received result ("+str(result)+")")
-    soc.send(bytes(str(result), encoding="utf8")) # Send result of hashing algorithm to pool
+    result = result.split(",")
+    debugOutput("Received result ("+str(result[0])+")")
+    debugOutput("Received time ("+str(result[1])+")")
+    soc.send(bytes(str(result[0]), encoding="utf8")) # Send result of hashing algorithm to pool
 
     while True:
       feedback = soc.recv(1024).decode() # Get feedback
       time.sleep(0.025)
       if feedback == "GOOD": # If result was good
         now = datetime.datetime.now()
-        computetime = now - computestart # Time from start of hash computing to finding the result
-        computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
+        computetime = str(round(int(result[1]) / 1000000, 2)) # Convert to s
 
         shares[0] = shares[0] + 1 # Share rejected = increment correct shares counter by 1
-        title("Duino-Coin Arduino Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
-        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.GREEN + " Accepted " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(job[2]) + " • " + Style.BRIGHT + Fore.BLUE + computetime + "ms avr time " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
+        title("Duino-Coin AVR Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.GREEN + " Accepted " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(job[2]) + " • " + Style.BRIGHT + Fore.BLUE + computetime + "s avr time " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "(yay!)")
         break # Repeat
 
       elif feedback == "BLOCK": # If result was good
         now = datetime.datetime.now()
-        computetime = now - computestart # Time from start of hash computing to finding the result
-        computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
+        computetime = str(round(int(result[1]) / 1000000, 2)) # Convert to s
 
         shares[0] = shares[0] + 1 # Share rejected = increment correct shares counter by 1
-        title("Duino-Coin Arduino Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
-        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.GREEN + " Block accepted ("+str(job[0])[:8]+") " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(job[2]) + " • " + Style.BRIGHT + Fore.BLUE + computetime + "ms avr time " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
+        title("Duino-Coin AVR Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.GREEN + " Block accepted ("+str(job[0])[:8]+") " + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(job[2]) + " • " + Style.BRIGHT + Fore.BLUE + computetime + "s avr time " + Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "(yay!!!)")
         break # Repeat
 
       elif feedback == "BAD": # If result was bad
         now = datetime.datetime.now()
-        computetime = now - computestart # Time from start of hash computing to finding the result
-        computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
+        computetime = str(round(int(result[1]) / 1000000, 2)) # Convert to s
                                                                                                                        
         shares[1] = shares[1] + 1 # Share rejected = increment rejected shares counter by 1
-        title("Duino-Coin Arduino Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
-        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.RED + " Rejected " + Fore.YELLOW + str(shares[1]) + "/" + str(shares[1] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) "  + Style.NORMAL + Fore.WHITE + "• diff " + str(job[2]) + " • "  + Style.BRIGHT + Fore.BLUE + computetime + "ms avr time " + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "(boo!!!)")
+        title("Duino-Coin AVR Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+        print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " avr " + Back.RESET + Fore.RED + " Rejected " + Fore.YELLOW + str(shares[1]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) "  + Style.NORMAL + Fore.WHITE + "• diff " + str(job[2]) + " • "  + Style.BRIGHT + Fore.BLUE + computetime + "s avr time " + Style.RESET_ALL + Style.BRIGHT + Fore.RED + "(boo!)")
         break # Repeat
 
 
 init(autoreset=True) # Enable colorama
 
 while True:
-  title("Duino-Coin Arduino Miner (v"+str(VER)+")")
+  title("Duino-Coin AVR Miner (v"+str(VER)+")")
 
   try:
     loadConfig() # Load configfile
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error loading the configfile. Try removing it and re-running configuration. Exiting in 15s."  + Style.RESET_ALL)
-    if debug == "true":
+    if debug == True:
       raise
     time.sleep(15)
     os._exit(1)
@@ -380,7 +371,7 @@ while True:
       debugOutput("Autorestarted is disabled")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file. Exiting in 15s." + Style.RESET_ALL)    
-    if debug == "true":
+    if debug == True:
       raise
     time.sleep(15)
     os._exit(1)
@@ -389,7 +380,7 @@ while True:
     Greeting() # Display greeting message
     debugOutput("Greeting displayed")
   except:
-    if debug == "true":
+    if debug == True:
       raise
   
   try:
@@ -397,7 +388,7 @@ while True:
     debugOutput("Connected to master server")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while connecting to the server. Restarting in 15 seconds." + Style.RESET_ALL)
-    if debug == "true":
+    if debug == True:
       raise
     time.sleep(15)
     os.execl(sys.executable, sys.executable, *sys.argv)
@@ -407,20 +398,20 @@ while True:
     debugOutput("Version check complete")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while connecting to the server. Restarting in 15 seconds." + Style.RESET_ALL)
-    if debug == "true":
+    if debug == True:
       raise
     time.sleep(15)
     os.execl(sys.executable, sys.executable, *sys.argv)
 
-  ConnectToArduino() # Connect to AVR board
+  ConnectToAVR() # Connect to AVR board
 
   try:
     debugOutput("Mining started")
-    ArduinoMine()
+    AVRMine()
     debugOutput("Mining ended")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining. Restarting." + Style.RESET_ALL)
-    if debug == "true":
+    if debug == True:
       raise
     os.execl(sys.executable, sys.executable, *sys.argv)
 
