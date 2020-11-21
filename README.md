@@ -5,8 +5,7 @@
 
 <p align = "center">
   <a href="https://github.com/revoxhere/duino-coin">
-    <img width="80%" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" /></a><br />
-    <h2 align="center">Duino-Coin is a cryptocurrency that can be mined with AVR boards.</h2><br /><br />
+    <img width="80%" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" /></a><br /><br />
   <a href="https://duinocoin.com">
     <img src="https://img.shields.io/badge/duinocoin.com-555555.svg?style=for-the-badge&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAmklEQVQ4T7WUQQ6AIAwEIcaX%2BALj0fdz9gM%2BxMRESQ8ktSllrciZTneX0hg6n8h5Z5pvhD%2Bu26OO17iABaCBPwEJLKFV6ZZ1GQ2HwgqlEg51ATV7GhSyXFPjBpK6UsztdQdqjSDLNYVu4JGWaQjXLh%2BmaRn5eq8ybAGRWfx3sJFNo7lw%2FxStobkcWhlKYJf1ZS1XaggPNpIv3cls33EVXWotfwAAAABJRU5ErkJggg%3D%3D" /></a>
   <a href="http://163.172.179.54/webwallet.html">
@@ -25,6 +24,8 @@
   <a href="https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015">
     <img src="https://img.shields.io/badge/Bitcointalk-555555.svg?style=for-the-badge&logo=bitcoin" /></a>
 </p>
+
+<h2 align="center">Duino-Coin is a cryptocurrency that can be mined with AVR boards.</h2><br /><br />
 
 Key features:
 *   Supported by large number of platforms
