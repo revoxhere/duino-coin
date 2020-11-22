@@ -13,7 +13,7 @@ try: # Check if colorama is installed
   from colorama import init, Fore, Back, Style
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "Colorama is not installed. Please install it using: python3 -m pip install colorama.\nExiting in 15s.")
+  print(now.strftime("%H:%M:%S ") + "Colorama is not installed. Please install it using: pip install -r requirements.txt.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
 
@@ -21,7 +21,7 @@ try: # Check if requests is installed
   import requests
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "Requests is not installed. Please install it using: python3 -m pip install requests.\nExiting in 15s.")
+  print(now.strftime("%H:%M:%S ") + "Requests is not installed. Please install it using: pip install -r requirements.txt.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
 
@@ -29,7 +29,7 @@ try:
   import serial
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "Pyserial is not installed. Please install it using: python3 -m pip install pyserial.\nExiting in 15s.")
+  print(now.strftime("%H:%M:%S ") + "Pyserial is not installed. Please install it using: pip install -r requirements.txt.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
 
@@ -37,7 +37,7 @@ try:
   import serial.tools.list_ports
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "Serial tools is not installed. Please install it using: python3 -m pip install serial.tools.list_ports.\nExiting in 15s.")
+  print(now.strftime("%H:%M:%S ") + "Serial tools is not installed. Please install it using: pip install -r requirements.txt.\nExiting in 15s.")
   time.sleep(15)
   os._exit(1)
 
