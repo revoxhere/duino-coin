@@ -25,23 +25,25 @@
 
 // Include SHA1 part of cryptosuite2 library
 #include "sha1.h"
-
 String result; // Create globals
-char buffer[64];
+char buffer[64] = "";
 unsigned int iJob = 0;
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Prepare built-in led pin as output
   Serial.begin(115200); // Open serial port
   Serial.println("ready"); // Send start word to miner program
+  Serial.flush();
 }
 
 void loop() {
   String startStr = Serial.readStringUntil('\n');
   if (startStr == "start") { // Wait for start word, serial.available caused problems
+    Serial.flush();
     String hash = Serial.readStringUntil('\n'); // Read hash
     String job = Serial.readStringUntil('\n'); // Read job
     unsigned int diff = Serial.parseInt(); // Read difficulty
+    unsigned long StartTime = micros();
     for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
       Sha1.init(); // Create sha1 hasher
       Sha1.print(String(hash) + String(iJob));
@@ -55,9 +57,11 @@ void loop() {
       result = String(buffer); // Convert and prepare array
       result.remove(40, 28); // First 40 characters are good, rest is garbage
       if (String(result) == String(job)) { // If result is found
-        Serial.println(String(iJob)); // Send result back to Arduino Miner
+        unsigned long EndTime = micros();
+        unsigned long ElapsedTime = EndTime - StartTime;
+        Serial.println(String(iJob) + "," + String(ElapsedTime)); // Send result back to the program with share time
         PORTB = PORTB | B00100000;   // Turn on built-in led
-        delay(50); // Wait a bit
+        delay(75); // Wait a bit
         PORTB = PORTB & B11011111; // Turn off built-in led
         break; // Stop and wait for more work
       }
