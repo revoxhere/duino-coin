@@ -109,6 +109,12 @@ After loging-in you have access to the following commands:
 
 Duino-Coin is mostly distributed under the MIT License. See `LICENSE` file for more information.
 
+<h2 align="center">Officially tested devices</h2><br>
+
+* Arduino Pro Mini (ATmega328p @ 16MHz 5V) - 150 H/s - Arduino Code & Miner
+* NodeMCU (ESP8266 @ 80 MHz) - 1,15 - ESP Code
+* NodeMCU (ESP8266 @ 160 MHz) - 2,15 kH/s - ESP Code
+
 Major frameworks used by Duino-Coin:
 *   [cryptosuite2](https://github.com/daknuett/cryptosuite2) - Arduino SHA1 hashing
 *   [Hash.h library](https://github.com/esp8266/Arduino/blob/master/libraries/Hash/src/Hash.h) - ESP8266 SHA1 hashing
