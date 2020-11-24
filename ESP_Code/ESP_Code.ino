@@ -84,10 +84,10 @@ void loop() {
 
     String hash = client.readStringUntil(','); // Read last block hash
     String job = client.readStringUntil(','); // Read expected hash
-    unsigned int diff =  1500; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
+    unsigned int diff =  (1500) * 100 + 1; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
     //Serial.println("Job received: " + String(hash) + " " + String(job));
 
-    for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
+    for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
       //yield(); // uncomment if ESP watchdog triggers
       String result = sha1(String(hash) + String(iJob)); // Hash previous block hash and current iJob
       if (result == job) { // If result is found
