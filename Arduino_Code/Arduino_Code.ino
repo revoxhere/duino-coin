@@ -25,6 +25,7 @@
 
 // Include SHA1 part of cryptosuite2 library
 #include "sha1.h"
+
 String result; // Create globals
 char buffer[64] = "";
 unsigned int iJob = 0;
