@@ -42,9 +42,9 @@ void loop() {
     Serial.flush();
     String hash = Serial.readStringUntil('\n'); // Read hash
     String job = Serial.readStringUntil('\n'); // Read job
-    unsigned int diff = Serial.parseInt(); // Read difficulty
+    unsigned int diff = Serial.parseInt() * 100 + 1; // Read difficulty
     unsigned long StartTime = micros();
-    for (unsigned int iJob = 0; iJob < diff * 100 + 1; iJob++) { // Difficulty loop
+    for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
       Sha1.init(); // Create sha1 hasher
       Sha1.print(String(hash) + String(iJob));
       uint8_t * hash_bytes = Sha1.result(); // Get result
