@@ -56,8 +56,9 @@ void loop() {
           buffer[2 * i + 1] = "0123456789abcdef"[hash_bytes[i] & 0xf]; //It retreves the value from that address next spot over
         }
       }
-      result = String(buffer).remove(40); // Convert and prepare array, first 40 characters are good, rest is garbage
-      if (result == job) { // If result is found
+      result = String(buffer); // Convert and prepare array
+      result.remove(40, 28); // First 40 characters are good, rest is garbage
+      if (String(result) == String(job)) { // If result is found
         unsigned long EndTime = micros();
         unsigned long ElapsedTime = EndTime - StartTime;
         Serial.println(String(iJob) + "," + String(ElapsedTime)); // Send result back to the program with share time
