@@ -51,8 +51,9 @@ void loop() {
       uint8_t * hash_bytes = Sha1.result(); // Get result
       for (int i = 0; i < 10; i++) { // Cast result to array
         for (int i = 0; i < 32; i++) {
-          buffer[2 * i] = "0123456789abcdef"[hash_bytes[i] >> 4];
-          buffer[2 * i + 1] = "0123456789abcdef"[hash_bytes[i] & 0xf];
+          buffer[2 * i] = "0123456789abcdef"[hash_bytes[i] >> 4]; //MSB to LSB I guess? Depending on the address in hash_bytes,
+                                                                  // it chooses that from the given array of characters
+          buffer[2 * i + 1] = "0123456789abcdef"[hash_bytes[i] & 0xf]; //It retreves the value from that address next spot over
         }
       }
       result = String(buffer); // Convert and prepare array
