@@ -57,7 +57,7 @@ void loop() {
         }
       }
       result = String(buffer); // Convert and prepare array
-      result.remove(40, 28); // First 40 characters are good, rest is garbage
+      result.remove(40); // First 40 characters are good, rest is garbage
       if (String(result) == String(job)) { // If result is found
         unsigned long EndTime = micros();
         unsigned long ElapsedTime = EndTime - StartTime;
