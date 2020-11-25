@@ -5,8 +5,7 @@ require 'digest'
 require 'net/http'
 require 'json' # Only default ruby libraries
 
-username = "username" # Replace these with your credentials
-password = "password"
+username = "username" # Replace this with your username
 
 $VERBOSE = nil # Disable debug output
 url = 'https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt'
@@ -20,17 +19,8 @@ s = TCPSocket.open(serverip, serverport) # Connect to the server
 SERVER_VER = s.gets(3) # Read server version
 puts "Server is on version " + SERVER_VER
 
-s.puts("LOGI,"+String(username)+","+String(password)) # Send login request
-FEEDBACK = s.gets(2) # Receive login feedback
-if FEEDBACK == "OK"
-	puts "Logged in"
-else
-	puts "Error loging in - check account credentials!"
-	exit # Exit if credentials are incorrect
-end
-
 loop do # Mining loop
-	s.puts("JOB") # Send job request
+	s.puts("JOB,"+String(username)) # Send job request
 	job = s.read(86) # Read job
 	job = job.split(',') # Split into previous block hash, result hash and difficulty
 	difficulty = job[2]
@@ -39,12 +29,17 @@ loop do # Mining loop
 		if sha1 == String(job[1]) # If result is found
 			s.write(result) # Send numeric result to the server
 			SHAREFEED = s.read(4) # And receive result feedback
-			if SHAREFEED == "GOOD" # Check wheter it was accepted or not
+			if SHAREFEED == "GOOD" or SHAREFEED == "BLOCK" # Check wheter it was accepted or not
 				puts "Accepted share " + String(result) + " (Difficulty " + String(difficulty) + ")"
 				break
-			else
+			if SHAREFEED == "INVU"
+				puts "Invalid username!"
+				exit
+			if SHAREFEED == "BAD"
 				puts "Rejected share " + String(result) + " (Difficulty " + String(difficulty) + ")"
 				break
+				end
+			end
 			end
 		end
 	end
