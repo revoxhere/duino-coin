@@ -12,6 +12,7 @@ from requests import get
 from json import loads
 from threading import Timer
 
+socket.setdefaulttimeout(10)
 
 with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as content:
     content = content.read().decode().splitlines()
