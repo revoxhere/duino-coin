@@ -27,6 +27,12 @@ def decode_soc(rec):
     response = response.split(",")
     return response
 
+
+def decode_soc_no_utf(rec):
+    response = rec.decode()
+    response = response.split(",")
+    return response
+
 def GetDucoPrice():
     global ducofiat
     jsonapi = get("http://163.172.179.54/api.json", data = None)
