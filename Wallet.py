@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ##########################################
 # Duino-Coin GUI Wallet (v1.7)
-# https://github.com/revoxhere/duino-coin 
+# https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2020
 ##########################################
@@ -131,7 +131,7 @@ class LoginFrame(Frame):
 			soc = socket.socket()
 			soc.connect((pool_address, int(pool_port)))
 			soc.recv(3)
-			soc.send(bytes("LOGI,"+str(username)+","+str(password), encoding="utf8"))
+			soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
 			response = soc.recv(64).decode("utf8")
 			response = response.split(",")
 
@@ -154,13 +154,13 @@ class LoginFrame(Frame):
 		usernameS = username.get()
 		passwordS = password.get()
 		confpasswordS = confpassword.get()
-		
+
 		if emailS and usernameS and passwordS and confpasswordS:
 			if passwordS == confpasswordS:
 				soc = socket.socket()
 				soc.connect((pool_address, int(pool_port)))
 				soc.recv(3)
-				soc.send(bytes("REGI,"+str(usernameS)+","+str(passwordS)+","+str(emailS), encoding="utf8"))
+				soc.send(bytes(f"REGI,{str(usernameS)},{str(passwordS)},{str(emailS)}", encoding="utf8"))
 				response = soc.recv(128).decode("utf8")
 				response = response.split(",")
 
@@ -301,7 +301,7 @@ def openTransactions(handler):
 
 	Label(transactionsWindow,
 		text="LOCAL TRANSACTIONS LIST",
-		font=textFont3, 
+		font=textFont3,
 		background=backgroundColor,
 		foreground=foregroundColor).pack()
 	Label(transactionsWindow,
@@ -310,25 +310,25 @@ def openTransactions(handler):
 		background=backgroundColor,
 		foreground=foregroundColor).pack()
 
-	listbox = Listbox(transactionsWindow) 
-	listbox.pack(side = LEFT, fill = BOTH, expand=1) 
+	listbox = Listbox(transactionsWindow)
+	listbox.pack(side = LEFT, fill = BOTH, expand=1)
 	scrollbar = Scrollbar(transactionsWindow)
-	scrollbar.pack(side = RIGHT, fill = BOTH) 
+	scrollbar.pack(side = RIGHT, fill = BOTH)
 
 	with open(resources + "transactions.bin", "r") as transactionsfile:
 		transactionsFileContent = transactionsfile.read().splitlines()
 		for line in transactionsFileContent:
-			listbox.insert(END, line) 
+			listbox.insert(END, line)
 
 	listbox.config(highlightcolor = backgroundColor,
 				selectbackground = "#f39c12", bd = 0,
 				yscrollcommand = scrollbar.set,
 				background=backgroundColor,
 				foreground=foregroundColor,
-				font=textFont) 
+				font=textFont)
 	scrollbar.config(command = listbox.yview, background = "#7bed9f")
 
-	
+
 def currencyConvert():
 	fromcurrency = fromCurrencyInput.get(fromCurrencyInput.curselection())
 	tocurrency = toCurrencyInput.get(toCurrencyInput.curselection())
@@ -484,9 +484,9 @@ def openSettings(handler):
 						soc = socket.socket()
 						soc.connect((pool_address, int(pool_port)))
 						soc.recv(3)
-						soc.send(bytes("LOGI,"+str(username)+","+str(password), encoding="utf8"))
+						soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
 						soc.recv(2)
-						soc.send(bytes("CHGP,"+str(oldpasswordS)+","+str(newpasswordS), encoding="utf8"))
+						soc.send(bytes(f"CHGP,{str(oldpasswordS)},{str(newpasswordS)}", encoding="utf8"))
 						response = soc.recv(128).decode("utf8")
 						soc.close()
 
@@ -592,7 +592,7 @@ def getBalance():
 		soc = socket.socket()
 		soc.connect((pool_address, int(pool_port)))
 		soc.recv(3)
-		soc.send(bytes("LOGI,"+str(username)+","+str(password), encoding="utf8"))
+		soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
 		response = soc.recv(2)
 		soc.send(bytes("BALA", encoding="utf8"))
 		oldbalance = balance
@@ -600,7 +600,7 @@ def getBalance():
 		soc.close()
 	except ConnectionResetError:
 		getBalance()
- 
+
 	if oldbalance != balance:
 		difference = float(balance) - float(oldbalance)
 		if float(balance) != float(difference):
@@ -654,7 +654,7 @@ def updateBalanceLabel():
 def calculateProfit(start_bal):
 	try: # Thanks Bilaboz for the code!
 		global curr_bal, profit_array
-		
+
 		prev_bal = curr_bal
 		curr_bal = getBalance()
 		session = curr_bal - start_bal
@@ -678,9 +678,9 @@ def sendFunds(handler):
 	soc.connect((pool_address, int(pool_port)))
 	soc.recv(3)
 
-	soc.send(bytes("LOGI,"+str(username)+","+str(password), encoding="utf8"))
-	response = soc.recv(2)	   
-	soc.send(bytes("SEND,-,"+str(recipientStr)+","+str(amountStr), encoding="utf8"))
+	soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
+	response = soc.recv(2)
+	soc.send(bytes(f"SEND,-,{str(recipientStr)},{str(amountStr)}", encoding="utf8"))
 
 	response = soc.recv(128).decode()
 	soc.close()
@@ -788,7 +788,7 @@ class Wallet:
 			font=textFont,
 			background=backgroundColor,
 			foreground=foregroundColor).place(relx=.15, rely=.2)
-		
+
 		def clear_recipient_placeholder(self):
 			recipient.delete("0", "100")
 
@@ -916,7 +916,7 @@ class Wallet:
 		curr_bal = start_balance
 		calculateProfit(start_balance)
 		updateBalanceLabel()
-		
+
 		root.mainloop()
 
 try:

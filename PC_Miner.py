@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python Miner (v1.7) 
-# https://github.com/revoxhere/duino-coin 
+# Duino-Coin Python Miner (v1.7)
+# https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2020
 ##########################################
@@ -73,7 +73,7 @@ def title(title):
   else:
     print('\33]0;'+title+'\a', end='')
     sys.stdout.flush()
-        
+
 def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
   now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "\n%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " SIGINT detected - Exiting gracefully." + Style.NORMAL + Fore.WHITE + " See you soon!")
@@ -95,9 +95,9 @@ def Greeting(): # Greeting message depending on time
     autorestartmessage = "disabled"
   if float(autorestart) > 0:
     autorestartmessage = "restarting every " + str(autorestart) + "s"
-    
+
   current_hour = time.strptime(time.ctime(time.time())).tm_hour
-  
+
   if current_hour < 12 :
     greeting = "Have a wonderful morning"
   elif current_hour == 12 :
@@ -108,7 +108,7 @@ def Greeting(): # Greeting message depending on time
     greeting = "Have a cozy evening"
   else:
     greeting = "Welcome back"
-  
+
   print(" * " + Fore.YELLOW + Style.BRIGHT + "Official Duino-Coin © Python Miner " + Style.RESET_ALL + Fore.WHITE + "(v" + str(VER) + ") 2019-2020") # Startup message
   print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
   try:
@@ -121,7 +121,7 @@ def Greeting(): # Greeting message depending on time
   print(" * " + Fore.WHITE + "Algorithm: " + Style.BRIGHT + Fore.YELLOW + "DUCO-S1")
   print(" * " + Fore.WHITE + "Autorestarter: " + Style.BRIGHT + Fore.YELLOW + str(autorestartmessage))
   print(" * " + Fore.WHITE + str(greeting) + ", " + Style.BRIGHT + Fore.YELLOW + str(username) + "!\n")
-  
+
   if os.name == 'nt':
     if not Path(str(resources) + "/Donate_executable.exe").is_file(): # Initial miner executable section
       debugOutput("OS is Windows, downloading developer donation executable")
@@ -133,14 +133,14 @@ def Greeting(): # Greeting message depending on time
 
 def hashrateCalculator(): # Hashes/sec calculation
   global last_hash_count, hash_count, khash_count, hash_mean
-  
+
   last_hash_count = hash_count
   khash_count = last_hash_count / 1000
   hash_mean.append(khash_count) # Calculate average hashrate
   khash_count = statistics.mean(hash_mean)
   khash_count = round(khash_count, 2)
   hash_count = 0 # Reset counter
-  
+
   threading.Timer(1.0, hashrateCalculator).start() # Run this def every 1s
 
 def autorestarter(): # Autorestarter
@@ -154,7 +154,7 @@ def autorestarter(): # Autorestarter
 
 def loadConfig(): # Config loading section
   global pool_address, pool_port, username, efficiency, autorestart, donationlevel, debug
-  
+
   if not Path(str(resources) + "/Miner_config.cfg").is_file(): # Initial configuration section
     print(Style.BRIGHT + "Duino-Coin basic configuration tool\nEdit "+str(resources) + "/Miner_config.cfg file later if you want to change it.")
     print(Style.RESET_ALL + "Don't have an Duino-Coin account yet? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register on server.\n")
@@ -165,7 +165,7 @@ def loadConfig(): # Config loading section
     donationlevel = "0"
     if os.name == 'nt':
       donationlevel = input(Style.RESET_ALL + Fore.YELLOW + "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: " + Style.BRIGHT)
-    
+
     efficiency = re.sub("\D", "", efficiency)  # Check wheter efficiency is correct
     if float(efficiency) > int(100):
       efficiency = 100
@@ -177,14 +177,14 @@ def loadConfig(): # Config loading section
       donationlevel = 5
     if float(donationlevel) < int(0):
       donationlevel = 0
-      
+
     config['miner'] = { # Format data
     "username": username,
     "efficiency": efficiency,
     "autorestart": autorestart,
     "donate": donationlevel,
     "debug": False}
-    
+
     with open(str(resources) + "/Miner_config.cfg", "w") as configfile: # Write data to file
       config.write(configfile)
     print(Style.RESET_ALL + "Config saved! Launching...")
@@ -199,7 +199,7 @@ def loadConfig(): # Config loading section
 
 def Connect(): # Connect to pool section
   global soc, res, pool_address, pool_port
-  
+
   while True: # Grab data grom GitHub section
     try:
       try:
@@ -213,7 +213,7 @@ def Connect(): # Connect to pool section
         break # Continue
       else:
         time.sleep(0.025) # Restart if wrong status code
-        
+
     except:
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Connection error!\nRestarting in 15 seconds.")
@@ -221,27 +221,27 @@ def Connect(): # Connect to pool section
         raise
       time.sleep(15)
       os.execl(sys.executable, sys.executable, *sys.argv)
-      
+
     time.sleep(0.025)
-    
+
   while True:
     try: # Shutdown previous connections if any
       soc.shutdown(socket.SHUT_RDWR)
       soc.close()
     except:
       debugOutput("No previous connections to close")
-    
+
     try:
       soc = socket.socket()
     except:
       debugOutput("Reconnecting")
       Connect() # Reconnect if pool down
-    
+
     try: # Try to connect
       soc.connect((str(pool_address), int(pool_port)))
       soc.settimeout(timeout)
       break # If connection was established, continue
-    
+
     except: # If it wasn't, display a message
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Connection error!\nMaster server is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
@@ -249,8 +249,8 @@ def Connect(): # Connect to pool section
           raise
       time.sleep(15)
       os.execl(sys.executable, sys.executable, *sys.argv)
-      
-    Connect()  
+
+    Connect()
 
 def checkVersion():
   try:
@@ -258,18 +258,18 @@ def checkVersion():
       SERVER_VER = soc.recv(1024).decode() # Check server version
     except:
       debugOutput("Error checking server version, reconnecting")
-      Connect() # Reconnect if pool down                  
-      
+      Connect() # Reconnect if pool down
+
     if float(SERVER_VER) <= float(VER) and len(SERVER_VER) == 3: # If miner is up-to-date, display a message and continue
       now = datetime.datetime.now()
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.YELLOW + " Connected" + Style.RESET_ALL + Fore.WHITE + " to master Duino-Coin server (v"+str(SERVER_VER)+")")
-      soc.send(bytes("FROM," + "Python Miner," + str(username) + "," + str(platform), encoding="utf8")) # Send metrics to server about client
+      soc.send(bytes(f"FROM,Python Miner,{str(username)},{str(platform)}", encoding="utf8")) # Send metrics to server about client
     else:
       now = datetime.datetime.now()
       cont = input(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Miner is outdated (v"+VER+")," + Style.RESET_ALL + Fore.RED + " server is on v"+SERVER_VER+", please download latest version from https://github.com/revoxhere/duino-coin/releases/ or type \'continue\' if you wish to continue anyway.\n")
-      if cont != "continue": 
+      if cont != "continue":
         os._exit(1)
-    
+
   except:
     Connect() # Reconnect if pool down
 
@@ -311,11 +311,11 @@ def Mine(): # Mining section
 
   now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Mining thread is starting" + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1 algorithm")
-  
+
   while True:
     time.sleep(float(efficiency)) # Sleep to achieve lower efficiency
     try:
-      soc.send(bytes("JOB," + str(username), encoding="utf8")) # Send job request
+      soc.send(bytes(f"JOB,{str(username)}", encoding="utf8")) # Send job request
     except:
       debugOutput("Reconnecting")
       Connect() # Reconnect if pool down
@@ -336,19 +336,19 @@ def Mine(): # Mining section
       if debug == True:
         raise
       os.execl(sys.executable, sys.executable, *sys.argv)
-    
+
     computestart = datetime.datetime.now()
     for iJob in range(100 * int(job[2]) + 1): # Calculate hash with difficulty
       ducos1 = hashlib.sha1(str(job[0] + str(iJob)).encode("utf-8")).hexdigest() # Generate hash
       hash_count = hash_count + 1 # Increment hash counter
-      
+
       if job[1] == ducos1: # If result is even with job, send the result
         computestop = datetime.datetime.now()
         try:
-          soc.send(bytes(str(iJob) + "," + str(last_hash_count), encoding="utf8")) # Send result of hashing algorithm to pool
+          soc.send(bytes(f"{str(iJob)},{str(last_hash_count)}", encoding="utf8")) # Send result of hashing algorithm to pool
         except:
           os.execl(sys.executable, sys.executable, *sys.argv) # Reconnect if pool down
-          
+
         while True:
           try:
             feedback = soc.recv(1024).decode() # Get feedback
@@ -380,7 +380,7 @@ def Mine(): # Mining section
             now = datetime.datetime.now()
             computetime = now - computestart # Time from start of hash computing to finding the result
             computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
-            
+
             shares[1] = shares[1] + 1 # Share rejected = increment bad shares counter by 1
             title("Duino-Coin Python Miner (v"+str(VER)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
             print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " cpu " + Back.RESET + Fore.RED + " Rejected " + Fore.YELLOW + str(shares[1]) + "/" + str(shares[0] + shares[1]) + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100), 2)) + "%) " + Style.NORMAL + Fore.WHITE + "• diff " + str(diff) + " • " + Style.BRIGHT + Fore.WHITE + str(khash_count) + " kH/s "  + Style.BRIGHT + Fore.RED + "(boo!) " + Style.DIM + Fore.BLUE + "[" + computetime + "ms]")
@@ -416,7 +416,7 @@ while True:
     else:
       debugOutput("Autorestarted is disabled")
   except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)    
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
     if debug == True:
       raise
     time.sleep(15)
