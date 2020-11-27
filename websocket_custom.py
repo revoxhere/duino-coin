@@ -115,12 +115,12 @@ def reset_pass(old_password, new_password):
     return response
 
 
-def stat(username):
-    try:
-        sock.send(bytes(f"STAT,{str(username)}", encoding="utf8"))
-        response = sock.recv(1024).decode()
-    except Exception as e:
-        raise Exception("Socket not initialized please add 'init_socket' to your code")
+# def stat(username):
+#     try:
+#         sock.send(bytes(f"STAT,{str(username)}", encoding="utf8"))
+#         response = sock.recv(1024).decode()
+#     except Exception as e:
+#         raise Exception("Socket not initialized please add 'init_socket' to your code")
 
-    return response
+#     return response
 
