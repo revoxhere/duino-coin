@@ -110,23 +110,19 @@ def transfer(recipient_username, amount):
 def reset_pass(old_password, new_password):
     try:
         sock.send(bytes(f"CHGP,{str(oldpasswordS)},{str(newpasswordS)}", encoding="utf8"))
-        response = soc.recv(128).decode("utf8")
+        response = sock.recv(128).decode("utf8")
     except Exception as e:
         raise Exception("Socket not initialized please add 'init_socket' to your code")
 
+    return response
 
 
+def stat(username):
+    try:
+        sock.send(bytes(f"STAT,{str(username)}", encoding="utf8"))
+        response = sock.recv(1024).decode()
+    except Exception as e:
+        raise Exception("Socket not initialized please add 'init_socket' to your code")
 
-
-
-soc2 = init_socket()
-num = 1
-
-response = login(f'test_user{num}', f"password123")
-# # response = register(soc2, f'test_user{num}', f"password123", f"hessconnor41+{num}@gmail.com")
-
-print(response)
-# print(st_username)
-# print(balance())
-print(balance())
+    return response
 
