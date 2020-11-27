@@ -45,8 +45,6 @@ def GetDucoPrice():
     Timer(15, GetDucoPrice).start()
 
 
-
-
 def init_socket():
     global sock
     sock = socket.socket()
