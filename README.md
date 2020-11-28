@@ -152,23 +152,6 @@ print(current_bnalance)
 sock.close()
 ```
 
-After connecting, the server will send version number it's currently on (1.6).
-At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
-To login, send `LOGI,username,password` - replace username and password with credentials. After sucessfull login server will send `OK`.
-If login fails, server will send `NO,Reason of failed login`.
-
-To register, send `REGI,username,password,email` - again, by replacing words with respective data.
-After sucessfull registration server will send `OK`.
-If registration fails, server will send `NO,Reason of failed registration`.
-
-After loging-in you have access to the following commands:
-*   `BALA` - Server will return balance of current user
-*   `JOB` - Server will return job for mining - you can also use `JOB,username` to mine without loging-in
-*   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
-*   `CHGP,oldPassword,newPassword` - Change password of current user
-*   `FROM,Program Name,username,Other info` - Send metrics data to the server
-*   `STAT` - Server will return rank and e-mail of the user
-
 <h2 align="center">License</h2><br>
 
 Duino-Coin is mostly distributed under the MIT License. See `LICENSE` file for more information.
