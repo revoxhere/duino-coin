@@ -115,7 +115,7 @@ To build your own Duino-Coin apps, here's a some documentation for the python mo
 import duco_api
 ```
 
-First you need to initialize the connection to the socket, to do this you use
+First you need to initialize the connection to the server
 
 ```
 duco_api.init_socket() #returns an instance of the socket connection but also makes it global
@@ -174,8 +174,8 @@ sock = duco_api.init_socket()
 
 duco_api.login(username='YourUsername', password='YourPassword')
 
-current_bnalance = duco_api.balance()
-print(current_bnalance)
+current_balance = duco_api.balance()
+print(current_balance)
 
 sock.close()
 ```
