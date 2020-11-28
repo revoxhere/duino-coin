@@ -90,7 +90,7 @@ def balance():
         sock.send(bytes("BALA", encoding="utf8"))
         user_balance = sock.recv(1024).decode()
     except Exception as e:
-        raise Exception("Socket not initialized please add 'init_socket' to your code")
+        raise Exception(f"Socket not initialized please add 'init_socket' to your code depending on failure reason\n{e}")
 
     return user_balance
 
@@ -132,5 +132,3 @@ def reset_pass(old_password, new_password):
 #         raise Exception("Socket not initialized please add 'init_socket' to your code")
 
 #     return response
-help(balance)
-print(balance)
