@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 *** Official Duino Coin README
 *** by revox, 2019-2020
 -->
@@ -72,7 +72,7 @@ This list will be actively updated
 
 <h2 align="center">Contributing</h2><br>
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. 
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create.
 Any contributions you make are greatly appreciated.
 
 *   Fork the Project
@@ -91,7 +91,7 @@ To start communication however, firstly you need to connect to the server. For n
 After connecting, the server will send version number it's currently on (1.6).
 At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
 To login, send `LOGI,username,password` - replace username and password with credentials. After sucessfull login server will send `OK`.
-If login fails, server will send `NO,Reason of failed login`. 
+If login fails, server will send `NO,Reason of failed login`.
 
 To register, send `REGI,username,password,email` - again, by replacing words with respective data.
 After sucessfull registration server will send `OK`.
@@ -104,6 +104,81 @@ After loging-in you have access to the following commands:
 *   `CHGP,oldPassword,newPassword` - Change password of current user
 *   `FROM,Program Name,username,Other info` - Send metrics data to the server
 *   `STAT` - Server will return rank and e-mail of the user
+
+<h2 align="center">Duco API python Module</h2><br>
+
+To build your own Duino-Coin apps, here's a some documentation for the python module.
+
+<h3>Getting Started</h3>
+
+```
+import duco_api
+```
+
+First you need to initialize the connection to the socket, to do this you use
+
+```
+duco_api.init_socket() #returns an instance of the socket connection but also makes it global
+```
+
+The next step is to Login/Register <i>*Note: login and register do not require you to init but they close the connection after use*</i>
+<h4>Login</h4>
+
+```
+duco_api.login(username="username", password="password")
+```
+
+<h4>Register</h4>
+
+```
+duco_api.register(username="username", password="password", email="user@example.com")
+```
+
+<h3>Functions <i>*Requires Login*</i></h3>
+<h4>Balance</h4>
+Gets the current balance of the logged-in user
+
+```
+duco_api.balance() # takes no args
+```
+
+<h4>Transfer</h4>
+Transfers Duco from logged-in user to the specified username
+
+```
+duco_api.transfer(recipient_username='test_user1', amount=1)
+```
+
+<h4>reset password</h4>
+Resets the password of the logged-in user
+
+```
+duco_api.reset_pass(old_password='123', new_password='abc')
+```
+
+<h3>Other Functions <i>*Does NOT Require Login*</i></h3>
+<h4>Get Duco Price</h4>
+starts a thread with a loop that runs every 15 seconds
+
+
+```
+duco_api.GetDucoPrice() # access the value by using the global variable <ducofiat>
+```
+
+<h3>Example</h3>
+
+```
+import duco_api
+
+sock = duco_api.init_socket()
+
+duco_api.login(username='YourUsername', password='YourPassword')
+
+current_bnalance = duco_api.balance()
+print(current_bnalance)
+
+sock.close()
+```
 
 <h2 align="center">License</h2><br>
 
