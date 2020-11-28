@@ -83,6 +83,9 @@ def login(username, password):
 
 
 def balance():
+    """
+    Server will return balance of current user\nRequires you do use the login() function first.
+    """
     try:
         sock.send(bytes("BALA", encoding="utf8"))
         user_balance = sock.recv(1024).decode()
@@ -95,6 +98,9 @@ def balance():
 
 
 def transfer(recipient_username, amount):
+    """
+    recipientUsername,amount - Send funds to someone, server will return a message about state of the transaction\nRequires you do use the login() function first.
+    """
     try:
         sock.send(bytes(f"SEND,-,{str(recipient_username)},{str(amount)}", encoding="utf8"))
         response = sock.recv(128).decode()
@@ -106,6 +112,9 @@ def transfer(recipient_username, amount):
 
 
 def reset_pass(old_password, new_password):
+    """
+    Change password of current user\nRequires you do use the login() function first.
+    """
     try:
         sock.send(bytes(f"CHGP,{str(oldpasswordS)},{str(newpasswordS)}", encoding="utf8"))
         response = sock.recv(128).decode("utf8")
@@ -123,4 +132,5 @@ def reset_pass(old_password, new_password):
 #         raise Exception("Socket not initialized please add 'init_socket' to your code")
 
 #     return response
-
+help(balance)
+print(balance)
