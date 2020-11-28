@@ -110,48 +110,34 @@ After loging-in you have access to the following commands:
 To build your own Duino-Coin apps, here's a some documentation for the python module.
 
 <h3>Getting Started</h3>
-```
-import duco_api
-```
+`import duco_api`
 First you need to initialize the connection to the socket, to do this you use
-```
-duco_api.init_socket() #returns an instance of the socket connection but also makes it global
-```
+`duco_api.init_socket() #returns an instance of the socket connection but also makes it global`
 The next step is to Login/Register <i>*Note: login and register do not require you to init but they close the connection after use*</i>
 <h4>Login</h4>
-```
-duco_api.login(username="username", password="password")
-```
+`duco_api.login(username="username", password="password")`
 <h4>Register</h4>
-```
-duco_api.register(username="username", password="password", email="user@example.com")
-```
+`duco_api.register(username="username", password="password", email="user@example.com")`
 
 <h3>Functions <i>*Requires Login*</i></h3>
 <h4>Balance</h4>
 Gets the current balance of the logged-in user
-```
-duco_api.balance() # takes no args
-```
+`duco_api.balance() # takes no args`
 
 <h4>Transfer</h4>
 Transfers Duco from logged-in user to the specified username
-```
-duco_api.transfer(recipient_username='test_user1', amount=1)
-```
+`duco_api.transfer(recipient_username='test_user1', amount=1)`
 
 <h4>reset password</h4>
 Resets the password of the logged-in user
-```
-duco_api.reset_pass(old_password='123', new_password='abc')
-```
+`duco_api.reset_pass(old_password='123', new_password='abc')`
+
 <h3>Other Functions <i>*Does NOT Require Login*</i></h3>
 <h4>Get Duco Price</h4>
 starts a thread with a loop that runs every 15 seconds
 access the value by using the global variable `ducofiat`
-```
-duco_api.GetDucoPrice()
-```
+`duco_api.GetDucoPrice()`
+
 <h3>Example</h3>
 ```
 import duco_api
