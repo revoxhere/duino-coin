@@ -159,10 +159,10 @@ duco_api.reset_pass(old_password='123', new_password='abc')
 <h3>Other Functions <i>*Does NOT Require Login*</i></h3>
 <h4>Get Duco Price</h4>
 starts a thread with a loop that runs every 15 seconds
-access the value by using the global variable `ducofiat`
+
 
 ```
-duco_api.GetDucoPrice()
+duco_api.GetDucoPrice() # access the value by using the global variable <ducofiat>
 ```
 
 <h3>Example</h3>
