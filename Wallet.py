@@ -39,6 +39,7 @@ except FileExistsError:
 with sqlite3.connect(f"{resources}/wallet.db") as con:
 	cur = con.cursor()
 	cur.execute('''CREATE TABLE IF NOT EXISTS Transactions(Transaction_Date TEXT, amount REAL)''')
+	cur.execute('''CREATE TABLE IF NOT EXISTS UserData(username TEXT, password TEXT)''')
 
 
 with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as content:
@@ -146,11 +147,10 @@ class LoginFrame(Frame):
 			if response[0] == "OK":
 				if keeplogedin >= 1:
 					passwordEnc = b64encode(bytes(password, encoding="utf8"))
-					config["wallet"] = {
-						"username": username,
-						"password": passwordEnc}
-					with open(resources + "userdata.bin", "w") as configfile:
-						config.write(configfile)
+					with sqlite3.connect(f"{resources}/wallet.db") as con:
+						cur = con.cursor()
+						cur.execute('''INSERT INTO UserData(username, password) VALUES(?, ?)''',(username, passwordEnc))
+						con.commit()
 				root.destroy()
 			else:
 				messagebox.showerror(title="Error loging-in", message=response[1])
@@ -272,15 +272,22 @@ if not Path(resources + "settings.png").is_file():
 if not Path(resources + "transactions.png").is_file():
 	urlretrieve('https://i.imgur.com/lR8ZCwA.png', resources + 'transactions.png')
 
-if not Path(resources + "userdata.bin").is_file():
+with sqlite3.connect(f"{resources}/wallet.db") as con:
+	cur = con.cursor()
+	cur.execute("SELECT COUNT(username) FROM UserData")
+	userdata_count = cur.fetchall()[0][0]
+if userdata_count != 1:
 	root = Tk()
 	lf = LoginFrame(root)
 	root.mainloop()
 else:
-	config.read(resources + "userdata.bin")
-	username = config["wallet"]["username"]
-	passwordEnc = config["wallet"]["password"]
-	password = b64decode(passwordEnc[2:-1]).decode("utf8")
+	with sqlite3.connect(f"{resources}/wallet.db") as con:
+		cur = con.cursor()
+		cur.execute("SELECT * FROM UserData")
+		userdata_query = cur.fetchone()
+		username = userdata_query[0]
+		passwordEnc = (userdata_query[1]).decode("utf-8")
+		password = b64decode(passwordEnc).decode("utf8")
 
 def openWebsite(handler):
 	open_new_tab("https://duinocoin.com")
@@ -476,8 +483,18 @@ def openCalculator(handler):
 
 def openSettings(handler):
 	def _logout():
-		remove(resources + "userdata.bin")
-		execl(sys.executable, sys.executable, *sys.argv)
+		try:
+			with sqlite3.connect(f"{resources}/wallet.db") as con:
+				cur = con.cursor()
+				cur.execute('DELETE FROM UserData')
+				con.commit()
+		except Exception as e:
+			print(e)
+		# remove(resources + "userdata.bin")
+		try:
+			execl(sys.executable, sys.executable, *sys.argv)
+		except Exception as e:
+			print(e)
 
 	def _cleartrs():
 		# open(resources + "transactions.bin", "w+")
@@ -509,7 +526,14 @@ def openSettings(handler):
 						else:
 							messagebox.showinfo(title="Password changed", message=response)
 							try:
-								remove(resources + "userdata.bin")
+								# remove(resources + "userdata.bin")
+								try:
+									with sqlite3.connect(f"{resources}/wallet.db") as con:
+										cur = con.cursor()
+										cur.execute('DELETE FROM UserData')
+										con.commit()
+								except Exception as e:
+									print(e)
 							except FileNotFoundError:
 								pass
 							execl(sys.executable, sys.executable, *sys.argv)
