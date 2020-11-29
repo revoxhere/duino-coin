@@ -757,6 +757,7 @@ class Wallet:
 		textFont3 = Font(size=12,weight="bold")
 		textFont2 = Font(size=22,weight="bold")
 		textFont = Font(size=12,weight="normal")
+		rsize = Font(size=10)
 
 		self.master = master
 		master.geometry("720x420")
@@ -765,16 +766,16 @@ class Wallet:
 		master.configure(background = backgroundColor)
 
 		Label(master, # UP - DOWN
-			background="#7bed9f",
+			background="#7bed9f", font=rsize,
 			width="10", height="100").place(relx=.0, rely= .0)
 
 		Label(master, # LEFT - RIGHT
-			background="#f5cd79",
-			width="150", height="5").place(relx=.0, rely= .0)
+			background="#f5cd79", font=rsize,
+			width="150", height="4").place(relx=.0, rely= .0)
 
 		Label(master, # SQUARE
-			background="#ff7f50",
-			width="10", height="5").place(relx=.0, rely= .0)
+			background="#ff7f50", font=rsize,
+			width="10", height="4").place(relx=.0, rely= .0)
 
 		balancetext = StringVar()
 		balancetext.set("Please wait...")
@@ -789,7 +790,7 @@ class Wallet:
 		Label(master, text="1 DUCO = $"+str(ducofiat),
 			background="#f5cd79",
 			foreground=foregroundColor,
-			font=textFont).place(relx=.6, rely= .1125)
+			font=textFont).place(relx=.6, rely= .11)
 
 		Label(master, text="BALANCE",
 			background="#f5cd79",
