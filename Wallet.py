@@ -253,8 +253,6 @@ class LoginFrame(Frame):
 										font=textFont2)
 		self.logbtn.grid(columnspan=2, sticky="nswe", padx=(5, 5), pady=(5,0))
 
-if not Path(resources + "transactions.bin").is_file():
-	open(resources + 'transactions.bin', 'w+')
 if not Path(resources + "duco.png").is_file():
 	urlretrieve('https://i.imgur.com/GXXsMAC.png', resources + 'duco.png')
 if not Path(resources + "calculator.png").is_file():
