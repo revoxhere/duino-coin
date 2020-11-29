@@ -27,11 +27,20 @@ config = ConfigParser()
 resources = "res/"
 backgroundColor = "#FEEEDA"
 foregroundColor = "#212121"
+min_trans_difference = 1
+
+import sqlite3
 
 try:
 	mkdir(resources)
 except FileExistsError:
 	pass
+
+with sqlite3.connect(f"{resources}/wallet.db") as con:
+	cur = con.cursor()
+	cur.execute('''CREATE TABLE IF NOT EXISTS Transactions(Transaction_Date TEXT, amount REAL)''')
+	cur.execute('''CREATE TABLE IF NOT EXISTS UserData(username TEXT, password TEXT)''')
+
 
 with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as content:
 	content = content.read().decode().splitlines()
@@ -56,7 +65,7 @@ class LoginFrame(Frame):
 
 		master.title("Login")
 		master.resizable(False, False)
-		master.geometry("220x350")
+		#master.geometry("220x350")
 		master.configure(background = backgroundColor)
 		self.configure(background = backgroundColor)
 
@@ -92,13 +101,13 @@ class LoginFrame(Frame):
 										font=textFont)
 
 
-		self.ducoLabel.grid(row=0, sticky="nswe", pady=(5,0))
-		self.ducoLabel2.grid(row=1, sticky="nswe")
-		self.spacer.grid(row=3, sticky="nswe")
-		self.label_username.grid(row=4, sticky=W)
-		self.entry_username.grid(row=5, sticky=W)
-		self.label_password.grid(row=6, sticky=W)
-		self.entry_password.grid(row=7, sticky=W)
+		self.ducoLabel.grid(row=0, sticky="nswe", pady=(5,0), padx=(5))
+		self.ducoLabel2.grid(row=1, sticky="nswe", padx=(5))
+		self.spacer.grid(row=3, sticky="nswe", padx=(5))
+		self.label_username.grid(row=4, sticky=W, pady=(5))
+		self.entry_username.grid(row=5, sticky=N, padx=(5))
+		self.label_password.grid(row=6, sticky=W, pady=(5))
+		self.entry_password.grid(row=7, sticky=N, pady=(5))
 
 		self.var = IntVar()
 		self.checkbox = Checkbutton(self, text="Keep me logged in", variable=self.var,
@@ -111,13 +120,13 @@ class LoginFrame(Frame):
 										background=backgroundColor,
 										foreground=foregroundColor,
 										font=textFont2)
-		self.logbtn.grid(columnspan=2,sticky="nswe")
+		self.logbtn.grid(columnspan=2,sticky="nswe", padx=(5), pady=(0, 3))
 
 		self.regbtn = Button(self, text="REGISTER", command=self._register_btn_clicked,
 										background=backgroundColor,
 										foreground=foregroundColor,
 										font=textFont2)
-		self.regbtn.grid(columnspan=2,sticky="nswe")
+		self.regbtn.grid(columnspan=2,sticky="nswe", padx=(5), pady=(0, 5))
 
 		self.pack()
 
@@ -138,11 +147,10 @@ class LoginFrame(Frame):
 			if response[0] == "OK":
 				if keeplogedin >= 1:
 					passwordEnc = b64encode(bytes(password, encoding="utf8"))
-					config["wallet"] = {
-						"username": username,
-						"password": passwordEnc}
-					with open(resources + "userdata.bin", "w") as configfile:
-						config.write(configfile)
+					with sqlite3.connect(f"{resources}/wallet.db") as con:
+						cur = con.cursor()
+						cur.execute('''INSERT INTO UserData(username, password) VALUES(?, ?)''',(username, passwordEnc))
+						con.commit()
 				root.destroy()
 			else:
 				messagebox.showerror(title="Error loging-in", message=response[1])
@@ -185,7 +193,7 @@ class LoginFrame(Frame):
 		register = Tk()
 		register.title("Register")
 		register.resizable(False, False)
-		register.geometry("220x350")
+		#register.geometry("220x350")
 		register.configure(background = backgroundColor)
 
 		textFont2 = Font(register, family="MS Sans Serif",size=12,weight="bold")
@@ -243,10 +251,8 @@ class LoginFrame(Frame):
 										background=backgroundColor,
 										foreground=foregroundColor,
 										font=textFont2)
-		self.logbtn.grid(columnspan=2, sticky="nswe", padx=(5, 5), pady=(5,0))
+		self.logbtn.grid(columnspan=2, sticky="nswe", padx=(5, 5), pady=(5,5))
 
-if not Path(resources + "transactions.bin").is_file():
-	open(resources + 'transactions.bin', 'w+')
 if not Path(resources + "duco.png").is_file():
 	urlretrieve('https://i.imgur.com/GXXsMAC.png', resources + 'duco.png')
 if not Path(resources + "calculator.png").is_file():
@@ -266,15 +272,22 @@ if not Path(resources + "settings.png").is_file():
 if not Path(resources + "transactions.png").is_file():
 	urlretrieve('https://i.imgur.com/lR8ZCwA.png', resources + 'transactions.png')
 
-if not Path(resources + "userdata.bin").is_file():
+with sqlite3.connect(f"{resources}/wallet.db") as con:
+	cur = con.cursor()
+	cur.execute("SELECT COUNT(username) FROM UserData")
+	userdata_count = cur.fetchall()[0][0]
+if userdata_count != 1:
 	root = Tk()
 	lf = LoginFrame(root)
 	root.mainloop()
 else:
-	config.read(resources + "userdata.bin")
-	username = config["wallet"]["username"]
-	passwordEnc = config["wallet"]["password"]
-	password = b64decode(passwordEnc[2:-1]).decode("utf8")
+	with sqlite3.connect(f"{resources}/wallet.db") as con:
+		cur = con.cursor()
+		cur.execute("SELECT * FROM UserData")
+		userdata_query = cur.fetchone()
+		username = userdata_query[0]
+		passwordEnc = (userdata_query[1]).decode("utf-8")
+		password = b64decode(passwordEnc).decode("utf8")
 
 def openWebsite(handler):
 	open_new_tab("https://duinocoin.com")
@@ -315,10 +328,14 @@ def openTransactions(handler):
 	scrollbar = Scrollbar(transactionsWindow)
 	scrollbar.pack(side = RIGHT, fill = BOTH)
 
-	with open(resources + "transactions.bin", "r") as transactionsfile:
-		transactionsFileContent = transactionsfile.read().splitlines()
-		for line in transactionsFileContent:
-			listbox.insert(END, line)
+	with sqlite3.connect(f"{resources}/wallet.db") as con:
+		cur = con.cursor()
+		cur.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
+		Transactions = cur.fetchall()
+	transactionstext_format = ''
+	for i, row in enumerate(Transactions, start=1):
+		listbox.insert(END, f"{str(row[1])}  {row[2]} DUCO\n")
+
 
 	listbox.config(highlightcolor = backgroundColor,
 				selectbackground = "#f39c12", bd = 0,
@@ -356,6 +373,7 @@ def currencyConvert():
 					result = str(round(float(amount) * float(exchangerates["rates"][tocurrency]), 6)) + " " + str(tocurrency)
 	except:
 		result = "Incorrect calculation"
+	result = "RESULT: " + result
 	conversionresulttext.set(str(result))
 	calculatorWindow.update()
 
@@ -368,24 +386,24 @@ def openCalculator(handler):
 		exchangerates["rates"]["DUCO"] = float(ducofiat)
 
 	calculatorWindow = Tk()
-	calculatorWindow.geometry("420x420")
+	#calculatorWindow.geometry("420x420")
 	calculatorWindow.resizable(False, False)
 	calculatorWindow.title("Duino-Coin Wallet - Calculator")
 	calculatorWindow.configure(background = backgroundColor)
 
-	textFont2 = Font(calculatorWindow, family="MS Sans Serif",size=12,weight="bold")
-	textFont3 = Font(calculatorWindow, family="MS Sans Serif",size=14,weight="bold")
-	textFont = Font(calculatorWindow, family="MS Sans Serif",size=12,weight="normal")
+	textFont2 = Font(calculatorWindow, size=12,weight="bold")
+	textFont3 = Font(calculatorWindow, size=14,weight="bold")
+	textFont = Font(calculatorWindow, size=12,weight="normal")
 
 	Label(calculatorWindow, text="CURRENCY CONVERTER",
 		background = backgroundColor,
 		foreground = foregroundColor,
-		font = textFont3).place(relx=.01, rely=.01)
+		font = textFont3).grid(row=0, column=0)
 
 	Label(calculatorWindow, text="FROM",
 		background = backgroundColor,
 		foreground = foregroundColor,
-		font = textFont2).place(relx=.01, rely=.08)
+		font = textFont2).grid(row=1, column=0)
 
 	fromCurrencyInput = Listbox(calculatorWindow,
 								exportselection=False,
@@ -394,7 +412,7 @@ def openCalculator(handler):
 								selectbackground = "#7bed9f",
 								border="0", font=textFont,
 								width="20", height="13")
-	fromCurrencyInput.place(relx=.01, rely= .125)
+	fromCurrencyInput.grid(row=2, column=0)
 	i=0
 	for currency in exchangerates["rates"]:
 		fromCurrencyInput.insert(i, currency)
@@ -403,7 +421,7 @@ def openCalculator(handler):
 	Label(calculatorWindow, text="TO",
 		background = backgroundColor,
 		foreground = foregroundColor,
-		font = textFont2).place(relx=.5, rely=.08)
+		font = textFont2).grid(row=1, column=1)
 
 	toCurrencyInput = Listbox(calculatorWindow,
 								exportselection=False,
@@ -412,7 +430,7 @@ def openCalculator(handler):
 								selectbackground = "#7bed9f",
 								border="0", font=textFont,
 								width="20", height="13")
-	toCurrencyInput.place(relx=.5, rely= .125)
+	toCurrencyInput.grid(row=2, column=1)
 	i=0
 	for currency in exchangerates["rates"]:
 		toCurrencyInput.insert(i, currency)
@@ -426,51 +444,60 @@ def openCalculator(handler):
 	Label(calculatorWindow, text="AMOUNT",
 		background = backgroundColor,
 		foreground = foregroundColor,
-		font = textFont2).place(relx=.01, rely=.75)
+		font = textFont2).grid(row=3, column=0)
 
 	def clear_ccamount_placeholder(self):
 			amountInput.delete("0", "100")
 
 	amountInput = Entry(calculatorWindow,
-						background = "#7bed9f",
+						background = "#7bed9f", foreground=foregroundColor,
 						border="0", font=textFont,
 						width="20")
-	amountInput.place(relx=.01, rely= .8)
+	amountInput.grid(row=4, column=0)
 	amountInput.insert("0", str(getBalance()))
 	amountInput.bind("<FocusIn>", clear_ccamount_placeholder)
 
 	Button(calculatorWindow, text="Convert",
-			background = "#FEEEDA",
-			command=currencyConvert, width="22").place(relx=.01, rely=.8625)
-
-	Label(calculatorWindow, text="RESULT",
-		background = backgroundColor,
-		foreground = foregroundColor,
-		font = textFont2).place(relx=.5, rely=.7925)
+			background = "#FEEEDA", foreground=foregroundColor,
+			command=currencyConvert, width="22").grid(row=3, column=1, pady=(5, 0))
 
 	conversionresulttext = StringVar(calculatorWindow)
-	conversionresulttext.set("0.0")
+	conversionresulttext.set("RESULT: 0.0")
 	conversionresultLabel = Label(calculatorWindow,
 								textvariable=conversionresulttext,
 								background = backgroundColor,
 								foreground = foregroundColor,
 								font = textFont2)
-	conversionresultLabel.place(relx=.5, rely=.85)
+	conversionresultLabel.grid(row=4, column=1)
 
-	Label(calculatorWindow, text="This feature will be improved in the near future",
+	Label(calculatorWindow, text=" ",
 		background = backgroundColor,
 		foreground = foregroundColor,
-		font = textFont).place(relx=.01, rely=.94)
+		font = textFont2).grid(row=5, column=0)
 
 	calculatorWindow.mainloop()
 
 def openSettings(handler):
 	def _logout():
-		remove(resources + "userdata.bin")
-		execl(sys.executable, sys.executable, *sys.argv)
+		try:
+			with sqlite3.connect(f"{resources}/wallet.db") as con:
+				cur = con.cursor()
+				cur.execute('DELETE FROM UserData')
+				con.commit()
+		except Exception as e:
+			print(e)
+		# remove(resources + "userdata.bin")
+		try:
+			execl(sys.executable, sys.executable, *sys.argv)
+		except Exception as e:
+			print(e)
 
 	def _cleartrs():
-		open(resources + "transactions.bin", "w+")
+		# open(resources + "transactions.bin", "w+")
+		with sqlite3.connect(f"{resources}/wallet.db") as con:
+			cur = con.cursor()
+			cur.execute('DELETE FROM transactions')
+			con.commit()
 
 	def _chgpass():
 		def _changepassprotocol():
@@ -495,7 +522,14 @@ def openSettings(handler):
 						else:
 							messagebox.showinfo(title="Password changed", message=response)
 							try:
-								remove(resources + "userdata.bin")
+								# remove(resources + "userdata.bin")
+								try:
+									with sqlite3.connect(f"{resources}/wallet.db") as con:
+										cur = con.cursor()
+										cur.execute('DELETE FROM UserData')
+										con.commit()
+								except Exception as e:
+									print(e)
 							except FileNotFoundError:
 								pass
 							execl(sys.executable, sys.executable, *sys.argv)
@@ -585,8 +619,9 @@ def openSettings(handler):
 
 oldbalance = 0
 balance = 0
+unpaid_balance = 0
 def getBalance():
-	global oldbalance, balance
+	global oldbalance, balance, unpaid_balance
 
 	try:
 		soc = socket.socket()
@@ -601,18 +636,23 @@ def getBalance():
 	except ConnectionResetError:
 		getBalance()
 
-	if oldbalance != balance:
-		difference = float(balance) - float(oldbalance)
-		if float(balance) != float(difference):
-			with open(resources + "transactions.bin", "r+") as transactionsFile:
-				transactionsFileContent = transactionsFile.read()
-				if difference >= 0: # Add prefix
-					difference = " +" + str(round(difference, 12))
+	try:
+		if oldbalance != balance:
+			difference = (float(balance) - float(oldbalance))
+			dif_with_unpaid = (float(balance) - float(oldbalance)) + unpaid_balance
+			if float(balance) != float(difference):
+				if dif_with_unpaid >= 1 or dif_with_unpaid < 0:
+					now = datetime.datetime.now()
+					difference = (round(dif_with_unpaid, 12))
+					with sqlite3.connect(f"{resources}/wallet.db") as con:
+						cur = con.cursor()
+						cur.execute('''INSERT INTO Transactions(Transaction_Date, amount) VALUES(?, ?)''',(now.strftime("%d %b %Y %H:%M:%S"), float(difference)))
+						con.commit()
+						unpaid_balance = 0
 				else:
-					difference = " " + str(round(difference, 12))
-			with open(resources + "transactions.bin", "w") as transactionsFile:
-				now = datetime.datetime.now()
-				transactionsFile.write(str(now.strftime("%d %b %Y %H:%M:%S ")) + str(difference) + " DUCO\n" + transactionsFileContent)
+					unpaid_balance += (float(balance) - float(oldbalance))
+	except Exception as e:
+		print(e)
 
 	return round(float(balance), 8)
 
@@ -623,15 +663,29 @@ def updateBalanceLabel():
 		balancetext.set(str(getBalance()))
 		balanceusdtext.set("$"+str(round(getBalance()*ducofiat, 6)))
 
-		with open(resources + "transactions.bin", "r") as transactionsFile:
-			transactionsFileContent = transactionsFile.read().splitlines()
+		# with open(resources + "transactions.bin", "r") as transactionsFile:
+		# 	transactionsFileContent = transactionsFile.read().splitlines()
+		# try:
+		# 	transactionstext.set(transactionsFileContent[0] +"\n"
+		# 						+ transactionsFileContent[1] +"\n"
+		# 						+ transactionsFileContent[2] +"\n"
+		# 						+ transactionsFileContent[3] +"\n"
+		# 						+ transactionsFileContent[4] +"\n"
+		# 						+ transactionsFileContent[5])
+		# except IndexError:
+		# 	transactionstext.set("No local transactions yet")
+
+		with sqlite3.connect(f"{resources}/wallet.db") as con:
+			cur = con.cursor()
+			cur.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
+			Transactions = cur.fetchall()
 		try:
-			transactionstext.set(transactionsFileContent[0] +"\n"
-								+ transactionsFileContent[1] +"\n"
-								+ transactionsFileContent[2] +"\n"
-								+ transactionsFileContent[3] +"\n"
-								+ transactionsFileContent[4] +"\n"
-								+ transactionsFileContent[5])
+			transactionstext_format = ''
+			for i, row in enumerate(Transactions, start=1):
+				transactionstext_format += f"{str(row[1])}	{row[2]} DUCO\n"
+				if i == 6:
+					break
+			transactionstext.set(transactionstext_format)
 		except IndexError:
 			transactionstext.set("No local transactions yet")
 
@@ -647,7 +701,8 @@ def updateBalanceLabel():
 				hourlyprofittext.set("")
 				dailyprofittext.set("")
 			profitCheck += 1
-	except:
+	except Exception as e:
+		print(e)
 		_exit(0)
 	Timer(.5, updateBalanceLabel).start()
 
@@ -699,9 +754,9 @@ class Wallet:
 		global transactionstext
 		global curr_bal, profit_array
 
-		textFont3 = Font(family="MS Sans Serif",size=12,weight="bold")
-		textFont2 = Font(family="MS Sans Serif",size=22,weight="bold")
-		textFont = Font(family="MS Sans Serif",size=12,weight="normal")
+		textFont3 = Font(size=12,weight="bold")
+		textFont2 = Font(size=22,weight="bold")
+		textFont = Font(size=12,weight="normal")
 
 		self.master = master
 		master.geometry("720x420")
@@ -721,12 +776,6 @@ class Wallet:
 			background="#ff7f50",
 			width="10", height="4").place(relx=.0, rely= .0)
 
-
-		Label(master, text="BALANCE",
-			background="#f5cd79",
-			foreground=foregroundColor,
-			font=textFont).place(relx=.1525, rely= .02)
-
 		balancetext = StringVar()
 		balancetext.set("Please wait...")
 		balanceLabel = Label(master,
@@ -737,10 +786,15 @@ class Wallet:
 		balanceLabel.place(relx=.15, rely= .06)
 
 
-		Label(master, text="FIAT BALANCE",
+		Label(master, text="1 DUCO = $"+str(ducofiat),
 			background="#f5cd79",
 			foreground=foregroundColor,
-			font=textFont).place(relx=.6, rely= .02)
+			font=textFont).place(relx=.6, rely= .1075)
+
+		Label(master, text="BALANCE",
+			background="#f5cd79",
+			foreground=foregroundColor,
+			font=textFont).place(relx=.1525, rely= .015)
 
 		balanceusdtext = StringVar()
 		balanceusdtext.set("Please wait...")
@@ -751,10 +805,10 @@ class Wallet:
 							font=textFont3)
 		balanceusdLabel.place(relx=.6, rely= .06)
 
-		Label(master, text="1 DUCO = $"+str(ducofiat),
+		Label(master, text="FIAT BALANCE",
 			background="#f5cd79",
 			foreground=foregroundColor,
-			font=textFont).place(relx=.6, rely= .1)
+			font=textFont).place(relx=.6, rely= .015)
 
 		duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
 		duco.image = duco
@@ -792,8 +846,8 @@ class Wallet:
 		def clear_recipient_placeholder(self):
 			recipient.delete("0", "100")
 
-		recipient = Entry(master, background = "#87ebff", border="0",font=textFont, width="20")
-		recipient.place(relx=.1525, rely= .25)
+		recipient = Entry(master, background = "#87ebff", foreground=foregroundColor, border="0",font=textFont, width="20")
+		recipient.place(relx=.1525, rely= .255)
 		recipient.insert("0", "revox")
 		recipient.bind("<FocusIn>", clear_recipient_placeholder)
 
@@ -805,8 +859,8 @@ class Wallet:
 		def clear_amount_placeholder(self):
 			amount.delete("0", "100")
 
-		amount = Entry(master,background = "#87ebff", border="0", font=textFont, width="20")
-		amount.place(relx=.1525, rely= .37)
+		amount = Entry(master,background = "#87ebff", foreground=foregroundColor, border="0", font=textFont, width="20")
+		amount.place(relx=.1525, rely= .375)
 		amount.insert("0", "1.7")
 		amount.bind("<FocusIn>", clear_amount_placeholder)
 
