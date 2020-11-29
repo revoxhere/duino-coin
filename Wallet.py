@@ -28,10 +28,18 @@ resources = "res/"
 backgroundColor = "#FEEEDA"
 foregroundColor = "#212121"
 
+import sqlite3
+
 try:
 	mkdir(resources)
 except FileExistsError:
 	pass
+
+conn = sqlite3.connect(f"{resources}/wallet.db", check_same_thread=False)
+c = conn.cursor()
+
+c.execute('''CREATE TABLE IF NOT EXISTS Transactions(Transaction_Date TEXT, amount REAL)''')
+
 
 with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as content:
 	content = content.read().decode().splitlines()
@@ -604,15 +612,19 @@ def getBalance():
 	if oldbalance != balance:
 		difference = float(balance) - float(oldbalance)
 		if float(balance) != float(difference):
-			with open(resources + "transactions.bin", "r+") as transactionsFile:
-				transactionsFileContent = transactionsFile.read()
-				if difference >= 0: # Add prefix
-					difference = " +" + str(round(difference, 12))
-				else:
-					difference = " " + str(round(difference, 12))
-			with open(resources + "transactions.bin", "w") as transactionsFile:
-				now = datetime.datetime.now()
-				transactionsFile.write(str(now.strftime("%d %b %Y %H:%M:%S ")) + str(difference) + " DUCO\n" + transactionsFileContent)
+			now = datetime.datetime.now()
+			difference = (round(difference, 12))
+			c.execute('''INSERT INTO Transactions(Transaction_Date, amount) VALUES(?, ?)''',(now.strftime("%d %b %Y %H:%M:%S"), float(difference)))
+			conn.commit()
+			# with open(resources + "transactions.bin", "r+") as transactionsFile:
+			# 	transactionsFileContent = transactionsFile.read()
+			# 	if difference >= 0: # Add prefix
+			# 		difference = " +" + str(round(difference, 12))
+			# 	else:
+			# 		difference = " " + str(round(difference, 12))
+			# with open(resources + "transactions.bin", "w") as transactionsFile:
+			# 	now = datetime.datetime.now()
+			# 	transactionsFile.write(str(now.strftime("%d %b %Y %H:%M:%S ")) + str(difference) + " DUCO\n" + transactionsFileContent)
 
 	return round(float(balance), 8)
 
@@ -623,15 +635,27 @@ def updateBalanceLabel():
 		balancetext.set(str(getBalance()))
 		balanceusdtext.set("$"+str(round(getBalance()*ducofiat, 6)))
 
-		with open(resources + "transactions.bin", "r") as transactionsFile:
-			transactionsFileContent = transactionsFile.read().splitlines()
+		# with open(resources + "transactions.bin", "r") as transactionsFile:
+		# 	transactionsFileContent = transactionsFile.read().splitlines()
+		# try:
+		# 	transactionstext.set(transactionsFileContent[0] +"\n"
+		# 						+ transactionsFileContent[1] +"\n"
+		# 						+ transactionsFileContent[2] +"\n"
+		# 						+ transactionsFileContent[3] +"\n"
+		# 						+ transactionsFileContent[4] +"\n"
+		# 						+ transactionsFileContent[5])
+		# except IndexError:
+		# 	transactionstext.set("No local transactions yet")
+
+		c.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
+		Transactions = c.fetchall()
 		try:
-			transactionstext.set(transactionsFileContent[0] +"\n"
-								+ transactionsFileContent[1] +"\n"
-								+ transactionsFileContent[2] +"\n"
-								+ transactionsFileContent[3] +"\n"
-								+ transactionsFileContent[4] +"\n"
-								+ transactionsFileContent[5])
+			transactionstext_format = ''
+			for i, row in enumerate(Transactions, start=1):
+				transactionstext_format += f"{str(row[1])} {row[2]} DUCO\n"
+				if i == 6:
+					break
+			transactionstext.set(transactionstext_format)
 		except IndexError:
 			transactionstext.set("No local transactions yet")
 
@@ -647,7 +671,8 @@ def updateBalanceLabel():
 				hourlyprofittext.set("")
 				dailyprofittext.set("")
 			profitCheck += 1
-	except:
+	except Exception as e:
+		print(e)
 		_exit(0)
 	Timer(.5, updateBalanceLabel).start()
 
