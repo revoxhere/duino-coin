@@ -478,7 +478,9 @@ def openSettings(handler):
 		execl(sys.executable, sys.executable, *sys.argv)
 
 	def _cleartrs():
-		open(resources + "transactions.bin", "w+")
+		# open(resources + "transactions.bin", "w+")
+		c.execute('DELETE FROM transactions')
+		conn.commit()
 
 	def _chgpass():
 		def _changepassprotocol():
