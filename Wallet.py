@@ -36,10 +36,9 @@ try:
 except FileExistsError:
 	pass
 
-conn = sqlite3.connect(f"{resources}/wallet.db", check_same_thread=False)
-c = conn.cursor()
-
-c.execute('''CREATE TABLE IF NOT EXISTS Transactions(Transaction_Date TEXT, amount REAL)''')
+with sqlite3.connect(f"{resources}/wallet.db") as con:
+	cur = con.cursor()
+	cur.execute('''CREATE TABLE IF NOT EXISTS Transactions(Transaction_Date TEXT, amount REAL)''')
 
 
 with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as content:
@@ -596,8 +595,9 @@ def openSettings(handler):
 
 oldbalance = 0
 balance = 0
+unpaid_balance = 0
 def getBalance():
-	global oldbalance, balance
+	global oldbalance, balance, unpaid_balance
 
 	try:
 		soc = socket.socket()
@@ -612,13 +612,23 @@ def getBalance():
 	except ConnectionResetError:
 		getBalance()
 
-	if oldbalance != balance:
-		difference = float(balance) - float(oldbalance)
-		if float(balance) != float(difference) and difference > min_trans_difference:
-			now = datetime.datetime.now()
-			difference = (round(difference, 12))
-			c.execute('''INSERT INTO Transactions(Transaction_Date, amount) VALUES(?, ?)''',(now.strftime("%d %b %Y %H:%M:%S"), float(difference)))
-			conn.commit()
+	try:
+		if oldbalance != balance:
+			difference = (float(balance) - float(oldbalance))
+			dif_with_unpaid = (float(balance) - float(oldbalance)) + unpaid_balance
+			if float(balance) != float(difference):
+				if dif_with_unpaid >= 1 or dif_with_unpaid < 0:
+					now = datetime.datetime.now()
+					difference = (round(dif_with_unpaid, 12))
+					with sqlite3.connect(f"{resources}/wallet.db") as con:
+						cur = con.cursor()
+						cur.execute('''INSERT INTO Transactions(Transaction_Date, amount) VALUES(?, ?)''',(now.strftime("%d %b %Y %H:%M:%S"), float(difference)))
+						con.commit()
+						unpaid_balance = 0
+				else:
+					unpaid_balance += (float(balance) - float(oldbalance))
+	except Exception as e:
+		print(e)
 
 	return round(float(balance), 8)
 
@@ -641,12 +651,14 @@ def updateBalanceLabel():
 		# except IndexError:
 		# 	transactionstext.set("No local transactions yet")
 
-		c.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
-		Transactions = c.fetchall()
+		with sqlite3.connect(f"{resources}/wallet.db") as con:
+			cur = con.cursor()
+			cur.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
+			Transactions = cur.fetchall()
 		try:
 			transactionstext_format = ''
 			for i, row in enumerate(Transactions, start=1):
-				transactionstext_format += f"{str(row[1])} {row[2]} DUCO\n"
+				transactionstext_format += f"{str(row[1])}	{row[2]} DUCO\n"
 				if i == 6:
 					break
 			transactionstext.set(transactionstext_format)
