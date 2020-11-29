@@ -27,6 +27,7 @@ config = ConfigParser()
 resources = "res/"
 backgroundColor = "#FEEEDA"
 foregroundColor = "#212121"
+min_trans_difference = 1
 
 import sqlite3
 
@@ -613,20 +614,11 @@ def getBalance():
 
 	if oldbalance != balance:
 		difference = float(balance) - float(oldbalance)
-		if float(balance) != float(difference):
+		if float(balance) != float(difference) and difference > min_trans_difference:
 			now = datetime.datetime.now()
 			difference = (round(difference, 12))
 			c.execute('''INSERT INTO Transactions(Transaction_Date, amount) VALUES(?, ?)''',(now.strftime("%d %b %Y %H:%M:%S"), float(difference)))
 			conn.commit()
-			# with open(resources + "transactions.bin", "r+") as transactionsFile:
-			# 	transactionsFileContent = transactionsFile.read()
-			# 	if difference >= 0: # Add prefix
-			# 		difference = " +" + str(round(difference, 12))
-			# 	else:
-			# 		difference = " " + str(round(difference, 12))
-			# with open(resources + "transactions.bin", "w") as transactionsFile:
-			# 	now = datetime.datetime.now()
-			# 	transactionsFile.write(str(now.strftime("%d %b %Y %H:%M:%S ")) + str(difference) + " DUCO\n" + transactionsFileContent)
 
 	return round(float(balance), 8)
 
