@@ -332,8 +332,7 @@ def openTransactions(handler):
 		cur = con.cursor()
 		cur.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
 		Transactions = cur.fetchall()
-	transactionstext_format = ''
-	for i, row in enumerate(Transactions, start=1):
+	for row in Transactions:
 		listbox.insert(END, f"{str(row[1])}  {row[2]} DUCO\n")
 
 
