@@ -323,10 +323,14 @@ def openTransactions(handler):
 	scrollbar = Scrollbar(transactionsWindow)
 	scrollbar.pack(side = RIGHT, fill = BOTH)
 
-	with open(resources + "transactions.bin", "r") as transactionsfile:
-		transactionsFileContent = transactionsfile.read().splitlines()
-		for line in transactionsFileContent:
-			listbox.insert(END, line)
+	with sqlite3.connect(f"{resources}/wallet.db") as con:
+		cur = con.cursor()
+		cur.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
+		Transactions = cur.fetchall()
+	transactionstext_format = ''
+	for i, row in enumerate(Transactions, start=1):
+		listbox.insert(END, f"{str(row[1])}  {row[2]} DUCO\n")
+
 
 	listbox.config(highlightcolor = backgroundColor,
 				selectbackground = "#f39c12", bd = 0,
