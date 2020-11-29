@@ -43,6 +43,7 @@ Technical specifications:
 *   Block time: Instant ⚡
 *   Ticker: DUCO (ᕲ)
 *   Algorithms: DUCO-S1, DUCO-S1A
+*   Original [Kolka system](https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png) helping reward miners fairly 
 
 <h2 align="center">Get started</h2><br>
 
@@ -65,8 +66,6 @@ Official getting started guides for creating an account and setting up miners on
 *   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz
 *   [Duino DogeRock GUI Wallet](https://github.com/DogeRock/Duino-Coin-Gui-Wallet) by DogeRock
 *   [Duino DogeRock CLI Wallet](https://github.com/DogeRock/DogeRock-Duino-Coin-cmd-line-wallet) by DogeRock
-
-
 
 This list will be actively updated
 
@@ -105,7 +104,7 @@ After loging-in you have access to the following commands:
 *   `FROM,Program Name,username,Other info` - Send metrics data to the server
 *   `STAT` - Server will return rank and e-mail of the user
 
-<h2 align="center">Duco API python Module</h2><br>
+<h2 align="center">Python DUCO API module</h2><br>
 
 To build your own Duino-Coin apps, here's a some documentation for the python module.
 
@@ -134,7 +133,9 @@ duco_api.login(username="username", password="password")
 duco_api.register(username="username", password="password", email="user@example.com")
 ```
 
-<h3>Functions <i>*Requires Login*</i></h3>
+<h3>Functions</h3>
+These functions require user being loged-in.
+
 <h4>Balance</h4>
 Gets the current balance of the logged-in user
 
@@ -156,16 +157,17 @@ Resets the password of the logged-in user
 duco_api.reset_pass(old_password='123', new_password='abc')
 ```
 
-<h3>Other Functions <i>*Does NOT Require Login*</i></h3>
+<h3>Other Functions</h3>
+Use of this functions does not require being loged-in.
+
 <h4>Get Duco Price</h4>
 starts a thread with a loop that runs every 15 seconds
-
 
 ```
 duco_api.GetDucoPrice() # access the value by using the global variable <ducofiat>
 ```
 
-<h3>Example</h3>
+<h4>Example API script</h4>
 
 ```
 import duco_api
