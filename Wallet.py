@@ -479,8 +479,10 @@ def openSettings(handler):
 
 	def _cleartrs():
 		# open(resources + "transactions.bin", "w+")
-		c.execute('DELETE FROM transactions')
-		conn.commit()
+		with sqlite3.connect(f"{resources}/wallet.db") as con:
+			cur = con.cursor()
+			cur.execute('DELETE FROM transactions')
+			con.commit()
 
 	def _chgpass():
 		def _changepassprotocol():
