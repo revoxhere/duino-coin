@@ -27,7 +27,7 @@ config = ConfigParser()
 resources = "res/"
 backgroundColor = "#FEEEDA"
 foregroundColor = "#212121"
-min_trans_difference = 1
+min_trans_difference = 0.000000001 # Minimum transaction amount to be saved
 
 import sqlite3
 
@@ -641,7 +641,7 @@ def getBalance():
 			difference = (float(balance) - float(oldbalance))
 			dif_with_unpaid = (float(balance) - float(oldbalance)) + unpaid_balance
 			if float(balance) != float(difference):
-				if dif_with_unpaid >= 1 or dif_with_unpaid < 0:
+				if dif_with_unpaid >= min_trans_difference or dif_with_unpaid < 0:
 					now = datetime.datetime.now()
 					difference = (round(dif_with_unpaid, 12))
 					with sqlite3.connect(f"{resources}/wallet.db") as con:
