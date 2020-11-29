@@ -69,9 +69,9 @@ class LoginFrame(Frame):
 		master.configure(background = backgroundColor)
 		self.configure(background = backgroundColor)
 
-		textFont2 = Font(family="MS Sans Serif",size=12,weight="bold")
-		textFont3 = Font(family="MS Sans Serif",size=14,weight="bold")
-		textFont = Font(family="MS Sans Serif",size=12,weight="normal")
+		textFont2 = Font(size=12,weight="bold")
+		textFont3 = Font(size=14,weight="bold")
+		textFont = Font(size=12,weight="normal")
 
 		self.duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
 		self.duco.image = self.duco
@@ -196,9 +196,9 @@ class LoginFrame(Frame):
 		#register.geometry("220x350")
 		register.configure(background = backgroundColor)
 
-		textFont2 = Font(register, family="MS Sans Serif",size=12,weight="bold")
-		textFont3 = Font(register, family="MS Sans Serif",size=14,weight="bold")
-		textFont = Font(register, family="MS Sans Serif",size=12,weight="normal")
+		textFont2 = Font(register, size=12,weight="bold")
+		textFont3 = Font(register, size=14,weight="bold")
+		textFont = Font(register, size=12,weight="normal")
 
 		duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
 		duco.image = duco
@@ -308,9 +308,9 @@ def openTransactions(handler):
 	transactionsWindow.title("Duino-Coin Wallet - Transactions")
 	transactionsWindow.configure(background = backgroundColor)
 
-	textFont2 = Font(transactionsWindow, family="MS Sans Serif",size=12,weight="bold")
-	textFont3 = Font(transactionsWindow, family="MS Sans Serif",size=14,weight="bold")
-	textFont = Font(transactionsWindow, family="MS Sans Serif",size=12,weight="normal")
+	textFont2 = Font(transactionsWindow, size=12,weight="bold")
+	textFont3 = Font(transactionsWindow, size=14,weight="bold")
+	textFont = Font(transactionsWindow, size=12,weight="normal")
 
 	Label(transactionsWindow,
 		text="LOCAL TRANSACTIONS LIST",
@@ -549,9 +549,9 @@ def openSettings(handler):
 		changepassWindow.resizable(False, False)
 		changepassWindow.configure(background = backgroundColor)
 
-		textFont2 = Font(changepassWindow, family="MS Sans Serif",size=12,weight="bold")
-		textFont3 = Font(changepassWindow, family="MS Sans Serif",size=14,weight="bold")
-		textFont = Font(changepassWindow, family="MS Sans Serif",size=12,weight="normal")
+		textFont2 = Font(changepassWindow, size=12,weight="bold")
+		textFont3 = Font(changepassWindow, size=14,weight="bold")
+		textFont = Font(changepassWindow, size=12,weight="normal")
 
 		Label(changepassWindow, text="OLD PASSWORD",
 				background=backgroundColor,
@@ -590,7 +590,7 @@ def openSettings(handler):
 	settingsWindow.resizable(False, False)
 	settingsWindow.title("Duino-Coin Wallet - Settings")
 	settingsWindow.configure(background = backgroundColor)
-	textFont = Font(settingsWindow, family="MS Sans Serif", size=12, weight="normal")
+	textFont = Font(settingsWindow,  size=12, weight="normal")
 
 	logoutbtn = Button(settingsWindow, text="LOGOUT", command=_logout,
 										background=backgroundColor,
@@ -770,11 +770,11 @@ class Wallet:
 
 		Label(master, # LEFT - RIGHT
 			background="#f5cd79",
-			width="100", height="4").place(relx=.0, rely= .0)
+			width="150", height="5").place(relx=.0, rely= .0)
 
 		Label(master, # SQUARE
 			background="#ff7f50",
-			width="10", height="4").place(relx=.0, rely= .0)
+			width="10", height="5").place(relx=.0, rely= .0)
 
 		balancetext = StringVar()
 		balancetext.set("Please wait...")
@@ -783,18 +783,23 @@ class Wallet:
 							background="#f5cd79",
 							foreground=foregroundColor,
 							font=textFont2)
-		balanceLabel.place(relx=.15, rely= .06)
+		balanceLabel.place(relx=.15, rely= .07)
 
 
 		Label(master, text="1 DUCO = $"+str(ducofiat),
 			background="#f5cd79",
 			foreground=foregroundColor,
-			font=textFont).place(relx=.6, rely= .1075)
+			font=textFont).place(relx=.6, rely= .1125)
 
 		Label(master, text="BALANCE",
 			background="#f5cd79",
 			foreground=foregroundColor,
-			font=textFont).place(relx=.1525, rely= .015)
+			font=textFont).place(relx=.1525, rely= .0155)
+
+		Label(master, text="FIAT BALANCE",
+			background="#f5cd79",
+			foreground=foregroundColor,
+			font=textFont).place(relx=.6, rely= .015)
 
 		balanceusdtext = StringVar()
 		balanceusdtext.set("Please wait...")
@@ -805,21 +810,16 @@ class Wallet:
 							font=textFont3)
 		balanceusdLabel.place(relx=.6, rely= .06)
 
-		Label(master, text="FIAT BALANCE",
-			background="#f5cd79",
-			foreground=foregroundColor,
-			font=textFont).place(relx=.6, rely= .015)
-
 		duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
 		duco.image = duco
 		ducoLabel = Label(master, background = "#ff7f50", image = duco)
-		ducoLabel.place(relx=.0125, rely=.005)
+		ducoLabel.place(relx=.005, rely=.0025)
 		ducoLabel.bind("<Button>", openWebsite)
 
 		transactions = ImageTk.PhotoImage(Image.open(resources + "transactions.png"))
 		transactions.image = transactions
 		transactionsLabel =  Label(master, background = "#7bed9f", image = transactions)
-		transactionsLabel.place(relx=.0125, rely=.2)
+		transactionsLabel.place(relx=.005, rely=.2)
 		transactionsLabel.bind("<Button>", openTransactions)
 
 		calculator = ImageTk.PhotoImage(Image.open(resources + "calculator.png"))
@@ -827,7 +827,7 @@ class Wallet:
 		calculatorLabel =  Label(master,
 							background = "#7bed9f",
 							image = calculator)
-		calculatorLabel.place(relx=.0125, rely=.37)
+		calculatorLabel.place(relx=.005, rely=.37)
 		calculatorLabel.bind("<Button>", openCalculator)
 
 		settings = ImageTk.PhotoImage(Image.open(resources + "settings.png"))
@@ -835,7 +835,7 @@ class Wallet:
 		settingsLabel =  Label(master,
 							background = "#7bed9f",
 							image = settings)
-		settingsLabel.place(relx=.0125, rely=.82)
+		settingsLabel.place(relx=.005, rely=.82)
 		settingsLabel.bind("<Button>", openSettings)
 
 		Label(master, text="RECIPIENT",
