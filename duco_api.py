@@ -116,7 +116,7 @@ class api_actions():
         """
         if self.password == None or self.username == None:
             raise Exception("User not logged in")
-        self.sock.send(bytes(f"CHGP,{str(oldpasswordS)},{str(newpasswordS)}", encoding="utf8"))
+        self.sock.send(bytes(f"CHGP,{str(old_password)},{str(new_password)}", encoding="utf8"))
         self.reset_password_response = self.sock.recv(128).decode("utf8")
         return self.reset_password_response
 
