@@ -23,6 +23,9 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
+//If defined, the count is reversed. This allows you to not repeat searching the same numbers twice if you have an arduino searching the conventional way.
+//#define REVERSE_SEARCH
+
 // Include SHA1 part of cryptosuite2 library
 #include "sha1.h"
 
@@ -45,7 +48,11 @@ void loop() {
     String job = Serial.readStringUntil('\n'); // Read job
     unsigned int diff = Serial.parseInt() * 100 + 1; // Read difficulty
     unsigned long StartTime = micros();
+#ifdef REVERSE_SEARCH
+    for (unsigned int iJob = diff; iJob >= 0; iJob--) { // Difficulty loop
+#else
     for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
+#endif
       Sha1.init(); // Create sha1 hasher
       Sha1.print(String(hash) + String(iJob));
       uint8_t * hash_bytes = Sha1.result(); // Get result
