@@ -196,6 +196,7 @@ Major frameworks used by Duino-Coin:
 
 <h2 align="center">Officially tested devices</h2><br>
 
+* Arduino Uno Rev3 (ATmega328p @ 16MHz 5V) - Unkown Hashrate - Arduino Code & Miner
 * Arduino Pro Mini (ATmega328p @ 16MHz 5V) - 150 H/s - Arduino Code & Miner
 * NodeMCU (ESP8266 @ 80 MHz) - 1,15 kH/s - ESP Code
 * NodeMCU (ESP8266 @ 160 MHz) - 2,15 kH/s - ESP Code
