@@ -11,7 +11,7 @@ from json import loads
 from threading import Timer
 
 socket.setdefaulttimeout(10)
-
+ducofiat = .003
 
 
 def decode_soc(rec):
@@ -28,7 +28,6 @@ def decode_soc_no_utf(rec):
 
 def GetDucoPrice():
     global ducofiat
-    ducofiat = .003
     jsonapi = get("http://163.172.179.54/api.json", data = None)
     if jsonapi.status_code == 200:
         content = jsonapi.content.decode()
@@ -37,7 +36,6 @@ def GetDucoPrice():
     else:
         ducofiat = .003
     Timer(15, GetDucoPrice).start()
-
 
 
 class api_actions():
