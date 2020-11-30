@@ -61,6 +61,9 @@ GetDucoPrice()
 
 class LoginFrame(Frame):
 	def __init__(self, master):
+		"""
+		init login frame
+		"""
 		super().__init__(master)
 
 		master.title("Login")
@@ -70,7 +73,7 @@ class LoginFrame(Frame):
 		self.configure(background = backgroundColor)
 
 		textFont2 = Font(size=12,weight="bold")
-		textFont3 = Font(size=14,weight="bold")
+		# textFont3 = Font(size=14,weight="bold")
 		textFont = Font(size=12,weight="normal")
 
 		self.duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
