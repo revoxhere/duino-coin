@@ -6,7 +6,7 @@
 # © Duino-Coin Community 2020
 ##########################################
 
-from tkinter import Tk, Label, Frame, Entry, StringVar, IntVar, Button, PhotoImage, Listbox, Scrollbar, Checkbutton
+from tkinter import Tk, Label, Frame, Entry, StringVar, IntVar, Button, PhotoImage, Listbox, Scrollbar, Checkbutton, Toplevel
 from tkinter.font import Font
 from tkinter import LEFT, BOTH, RIGHT, END, BOTTOM, TOP, N, E, S, W
 from webbrowser import open_new_tab
@@ -302,11 +302,12 @@ def openDiscord(handler):
 	open_new_tab("https://discord.com/invite/kvBkccy")
 
 def openTransactions(handler):
-	transactionsWindow = Tk()
+	transactionsWindow = Toplevel()
 	transactionsWindow.geometry("420x420")
 	transactionsWindow.resizable(False, False)
 	transactionsWindow.title("Duino-Coin Wallet - Transactions")
 	transactionsWindow.configure(background = backgroundColor)
+	transactionsWindow.transient([root])
 
 	textFont2 = Font(transactionsWindow, size=12,weight="bold")
 	textFont3 = Font(transactionsWindow, size=14,weight="bold")
@@ -385,11 +386,12 @@ def openCalculator(handler):
 		exchangerates = loads(currencyapi.content.decode())
 		exchangerates["rates"]["DUCO"] = float(ducofiat)
 
-	calculatorWindow = Tk()
+	calculatorWindow = Toplevel()
 	#calculatorWindow.geometry("420x420")
 	calculatorWindow.resizable(False, False)
 	calculatorWindow.title("Duino-Coin Wallet - Calculator")
 	calculatorWindow.configure(background = backgroundColor)
+	calculatorWindow.transient([root])
 
 	textFont2 = Font(calculatorWindow, size=12,weight="bold")
 	textFont3 = Font(calculatorWindow, size=14,weight="bold")
@@ -544,10 +546,12 @@ def openSettings(handler):
 					message="New password is the same as the old one")
 
 		settingsWindow.destroy()
-		changepassWindow = Tk()
+		changepassWindow = Toplevel()
 		changepassWindow.title("Change password")
 		changepassWindow.resizable(False, False)
 		changepassWindow.configure(background = backgroundColor)
+		changepassWindow.transient([root])
+
 
 		textFont2 = Font(changepassWindow, size=12,weight="bold")
 		textFont3 = Font(changepassWindow, size=14,weight="bold")
@@ -586,10 +590,12 @@ def openSettings(handler):
 										font=textFont2)
 		chgpbtn.grid(columnspan=2, sticky="nswe", pady=(5,5), padx=(5,5))
 
-	settingsWindow = Tk()
+	settingsWindow = Toplevel()
 	settingsWindow.resizable(False, False)
 	settingsWindow.title("Duino-Coin Wallet - Settings")
 	settingsWindow.configure(background = backgroundColor)
+	settingsWindow.transient([root])
+
 	textFont = Font(settingsWindow,  size=12, weight="normal")
 
 	logoutbtn = Button(settingsWindow, text="LOGOUT", command=_logout,
