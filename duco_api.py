@@ -14,12 +14,6 @@ from threading import Timer
 
 socket.setdefaulttimeout(10)
 
-with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as content:
-    content = content.read().decode().splitlines()
-    pool_address = content[0]
-    pool_port = content[1]
-    server_address = {'address': pool_address, 'port': pool_port}
-
 
 
 def decode_soc(rec):
@@ -33,6 +27,7 @@ def decode_soc_no_utf(rec):
     response = response.split(",")
     return response
 
+
 def GetDucoPrice():
     global ducofiat
     jsonapi = get("http://163.172.179.54/api.json", data = None)
@@ -45,90 +40,67 @@ def GetDucoPrice():
     Timer(15, GetDucoPrice).start()
 
 
-def init_socket():
-    global sock
-    sock = socket.socket()
-    sock.connect((server_address['address'], int(server_address['port'])))
-    sock.recv(3)
-    return sock
+
+class api_actions():
+
+    def __init__(self):
+        with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as self.content:
+            self.content = self.content.read().decode().splitlines()
+            self.pool_address = self.content[0]
+            self.pool_port = int(self.content[1])
+
+        socket.setdefaulttimeout(10)
+        self.sock = socket.socket()
+        self.sock.connect((self.pool_address, self.pool_port))
+        self.sock.recv(3)
+        self.username = None
+        self.password = None
 
 
+    def register(self, username, password, email, send_email=False):
+        self.sock.send(bytes(f"REGI,{str(username)},{str(password)},{str(email)}", encoding="utf8"))
+        self.register_result = decode_soc(self.sock.recv(128))
+        if 'NO' in self.register_result:
+            raise Exception(self.register_result[1])
+        return self.register_result
+
+    def login(self, username, password):
+        self.username = username
+        self.password = password
+
+        self.sock.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
+        self.login_result = decode_soc(self.sock.recv(64))
+
+        if 'NO' in self.login_result:
+            raise Exception(self.login_result[1])
+
+        return self.login_result
+
+    def logout(self):
+        self.sock.close()
+
+    def balance(self):
+        if self.password == None or self.username == None:
+            raise Exception("User not logged in")
+        self.sock.send(bytes("BALA", encoding="utf8"))
+        self.user_balance = self.sock.recv(1024).decode()
+        return self.user_balance
 
 
+    def transfer(self, recipient_username, amount):
+        if self.password == None or self.username == None:
+            raise Exception("User not logged in")
+        self.sock.send(bytes(f"SEND,-,{str(recipient_username)},{str(amount)}", encoding="utf8"))
+        self.transfer_response = self.sock.recv(128).decode()
+        return self.transfer_response
 
-def register(username, password, email, send_email=False):
-    try:
-        sock.send(bytes(f"REGI,{str(username)},{str(password)},{str(email)}", encoding="utf8"))
-        result = decode_soc(sock.recv(128))
-    except Exception as e:
-        init_socket()
-        sock.send(bytes(f"REGI,{str(username)},{str(password)},{str(email)}", encoding="utf8"))
-        result = decode_soc(sock.recv(128))
-        sock.close()
-    return result
+    def reset_pass(self, old_password, new_password):
+        if self.password == None or self.username == None:
+            raise Exception("User not logged in")
+        self.sock.send(bytes(f"CHGP,{str(oldpasswordS)},{str(newpasswordS)}", encoding="utf8"))
+        self.reset_password_response = self.sock.recv(128).decode("utf8")
+        return self.reset_password_response
 
+    def close(self):
+        self.sock.close()
 
-
-def login(username, password):
-    try:
-        sock.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
-        result = decode_soc(sock.recv(64))
-    except Exception as e:
-        init_socket()
-        sock.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
-        result = decode_soc(sock.recv(64))
-        sock.close()
-    return result
-
-
-
-def balance():
-    """
-    Server will return balance of current user\nRequires you do use the login() function first.
-    """
-    try:
-        sock.send(bytes("BALA", encoding="utf8"))
-        user_balance = sock.recv(1024).decode()
-    except Exception as e:
-        raise Exception(f"Socket not initialized please add 'init_socket' to your code depending on failure reason\n{e}")
-
-    return user_balance
-
-
-
-
-def transfer(recipient_username, amount):
-    """
-    recipientUsername,amount - Send funds to someone, server will return a message about state of the transaction\nRequires you do use the login() function first.
-    """
-    try:
-        sock.send(bytes(f"SEND,-,{str(recipient_username)},{str(amount)}", encoding="utf8"))
-        response = sock.recv(128).decode()
-    except Exception as e:
-        raise Exception("Socket not initialized please add 'init_socket' to your code")
-
-    return response
-
-
-
-def reset_pass(old_password, new_password):
-    """
-    Change password of current user\nRequires you do use the login() function first.
-    """
-    try:
-        sock.send(bytes(f"CHGP,{str(oldpasswordS)},{str(newpasswordS)}", encoding="utf8"))
-        response = sock.recv(128).decode("utf8")
-    except Exception as e:
-        raise Exception("Socket not initialized please add 'init_socket' to your code")
-
-    return response
-
-
-# def stat(username):
-#     try:
-#         sock.send(bytes(f"STAT,{str(username)}", encoding="utf8"))
-#         response = sock.recv(1024).decode()
-#     except Exception as e:
-#         raise Exception("Socket not initialized please add 'init_socket' to your code")
-
-#     return response
