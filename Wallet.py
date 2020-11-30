@@ -717,8 +717,8 @@ def calculateProfit(start_bal):
 	try: # Thanks Bilaboz for the code!
 		global curr_bal, profit_array
 
-		prev_bal = curr_bal
 		curr_bal = getBalance()
+		prev_bal = curr_bal
 		session = curr_bal - start_bal
 		tensec = curr_bal - prev_bal
 		minute = tensec * 6
