@@ -19,8 +19,8 @@
     <img src="https://img.shields.io/codacy/grade/a995acf7cd4c4211af6da874fe549ee5?color=f68e09&style=for-the-badge" /></a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-f97606.svg?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/releases/tag/1.6">
-    <img src="https://img.shields.io/badge/release-1.6-fb6404.svg?style=for-the-badge" /></a>
+  <a href="https://github.com/revoxhere/duino-coin/releases/tag/1.7">
+    <img src="https://img.shields.io/badge/release-1.7-fb6404.svg?style=for-the-badge" /></a>
   <a href="https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015">
     <img src="https://img.shields.io/badge/Bitcointalk-555555.svg?style=for-the-badge&logo=bitcoin" /></a>
 </p>
@@ -87,7 +87,7 @@ To start communication however, firstly you need to connect to the server. For n
 *   TCP connection (recommended) - server IP and port are now static (but can change) and can be found [here](https://github.com/revoxhere/duino-coin/blob/gh-pages/serverip.txt)
 *   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static and are `ws://163.172.179.54:15808`
 
-After connecting, the server will send version number it's currently on (1.6).
+After connecting, the server will send version number it's currently on (1.7).
 At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
 To login, send `LOGI,username,password` - replace username and password with credentials. After sucessfull login server will send `OK`.
 If login fails, server will send `NO,Reason of failed login`.
