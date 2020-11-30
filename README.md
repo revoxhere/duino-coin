@@ -110,26 +110,26 @@ To build your own Duino-Coin apps, here's a some documentation for the python mo
 
 <h3>Getting Started</h3>
 
-```
+```python
 import duco_api
 ```
 
 First you need to initialize the connection to the server
 
-```
+```python
 api_connection = duco_api.api_actions() #creates the api connection instance
 ```
 
 The next step is to Login/Register <i>*Note: login and register do not require you to init but they close the connection after use*</i>
 <h4>Login</h4>
 
-```
+```python
 api_connection.login(username="username", password="password")
 ```
 
 <h4>Register</h4>
 
-```
+```python
 api_connection.register(username="username", password="password", email="user@example.com")
 ```
 
@@ -139,21 +139,21 @@ These functions require user being loged-in.
 <h4>Balance</h4>
 Gets the current balance of the logged-in user
 
-```
+```python
 api_connection.balance() # takes no args
 ```
 
 <h4>Transfer</h4>
 Transfers Duco from logged-in user to the specified username
 
-```
+```python
 api_connection.transfer(recipient_username='test_user1', amount=1)
 ```
 
 <h4>reset password</h4>
 Resets the password of the logged-in user
 
-```
+```python
 api_connection.reset_pass(old_password='123', new_password='abc')
 ```
 
@@ -163,13 +163,13 @@ Use of this functions does not require being loged-in.
 <h4>Get Duco Price</h4>
 starts a thread with a loop that runs every 15 seconds
 
-```
+```python
 duco_api.GetDucoPrice() # access the value by using the global variable <ducofiat>
 ```
 
 <h4>Example API script</h4>
 
-```
+```python
 import duco_api
 
 api_connection = duco_api.api_actions()
