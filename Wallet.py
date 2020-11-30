@@ -336,7 +336,7 @@ def openTransactions(handler):
 		cur = con.cursor()
 		cur.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
 		Transactions = cur.fetchall()
-	transactionstext_format = ''
+	# transactionstext_format = ''
 	for i, row in enumerate(Transactions, start=1):
 		listbox.insert(END, f"{str(row[1])}  {row[2]} DUCO\n")
 
@@ -637,7 +637,7 @@ def getBalance():
 		soc.connect((pool_address, int(pool_port)))
 		soc.recv(3)
 		soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
-		response = soc.recv(2)
+		_ = soc.recv(2)
 		soc.send(bytes("BALA", encoding="utf8"))
 		oldbalance = balance
 		balance = soc.recv(1024).decode()
