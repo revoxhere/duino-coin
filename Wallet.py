@@ -8,7 +8,7 @@
 
 from tkinter import Tk, Label, Frame, Entry, StringVar, IntVar, Button, PhotoImage, Listbox, Scrollbar, Checkbutton, Toplevel
 from tkinter.font import Font
-from tkinter import LEFT, BOTH, RIGHT, END, TOP, N, E, S, W
+from tkinter import LEFT, BOTH, RIGHT, END, N, E, S, W
 from webbrowser import open_new_tab
 from urllib.request import urlopen, urlretrieve
 from pathlib import Path
@@ -61,9 +61,7 @@ GetDucoPrice()
 
 class LoginFrame(Frame):
 	def __init__(self, master):
-		"""
-		init login frame
-		"""
+		""" init login frame """
 		super().__init__(master)
 
 		master.title("Login")
