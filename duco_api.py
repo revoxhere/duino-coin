@@ -41,11 +41,7 @@ def GetDucoPrice():
 class api_actions():
 
     def __init__(self):
-        """
-        initiate connection with socket server
-
-        This is to initiate the connection with the server
-        """
+        """ initiate connection with socket server """
         with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as self.content:
             self.content = self.content.read().decode().splitlines()
             self.pool_address = self.content[0]
@@ -60,9 +56,7 @@ class api_actions():
 
 
     def register(self, username, password, email, send_email=False):
-        """
-        Register User
-        """
+        """ Register User """
         self.sock.send(bytes(f"REGI,{str(username)},{str(password)},{str(email)}", encoding="utf8"))
         self.register_result = decode_soc(self.sock.recv(128))
         if 'NO' in self.register_result:
