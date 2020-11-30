@@ -8,7 +8,7 @@
 
 from tkinter import Tk, Label, Frame, Entry, StringVar, IntVar, Button, PhotoImage, Listbox, Scrollbar, Checkbutton, Toplevel
 from tkinter.font import Font
-from tkinter import LEFT, BOTH, RIGHT, END, BOTTOM, TOP, N, E, S, W
+from tkinter import LEFT, BOTH, RIGHT, END, TOP, N, E, S, W
 from webbrowser import open_new_tab
 from urllib.request import urlopen, urlretrieve
 from pathlib import Path
@@ -197,7 +197,7 @@ class LoginFrame(Frame):
 		register.configure(background = backgroundColor)
 
 		textFont2 = Font(register, size=12,weight="bold")
-		textFont3 = Font(register, size=14,weight="bold")
+		# textFont3 = Font(register, size=14,weight="bold")
 		textFont = Font(register, size=12,weight="normal")
 
 		duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
@@ -309,7 +309,7 @@ def openTransactions(handler):
 	transactionsWindow.configure(background = backgroundColor)
 	transactionsWindow.transient([root])
 
-	textFont2 = Font(transactionsWindow, size=12,weight="bold")
+	# textFont2 = Font(transactionsWindow, size=12,weight="bold")
 	textFont3 = Font(transactionsWindow, size=14,weight="bold")
 	textFont = Font(transactionsWindow, size=12,weight="normal")
 
@@ -554,7 +554,7 @@ def openSettings(handler):
 
 
 		textFont2 = Font(changepassWindow, size=12,weight="bold")
-		textFont3 = Font(changepassWindow, size=14,weight="bold")
+		# textFont3 = Font(changepassWindow, size=14,weight="bold")
 		textFont = Font(changepassWindow, size=12,weight="normal")
 
 		Label(changepassWindow, text="OLD PASSWORD",
@@ -746,15 +746,16 @@ def sendFunds(handler):
 	response = soc.recv(128).decode()
 	soc.close()
 
-	transactionstatus.set(response)
+	# transactionstatus.set(response)
 	root.update()
 	sleep(3.5)
-	transactionstatus.set("")
+	# transactionstatus.set("")
 	root.update()
 
 class Wallet:
 	def __init__(self, master):
-		global recipient, amount, transactionstatus, balancetext
+		global recipient, amount, balancetext
+		# global transactionstatus
 		global sessionprofittext, minuteprofittext, hourlyprofittext,dailyprofittext
 		global balanceusdtext, ducopricetext
 		global transactionstext
@@ -888,11 +889,11 @@ class Wallet:
 		sendLabel.bind("<Enter>", changeDucoColor)
 		sendLabel.bind("<Leave>", changeDucoColor2)
 
-		transactionstatus = StringVar()
-		transactionLabel = Label(master, textvariable=transactionstatus,
-			font=textFont,
-			background=backgroundColor,
-			foreground=foregroundColor).place(relx=.15, rely=.435)
+		# transactionstatus = StringVar()
+		# transactionLabel = Label(master, textvariable=transactionstatus,
+		# 	font=textFont,
+		# 	background=backgroundColor,
+		# 	foreground=foregroundColor).place(relx=.15, rely=.435)
 
 		Label(master, text="PROFIT",
 			background="#feeeda",
