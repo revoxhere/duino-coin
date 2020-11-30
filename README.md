@@ -208,14 +208,21 @@ Hashrate Calculators for AVR/ESP platforms are available in the [Useful tools br
 *   **Lead developers:**
     *   [@revox](https://github.com/revoxhere/) - [YouTube](https://youtube.com/c/reVox96) - robik123.345@gmail.com
     *   [@Bilaboz](https://github.com/bilaboz/)
+
 *   **Developers:**
     *   [@kyngs](https://github.com/kyngs)
+
 *   **Contributors:**
     *   [@connorhess](https://github.com/connorhess)
+
     *   [@httsmvkcom](https://github.com/httsmvkcom)
+
     *   [@Nosh-Ware](https://github.com/Nosh-Ware)
+
     *   [@IdotMaster1](https://github.com/IdotMaster1)
+
     *   [@JoyBed](https://github.com/JoyBed)
+
     *   [@Furim](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
 
 <h2 align="center">Special thanks</h2><br>
