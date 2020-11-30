@@ -43,7 +43,7 @@ class api_actions():
 
     def __init__(self):
         """
-        initiate connection
+        initiate connection with socket server
         """
         with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as self.content:
             self.content = self.content.read().decode().splitlines()
