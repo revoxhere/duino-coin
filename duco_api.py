@@ -42,10 +42,11 @@ class api_actions():
 
     def __init__(self):
         """
-        Initiate connection with socket server
+
+        Initiate connection with socket server.
 
 
-        This is to initiate the connection with the server
+        This is to initiate the connection with the server.
         args: none
         """
         with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as self.content:
