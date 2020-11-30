@@ -44,6 +44,7 @@ class api_actions():
         """
         Initiate connection with socket server
 
+
         This is to initiate the connection with the server
         args: none
         """
@@ -61,7 +62,6 @@ class api_actions():
 
 
     def register(self, username, password, email, send_email=False):
-        """Register User"""
         self.sock.send(bytes(f"REGI,{str(username)},{str(password)},{str(email)}", encoding="utf8"))
         self.register_result = decode_soc(self.sock.recv(128))
         if 'NO' in self.register_result:
@@ -69,7 +69,6 @@ class api_actions():
         return self.register_result
 
     def login(self, username, password):
-        """Login User"""
         self.username = username
         self.password = password
 
@@ -82,11 +81,9 @@ class api_actions():
         return self.login_result
 
     def logout(self):
-        """Logout user/close connection"""
         self.sock.close()
 
     def balance(self):
-        """Get user balance"""
         if self.password == None or self.username == None:
             raise Exception("User not logged in")
         self.sock.send(bytes("BALA", encoding="utf8"))
@@ -95,7 +92,6 @@ class api_actions():
 
 
     def transfer(self, recipient_username, amount):
-        """transfer duco from current user to target user"""
         if self.password == None or self.username == None:
             raise Exception("User not logged in")
         self.sock.send(bytes(f"SEND,-,{str(recipient_username)},{str(amount)}", encoding="utf8"))
@@ -103,7 +99,6 @@ class api_actions():
         return self.transfer_response
 
     def reset_pass(self, old_password, new_password):
-        """resets current user's password"""
         if self.password == None or self.username == None:
             raise Exception("User not logged in")
         self.sock.send(bytes(f"CHGP,{str(old_password)},{str(new_password)}", encoding="utf8"))
@@ -111,6 +106,5 @@ class api_actions():
         return self.reset_password_response
 
     def close(self):
-        """closes the connection"""
         self.sock.close()
 
