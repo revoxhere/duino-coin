@@ -16,7 +16,7 @@ import socket, sys
 from threading import Timer
 from PIL import Image, ImageTk
 from time import sleep
-from os import _exit, mkdir, execl, remove
+from os import _exit, mkdir, execl
 import datetime
 from tkinter import messagebox
 from base64 import b64encode, b64decode
