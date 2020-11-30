@@ -43,7 +43,7 @@ Technical specifications:
 *   Block time: Instant ⚡
 *   Ticker: DUCO (ᕲ)
 *   Algorithms: DUCO-S1, DUCO-S1A
-*   Original [Kolka system](https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png) helping reward miners fairly 
+*   Original [Kolka system](https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png) helping reward miners fairly
 
 <h2 align="center">Get started</h2><br>
 
@@ -117,20 +117,20 @@ import duco_api
 First you need to initialize the connection to the server
 
 ```
-duco_api.init_socket() #returns an instance of the socket connection but also makes it global
+api_connection = duco_api.api_actions() #creates the api connection instance
 ```
 
 The next step is to Login/Register <i>*Note: login and register do not require you to init but they close the connection after use*</i>
 <h4>Login</h4>
 
 ```
-duco_api.login(username="username", password="password")
+api_connection.login(username="username", password="password")
 ```
 
 <h4>Register</h4>
 
 ```
-duco_api.register(username="username", password="password", email="user@example.com")
+api_connection.register(username="username", password="password", email="user@example.com")
 ```
 
 <h3>Functions</h3>
@@ -140,21 +140,21 @@ These functions require user being loged-in.
 Gets the current balance of the logged-in user
 
 ```
-duco_api.balance() # takes no args
+api_connection.balance() # takes no args
 ```
 
 <h4>Transfer</h4>
 Transfers Duco from logged-in user to the specified username
 
 ```
-duco_api.transfer(recipient_username='test_user1', amount=1)
+api_connection.transfer(recipient_username='test_user1', amount=1)
 ```
 
 <h4>reset password</h4>
 Resets the password of the logged-in user
 
 ```
-duco_api.reset_pass(old_password='123', new_password='abc')
+api_connection.reset_pass(old_password='123', new_password='abc')
 ```
 
 <h3>Other Functions</h3>
@@ -172,14 +172,14 @@ duco_api.GetDucoPrice() # access the value by using the global variable <ducofia
 ```
 import duco_api
 
-sock = duco_api.init_socket()
+api_connection = duco_api.api_actions()
 
-duco_api.login(username='YourUsername', password='YourPassword')
+api_connection.login(username='YourUsername', password='YourPassword')
 
-current_balance = duco_api.balance()
+current_balance = api_connection.balance()
 print(current_balance)
 
-sock.close()
+api_connection.close()
 ```
 
 <h2 align="center">License</h2><br>
