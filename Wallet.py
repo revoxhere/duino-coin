@@ -495,7 +495,6 @@ def openStats(handler):
 	statsWindow.configure(background = backgroundColor)
 	statsWindow.transient([root])
 
-	textFont2 = Font(statsWindow, size=12,weight="bold")
 	textFont3 = Font(statsWindow, size=14,weight="bold")
 	textFont = Font(statsWindow, size=12,weight="normal")
 
