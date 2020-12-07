@@ -23,6 +23,7 @@ from base64 import b64encode, b64decode
 from requests import get
 from json import loads
 from configparser import ConfigParser
+import json
 config = ConfigParser()
 resources = "res/"
 backgroundColor = "#FEEEDA"
@@ -272,6 +273,8 @@ if not Path(resources + "settings.png").is_file():
 	urlretrieve('https://i.imgur.com/vQitW9M.png', resources + 'settings.png')
 if not Path(resources + "transactions.png").is_file():
 	urlretrieve('https://i.imgur.com/lR8ZCwA.png', resources + 'transactions.png')
+if not Path(resources + "stats.png").is_file():
+	urlretrieve('https://icons-for-free.com/iconfiles/png/512/STATISTICS-131994911363180250.png', resources + 'stats.png')
 
 with sqlite3.connect(f"{resources}/wallet.db") as con:
 	cur = con.cursor()
@@ -479,6 +482,80 @@ def openCalculator(handler):
 		font = textFont2).grid(row=5, column=0)
 
 	calculatorWindow.mainloop()
+
+def openStats(handler):
+	statsApi = get("https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json", data=None)
+	if statsApi.status_code == 200: #Check for reponse
+		statsApi = (statsApi.json())
+		print(statsApi)
+
+	statsWindow = Toplevel()
+	statsWindow.resizable(False, False)
+	statsWindow.title("Duino-Coin Wallet - Stats")
+	statsWindow.configure(background = backgroundColor)
+	statsWindow.transient([root])
+
+	textFont2 = Font(statsWindow, size=12,weight="bold")
+	textFont3 = Font(statsWindow, size=14,weight="bold")
+	textFont = Font(statsWindow, size=12,weight="normal")
+
+	Label(statsWindow, text="Duco Statistics",
+		background = backgroundColor,
+		foreground = foregroundColor,
+		font = textFont3).grid(row=0, column=0)
+
+	i = 3
+	i2 = 3
+	for key in statsApi.keys():
+		if str(key) == 'Active workers' or str(key) == 'Top 10 richest miners' or str(key) == 'Total supply' or str(key) == 'Full last block hash' or str(key) == 'GitHub API file update count' or str(key) == 'Diff increases per':
+			pass
+		else:
+			if len(statsApi.get(str(key))) > 8:
+				Label(statsWindow, text=f"{key}: {statsApi.get(str(key))}",
+				background = backgroundColor,
+				foreground = foregroundColor,
+				font = textFont).grid(row=i2, column=1, sticky=W)
+				i2 += 1
+			else:
+				Label(statsWindow, text=f"{key}: {statsApi.get(str(key))}",
+				background = backgroundColor,
+				foreground = foregroundColor,
+				font = textFont).grid(row=i, column=0, sticky=W)
+				i += 1
+
+	Active_workers_listbox = Listbox(statsWindow,
+								exportselection=False,
+								background = backgroundColor,
+								foreground = foregroundColor,
+								selectbackground = "#7bed9f",
+								border="0", font=textFont,
+								width="20", height="13")
+	Active_workers_listbox.grid(row=1, column=0, sticky=W)
+	i=0
+	for worker in (statsApi['Active workers']).split(', '):
+		Active_workers_listbox.insert(i, worker)
+		i = i+1
+
+	Active_workers_listbox.select_set(32)
+	Active_workers_listbox.event_generate("<<ListboxSelect>>")
+
+	Top_10_listbox = Listbox(statsWindow,
+								exportselection=False,
+								background = backgroundColor,
+								foreground = foregroundColor,
+								selectbackground = "#7bed9f",
+								border="0", font=textFont,
+								width="33", height="13")
+	Top_10_listbox.grid(row=1, column=1, sticky=W)
+	i=0
+	for rich in (statsApi['Top 10 richest miners']).split(', '):
+		Top_10_listbox.insert(i, rich)
+		i = i+1
+
+	Top_10_listbox.select_set(32)
+	Top_10_listbox.event_generate("<<ListboxSelect>>")
+
+	statsWindow.mainloop()
 
 def openSettings(handler):
 	def _logout():
@@ -838,6 +915,17 @@ class Wallet:
 							image = calculator)
 		calculatorLabel.place(relx=.005, rely=.37)
 		calculatorLabel.bind("<Button>", openCalculator)
+
+		original = Image.open(resources + "stats.png")
+		resized = original.resize((64, 64),Image.ANTIALIAS)
+
+		stats = ImageTk.PhotoImage(resized)
+		stats.image = stats
+		statsLabel =  Label(master,
+							background = "#7bed9f",
+							image = stats)
+		statsLabel.place(relx=.005, rely=.53)
+		statsLabel.bind("<Button>", openStats)
 
 		settings = ImageTk.PhotoImage(Image.open(resources + "settings.png"))
 		settings.image = settings
