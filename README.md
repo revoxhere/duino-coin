@@ -51,7 +51,7 @@ Technical specifications:
 :----------------:|:----------------:
 [<img src="https://media.discordapp.net/attachments/691626288376709140/719828194319925298/WALLET.gif">](https://duinocoin.com/getting-started#register)  |  [<img src="https://media.discordapp.net/attachments/691626288376709140/719828166478266398/MINER.gif">](https://duinocoin.com/getting-started#pc)
 
-Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a>.
+Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website (Clearnet)</a> <a href="http://duinoyliedtvs4zp7wtz2o7uqmv4tfcyvdlclbwr3zbez2hxwolry7ad.onion/">(.Onion).</a>
 
 <h3 align="center">Community-made software</h3><br>
 
