@@ -45,8 +45,6 @@ Technical specifications:
 *   Algorithms: DUCO-S1, DUCO-S1A
 *   Original [Kolka system](https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png) helping reward miners fairly
 
-Note: development by the main developer (revox) is currently paused but will be resumed as soon as possible. Only security fixed will be made if needed. I'm having some difficulties with my own life but I'll do my best to keep everything going.
-
 <h2 align="center">Get started</h2><br>
 
 | Official Wallet | Official Miners |
