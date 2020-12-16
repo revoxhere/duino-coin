@@ -50,7 +50,7 @@ with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/se
 
 def GetDucoPrice():
 	global ducofiat
-	jsonapi = get("http://93.113.207.71/api.json", data = None)
+	jsonapi = get("https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json", data = None)
 	if jsonapi.status_code == 200:
 		content = jsonapi.content.decode()
 		contentjson = loads(content)
