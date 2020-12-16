@@ -28,7 +28,7 @@ def decode_soc_no_utf(rec):
 
 def GetDucoPrice():
     global ducofiat
-    jsonapi = get("http://163.172.179.54/api.json", data = None)
+    jsonapi = get("http://93.113.207.71/api.json", data = None)
     if jsonapi.status_code == 200:
         content = jsonapi.content.decode()
         contentjson = loads(content)
