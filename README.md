@@ -8,7 +8,7 @@
     <img width="80%" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" /></a><br /><br />
   <a href="https://duinocoin.com">
     <img src="https://img.shields.io/badge/duinocoin.com-555555.svg?style=for-the-badge&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAmklEQVQ4T7WUQQ6AIAwEIcaX%2BALj0fdz9gM%2BxMRESQ8ktSllrciZTneX0hg6n8h5Z5pvhD%2Bu26OO17iABaCBPwEJLKFV6ZZ1GQ2HwgqlEg51ATV7GhSyXFPjBpK6UsztdQdqjSDLNYVu4JGWaQjXLh%2BmaRn5eq8ybAGRWfx3sJFNo7lw%2FxStobkcWhlKYJf1ZS1XaggPNpIv3cls33EVXWotfwAAAABJRU5ErkJggg%3D%3D" /></a>
-  <a href="http://93.113.207.71/webwallet.html">
+  <a href="http://51.15.127.80/webwallet.html">
     <img src="https://img.shields.io/badge/Online Wallet-555555.svg?style=for-the-badge" /></a>
   <a href="https://duinocoin.com/whitepaper">
     <img src="https://img.shields.io/badge/whitepaper-555555.svg?style=for-the-badge&logo=Academia" /></a>
@@ -85,7 +85,7 @@ Any contributions you make are greatly appreciated.
 To build your own Duino-Coin apps, here's a list of of commands the master server accepts.
 To start communication however, firstly you need to connect to the server. For now you have two options:
 *   TCP connection (recommended) - server IP and port are now static (but can change) and can be found [here](https://github.com/revoxhere/duino-coin/blob/gh-pages/serverip.txt)
-*   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static and are `ws://93.113.207.71:15808`
+*   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static and are `ws://51.15.127.80:15808`
 
 After connecting, the server will send version number it's currently on (1.7).
 At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
