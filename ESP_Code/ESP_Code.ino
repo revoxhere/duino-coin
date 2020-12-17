@@ -56,7 +56,7 @@ void blink(int times) {
 }
 
 void loop() {
-  const char * host = "93.113.207.71"; // Static server IP
+  const char * host = "51.15.127.80"; // Static server IP
   const int port = 14808;
   unsigned int acceptedShares = 0; // Shares variables
   unsigned int rejectedShares = 0;
