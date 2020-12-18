@@ -218,12 +218,11 @@ def Connect(): # Connect to pool section
     soc.settimeout(timeout)
   except: # If it wasn't, display a message
     now = datetime.datetime.now()
-    print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Connection error!\nMaster server is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
-    raise
+    print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Connection error! Retrying in 15s.")
     if debug == True:
       raise
     time.sleep(15)
-    os.execl(sys.executable, sys.executable, *sys.argv)
+    Connect()
 
 def checkVersion():
   serverVersion = soc.recv(1024).decode() # Check server version
@@ -351,11 +350,11 @@ if __name__ == '__main__':
       Connect() # Connect to pool
       debugOutput("Connected to master server")
     except:
-      print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error connecting to pool. Check your config file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
+      print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error connecting to the server. Retrying in 15s." + Style.RESET_ALL)
       if debug == True:
         raise
       time.sleep(15)
-      os._exit(1)
+      Connect()
 
     try:
       checkVersion() # Check version
