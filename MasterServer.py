@@ -108,6 +108,7 @@ def getLeaders():
         for row in datab.fetchall():
             leadersdata.append(f"{round((row[3]), 4)} DUCO - {row[0]}")
     return(leadersdata[:10])
+  
 def API():
     while True:
         with sqlite3.connect(blockchain) as blockconn:
@@ -130,7 +131,7 @@ def API():
                 "Server version":        float(serverVersion),
                 "Active connections":    int(connectedUsers),
                 "Last update":           str(now.strftime("%d/%m/%Y %H:%M (UTC)")),
-                "Pool hashrate": str(round(serverHashrate/1000, 2))+" kH/s",
+                "Pool hashrate":         str(round(serverHashrate/1000, 2))+" kH/s",
                 "Duco price":            float(getDucoPrice()), # Call getDucoPrice function
                 "Registered users":      int(getRegisteredUsers()), # Call getRegisteredUsers function
                 "All-time mined DUCO":   float(getMinedDuco()), # Call getMinedDuco function
