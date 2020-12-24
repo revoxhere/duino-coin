@@ -74,13 +74,11 @@ void loop() {
   client.setTimeout(5000);
   String SERVER_VER = client.readString(); // Server sends SERVER_VERSION after connecting
   Serial.println("Connected to the server. Server version: " + String(SERVER_VER));
-  client.print("FROM,ESP Miner," + String(ducouser)); // Metrics for the server
-
   blink(3); // Blink 3 times - indicate sucessfull connection with the server
 
   while (client.connected()) {
     //Serial.println("Asking for a new job for user: " + String(ducouser));
-    client.print("JOBLDIFF," + String(ducouser)); // Ask for new job
+    client.print("JOB," + String(ducouser) + "ESP"); // Ask for new job
 
     String hash = client.readStringUntil(','); // Read last block hash
     String job = client.readStringUntil(','); // Read expected hash
