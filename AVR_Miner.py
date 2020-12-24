@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin AVR Miner (v1.7) 
-# https://github.com/revoxhere/duino-coin 
+# Duino-Coin AVR Miner (v1.8)
+# https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2020
 ##########################################
-import socket, threading, time, re, subprocess, platform, getpass, configparser, sys, datetime, os # Import libraries
+import socket, threading, time, re, subprocess, platform, configparser, sys, datetime, os # Import libraries
 from pathlib import Path
 from signal import signal, SIGINT
 
@@ -42,7 +42,7 @@ except:
   os._exit(1)
 
 # Global variables
-VER = "1.7" # Version number
+VER = "1.8" # Version number
 timeout = 5 # Socket timeout
 resources = "AVRMiner_"+str(VER)+"_resources"
 
@@ -75,7 +75,7 @@ def title(title):
   else:
     print('\33]0;'+title+'\a', end='')
     sys.stdout.flush()
-        
+
 def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
   now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "\n%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " SIGINT detected - Exiting gracefully." + Style.NORMAL + Fore.WHITE + " See you soon!")
@@ -250,7 +250,7 @@ def checkVersion():
     else:
       now = datetime.datetime.now()
       cont = input(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Miner is outdated (v"+VER+")," + Style.RESET_ALL + Fore.RED + " server is on v"+SERVER_VER+", please download latest version from https://github.com/revoxhere/duino-coin/releases/ or type \'continue\' if you wish to continue anyway.\n")
-      if cont != "continue": 
+      if cont != "continue":
         os._exit(1)
     
   except:
@@ -263,43 +263,29 @@ def ConnectToAVR():
 def AVRMine(): # Mining section
   global donationlevel, donatorrunning
   
-  if os.name == 'nt':
-    debugOutput("OS is Windows, displaying donation message")
-    if int(donationlevel) > 0:
-      now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Thank You for being an awesome donator! <3")
-    else:
-      now = datetime.datetime.now()
-      print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Duino-Coin network is a completely free service and will always be." + Style.BRIGHT + Fore.YELLOW + "\n  You can help us maintain the server and low-fee payouts by donating.\n  Visit " + Style.RESET_ALL + Fore.GREEN + "https://revoxhere.github.io/duino-coin/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more.")
-
-    if not donatorrunning: # Check wheter donation was already started
-      if int(donationlevel) == int(5):  # Check donationlevel and if it's more than 0 launch Magi Miner as donation
-          cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://eu.npc-mining.net:3002 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p c=XMG -e 100 -s 4"
-      if int(donationlevel) == int(4):
-          cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://eu.npc-mining.net:3002 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p c=XMG -e 70 -s 4"
-      if int(donationlevel) == int(3):
-          cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://eu.npc-mining.net:3002 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p c=XMG -e 50 -s 4"
-      if int(donationlevel) == int(2):
-          cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://eu.npc-mining.net:3002 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p c=XMG -e 35 -s 4"
-      if int(donationlevel) == int(1):
-          cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://eu.npc-mining.net:3002 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p c=XMG -e 20 -s 4"
-      if int(donationlevel) == int(0):
-          cmd = ""
-      try:  # Start cmd set above
-        debugOutput("Starting donation process")
-        subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL) # Open command
-        donatorrunning = True
-      except:
-        if debug == True:
-          raise
-
+if os.name == 'nt' and donatorrunning == False:
+  cmd = str(resources) + "/Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -o revox.donate -p x -e "
+  if int(donationlevel) == 5: cmd += "100"
+  elif int(donationlevel) == 4: cmd += "75"
+  elif int(donationlevel) == 3: cmd += "50"
+  elif int(donationlevel) == 2: cmd += "25"
+  elif int(donationlevel) == 1: cmd += "10"
+  if int(donationlevel) > 0: # Launch CMD as subprocess
+    debugOutput("Starting donation process")
+    donatorrunning = True
+    subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL)
+    now = datetime.datetime.now()
+    print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Thank You for being an awesome donator! <3")
+  else:
+    now = datetime.datetime.now()
+    print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Duino-Coin network is a completely free service and will always be." + Style.BRIGHT + Fore.YELLOW + "\n  You can help us maintain the server and low-fee payouts by donating.\n  Visit " + Style.RESET_ALL + Fore.GREEN + "https://duinocoin.com/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more.")
+  
   now = datetime.datetime.now()
   print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " AVR mining thread is starting" + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1A algorithm, please wait...")
-  
   ready = com.readline().decode().rstrip().lstrip() # AVR will send ready signal
   debugOutput("Received start word ("+str(ready)+")")
   while True:
-    soc.send(bytes("JOBAVR,"+str(username),encoding="utf8")) # Send job request to server
+    soc.send(bytes("JOB,"+str(username)+",AVR",encoding="utf8")) # Send job request to server
     job = soc.recv(1024).decode().split(",") # Split received job
     debugOutput("Job received: " + str(job[0]))
 
@@ -316,7 +302,7 @@ def AVRMine(): # Mining section
     result = result.split(",")
     debugOutput("Received result ("+str(result[0])+")")
     debugOutput("Received time ("+str(result[1])+")")
-    soc.send(bytes(str(result[0]), encoding="utf8")) # Send result of hashing algorithm to pool
+    soc.send(bytes(str(result[0])+",150,Official AVR Miner v"+str(VER), encoding="utf8")) # Send result of hashing algorithm to pool
 
     while True:
       feedback = soc.recv(1024).decode() # Get feedback
