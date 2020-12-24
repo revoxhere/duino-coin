@@ -274,7 +274,7 @@ if not Path(resources + "settings.png").is_file():
 if not Path(resources + "transactions.png").is_file():
 	urlretrieve('https://i.imgur.com/lR8ZCwA.png', resources + 'transactions.png')
 if not Path(resources + "stats.png").is_file():
-	urlretrieve('https://icons-for-free.com/iconfiles/png/512/STATISTICS-131994911363180250.png', resources + 'stats.png')
+	urlretrieve('https://i.imgur.com/YCEBVXX.png', resources + 'stats.png')
 
 with sqlite3.connect(f"{resources}/wallet.db") as con:
 	cur = con.cursor()
@@ -601,7 +601,6 @@ def openSettings(handler):
 						else:
 							messagebox.showinfo(title="Password changed", message=response)
 							try:
-								# remove(resources + "userdata.bin")
 								try:
 									with sqlite3.connect(f"{resources}/wallet.db") as con:
 										cur = con.cursor()
