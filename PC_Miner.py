@@ -63,7 +63,7 @@ except:
     pass
 
 def debugOutput(text):
-  if debug == True:
+  #if debug == True:
     now = datetime.datetime.now()
     print(now.strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
 
@@ -230,7 +230,6 @@ def checkVersion():
   if float(serverVersion) <= float(minerVersion) and len(serverVersion) == 3: # If miner is up-to-date, display a message and continue
     now = datetime.datetime.now()
     print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.YELLOW + " Connected" + Style.RESET_ALL + Fore.WHITE + " to master Duino-Coin server (v"+str(serverVersion)+")")
-    soc.send(bytes(f"FROM,Python Miner,{str(username)},{str(platform)}", encoding="utf8")) # Send metrics to server about client
   else:
     now = datetime.datetime.now()
     cont = input(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.RED + " Miner is outdated (v"+minerVersion+")," + Style.RESET_ALL + Fore.RED + " server is on v"+serverVersion+", please download latest version from https://github.com/revoxhere/duino-coin/releases/ or type \'continue\' if you wish to continue anyway.\n")
@@ -240,6 +239,7 @@ def checkVersion():
 def Mine(): # Mining section
   global last_hash_count, hash_count, khash_count, donationlevel, donatorrunning, efficiency
   if os.name == 'nt' and donatorrunning == False:
+    cmd = str(resources) + "/Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -o revox.donate -p x -e "
     if int(donationlevel) == 5: cmd += "100"
     elif int(donationlevel) == 4: cmd += "75"
     elif int(donationlevel) == 3: cmd += "50"
@@ -278,7 +278,7 @@ def Mine(): # Mining section
         computestop = datetime.datetime.now()
         while True:
           try:
-            soc.send(bytes(f"{str(ducos1res)},{str(last_hash_count)}", encoding="utf8")) # Send result of hashing algorithm to pool
+            soc.send(bytes(f"{str(ducos1res)},{str(khash_count*1000)},Official Python Miner v{str(minerVersion)}", encoding="utf8")) # Send result of hashing algorithm to pool
             feedback = soc.recv(1024).decode() # Get feedback
             debugOutput("Feedback received: " + str(feedback))
           except socket.timeout:
