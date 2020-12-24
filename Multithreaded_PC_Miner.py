@@ -95,7 +95,7 @@ def start_thread(arr, i, username, accepted_shares, bad_shares, thread_number):
                 hash_count = hash_count + 1
                 ducos1 = hashlib.sha1(str(job[0] + str(result)).encode("utf-8")).hexdigest()
                 if job[1] == ducos1:
-                    soc.send(bytes(str(result) + "," + str(last_hash_count), encoding="utf8"))
+                    soc.send(bytes(str(result) + "," + str(last_hash_count) + ",Multithreaded Miner v1.7", encoding="utf8"))
                     feedback = soc.recv(1024).decode()
                     arr[i] = khash_count
                     if feedback == "GOOD" or feedback == "BLOCK":
@@ -133,9 +133,7 @@ def getBalance():
         print("Error logging in - check account credentials!")
         soc.close()
         os._exit(1)
-    else:
-        soc.send(bytes("FROM,Multithreaded PC Miner,"+str(username), encoding="utf8")) # Metrics
-
+        
     soc.send(bytes("BALA", encoding="utf8"))
     balance = soc.recv(1024).decode()
     soc.close()
