@@ -50,11 +50,11 @@ with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/se
 
 def GetDucoPrice():
 	global ducofiat
-	jsonapi = get("http://51.15.127.80/api.json", data = None)
+	jsonapi = get("https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json", data = None)
 	if jsonapi.status_code == 200:
 		content = jsonapi.content.decode()
 		contentjson = loads(content)
-		ducofiat = round(float(contentjson["Duco price"]), 6)
+		ducofiat = round(float(contentjson["Duco price"]), 4)
 	else:
 		ducofiat = .003
 	Timer(15, GetDucoPrice).start()
@@ -62,17 +62,14 @@ GetDucoPrice()
 
 class LoginFrame(Frame):
 	def __init__(self, master):
-		""" init login frame """
 		super().__init__(master)
 
 		master.title("Login")
 		master.resizable(False, False)
-		#master.geometry("220x350")
 		master.configure(background = backgroundColor)
 		self.configure(background = backgroundColor)
 
 		textFont2 = Font(size=12,weight="bold")
-		# textFont3 = Font(size=14,weight="bold")
 		textFont = Font(size=12,weight="normal")
 
 		self.duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
@@ -337,10 +334,8 @@ def openTransactions(handler):
 		cur = con.cursor()
 		cur.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
 		Transactions = cur.fetchall()
-	# transactionstext_format = ''
 	for i, row in enumerate(Transactions, start=1):
 		listbox.insert(END, f"{str(row[1])}  {row[2]} DUCO\n")
-
 
 	listbox.config(highlightcolor = backgroundColor,
 				selectbackground = "#f39c12", bd = 0,
@@ -391,7 +386,6 @@ def openCalculator(handler):
 		exchangerates["rates"]["DUCO"] = float(ducofiat)
 
 	calculatorWindow = Toplevel()
-	#calculatorWindow.geometry("420x420")
 	calculatorWindow.resizable(False, False)
 	calculatorWindow.title("Duino-Coin Wallet - Calculator")
 	calculatorWindow.configure(background = backgroundColor)
@@ -503,25 +497,6 @@ def openStats(handler):
 		foreground = foregroundColor,
 		font = textFont3).grid(row=0, column=0)
 
-	i = 3
-	i2 = 3
-	for key in statsApi.keys():
-		if str(key) == 'Active workers' or str(key) == 'Top 10 richest miners' or str(key) == 'Total supply' or str(key) == 'Full last block hash' or str(key) == 'GitHub API file update count' or str(key) == 'Diff increases per':
-			pass
-		else:
-			if len(statsApi.get(str(key))) > 8:
-				Label(statsWindow, text=f"{key}: {statsApi.get(str(key))}",
-				background = backgroundColor,
-				foreground = foregroundColor,
-				font = textFont).grid(row=i2, column=1, sticky=W)
-				i2 += 1
-			else:
-				Label(statsWindow, text=f"{key}: {statsApi.get(str(key))}",
-				background = backgroundColor,
-				foreground = foregroundColor,
-				font = textFont).grid(row=i, column=0, sticky=W)
-				i += 1
-
 	Active_workers_listbox = Listbox(statsWindow,
 								exportselection=False,
 								background = backgroundColor,
@@ -531,9 +506,9 @@ def openStats(handler):
 								width="20", height="13")
 	Active_workers_listbox.grid(row=1, column=0, sticky=W)
 	i=0
-	for worker in (statsApi['Active workers']).split(', '):
+	for worker in statsApi['Active workers']:
 		Active_workers_listbox.insert(i, worker)
-		i = i+1
+		i += 1
 
 	Active_workers_listbox.select_set(32)
 	Active_workers_listbox.event_generate("<<ListboxSelect>>")
@@ -547,9 +522,9 @@ def openStats(handler):
 								width="33", height="13")
 	Top_10_listbox.grid(row=1, column=1, sticky=W)
 	i=0
-	for rich in (statsApi['Top 10 richest miners']).split(', '):
-		Top_10_listbox.insert(i, rich)
-		i = i+1
+	for rich in statsApi['Top 10 richest miners']:
+		Top_10_listbox.insert(i, statsApi['Top 10 richest miners'][i])
+		i += 1
 
 	Top_10_listbox.select_set(32)
 	Top_10_listbox.event_generate("<<ListboxSelect>>")
@@ -565,14 +540,12 @@ def openSettings(handler):
 				con.commit()
 		except Exception as e:
 			print(e)
-		# remove(resources + "userdata.bin")
 		try:
 			execl(sys.executable, sys.executable, *sys.argv)
 		except Exception as e:
 			print(e)
 
 	def _cleartrs():
-		# open(resources + "transactions.bin", "w+")
 		with sqlite3.connect(f"{resources}/wallet.db") as con:
 			cur = con.cursor()
 			cur.execute('DELETE FROM transactions')
@@ -630,7 +603,6 @@ def openSettings(handler):
 
 
 		textFont2 = Font(changepassWindow, size=12,weight="bold")
-		# textFont3 = Font(changepassWindow, size=14,weight="bold")
 		textFont = Font(changepassWindow, size=12,weight="normal")
 
 		Label(changepassWindow, text="OLD PASSWORD",
@@ -744,18 +716,6 @@ def updateBalanceLabel():
 	try:
 		balancetext.set(str(getBalance()))
 		balanceusdtext.set("$"+str(round(getBalance()*ducofiat, 6)))
-
-		# with open(resources + "transactions.bin", "r") as transactionsFile:
-		# 	transactionsFileContent = transactionsFile.read().splitlines()
-		# try:
-		# 	transactionstext.set(transactionsFileContent[0] +"\n"
-		# 						+ transactionsFileContent[1] +"\n"
-		# 						+ transactionsFileContent[2] +"\n"
-		# 						+ transactionsFileContent[3] +"\n"
-		# 						+ transactionsFileContent[4] +"\n"
-		# 						+ transactionsFileContent[5])
-		# except IndexError:
-		# 	transactionstext.set("No local transactions yet")
 
 		with sqlite3.connect(f"{resources}/wallet.db") as con:
 			cur = con.cursor()
