@@ -99,10 +99,11 @@ If registration fails, server will send `NO,Reason of failed registration`.
 After loging-in you have access to the following commands:
 *   `BALA` - Server will return balance of current user
 *   `JOB` - Server will return job for mining - you can also use `JOB,username` to mine without loging-in
+    *   When sending result, you can pass hashrate count and miner name to display in the API, e.g.(6801,250000,My Cool Miner v4.20) indicates that result 6801 was found, hashrate was 250000H/S (250kH/s) and software name was My Cool Miner v4.20
+        *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
+        *   If software name is not received, server uses `"Software": "Unknown"` in the API
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
 *   `CHGP,oldPassword,newPassword` - Change password of current user
-*   `FROM,Program Name,username,Other info` - Send metrics data to the server
-*   `STAT` - Server will return rank and e-mail of the user
 
 <h2 align="center">Python DUCO API module</h2><br>
 
