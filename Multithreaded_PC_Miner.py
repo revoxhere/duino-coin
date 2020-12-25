@@ -241,6 +241,8 @@ if __name__ == '__main__':
     username = str(sys.argv[1])
     password = str(sys.argv[2])
     thread_number = int(sys.argv[3])
+    if thread_number > 8:
+        print("Notice: you're launching a miner with 8+ threads, values this high may not add anything to your efficiency but are spamming our small server.\nIf you don't want to contribute in making server go offline then please set this number a bit lower.\nThanks in advance")
     print(f"Miner for user {username} started with {thread_number} threads")
 
     hashrate_array = multiprocessing.Array("d", thread_number)
