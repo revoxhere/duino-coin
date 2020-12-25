@@ -25,7 +25,10 @@ const char* ducouser = "DUCO USERNAME HERE"; // Change this to your Duino-Coin u
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
-#include <Hash.h> // Include crypto library
+#include <ESP8266mDNS.h> // OTA libraries
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+#include <Hash.h> // SHA1 crypto library
 
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Define built-in led as output
@@ -40,6 +43,26 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
+  
+  ArduinoOTA.onStart([]() { // Prepare OTA stuff
+    Serial.println("Start");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+  ArduinoOTA.begin();
+  
   Serial.println("\nConnected to WiFi!");
   Serial.println("Local IP address: " + WiFi.localIP().toString());
   blink(2); // Blink 2 times - indicate sucessfull connection with wifi network
@@ -56,6 +79,7 @@ void blink(int times) {
 }
 
 void loop() {
+  ArduinoOTA.handle(); // Enable OTA handler
   const char * host = "51.15.127.80"; // Static server IP
   const int port = 14808;
   unsigned int acceptedShares = 0; // Shares variables
