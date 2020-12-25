@@ -56,6 +56,7 @@ Official getting started guides for creating an account and setting up miners on
 <h3 align="center">Community-made software</h3><br>
 
 **Miners:**
+*   [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch
 *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) by phantom32
 *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
 *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners) by various authors
