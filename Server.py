@@ -131,13 +131,13 @@ def API():
                 hashrate = lista[1]
                 serverHashrate += float(hashrate) # Add user hashrate to the server hashrate
         if serverHashrate >= 1000:
-            prefix = "kH/s"
+            prefix = " kH/s"
             serverHashrate = serverHashrate / 1000
         elif serverHashrate >= 1000000:
-            prefix = "MH/s"
+            prefix = " MH/s"
             serverHashrate = serverHashrate / 1000000
         else:
-            prefix = "H/s"
+            prefix = " H/s"
         formattedMinerApi = { # Prepare server API data
                 "Server version":        float(serverVersion),
                 "Active connections":    int(connectedUsers.value),
