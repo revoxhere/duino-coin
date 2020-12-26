@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards v1.7
+//  Code for ESP8266 boards v1.8
 //  © Duino-Coin Community 2019-2020
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -19,9 +19,9 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-const char* ssid     = "WIFI NAME HERE"; // Change this to your WiFi SSID
-const char* password = "WIFI PASSWORD HERE"; // Change this to your WiFi password
-const char* ducouser = "DUCO USERNAME HERE"; // Change this to your Duino-Coin username
+const char* ssid     = "Dom"; // Change this to your WiFi SSID
+const char* password = "07251498"; // Change this to your WiFi password
+const char* ducouser = "revox"; // Change this to your Duino-Coin username
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
@@ -33,7 +33,7 @@ const char* ducouser = "DUCO USERNAME HERE"; // Change this to your Duino-Coin u
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Define built-in led as output
   Serial.begin(115200); // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP Miner v1.7");
+  Serial.println("\n\nDuino-Coin ESP Miner v1.8");
 
   Serial.println("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
@@ -43,7 +43,7 @@ void setup() {
     delay(500);
     Serial.print(".");
   }
-  
+
   ArduinoOTA.onStart([]() { // Prepare OTA stuff
     Serial.println("Start");
   });
@@ -62,7 +62,7 @@ void setup() {
     else if (error == OTA_END_ERROR) Serial.println("End Failed");
   });
   ArduinoOTA.begin();
-  
+
   Serial.println("\nConnected to WiFi!");
   Serial.println("Local IP address: " + WiFi.localIP().toString());
   blink(2); // Blink 2 times - indicate sucessfull connection with wifi network
@@ -81,7 +81,7 @@ void blink(int times) {
 void loop() {
   ArduinoOTA.handle(); // Enable OTA handler
   const char * host = "51.15.127.80"; // Static server IP
-  const int port = 14808;
+  const int port = 2811;
   unsigned int acceptedShares = 0; // Shares variables
   unsigned int rejectedShares = 0;
 
@@ -101,16 +101,18 @@ void loop() {
   blink(3); // Blink 3 times - indicate sucessfull connection with the server
 
   while (client.connected()) {
-    //Serial.println("Asking for a new job for user: " + String(ducouser));
-    client.print("JOB," + String(ducouser) + "ESP"); // Ask for new job
+    ArduinoOTA.handle(); // Enable OTA handler
+    Serial.println("Asking for a new job for user: " + String(ducouser));
+    client.print("JOB," + String(ducouser) + ",ESP"); // Ask for new job
 
     String hash = client.readStringUntil(','); // Read last block hash
     String job = client.readStringUntil(','); // Read expected hash
     unsigned int diff =  (1500) * 100 + 1; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
-    //Serial.println("Job received: " + String(hash) + " " + String(job));
+    Serial.println("Job received: " + String(hash) + " " + String(job) + " " + String(diff));
 
     for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
-      //yield(); // uncomment if ESP watchdog triggers
+      ArduinoOTA.handle(); // Enable OTA handler
+      yield(); // uncomment if ESP watchdog triggers
       String result = sha1(String(hash) + String(iJob)); // Hash previous block hash and current iJob
       if (result == job) { // If result is found
         client.print(iJob); // Send result to server
