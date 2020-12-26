@@ -38,7 +38,6 @@ except:
 minerVersion = "1.8" # Version number
 timeout = 5 # Socket timeout
 resources = "PCMiner_"+str(minerVersion)+"_resources"
-
 shares = [0, 0]
 diff = 0
 last_hash_count = 0
@@ -46,13 +45,11 @@ khash_count = 0
 hash_count = 0
 hash_mean = []
 donatorrunning = False
-debug = True
-
+debug = False
 serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
 autorestart = 0
 donationlevel = 0
-
 platform = str(platform.system()) + " " + str(platform.release()) # Platform information
 freeze_support() # If not used, pyinstaller hangs when checking cpuinfo
 cpu = cpuinfo.get_cpu_info() # Processor info
@@ -63,7 +60,7 @@ except:
     pass
 
 def debugOutput(text):
-  #if debug == True:
+  if debug == "True":
     now = datetime.datetime.now()
     print(now.strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
 
@@ -80,8 +77,7 @@ def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE 
   try:
     soc.send(bytes("CLOSE", encoding="utf8")) # Try sending a close connection request to the server
   except:
-    if debug == True:
-      raise
+    if debug == "True": raise
   os._exit(0)
 
 signal(SIGINT, handler) # Enable signal handler
@@ -114,8 +110,7 @@ def Greeting(): # Greeting message depending on time
   try:
     print(" > " + Fore.WHITE + "CPU: " + Style.BRIGHT + Fore.YELLOW + str(cpu["brand_raw"]))
   except:
-    if debug == True:
-      raise
+    if debug == "True": raise
   if os.name == 'nt':
     print(" > " + Fore.WHITE + "Donation level: " +  Style.BRIGHT + Fore.YELLOW + str(donationlevel))
   print(" > " + Fore.WHITE + "Algorithm: " + Style.BRIGHT + Fore.YELLOW + "DUCO-S1")
@@ -192,6 +187,7 @@ def loadConfig(): # Config loading section
     config.read(str(resources) + "/Miner_config.cfg")
     username = config["miner"]["username"]
     efficiency = config["miner"]["efficiency"]
+    efficiency = (100 - float(efficiency)) * 0.01 # Calulate efficiency for use with sleep function
     autorestart = config["miner"]["autorestart"]
     donationlevel = config["miner"]["donate"]
     debug = config["miner"]["debug"]
@@ -219,8 +215,7 @@ def Connect(): # Connect to pool section
   except: # If it wasn't, display a message
     now = datetime.datetime.now()
     print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Connection error! Retrying in 15s.")
-    if debug == True:
-      raise
+    if debug == "True": raise
     time.sleep(15)
     Connect()
 
@@ -256,8 +251,7 @@ def Mine(): # Mining section
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Duino-Coin network is a completely free service and will always be." + Style.BRIGHT + Fore.YELLOW + "\n  You can help us maintain the server and low-fee payouts by donating.\n  Visit " + Style.RESET_ALL + Fore.GREEN + "https://duinocoin.com/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more.")
 
   now = datetime.datetime.now()
-  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Mining thread is starting" + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1 algorithm with " + Fore.YELLOW +  str(efficiency) + "% efficiency")
-  efficiency = (100 - float(efficiency)) * 0.01 # Calulate efficiency for use in sleep function
+  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Mining thread is starting" + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1 algorithm with " + Fore.YELLOW +  str(100-(100*efficiency)) + "% efficiency")
   while True:
     if float(efficiency) < 100: time.sleep(float(efficiency)) # Sleep to achieve lower efficiency if less than 100 selected
     while True:
@@ -305,6 +299,12 @@ def Mine(): # Mining section
             time.sleep(15)
             os._exit(1)
 
+          elif feedback == "ERR": # If this user doesn't exist server will forward earnings to developer account
+            now = datetime.datetime.now()
+            print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net " + Back.RESET + Fore.RED + " Internal server error." + Style.RESET_ALL + Fore.RED + " Retrying in 15s.")
+            time.sleep(15)
+            Connect()
+
           else: # If result was bad
             shares[1] += 1 # Share rejected = increment bad shares counter by 1
             title("Duino-Coin Python Miner (v"+str(minerVersion)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
@@ -321,16 +321,14 @@ if __name__ == '__main__':
     debugOutput("Config file loaded")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error loading the configfile (Miner_config.cfg). Try removing it and re-running configuration. Exiting in 15s."  + Style.RESET_ALL)
-    if debug == True:
-      raise
+    if debug == "True": raise
     time.sleep(15)
     os._exit(1)
   try:
     Greeting() # Display greeting message
     debugOutput("Greeting displayed")
   except:
-    if debug == True:
-      raise
+    if debug == "True": raise
 
   while True:
     try: # Setup autorestarter
@@ -341,8 +339,7 @@ if __name__ == '__main__':
         debugOutput("Autorestarted is disabled")
     except:
       print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
-      if debug == True:
-        raise
+      if debug == "True": raise
       time.sleep(15)
       os._exit(1)
 
@@ -351,8 +348,7 @@ if __name__ == '__main__':
       debugOutput("Connected to master server")
     except:
       print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error connecting to the server. Retrying in 15s." + Style.RESET_ALL)
-      if debug == True:
-        raise
+      if debug == "True": raise
       time.sleep(15)
       Connect()
 
@@ -361,8 +357,7 @@ if __name__ == '__main__':
       debugOutput("Version check complete")
     except:
       print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error checking server version. Restarting." + Style.RESET_ALL)
-      if debug == True:
-        raise
+      if debug == "True": raise
       Connect()
 
     try:
@@ -371,8 +366,7 @@ if __name__ == '__main__':
       debugOutput("Mining ended")
     except:
       print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining. Restarting." + Style.RESET_ALL)
-      if debug == True:
-       raise
+      if debug == "True": raise
       Connect()
     time.sleep(0.025) # Restart
     debugOutput("Restarting")
