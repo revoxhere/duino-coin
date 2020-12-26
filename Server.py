@@ -15,8 +15,8 @@ host = "" # Server will use this as hostname to bind to (localhost on Windows, 0
 port = 2811 # Server will listen on this port - 2811 for official Duino-Coin server (14808 for old one)
 serverVersion = 1.7 # Server version which will be sent to the clients
 diff_incrase_per = 2000 # Difficulty will increase every x blocks (official server uses 5k)
-duco_email = "duino.coin@gmail.com" # E-mail and password to send registration mail from
-duco_password = "thisisaduinocoinstrongpassword123"
+duco_email = "xxx" # E-mail and password to send registration mail from
+duco_password = "xxx"
 # Registration email - text version
 text = """\
 Hi there!
