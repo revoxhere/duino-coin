@@ -19,9 +19,9 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-const char* ssid     = "Dom"; // Change this to your WiFi SSID
-const char* password = "07251498"; // Change this to your WiFi password
-const char* ducouser = "revox"; // Change this to your Duino-Coin username
+const char* ssid     = "Wifi Name Here"; // Change this to your WiFi SSID
+const char* password = "Wifi Password Here"; // Change this to your WiFi password
+const char* ducouser = "DuinoCoin Username Here"; // Change this to your Duino-Coin username
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
