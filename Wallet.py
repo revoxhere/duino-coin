@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin GUI Wallet (v1.7)
+# Duino-Coin GUI Wallet (v1.8)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -492,7 +492,7 @@ def openStats(handler):
 	textFont3 = Font(statsWindow, size=14,weight="bold")
 	textFont = Font(statsWindow, size=12,weight="normal")
 
-	Label(statsWindow, text="Duco Statistics",
+	Label(statsWindow, text="Duco Statistics - WIP",
 		background = backgroundColor,
 		foreground = foregroundColor,
 		font = textFont3).grid(row=0, column=0)
@@ -916,7 +916,7 @@ class Wallet:
 
 		amount = Entry(master,background = "#87ebff", foreground=foregroundColor, border="0", font=textFont, width="20")
 		amount.place(relx=.1525, rely= .375)
-		amount.insert("0", "1.7")
+		amount.insert("0", "1.8")
 		amount.bind("<FocusIn>", clear_amount_placeholder)
 
 		def changeDucoColor(handler):
