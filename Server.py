@@ -130,12 +130,12 @@ def API():
                 lista = minerapi[x] # Convert list to strings
                 hashrate = lista[1]
                 serverHashrate += float(hashrate) # Add user hashrate to the server hashrate
-        if serverHashrate >= 1000:
-            prefix = " kH/s"
-            serverHashrate = serverHashrate / 1000
-        elif serverHashrate >= 1000000:
+        if serverHashrate >= 1000000:
             prefix = " MH/s"
             serverHashrate = serverHashrate / 1000000
+        elif serverHashrate >= 1000:
+            prefix = " kH/s"
+            serverHashrate = serverHashrate / 1000
         else:
             prefix = " H/s"
         formattedMinerApi = { # Prepare server API data
