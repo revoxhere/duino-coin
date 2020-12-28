@@ -9,30 +9,34 @@ import socket, statistics, threading, time, re, subprocess, hashlib, platform, g
 from pathlib import Path
 from signal import signal, SIGINT
 
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
 try: # Check if cpuinfo is installed
   import cpuinfo
   from multiprocessing import freeze_support
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "Cpuinfo is not installed. Please install it using: python3 -m pip install py-cpuinfo.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
-  time.sleep(15)
-  os._exit(1)
+  print(now.strftime("%H:%M:%S ") + "Cpuinfo is not installed. Miner will try to install it. If it fails, please install it using: python3 -m pip install py-cpuinfo.\nIf you can't install it, use Minimal-PC_Miner.")
+  install("py-cpuinfo")
+  os.execl(sys.executable, sys.executable, *sys.argv)
 
 try: # Check if colorama is installed
   from colorama import init, Fore, Back, Style
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "Colorama is not installed. Please install it using: python3 -m pip install colorama.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
-  time.sleep(15)
-  os._exit(1)
+  print(now.strftime("%H:%M:%S ") + "Colorama is not installed. Miner will try to install it. If it fails, please install it using: python3 -m pip install colorama.\nIf you can't install it, use Minimal-PC_Miner.")
+  install("colorama")
+  os.execl(sys.executable, sys.executable, *sys.argv)
 
 try: # Check if requests is installed
   import requests
 except:
   now = datetime.datetime.now()
-  print(now.strftime("%H:%M:%S ") + "Requests is not installed. Please install it using: python3 -m pip install requests.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
-  time.sleep(15)
-  os._exit(1)
+  print(now.strftime("%H:%M:%S ") + "Requests is not installed. Miner will try to install it. If it fails, please install it using: python3 -m pip install requests.\nIf you can't install it, use Minimal-PC_Miner.")
+  install("requests")
+  os.execl(sys.executable, sys.executable, *sys.argv)
 
 # Global variables
 minerVersion = "1.8" # Version number
@@ -181,6 +185,7 @@ def loadConfig(): # Config loading section
 
     with open(str(resources) + "/Miner_config.cfg", "w") as configfile: # Write data to file
       config.write(configfile)
+    efficiency = (100 - float(efficiency)) * 0.01 # Calulate efficiency for use with sleep function
     print(Style.RESET_ALL + "Config saved! Launching...\n")
 
   else: # If config already exists, load from it
@@ -251,7 +256,7 @@ def Mine(): # Mining section
       print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Duino-Coin network is a completely free service and will always be." + Style.BRIGHT + Fore.YELLOW + "\n  You can help us maintain the server and low-fee payouts by donating.\n  Visit " + Style.RESET_ALL + Fore.GREEN + "https://duinocoin.com/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more.")
 
   now = datetime.datetime.now()
-  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Mining thread is starting" + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1 algorithm with " + Fore.YELLOW +  str(100-(100*efficiency)) + "% efficiency")
+  print(now.strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys " + Back.RESET + Fore.YELLOW + " Mining thread is starting" + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1 algorithm with " + Fore.YELLOW + str(100-(100*int(efficiency))) + "% efficiency")
   while True:
     if float(efficiency) < 100: time.sleep(float(efficiency)) # Sleep to achieve lower efficiency if less than 100 selected
     while True:
@@ -366,7 +371,8 @@ if __name__ == '__main__':
       debugOutput("Mining ended")
     except:
       print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining. Restarting." + Style.RESET_ALL)
-      if debug == "True": raise
+      #if debug == "True": raise
+      raise
       Connect()
     time.sleep(0.025) # Restart
     debugOutput("Restarting")
