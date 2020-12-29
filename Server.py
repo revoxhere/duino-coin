@@ -13,7 +13,7 @@ from email.mime.multipart import MIMEMultipart
 
 host = "" # Server will use this as hostname to bind to (localhost on Windows, 0.0.0.0 on Linux in most cases)
 port = 2811 # Server will listen on this port - 2811 for official Duino-Coin server (14808 for old one)
-serverVersion = 1.7 # Server version which will be sent to the clients
+serverVersion = 1.8 # Server version which will be sent to the clients
 diff_incrase_per = 2000 # Difficulty will increase every x blocks (official server uses 5k)
 duco_email = "xxx" # E-mail and password to send registration mail from
 duco_password = "xxx"
@@ -108,7 +108,7 @@ def getLeaders():
         datab = conn.cursor()
         datab.execute("SELECT * FROM Users ORDER BY balance DESC")
         for row in datab.fetchall():
-            leadersdata.append(f"{round((row[3]), 4)} DUCO - {row[0]}")
+            leadersdata.append(f"{round((float(row[3])), 4)} DUCO - {row[0]}")
     return(leadersdata[:10])
 def API():
     while True:
@@ -126,7 +126,7 @@ def API():
         hashrate = 0
         l = multiprocessing.Lock()
         with l:
-            for x in minerapi: 
+            for x in minerapi.copy(): 
                 lista = minerapi[x] # Convert list to strings
                 hashrate = lista[1]
                 serverHashrate += float(hashrate) # Add user hashrate to the server hashrate
@@ -143,7 +143,7 @@ def API():
                 "Active connections":    int(connectedUsers.value),
                 "Last update":           str(now.strftime("%d/%m/%Y %H:%M (UTC)")),
                 "Pool hashrate":         str(round(serverHashrate, 2))+prefix,
-                "Duco price":            float(round(getDucoPrice(), 4)), # Call getDucoPrice function
+                "Duco price":            float(round(getDucoPrice(), 6)), # Call getDucoPrice function
                 "Registered users":      int(getRegisteredUsers()), # Call getRegisteredUsers function
                 "All-time mined DUCO":   float(round(getMinedDuco(), 2)), # Call getMinedDuco function
                 "Current difficulty":    int(diff),
@@ -155,7 +155,7 @@ def API():
                 "Miners": {}}
         l = multiprocessing.Lock()
         with l:
-            for x in minerapi: # Get data from every miner  
+            for x in minerapi.copy(): # Get data from every miner  
                 lista = minerapi[x] # Convert list to strings
                 user = lista[0]
                 hashrate = lista[1]
@@ -174,7 +174,6 @@ def API():
                 "Rejected":      int(rejectedShares),
                 "Diff":          int(diff),
                 "Software":      str(minerUsed)}
-                serverHashrate += float(hashrate) # Add user hashrate to the server hashrate
         for thread in formattedMinerApi["Miners"]:
             minerList.append(formattedMinerApi["Miners"][thread]["User"]) # Append miners to formattedMinerApi["Miners"][id of thread]
         for i in minerList:
@@ -498,6 +497,7 @@ class Server(object):
         try:
             self.logger.debug("listening")
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.socket.bind((self.hostname, self.port))
             self.socket.listen(1)
 
