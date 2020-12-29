@@ -737,7 +737,7 @@ def updateBalanceLabel():
 			hourlyprofittext.set("≈" + str(profit_array[2]) + " ᕲ/HOUR")
 			dailyprofittext.set("≈" + str(profit_array[3]) + " ᕲ/DAY ("+str(round(profit_array[3]*ducofiat, 4))+" $)")
 		else:
-			if profitCheck > 5:
+			if profitCheck > 1:
 				sessionprofittext.set("Launch your miners")
 				minuteprofittext.set("first to see estimated profit.")
 				hourlyprofittext.set("")
@@ -752,8 +752,8 @@ def calculateProfit(start_bal):
 	try: # Thanks Bilaboz for the code!
 		global curr_bal, profit_array
 
-		curr_bal = getBalance()
 		prev_bal = curr_bal
+		curr_bal = getBalance()
 		session = curr_bal - start_bal
 		tensec = curr_bal - prev_bal
 		minute = tensec * 6
@@ -762,6 +762,7 @@ def calculateProfit(start_bal):
 
 		if tensec >= 0:
 			profit_array = [round(session, 8), round(minute,6), round(hourly,4), round(daily,2)]
+			print(profit_array)
 	except:
 		_exit(0)
 	Timer(10, calculateProfit, [start_bal]).start()
@@ -803,22 +804,22 @@ class Wallet:
 		rsize = Font(size=10)
 
 		self.master = master
-		master.geometry("720x420")
-		master.resizable(False, False)
+		#master.geometry("720x420")
+		#master.resizable(False, False)
 		master.title("Duino-Coin Wallet")
 		master.configure(background = backgroundColor)
 
 		Label(master, # UP - DOWN
 			background="#7bed9f", font=rsize,
-			width="10", height="100").place(relx=.0, rely= .0)
+			width="10", height="20").grid(row=1, column=0)
 
 		Label(master, # LEFT - RIGHT
 			background="#f5cd79", font=rsize,
-			width="150", height="4").place(relx=.0, rely= .0)
+			width="80", height="4").grid(row=0, column=1)
 
 		Label(master, # SQUARE
 			background="#ff7f50", font=rsize,
-			width="10", height="4").place(relx=.0, rely= .0)
+			width="10", height="4").grid(row=0, column=0, columnspan=1, rowspan=1)
 
 		balancetext = StringVar()
 		balancetext.set("Please wait...")
