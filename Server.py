@@ -322,7 +322,10 @@ def handle(c, address):
                         hashrate = response[1]
                         hashrateEstimated = False
                     except IndexError: # If not, estimate it ourselves
-                        hashrate = int(rand) / int(sharetime) * 2000000 / int(diff) # This formula gives a rough estimation of the hashrate
+                        try:
+                            hashrate = int(rand) / int(sharetime) * 2000000 / int(diff) # This formula gives a rough estimation of the hashrate
+                        except ZeroDivisionError:
+                            hashrate = 1000
                         hashrateEstimated = True
                     try:
                         minerUsed = str(response[2])
@@ -367,8 +370,11 @@ def handle(c, address):
                                     datab = conn.cursor() # Update his the balance
                                     datab.execute("UPDATE Users set balance = ? where username = ?", (f'{balance:.20f}', username))
                                     conn.commit()
-                        rejectedShares += 1
-                        c.send(bytes("BAD", encoding="utf8")) # Send feedback that incorrect result was received
+                        try:
+                            rejectedShares += 1
+                            c.send(bytes("BAD", encoding="utf8")) # Send feedback that incorrect result was received
+                        except:
+                            break
                 except:
                     c.send(bytes("ERR", encoding="utf8"))
                     raise
