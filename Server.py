@@ -377,7 +377,6 @@ def handle(c, address):
                             break
                 except:
                     c.send(bytes("ERR", encoding="utf8"))
-                    raise
                     break
 
             ######################################################################
