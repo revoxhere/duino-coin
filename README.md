@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/duinocoin.com-555555.svg?style=for-the-badge&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAmklEQVQ4T7WUQQ6AIAwEIcaX%2BALj0fdz9gM%2BxMRESQ8ktSllrciZTneX0hg6n8h5Z5pvhD%2Bu26OO17iABaCBPwEJLKFV6ZZ1GQ2HwgqlEg51ATV7GhSyXFPjBpK6UsztdQdqjSDLNYVu4JGWaQjXLh%2BmaRn5eq8ybAGRWfx3sJFNo7lw%2FxStobkcWhlKYJf1ZS1XaggPNpIv3cls33EVXWotfwAAAABJRU5ErkJggg%3D%3D" /></a>
   <a href="http://51.15.127.80/webwallet.html">
     <img src="https://img.shields.io/badge/Online Wallet-555555.svg?style=for-the-badge" /></a>
-  <a href="https://duinocoin.com/whitepaper">
+  <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/whitepaper.pdf">
     <img src="https://img.shields.io/badge/whitepaper-555555.svg?style=for-the-badge&logo=Academia" /></a>
   <a href="https://app.codacy.com/manual/revoxhere/duino-coin?utm_source=github.com&utm_medium=referral&utm_content=revoxhere/duino-coin">
     <br>
@@ -33,17 +33,16 @@ Key features:
 *   Easy to use & exchange
 *   Available everywhere
 *   Cost-effective
+*   Easy to mine
 *   Open-source
-*   Easy to mine!
 
 Technical specifications:
-*   Coin supply: ~ 350k
-*   Block supply: ~ 35 million
-*   Premine: ~ 5k blocks
+*   Coin supply: Infinite ♾️ (before December 2020: 350k coins)
+*   Premine: <5k blocks (<500coins)
 *   Block time: Instant ⚡
+*   Decimals: 20
 *   Ticker: DUCO (ᕲ)
-*   Algorithms: DUCO-S1, DUCO-S1A
-*   Original [Kolka system](https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png) helping reward miners fairly
+*   Algorithms: DUCO-S1, DUCO-S1A (+more planned) supported by [Kolka system](https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png) helping reward miners fairly
 
 <h2 align="center">Get started</h2><br>
 
@@ -55,7 +54,7 @@ Official getting started guides for creating an account and setting up miners on
 
 <h3 align="center">Community-made software</h3><br>
 
-**Miners:**
+**Other miners:**
 *   [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch
 *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) by phantom32
 *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
@@ -68,7 +67,7 @@ Official getting started guides for creating an account and setting up miners on
 *   [Duino DogeRock GUI Wallet](https://github.com/DogeRock/Duino-Coin-Gui-Wallet) by DogeRock
 *   [Duino DogeRock CLI Wallet](https://github.com/DogeRock/DogeRock-Duino-Coin-cmd-line-wallet) by DogeRock
 
-This list will be actively updated
+This list will be actively updated.
 
 <h2 align="center">Contributing</h2><br>
 
@@ -208,25 +207,23 @@ Hashrate Calculators for AVR/ESP platforms are available in the [Useful tools br
 <h2 align="center">Developers</h2><br>
 
 *   **Lead developers:**
-    *   [@revox](https://github.com/revoxhere/) - [YouTube](https://youtube.com/c/reVox96) - robik123.345@gmail.com
+    *   [@revox](https://github.com/revoxhere/) - robik123.345@gmail.com
     *   [@Bilaboz](https://github.com/bilaboz/)
 
-*   **Developers:**
-    *   [@kyngs](https://github.com/kyngs)
-
 *   **Contributors:**
+    *   [@kyngs](https://github.com/kyngs)
     *   [@connorhess](https://github.com/connorhess)
     *   [@httsmvkcom](https://github.com/httsmvkcom)
     *   [@Nosh-Ware](https://github.com/Nosh-Ware)
     *   [@IdotMaster1](https://github.com/IdotMaster1)
     *   [@JoyBed](https://github.com/JoyBed)
-    *   [@Furim](https://github.com/Furim) - [YouTube](https://www.youtube.com/channel/UCKxFuOCalYxlQoS7R6zilRQ)
+    *   [@Furim](https://github.com/Furim)
 
 <h2 align="center">Special thanks</h2><br>
 
-*   [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg) for designing logos
-*   [@Tech1k](https://github.com/Tech1k) from [Beyondcoin](https://beyondcoin.io) for providing [duinocoin.com](https://duinocoin.com) domain
-*   [@MrKris7100](https://github.com/MrKris7100) - [YouTube](https://www.youtube.com/user/MrKris7100) for help with implementing SHA1 algorithm
+*   [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg) for designing early logos
+*   [@Tech1k](https://github.com/Tech1k) for [Beyondcoin](https://beyondcoin.io) partnership and providing [duinocoin.com](https://duinocoin.com) domain
+*   [@MrKris7100](https://github.com/MrKris7100) for help with implementing SHA1 algorithm
 *   [@daknuett](https://github.com/daknuett) for help with Arduino SHA1 library
 
 <h2 align="center">Donate</h2><br>
