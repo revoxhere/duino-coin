@@ -9,7 +9,6 @@ import socket, statistics, threading, time, re, subprocess, hashlib, platform, g
 from pathlib import Path
 from signal import signal, SIGINT
 
-
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
@@ -239,7 +238,7 @@ def checkVersion():
 def Mine(): # Mining section
   global last_hash_count, hash_count, khash_count, donationlevel, donatorrunning, efficiency
   if os.name == 'nt' and donatorrunning == False:
-    cmd = str(resources) + "/Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -o revox.donate -p x -e "
+    cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
     if int(donationlevel) == 5: cmd += "100"
     elif int(donationlevel) == 4: cmd += "75"
     elif int(donationlevel) == 3: cmd += "50"
@@ -341,7 +340,7 @@ if __name__ == '__main__':
         debugOutput("Enabled autorestarter for " + str(autorestart) + " minutes")
         threading.Thread(target=autorestarter).start()
       else:
-        debugOutput("Autorestarted is disabled")
+        debugOutput("Autorestarter is disabled")
     except:
       print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
       if debug == "True": raise
