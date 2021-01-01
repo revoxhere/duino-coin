@@ -3,7 +3,7 @@
 # Duino-Coin AVR Miner (v1.8)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2020
+# © Duino-Coin Community 2021
 ##########################################
 import socket, threading, time, re, subprocess, platform, configparser, sys, datetime, os # Import libraries
 from pathlib import Path
@@ -264,7 +264,7 @@ def AVRMine(): # Mining section
   global donationlevel, donatorrunning
   
 if os.name == 'nt' and donatorrunning == False:
-  cmd = str(resources) + "/Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -o revox.donate -p x -e "
+  cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
   if int(donationlevel) == 5: cmd += "100"
   elif int(donationlevel) == 4: cmd += "75"
   elif int(donationlevel) == 3: cmd += "50"
@@ -354,7 +354,7 @@ while True:
       debugOutput("Enabled autorestarter for " + str(autorestart) + " seconds")
       threading.Thread(target=autorestarter).start()
     else:
-      debugOutput("Autorestarted is disabled")
+      debugOutput("Autorestarter is disabled")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file. Exiting in 15s." + Style.RESET_ALL)    
     if debug == True:
