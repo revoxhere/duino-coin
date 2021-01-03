@@ -41,7 +41,9 @@ Technical specifications:
 *   Premine: <5k blocks (<500coins)
 *   Block time: Instant ⚡
 *   Decimals: 20
-*   Ticker: DUCO (ᕲ)
+*   Tickers:
+    *  DUCO (ᕲ) - "main" coin
+    *  wDUCO - [Wrapped DUCO](https://tronscan.org/#/token20/TY52fgFbVmyQQuvac8d3K9GXoFZ4nnN2NL)
 *   Algorithms: DUCO-S1, DUCO-S1A (+more planned) supported by [Kolka system](https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png) helping reward miners fairly
 
 <h2 align="center">Get started</h2><br>
