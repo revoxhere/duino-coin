@@ -238,7 +238,7 @@ def checkVersion():
 def Mine(): # Mining section
   global last_hash_count, hash_count, khash_count, donationlevel, donatorrunning, efficiency
   if os.name == 'nt' and donatorrunning == False:
-    cmd = "cd " + str(resources) + " & Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
+    cmd = str(resources) + "/Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -o revox.donate -p x -e "
     if int(donationlevel) == 5: cmd += "100"
     elif int(donationlevel) == 4: cmd += "75"
     elif int(donationlevel) == 3: cmd += "50"
@@ -267,20 +267,20 @@ def Mine(): # Mining section
         debugOutput("Job received: " +str(job))
         break # If job received, continue to hashing algo
 
-    computestart = datetime.datetime.now()
     for ducos1res in range(100 * int(diff) + 1): # Loop from 1 too 100*diff)
       ducos1 = hashlib.sha1(str(job[0] + str(ducos1res)).encode("utf-8")).hexdigest() # Generate hash
       hash_count = hash_count + 1 # Increment hash counter
       if job[1] == ducos1: # If result is even with job, send the result
         debugOutput("Result found: " + str(ducos1res))
-        computestop = datetime.datetime.now()
         while True:
           try:
+            computestart = datetime.datetime.now()
             soc.send(bytes(f"{str(ducos1res)},{str(khash_count*1000)},Official Python Miner v{str(minerVersion)}", encoding="utf8")) # Send result of hashing algorithm to pool
             feedback = soc.recv(1024).decode() # Get feedback
+            computestop = datetime.datetime.now()
             debugOutput("Feedback received: " + str(feedback))
           except socket.timeout:
-            pass
+            Connect()
           now = datetime.datetime.now()
           computetime = now - computestart # Time from start of hash computing to finding the result
           computetime = str(int(computetime.microseconds / 1000)) # Convert to ms
@@ -340,7 +340,7 @@ if __name__ == '__main__':
         debugOutput("Enabled autorestarter for " + str(autorestart) + " minutes")
         threading.Thread(target=autorestarter).start()
       else:
-        debugOutput("Autorestarter is disabled")
+        debugOutput("Autorestarted is disabled")
     except:
       print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
       if debug == "True": raise
