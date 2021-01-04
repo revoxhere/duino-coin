@@ -5,7 +5,7 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2020
 #############################################
-import requests, multiprocessing, smtplib, sys, ssl, socket, re, math, random, hashlib, datetime,  requests, smtplib, ssl, sqlite3, bcrypt, time, os.path, json, logging, threading
+import requests, smtplib, sys, ssl, socket, re, math, random, hashlib, datetime,  requests, smtplib, ssl, sqlite3, bcrypt, time, os.path, json, logging, threading
 from _thread import *
 from shutil import copyfile
 from email.mime.text import MIMEText
@@ -41,10 +41,8 @@ html = """\
   </body>
 </html>
 """
-# Manager to create shared object
-manager = multiprocessing.Manager()
-minerapi = manager.dict()
-connectedUsers = manager.Value("i", 0)
+minerapi = {}
+connectedUsers = 0
 database = 'crypto_database.db' # User data database location
 if not os.path.isfile(database): # Create it if it doesn't exist
     with sqlite3.connect(database) as conn:
@@ -112,81 +110,71 @@ def getLeaders():
     return(leadersdata[:10])
 def API():
     while True:
-        with sqlite3.connect(blockchain) as blockconn:
-            blockdatab = blockconn.cursor()
-            blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
-            blocks = int(blockdatab.fetchone()[0])
-            blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
-            lastBlockHash = str(blockdatab.fetchone()[0])
-            diff = math.ceil(blocks / diff_incrase_per) # Calculate difficulty
-        now = datetime.datetime.now()
-        minerList = []
-        usernameMinerCounter = {}
-        serverHashrate = 0
-        hashrate = 0
-        l = multiprocessing.Lock()
+        l = threading.Lock()
         with l:
+            with sqlite3.connect(blockchain) as blockconn:
+                blockdatab = blockconn.cursor()
+                blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
+                blocks = int(blockdatab.fetchone()[0])
+                blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
+                lastBlockHash = str(blockdatab.fetchone()[0])
+                diff = math.ceil(blocks / diff_incrase_per) # Calculate difficulty
+            now = datetime.datetime.now()
+            minerList = []
+            usernameMinerCounter = {}
+            serverHashrate = 0
+            hashrate = 0
             for x in minerapi.copy(): 
                 lista = minerapi[x] # Convert list to strings
                 hashrate = lista[1]
                 serverHashrate += float(hashrate) # Add user hashrate to the server hashrate
-        if serverHashrate >= 1000000:
-            prefix = " MH/s"
-            serverHashrate = serverHashrate / 1000000
-        elif serverHashrate >= 1000:
-            prefix = " kH/s"
-            serverHashrate = serverHashrate / 1000
-        else:
-            prefix = " H/s"
-        formattedMinerApi = { # Prepare server API data
-                "Server version":        float(serverVersion),
-                "Active connections":    int(connectedUsers.value),
-                "Last update":           str(now.strftime("%d/%m/%Y %H:%M (UTC)")),
-                "Pool hashrate":         str(round(serverHashrate, 2))+prefix,
-                "Duco price":            float(round(getDucoPrice(), 6)), # Call getDucoPrice function
-                "Registered users":      int(getRegisteredUsers()), # Call getRegisteredUsers function
-                "All-time mined DUCO":   float(round(getMinedDuco(), 2)), # Call getMinedDuco function
-                "Current difficulty":    int(diff),
-                "Mined blocks":          int(blocks),
-                "Full last block hash":  str(lastBlockHash),
-                "Last block hash":       str(lastBlockHash)[:10]+"...",
-                "Top 10 richest miners": getLeaders(), # Call getLeaders function
-                "Active workers":        usernameMinerCounter,
-                "Miners": {}}
-        l = multiprocessing.Lock()
-        with l:
+            if serverHashrate >= 1000000:
+                prefix = " MH/s"
+                serverHashrate = serverHashrate / 1000000
+            elif serverHashrate >= 1000:
+                prefix = " kH/s"
+                serverHashrate = serverHashrate / 1000
+            else:
+                prefix = " H/s"
+            formattedMinerApi = { # Prepare server API data
+                    "Server version":        float(serverVersion),
+                    "Active connections":    int(connectedUsers),
+                    "Last update":           str(now.strftime("%d/%m/%Y %H:%M (UTC)")),
+                    "Pool hashrate":         str(round(serverHashrate, 2))+prefix,
+                    "Duco price":            float(round(getDucoPrice(), 6)), # Call getDucoPrice function
+                    "Registered users":      int(getRegisteredUsers()), # Call getRegisteredUsers function
+                    "All-time mined DUCO":   float(round(getMinedDuco(), 2)), # Call getMinedDuco function
+                    "Current difficulty":    int(diff),
+                    "Mined blocks":          int(blocks),
+                    "Full last block hash":  str(lastBlockHash),
+                    "Last block hash":       str(lastBlockHash)[:10]+"...",
+                    "Top 10 richest miners": getLeaders(), # Call getLeaders function
+                    "Active workers":        usernameMinerCounter,
+                    "Miners": {}}
+
             for x in minerapi.copy(): # Get data from every miner  
                 lista = minerapi[x] # Convert list to strings
-                user = lista[0]
-                hashrate = lista[1]
-                sharetime = lista[2]
-                acceptedShares = lista[3]
-                rejectedShares = lista[4]
-                diff = lista[5]
-                isEstimated = lista[6]
-                minerUsed = lista[7]
                 formattedMinerApi["Miners"][x] = { # Format data
-                "User":          str(user),
-                "Hashrate":      float(hashrate),
-                "Is estimated":  str(isEstimated),
-                "Sharetime":     float(sharetime),
-                "Accepted":      int(acceptedShares),
-                "Rejected":      int(rejectedShares),
-                "Diff":          int(diff),
-                "Software":      str(minerUsed)}
-        for thread in formattedMinerApi["Miners"]:
-            minerList.append(formattedMinerApi["Miners"][thread]["User"]) # Append miners to formattedMinerApi["Miners"][id of thread]
-        for i in minerList:
-            usernameMinerCounter[i]=minerList.count(i) # Count miners for every username
-        with open('api.json', 'w') as outfile: # Write JSON to file
-            json.dump(formattedMinerApi, outfile, indent=4, ensure_ascii=False)
-        time.sleep(1)
+                "User":          str(lista[0]),
+                "Hashrate":      float(lista[1]),
+                "Is estimated":  str(lista[6]),
+                "Sharetime":     float(lista[2]),
+                "Accepted":      int(lista[3]),
+                "Rejected":      int(lista[4]),
+                "Diff":          int(lista[5]),
+                "Software":      str(lista[7])}
+            for thread in formattedMinerApi["Miners"]:
+                minerList.append(formattedMinerApi["Miners"][thread]["User"]) # Append miners to formattedMinerApi["Miners"][id of thread]
+            for i in minerList:
+                usernameMinerCounter[i]=minerList.count(i) # Count miners for every username
+            with open('api.json', 'w') as outfile: # Write JSON to file
+                json.dump(formattedMinerApi, outfile, indent=4, ensure_ascii=False)
+        time.sleep(3)
 
-def handle(c, address):
+def handle(c):
     global connectedUsers, minerapi # These globals are used in the statistics API
     c.send(bytes(str(serverVersion), encoding="utf8")) # Send server version
-
-    connectedUsers.value += 1 # Count new opened connection
+    connectedUsers += 1 # Count new opened connection
     username = "" # Variables for every thread
     lastBlockHash = ""
     acceptedShares = 0
@@ -202,7 +190,7 @@ def handle(c, address):
                 data = data.split(",") # Split incoming data
 
             ######################################################################
-            if data[0] == "REGI":
+            if str(data[0]) == "REGI":
                 try:
                     username = str(data[1])
                     unhashed_pass = str(data[2]).encode('utf-8')
@@ -285,12 +273,15 @@ def handle(c, address):
                     except IndexError:
                         c.send(bytes("NO,Not enough data", encoding='utf8'))
                         break
-                with sqlite3.connect(blockchain) as blockconn:
-                    blockdatab = blockconn.cursor()
-                    blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
-                    blocks = int(blockdatab.fetchone()[0])
-                    blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
-                    lastBlockHash = str(blockdatab.fetchone()[0])
+                try:
+                    with sqlite3.connect(blockchain) as blockconn:
+                        blockdatab = blockconn.cursor()
+                        blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
+                        blocks = int(blockdatab.fetchone()[0])
+                        blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
+                        lastBlockHash = str(blockdatab.fetchone()[0])
+                except:
+                    break
                 # Calculate difficulty and create new block hash
                 try:
                     customDiff = str(data[2])
@@ -332,12 +323,10 @@ def handle(c, address):
                     except IndexError:
                         minerUsed = "Unknown"
                     try:
-                        l = manager.Lock()
-                        with l:
-                            minerapi.update({str(multiprocessing.current_process().name): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
+                        minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
                     except:
                         pass
-                    if result == str(rand) and int(sharetime) > int(shareTimeRequired):
+                    if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 999:
                         with sqlite3.connect(blockchain) as blockconn: # Update blocks counter and lastblock's hash
                             blocks += 1
                             blockdatab = blockconn.cursor()
@@ -476,64 +465,40 @@ def handle(c, address):
         except ConnectionResetError:
             break
     #User disconnected, exiting loop
-    connectedUsers.value -= 1 # Subtract connected miners amount
+    connectedUsers -= 1 # Subtract connected miners amount
     try: # Delete miner from minerapi if it was used
-        l = manager.Lock()
-        with l:
-            del minerapi[str(multiprocessing.current_process().name)]
+        del minerapi[str(threading.get_ident())]
     except KeyError:
         pass
-    c.close() # Close the connection
-    import os
+    sys.exit() # Close thread
 
-    os._exit(0) # Close thread
-    exit()
+IPS = []
+def countips():
+    while True:
+        from collections import Counter
+        x = Counter(IPS)
+        print("5 IPs with the most connections:", x.most_common(5))
+        time.sleep(5)
 
-    print("this is still running what")
-    
-class Server(object):
-    def __init__(self, hostname, port):
-        import logging
-        self.logger = logging.getLogger("server")
-        self.hostname = hostname
-        self.port = port
-
-    def start(self):
-        try:
-            self.logger.debug("listening")
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            self.socket.bind((self.hostname, self.port))
-            self.socket.listen(1)
-
-            while True:
-                conn, address = self.socket.accept()
-                self.logger.debug("Got connection")
-                process = multiprocessing.Process(target=handle, args=(conn, address))
-                process.daemon = True
-                process.start()
-                self.logger.debug("Started process %r", process)
-        except:
-            print("restarting")
-            import os
-            os.execv(sys.argv[0], sys.argv)
-
-def Main():
+if __name__ == '__main__':
     print("Duino-Coin Master Server", serverVersion, "is starting...")
     threading.Thread(target=API).start() # Create JSON API thread
     threading.Thread(target=createBackup).start() # Create Backup generator thread
-    #logging.basicConfig(level=logging.DEBUG)
-    server = Server(host, port)
-    print("Socket binded to port", port)
-    try:
-        server.start()
-    finally:
-        print("Shutting down")
-        for process in multiprocessing.active_children():
-            print("Shutting down process %r", process)
-            process.terminate()
-            process.join()
-        server.shutdown(SHUT_RDWR)
-    logging.info("All done")
-if __name__ == '__main__': 
-    Main()
+    #threading.Thread(target=countips).start() # Uncomment to see how many connections there were from what IP
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((host, port)) 
+    print("Socket binded to port", port) 
+    # Put the socket into listening mode 
+    s.listen(5) # Queue of 5 connections
+    print("Socket is listening") 
+    # a forever loop until client wants to exit 
+    while True: 
+        # Establish connection with client 
+        c, addr = s.accept()
+        IPS.append(addr[0])
+        #print('Connected to :', addr[0], ':', addr[1]) 
+        # Start a new thread and return its identifier 
+        start_new_thread(handle, (c,)) 
+    s.close() 
+
