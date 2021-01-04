@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for Arduino boards v1.7 
+//  Code for Arduino boards v1.8
 //  © Duino-Coin Community 2019-2020
 //
 //  Big thanks to JoyBed for optimizations!
@@ -23,7 +23,7 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-//If defined, the count is reversed. This allows you to not repeat searching the same numbers twice if you have an arduino searching the conventional way.
+//If defined, the count is reversed. This allows you to not repeat searching the same numbers twice if you have a second arduino searching the "conventional" way.
 //#define REVERSE_SEARCH
 
 // Include SHA1 part of cryptosuite2 library
@@ -48,18 +48,18 @@ void loop() {
     String job = Serial.readStringUntil('\n'); // Read job
     unsigned int diff = Serial.parseInt() * 100 + 1; // Read difficulty
     unsigned long StartTime = micros();
-#ifdef REVERSE_SEARCH
+    #ifdef REVERSE_SEARCH
     for (unsigned int iJob = diff; iJob >= 0; iJob--) { // Difficulty loop
-#else
+    #else
     for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
-#endif
+    #endif
       Sha1.init(); // Create sha1 hasher
       Sha1.print(String(hash) + String(iJob));
       uint8_t * hash_bytes = Sha1.result(); // Get result
       for (int i = 0; i < 10; i++) { // Cast result to array
         for (int i = 0; i < 32; i++) {
           buffer[2 * i] = "0123456789abcdef"[hash_bytes[i] >> 4]; //MSB to LSB I guess? Depending on the address in hash_bytes,
-                                                                  // it chooses that from the given array of characters
+          // it chooses that from the given array of characters
           buffer[2 * i + 1] = "0123456789abcdef"[hash_bytes[i] & 0xf]; //It retreves the value from that address next spot over
         }
       }
@@ -70,7 +70,7 @@ void loop() {
         unsigned long ElapsedTime = EndTime - StartTime;
         Serial.println(String(iJob) + "," + String(ElapsedTime)); // Send result back to the program with share time
         PORTB = PORTB | B00100000;   // Turn on built-in led
-        delay(75); // Wait a bit
+        delay(50); // Wait a bit
         PORTB = PORTB & B11011111; // Turn off built-in led
         break; // Stop and wait for more work
       }
