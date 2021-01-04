@@ -3,7 +3,7 @@
 # Duino-Coin AVR Miner (v1.8)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2020
+# © Duino-Coin Community 2021
 ##########################################
 import socket, threading, time, re, subprocess, platform, configparser, sys, datetime, os # Import libraries
 from pathlib import Path
@@ -353,7 +353,7 @@ if __name__ == '__main__':
         debugOutput("Enabled autorestarter for " + str(autorestart) + " minutes")
         threading.Thread(target=autorestarter).start()
       else:
-        debugOutput("Autorestarted is disabled")
+        debugOutput("Autorestarter is disabled")
     except:
       print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file (Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
       if debug == "True": raise
@@ -392,6 +392,6 @@ if __name__ == '__main__':
     except:
       print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining. Restarting." + Style.RESET_ALL)
       if debug == "True": raise
-      Connect()
+      os.execl(sys.executable, sys.executable, *sys.argv)
     time.sleep(0.025) # Restart
     debugOutput("Restarting")
