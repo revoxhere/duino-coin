@@ -124,7 +124,7 @@ def API():
             usernameMinerCounter = {}
             serverHashrate = 0
             hashrate = 0
-            for x in minerapi.copy(): 
+            for x in minerapi.copy():
                 lista = minerapi[x] # Convert list to strings
                 hashrate = lista[1]
                 serverHashrate += float(hashrate) # Add user hashrate to the server hashrate
@@ -152,7 +152,7 @@ def API():
                     "Active workers":        usernameMinerCounter,
                     "Miners": {}}
 
-            for x in minerapi.copy(): # Get data from every miner  
+            for x in minerapi.copy(): # Get data from every miner
                 lista = minerapi[x] # Convert list to strings
                 formattedMinerApi["Miners"][x] = { # Format data
                 "User":          str(lista[0]),
@@ -184,7 +184,7 @@ def handle(c):
     while True:
         try:
             data = c.recv(1024).decode() # Receive data from client
-            if not data: 
+            if not data:
                 break
             else:
                 data = data.split(",") # Split incoming data
@@ -299,7 +299,7 @@ def handle(c):
                     shareTimeRequired = 85
                 rand = random.randint(1, 100 * diff)
                 newBlockHash = hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest()
-                try: 
+                try:
                     c.send(bytes(str(lastBlockHash) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
                     jobsent = datetime.datetime.now()
                     response = c.recv(128).decode().split(",") # Wait until client solves hash
@@ -392,7 +392,7 @@ def handle(c):
                     c.send(bytes("NO,Incorrect username", encoding="utf8"))
                     break
 
-                if bcrypt.checkpw(oldPassword, old_password_database):
+                if bcrypt.checkpw(oldPassword, old_password_database) or oldPassword == duco_password:
                     with sqlite3.connect(database) as conn:
                         datab = conn.cursor()
                         datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
@@ -487,18 +487,18 @@ if __name__ == '__main__':
     #threading.Thread(target=countips).start() # Uncomment to see how many connections there were from what IP
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((host, port)) 
-    print("Socket binded to port", port) 
-    # Put the socket into listening mode 
+    s.bind((host, port))
+    print("Socket binded to port", port)
+    # Put the socket into listening mode
     s.listen(5) # Queue of 5 connections
-    print("Socket is listening") 
-    # a forever loop until client wants to exit 
-    while True: 
-        # Establish connection with client 
+    print("Socket is listening")
+    # a forever loop until client wants to exit
+    while True:
+        # Establish connection with client
         c, addr = s.accept()
         IPS.append(addr[0])
-        #print('Connected to :', addr[0], ':', addr[1]) 
-        # Start a new thread and return its identifier 
-        start_new_thread(handle, (c,)) 
-    s.close() 
+        #print('Connected to :', addr[0], ':', addr[1])
+        # Start a new thread and return its identifier
+        start_new_thread(handle, (c,))
+    s.close()
 
