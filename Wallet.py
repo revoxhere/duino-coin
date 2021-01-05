@@ -772,16 +772,20 @@ def sendFunds(handler):
 	recipientStr = recipient.get()
 	amountStr = amount.get()
 
-	soc = socket.socket()
-	soc.connect((pool_address, int(pool_port)))
-	soc.recv(3)
+	MsgBox = messagebox.askquestion('Warning',f'Are you sure you want to send {amountStr} DUCO to {recipientStr}',icon = 'warning')
+	if MsgBox == 'yes':
+		soc = socket.socket()
+		soc.connect((pool_address, int(pool_port)))
+		soc.recv(3)
 
-	soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
-	response = soc.recv(2)
-	soc.send(bytes(f"SEND,-,{str(recipientStr)},{str(amountStr)}", encoding="utf8"))
+		soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
+		response = soc.recv(2)
+		soc.send(bytes(f"SEND,-,{str(recipientStr)},{str(amountStr)}", encoding="utf8"))
 
-	response = soc.recv(128).decode()
-	soc.close()
+		response = soc.recv(128).decode()
+		soc.close()
+		MsgBox = messagebox.showinfo('Success',f'Sucessfully transfered {amountStr} DUCO to {recipientStr}')
+
 
 	# transactionstatus.set(response)
 	root.update()
