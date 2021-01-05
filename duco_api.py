@@ -2,7 +2,7 @@
 # Duino-Coin Api Module
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2020
+# © Duino-Coin Community 2021
 ##########################################
 from urllib.request import urlopen
 import socket
