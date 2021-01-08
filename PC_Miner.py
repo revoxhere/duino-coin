@@ -110,7 +110,7 @@ def Greeting(): # Greeting message depending on time
     print(" > " + Fore.WHITE + "CPU: " + Style.BRIGHT + Fore.YELLOW + str(cpu["brand_raw"]))
   except:
     if debug == "True": raise
-  if os.name == 'nt':
+  if os.name == 'nt' or os.name == 'posix':
     print(" > " + Fore.WHITE + "Donation level: " +  Style.BRIGHT + Fore.YELLOW + str(donationlevel))
   print(" > " + Fore.WHITE + "Algorithm: " + Style.BRIGHT + Fore.YELLOW + "DUCO-S1")
   print(" > " + Fore.WHITE + "Autorestarter: " + Style.BRIGHT + Fore.YELLOW + str(autorestartmessage))
@@ -122,6 +122,13 @@ def Greeting(): # Greeting message depending on time
       url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
       r = requests.get(url)
       with open(resourcesFolder + '/Donate_executable.exe', 'wb') as f:
+        f.write(r.content)
+  elif os.name == 'posix':
+    if not Path(resourcesFolder + "/Donate_executable").is_file(): # Initial miner executable section
+      debugOutput("OS is Windows, downloading developer donation executable")
+      url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/DonateExecutableLinux?raw=true'
+      r = requests.get(url)
+      with open(resourcesFolder + '/Donate_executable', 'wb') as f:
         f.write(r.content)
 
 def hashrateCalculator(): # Hashes/sec calculation
@@ -150,7 +157,7 @@ def loadConfig(): # Config loading section
     efficiency = input(Style.RESET_ALL + Fore.YELLOW + "Set mining intensity (1-100)% (recommended: 100): " + Style.BRIGHT)
     autorestart = input(Style.RESET_ALL + Fore.YELLOW + "If you want, set after how many minutes miner will restart (recommended: 30): " + Style.BRIGHT)
     donationlevel = "0"
-    if os.name == 'nt':
+    if os.name == 'nt' or os.name == 'posix':
       donationlevel = input(Style.RESET_ALL + Fore.YELLOW + "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: " + Style.BRIGHT)
 
     efficiency = re.sub("\D", "", efficiency)  # Check wheter efficiency is correct
@@ -232,8 +239,17 @@ def checkVersion():
 
 def Mine(): # Mining section
   global last_hash_count, hash_count, khash_count, donationlevel, donatorrunning, efficiency
-  if os.name == 'nt' and donatorrunning == False:
-    cmd = resourcesFolder + "/Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -o revox.donate -p x -e "
+
+  if os.name == 'nt':
+    cmd = "cd " + resourcesFolder + "& Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
+  elif os.name == 'posix' :
+    cmd = "cd " + resourcesFolder + "&& chmod +x Donate_executable && ./Donate_executable -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
+  if int(donationlevel) <= 0:
+    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
+      + Back.RESET + Fore.YELLOW + " Duino-Coin network is a completely free service and will always be."
+      + Style.BRIGHT + Fore.YELLOW + "\nWe don't take any fees from your mining.\nYou can really help us maintain the server and low-fee exchanges by donating.\nVisit "
+      + Style.RESET_ALL + Fore.GREEN + "https://duinocoin.com/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more about how you can help :)")
+  if donatorrunning == False:
     if int(donationlevel) == 5: cmd += "100"
     elif int(donationlevel) == 4: cmd += "75"
     elif int(donationlevel) == 3: cmd += "50"
@@ -244,13 +260,8 @@ def Mine(): # Mining section
       donatorrunning = True
       subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL)
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-        + Back.RESET + Fore.RED + "Thank You for being an awesome donator! <3")
-    else:
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-        + Back.RESET + Fore.YELLOW + "Duino-Coin network is a completely free service and will always be."
-        + Style.BRIGHT + Fore.YELLOW + "\nWe don't take any fees from your mining.\nYou can really help us maintain the server and low-fee exchanges by donating.\nVisit "
-        + Style.RESET_ALL + Fore.GREEN + "https://duinocoin.com/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more about how you can help :)")
-
+        + Back.RESET + Fore.RED + " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development")
+  
   print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
     + Back.RESET + Fore.YELLOW + " Mining thread is starting"
     + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1 algorithm with " + Fore.YELLOW + str(100-(100*int(efficiency))) + "% efficiency")
@@ -357,7 +368,8 @@ if __name__ == '__main__':
       else:
         debugOutput("Autorestarter is disabled")
     except:
-      print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "There was an error in autorestarter. Check configuration file ("+resources+"/Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
+      print(nnow().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
+        + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file ("+resources+"/Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
       if debug == "True": raise
       time.sleep(15)
       os._exit(1)
@@ -366,7 +378,8 @@ if __name__ == '__main__':
       Connect() # Connect to pool
       debugOutput("Connected to master server")
     except:
-      print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "There was an error connecting to the server. Retrying in 15s." + Style.RESET_ALL)
+      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error connecting to the server. Retrying in 15s." + Style.RESET_ALL)
       if debug == "True": raise
       time.sleep(15)
       Connect()
@@ -375,7 +388,8 @@ if __name__ == '__main__':
       checkVersion() # Check version
       debugOutput("Version check complete")
     except:
-      print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "There was an error checking server version. Rescuing." + Style.RESET_ALL)
+      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error checking server version. Rescuing." + Style.RESET_ALL)
       if debug == "True": raise
       Connect()
 
@@ -384,7 +398,8 @@ if __name__ == '__main__':
       Mine() # Launch mining thread
       debugOutput("Mining ended")
     except:
-      print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "There was an error while mining (most likely server timeout). Rescuing." + Style.RESET_ALL)
+      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining (most likely server timeout). Rescuing." + Style.RESET_ALL)
       if debug == "True": raise
       Connect()
     time.sleep(0.025) # Restart
