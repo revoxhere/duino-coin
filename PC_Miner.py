@@ -26,7 +26,7 @@ except:
 try: # Check if colorama is installed
   from colorama import init, Fore, Back, Style
 except:
-  print(now().strftime("%H:%M:%S ") + "Colorama is not installed. Miner will try to install it. If it fails, please manually install \"colorama\" python3 package.\nIf you can't install it, use thh Minimal-PC_Miner.")
+  print(now().strftime("%H:%M:%S ") + "Colorama is not installed. Miner will try to install it. If it fails, please manually install \"colorama\" python3 package.\nIf you can't install it, use the Minimal-PC_Miner.")
   install("colorama")
 
 try: # Check if requests is installed
@@ -104,7 +104,7 @@ def Greeting(): # Greeting message depending on time
     greeting = "Welcome back"
 
   print(" > " + Fore.YELLOW + Style.BRIGHT + "Official Duino-Coin © Python Miner "
-  + Style.RESET_ALL + Fore.WHITE + "(v" + str(minerVersion) + ") 2019-2020") # Startup message
+  + Style.RESET_ALL + Fore.WHITE + "(v" + str(minerVersion) + ") 2019-2021") # Startup message
   print(" > " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
   try:
     print(" > " + Fore.WHITE + "CPU: " + Style.BRIGHT + Fore.YELLOW + str(cpu["brand_raw"]))
