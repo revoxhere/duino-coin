@@ -142,6 +142,10 @@ def hashrateCalculator(): # Hashes/sec calculation
 
 def autorestarter(): # Autorestarter
   time.sleep(float(autorestart)*60)
+  try:
+    donateExecutable.terminate() # Stop the donation process (if running)
+  except:
+    pass
   print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
     + Back.RESET + Fore.YELLOW + " Autorestarting the miner")
   os.execl(sys.executable, sys.executable, *sys.argv)
@@ -182,7 +186,7 @@ def loadConfig(): # Config loading section
     with open(resourcesFolder + "/Miner_config.cfg", "w") as configfile: # Write data to file
       config.write(configfile)
     efficiency = (100 - float(efficiency)) * 0.01 # Calulate efficiency for use with sleep function
-    print(Style.RESET_ALL + "Config saved! Launching...\n")
+    print(Style.RESET_ALL + "Config saved! Launching the miner")
 
   else: # If config already exists, load from it
     config.read(resourcesFolder + "/Miner_config.cfg")
@@ -238,7 +242,7 @@ def checkVersion():
       os._exit(1)
 
 def Mine(): # Mining section
-  global last_hash_count, hash_count, khash_count, donationlevel, donatorrunning, efficiency
+  global last_hash_count, hash_count, khash_count, donationlevel, donatorrunning, efficiency, donateExecutable
 
   if os.name == 'nt':
     cmd = "cd " + resourcesFolder + "& Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
@@ -258,7 +262,7 @@ def Mine(): # Mining section
     if int(donationlevel) > 0: # Launch CMD as subprocess
       debugOutput("Starting donation process")
       donatorrunning = True
-      subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL)
+      donateExecutable = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL)
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
         + Back.RESET + Fore.RED + " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development")
   
