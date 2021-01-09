@@ -369,7 +369,7 @@ if __name__ == '__main__':
       else:
         debugOutput("Autorestarter is disabled")
     except:
-      print(nnow().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
+      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
         + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error in the autorestarter. Check configuration file ("+resources+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
       if debug == "True": raise
       time.sleep(10)
