@@ -5,13 +5,13 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2021
 ##########################################
-import socket, statistics, threading, time, re, subprocess, hashlib, platform, configparser, sys, datetime, os # Import libraries
+import socket, statistics, threading, time, re, subprocess, hashlib, configparser, sys, datetime, os # Import libraries
 from pathlib import Path
 from signal import signal, SIGINT
 
 def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-    os.execl(sys.executable, sys.executable, *sys.argv)
+  subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+  os.execl(sys.executable, sys.executable, *sys.argv)
 
 def now():
   return datetime.datetime.now()
@@ -51,7 +51,6 @@ serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/
 config = configparser.ConfigParser()
 autorestart = 0
 donationlevel = 0
-platform = str(platform.system()) + " " + str(platform.release()) # Platform information
 freeze_support() # If not used, pyinstaller hangs when checking cpuinfo
 cpu = cpuinfo.get_cpu_info() # Processor info
 
@@ -77,7 +76,6 @@ def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE 
   except:
     pass
   os._exit(0)
-
 signal(SIGINT, handler) # Enable signal handler
 
 def Greeting(): # Greeting message depending on time
@@ -103,8 +101,8 @@ def Greeting(): # Greeting message depending on time
   else:
     greeting = "Welcome back"
 
-  print(" > " + Fore.YELLOW + Style.BRIGHT + "Official Duino-Coin © Python Miner "
-  + Style.RESET_ALL + Fore.WHITE + "(v" + str(minerVersion) + ") 2019-2021") # Startup message
+  print(" > " + Fore.YELLOW + Style.BRIGHT + "Official Duino-Coin © Python Miner"
+  + Style.RESET_ALL + Fore.WHITE + " (v" + str(minerVersion) + ") 2019-2021") # Startup message
   print(" > " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
   try:
     print(" > " + Fore.WHITE + "CPU: " + Style.BRIGHT + Fore.YELLOW + str(cpu["brand_raw"]))
@@ -324,7 +322,7 @@ def Mine(): # Mining section
           elif feedback == "INVU": # If this user doesn't exist 
             print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
               + Back.RESET + Fore.RED + " User "+str(username)+" doesn't exist."
-              + Style.RESET_ALL + Fore.RED + " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s.")
+              + Style.RESET_ALL + Fore.RED + " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s")
             time.sleep(10)
             Connect()
 
@@ -406,4 +404,3 @@ if __name__ == '__main__':
       + Style.RESET_ALL + Style.BRIGHT + Fore.MAGENTA + " Master server timeout - rescuing" + Style.RESET_ALL)
       if debug == "True": raise
       Connect()
-    time.sleep(0.025) # Restart
