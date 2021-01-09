@@ -28,21 +28,21 @@
 <h2 align="center">Duino-Coin is a cryptocurrency that can be mined with AVR boards.</h2><br />
 
 Key features:
-*   Supported by large number of platforms
-*   Friendly & growing community
-*   Easy to use & exchange
-*   Available everywhere
-*   Cost-effective
-*   Easy to mine
-*   Open-source
+*   Supported by large number of platforms 💻
+*   Friendly & growing community 👥
+*   Easy to use & exchange 💱
+*   Available everywhere 🌎
+*   Cost-effective 💰
+*   Easy to mine ⛏️
+*   Open-source 📚
 
 Technical specifications:
 *   Coin supply: Infinite ♾️ (before December 2020: 350k coins)
-*   Premine: <5k blocks (<500coins)
+*   Premine: <5k blocks (<500coins) 😎
 *   Block time: Instant ⚡
-*   Decimals: 20
+*   Decimals: 20 🔢
 *   Ticker: DUCO (ᕲ)
-*   Algorithms: DUCO-S1, DUCO-S1A (+more planned) supported by [Kolka system](https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png) helping reward miners fairly
+*   Algorithms: DUCO-S1, DUCO-S1A (+more planned) supported by [Kolka system](https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png) helping reward miners fairly ♐
 
 <h2 align="center">Get started</h2><br>
 
@@ -105,9 +105,9 @@ After loging-in you have access to the following commands:
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
 *   `CHGP,oldPassword,newPassword` - Change password of current user
 
-<h2 align="center">Python DUCO API module</h2><br>
+<h2 align="center">Python3 DUCO API module</h2><br>
 
-To build your own Duino-Coin apps, here's a some documentation for the python module.
+To build your own Duino-Coin apps we've created Duino-Coin API for python3. Here's the documentation for the module.
 
 <h3>Getting Started</h3>
 
@@ -115,7 +115,7 @@ To build your own Duino-Coin apps, here's a some documentation for the python mo
 import duco_api
 ```
 
-First you need to initialize the connection to the server
+Initialize the connection to the server
 
 ```python
 api_connection = duco_api.api_actions() #creates the api connection instance
