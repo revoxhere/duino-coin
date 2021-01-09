@@ -231,7 +231,7 @@ def ConnectToAVR():
   com = serial.Serial(avrport, 115200, timeout=5)
 
 def AVRMine(): # Mining section
-  global donationlevel, donatorrunning
+  global donationlevel, donatorrunning, donateExecutable
 
   if os.name == 'nt':
     cmd = "cd " + resourcesFolder + "& Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
