@@ -208,9 +208,9 @@ def Connect(): # Connect to master server section
       debugOutput("Retrieved pool IP: " + masterServer_address + ":" + str(masterServer_port))
   except: # If it wasn't, display a message
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Back.RESET + Fore.RED + " Error retrieving data from GitHub! Retrying in 15s.")
+      + Back.RESET + Fore.RED + " Error retrieving data from GitHub! Retrying in 10s.")
     if debug == "True": raise
-    time.sleep(15)
+    time.sleep(10)
     Connect()
   try: # Try to connect
     try: # Shutdown previous connections (if any)
@@ -223,9 +223,9 @@ def Connect(): # Connect to master server section
     soc.settimeout(timeout)
   except: # If it wasn't, display a message
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 15s.")
+      + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
     if debug == "True": raise
-    time.sleep(15)
+    time.sleep(10)
     Connect()
 
 def checkVersion():
@@ -311,28 +311,27 @@ def Mine(): # Mining section
               + Style.NORMAL + " @ diff " + str(diff) + " ⁃ " + Fore.BLUE + "ping " + ping + "ms")
             break # Repeat
 
-          elif feedback == "BLOCK": # If big block was found
+          elif feedback == "BLOCK": # If block was found
             shares[0] += 1 # Share accepted = increment feedback shares counter by 1
             title("Duino-Coin Python Miner (v"+str(minerVersion)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
             print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.YELLOW + Fore.WHITE + " cpu "
-              + Back.RESET + Fore.GREEN + " Block accepted ("+str(job[0])[:8]+") "
-              + Fore.YELLOW + str(shares[0]) + "/" + str(shares[0] + shares[1])
-              + Back.RESET + Style.DIM + " (" + str(round((shares[0] / (shares[0] + shares[1]) * 100))) + "%) "
-              + Style.NORMAL + Fore.WHITE + "⁃ diff " + str(diff) + " ⁃ "
-              + Style.BRIGHT + Fore.WHITE + str(khash_count) + " kH/s " + Fore.BLUE + "ping " + ping + "ms")
+              + Back.RESET + Fore.CYAN + " Block found " + Fore.WHITE + str(shares[0]) + "/" + str(shares[0] + shares[1])
+              + Back.RESET + Fore.YELLOW + " (" + str(int((shares[0] / (shares[0] + shares[1]) * 100))) + "%)"
+              + Style.NORMAL + Fore.WHITE + " ⁃ " + Style.BRIGHT + Fore.WHITE + str(khash_count) + " kH/s"
+              + Style.NORMAL + " @ diff " + str(diff) + " ⁃ " + Fore.BLUE + "ping " + ping + "ms")
             break # Repeat
 
-          elif feedback == "INVU": # If this user doesn't exist server will forward earnings to developer account
+          elif feedback == "INVU": # If this user doesn't exist 
             print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
               + Back.RESET + Fore.RED + " User "+str(username)+" doesn't exist."
-              + Style.RESET_ALL + Fore.RED + " Make sure you've entered the username correctly. Please check your config file. Retrying in 15s.")
-            time.sleep(15)
+              + Style.RESET_ALL + Fore.RED + " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s.")
+            time.sleep(10)
             Connect()
 
-          elif feedback == "ERR": # If this user doesn't exist server will forward earnings to developer account
+          elif feedback == "ERR": # If server reports internal error
             print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-              + Back.RESET + Fore.RED + " Internal server error." + Style.RESET_ALL + Fore.RED + " Retrying in 15s.")
-            time.sleep(15)
+              + Back.RESET + Fore.RED + " Internal server error." + Style.RESET_ALL + Fore.RED + " Retrying in 10s")
+            time.sleep(10)
             Connect()
 
           else: # If result was bad
@@ -354,9 +353,9 @@ if __name__ == '__main__':
     loadConfig() # Load configfile
     debugOutput("Config file loaded")
   except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "There was an error loading the configfile (Miner_config.cfg). Try removing it and re-running configuration. Exiting in 15s." + Style.RESET_ALL)
+    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "Error loading the configfile ("+resources+"/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s" + Style.RESET_ALL)
     if debug == "True": raise
-    time.sleep(15)
+    time.sleep(10)
     os._exit(1)
   try:
     Greeting() # Display greeting message
@@ -373,9 +372,9 @@ if __name__ == '__main__':
         debugOutput("Autorestarter is disabled")
     except:
       print(nnow().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-        + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error in autorestarter. Check configuration file ("+resources+"/Miner_config.cfg). Exiting in 15s." + Style.RESET_ALL)
+        + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error in the autorestarter. Check configuration file ("+resources+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
       if debug == "True": raise
-      time.sleep(15)
+      time.sleep(10)
       os._exit(1)
 
     try:
@@ -383,9 +382,9 @@ if __name__ == '__main__':
       debugOutput("Connected to master server")
     except:
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error connecting to the server. Retrying in 15s." + Style.RESET_ALL)
+      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the server. Retrying in 10s" + Style.RESET_ALL)
       if debug == "True": raise
-      time.sleep(15)
+      time.sleep(10)
       Connect()
 
     try:
@@ -393,8 +392,9 @@ if __name__ == '__main__':
       debugOutput("Version check complete")
     except:
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error checking server version. Rescuing." + Style.RESET_ALL)
+      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Rrror checking server version. Retrying in 10s" + Style.RESET_ALL)
       if debug == "True": raise
+      time.sleep(10)
       Connect()
 
     try:
@@ -403,7 +403,7 @@ if __name__ == '__main__':
       debugOutput("Mining ended")
     except:
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " There was an error while mining (most likely server timeout). Rescuing." + Style.RESET_ALL)
+      + Style.RESET_ALL + Style.BRIGHT + Fore.MAGENTA + " Master server timeout - rescuing" + Style.RESET_ALL)
       if debug == "True": raise
       Connect()
     time.sleep(0.025) # Restart
