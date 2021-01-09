@@ -8,7 +8,7 @@
     <img width="80%" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" /></a><br /><br />
   <a href="https://duinocoin.com">
     <img src="https://img.shields.io/badge/duinocoin.com-555555.svg?style=for-the-badge&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAmklEQVQ4T7WUQQ6AIAwEIcaX%2BALj0fdz9gM%2BxMRESQ8ktSllrciZTneX0hg6n8h5Z5pvhD%2Bu26OO17iABaCBPwEJLKFV6ZZ1GQ2HwgqlEg51ATV7GhSyXFPjBpK6UsztdQdqjSDLNYVu4JGWaQjXLh%2BmaRn5eq8ybAGRWfx3sJFNo7lw%2FxStobkcWhlKYJf1ZS1XaggPNpIv3cls33EVXWotfwAAAABJRU5ErkJggg%3D%3D" /></a>
-  <a href="http://51.15.127.80/webwallet.html">
+  <a href="http://wallet.duinocoin.com">
     <img src="https://img.shields.io/badge/Online Wallet-555555.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/whitepaper.pdf">
     <img src="https://img.shields.io/badge/whitepaper-555555.svg?style=for-the-badge&logo=Academia" /></a>
@@ -209,6 +209,9 @@ Hashrate Calculators for AVR/ESP platforms are available in the [Useful tools br
 *   **Lead developers:**
     *   [@revox](https://github.com/revoxhere/) - robik123.345@gmail.com
     *   [@Bilaboz](https://github.com/bilaboz/)
+
+*   **Webmaster:**
+    *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io
 
 *   **Contributors:**
     *   [@kyngs](https://github.com/kyngs)
