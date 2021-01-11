@@ -200,7 +200,6 @@ def InputManagement():
             print("  Are you sure you want to exit DUCO server?")
             confirm = input("  Y/n")
             if confirm == "Y" or confirm == "y" or confirm == "":
-                s.shutdown(socket.SHUT_RDWR)
                 s.close()
                 os._exit(0)
             else:
@@ -210,7 +209,6 @@ def InputManagement():
             confirm = input("  Y/n")
             if confirm == "Y" or confirm == "y" or confirm == "":
                 os.system('clear')
-                s.shutdown(socket.SHUT_RDWR)
                 s.close()
                 os.execl(sys.executable, sys.executable, *sys.argv)
             else:
@@ -403,15 +401,16 @@ def handle(c):
                             c.send(bytes("NO,Password is invalid", encoding='utf8'))
                             break
                     except:
-                        stored_password = str(stored_password).encode('utf-8')
-                        if bcrypt.checkpw(password, stored_password):
-                            c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
-                        else: # Disconnect user which password isn't valid, close the connection
-                            c.send(bytes("NO,Password is invalid", encoding='utf8'))
+                        try:
+                            stored_password = str(stored_password).encode('utf-8')
+                            if bcrypt.checkpw(password, stored_password):
+                                c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
+                            else: # Disconnect user which password isn't valid, close the connection
+                                c.send(bytes("NO,Password is invalid", encoding='utf8'))
+                                break
+                        except:
+                            c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
                             break
-                    finally:
-                        c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
-                        break
                     
                 else: # User used unallowed characters, close the connection
                     c.send(bytes("NO,You have used unallowed characters", encoding='utf8'))
@@ -453,78 +452,88 @@ def handle(c):
                     rand = random.randint(1, diff)
                 else:
                     rand = random.randint(1, 100 * diff)
-                newBlockHash = hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest()
-                try: 
+                try:
+                    newBlockHash = hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest()
                     c.send(bytes(str(lastBlockHash) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
                     jobsent = datetime.datetime.now()
                     response = c.recv(128).decode().split(",") # Wait until client solves hash
                     result = response[0]
                     # Kolka system - reward dependent on share submission time and rejection of very fast shares
                     resultreceived = datetime.datetime.now()
-                    sharetime = resultreceived - jobsent # Time from start of hash computing to finding the result
-                    sharetime = int(sharetime.microseconds / 1000) # Convert to ms
-                    reward = int(int(sharetime) **2) / 750000000 # Calculate reward dependent on share submission time
-                    try: # If client submitted hashrate, use it
-                        hashrate = float(response[1])
-                        hashrateEstimated = False
-                    except: # If not, estimate it ourselves
-                        try:
-                            hashrate = int(rand) / int(sharetime) * 2000000 / int(diff) # This formula gives a rough estimation of the hashrate
-                        except ZeroDivisionError:
-                            hashrate = 1000
-                        hashrateEstimated = True
+                except:
+                    break
+                sharetime = resultreceived - jobsent # Time from start of hash computing to finding the result
+                sharetime = int(sharetime.microseconds / 1000) # Convert to ms
+                reward = int(int(sharetime) **2) / 750000000 # Calculate reward dependent on share submission time
+                try: # If client submitted hashrate, use it
+                    hashrate = float(response[1])
+                    hashrateEstimated = False
+                except: # If not, estimate it ourselves
                     try:
-                        minerUsed = str(response[2])
-                    except:
-                        minerUsed = "Unknown"
+                        hashrate = int(rand) / int(sharetime) * 2000000 / int(diff) # This formula gives a rough estimation of the hashrate
+                    except ZeroDivisionError:
+                        hashrate = 1000
+                    hashrateEstimated = True
+                try:
+                    minerUsed = str(response[2])
+                except:
+                    minerUsed = "Unknown"
+                try:
+                    minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
+                except:
+                    pass
+                if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 999:
                     try:
-                        minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
-                    except:
-                        pass
-                    if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 999:
-                        with sqlite3.connect(blockchain, timeout=20) as blockconn: # Update blocks counter and lastblock's hash
-                            blocks += 1
-                            blockdatab = blockconn.cursor()
-                            blockdatab.execute("UPDATE Server set blocks = ? ", (blocks,))
-                            blockdatab.execute("UPDATE Server set lastBlockHash = ?", (newBlockHash,))
-                            blockconn.commit()
-                        try:
-                            with sqlite3.connect(database, timeout=20) as conn: # Get users balance and check if it exists
-                                datab = conn.cursor()
-                                datab.execute("SELECT * FROM Users WHERE username = ?", (username,))
-                                balance = float(datab.fetchone()[3])
-                                balance += float(reward) # Reward user
-                                datab = conn.cursor()
-                                datab.execute("UPDATE Users set balance = ? where username = ?", (f'{balance:.20f}', username))
-                                conn.commit()
-                                acceptedShares += 1
-                                c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
-                        except:
-                            c.send(bytes("INVU", encoding="utf8")) # Send feedback that this user doesn't exist
-                            break
-
-                    else: # Incorrect result received
-                        with sqlite3.connect(database, timeout=20) as conn:
-                            datab = conn.cursor()
-                            datab.execute("SELECT * FROM Users WHERE username = ?", (username,))
-                            balance = str(datab.fetchone()[3]) # Get miner balance
-                            if float(balance) > .00005:
-                                balance = float(balance) - int(int(sharetime) *2) / 750000000 # Calculate penalty dependent on share submission time
-                                with sqlite3.connect(database) as conn:
-                                    datab = conn.cursor() # Update his the balance
+                        acceptedShares += 1
+                        c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
+                        while True:
+                            try:
+                                with sqlite3.connect(database, timeout=15) as conn: # Get users balance and check if it exists
+                                    datab = conn.cursor()
+                                    datab.execute("SELECT * FROM Users WHERE username = ?", (username,))
+                                    balance = float(datab.fetchone()[3])
+                                    balance += float(reward) # Reward user
+                                    datab = conn.cursor()
                                     datab.execute("UPDATE Users set balance = ? where username = ?", (f'{balance:.20f}', username))
                                     conn.commit()
-                        try:
-                            rejectedShares += 1
-                            c.send(bytes("BAD", encoding="utf8")) # Send feedback that incorrect result was received
-                        except:
-                            break
-                except:
-                    try:
-                        c.send(bytes("ERR", encoding="utf8"))
+                                    break
+                            except:
+                                pass
+                    except:
+                        c.send(bytes("INVU", encoding="utf8")) # Send feedback that this user doesn't exist
                         break
+                    while True:
+                        try:
+                            with sqlite3.connect(blockchain, timeout=20) as blockconn: # Update blocks counter and lastblock's hash
+                                blocks += 1
+                                blockdatab = blockconn.cursor()
+                                blockdatab.execute("UPDATE Server set blocks = ? ", (blocks,))
+                                blockdatab.execute("UPDATE Server set lastBlockHash = ?", (newBlockHash,))
+                                blockconn.commit()
+                                break
+                        except:
+                            pass
+                else: # Incorrect result received
+                    try:
+                        rejectedShares += 1
+                        c.send(bytes("BAD", encoding="utf8")) # Send feedback that incorrect result was received
                     except:
                         break
+                    with sqlite3.connect(database, timeout=15) as conn:
+                        datab = conn.cursor()
+                        datab.execute("SELECT * FROM Users WHERE username = ?", (username,))
+                        balance = str(datab.fetchone()[3]) # Get miner balance
+                        if float(balance) > .00005:
+                            balance = float(balance) - int(int(sharetime) *2) / 750000000 # Calculate penalty dependent on share submission time
+                            while True:
+                                try:
+                                    with sqlite3.connect(database) as conn:
+                                        datab = conn.cursor() # Update his the balance
+                                        datab.execute("UPDATE Users set balance = ? where username = ?", (f'{balance:.20f}', username))
+                                        conn.commit()
+                                        break
+                                except:
+                                    pass
 
             ######################################################################
             if str(data[0]) == "CHGP" and str(username) != "":
@@ -620,6 +629,7 @@ def handle(c):
                     datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                     balance = str(datab.fetchone()[3]) # Fetch balance of user
                 c.send(bytes(str(f'{float(balance):.20f}'), encoding="utf8")) # Send it as 20 digit float
+                time.sleep(0.05)
 
             ######################################################################
             elif str(data[0]) == "WRAP" and str(username) != "":
