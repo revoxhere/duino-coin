@@ -3,7 +3,7 @@
 # Duino-Coin Master Server Remastered (v1.9)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2019-2020
+# © Duino-Coin Community 2019-2021
 #############################################
 import requests, smtplib, sys, ssl, socket, re, math, random, hashlib, datetime,  requests, smtplib, ssl, sqlite3, bcrypt, time, os.path, json, logging, threading
 from _thread import *
@@ -118,66 +118,79 @@ def getLeaders():
         for row in datab.fetchall():
             leadersdata.append(f"{round((float(row[3])), 4)} DUCO - {row[0]}")
     return(leadersdata[:10])
+def getCpuUsage():
+    import psutil
+    while True:
+        try:
+            cpuperc = psutil.cpu_percent() / 4
+            break
+        except:
+            pass
+    return(cpuperc)
 def API():
     while True:
-        l = threading.Lock()
-        with l:
-            with sqlite3.connect(blockchain, timeout = 15) as blockconn:
-                blockdatab = blockconn.cursor()
-                blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
-                blocks = int(blockdatab.fetchone()[0])
-                blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
-                lastBlockHash = str(blockdatab.fetchone()[0])
-                diff = math.ceil(blocks / diff_incrase_per) # Calculate difficulty
-            now = datetime.datetime.now()
-            minerList = []
-            usernameMinerCounter = {}
-            serverHashrate = 0
-            hashrate = 0
-            for x in minerapi.copy():
-                lista = minerapi[x] # Convert list to strings
-                hashrate = lista[1]
-                serverHashrate += float(hashrate) # Add user hashrate to the server hashrate
-            if serverHashrate >= 1000000:
-                prefix = " MH/s"
-                serverHashrate = serverHashrate / 1000000
-            elif serverHashrate >= 1000:
-                prefix = " kH/s"
-                serverHashrate = serverHashrate / 1000
-            else:
-                prefix = " H/s"
-            formattedMinerApi = { # Prepare server API data
-                    "Server version":        float(serverVersion),
-                    "Active connections":    int(connectedUsers),
-                    "Last update":           str(now.strftime("%d/%m/%Y %H:%M (UTC)")),
-                    "Pool hashrate":         str(round(serverHashrate, 2))+prefix,
-                    "Duco price":            float(round(getDucoPrice(), 6)), # Call getDucoPrice function
-                    "Registered users":      int(getRegisteredUsers()), # Call getRegisteredUsers function
-                    "All-time mined DUCO":   float(round(getMinedDuco(), 2)), # Call getMinedDuco function
-                    "Current difficulty":    int(diff),
-                    "Mined blocks":          int(blocks),
-                    "Full last block hash":  str(lastBlockHash),
-                    "Last block hash":       str(lastBlockHash)[:10]+"...",
-                    "Top 10 richest miners": getLeaders(), # Call getLeaders function
-                    "Active workers":        usernameMinerCounter,
-                    "Miners": {}}
-            for x in minerapi.copy(): # Get data from every miner
-                lista = minerapi[x] # Convert list to strings
-                formattedMinerApi["Miners"][x] = { # Format data
-                "User":          str(lista[0]),
-                "Hashrate":      float(lista[1]),
-                "Is estimated":  str(lista[6]),
-                "Sharetime":     float(lista[2]),
-                "Accepted":      int(lista[3]),
-                "Rejected":      int(lista[4]),
-                "Diff":          int(lista[5]),
-                "Software":      str(lista[7])}
-            for thread in formattedMinerApi["Miners"]:
-                minerList.append(formattedMinerApi["Miners"][thread]["User"]) # Append miners to formattedMinerApi["Miners"][id of thread]
-            for i in minerList:
-                usernameMinerCounter[i]=minerList.count(i) # Count miners for every username
-            with open('api.json', 'w') as outfile: # Write JSON to file
-                json.dump(formattedMinerApi, outfile, indent=4, ensure_ascii=False)
+        try:
+            l = threading.Lock()
+            with l:
+                with sqlite3.connect(blockchain, timeout = 15) as blockconn:
+                    blockdatab = blockconn.cursor()
+                    blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
+                    blocks = int(blockdatab.fetchone()[0])
+                    blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
+                    lastBlockHash = str(blockdatab.fetchone()[0])
+                    diff = math.ceil(blocks / diff_incrase_per) # Calculate difficulty
+                now = datetime.datetime.now()
+                minerList = []
+                usernameMinerCounter = {}
+                serverHashrate = 0
+                hashrate = 0
+                for x in minerapi.copy():
+                    lista = minerapi[x] # Convert list to strings
+                    hashrate = lista[1]
+                    serverHashrate += float(hashrate) # Add user hashrate to the server hashrate
+                if serverHashrate >= 1000000:
+                    prefix = " MH/s"
+                    serverHashrate = serverHashrate / 1000000
+                elif serverHashrate >= 1000:
+                    prefix = " kH/s"
+                    serverHashrate = serverHashrate / 1000
+                else:
+                    prefix = " H/s"
+                formattedMinerApi = { # Prepare server API data
+                        "Server version":        float(serverVersion),
+                        "Active connections":    int(connectedUsers),
+                        "Server CPU usage":      float(getCpuUsage()),
+                        "Last update":           str(now.strftime("%d/%m/%Y %H:%M (UTC)")),
+                        "Pool hashrate":         str(round(serverHashrate, 2))+prefix,
+                        "Duco price":            float(round(getDucoPrice(), 6)), # Call getDucoPrice function
+                        "Registered users":      int(getRegisteredUsers()), # Call getRegisteredUsers function
+                        "All-time mined DUCO":   float(round(getMinedDuco(), 2)), # Call getMinedDuco function
+                        "Current difficulty":    int(diff),
+                        "Mined blocks":          int(blocks),
+                        "Full last block hash":  str(lastBlockHash),
+                        "Last block hash":       str(lastBlockHash)[:10]+"...",
+                        "Top 10 richest miners": getLeaders(), # Call getLeaders function
+                        "Active workers":        usernameMinerCounter,
+                        "Miners": {}}
+                for x in minerapi.copy(): # Get data from every miner
+                    lista = minerapi[x] # Convert list to strings
+                    formattedMinerApi["Miners"][x] = { # Format data
+                    "User":          str(lista[0]),
+                    "Hashrate":      float(lista[1]),
+                    "Is estimated":  str(lista[6]),
+                    "Sharetime":     float(lista[2]),
+                    "Accepted":      int(lista[3]),
+                    "Rejected":      int(lista[4]),
+                    "Diff":          int(lista[5]),
+                    "Software":      str(lista[7])}
+                for thread in formattedMinerApi["Miners"]:
+                    minerList.append(formattedMinerApi["Miners"][thread]["User"]) # Append miners to formattedMinerApi["Miners"][id of thread]
+                for i in minerList:
+                    usernameMinerCounter[i]=minerList.count(i) # Count miners for every username
+                with open('api.json', 'w') as outfile: # Write JSON to file
+                    json.dump(formattedMinerApi, outfile, indent=4, ensure_ascii=False)
+        except:
+            pass
         time.sleep(3)
 
 def InputManagement():
@@ -438,7 +451,7 @@ def handle(c):
                     customDiff = str(data[2])
                     if str(customDiff) == "AVR":
                         diff = 300 # Use 300 - optimal diff for very low power devices like arduino
-                        shareTimeRequired = 120
+                        shareTimeRequired = 100
                     elif str(customDiff) == "ESP":
                         diff = 1500 # Use 1500 - optimal diff for low power devices like ESP
                         shareTimeRequired = 200
@@ -447,11 +460,11 @@ def handle(c):
                         shareTimeRequired = 170
                 except:
                     diff = math.ceil(blocks / diff_incrase_per) # Use "standard" difficulty
-                    shareTimeRequired = 85
                 if diff == 300:
                     rand = random.randint(1, diff)
                 else:
                     rand = random.randint(1, 100 * diff)
+                    shareTimeRequired = rand / 10000
                 try:
                     newBlockHash = hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest()
                     c.send(bytes(str(lastBlockHash) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
@@ -519,21 +532,27 @@ def handle(c):
                         c.send(bytes("BAD", encoding="utf8")) # Send feedback that incorrect result was received
                     except:
                         break
-                    with sqlite3.connect(database, timeout=15) as conn:
-                        datab = conn.cursor()
-                        datab.execute("SELECT * FROM Users WHERE username = ?", (username,))
-                        balance = str(datab.fetchone()[3]) # Get miner balance
-                        if float(balance) > .00005:
-                            balance = float(balance) - int(int(sharetime) *2) / 750000000 # Calculate penalty dependent on share submission time
-                            while True:
-                                try:
-                                    with sqlite3.connect(database) as conn:
-                                        datab = conn.cursor() # Update his the balance
-                                        datab.execute("UPDATE Users set balance = ? where username = ?", (f'{balance:.20f}', username))
-                                        conn.commit()
-                                        break
-                                except:
-                                    pass
+                    
+                    while True:
+                        try:
+                            with sqlite3.connect(database, timeout=15) as conn:
+                                datab = conn.cursor()
+                                datab.execute("SELECT * FROM Users WHERE username = ?", (username,))
+                                balance = str(datab.fetchone()[3]) # Get miner balance
+                                if float(balance) > .00005:
+                                    balance = float(balance) - int(int(sharetime) *2) / 750000000 # Calculate penalty dependent on share submission time
+                                    while True:
+                                        try:
+                                            with sqlite3.connect(database) as conn:
+                                                datab = conn.cursor() # Update his the balance
+                                                datab.execute("UPDATE Users set balance = ? where username = ?", (f'{balance:.20f}', username))
+                                                conn.commit()
+                                                break
+                                        except:
+                                            pass
+                                break
+                        except:
+                            pass
 
             ######################################################################
             if str(data[0]) == "CHGP" and str(username) != "":
@@ -624,12 +643,19 @@ def handle(c):
 
             ######################################################################
             elif str(data[0]) == "BALA" and str(username) != "":
-                with sqlite3.connect(database, timeout = 15) as conn:
-                    datab = conn.cursor()
-                    datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
-                    balance = str(datab.fetchone()[3]) # Fetch balance of user
-                c.send(bytes(str(f'{float(balance):.20f}'), encoding="utf8")) # Send it as 20 digit float
-                time.sleep(0.05)
+                while True:
+                    try:
+                        with sqlite3.connect(database, timeout = 15) as conn:
+                            datab = conn.cursor()
+                            datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
+                            balance = str(datab.fetchone()[3]) # Fetch balance of user
+                            try:
+                                c.send(bytes(str(f'{float(balance):.20f}'), encoding="utf8")) # Send it as 20 digit float
+                            except:
+                                break
+                            break
+                    except:
+                        pass
 
             ######################################################################
             elif str(data[0]) == "WRAP" and str(username) != "":
@@ -690,7 +716,7 @@ def handle(c):
                                 else:
                                     try:
                                         datab.execute("UPDATE Users set balance = ? where username = ?", (balancebackup, username))
-                                        c.send(bytes("NO,smth went wrong, transaction reverted", encoding="utf8"))
+                                        c.send(bytes("NO,Unknown error, transaction reverted", encoding="utf8"))
                                     except:
                                         break
                             except:
@@ -699,7 +725,7 @@ def handle(c):
                         c.send(bytes("NO,Wrapper disabled", emcoding="utf8"))
                         print("NO,Wrapper disabled")
 
-            ##################### DUCO Unwrapper ######################
+            ######################################################################
             elif str(data[0]) == "UNWRAP" and str(username) != "":
                 if use_wrapper and wrapper_permission:
                     print("Starting unwraping protocol")
@@ -714,7 +740,7 @@ def handle(c):
                     except:
                         print("Error retrieving user balance")
                         try:
-                            c.send(bytes("No,smth went wrong", encoding="utf8"))
+                            c.send(bytes("NO,Error retrieving balance", encoding="utf8"))
                             break
                         except:
                             break
@@ -734,7 +760,8 @@ def handle(c):
                                         datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
                                         conn.commit()
                                 except:
-                                    print("NO,Error with DUCO DB")
+                                    print("Error with DUCO DB")
+                                    c.send(bytes("NO,Error with DUCO DB", encoding="utf8"))
                                     break
 
                                 try:
@@ -764,13 +791,13 @@ def handle(c):
                                         break
                             else:
                                 try:
-                                    c.send(bytes("No,Minimum amount is 10", encoding="utf8"))
+                                    c.send(bytes("NO,Minimum amount is 10", encoding="utf8"))
                                 except:
                                     break
                 else:
                     print("Wrapper disabled")
                     try:
-                        c.send(bytes("No,Minimum amount is 10", encoding="utf8"))
+                        c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
                     except:
                         break
         except ConnectionResetError:
@@ -783,20 +810,33 @@ def handle(c):
         pass
     sys.exit() # Close thread
 
-IPS = []
+def unbanip(ip):
+    os.system("sudo iptables -D INPUT -s "+str(ip)+" -j DROP")
+    print("Unbanning IP:", ip)
+
+IPS = {}
+bannedIPS = {}
 def countips():
     while True:
-        from collections import Counter
-        x = Counter(IPS)
-        print("5 IPs with the most connections:", x.most_common(5))
-        time.sleep(5)
+        for ip in IPS.copy():
+            if IPS[ip] > 50 and not ip == "51.15.127.80":
+                print("Banning IP:", ip)
+                os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
+                IPS.pop(ip)
+                threading.Timer(60.0, unbanip, [ip]).start() # Start auto-unban thread for this IP
+        time.sleep(2)
+def resetips():
+    while True:
+        time.sleep(30)
+        IPS.clear()
 
 if __name__ == '__main__':
-    print("Duino-Coin Testnet Server", serverVersion, "is starting...")
+    print("Duino-Coin Master Server", serverVersion, "is starting...")
     threading.Thread(target=API).start() # Create JSON API thread
     threading.Thread(target=createBackup).start() # Create Backup generator thread
     threading.Thread(target=InputManagement).start() # Admin input management thread
-    #threading.Thread(target=countips).start() # Uncomment to see how many connections there were from what IP
+    threading.Thread(target=countips).start() # Start anti-DDoS thread
+    threading.Thread(target=resetips).start() # Start connection counter reseter for the ant-DDoS thread
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host, port))
@@ -810,10 +850,15 @@ if __name__ == '__main__':
         while True:
             # Establish connection with client
             c, addr = s.accept()
-            IPS.append(addr[0])
+            try:
+                IPS[addr[0]] += 1
+            except:
+                IPS[addr[0]] = 1
             #print('Connected to :', addr[0], ':', addr[1])
             # Start a new thread and return its identifier
             start_new_thread(handle, (c,))
-    except:
+    finally:
+        print("exiting")
         s.close()
-        exit()
+        import os
+        os._exit(1) # error code 1 so it will autorestart with systemd
