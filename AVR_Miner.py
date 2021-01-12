@@ -38,7 +38,7 @@ except:
 
 # Global variables
 minerVersion = "1.9" # Version number
-timeout = 5 # Socket timeout
+timeout = 15 # Socket timeout
 resourcesFolder = "AVRMiner_"+str(minerVersion)+"_resources"
 shares = [0, 0]
 diff = 0
@@ -228,7 +228,7 @@ def ConnectToAVR():
     com.close()
   except:
     pass
-  com = serial.Serial(avrport, 115200, timeout=3, write_timeout=0.2, inter_byte_timeout=1)
+  com = serial.Serial(avrport, 115200, timeout=5, write_timeout=5, inter_byte_timeout=1)
 
 def AVRMine(): # Mining section
   global donationlevel, donatorrunning, donateExecutable
@@ -255,20 +255,16 @@ def AVRMine(): # Mining section
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
         + Back.RESET + Fore.RED + " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development")
 
-  try:
-    while True:
-      try:
-        ready = com.readline().decode().rstrip().lstrip() # AVR will send ready signal
-        debugOutput("Received start word ("+str(ready)+")")
-        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-          + Back.RESET + Fore.YELLOW + " AVR mining thread is starting"
-          + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1A algorithm")
-        break
-      except:
-        pass
-  except:
-    if debug == "True": raise
-    Connect()
+  while True:
+    try:
+      ready = com.readline().decode() # AVR will send ready signal
+      debugOutput("Received start word ("+str(ready)+")")
+      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
+        + Back.RESET + Fore.YELLOW + " AVR mining thread is starting"
+        + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1A algorithm")
+      break
+    except:
+      ConnectToAVR()
 
   while True:
     while True:
@@ -287,14 +283,10 @@ def AVRMine(): # Mining section
     try: # Write data to AVR board
       com.write(bytes("start\n", encoding="utf8")) # start word
       debugOutput("Written start word")
-      com.write(bytes(str(job[0])+"\n", encoding="utf8")) # hash
-      debugOutput("Written hash")
-      com.write(bytes(str(job[1])+"\n", encoding="utf8")) # job
-      debugOutput("Written job")
-      com.write(bytes(str(job[2])+"\n", encoding="utf8")) # difficulty
-      debugOutput("Written diff")
+      com.write(bytes(str(job[0] + "\n" + job[1]+ "\n" + job[2] + "\n"), encoding="utf8")) # hash
+      debugOutput("Written hash, job and diff")
 
-      result = com.readline().decode().rstrip().lstrip() # Read the result
+      result = com.readline().decode() # Read the result
       result = result.split(",")
       debugOutput("Received result ("+str(result[0])+")")
       debugOutput("Received time ("+str(result[1])+")")
