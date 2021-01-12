@@ -228,7 +228,7 @@ def ConnectToAVR():
     com.close()
   except:
     pass
-  com = serial.Serial(avrport, 115200, timeout=5)
+  com = serial.Serial(avrport, 115200, timeout=3, write_timeout=0.2, inter_byte_timeout=1)
 
 def AVRMine(): # Mining section
   global donationlevel, donatorrunning, donateExecutable
@@ -256,12 +256,16 @@ def AVRMine(): # Mining section
         + Back.RESET + Fore.RED + " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development")
 
   try:
-    debugOutput("Sending start word")
-    ready = com.readline().decode().rstrip().lstrip() # AVR will send ready signal
-    debugOutput("Received start word ("+str(ready)+")")
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-      + Back.RESET + Fore.YELLOW + " AVR mining thread is starting"
-      + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1A algorithm")
+    while True:
+      try:
+        ready = com.readline().decode().rstrip().lstrip() # AVR will send ready signal
+        debugOutput("Received start word ("+str(ready)+")")
+        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
+          + Back.RESET + Fore.YELLOW + " AVR mining thread is starting"
+          + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1A algorithm")
+        break
+      except:
+        pass
   except:
     if debug == "True": raise
     Connect()
@@ -428,4 +432,5 @@ if __name__ == '__main__':
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
       + Style.RESET_ALL + Style.BRIGHT + Fore.MAGENTA + " Master server timeout OR AVR connection error - rescuing" + Style.RESET_ALL)
       if debug == "True": raise
+      ConnectToAVR()
       Connect()
