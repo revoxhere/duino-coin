@@ -320,7 +320,7 @@ def handle(c):
         print("Sent wrap tx to TRON network")
         feedback = txn.wait()
         return feedback
-    
+
     def unwraptx(duco_username, recipient, amount, private_key, public_key):
         txn = wduco.functions.initiateWithdraw(duco_username,recipient,int(float(amount)*10**6)).with_owner(PublicKey(PrivateKey(bytes.fromhex(wrapper_public_key)))).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
         feedback = txn.broadcast().wait()
@@ -331,7 +331,7 @@ def handle(c):
         txn = txn.broadcast()
         print("Sent confirm tx to tron network")
         return feedback
-    
+
     while True:
         try:
             data = c.recv(1024).decode() # Receive data from client
@@ -355,7 +355,7 @@ def handle(c):
                         datab = conn.cursor()
                         datab.execute("SELECT COUNT(username) FROM Users WHERE username = ?",(username,))
                         if int(datab.fetchone()[0]) == 0:
-                            if(re.search("^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$",email)):
+                            if "@" in email and "." in email:
                                 message = MIMEMultipart("alternative")
                                 message["Subject"] = "Welcome on Duino-Coin network, "+str(username)+"! " + u"\U0001F44B"
                                 message["From"] = duco_email
@@ -424,7 +424,7 @@ def handle(c):
                         except:
                             c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
                             break
-                    
+
                 else: # User used unallowed characters, close the connection
                     c.send(bytes("NO,You have used unallowed characters", encoding='utf8'))
                     break
@@ -532,7 +532,7 @@ def handle(c):
                         c.send(bytes("BAD", encoding="utf8")) # Send feedback that incorrect result was received
                     except:
                         break
-                    
+
                     while True:
                         try:
                             with sqlite3.connect(database, timeout=15) as conn:
