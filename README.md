@@ -59,13 +59,10 @@ Official getting started guides for creating an account and setting up miners on
 *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) by phantom32
 *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
 *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners) by various authors
-*   [Duino DogeRock GUI Miner](https://github.com/DogeRock/Duino-Coin-Gui-Miner) by DogeRock
 
 **Other tools:**
 *   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
 *   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz
-*   [Duino DogeRock GUI Wallet](https://github.com/DogeRock/Duino-Coin-Gui-Wallet) by DogeRock
-*   [Duino DogeRock CLI Wallet](https://github.com/DogeRock/DogeRock-Duino-Coin-cmd-line-wallet) by DogeRock
 
 This list will be actively updated.
 
@@ -237,20 +234,20 @@ Hashrate Calculators for AVR/ESP platforms are available in the [Useful tools br
 
 <h2 align="center">Developers</h2><br>
 
-*   **Lead developers:**
-    *   [@revox](https://github.com/revoxhere/) - robik123.345@gmail.com
+*   **Developers:**
+    *   [@revox](https://github.com/revoxhere/) (Founder) - robik123.345@gmail.com
     *   [@Bilaboz](https://github.com/bilaboz/)
+    *   [@connorhess](https://github.com/connorhess)
+    *   [@JoyBed](https://github.com/JoyBed)
 
 *   **Webmaster:**
     *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io
 
 *   **Contributors:**
+    *   [@ygboucherk](https://github.com/ygboucherk) (wDUCO dev)
     *   [@kyngs](https://github.com/kyngs)
-    *   [@connorhess](https://github.com/connorhess)
     *   [@httsmvkcom](https://github.com/httsmvkcom)
     *   [@Nosh-Ware](https://github.com/Nosh-Ware)
-    *   [@IdotMaster1](https://github.com/IdotMaster1)
-    *   [@JoyBed](https://github.com/JoyBed)
     *   [@Furim](https://github.com/Furim)
 
 <h2 align="center">Special thanks</h2><br>
@@ -259,10 +256,6 @@ Hashrate Calculators for AVR/ESP platforms are available in the [Useful tools br
 *   [@Tech1k](https://github.com/Tech1k) for [Beyondcoin](https://beyondcoin.io) partnership and providing [duinocoin.com](https://duinocoin.com) domain
 *   [@MrKris7100](https://github.com/MrKris7100) for help with implementing SHA1 algorithm
 *   [@daknuett](https://github.com/daknuett) for help with Arduino SHA1 library
-
-<h2 align="center">Donate</h2><br>
-
-If you want to support the project, visit [Donate page](https://revoxhere.github.io/duino-coin/donate) on our website.
 
 <hr>
 
