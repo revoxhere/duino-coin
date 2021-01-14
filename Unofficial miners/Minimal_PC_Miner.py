@@ -3,7 +3,8 @@
 import socket, hashlib, urllib.request # Only python3 included libraries
 soc = socket.socket()
 
-username = "your username here"
+username = "your username here" # Edit this to your username, mind the quotes
+UseLowerDiff = False # Set it to True to mine with lower difficulty
 
 # This sections grabs pool adress and port from Duino-Coin GitHub file
 serverip = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
@@ -19,7 +20,10 @@ print("Server is on version", server_version)
 
 # Mining section
 while True:
-    soc.send(bytes("JOB,"+str(username), encoding="utf8")) # Send job request
+    if UseLowerDiff:
+        soc.send(bytes("JOB,"+str(username)+",MEDIUM", encoding="utf8")) # Send job request
+    else:
+        soc.send(bytes("JOB,"+str(username), encoding="utf8")) # Send job request
     job = soc.recv(1024).decode() # Get work from pool
     job = job.split(",") # Split received data to job (job and difficulty)
     difficulty = job[2]
