@@ -16,11 +16,11 @@ port = 2811 # Server will listen on this port - 2811 for official Duino-Coin ser
 serverVersion = 1.9 # Server version which will be sent to the clients
 diff_incrase_per = 2000 # Difficulty will increase every x blocks (official server uses 2k)
 duco_email = "xxx" # E-mail and password to send registration mail from
-duco_password = "xxx"
+duco_password = "xxx" # E-mail password and admin override password
+NodeS_Overide = "xxx" # Node-S override key
 wrapper_private_key = "xxx" # private key used for interacting with blockchain
 use_wrapper = True # Choosing if you want to use wrapper or not
 wrapper_permission = False # set to false for declaration, will be updated by checking smart contract
-NodeS_Overide = "xxx"
 # Registration email - text version
 text = """\
 Hi there!
@@ -409,7 +409,7 @@ def handle(c):
                         c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
                         break
                     try:
-                        if bcrypt.checkpw(password, stored_password) or password == duco_password or password == NodeS_Overide:
+                        if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8') or password == NodeS_Overide:
                             c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
                         else: # Disconnect user which password isn't valid, close the connection
                             c.send(bytes("NO,Password is invalid", encoding='utf8'))
@@ -417,7 +417,7 @@ def handle(c):
                     except:
                         try:
                             stored_password = str(stored_password).encode('utf-8')
-                            if bcrypt.checkpw(password, stored_password) or password == duco_password:
+                            if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8'):
                                 c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
                             else: # Disconnect user which password isn't valid, close the connection
                                 c.send(bytes("NO,Password is invalid", encoding='utf8'))
@@ -453,6 +453,27 @@ def handle(c):
                     if str(customDiff) == "AVR":
                         diff = 300 # Use 300 - optimal diff for very low power devices like arduino
                         shareTimeRequired = 100
+                    if str(customDiff) == "AVR200":
+                        diff = 200 # Use 300 - optimal diff for very low power devices like arduino
+                        shareTimeRequired = 80
+                    if str(customDiff) == "AVR400":
+                        diff = 300 # Use 300 - optimal diff for very low power devices like arduino
+                        shareTimeRequired = 100
+                    if str(customDiff) == "AVR500":
+                        diff = 500 # Use 300 - optimal diff for very low power devices like arduino
+                        shareTimeRequired = 100
+                    if str(customDiff) == "AVR600":
+                        diff = 600 # Use 300 - optimal diff for very low power devices like arduino
+                        shareTimeRequired = 100
+                    if str(customDiff) == "AVR700":
+                        diff = 700 # Use 300 - optimal diff for very low power devices like arduino
+                        shareTimeRequired = 100
+                    if str(customDiff) == "AVR800":
+                        diff = 800 # Use 300 - optimal diff for very low power devices like arduino
+                        shareTimeRequired = 100
+                    if str(customDiff) == "AVR900":
+                        diff = 900 # Use 300 - optimal diff for very low power devices like arduino
+                        shareTimeRequired = 100
                     elif str(customDiff) == "ESP":
                         diff = 1500 # Use 1500 - optimal diff for low power devices like ESP
                         shareTimeRequired = 200
@@ -461,7 +482,7 @@ def handle(c):
                         shareTimeRequired = 170
                 except:
                     diff = math.ceil(blocks / diff_incrase_per) # Use "standard" difficulty
-                if diff == 300:
+                if diff < 1000:
                     rand = random.randint(1, diff)
                 else:
                     rand = random.randint(1, 100 * diff)
@@ -579,7 +600,7 @@ def handle(c):
                     c.send(bytes("NO,Incorrect username", encoding="utf8"))
                     break
 
-                if bcrypt.checkpw(oldPassword, old_password_database) or oldPassword == duco_password:
+                if bcrypt.checkpw(oldPassword, old_password_database) or oldPassword == duco_password.encode('utf-8'):
                     with sqlite3.connect(database, timeout = 15) as conn:
                         datab = conn.cursor()
                         datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
@@ -587,13 +608,11 @@ def handle(c):
                         try:
                             c.send(bytes("OK,Your password has been changed", encoding='utf8'))
                         except:
-                            server.send(bytes("NO,Debug location 2", encoding='utf8'))
                             break
                 else:
                     try:
                         server.send(bytes("NO,Your old password doesn't match!", encoding='utf8'))
                     except:
-                        server.send(bytes("NO,Debug location 1", encoding='utf8'))
                         break
 
             ######################################################################
@@ -766,7 +785,6 @@ def handle(c):
                                     print("Error with DUCO DB")
                                     c.send(bytes("NO,Error with DUCO DB", encoding="utf8"))
                                     break
-
                                 try:
                                     print("Sending tron transaction !")
                                     txn = wduco.functions.confirmWithdraw(username,tron_address,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
@@ -803,7 +821,7 @@ def handle(c):
                         c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
                     except:
                         break
-        except ConnectionResetError:
+        except:
             break
     #User disconnected, exiting loop
     connectedUsers -= 1 # Subtract connected miners amount
