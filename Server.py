@@ -586,11 +586,13 @@ def handle(c):
                         try:
                             c.send(bytes("OK,Your password has been changed", encoding='utf8'))
                         except:
+                            server.send(bytes("NO,Debug location 2", encoding='utf8'))
                             break
                 else:
                     try:
                         server.send(bytes("NO,Your old password doesn't match!", encoding='utf8'))
                     except:
+                        server.send(bytes("NO,Debug location 1", encoding='utf8'))
                         break
 
             ######################################################################
