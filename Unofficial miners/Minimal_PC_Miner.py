@@ -31,7 +31,7 @@ while True:
     for result in range(100 * int(difficulty) + 1): # Calculate hash with difficulty
         ducos1 = hashlib.sha1(str(job[0] + str(result)).encode("utf-8")).hexdigest() # Generate hash
         if job[1] == ducos1: # If result is even with job
-            soc.send(bytes(str(result), encoding="utf8")) # Send result of hashing algorithm to pool
+            soc.send(bytes(str(result)+",,Minimal_PC_Miner", encoding="utf8")) # Send result of hashing algorithm to pool
             feedback = soc.recv(1024).decode() # Get feedback about the result
             if feedback == "GOOD": # If result was good
                 print("Accepted share", result, "Difficulty", difficulty)
