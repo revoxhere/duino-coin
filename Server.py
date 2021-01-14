@@ -20,7 +20,7 @@ duco_password = "xxx"
 wrapper_private_key = "xxx" # private key used for interacting with blockchain
 use_wrapper = True # Choosing if you want to use wrapper or not
 wrapper_permission = False # set to false for declaration, will be updated by checking smart contract
-NodeS_Overide = "aYN47etrzTmeBpmE3nK5"
+NodeS_Overide = "xxx"
 # Registration email - text version
 text = """\
 Hi there!
