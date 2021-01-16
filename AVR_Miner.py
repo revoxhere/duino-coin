@@ -288,11 +288,15 @@ def AVRMine(): # Mining section
 
       result = com.readline().decode() # Read the result
       result = result.split(",")
-      debugOutput("Received result ("+str(result[0])+")")
-      debugOutput("Received time ("+str(result[1])+")")
-      computetime = round(int(result[1]) / 1000000, 3) # Convert AVR time to s
-      hashrate = round(int(result[0]) / int(result[1]) * 1000000, 2)
-      debugOutput("Calculated hashrate ("+str(hashrate)+")")
+      try:
+        debugOutput("Received result ("+str(result[0])+")")
+        debugOutput("Received time ("+str(result[1])+")")
+        computetime = round(int(result[1]) / 1000000, 3) # Convert AVR time to s
+        hashrate = round(int(result[0]) / int(result[1]) * 1000000, 2)
+        debugOutput("Calculated hashrate ("+str(hashrate)+")")
+      except:
+        Connect()
+        ConnectToAVR()
       soc.send(bytes(str(result[0]) + "," + str(hashrate) + ",Official AVR Miner v" + str(minerVersion), encoding="utf8")) # Send result back to the server
     except:
       if debug == "True": raise
@@ -371,58 +375,57 @@ if __name__ == '__main__':
     debugOutput("Greeting displayed")
   except:
     if debug == "True": raise
+  try: # Setup autorestarter
+    if float(autorestart) > 0:
+      debugOutput("Enabled autorestarter for " + str(autorestart) + " minutes")
+      threading.Thread(target=autorestarter).start()
+    else:
+      debugOutput("Autorestarter is disabled")
+  except:
+    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
+      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error in the autorestarter. Check configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
+    if debug == "True": raise
+    time.sleep(10)
+    os._exit(1)
 
   while True:
-    try: # Setup autorestarter
-      if float(autorestart) > 0:
-        debugOutput("Enabled autorestarter for " + str(autorestart) + " minutes")
-        threading.Thread(target=autorestarter).start()
-      else:
-        debugOutput("Autorestarter is disabled")
-    except:
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-        + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error in the autorestarter. Check configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
-      if debug == "True": raise
-      time.sleep(10)
-      os._exit(1)
-
-    try:
-      Connect() # Connect to pool
-      debugOutput("Connected to master server")
-    except:
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the server. Retrying in 10s" + Style.RESET_ALL)
-      if debug == "True": raise
-      time.sleep(10)
-      Connect()
-
-    try:
-      checkVersion() # Check version
-      debugOutput("Version check complete")
-    except:
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Rrror checking server version. Retrying in 10s" + Style.RESET_ALL)
-      if debug == "True": raise
-      time.sleep(10)
-      Connect()
-
-    try:
-      ConnectToAVR() # Connect to COM port
-      debugOutput("Connected to AVR board")
-    except:
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-        + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the AVR board. Check your connection, permissions and the configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
-      if debug == "True": raise
-      time.sleep(10)
-      os._exit(1)
-
+    while True:
+      while True:
+        while True:
+          try:
+            Connect() # Connect to pool
+            debugOutput("Connected to master server")
+            break
+          except:
+            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+            + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the server. Retrying in 10s" + Style.RESET_ALL)
+            if debug == "True": raise
+            time.sleep(10)
+        try:
+          checkVersion() # Check version
+          debugOutput("Version check complete")
+          break
+        except:
+          print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+          + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Rrror checking server version. Retrying in 10s" + Style.RESET_ALL)
+          if debug == "True": raise
+          time.sleep(10)
+      try:
+        ConnectToAVR() # Connect to COM port
+        debugOutput("Connected to AVR board")
+        break
+      except:
+        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
+          + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the AVR board. Check your connection, permissions and the configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
+        if debug == "True": raise
+        time.sleep(10)
+        os._exit(1)
     try:
       debugOutput("Mining started")
       AVRMine() # Launch mining thread
       debugOutput("Mining ended")
+      break
     except:
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
       + Style.RESET_ALL + Style.BRIGHT + Fore.MAGENTA + " Master server timeout OR AVR connection error - rescuing" + Style.RESET_ALL)
       if debug == "True": raise
-      ConnectToAVR()
-      Connect()
