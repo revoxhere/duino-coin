@@ -28,8 +28,8 @@
 <h2 align="center">Duino-Coin is a cryptocurrency that can be mined with AVR boards.</h2><br />
 
 Key features:
-*   Supported by large number of platforms 💻
-*   Friendly & growing community 👥
+*   Supported by a large number of platforms 💻
+*   A friendly & growing community 👥
 *   Easy to use & exchange 💱
 *   Available everywhere 🌎
 *   Cost-effective 💰
