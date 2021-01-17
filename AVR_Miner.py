@@ -286,7 +286,14 @@ def AVRMine(): # Mining section
       com.write(bytes(str(job[0] + "\n" + job[1]+ "\n" + job[2] + "\n"), encoding="utf8")) # hash
       debugOutput("Written hash, job and diff")
 
-      result = com.readline().decode() # Read the result
+      wrong_avr_result = True
+      while wrong_avr_result:
+        result = com.readline().decode() # Read the result
+        if result == "":
+          wrong_avr_result = True
+        else:
+          wrong_avr_result = False
+            
       result = result.split(",")
       try:
         debugOutput("Received result ("+str(result[0])+")")
