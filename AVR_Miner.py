@@ -38,7 +38,7 @@ except:
 
 # Global variables
 minerVersion = "1.9" # Version number
-timeout = 15 # Socket timeout
+timeout = 60 # Socket timeout
 resourcesFolder = "AVRMiner_"+str(minerVersion)+"_resources"
 shares = [0, 0]
 diff = 0
@@ -54,7 +54,8 @@ if not os.path.exists(resourcesFolder):
     os.mkdir(resourcesFolder) # Create resources folder if it doesn't exist
 
 def debugOutput(text):
-  if debug == "True":
+  debug = False
+  if debug:
     print(now().strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
 
 def title(title):
@@ -190,7 +191,7 @@ def Connect(): # Connect to master server section
   except: # If it wasn't, display a message
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
       + Back.RESET + Fore.RED + " Error retrieving data from GitHub! Retrying in 10s.")
-    if debug == "True": raise
+    if debug: raise
     time.sleep(10)
     Connect()
   try: # Try to connect
@@ -205,7 +206,7 @@ def Connect(): # Connect to master server section
   except: # If it wasn't, display a message
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
       + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
-    if debug == "True": raise
+    if debug: raise
     time.sleep(10)
     Connect()
 
@@ -269,23 +270,34 @@ def AVRMine(): # Mining section
   while True:
     while True:
       try:
-        soc.send(bytes("JOB,"+str(username)+",AVR",encoding="utf8")) # Send job request
-        job = soc.recv(1024).decode() # Get work from pool
+        job_not_received = True
+        while job_not_received:
+          soc.send(bytes("JOB,"+str(username)+",AVR",encoding="utf8")) # Send job request
+          try:
+            job = soc.recv(1024).decode() # Retrieves work from pool
+            debugOutput("Received job")
+            job_not_received = False
+          except:
+            Connect() # reconnects pool
+            job_not_received = True
         job = job.split(",") # Split received data to job and difficulty
         diff = job[2]
         if job[0] and job[1] and job[2]:
           debugOutput("Job received: " +str(job))
           break # If job received, continue 
       except:
-        if debug == "True": raise
+        if debug: raise
         Connect()
         ConnectToAVR()
     try: # Write data to AVR board
-      com.write(bytes("start\n", encoding="utf8")) # start word
-      debugOutput("Written start word")
-      com.write(bytes(str(job[0] + "\n" + job[1]+ "\n" + job[2] + "\n"), encoding="utf8")) # hash
-      debugOutput("Written hash, job and diff")
-
+      try:
+        com.write(bytes("start\n", encoding="utf8")) # start word
+        debugOutput("Written start word")
+        com.write(bytes(str(job[0] + "\n" + job[1]+ "\n" + job[2] + "\n"), encoding="utf8")) # hash
+      except:
+        Connect()
+        ConnectToAVR()
+        break
       wrong_avr_result = True
       while wrong_avr_result:
         result = com.readline().decode() # Read the result
@@ -293,7 +305,7 @@ def AVRMine(): # Mining section
           wrong_avr_result = True
         else:
           wrong_avr_result = False
-            
+      debugOutput(str("result: ")+str(result))
       result = result.split(",")
       try:
         debugOutput("Received result ("+str(result[0])+")")
@@ -304,23 +316,30 @@ def AVRMine(): # Mining section
       except:
         Connect()
         ConnectToAVR()
-      soc.send(bytes(str(result[0]) + "," + str(hashrate) + ",Official AVR Miner v" + str(minerVersion), encoding="utf8")) # Send result back to the server
+      try:
+        soc.send(bytes(str(result[0]) + "," + str(hashrate) + ",Official AVR Miner v" + str(minerVersion), encoding="utf8")) # Send result back to the server
+      except:
+        if debug: raise
+        Connect()
+        ConnectToAVR()
+        break
     except:
-      if debug == "True": raise
+      if debug: raise
       Connect()
       ConnectToAVR()
+      break
 
     while True:
+      responsetimetart = now()
       try:
-        responsetimetart = now()
-        feedback = soc.recv(1024).decode() # Get feedback
+        feedback = soc.recv(64).decode() # Get feedback
         responsetimestop = now() # Measure server ping
         ping = responsetimestop - responsetimetart # Calculate ping
         ping = str(int(ping.microseconds / 1000)) # Convert to ms
       except:
-        if debug == "True": raise
+        if debug: raise
         Connect()
-        ConnectToAVR()
+        break
 
       if feedback == "GOOD": # If result was good
         shares[0] = shares[0] + 1 # Share accepted  = increment correct shares counter by 1
@@ -374,14 +393,14 @@ if __name__ == '__main__':
     debugOutput("Config file loaded")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "Error loading the configfile ("+resourcesFolder+"/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s" + Style.RESET_ALL)
-    if debug == "True": raise
+    if debug: raise
     time.sleep(10)
     os._exit(1)
   try:
     Greeting() # Display greeting message
     debugOutput("Greeting displayed")
   except:
-    if debug == "True": raise
+    if debug: raise
   try: # Setup autorestarter
     if float(autorestart) > 0:
       debugOutput("Enabled autorestarter for " + str(autorestart) + " minutes")
@@ -391,7 +410,7 @@ if __name__ == '__main__':
   except:
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
       + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error in the autorestarter. Check configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
-    if debug == "True": raise
+    if debug: raise
     time.sleep(10)
     os._exit(1)
 
@@ -406,7 +425,7 @@ if __name__ == '__main__':
           except:
             print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
             + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the server. Retrying in 10s" + Style.RESET_ALL)
-            if debug == "True": raise
+            if debug: raise
             time.sleep(10)
         try:
           checkVersion() # Check version
@@ -414,8 +433,8 @@ if __name__ == '__main__':
           break
         except:
           print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-          + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Rrror checking server version. Retrying in 10s" + Style.RESET_ALL)
-          if debug == "True": raise
+          + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error checking server version. Retrying in 10s" + Style.RESET_ALL)
+          if debug: raise
           time.sleep(10)
       try:
         ConnectToAVR() # Connect to COM port
@@ -424,7 +443,7 @@ if __name__ == '__main__':
       except:
         print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
           + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the AVR board. Check your connection, permissions and the configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
-        if debug == "True": raise
+        if debug: raise
         time.sleep(10)
         os._exit(1)
     try:
@@ -435,4 +454,4 @@ if __name__ == '__main__':
     except:
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
       + Style.RESET_ALL + Style.BRIGHT + Fore.MAGENTA + " Master server timeout OR AVR connection error - rescuing" + Style.RESET_ALL)
-      if debug == "True": raise
+      if debug: raise
