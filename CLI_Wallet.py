@@ -93,7 +93,7 @@ while True:
 		choice = input("  1 - Login\n  2 - Register\n  3 - Exit\n")
 		if int(choice) <= 1:
 			username = input(Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT)
-			password = input(Style.RESET_ALL + Fore.YELLOW + "Enter your password: " + Style.BRIGHT)
+			password = getpass.getpass(prompt=Style.RESET_ALL + Fore.YELLOW + "Enter your password: " + Style.BRIGHT, stream=None)
 
 			s.send(bytes("LOGI," + str(username) + "," + str(password), encoding="utf8"))
 			loginFeedback = s.recv(64).decode().split(",")
@@ -111,8 +111,8 @@ while True:
 
 		if int(choice) == 2:
 			username = input(Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT)
-			password = input(Style.RESET_ALL + Fore.YELLOW + "Enter your password: " + Style.BRIGHT)
-			pconfirm = input(Style.RESET_ALL + Fore.YELLOW + "Confirm your password: " + Style.BRIGHT)
+			password = getpass.getpass(prompt=Style.RESET_ALL + Fore.YELLOW + "Enter your password: " + Style.BRIGHT, stream=None)
+			pconfirm = getpass.getpass(prompt=Style.RESET_ALL + Fore.YELLOW + "Confirm your password: " + Style.BRIGHT, stream=None)
 			email = input(Style.RESET_ALL + Fore.YELLOW + "Enter your e-mail address (used for exchange and support): " + Style.BRIGHT)
 			if password == pconfirm:
 				while True:
