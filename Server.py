@@ -517,7 +517,7 @@ def handle(c):
                     minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
                 except:
                     pass
-                if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 999:
+                if result == str(rand) and int(sharetime) > int(shareTimeRequired):
                     try:
                         acceptedShares += 1
                         c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
