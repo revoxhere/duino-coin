@@ -202,6 +202,7 @@ def Connect(): # Connect to master server section
       debugOutput("No previous connections to close")
     soc = socket.socket()
     soc.connect((str(masterServer_address), int(masterServer_port)))
+    debugOutput("Connected to server !")
     soc.settimeout(timeout)
   except: # If it wasn't, display a message
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
@@ -229,11 +230,11 @@ def ConnectToAVR():
     com.close()
   except:
     pass
-  com = serial.Serial(avrport, 115200, timeout=5, write_timeout=5, inter_byte_timeout=1)
+  com = serial.Serial(avrport, 115200, timeout=30, write_timeout=30, inter_byte_timeout=1)
 
 def AVRMine(): # Mining section
   global donationlevel, donatorrunning, donateExecutable
-
+  first_share = True
   if os.name == 'nt':
     cmd = "cd " + resourcesFolder + "& Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
   elif os.name == 'posix' :
@@ -279,12 +280,16 @@ def AVRMine(): # Mining section
             job_not_received = False
           except:
             Connect() # reconnects pool
+            debugOutput("Reconnecting to pool !")
             job_not_received = True
         job = job.split(",") # Split received data to job and difficulty
-        diff = job[2]
-        if job[0] and job[1] and job[2]:
-          debugOutput("Job received: " +str(job))
-          break # If job received, continue 
+        try:
+          if job[0] and job[1] and job[2]:
+            debugOutput("Job received: " +str(job))
+            diff = job[2]
+            break # If job received, continue 
+        except IndexError:
+          debugOutput("IndexError, retrying")
       except:
         if debug: raise
         Connect()
@@ -294,6 +299,7 @@ def AVRMine(): # Mining section
         com.write(bytes("start\n", encoding="utf8")) # start word
         debugOutput("Written start word")
         com.write(bytes(str(job[0] + "\n" + job[1]+ "\n" + job[2] + "\n"), encoding="utf8")) # hash
+        debugOutput("Send job to arduino")
       except:
         Connect()
         ConnectToAVR()
@@ -303,8 +309,11 @@ def AVRMine(): # Mining section
         result = com.readline().decode() # Read the result
         if result == "":
           wrong_avr_result = True
+          if first_share:
+            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr " + Back.RESET + Fore.RED + " Arduino is taking longer than expected, try resetting card ! ")
         else:
           wrong_avr_result = False
+          first_share = False
       debugOutput(str("result: ")+str(result))
       result = result.split(",")
       try:
@@ -331,15 +340,25 @@ def AVRMine(): # Mining section
 
     while True:
       responsetimetart = now()
-      try:
-        feedback = soc.recv(64).decode() # Get feedback
-        responsetimestop = now() # Measure server ping
-        ping = responsetimestop - responsetimetart # Calculate ping
-        ping = str(int(ping.microseconds / 1000)) # Convert to ms
-      except:
-        if debug: raise
-        Connect()
-        break
+      feedback_not_received = True
+      while feedback_not_received:
+        try:
+          feedback = soc.recv(64).decode() # Get feedback
+        except socket.timeout:
+          feedback_not_received = True
+          debugOutput("Timeout while getting feedback, retrying")
+        except ConnectionResetError:
+          debugOutput("Connection was reset, reconnecting")
+          if debug: raise
+          Connect()
+          feedback_not_received = True
+          break
+        else:
+          responsetimestop = now() # Measure server ping
+          ping = responsetimestop - responsetimetart # Calculate ping
+          ping = str(int(ping.microseconds / 1000)) # Convert to ms
+          feedback_not_received = False
+          debugOutput("Successfully retrieved feedback")
 
       if feedback == "GOOD": # If result was good
         shares[0] = shares[0] + 1 # Share accepted  = increment correct shares counter by 1
