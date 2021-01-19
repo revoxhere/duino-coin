@@ -542,7 +542,7 @@ def handle(c):
                 except:
                     break
                 sharetime = resultreceived - jobsent # Time from start of hash computing to finding the result
-                sharetime = int(sharetime.total_seconds() / 1000) # Get total ms
+                sharetime = int(sharetime.total_seconds() * 1000) # Get total ms
                 reward = int(int(sharetime) **2) / 750000000 # Calculate reward dependent on share submission time
                 try: # If client submitted hashrate, use it
                     hashrate = float(response[1])
