@@ -111,16 +111,26 @@ def getDucoPriceBTC():
     ducoBtcPrice = round(float(ducobtcLong) / 10, 8) # 1:10 rate
     return ducoBtcPrice
 def getRegisteredUsers():
-    with sqlite3.connect(database, timeout = 15) as conn:
-        datab = conn.cursor()
-        datab.execute("SELECT COUNT(username) FROM Users")
-        registeredUsers = datab.fetchone()[0]
+    while True:
+        try:
+            with sqlite3.connect(database, timeout = 15) as conn:
+                datab = conn.cursor()
+                datab.execute("SELECT COUNT(username) FROM Users")
+                registeredUsers = datab.fetchone()[0]
+                break
+        except:
+            pass
     return registeredUsers
 def getMinedDuco():
-    with sqlite3.connect(database, timeout = 15) as conn:
-        datab = conn.cursor()
-        datab.execute("SELECT SUM(balance) FROM Users")
-        allMinedDuco = datab.fetchone()[0]
+    while True:
+        try:
+            with sqlite3.connect(database, timeout = 15) as conn:
+                datab = conn.cursor()
+                datab.execute("SELECT SUM(balance) FROM Users")
+                allMinedDuco = datab.fetchone()[0]
+                break
+        except:
+            pass
     return allMinedDuco
 def getLeaders():
     while True:
