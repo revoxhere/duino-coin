@@ -5,7 +5,7 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
 #############################################
-import requests, smtplib, sys, ssl, socket, re, math, random, hashlib, datetime,  requests, smtplib, ssl, sqlite3, bcrypt, time, os.path, json, logging, threading
+import requests, smtplib, sys, ssl, socket, re, math, random, hashlib, datetime,  requests, smtplib, ssl, sqlite3, bcrypt, time, os.path, json, logging, threading, configparser
 from _thread import *
 from shutil import copyfile
 from email.mime.text import MIMEText
@@ -15,12 +15,24 @@ host = "" # Server will use this as hostname to bind to (localhost on Windows, 0
 port = 2811 # Server will listen on this port - 2811 for official Duino-Coin server (14808 for old one)
 serverVersion = 1.9 # Server version which will be sent to the clients
 diff_incrase_per = 2000 # Difficulty will increase every x blocks (official server uses 2k)
-duco_email = "xxx" # E-mail and password to send registration mail from
-duco_password = "xxx"
-NodeS_Overide = "xxx"
-wrapper_private_key = "xxx" # private key used for interacting with blockchain
 use_wrapper = True # Choosing if you want to use wrapper or not
 wrapper_permission = False # set to false for declaration, will be updated by checking smart contract
+lock = threading.Lock()
+config = configparser.ConfigParser()
+try:
+    config.read('AdminData.ini')
+    duco_email = config["main"]["duco_email"]
+    duco_password = config["main"]["duco_password"]
+    NodeS_Overide = config["main"]["NodeS_Overide"]
+    wrapper_private_key = config["main"]["wrapper_private_key"]
+except:
+    print("""Please create AdminData.ini config file first:
+        [main]
+        duco_email = ???
+        duco_password = ???
+        NodeS_Overide = ???
+        wrapper_private_key = ???""")
+    exit()
 # Registration email - text version
 text = """\
 Hi there!
@@ -234,9 +246,8 @@ def API():
                 with open('balances.json', 'w') as outfile: # Write JSON bals to file
                     json.dump(formattedBalances, outfile, indent=4, ensure_ascii=False)
         except:
-            raise
             pass
-        time.sleep(3)
+        time.sleep(5)
 
 def InputManagement():
     while True:
@@ -272,80 +283,84 @@ def InputManagement():
             else:
                 print("Canceled")
         elif userInput[0] == "balance":
-            try:
-                with sqlite3.connect(database, timeout = 15) as conn:
-                    datab = conn.cursor()
-                    datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
-                    balance = str(datab.fetchone()[3]) # Fetch balance of user
-                print(userInput[1] + "'s balance: " + str(balance))
-            except:
-                print("User '" + userInput[1] + "' doesn't exist")
+            with lock:
+                try:
+                    with sqlite3.connect(database, timeout = 15) as conn:
+                        datab = conn.cursor()
+                        datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
+                        balance = str(datab.fetchone()[3]) # Fetch balance of user
+                        print(userInput[1] + "'s balance: " + str(balance))
+                except:
+                    print("User '" + userInput[1] + "' doesn't exist")
         elif userInput[0] == "set":
-            try:
-                with sqlite3.connect(database, timeout = 15) as conn:
-                    datab = conn.cursor()
-                    datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
-                    balance = str(datab.fetchone()[3]) # Fetch balance of user
-                print("  " + userInput[1] + "'s balance is " + str(balance) + ", set it to " + str(float(userInput[2])) + "?")
-                confirm = input("  Y/n")
-                if confirm == "Y" or confirm == "y" or confirm == "":
-                    with sqlite3.connect(database, timeout = 15) as conn:
-                        datab = conn.cursor()
-                        datab.execute("UPDATE Users set balance = ? where username = ?", (float(userInput[2]), userInput[1]))
-                        conn.commit()
+            with lock:
+                try:
                     with sqlite3.connect(database, timeout = 15) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
-                    print("User balance is now " + str(balance))
-                else:
-                    print("Canceled")
-            except:
-                print("User '" + str(userInput[1]) + "' doesn't exist or you've entered wrong number ("+str(userInput[2])+")")
+                    print("  " + userInput[1] + "'s balance is " + str(balance) + ", set it to " + str(float(userInput[2])) + "?")
+                    confirm = input("  Y/n")
+                    if confirm == "Y" or confirm == "y" or confirm == "":
+                        with sqlite3.connect(database, timeout = 15) as conn:
+                            datab = conn.cursor()
+                            datab.execute("UPDATE Users set balance = ? where username = ?", (float(userInput[2]), userInput[1]))
+                            conn.commit()
+                        with sqlite3.connect(database, timeout = 15) as conn:
+                            datab = conn.cursor()
+                            datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
+                            balance = str(datab.fetchone()[3]) # Fetch balance of user
+                        print("User balance is now " + str(balance))
+                    else:
+                        print("Canceled")
+                except:
+                    print("User '" + str(userInput[1]) + "' doesn't exist or you've entered wrong number ("+str(userInput[2])+")")
         elif userInput[0] == "subtract":
-            try:
-                with sqlite3.connect(database, timeout = 15) as conn:
-                    datab = conn.cursor()
-                    datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
-                    balance = str(datab.fetchone()[3]) # Fetch balance of user
-                print("  " + userInput[1] + "'s balance is " + str(balance) + ", subtract " + str(float(userInput[2])) + "?")
-                confirm = input("  Y/n")
-                if confirm == "Y" or confirm == "y" or confirm == "":
-                    with sqlite3.connect(database, timeout = 15) as conn:
-                        datab = conn.cursor()
-                        datab.execute("UPDATE Users set balance = ? where username = ?", (float(balance)-float(userInput[2]), userInput[1]))
-                        conn.commit()
+            with lock:
+                try:
                     with sqlite3.connect(database, timeout = 15) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
-                    print("User balance is now " + str(balance))
-                else:
-                    print("Canceled")
-            except:
-                print("User '" + str(userInput[1]) + "' doesn't exist or you've entered wrong number ("+str(userInput[2])+")")
+                    print("  " + userInput[1] + "'s balance is " + str(balance) + ", subtract " + str(float(userInput[2])) + "?")
+                    confirm = input("  Y/n")
+                    if confirm == "Y" or confirm == "y" or confirm == "":
+                        with sqlite3.connect(database, timeout = 15) as conn:
+                            datab = conn.cursor()
+                            datab.execute("UPDATE Users set balance = ? where username = ?", (float(balance)-float(userInput[2]), userInput[1]))
+                            conn.commit()
+                        with sqlite3.connect(database, timeout = 15) as conn:
+                            datab = conn.cursor()
+                            datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
+                            balance = str(datab.fetchone()[3]) # Fetch balance of user
+                        print("User balance is now " + str(balance))
+                    else:
+                        print("Canceled")
+                except:
+                    print("User '" + str(userInput[1]) + "' doesn't exist or you've entered wrong number ("+str(userInput[2])+")")
         elif userInput[0] == "add":
-            try:
-                with sqlite3.connect(database, timeout = 15) as conn:
-                    datab = conn.cursor()
-                    datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
-                    balance = str(datab.fetchone()[3]) # Fetch balance of user
-                print("  " + userInput[1] + "'s balance is " + str(balance) + ", add " + str(float(userInput[2])) + "?")
-                confirm = input("  Y/n")
-                if confirm == "Y" or confirm == "y" or confirm == "":
-                    with sqlite3.connect(database, timeout = 15) as conn:
-                        datab = conn.cursor()
-                        datab.execute("UPDATE Users set balance = ? where username = ?", (float(balance)+float(userInput[2]), userInput[1]))
-                        conn.commit()
+            with lock:
+                try:
                     with sqlite3.connect(database, timeout = 15) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
-                    print("User balance is now " + str(balance))
-                else:
-                    print("Canceled")
-            except:
-                print("User '" + str(userInput[1]) + "' doesn't exist or you've entered wrong number ("+str(userInput[2])+")")
+                    print("  " + userInput[1] + "'s balance is " + str(balance) + ", add " + str(float(userInput[2])) + "?")
+                    confirm = input("  Y/n")
+                    if confirm == "Y" or confirm == "y" or confirm == "":
+                        with sqlite3.connect(database, timeout = 15) as conn:
+                            datab = conn.cursor()
+                            datab.execute("UPDATE Users set balance = ? where username = ?", (float(balance)+float(userInput[2]), userInput[1]))
+                            conn.commit()
+                        with sqlite3.connect(database, timeout = 15) as conn:
+                            datab = conn.cursor()
+                            datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
+                            balance = str(datab.fetchone()[3]) # Fetch balance of user
+                        print("User balance is now " + str(balance))
+                    else:
+                        print("Canceled")
+                except:
+                    print("User '" + str(userInput[1]) + "' doesn't exist or you've entered wrong number ("+str(userInput[2])+")")
 
 def handle(c):
     global connectedUsers, minerapi # These globals are used in the statistics API
@@ -590,8 +605,8 @@ def handle(c):
                 except:
                     break
                 sharetime = resultreceived - jobsent # Time from start of hash computing to finding the result
-                sharetime = int(sharetime.total_seconds() / 1000) # Get total ms
-                reward = int(int(sharetime) **2) / 750000000 # Calculate reward dependent on share submission time
+                sharetime = int(sharetime.total_seconds() * 1000) # Get total ms
+                reward = int(int(sharetime) **2) / 550000000 # Calculate reward dependent on share submission time
                 try: # If client submitted hashrate, use it
                     hashrate = float(response[1])
                     hashrateEstimated = False
@@ -740,35 +755,36 @@ def handle(c):
                 elif float(balance) >= float(amount) and str(recipient) != str(username) and float(amount) >= 0:
                     try:
                         balance -= float(amount) # Remove amount from senders' balance
-                        while True:
-                            try:
-                                with sqlite3.connect(database, timeout = 15) as conn:
-                                    datab = conn.cursor()
-                                    datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
-                                    conn.commit()
-                                    break
-                            except:
-                                pass
-                        while True:
-                            try:
-                                with sqlite3.connect(database, timeout = 15) as conn:
-                                    datab = conn.cursor()
-                                    datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
-                                    recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
-                                    break
-                            except:
-                                pass
-                        recipientbal += float(amount)
-                        while True:
-                            try:
-                                with sqlite3.connect(database, timeout = 15) as conn:
-                                    datab = conn.cursor() # Update receipents' balance
-                                    datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
-                                    conn.commit()
-                                    break
-                            except:
-                                pass
-                        c.send(bytes("OK,Successfully transferred funds!", encoding='utf8'))
+                        with lock:
+                            while True:
+                                try:
+                                    with sqlite3.connect(database, timeout = 15) as conn:
+                                        datab = conn.cursor()
+                                        datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
+                                        conn.commit()
+                                        break
+                                except:
+                                    pass
+                            while True:
+                                try:
+                                    with sqlite3.connect(database, timeout = 15) as conn:
+                                        datab = conn.cursor()
+                                        datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
+                                        recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
+                                        break
+                                except:
+                                    pass
+                            recipientbal += float(amount)
+                            while True:
+                                try:
+                                    with sqlite3.connect(database, timeout = 15) as conn:
+                                        datab = conn.cursor() # Update receipents' balance
+                                        datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
+                                        conn.commit()
+                                        c.send(bytes("OK,Successfully transferred funds!", encoding='utf8'))
+                                        break
+                                except:
+                                    pass
                     except:
                         c.send(bytes("NO,Error occured while sending funds", encoding='utf8'))
                         break
@@ -967,18 +983,17 @@ if __name__ == '__main__':
     print("Duino-Coin Master Server", serverVersion, "is starting...")
     threading.Thread(target=API).start() # Create JSON API thread
     threading.Thread(target=createBackup).start() # Create Backup generator thread
-    threading.Thread(target=InputManagement).start() # Admin input management thread
     threading.Thread(target=countips).start() # Start anti-DDoS thread
     threading.Thread(target=resetips).start() # Start connection counter reseter for the ant-DDoS thread
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host, port))
-    lock = threading.Lock()
     print("Socket binded to port", port)
     # Put the socket into listening mode
     s.listen(5) # Queue of 5 connections
     print("Socket is listening")
-    print("Wrapper's tron address :", wrapper_public_key)
+    print("Wrapper's tron address:", wrapper_public_key)
+    threading.Thread(target=InputManagement).start() # Admin input management thread
     # a forever loop until client wants to exit
     try:
         while True:
