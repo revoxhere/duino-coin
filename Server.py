@@ -498,7 +498,7 @@ def handle(c):
                 except:
                     break
                 sharetime = resultreceived - jobsent # Time from start of hash computing to finding the result
-                sharetime = int(sharetime.microseconds / 1000) # Convert to ms
+                sharetime = sharetime.total_seconds() * 1000 # Get total ms
                 reward = int(int(sharetime) **2) / 750000000 # Calculate reward dependent on share submission time
                 try: # If client submitted hashrate, use it
                     hashrate = float(response[1])
@@ -517,7 +517,7 @@ def handle(c):
                     minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
                 except:
                     pass
-                if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 999:
+                if result == str(rand) and int(sharetime) > int(shareTimeRequired):
                     try:
                         acceptedShares += 1
                         c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
