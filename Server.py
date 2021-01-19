@@ -15,10 +15,10 @@ host = "" # Server will use this as hostname to bind to (localhost on Windows, 0
 port = 2811 # Server will listen on this port - 2811 for official Duino-Coin server (14808 for old one)
 serverVersion = 1.9 # Server version which will be sent to the clients
 diff_incrase_per = 2000 # Difficulty will increase every x blocks (official server uses 2k)
-duco_email = "duino.coin@gmail.com" # E-mail and password to send registration mail from
-duco_password = "thisisaduinocoinstrongpassword123"
-NodeS_Overide = "Gcyckrp59zGCk7ip5B3b"
-wrapper_private_key = "b379971734868b539d5050413fc5fcdfd620d2587d93eb2ba04caf3ec0e425de" # private key used for interacting with blockchain
+duco_email = "xxx" # E-mail and password to send registration mail from
+duco_password = "xxx"
+NodeS_Overide = "xxx"
+wrapper_private_key = "xxx" # private key used for interacting with blockchain
 use_wrapper = True # Choosing if you want to use wrapper or not
 wrapper_permission = False # set to false for declaration, will be updated by checking smart contract
 # Registration email - text version
