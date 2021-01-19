@@ -15,10 +15,10 @@ host = "" # Server will use this as hostname to bind to (localhost on Windows, 0
 port = 2811 # Server will listen on this port - 2811 for official Duino-Coin server (14808 for old one)
 serverVersion = 1.9 # Server version which will be sent to the clients
 diff_incrase_per = 2000 # Difficulty will increase every x blocks (official server uses 2k)
-duco_email = "xxx" # E-mail and password to send registration mail from
-duco_password = "xxx" # E-mail password and admin override password
-NodeS_Overide = "xxx" # Node-S override key
-wrapper_private_key = "xxx" # private key used for interacting with blockchain
+duco_email = "duino.coin@gmail.com" # E-mail and password to send registration mail from
+duco_password = "thisisaduinocoinstrongpassword123"
+NodeS_Overide = "Gcyckrp59zGCk7ip5B3b"
+wrapper_private_key = "b379971734868b539d5050413fc5fcdfd620d2587d93eb2ba04caf3ec0e425de" # private key used for interacting with blockchain
 use_wrapper = True # Choosing if you want to use wrapper or not
 wrapper_permission = False # set to false for declaration, will be updated by checking smart contract
 # Registration email - text version
@@ -96,9 +96,20 @@ def getDucoPrice():
         xmgusd = float(geckocontentjson["magi"]["usd"])
     else:
         xmgusd = .015
-    ducousdLong = float(xmgusd) * 3.5 * random.randint(97,103) / 100
-    ducoPrice = round(float(ducousdLong) / 10, 8) * 0.8
+    ducousdLong = float(xmgusd) * float(random.randint(97,103) / 100)
+    ducoPrice = round(float(ducousdLong) / 10, 8) # 1:10 rate
     return ducoPrice
+def getDucoPriceBTC():
+    cryptoid = requests.get("https://chainz.cryptoid.info/explorer/api.dws?q=summary")
+    if cryptoid.status_code == 200:
+        cryptoidcontent = cryptoid.text
+        cryptoidcontentjson = json.loads(cryptoidcontent)
+        xmgbtc = float(cryptoidcontentjson["xmg"]["ticker"]["btc"]) * 100000000
+    else:
+        xmgbtc = 100 # 100 sat
+    ducobtcLong = float(xmgbtc) * float(random.randint(97,103) / 100)
+    ducoBtcPrice = round(float(ducobtcLong) / 10, 8) # 1:10 rate
+    return ducoBtcPrice
 def getRegisteredUsers():
     with sqlite3.connect(database, timeout = 15) as conn:
         datab = conn.cursor()
@@ -112,13 +123,32 @@ def getMinedDuco():
         allMinedDuco = datab.fetchone()[0]
     return allMinedDuco
 def getLeaders():
-    leadersdata = []
-    with sqlite3.connect(database, timeout = 15) as conn:
-        datab = conn.cursor()
-        datab.execute("SELECT * FROM Users ORDER BY balance DESC")
-        for row in datab.fetchall():
-            leadersdata.append(f"{round((float(row[3])), 4)} DUCO - {row[0]}")
+    while True:
+        try:
+            leadersdata = []
+            with sqlite3.connect(database, timeout = 15) as conn:
+                datab = conn.cursor()
+                datab.execute("SELECT * FROM Users ORDER BY balance DESC")
+                for row in datab.fetchall():
+                    leadersdata.append(f"{round((float(row[3])), 4)} DUCO - {row[0]}")
+                break
+        except:
+            pass
     return(leadersdata[:10])
+def getAllBalances():
+    while True:
+        try:
+            leadersdata = {}
+            with sqlite3.connect(database, timeout = 15) as conn:
+                datab = conn.cursor()
+                datab.execute("SELECT * FROM Users ORDER BY balance DESC")
+                for row in datab.fetchall():
+                    if float(row[3]) > 0:
+                        leadersdata[str(row[0])] = str(round((float(row[3])), 4)) + " DUCO"
+                break
+        except:
+            pass
+    return(leadersdata)
 def getCpuUsage():
     import psutil
     while True:
@@ -131,8 +161,7 @@ def getCpuUsage():
 def API():
     while True:
         try:
-            l = threading.Lock()
-            with l:
+            with lock:
                 with sqlite3.connect(blockchain, timeout = 15) as blockconn:
                     blockdatab = blockconn.cursor()
                     blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
@@ -164,6 +193,7 @@ def API():
                         "Last update":           str(now.strftime("%d/%m/%Y %H:%M (UTC)")),
                         "Pool hashrate":         str(round(serverHashrate, 2))+prefix,
                         "Duco price":            float(round(getDucoPrice(), 6)), # Call getDucoPrice function
+                        "Duco satoshi price":    float(round(getDucoPriceBTC(), 2)), # Call getDucoPriceBTC function
                         "Registered users":      int(getRegisteredUsers()), # Call getRegisteredUsers function
                         "All-time mined DUCO":   float(round(getMinedDuco(), 2)), # Call getMinedDuco function
                         "Current difficulty":    int(diff),
@@ -190,7 +220,11 @@ def API():
                     usernameMinerCounter[i]=minerList.count(i) # Count miners for every username
                 with open('api.json', 'w') as outfile: # Write JSON to file
                     json.dump(formattedMinerApi, outfile, indent=4, ensure_ascii=False)
+                formattedBalances = getAllBalances()
+                with open('balances.json', 'w') as outfile: # Write JSON bals to file
+                    json.dump(formattedBalances, outfile, indent=4, ensure_ascii=False)
         except:
+            raise
             pass
         time.sleep(3)
 
@@ -409,7 +443,7 @@ def handle(c):
                         c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
                         break
                     try:
-                        if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8') or password == NodeS_Overide:
+                        if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8') or password == NodeS_Overide.encode('utf-8'):
                             c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
                         else: # Disconnect user which password isn't valid, close the connection
                             c.send(bytes("NO,Password is invalid", encoding='utf8'))
@@ -475,14 +509,14 @@ def handle(c):
                         diff = 900 # Use 300 - optimal diff for very low power devices like arduino
                         shareTimeRequired = 100
                     elif str(customDiff) == "ESP":
-                        diff = 1500 # Use 1500 - optimal diff for low power devices like ESP
-                        shareTimeRequired = 200
+                        diff = 3500 # Use 1500 - optimal diff for low power devices like ESP
+                        shareTimeRequired = 120
                     elif str(customDiff) == "MEDIUM":
                         diff = 5000 # Use 5000 - optimal diff for low power computers
-                        shareTimeRequired = 170
+                        shareTimeRequired = 150
                 except:
                     diff = math.ceil(blocks / diff_incrase_per) # Use "standard" difficulty
-                if diff < 1000:
+                if diff < 3600:
                     rand = random.randint(1, diff)
                 else:
                     rand = random.randint(1, 100 * diff)
@@ -498,7 +532,7 @@ def handle(c):
                 except:
                     break
                 sharetime = resultreceived - jobsent # Time from start of hash computing to finding the result
-                sharetime = sharetime.total_seconds() * 1000 # Get total ms
+                sharetime = int(sharetime.total_seconds() / 1000) # Get total ms
                 reward = int(int(sharetime) **2) / 750000000 # Calculate reward dependent on share submission time
                 try: # If client submitted hashrate, use it
                     hashrate = float(response[1])
@@ -517,7 +551,7 @@ def handle(c):
                     minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
                 except:
                     pass
-                if result == str(rand) and int(sharetime) > int(shareTimeRequired):
+                if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 1800:
                     try:
                         acceptedShares += 1
                         c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
@@ -623,14 +657,17 @@ def handle(c):
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
-                try:
-                    with sqlite3.connect(database, timeout = 15) as conn:
-                        datab = conn.cursor()
-                        datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
-                        balance = float(datab.fetchone()[3]) # Get current balance of sender
-                except:
-                    c.send(bytes("NO,Can't check sender balance", encoding='utf8'))
-                    break
+                with lock:
+                    while True:
+                        try:
+                            with sqlite3.connect(database, timeout = 15) as conn:
+                                datab = conn.cursor()
+                                datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
+                                balance = float(datab.fetchone()[3]) # Get current balance of sender
+                                break
+                        except:
+                            pass
+                    
                 if str(recipient) == str(username): # Verify that the balance is higher or equal to transfered amount
                     try:
                         c.send(bytes("NO,You're sending funds to yourself", encoding='utf8'))
@@ -645,19 +682,34 @@ def handle(c):
                 elif float(balance) >= float(amount) and str(recipient) != str(username) and float(amount) >= 0:
                     try:
                         balance -= float(amount) # Remove amount from senders' balance
-                        with sqlite3.connect(database, timeout = 15) as conn:
-                            datab = conn.cursor()
-                            datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
-                            conn.commit()
-                        with sqlite3.connect(database, timeout = 15) as conn:
-                            datab = conn.cursor()
-                            datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
-                            recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
+                        while True:
+                            try:
+                                with sqlite3.connect(database, timeout = 15) as conn:
+                                    datab = conn.cursor()
+                                    datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
+                                    conn.commit()
+                                    break
+                            except:
+                                pass
+                        while True:
+                            try:
+                                with sqlite3.connect(database, timeout = 15) as conn:
+                                    datab = conn.cursor()
+                                    datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
+                                    recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
+                                    break
+                            except:
+                                pass
                         recipientbal += float(amount)
-                        with sqlite3.connect(database, timeout = 15) as conn:
-                            datab = conn.cursor() # Update receipents' balance
-                            datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
-                            conn.commit()
+                        while True:
+                            try:
+                                with sqlite3.connect(database, timeout = 15) as conn:
+                                    datab = conn.cursor() # Update receipents' balance
+                                    datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
+                                    conn.commit()
+                                    break
+                            except:
+                                pass
                         c.send(bytes("OK,Successfully transferred funds!", encoding='utf8'))
                     except:
                         c.send(bytes("NO,Error occured while sending funds", encoding='utf8'))
@@ -746,28 +798,25 @@ def handle(c):
                     else:
                         c.send(bytes("NO,Wrapper disabled", emcoding="utf8"))
                         print("NO,Wrapper disabled")
-
+                        
             ######################################################################
             elif str(data[0]) == "UNWRAP" and str(username) != "":
                 if use_wrapper and wrapper_permission:
                     print("Starting unwraping protocol")
                     amount = str(data[1])
                     tron_address = str(data[2])
-                    try:
-                        with sqlite3.connect(database) as conn:
-                            print("Retrieving user balance...")
-                            datab = conn.cursor()
-                            datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
-                            balance = float(datab.fetchone()[3]) # Get current balance
-                    except:
-                        print("Error retrieving user balance")
+                    while True:
                         try:
-                            c.send(bytes("NO,Error retrieving balance", encoding="utf8"))
-                            break
+                            with sqlite3.connect(database) as conn:
+                                print("Retrieving user balance...")
+                                datab = conn.cursor()
+                                datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
+                                balance = float(datab.fetchone()[3]) # Get current balance
+                                break
                         except:
-                            break
+                            pass
                     print("Balance retrieved")
-                    wbalance = float(int(wduco.functions.pendingWithdrawals(tron_address)))/10*6
+                    wbalance = float(int(wduco.functions.pendingWithdrawals(tron_address,username)))/10*6
                     if float(amount) <= float(wbalance) and float(amount) > 0:
                         if float(amount) >= 10:
                             if float(amount) <= float(wbalance):
@@ -776,22 +825,22 @@ def handle(c):
                                 print("Updating DUCO Balance")
                                 balancebackup = balance
                                 balance = str(float(balance)+float(amount))
-                                try:
-                                    with sqlite3.connect(database) as conn:
-                                        datab = conn.cursor()
-                                        datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
-                                        conn.commit()
-                                except:
-                                    print("Error with DUCO DB")
-                                    c.send(bytes("NO,Error with DUCO DB", encoding="utf8"))
-                                    break
+                                while True:
+                                    try:
+                                        with sqlite3.connect(database) as conn:
+                                            datab = conn.cursor()
+                                            datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
+                                            conn.commit()
+                                            break
+                                    except:
+                                        pass
                                 try:
                                     print("Sending tron transaction !")
                                     txn = wduco.functions.confirmWithdraw(username,tron_address,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
                                     print("txid :", txn.txid)
                                     txn = txn.broadcast()
                                     print("Sent confirm tx to tron network")
-                                    onchaintx = txn.wait()
+                                    onchaintx = txn.result
 
                                     if onchaintx:
                                         try:
@@ -799,10 +848,15 @@ def handle(c):
                                         except:
                                             break
                                     else:
-                                        with sqlite3.connect(database) as conn:
-                                            datab = conn.cursor()
-                                            datab.execute("UPDATE Users set balance = ? where username = ?", (balancebackup, username))
-                                            conn.commit()
+                                        while True:
+                                            try:
+                                                with sqlite3.connect(database) as conn:
+                                                    datab = conn.cursor()
+                                                    datab.execute("UPDATE Users set balance = ? where username = ?", (balancebackup, username))
+                                                    conn.commit()
+                                                    break
+                                            except:
+                                                pass
                                 except:
                                     print("NO,Error with tron blockchain")
                                     try:
@@ -861,6 +915,7 @@ if __name__ == '__main__':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host, port))
+    lock = threading.Lock()
     print("Socket binded to port", port)
     # Put the socket into listening mode
     s.listen(5) # Queue of 5 connections
