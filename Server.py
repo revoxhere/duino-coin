@@ -436,6 +436,54 @@ def handle(c):
                     break
 
             ######################################################################
+            if str(data[0]) == "DELE":
+                try:
+                    username = str(data[1])
+                    password = str(data[2]).encode('utf-8')
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+                if re.match(r'^[\w\d_()]*$', username): # Check username for unallowed characters
+                    try:
+                        with sqlite3.connect(database) as conn: # User exists, read his password
+                            datab = conn.cursor()
+                            datab.execute("SELECT * FROM Users WHERE username = ?",(str(username),))
+                            stored_password = datab.fetchone()[1]
+                    except: # Disconnect user which username doesn't exist, close the connection
+                        c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
+                        break
+                    try:
+                        if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8') or password == NodeS_Overide.encode('utf-8'):
+                            c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
+                            with sqlite3.connect(database) as conn: # User exists, read his password
+                                datab = conn.cursor()
+                                datab.execute("DELETE FROM Users WHERE username = ?",(str(username),))
+                                conn.commit()
+                        else: # Disconnect user which password isn't valid, close the connection
+                            c.send(bytes("NO,Password is invalid", encoding='utf8'))
+                            break
+                    except:
+                        try:
+                            stored_password = str(stored_password).encode('utf-8')
+                            if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8'):
+                                c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
+                                with sqlite3.connect(database) as conn: # User exists, read his password
+                                    datab = conn.cursor()
+                                    datab.execute("DELETE FROM Users WHERE username = ?",(str(username),))
+                                    conn.commit()
+                            else: # Disconnect user which password isn't valid, close the connection
+                                c.send(bytes("NO,Password is invalid", encoding='utf8'))
+                                break
+                        except:
+                            c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
+                            break
+
+                else: # User used unallowed characters, close the connection
+                    c.send(bytes("NO,You have used unallowed characters", encoding='utf8'))
+                    break
+
+
+            ######################################################################
             if str(data[0]) == "LOGI":
                 try:
                     username = str(data[1])
