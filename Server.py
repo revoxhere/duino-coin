@@ -411,7 +411,7 @@ def handle(c):
                     break
                 if re.match("^[A-Za-z0-9_-]*$", username) and len(username) < 64 and len(unhashed_pass) < 64 and len(email) < 128:
                     password = bcrypt.hashpw(unhashed_pass, bcrypt.gensalt()) # Encrypt password
-                    with sqlite3.connect(database, timeout = 15) as conn:
+                    with sqlite3.connect(database, timeout = 10) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT COUNT(username) FROM Users WHERE username = ?",(username,))
                         if int(datab.fetchone()[0]) == 0:
@@ -421,7 +421,7 @@ def handle(c):
                                 message["From"] = duco_email
                                 message["To"] = email
                                 try:
-                                    with sqlite3.connect(database, timeout = 15) as conn:
+                                    with sqlite3.connect(database, timeout = 10) as conn:
                                         datab = conn.cursor()
                                         datab.execute('''INSERT INTO Users(username, password, email, balance) VALUES(?, ?, ?, ?)''',(username, password, email, 0.0))
                                         conn.commit()
@@ -451,54 +451,6 @@ def handle(c):
                     break
 
             ######################################################################
-            if str(data[0]) == "DELE":
-                try:
-                    username = str(data[1])
-                    password = str(data[2]).encode('utf-8')
-                except IndexError:
-                    c.send(bytes("NO,Not enough data", encoding='utf8'))
-                    break
-                if re.match(r'^[\w\d_()]*$', username): # Check username for unallowed characters
-                    try:
-                        with sqlite3.connect(database) as conn: # User exists, read his password
-                            datab = conn.cursor()
-                            datab.execute("SELECT * FROM Users WHERE username = ?",(str(username),))
-                            stored_password = datab.fetchone()[1]
-                    except: # Disconnect user which username doesn't exist, close the connection
-                        c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
-                        break
-                    try:
-                        if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8') or password == NodeS_Overide.encode('utf-8'):
-                            c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
-                            with sqlite3.connect(database) as conn: # User exists, read his password
-                                datab = conn.cursor()
-                                datab.execute("DELETE FROM Users WHERE username = ?",(str(username),))
-                                conn.commit()
-                        else: # Disconnect user which password isn't valid, close the connection
-                            c.send(bytes("NO,Password is invalid", encoding='utf8'))
-                            break
-                    except:
-                        try:
-                            stored_password = str(stored_password).encode('utf-8')
-                            if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8'):
-                                c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
-                                with sqlite3.connect(database) as conn: # User exists, read his password
-                                    datab = conn.cursor()
-                                    datab.execute("DELETE FROM Users WHERE username = ?",(str(username),))
-                                    conn.commit()
-                            else: # Disconnect user which password isn't valid, close the connection
-                                c.send(bytes("NO,Password is invalid", encoding='utf8'))
-                                break
-                        except:
-                            c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
-                            break
-
-                else: # User used unallowed characters, close the connection
-                    c.send(bytes("NO,You have used unallowed characters", encoding='utf8'))
-                    break
-
-
-            ######################################################################
             if str(data[0]) == "LOGI":
                 try:
                     username = str(data[1])
@@ -508,7 +460,7 @@ def handle(c):
                     break
                 if re.match(r'^[\w\d_()]*$', username): # Check username for unallowed characters
                     try:
-                        with sqlite3.connect(database) as conn: # User exists, read his password
+                        with sqlite3.connect(database, timeout = 10) as conn: # User exists, read his password
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(str(username),))
                             stored_password = datab.fetchone()[1]
@@ -546,7 +498,7 @@ def handle(c):
                         c.send(bytes("NO,Not enough data", encoding='utf8'))
                         break
                 try:
-                    with sqlite3.connect(blockchain, timeout=20) as blockconn:
+                    with sqlite3.connect(blockchain) as blockconn:
                         blockdatab = blockconn.cursor()
                         blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
                         blocks = int(blockdatab.fetchone()[0])
@@ -606,7 +558,7 @@ def handle(c):
                     break
                 sharetime = resultreceived - jobsent # Time from start of hash computing to finding the result
                 sharetime = int(sharetime.total_seconds() * 1000) # Get total ms
-                reward = int(int(sharetime) **2) / 550000000 # Calculate reward dependent on share submission time
+                reward = int(int(sharetime) **2) / 650000000 # Calculate reward dependent on share submission time
                 try: # If client submitted hashrate, use it
                     hashrate = float(response[1])
                     hashrateEstimated = False
@@ -624,13 +576,13 @@ def handle(c):
                     minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
                 except:
                     pass
-                if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 1800:
+                if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 5000:
                     try:
                         acceptedShares += 1
                         c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
                         while True:
                             try:
-                                with sqlite3.connect(database, timeout=15) as conn: # Get users balance and check if it exists
+                                with sqlite3.connect(database) as conn: # Get users balance and check if it exists
                                     datab = conn.cursor()
                                     datab.execute("SELECT * FROM Users WHERE username = ?", (username,))
                                     balance = float(datab.fetchone()[3])
@@ -646,7 +598,7 @@ def handle(c):
                         break
                     while True:
                         try:
-                            with sqlite3.connect(blockchain, timeout=20) as blockconn: # Update blocks counter and lastblock's hash
+                            with sqlite3.connect(blockchain) as blockconn: # Update blocks counter and lastblock's hash
                                 blocks += 1
                                 blockdatab = blockconn.cursor()
                                 blockdatab.execute("UPDATE Server set blocks = ? ", (blocks,))
@@ -664,7 +616,7 @@ def handle(c):
 
                     while True:
                         try:
-                            with sqlite3.connect(database, timeout=15) as conn:
+                            with sqlite3.connect(database) as conn:
                                 datab = conn.cursor()
                                 datab.execute("SELECT * FROM Users WHERE username = ?", (username,))
                                 balance = str(datab.fetchone()[3]) # Get miner balance
@@ -672,11 +624,9 @@ def handle(c):
                                     balance = float(balance) - int(int(sharetime) *2) / 750000000 # Calculate penalty dependent on share submission time
                                     while True:
                                         try:
-                                            with sqlite3.connect(database) as conn:
-                                                datab = conn.cursor() # Update his the balance
-                                                datab.execute("UPDATE Users set balance = ? where username = ?", (f'{balance:.20f}', username))
-                                                conn.commit()
-                                                break
+                                            datab.execute("UPDATE Users set balance = ? where username = ?", (f'{balance:.20f}', username))
+                                            conn.commit()
+                                            break
                                         except:
                                             pass
                                 break
@@ -699,7 +649,7 @@ def handle(c):
                     c.send(bytes("NO,Bcrypt error", encoding="utf8"))
                     break
                 try:
-                    with sqlite3.connect(database, timeout = 15) as conn:
+                    with sqlite3.connect(database, timeout = 10) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                         old_password_database = datab.fetchone()[1]
@@ -708,7 +658,7 @@ def handle(c):
                     break
 
                 if bcrypt.checkpw(oldPassword, old_password_database) or oldPassword == duco_password.encode('utf-8'):
-                    with sqlite3.connect(database, timeout = 15) as conn:
+                    with sqlite3.connect(database, timeout = 10) as conn:
                         datab = conn.cursor()
                         datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
                         conn.commit()
@@ -730,13 +680,15 @@ def handle(c):
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
+                print("Sending protocol called")
                 with lock:
                     while True:
                         try:
-                            with sqlite3.connect(database, timeout = 15) as conn:
+                            with sqlite3.connect(database, timeout = 10) as conn:
                                 datab = conn.cursor()
                                 datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                                 balance = float(datab.fetchone()[3]) # Get current balance of sender
+                                print("Read senders balance:", balance)
                                 break
                         except:
                             pass
@@ -762,25 +714,28 @@ def handle(c):
                                         datab = conn.cursor()
                                         datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
                                         conn.commit()
+                                        print("Updated senders balance:", balance)
                                         break
                                 except:
                                     pass
                             while True:
                                 try:
-                                    with sqlite3.connect(database, timeout = 15) as conn:
+                                    with sqlite3.connect(database, timeout = 10) as conn:
                                         datab = conn.cursor()
                                         datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
                                         recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
+                                        print("Read recipients balance:", recipientbal)
                                         break
                                 except:
                                     pass
                             recipientbal += float(amount)
                             while True:
                                 try:
-                                    with sqlite3.connect(database, timeout = 15) as conn:
+                                    with sqlite3.connect(database, timeout = 10) as conn:
                                         datab = conn.cursor() # Update receipents' balance
                                         datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
                                         conn.commit()
+                                        print("Updated recipients balance:", recipientbal)
                                         c.send(bytes("OK,Successfully transferred funds!", encoding='utf8'))
                                         break
                                 except:
@@ -793,7 +748,7 @@ def handle(c):
             elif str(data[0]) == "BALA" and str(username) != "":
                 while True:
                     try:
-                        with sqlite3.connect(database, timeout = 15) as conn:
+                        with sqlite3.connect(database) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                             balance = str(datab.fetchone()[3]) # Fetch balance of user
