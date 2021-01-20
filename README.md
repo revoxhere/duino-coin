@@ -244,7 +244,7 @@ Hashrate Calculators for AVR/ESP platforms are available in the [Useful tools br
     *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io
 
 *   **Contributors:**
-    *   [@ygboucherk](https://github.com/ygboucherk) (wDUCO dev)
+    *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
     *   [@kyngs](https://github.com/kyngs)
     *   [@httsmvkcom](https://github.com/httsmvkcom)
     *   [@Nosh-Ware](https://github.com/Nosh-Ware)
