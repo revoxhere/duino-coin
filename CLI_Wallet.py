@@ -517,7 +517,7 @@ while True:
 
 			elif command == "donate":
 				print(Style.RESET_ALL + Fore.BLUE + Style.BRIGHT + "Feel free of donating for helping to maintain DUCO and wDUCO (wrapping/unwrapping involves fees for maintainers) ?")
-				print(Style.RESET_ALL + Fore.YELLOW + "TRON and tokens : " + Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + "TMpidRmkmZv1jgenvR5APdgJTQAgTWFScL" + Style.RESET_ALL + Fore.YELLOW + " (wrapper's address)")
+				print(Style.RESET_ALL + Fore.YELLOW + "TRON and tokens : " + Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + "TY5wfM6JsYKEEMfQR3RBQBPKfetTpf7nyM" + Style.RESET_ALL + Fore.YELLOW + " (wrapper's address)")
 				print("Duino-Coin : " + Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + "revox"  + Style.RESET_ALL + Fore.YELLOW + " (revox, DUCO lead developer)")
 				print("Duino-Coin : " + Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + "acridkiller"  + Style.RESET_ALL + Fore.YELLOW + " (Acrid, duco faucet maintainer)")
 				print("Duino-Coin : " + Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + "Yanis"  + Style.RESET_ALL + Fore.YELLOW + " (wDUCO developer)")
