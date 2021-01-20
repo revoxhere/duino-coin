@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v1.6)
+# Duino-Coin CLI Wallet (v2.0)
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -71,7 +71,7 @@ except ModuleNotFoundError:
 timeout = 5 # Socket timeout
 VER = 2.0
 use_wrapper = False # default value for preventing error
-res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
+ipfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
 pcusername = getpass.getuser() # Username
 platform = str(platform.system()) + " " + str(platform.release()) # Platform information
@@ -121,7 +121,7 @@ signal(SIGINT, handler) # Enable signal handler
 
 while True: # Grab data grom GitHub section
 	try:
-		res = requests.get(res, data = None) #Use request to grab data from raw github file
+		res = requests.get(ipfile, data = None) #Use request to grab data from raw github file
 		if res.status_code == 200: #Check for response
 			content = res.content.decode().splitlines() #Read content and split into lines
 			pool_address = content[0] #Line 1 = pool address
