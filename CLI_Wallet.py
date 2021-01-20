@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v2.0)
+# Duino-Coin CLI Wallet (v1.9)
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -68,7 +68,7 @@ except ModuleNotFoundError:
 	print(now.strftime("%H:%M:%S ") + "Tronpy is not installed. Please install it using: python3 -m pip install tronpy.\nWrapper was disabled because of tronpy is needed for !")
 
 timeout = 5 # Socket timeout
-VER = 2.0
+VER = 1.9
 use_wrapper = False # default value for preventing error
 ipfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
@@ -103,8 +103,8 @@ def password_encrypt(message: bytes, password: str, iterations: int = iterations
 
 def password_decrypt(token: bytes, password: str) -> bytes:
 	decoded = b64d(token)
-	salt, iter, token = decoded[:16], decoded[16:20], b64e(decoded[20:])
-	iterations = int.from_bytes(iter, 'big')
+	salt, iterations, token = decoded[:16], decoded[16:20], b64e(decoded[20:])
+	iterations = int.from_bytes(iterations, 'big')
 	key = _derive_key(password.encode(), salt, iterations)
 	return Fernet(key).decrypt(token)
 
@@ -175,6 +175,7 @@ def reconnect():
 						ducofiat = float(contentjson["Duco price"])
 					else:
 						ducofiat = 0.0025 # If json api request fails, wallet will use this value
+					return s
 					break # If connection was established, continue
 	
 				except: # If it wasn't, display a message
@@ -282,7 +283,7 @@ while True:
 				try:
 					s.send(bytes("BALA", encoding="utf8"))
 				except:
-					reconnect()
+					s = reconnect()
 				if use_wrapper:
 					wbalance = float(wduco.functions.balanceOf(pub_key))/10**6
 					try:
@@ -298,10 +299,11 @@ while True:
 			print(Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "\nDuino-Coin CLI Wallet")
 			print(Style.RESET_ALL + Fore.YELLOW + "You have " + Style.BRIGHT + str(balance) + " DUCO")
 			print(Style.RESET_ALL + Fore.YELLOW + "Which is about " + Style.BRIGHT + str(balanceusd) + " USD")
+			print(Style.RESET_ALL + Fore.YELLOW + "DUCO price : " + Style.BRIGHT + str(ducofiat) + " USD")
 			if use_wrapper:
 				print(Style.RESET_ALL + Fore.YELLOW + "And also " + Style.BRIGHT + str(wbalance) + " wDUCO")
 				print(Style.RESET_ALL + Fore.YELLOW + "Tron address for receiving : " + Style.BRIGHT + str(pub_key))
-				print(Style.RESET_ALL + Fore.YELLOW + "TRX balance (useful for fees) : " + Style.BRIGHT + str(trx_balance))  
+				print(Style.RESET_ALL + Fore.YELLOW + "TRX balance (useful for fees) : " + Style.BRIGHT + str(trx_balance))
 			print(Style.RESET_ALL + Fore.YELLOW + "Type `help` to list available commands")
 			command = input(Style.RESET_ALL + Fore.WHITE + "DUCO Console $ " + Style.BRIGHT)
 			if command == "refresh":
@@ -338,7 +340,7 @@ while True:
 				try:
 					message = s.recv(1024).decode()
 				except:
-					reconnect()
+					s = reconnect()
 				print(Style.RESET_ALL + Fore.BLUE + "Server message: " + Style.BRIGHT + str(message))
 
 			elif command == "wrapperconf": # wrapper config
@@ -413,7 +415,7 @@ while True:
 						s.send(bytes("BALA", encoding="utf8"))
 						balance = round(float(s.recv(256).decode()), 8)
 					except:
-						reconnect()
+						s = reconnect()
 					if float(amount) >= 10 and float(amount) <= balance:
 						tron_address = input(Style.RESET_ALL + Fore.WHITE + "Enter tron address, or leave blank to choose local wallet: " +Style.BRIGHT)
 						if tron_address == "":
@@ -503,6 +505,11 @@ while True:
 				print(Style.RESET_ALL + Fore.WHITE + "And is distributed under MIT license")
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + "https://duinocoin.com")
 				print(Style.RESET_ALL + Fore.WHITE + "Stay safe everyone!")
+				print(Style.RESET_ALL + Fore.WHITE + "Server version : " + Style.BRIGHT + SERVER_VER + Style.RESET_ALL)
+				if float(SERVER_VER) > VER:
+					print(Style.RESET_ALL + Fore.YELLOW + "Server is " + Fore.WHITE + Style.BRIGHT + SERVER_VER + Fore.YELLOW +Style.RESET_ALL + ", but client is " + Style.BRIGHT + Fore.WHITE + VER + Style.RESET_ALL + FORE.YELLOW + ", you should consider downloading last release")
+				else:
+					print(Style.RESET_ALL + Fore.WHITE + "Client is up-to-date :D")
 
 			elif command == "logout":
 				os.remove("CLIWallet_config.cfg")
