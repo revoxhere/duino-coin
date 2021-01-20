@@ -58,6 +58,7 @@ html = """\
 </html>
 """
 minerapi = {}
+balancesToUpdate = {}
 connectedUsers = 0
 database = 'crypto_database.db' # User data database location
 if not os.path.isfile(database): # Create it if it doesn't exist
@@ -247,6 +248,16 @@ def API():
                     json.dump(formattedBalances, outfile, indent=4, ensure_ascii=False)
         except:
             pass
+        time.sleep(5)
+
+def UpdateDatabase():
+    while True:
+        with sqlite3.connect(database) as conn:
+            datab = conn.cursor()
+            for user in balancesToUpdate.copy():
+                datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
+                balancesToUpdate.pop(user)
+            conn.commit()
         time.sleep(5)
 
 def InputManagement():
@@ -497,47 +508,28 @@ def handle(c):
                     except IndexError:
                         c.send(bytes("NO,Not enough data", encoding='utf8'))
                         break
-                try:
-                    with sqlite3.connect(blockchain) as blockconn:
-                        blockdatab = blockconn.cursor()
-                        blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
-                        blocks = int(blockdatab.fetchone()[0])
-                        blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
-                        lastBlockHash = str(blockdatab.fetchone()[0])
-                except:
-                    break
+                while True:
+                    try:
+                        with sqlite3.connect(blockchain, timeout = 10) as blockconn:
+                            blockdatab = blockconn.cursor()
+                            blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
+                            blocks = int(blockdatab.fetchone()[0])
+                            blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
+                            lastBlockHash = str(blockdatab.fetchone()[0])
+                            break
+                    except:
+                        pass
                 # Calculate difficulty and create new block hash
                 try:
                     customDiff = str(data[2])
                     if str(customDiff) == "AVR":
                         diff = 300 # Use 300 - optimal diff for very low power devices like arduino
                         shareTimeRequired = 100
-                    if str(customDiff) == "AVR200":
-                        diff = 200 # Use 300 - optimal diff for very low power devices like arduino
-                        shareTimeRequired = 80
-                    if str(customDiff) == "AVR400":
-                        diff = 300 # Use 300 - optimal diff for very low power devices like arduino
-                        shareTimeRequired = 100
-                    if str(customDiff) == "AVR500":
-                        diff = 500 # Use 300 - optimal diff for very low power devices like arduino
-                        shareTimeRequired = 100
-                    if str(customDiff) == "AVR600":
-                        diff = 600 # Use 300 - optimal diff for very low power devices like arduino
-                        shareTimeRequired = 100
-                    if str(customDiff) == "AVR700":
-                        diff = 700 # Use 300 - optimal diff for very low power devices like arduino
-                        shareTimeRequired = 100
-                    if str(customDiff) == "AVR800":
-                        diff = 800 # Use 300 - optimal diff for very low power devices like arduino
-                        shareTimeRequired = 100
-                    if str(customDiff) == "AVR900":
-                        diff = 900 # Use 300 - optimal diff for very low power devices like arduino
-                        shareTimeRequired = 100
                     elif str(customDiff) == "ESP":
-                        diff = 3500 # Use 1500 - optimal diff for low power devices like ESP
+                        diff = 3500 # Use 3500 - optimal diff for low power devices like ESP
                         shareTimeRequired = 120
                     elif str(customDiff) == "MEDIUM":
-                        diff = 5000 # Use 5000 - optimal diff for low power computers
+                        diff = 4000 # Use 4000 - diff for low power computers
                         shareTimeRequired = 150
                 except:
                     diff = math.ceil(blocks / diff_incrase_per) # Use "standard" difficulty
@@ -545,20 +537,23 @@ def handle(c):
                     rand = random.randint(1, diff)
                 else:
                     rand = random.randint(1, 100 * diff)
-                    shareTimeRequired = rand / 10000
+                    shareTimeRequired = int(rand / 10000)
+                    
+                newBlockHash = hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest()
                 try:
-                    newBlockHash = hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest()
                     c.send(bytes(str(lastBlockHash) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
                     jobsent = datetime.datetime.now()
                     response = c.recv(128).decode().split(",") # Wait until client solves hash
                     result = response[0]
-                    # Kolka system - reward dependent on share submission time and rejection of very fast shares
-                    resultreceived = datetime.datetime.now()
                 except:
                     break
+                # Kolka system - reward dependent on share submission time and rejection of very fast shares
+                resultreceived = datetime.datetime.now()
                 sharetime = resultreceived - jobsent # Time from start of hash computing to finding the result
                 sharetime = int(sharetime.total_seconds() * 1000) # Get total ms
-                reward = int(int(sharetime) **2) / 650000000 # Calculate reward dependent on share submission time
+                #print("Time:   :", sharetime)
+                #print("Required:", shareTimeRequired)
+                reward = int(int(sharetime) **2) / 1555050505 # Calculate reward dependent on share submission time
                 try: # If client submitted hashrate, use it
                     hashrate = float(response[1])
                     hashrateEstimated = False
@@ -576,29 +571,16 @@ def handle(c):
                     minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
                 except:
                     pass
-                if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 5000:
+                if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 3500:
+                    acceptedShares += 1
+                    c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
                     try:
-                        acceptedShares += 1
-                        c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
-                        while True:
-                            try:
-                                with sqlite3.connect(database) as conn: # Get users balance and check if it exists
-                                    datab = conn.cursor()
-                                    datab.execute("SELECT * FROM Users WHERE username = ?", (username,))
-                                    balance = float(datab.fetchone()[3])
-                                    balance += float(reward) # Reward user
-                                    datab = conn.cursor()
-                                    datab.execute("UPDATE Users set balance = ? where username = ?", (f'{balance:.20f}', username))
-                                    conn.commit()
-                                    break
-                            except:
-                                pass
-                    except:
-                        c.send(bytes("INVU", encoding="utf8")) # Send feedback that this user doesn't exist
-                        break
+                        balancesToUpdate[username] += reward
+                    except: 
+                        balancesToUpdate[username] = reward
                     while True:
                         try:
-                            with sqlite3.connect(blockchain) as blockconn: # Update blocks counter and lastblock's hash
+                            with sqlite3.connect(blockchain, timeout = 10) as blockconn: # Update blocks counter and lastblock's hash
                                 blocks += 1
                                 blockdatab = blockconn.cursor()
                                 blockdatab.execute("UPDATE Server set blocks = ? ", (blocks,))
@@ -613,25 +595,11 @@ def handle(c):
                         c.send(bytes("BAD", encoding="utf8")) # Send feedback that incorrect result was received
                     except:
                         break
-
-                    while True:
-                        try:
-                            with sqlite3.connect(database) as conn:
-                                datab = conn.cursor()
-                                datab.execute("SELECT * FROM Users WHERE username = ?", (username,))
-                                balance = str(datab.fetchone()[3]) # Get miner balance
-                                if float(balance) > .00005:
-                                    balance = float(balance) - int(int(sharetime) *2) / 750000000 # Calculate penalty dependent on share submission time
-                                    while True:
-                                        try:
-                                            datab.execute("UPDATE Users set balance = ? where username = ?", (f'{balance:.20f}', username))
-                                            conn.commit()
-                                            break
-                                        except:
-                                            pass
-                                break
-                        except:
-                            pass
+                    penalty = int(int(sharetime) **3) / 1100000000 # Calculate penalty dependent on share submission time
+                    try:
+                        balancesToUpdate[username] -= penalty
+                    except: 
+                        balancesToUpdate[username] = -penalty
 
             ######################################################################
             if str(data[0]) == "CHGP" and str(username) != "":
@@ -940,6 +908,7 @@ if __name__ == '__main__':
     threading.Thread(target=createBackup).start() # Create Backup generator thread
     threading.Thread(target=countips).start() # Start anti-DDoS thread
     threading.Thread(target=resetips).start() # Start connection counter reseter for the ant-DDoS thread
+    threading.Thread(target=UpdateDatabase).start() # Start connection counter reseter for the ant-DDoS thread
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host, port))
