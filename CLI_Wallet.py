@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v1.6)
+# Duino-Coin CLI Wallet (v1.9)
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -69,7 +69,7 @@ except ModuleNotFoundError:
 	print(now.strftime("%H:%M:%S ") + "Tronpy is not installed. Please install it using: python3 -m pip install tronpy.\nWrapper was disabled because of tronpy is needed for !")
 
 timeout = 5 # Socket timeout
-VER = 2.0
+VER = 1.9
 use_wrapper = False # default value for preventing error
 res = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
