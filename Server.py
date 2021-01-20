@@ -255,7 +255,12 @@ def UpdateDatabase():
         with sqlite3.connect(database) as conn:
             datab = conn.cursor()
             for user in balancesToUpdate.copy():
-                datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
+                datab.execute("SELECT * FROM Users WHERE username = ?",(user,))
+                balance = str(datab.fetchone()[3]) # Fetch balance of user
+                if not float(balancesToUpdate[user]) < 0:
+                    datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
+                if float(balance) < 0:
+                    datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(0.0), user))
                 balancesToUpdate.pop(user)
             conn.commit()
         time.sleep(5)
@@ -523,14 +528,14 @@ def handle(c):
                 try:
                     customDiff = str(data[2])
                     if str(customDiff) == "AVR":
-                        diff = 300 # Use 300 - optimal diff for very low power devices like arduino
-                        shareTimeRequired = 100
+                        diff = 400 # Use 400 - optimal diff for very low power devices like arduino
+                        shareTimeRequired = 85
                     elif str(customDiff) == "ESP":
                         diff = 3500 # Use 3500 - optimal diff for low power devices like ESP
-                        shareTimeRequired = 120
+                        shareTimeRequired = 85
                     elif str(customDiff) == "MEDIUM":
                         diff = 4000 # Use 4000 - diff for low power computers
-                        shareTimeRequired = 150
+                        shareTimeRequired = 120
                 except:
                     diff = math.ceil(blocks / diff_incrase_per) # Use "standard" difficulty
                 if diff < 3600:
@@ -553,7 +558,7 @@ def handle(c):
                 sharetime = int(sharetime.total_seconds() * 1000) # Get total ms
                 #print("Time:   :", sharetime)
                 #print("Required:", shareTimeRequired)
-                reward = int(int(sharetime) **2) / 1555050505 # Calculate reward dependent on share submission time
+                reward = int(int(sharetime) **2) / 1999090909 # Calculate reward dependent on share submission time
                 try: # If client submitted hashrate, use it
                     hashrate = float(response[1])
                     hashrateEstimated = False
@@ -595,11 +600,11 @@ def handle(c):
                         c.send(bytes("BAD", encoding="utf8")) # Send feedback that incorrect result was received
                     except:
                         break
-                    penalty = int(int(sharetime) **3) / 1100000000 # Calculate penalty dependent on share submission time
+                    penalty = float(int(int(sharetime) **2) / 1100000000) * -1 # Calculate penalty dependent on share submission time
                     try:
-                        balancesToUpdate[username] -= penalty
+                        balancesToUpdate[username] += penalty
                     except: 
-                        balancesToUpdate[username] = -penalty
+                        balancesToUpdate[username] = penalty
 
             ######################################################################
             if str(data[0]) == "CHGP" and str(username) != "":
