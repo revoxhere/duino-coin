@@ -175,13 +175,13 @@ def reconnect():
 						ducofiat = float(contentjson["Duco price"])
 					else:
 						ducofiat = 0.0025 # If json api request fails, wallet will use this value
-					return s
-					break # If connection was established, continue
 	
 				except: # If it wasn't, display a message
 					print(Style.RESET_ALL + Fore.RED + "Cannot connect to the server. It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
 					time.sleep(15)
 					os.execl(sys.executable, sys.executable, *sys.argv)
+				else:
+					return s
 			else:
 				print("Retrying connection...")
 				time.sleep(0.025) # Restart if wrong status code
@@ -507,7 +507,7 @@ while True:
 				print(Style.RESET_ALL + Fore.WHITE + "Stay safe everyone!")
 				print(Style.RESET_ALL + Fore.WHITE + "Server version : " + Style.BRIGHT + SERVER_VER + Style.RESET_ALL)
 				if float(SERVER_VER) > VER:
-					print(Style.RESET_ALL + Fore.YELLOW + "Server is " + Fore.WHITE + Style.BRIGHT + SERVER_VER + Fore.YELLOW +Style.RESET_ALL + ", but client is " + Style.BRIGHT + Fore.WHITE + VER + Style.RESET_ALL + FORE.YELLOW + ", you should consider downloading last release")
+					print(Style.RESET_ALL + Fore.YELLOW + "Server is " + Fore.WHITE + Style.BRIGHT + SERVER_VER + Fore.YELLOW +Style.RESET_ALL + ", but client is " + Style.BRIGHT + Fore.WHITE + VER + Style.RESET_ALL + Fore.YELLOW + ", you should consider downloading last release")
 				else:
 					print(Style.RESET_ALL + Fore.WHITE + "Client is up-to-date :D")
 
