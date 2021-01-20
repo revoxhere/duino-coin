@@ -14,7 +14,6 @@ try:
 	from cryptography.hazmat.backends import default_backend
 	from cryptography.hazmat.primitives import hashes
 	from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-	import cryptography
 except ModuleNotFoundError:
 	now = datetime.datetime.now()
 	print(now.strftime("%H:%M:%S ") + "Cryptography is not installed. Please install it using: python3 -m pip install cryptography.\nExiting in 15s.")
@@ -61,7 +60,7 @@ except:
 
 try:
 	import tronpy
-	from tronpy.keys import PrivateKey, PublicKey
+	from tronpy.keys import PrivateKey
 	tronpy_installed = True
 except ModuleNotFoundError:
 	tronpy_installed = False
