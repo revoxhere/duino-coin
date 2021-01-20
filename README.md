@@ -181,7 +181,7 @@ api_connection.close()
 ```
 
 
-**Duino-coin for the AUR!**
+<h2>**Duino-coin for the AUR!**</h2>
 
 You can get the whole duino-coin bundle now on the AUR.
 
