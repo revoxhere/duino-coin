@@ -82,6 +82,13 @@ if not os.path.isfile(blockchain): # Create it if it doesn't exist
         blockdatab.execute('''CREATE TABLE IF NOT EXISTS Server(blocks REAL, lastBlockHash TEXT)''')
         blockdatab.execute("INSERT INTO Server(blocks, lastBlockHash) VALUES(?, ?)", (blocks, lastBlockHash))
         blockconn.commit()
+else:
+    with sqlite3.connect(blockchain, timeout = 10) as blockconn:
+        blockdatab = blockconn.cursor()
+        blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
+        blocks = int(blockdatab.fetchone()[0])
+        blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
+        lastBlockHash = str(blockdatab.fetchone()[0])
 if use_wrapper:
     import tronpy # tronpy isn't default installed, install it with "pip install tronpy"
     from tronpy.keys import PrivateKey, PublicKey
@@ -185,13 +192,7 @@ def API():
     while True:
         try:
             with lock:
-                with sqlite3.connect(blockchain, timeout = 15) as blockconn:
-                    blockdatab = blockconn.cursor()
-                    blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
-                    blocks = int(blockdatab.fetchone()[0])
-                    blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
-                    lastBlockHash = str(blockdatab.fetchone()[0])
-                    diff = math.ceil(blocks / diff_incrase_per) # Calculate difficulty
+                diff = math.ceil(blocks / diff_incrase_per) # Calculate difficulty
                 now = datetime.datetime.now()
                 minerList = []
                 usernameMinerCounter = {}
@@ -263,6 +264,11 @@ def UpdateDatabase():
                     datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(0.0), user))
                 balancesToUpdate.pop(user)
             conn.commit()
+        with sqlite3.connect(blockchain, timeout = 10) as blockconn: # Update blocks counter and lastblock's hash
+            blockdatab = blockconn.cursor()
+            blockdatab.execute("UPDATE Server set blocks = ? ", (blocks,))
+            blockdatab.execute("UPDATE Server set lastBlockHash = ?", (lastBlockHash,))
+            blockconn.commit()
         time.sleep(5)
 
 def InputManagement():
@@ -380,13 +386,12 @@ def InputManagement():
 
 def handle(c):
     global connectedUsers, minerapi # These globals are used in the statistics API
+    global blocks, lastBlockHash # These globals hold the current block count and last accepted hash
     c.send(bytes(str(serverVersion), encoding="utf8")) # Send server version
     connectedUsers += 1 # Count new opened connection
     username = "" # Variables for every thread
-    lastBlockHash = ""
     acceptedShares = 0
     rejectedShares = 0
-    blocks = 0
     blockFound = False
 
     def wraptx(duco_username, address, amount):
@@ -513,18 +518,7 @@ def handle(c):
                     except IndexError:
                         c.send(bytes("NO,Not enough data", encoding='utf8'))
                         break
-                while True:
-                    try:
-                        with sqlite3.connect(blockchain, timeout = 10) as blockconn:
-                            blockdatab = blockconn.cursor()
-                            blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
-                            blocks = int(blockdatab.fetchone()[0])
-                            blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
-                            lastBlockHash = str(blockdatab.fetchone()[0])
-                            break
-                    except:
-                        pass
-                # Calculate difficulty and create new block hash
+                lastBlockHash_copy = lastBlockHash # lastBlockHash liable to be changed by other threads, so we use a copy
                 try:
                     customDiff = str(data[2])
                     if str(customDiff) == "AVR":
@@ -544,9 +538,9 @@ def handle(c):
                     rand = random.randint(1, 100 * diff)
                     shareTimeRequired = int(rand / 10000)
                     
-                newBlockHash = hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest()
+                newBlockHash = hashlib.sha1(str(lastBlockHash_copy + str(rand)).encode("utf-8")).hexdigest()
                 try:
-                    c.send(bytes(str(lastBlockHash) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
+                    c.send(bytes(str(lastBlockHash_copy) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
                     jobsent = datetime.datetime.now()
                     response = c.recv(128).decode().split(",") # Wait until client solves hash
                     result = response[0]
@@ -583,17 +577,8 @@ def handle(c):
                         balancesToUpdate[username] += reward
                     except: 
                         balancesToUpdate[username] = reward
-                    while True:
-                        try:
-                            with sqlite3.connect(blockchain, timeout = 10) as blockconn: # Update blocks counter and lastblock's hash
-                                blocks += 1
-                                blockdatab = blockconn.cursor()
-                                blockdatab.execute("UPDATE Server set blocks = ? ", (blocks,))
-                                blockdatab.execute("UPDATE Server set lastBlockHash = ?", (newBlockHash,))
-                                blockconn.commit()
-                                break
-                        except:
-                            pass
+                    blocks += 1
+                    lastBlockHash = newBlockHash
                 else: # Incorrect result received
                     try:
                         rejectedShares += 1
