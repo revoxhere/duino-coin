@@ -298,16 +298,7 @@ def AVRMine(): # Mining section
             debugOutput("Received job")
             job_not_received = False
           except:
-            while connection_error:
-              try:
-                Connect()
-              except:
-                connection_error = True
-                time.sleep(10)
-                print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-                  + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s")
-              else:
-                connection_error = False
+            Connect()
             continue
         job = job.split(",") # Split received data to job and difficulty
         try:
@@ -330,17 +321,8 @@ def AVRMine(): # Mining section
         com.write(bytes(str(job[0] + "\n" + job[1]+ "\n" + job[2] + "\n"), encoding="utf8")) # hash
         debugOutput("Send job to arduino")
       except:
-        connection_error = True
-        while connection_error:
-          try:
-            ConnectToAVR()
-            connection_error = False
-          except:
-            connection_error = True
-            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
-              + Back.RESET + Fore.RED + " Error connecting to AVR! Retrying in 10s.")
-            time.sleep(10)
-        break
+        ConnectToAVR()
+        continue
       wrong_avr_result = True
       wrong_results = 0
       while wrong_avr_result:
@@ -365,46 +347,16 @@ def AVRMine(): # Mining section
         hashrate = round(int(result[0]) / int(result[1]) * 1000000, 2)
         debugOutput("Calculated hashrate ("+str(hashrate)+")")
       except:
-        connection_error = True
-        while connection_error:
-          try:
-            Connect()
-          except:
-            connection_error = True
-            time.sleep(10)
-            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-              + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
-          else:
-            connection_error = False
+        Connect()
         break
       try:
         soc.send(bytes(str(result[0]) + "," + str(hashrate) + ",Official AVR Miner v" + str(minerVersion), encoding="utf8")) # Send result back to the server
       except:
-        pass
-        connection_error = True
-        while connection_error:
-          try:
-            Connect()
-          except:
-            connection_error = True
-            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-              + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
-            time.sleep(10)
-          else:
-            connection_error = False
-            debugOutput("Successfully reconnected to server ! ")
+        Connect()
         break
     except:
-      connection_error = True
-      while connection_error:
-        try:
-          Connect()
-          ConnectToAVR()
-        except:
-          connection_error = True
-          time.sleep(10)
-        else:
-          connection_error = False
+      Connect()
+      ConnectToAVR()
       first_share = True
       continue
 
@@ -459,44 +411,15 @@ def AVRMine(): # Mining section
           + Back.RESET + Fore.RED + " User "+str(username)+" doesn't exist."
           + Style.RESET_ALL + Fore.RED + " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s")
         time.sleep(10)
-        should_reconnect = True
-        while should_reconnect:
-          try:
-            Connect()
-          except:
-            should_reconnect = True
-          else:
-            should_reconnect = False
-        should_reconnect_avr = True
-        while should_reconnect_avr:
-          try:
-            ConnectToAVR()
-          except:
-            should_reconnect_avr = True
-          else:
-            should_reconnect_avr = False
+        Connect()
+        ConnectToAVR()
 
       elif feedback == "ERR": # If server says that it encountered an error
         print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
           + Back.RESET + Fore.RED + " Internal server error." + Style.RESET_ALL + Fore.RED + " Retrying in 10s")
         time.sleep(10)
-        should_reconnect = True
-        while should_reconnect:
-          try:
-            Connect()
-          except:
-            should_reconnect = True
-          else:
-            should_reconnect = False
-        should_reconnect_avr = True
-        while should_reconnect_avr:
-          try:
-            ConnectToAVR()
-          except:
-            should_reconnect_avr = True
-          else:
-            should_reconnect_avr = False
-        break
+        Connect()
+
 
       else: # If result was bad
         shares[1] += 1 # Share rejected = increment bad shares counter by 1
