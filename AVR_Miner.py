@@ -430,6 +430,40 @@ def AVRMine(): # Mining section
           + Style.NORMAL + " - " + str(hashrate) + " H/s @ diff " + str(diff) + " ⁃ " + Fore.BLUE + "ping " + ping + "ms")
         break # Repeat
 
+
+
+def Handler():
+  Connect() # Connect to pool
+  debugOutput("Connected to master server")
+  try:
+    checkVersion() # Check version
+    debugOutput("Version check complete")
+  except:
+    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error checking server version. Retrying in 10s" + Style.RESET_ALL)
+    time.sleep(10)
+    Handler()
+  try:
+    ConnectToAVR() # Connect to COM port
+  except:
+    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
+      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the AVR board. Check your connection, permissions and the configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
+    time.sleep(10)
+    os._exit(1)
+  else:
+    debugOutput("Connected to AVR board")
+  try:
+    debugOutput("Mining started")
+    AVRMine() # Launch mining thread
+    debugOutput("Mining ended")
+  except:
+    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+    + Style.RESET_ALL + Style.BRIGHT + Fore.MAGENTA + " Master server timeout OR AVR connection error - rescuing" + Style.RESET_ALL)
+    Handler()
+
+
+
+
 if __name__ == '__main__':
   init(autoreset=True) # Enable colorama
   debug = False
@@ -457,43 +491,4 @@ if __name__ == '__main__':
       + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error in the autorestarter. Check configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
     time.sleep(10)
     os._exit(1)
-
-  while True:
-    while True:
-      while True:
-        while True:
-          try:
-            Connect() # Connect to pool
-            debugOutput("Connected to master server")
-            break
-          except:
-            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-            + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the server. Retrying in 10s" + Style.RESET_ALL)
-            time.sleep(10)
-        try:
-          checkVersion() # Check version
-          debugOutput("Version check complete")
-          break
-        except:
-          print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-          + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error checking server version. Retrying in 10s" + Style.RESET_ALL)
-          time.sleep(10)
-      try:
-        ConnectToAVR() # Connect to COM port
-      except:
-        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-          + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the AVR board. Check your connection, permissions and the configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
-        time.sleep(10)
-        os._exit(1)
-      else:
-        debugOutput("Connected to AVR board")
-        break
-    try:
-      debugOutput("Mining started")
-      AVRMine() # Launch mining thread
-      debugOutput("Mining ended")
-      break
-    except:
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Style.RESET_ALL + Style.BRIGHT + Fore.MAGENTA + " Master server timeout OR AVR connection error - rescuing" + Style.RESET_ALL)
-      pass
+  Handler()
