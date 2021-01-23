@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python Miner (v1.9)
+# Duino-Coin Python Miner (v2.0)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
@@ -36,7 +36,7 @@ except:
   install("requests")
 
 # Global variables
-minerVersion = "1.9" # Version number
+minerVersion = "2.0" # Version number
 timeout = 5 # Socket timeout
 resourcesFolder = "PCMiner_"+str(minerVersion)+"_resources"
 shares = [0, 0]
