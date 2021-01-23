@@ -348,12 +348,12 @@ def AVRMine(): # Mining section
         debugOutput("Calculated hashrate ("+str(hashrate)+")")
       except:
         Connect()
-        break
+        continue
       try:
         soc.send(bytes(str(result[0]) + "," + str(hashrate) + ",Official AVR Miner v" + str(minerVersion), encoding="utf8")) # Send result back to the server
       except:
         Connect()
-        break
+        continue
     except:
       Connect()
       ConnectToAVR()
