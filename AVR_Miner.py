@@ -256,17 +256,19 @@ def AVRMine(): # Mining section
       donateExecutable = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL)
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
         + Back.RESET + Fore.RED + " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development")
-
-  while True:
+  
+  avr_not_initialized = True
+  while avr_not_initialized:
     try:
       ready = com.readline().decode() # AVR will send ready signal
       debugOutput("Received start word ("+str(ready)+")")
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
         + Back.RESET + Fore.YELLOW + " AVR mining thread is starting"
         + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1A algorithm")
-      break
+      avr_not_initialized = False
     except:
       ConnectToAVR()
+      avr_not_initialized = True
 
   while True:
     while True:
@@ -305,16 +307,21 @@ def AVRMine(): # Mining section
         ConnectToAVR()
         break
       wrong_avr_result = True
+      wrong_results = 0
       while wrong_avr_result:
         result = com.readline().decode() # Read the result
+        debugOutput(str("result: ")+str(result))
         if result == "":
           wrong_avr_result = True
+          wrong_results += 1
           if first_share:
-            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr " + Back.RESET + Fore.RED + " Arduino is taking longer than expected, try resetting card ! ")
+            wrong_avr_result = False
+            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr " + Back.RESET + Fore.RED + " Arduino is taking longer than expected, sending it a new job ")
         else:
           wrong_avr_result = False
           first_share = False
-      debugOutput(str("result: ")+str(result))
+      if first_share or wrong_results > 5:
+        continue
       result = result.split(",")
       try:
         debugOutput("Received result ("+str(result[0])+")")
