@@ -191,7 +191,6 @@ def Connect(): # Connect to master server section
   except: # If it wasn't, display a message
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
       + Back.RESET + Fore.RED + " Error retrieving data from GitHub! Retrying in 10s.")
-    if debug: raise
     time.sleep(10)
     Connect()
   try: # Try to connect
@@ -207,7 +206,6 @@ def Connect(): # Connect to master server section
   except: # If it wasn't, display a message
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
       + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
-    if debug: raise
     time.sleep(10)
     Connect()
 
@@ -226,11 +224,21 @@ def checkVersion():
 
 def ConnectToAVR():
   global com
+  avr_was_unplugged = False
   try: # Close previous serial connections (if any)
     com.close()
   except:
     pass
-  com = serial.Serial(avrport, 115200, timeout=30, write_timeout=30, inter_byte_timeout=1)
+  try:
+    com = serial.Serial(avrport, 115200, timeout=30, write_timeout=30, inter_byte_timeout=1)
+    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr " + Style.RESET_ALL + Style.BRIGHT + Fore.GREEN + " AVR is connected :D" + Style.RESET_ALL)
+  except:
+    debugOutput("Error connecting to AVR")
+    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
+      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " AVR connection error, please check wether it's plugged or not" + Style.RESET_ALL)
+    time.sleep(10)
+    ConnectToAVR()
+
 
 def AVRMine(): # Mining section
   global donationlevel, donatorrunning, donateExecutable
@@ -267,7 +275,16 @@ def AVRMine(): # Mining section
         + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1A algorithm")
       avr_not_initialized = False
     except:
-      ConnectToAVR()
+      while connection_error:
+        try:
+          ConnectToAVR()
+        except:
+          connection_error = True
+          time.sleep(10)
+          print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
+            + Back.RESET + Fore.RED + " Error connecting to the AVR! Retrying in 10s.")
+        else:
+          connection_error = False
       avr_not_initialized = True
 
   while True:
@@ -281,9 +298,17 @@ def AVRMine(): # Mining section
             debugOutput("Received job")
             job_not_received = False
           except:
-            Connect() # reconnects pool
-            debugOutput("Reconnecting to pool !")
-            job_not_received = True
+            while connection_error:
+              try:
+                Connect()
+              except:
+                connection_error = True
+                time.sleep(10)
+                print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+                  + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s")
+              else:
+                connection_error = False
+            continue
         job = job.split(",") # Split received data to job and difficulty
         try:
           if job[0] and job[1] and job[2]:
@@ -293,9 +318,11 @@ def AVRMine(): # Mining section
         except IndexError:
           debugOutput("IndexError, retrying")
       except:
-        if debug: raise
-        Connect()
-        ConnectToAVR()
+        try:
+          Connect()
+          ConnectToAVR()
+        except:
+          debugOutput("Error ! ")
     try: # Write data to AVR board
       try:
         com.write(bytes("start\n", encoding="utf8")) # start word
@@ -303,8 +330,16 @@ def AVRMine(): # Mining section
         com.write(bytes(str(job[0] + "\n" + job[1]+ "\n" + job[2] + "\n"), encoding="utf8")) # hash
         debugOutput("Send job to arduino")
       except:
-        Connect()
-        ConnectToAVR()
+        connection_error = True
+        while connection_error:
+          try:
+            ConnectToAVR()
+            connection_error = False
+          except:
+            connection_error = True
+            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
+              + Back.RESET + Fore.RED + " Error connecting to AVR! Retrying in 10s.")
+            time.sleep(10)
         break
       wrong_avr_result = True
       wrong_results = 0
@@ -330,20 +365,48 @@ def AVRMine(): # Mining section
         hashrate = round(int(result[0]) / int(result[1]) * 1000000, 2)
         debugOutput("Calculated hashrate ("+str(hashrate)+")")
       except:
-        Connect()
-        ConnectToAVR()
+        connection_error = True
+        while connection_error:
+          try:
+            Connect()
+          except:
+            connection_error = True
+            time.sleep(10)
+            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+              + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
+          else:
+            connection_error = False
+        break
       try:
         soc.send(bytes(str(result[0]) + "," + str(hashrate) + ",Official AVR Miner v" + str(minerVersion), encoding="utf8")) # Send result back to the server
       except:
-        if debug: raise
-        Connect()
-        ConnectToAVR()
+        pass
+        connection_error = True
+        while connection_error:
+          try:
+            Connect()
+          except:
+            connection_error = True
+            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+              + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
+            time.sleep(10)
+          else:
+            connection_error = False
+            debugOutput("Successfully reconnected to server ! ")
         break
     except:
-      if debug: raise
-      Connect()
-      ConnectToAVR()
-      break
+      connection_error = True
+      while connection_error:
+        try:
+          Connect()
+          ConnectToAVR()
+        except:
+          connection_error = True
+          time.sleep(10)
+        else:
+          connection_error = False
+      first_share = True
+      continue
 
     while True:
       responsetimetart = now()
@@ -356,7 +419,11 @@ def AVRMine(): # Mining section
           debugOutput("Timeout while getting feedback, retrying")
         except ConnectionResetError:
           debugOutput("Connection was reset, reconnecting")
-          if debug: raise
+          Connect()
+          feedback_not_received = True
+          break
+        except ConnectionAbortedError:
+          debugOutput("Connection was aborted, reconnecting")
           Connect()
           feedback_not_received = True
           break
@@ -392,15 +459,44 @@ def AVRMine(): # Mining section
           + Back.RESET + Fore.RED + " User "+str(username)+" doesn't exist."
           + Style.RESET_ALL + Fore.RED + " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s")
         time.sleep(10)
-        Connect()
-        ConnectToAVR()
+        should_reconnect = True
+        while should_reconnect:
+          try:
+            Connect()
+          except:
+            should_reconnect = True
+          else:
+            should_reconnect = False
+        should_reconnect_avr = True
+        while should_reconnect_avr:
+          try:
+            ConnectToAVR()
+          except:
+            should_reconnect_avr = True
+          else:
+            should_reconnect_avr = False
 
       elif feedback == "ERR": # If server says that it encountered an error
         print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
           + Back.RESET + Fore.RED + " Internal server error." + Style.RESET_ALL + Fore.RED + " Retrying in 10s")
         time.sleep(10)
-        Connect()
-        ConnectToAVR()
+        should_reconnect = True
+        while should_reconnect:
+          try:
+            Connect()
+          except:
+            should_reconnect = True
+          else:
+            should_reconnect = False
+        should_reconnect_avr = True
+        while should_reconnect_avr:
+          try:
+            ConnectToAVR()
+          except:
+            should_reconnect_avr = True
+          else:
+            should_reconnect_avr = False
+        break
 
       else: # If result was bad
         shares[1] += 1 # Share rejected = increment bad shares counter by 1
@@ -413,20 +509,20 @@ def AVRMine(): # Mining section
 
 if __name__ == '__main__':
   init(autoreset=True) # Enable colorama
+  debug = False
   title("Duino-Coin AVR Miner (v"+str(minerVersion)+")")
   try:
     loadConfig() # Load configfile
     debugOutput("Config file loaded")
   except:
     print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "Error loading the configfile ("+resourcesFolder+"/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s" + Style.RESET_ALL)
-    if debug: raise
     time.sleep(10)
     os._exit(1)
   try:
     Greeting() # Display greeting message
     debugOutput("Greeting displayed")
   except:
-    if debug: raise
+    pass
   try: # Setup autorestarter
     if float(autorestart) > 0:
       debugOutput("Enabled autorestarter for " + str(autorestart) + " minutes")
@@ -436,7 +532,6 @@ if __name__ == '__main__':
   except:
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
       + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error in the autorestarter. Check configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
-    if debug: raise
     time.sleep(10)
     os._exit(1)
 
@@ -451,7 +546,6 @@ if __name__ == '__main__':
           except:
             print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
             + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the server. Retrying in 10s" + Style.RESET_ALL)
-            if debug: raise
             time.sleep(10)
         try:
           checkVersion() # Check version
@@ -460,18 +554,17 @@ if __name__ == '__main__':
         except:
           print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
           + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error checking server version. Retrying in 10s" + Style.RESET_ALL)
-          if debug: raise
           time.sleep(10)
       try:
         ConnectToAVR() # Connect to COM port
-        debugOutput("Connected to AVR board")
-        break
       except:
         print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
           + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the AVR board. Check your connection, permissions and the configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
-        if debug: raise
         time.sleep(10)
         os._exit(1)
+      else:
+        debugOutput("Connected to AVR board")
+        break
     try:
       debugOutput("Mining started")
       AVRMine() # Launch mining thread
@@ -480,4 +573,4 @@ if __name__ == '__main__':
     except:
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
       + Style.RESET_ALL + Style.BRIGHT + Fore.MAGENTA + " Master server timeout OR AVR connection error - rescuing" + Style.RESET_ALL)
-      if debug: raise
+      pass
