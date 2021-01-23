@@ -65,6 +65,7 @@ if not os.path.isfile(database): # Create it if it doesn't exist
     with sqlite3.connect(database, timeout = 15) as conn:
         datab = conn.cursor()
         datab.execute('''CREATE TABLE IF NOT EXISTS Users(username TEXT, password TEXT, email TEXT, balance REAL)''')
+        conn.commit()
 blockchain = 'duino_blockchain.db' # Blockchain database location
 if not os.path.isfile(blockchain): # Create it if it doesn't exist
     with sqlite3.connect(blockchain, timeout = 15) as blockconn:
@@ -89,6 +90,16 @@ else:
         blocks = int(blockdatab.fetchone()[0])
         blockdatab.execute("SELECT lastBlockHash FROM Server") # Read lastblock's hash
         lastBlockHash = str(blockdatab.fetchone()[0])
+if not os.path.isfile("config/transactions.db"): # Create transactions database if it doesn't exist
+    with sqlite3.connect("config/transactions.db", timeout = 15) as conn:
+        datab = conn.cursor()
+        datab.execute('''CREATE TABLE IF NOT EXISTS Transactions(timestamp TEXT, username TEXT, recipient TEXT, amount REAL, hash TEXT)''')
+        conn.commit()
+if not os.path.isfile("config/foundBlocks.db"): # Create transactions database if it doesn't exist
+    with sqlite3.connect("config/foundBlocks.db", timeout = 15) as conn:
+        datab = conn.cursor()
+        datab.execute('''CREATE TABLE IF NOT EXISTS Blocks(timestamp TEXT, finder TEXT, amount REAL, hash TEXT)''')
+        conn.commit()
 if use_wrapper:
     import tronpy # tronpy isn't default installed, install it with "pip install tronpy"
     from tronpy.keys import PrivateKey, PublicKey
@@ -179,6 +190,44 @@ def getAllBalances():
         except:
             pass
     return(leadersdata)
+def getTransactions():
+    while True:
+        try:
+            transactiondata = {}
+            with sqlite3.connect("config/transactions.db", timeout = 10) as conn:
+                datab = conn.cursor()
+                datab.execute("SELECT * FROM Transactions")
+                for row in datab.fetchall():
+                    transactiondata[str(row[4])] = {
+                        "Date": str(row[0].split(" ")[0]),
+                        "Time": str(row[0].split(" ")[1]),
+                        "Sender": str(row[1]),
+                        "Recipient": str(row[2]),
+                        "Amount": float(row[3])}
+            break
+        except:
+            pass
+    return transactiondata
+def getBlocks():
+    while True:
+        try:
+            transactiondata = {}
+            with sqlite3.connect("config/foundBlocks.db", timeout = 10) as conn:
+                datab = conn.cursor()
+                datab.execute("SELECT * FROM Blocks")
+                for row in datab.fetchall():
+                    transactiondata[str(row[3]).replace("\n", "")] = {
+                        "Date": str(row[0].split(" ")[0]),
+                        "Time": str(row[0].split(" ")[1]),
+                        "Finder": str(row[1]),
+                        "Amount": float(row[2])}
+            break
+        except Exception as e:
+            print(e)
+            pass
+        with open('foundBlocks.json', 'w') as outfile: # Write JSON big blocks to file
+            json.dump(getBlocks(), outfile, indent=4, ensure_ascii=False)
+        time.sleep(60)
 def getCpuUsage():
     import psutil
     while True:
@@ -245,15 +294,17 @@ def API():
                 with open('api.json', 'w') as outfile: # Write JSON to file
                     json.dump(formattedMinerApi, outfile, indent=4, ensure_ascii=False)
                 formattedBalances = getAllBalances()
-                with open('balances.json', 'w') as outfile: # Write JSON bals to file
+                with open('balances.json', 'w') as outfile: # Write JSON balances to file
                     json.dump(formattedBalances, outfile, indent=4, ensure_ascii=False)
+                with open('transactions.json', 'w') as outfile: # Write JSON transactions to file
+                    json.dump(getTransactions(), outfile, indent=4, ensure_ascii=False)
         except:
             pass
         time.sleep(5)
 
 def UpdateDatabase():
     while True:
-        with sqlite3.connect(database) as conn:
+        with sqlite3.connect(database, timeout = 10) as conn:
             datab = conn.cursor()
             for user in balancesToUpdate.copy():
                 datab.execute("SELECT * FROM Users WHERE username = ?",(user,))
@@ -261,7 +312,7 @@ def UpdateDatabase():
                 if not float(balancesToUpdate[user]) < 0:
                     datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
                 if float(balance) < 0:
-                    datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(0.0), user))
+                    datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(0), user))
                 balancesToUpdate.pop(user)
             conn.commit()
         with sqlite3.connect(blockchain, timeout = 10) as blockconn: # Update blocks counter and lastblock's hash
@@ -392,7 +443,6 @@ def handle(c):
     username = "" # Variables for every thread
     acceptedShares = 0
     rejectedShares = 0
-    blockFound = False
 
     def wraptx(duco_username, address, amount):
         print("Tron wrapper called !")
@@ -536,7 +586,7 @@ def handle(c):
                     rand = random.randint(1, diff)
                 else:
                     rand = random.randint(1, 100 * diff)
-                    shareTimeRequired = int(rand / 10000)
+                    shareTimeRequired = int(rand / 700)
                     
                 newBlockHash = hashlib.sha1(str(lastBlockHash_copy + str(rand)).encode("utf-8")).hexdigest()
                 try:
@@ -552,7 +602,6 @@ def handle(c):
                 sharetime = int(sharetime.total_seconds() * 1000) # Get total ms
                 #print("Time:   :", sharetime)
                 #print("Required:", shareTimeRequired)
-                reward = int(int(sharetime) **2) / 1999090909 # Calculate reward dependent on share submission time
                 try: # If client submitted hashrate, use it
                     hashrate = float(response[1])
                     hashrateEstimated = False
@@ -571,8 +620,25 @@ def handle(c):
                 except:
                     pass
                 if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 3500:
+                    reward = int(int(sharetime) **2) / 5000000000 # Calculate reward dependent on share submission time
                     acceptedShares += 1
-                    c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
+                    try:
+                        blockfound = random.randint(1, 100000) # Low probability to find a "big block"
+                        if int(blockfound) == 1:
+                            reward += 7 # Add 7 DUCO to the reward
+                            with sqlite3.connect("config/foundBlocks.db", timeout = 10) as bigblockconn:
+                                datab = bigblockconn.cursor()
+                                now = datetime.datetime.now()
+                                formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
+                                datab.execute('''INSERT INTO Blocks(timestamp, finder, amount, hash) VALUES(?, ?, ?, ?)''', (formatteddatetime, username, reward, newBlockHash))
+                                bigblockconn.commit()
+                            print("Block found", formatteddatetime, username, reward, newBlockHash)
+                            c.send(bytes("BLOCK", encoding="utf8")) # Send feedback that block was found
+                        else:
+                            c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
+                    except Exception as e:
+                        print(e)
+                        break
                     try:
                         balancesToUpdate[username] += reward
                     except: 
@@ -585,7 +651,7 @@ def handle(c):
                         c.send(bytes("BAD", encoding="utf8")) # Send feedback that incorrect result was received
                     except:
                         break
-                    penalty = float(int(int(sharetime) **2) / 1100000000) * -1 # Calculate penalty dependent on share submission time
+                    penalty = float(int(int(sharetime) **2) / 1000000000) * -1 # Calculate penalty dependent on share submission time
                     try:
                         balancesToUpdate[username] += penalty
                     except: 
@@ -694,9 +760,16 @@ def handle(c):
                                         datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
                                         conn.commit()
                                         print("Updated recipients balance:", recipientbal)
-                                        c.send(bytes("OK,Successfully transferred funds!", encoding='utf8'))
-                                        break
-                                except:
+                                    with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
+                                        datab = tranconn.cursor()
+                                        now = datetime.datetime.now()
+                                        formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
+                                        datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (formatteddatetime, username, recipient, amount, lastBlockHash))
+                                        tranconn.commit()
+                                    c.send(bytes("OK,Successfully transferred funds!", encoding='utf8'))
+                                    break
+                                except Exception as e:
+                                    print(e)
                                     pass
                     except:
                         c.send(bytes("NO,Error occured while sending funds", encoding='utf8'))
@@ -881,32 +954,35 @@ bannedIPS = {}
 def countips():
     while True:
         for ip in IPS.copy():
-            if IPS[ip] > 50 and not ip == "51.15.127.80":
-                print("Banning IP:", ip)
-                os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
-                IPS.pop(ip)
-                threading.Timer(60.0, unbanip, [ip]).start() # Start auto-unban thread for this IP
-        time.sleep(2)
+            if IPS[ip] > 60 and not ip == "51.15.127.80" and not ip == "169.0.53.175":
+                try:
+                    print("Banning IP:", ip)
+                    os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
+                    IPS.pop(ip)
+                    threading.Timer(60.0, unbanip, [ip]).start() # Start auto-unban thread for this IP
+                except:
+                    pass
+        time.sleep(3)
 def resetips():
     while True:
         time.sleep(30)
         IPS.clear()
 
 if __name__ == '__main__':
-    print("Duino-Coin Master Server", serverVersion, "is starting...")
+    print("Duino-Coin Master Server", serverVersion, "is starting")
     threading.Thread(target=API).start() # Create JSON API thread
     threading.Thread(target=createBackup).start() # Create Backup generator thread
     threading.Thread(target=countips).start() # Start anti-DDoS thread
     threading.Thread(target=resetips).start() # Start connection counter reseter for the ant-DDoS thread
-    threading.Thread(target=UpdateDatabase).start() # Start connection counter reseter for the ant-DDoS thread
+    threading.Thread(target=getBlocks).start() # Start database updater
+    threading.Thread(target=UpdateDatabase).start() # Start database updater
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host, port))
     print("Socket binded to port", port)
     # Put the socket into listening mode
-    s.listen(5) # Queue of 5 connections
-    print("Socket is listening")
-    print("Wrapper's tron address:", wrapper_public_key)
+    s.listen(10) # Queue of 10 connections
+    print("wDUCO address", wrapper_public_key)
     threading.Thread(target=InputManagement).start() # Admin input management thread
     # a forever loop until client wants to exit
     try:
@@ -921,7 +997,7 @@ if __name__ == '__main__':
             # Start a new thread and return its identifier
             start_new_thread(handle, (c,))
     finally:
-        print("exiting")
+        print("Exiting")
         s.close()
         import os
         os._exit(1) # error code 1 so it will autorestart with systemd
