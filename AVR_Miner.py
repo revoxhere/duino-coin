@@ -188,28 +188,31 @@ def Connect(): # Connect to master server section
       masterServer_address = content[0] # Line 1 = pool address
       masterServer_port = content[1] # Line 2 = pool port
       debugOutput("Retrieved pool IP: " + masterServer_address + ":" + str(masterServer_port))
+      should_try_socket = True
   except: # If it wasn't, display a message
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
       + Back.RESET + Fore.RED + " Error retrieving data from GitHub! Retrying in 10s.")
     time.sleep(10)
     Connect()
-  try: # Try to connect
-    try: # Shutdown previous connections (if any)
-      soc.shutdown(socket.SHUT_RDWR)
-      soc.close()
-    except:
-      debugOutput("No previous connections to close")
-    soc = socket.socket()
-    soc.connect((str(masterServer_address), int(masterServer_port)))
-    debugOutput("Connected to server !")
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Back.RESET + Fore.GREEN + " Successfully connected to the server !")
-    soc.settimeout(timeout)
-  except: # If it wasn't, display a message
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
-    time.sleep(10)
-    Connect()
+    should_try_socket = False
+  if should_try_socket:
+    try: # Try to connect
+      try: # Shutdown previous connections (if any)
+        soc.shutdown(socket.SHUT_RDWR)
+        soc.close()
+      except:
+        debugOutput("No previous connections to close")
+      soc = socket.socket()
+      soc.connect((str(masterServer_address), int(masterServer_port)))
+      debugOutput("Connected to server !")
+      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+        + Back.RESET + Fore.GREEN + " Successfully connected to the server !")
+      soc.settimeout(timeout)
+    except: # If it wasn't, display a message
+      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+        + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
+      time.sleep(10)
+      Connect()
 
 def checkVersion():
   serverVersion = soc.recv(3).decode() # Check server version
