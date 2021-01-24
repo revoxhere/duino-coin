@@ -202,6 +202,8 @@ def Connect(): # Connect to master server section
     soc = socket.socket()
     soc.connect((str(masterServer_address), int(masterServer_port)))
     debugOutput("Connected to server !")
+    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+      + Back.RESET + Fore.GREEN + " Successfully connected to the server !")
     soc.settimeout(timeout)
   except: # If it wasn't, display a message
     print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
@@ -330,13 +332,14 @@ def AVRMine(): # Mining section
         debugOutput(str("result: ")+str(result))
         if result == "":
           wrong_avr_result = True
-          wrong_results += 1
-          if first_share:
+          wrong_results = wrong_results + 1
+          if first_share or wrong_results > 5:
             wrong_avr_result = False
             print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr " + Back.RESET + Fore.RED + " Arduino is taking longer than expected, sending it a new job ")
         else:
           wrong_avr_result = False
           first_share = False
+          wrong_results = 0
       if first_share or wrong_results > 5:
         continue
       result = result.split(",")
