@@ -574,18 +574,26 @@ unpaid_balance = 0
 def getBalance():
     global oldbalance, balance, unpaid_balance
 
-    try:
-        soc = socket.socket()
-        soc.connect((pool_address, int(pool_port)))
-        soc.recv(3)
-        soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
-        _ = soc.recv(2)
-        soc.send(bytes("BALA", encoding="utf8"))
-        oldbalance = balance
-        balance = soc.recv(1024).decode()
-        soc.close()
-    except ConnectionResetError:
-        getBalance()
+    while True:
+        try:
+            soc = socket.socket()
+            soc.connect((pool_address, int(pool_port)))
+            soc.recv(3)
+            soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
+            _ = soc.recv(2)
+            soc.send(bytes("BALA", encoding="utf8"))
+            oldbalance = balance
+            balance = soc.recv(1024).decode()
+            soc.close()
+            try:
+                balance = float(balance)
+                break
+            except ValueError:
+                pass
+        except Exception as e:
+            print(e)
+            print("Retrying in 5s.")
+            sleep(5)
 
     try:
         if oldbalance != balance:
@@ -677,7 +685,10 @@ def sendFunds(handler):
         response = soc.recv(128).decode().split(",")
         soc.close()
 
-        MsgBox = messagebox.showinfo(response[0], response[1])
+        if "OK" in str(response[0]):
+            MsgBox = messagebox.showinfo(response[0], response[1] + "\nTXID:" + response[2])
+        else:
+            MsgBox = messagebox.showwarning(response[0], response[1])
     root.update()
 
 class Wallet:
