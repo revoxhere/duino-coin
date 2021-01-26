@@ -1,0 +1,319 @@
+#!/usr/bin/env python3
+##########################################
+# Duino-Coin AVR Miner (v1.9)
+# https://github.com/revoxhere/duino-coin
+# Distributed under MIT license
+# © Duino-Coin Community 2021
+##########################################
+import socket, threading, time, re, subprocess, configparser, sys, datetime, os # Import libraries
+from pathlib import Path
+from signal import signal, SIGINT
+
+username = "revox"
+ports = ["/dev/ttyUSB0", "/dev/ttyUSB1"]
+
+def install(package):
+  subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+  os.execl(sys.executable, sys.executable, *sys.argv)
+
+def now():
+  return datetime.datetime.now()
+
+try: # Check if pyserial is installed
+  import serial
+  import serial.tools.list_ports
+except:
+  now = datetime.datetime.now()
+  print(now().strftime("%H:%M:%S ") + "Pyserial is not installed. Miner will try to install it. If it fails, please manually install \"pyserial\" python3 package.\nIf you can't install it, use the Minimal-PC_Miner.")
+  install("pyserial")
+
+try: # Check if colorama is installed
+  from colorama import init, Fore, Back, Style
+except:
+  print(now().strftime("%H:%M:%S ") + "Colorama is not installed. Miner will try to install it. If it fails, please manually install \"colorama\" python3 package.\nIf you can't install it, use the Minimal-PC_Miner.")
+  install("colorama")
+
+try: # Check if requests is installed
+  import requests
+except:
+  print(now().strftime("%H:%M:%S ") + "Requests is not installed. Miner will try to install it. If it fails, please manually install \"requests\" python3 package.\nIf you can't install it, use the Minimal-PC_Miner.")
+  install("requests")
+
+# Global variables
+minerVersion = "1.9" # Version number
+timeout = 60 # Socket timeout
+resourcesFolder = "AVRMiner_"+str(minerVersion)+"_resources"
+shares = [0, 0]
+diff = 0
+donatorrunning = False
+job = ""
+debug = False
+serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
+config = configparser.ConfigParser()
+autorestart = 0
+donationlevel = 0
+
+if not os.path.exists(resourcesFolder):
+    os.mkdir(resourcesFolder) # Create resources folder if it doesn't exist
+
+def debugOutput(text):
+  if debug:
+    print(now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
+
+def title(title):
+  if os.name == 'nt':
+    os.system("title "+title)
+  else:
+    print('\33]0;'+title+'\a', end='')
+    sys.stdout.flush()
+
+def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
+  print(now().strftime(Style.DIM + "\n%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
+    + Back.RESET + Fore.YELLOW + " SIGINT detected - Exiting gracefully." + Style.NORMAL + Fore.WHITE + " See you soon!")
+  try:
+    socId.close()
+  except:
+    pass
+  os._exit(0)
+signal(SIGINT, handler) # Enable signal handler
+
+def AVRMine(com): # Mining section
+  while True:
+    try:
+      socId = Connection(com)
+      while True:
+        try: # Close previous serial connections (if any)
+          com.close()
+        except:
+          pass
+        try:
+          com = serial.Serial(com, 115200, timeout=3, write_timeout=3, inter_byte_timeout=1)
+          print(now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+            + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " "+str(com.name[-4:].lower())+" "
+            + Style.RESET_ALL + Style.BRIGHT + Fore.GREEN + " AVR on port "+str(com.name[-4:])+" is connected" + Style.RESET_ALL)
+          break
+        except:
+          raise
+          debugOutput("Error connecting to AVR")
+          print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " "+str(com.name[-4:].lower())+" "
+            + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " AVR connection error on port "+str(com.name[-4:])+", please check wether it's plugged in or not" + Style.RESET_ALL)
+          time.sleep(10)
+      first_share = True
+      avr_not_initialized = True
+      while avr_not_initialized:
+        try:
+          ready = com.readline().decode() # AVR will send ready signal
+          debugOutput("Received start word ("+str(ready)+")")
+          print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys"+str(com.name[-1:])+" "
+            + Back.RESET + Fore.YELLOW + " AVR mining thread is starting"
+            + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1A algorithm ("+str(com.name)+")")
+          avr_not_initialized = False
+        except:
+          while connection_error:
+            try:
+              print("connerr")
+              ConnectToAVR()
+            except:
+              connection_error = True
+              time.sleep(10)
+              print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " "+str(com.name[-4:].toLower())+" "
+                + Back.RESET + Fore.RED + " Error connecting to the AVR! Retrying in 10s.")
+            else:
+              connection_error = False
+          avr_not_initialized = True
+
+      while True:
+        while True:
+          try:
+            job_not_received = True
+            while job_not_received:
+              socId.send(bytes("JOB,"+str(username)+",AVR",encoding="utf8")) # Send job request
+              try:
+                job = socId.recv(1024).decode() # Retrieves work from pool
+                debugOutput("Received job")
+                job_not_received = False
+              except:
+                socId = Connection(com)
+                continue
+            job = job.split(",") # Split received data to job and difficulty
+            try:
+              if job[0] and job[1] and job[2]:
+                debugOutput("Job received: " +str(job))
+                diff = job[2]
+                break # If job received, continue 
+            except IndexError:
+              debugOutput("IndexError, retrying")
+          except:
+            raise
+            try:
+              socId = Connection(com)
+              ConnectToAVR()
+            except:
+              debugOutput("Error ! ")
+        try: # Write data to AVR board
+          try:
+            com.write(bytes("start\n", encoding="utf8")) # start word
+            debugOutput("Written start word")
+            com.write(bytes(str(job[0] + "\n" + job[1]+ "\n" + job[2] + "\n"), encoding="utf8")) # hash
+            debugOutput("Send job to arduino")
+          except:
+            ConnectToAVR()
+            continue
+          wrong_avr_result = True
+          wrong_results = 0
+          while wrong_avr_result:
+            result = com.readline().decode() # Read the result
+            debugOutput(str("result: ")+str(result))
+            if result == "":
+              wrong_avr_result = True
+              wrong_results = wrong_results + 1
+              if first_share or wrong_results > 5:
+                wrong_avr_result = False
+                print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr " + Back.RESET + Fore.RED + " Arduino is taking longer than expected, sending it a new job ")
+            else:
+              wrong_avr_result = False
+              first_share = False
+              wrong_results = 0
+          if first_share or wrong_results > 5:
+            continue
+          result = result.split(",")
+          try:
+            debugOutput("Received result ("+str(result[0])+")")
+            debugOutput("Received time ("+str(result[1])+")")
+            computetime = round(int(result[1]) / 1000000, 3) # Convert AVR time to s
+            hashrate = round(int(result[0]) / int(result[1]) * 1000000, 2)
+            debugOutput("Calculated hashrate ("+str(hashrate)+")")
+          except:
+            socId = Connection(com)
+            continue
+          try:
+            socId.send(bytes(str(result[0]) + "," + str(hashrate) + ",Official AVR Miner v" + str(minerVersion), encoding="utf8")) # Send result back to the server
+          except:
+            socId = Connection(com)
+            continue
+        except:
+          socId = Connection(com)
+          ConnectToAVR()
+          first_share = True
+          continue
+
+        while True:
+          responsetimetart = now()
+          feedback_not_received = True
+          while feedback_not_received:
+            try:
+              feedback = socId.recv(64).decode() # Get feedback
+            except socket.timeout:
+              feedback_not_received = True
+              debugOutput("Timeout while getting feedback, retrying")
+            except ConnectionResetError:
+              debugOutput("Connection was reset, reconnecting")
+              socId = Connection(com)
+              feedback_not_received = True
+              break
+            except ConnectionAbortedError:
+              debugOutput("Connection was aborted, reconnecting")
+              socId = Connection(com)
+              feedback_not_received = True
+              break
+            else:
+              responsetimestop = now() # Measure server ping
+              ping = responsetimestop - responsetimetart # Calculate ping
+              ping = str(int(ping.microseconds / 1000)) # Convert to ms
+              feedback_not_received = False
+              debugOutput("Successfully retrieved feedback")
+
+          if feedback == "GOOD": # If result was good
+            shares[0] = shares[0] + 1 # Share accepted  = increment correct shares counter by 1
+            title("Duino-Coin AVR Miner (v"+str(minerVersion)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+            print(now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " "+str(com.name[-4:].lower())+" "
+              + Back.RESET + Fore.GREEN + " Accepted " + Fore.WHITE + str(shares[0]) + "/" + str(shares[0] + shares[1])
+              + Back.RESET + Fore.YELLOW + " (" + str(int((shares[0] / (shares[0] + shares[1]) * 100))) + "%)"
+              + Style.NORMAL + Fore.WHITE + " ⁃ " + Style.BRIGHT + Fore.WHITE + str(computetime) + "s"
+              + Style.NORMAL + " - " + str(hashrate) + " H/s @ diff " + str(diff) + " ⁃ " + Fore.BLUE + "ping " + ping + "ms")
+            break # Repeat
+
+          elif feedback == "BLOCK": # If result was good
+            shares[0] = shares[0] + 1 # Share accepted  = increment correct shares counter by 1
+            title("Duino-Coin AVR Miner (v"+str(minerVersion)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
+            print(now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " "+str(com.name[-4:].lower())+" "
+              + Back.RESET + Fore.CYAN + " Block found " + Fore.WHITE + str(shares[0]) + "/" + str(shares[0] + shares[1])
+              + Back.RESET + Fore.YELLOW + " (" + str(int((shares[0] / (shares[0] + shares[1]) * 100))) + "%)"
+              + Style.NORMAL + Fore.WHITE + " ⁃ " + Style.BRIGHT + Fore.WHITE + str(computetime) + "s"
+              + Style.NORMAL + " - " + str(hashrate) + " H/s @ diff " + str(diff) + " ⁃ " + Fore.BLUE + "ping " + ping + "ms")
+            break # Repeat
+
+          elif feedback == "INVU": # If user doesn't exist 
+            print(now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net"+str(com.name[-1:])+" "
+              + Back.RESET + Fore.RED + " User "+str(username)+" doesn't exist."
+              + Style.RESET_ALL + Fore.RED + " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s")
+            time.sleep(10)
+            socId = Connection(com)
+            ConnectToAVR()
+
+          elif feedback == "ERR": # If server says that it encountered an error
+            print(now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net"+str(com.name[-1:])+" "
+              + Back.RESET + Fore.RED + " Internal server error." + Style.RESET_ALL + Fore.RED + " Retrying in 10s")
+            time.sleep(10)
+            socId = Connection(com)
+
+          else: # If result was bad
+            shares[1] += 1 # Share rejected = increment bad shares counter by 1
+            print(now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " "+str(com.name[-4:].lower())+" "
+              + Back.RESET + Fore.RED + " Rejected " + Fore.WHITE + str(shares[0]) + "/" + str(shares[0] + shares[1])
+              + Back.RESET + Fore.YELLOW + " (" + str(int((shares[0] / (shares[0] + shares[1]) * 100))) + "%)"
+              + Style.NORMAL + Fore.WHITE + " ⁃ " + Style.BRIGHT + Fore.WHITE + str(computetime) + "s"
+              + Style.NORMAL + " - " + str(hashrate) + " H/s @ diff " + str(diff) + " ⁃ " + Fore.BLUE + "ping " + ping + "ms")
+            break # Repeat
+    except Exception as e:
+      print("Error occured ("+str(e)+"), restarting in 10s.")
+      time.sleep(10)
+      os.execl(sys.executable, sys.executable, *sys.argv)
+
+def Connection(port):
+  while True:
+    try:
+      try:
+        res = requests.get(serveripfile, data = None) # Use request to grab data from raw github file
+        if res.status_code == 200: # Check for response
+          content = res.content.decode().splitlines() # Read content and split into lines
+          masterServer_address = content[0] # Line 1 = pool address
+          masterServer_port = content[1] # Line 2 = pool port
+          debugOutput("Retrieved pool IP: " + masterServer_address + ":" + str(masterServer_port))
+          should_try_socket = True
+      except: # If it wasn't, display a message
+        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net"+str(port[-1:])+" "
+          + Back.RESET + Fore.RED + " Error retrieving data from GitHub! Retrying in 10s.")
+        time.sleep(10)
+        socId = Connection(com)
+        should_try_socket = False
+      if should_try_socket:
+        try: # Try to connect
+          try: # Shutdown previous connections (if any)
+            socnbr.shutdown(socket.SHUT_RDWR)
+            socnbr.close()
+          except:
+            debugOutput("No previous connections to close")
+          socnbr = socket.socket()
+          socnbr.connect((str(masterServer_address), int(masterServer_port)))
+          debugOutput("Connected to server!")
+          print(now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net"+str(port[-1:])+" "
+            + Back.RESET + Fore.GREEN + " Successfully connected to the server")
+          socnbr.settimeout(timeout)
+        except: # If it wasn't, display a message
+          print(now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net"+str(port[-1:])+" "
+            + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
+          time.sleep(10)
+          socId = Connection(com)
+      return socnbr
+      break
+    except Exception as e:
+      print("Error occured ("+str(e)+"), restarting in 10s.")
+      time.sleep(10)
+      os.execl(sys.executable, sys.executable, *sys.argv)
+      
+try:
+  for port in ports:
+    threading.Thread(target=AVRMine, args=(port,)).start()
+except Exception as e:
+  debugOutput("Error:" + e)
