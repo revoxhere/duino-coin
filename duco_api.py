@@ -21,6 +21,16 @@ def decode_response(rec):
     response = response.split(",")
     return response
 
+def get_duco_price():
+    """
+    A function for getting the current price of DUCO
+    """
+    api_response = get(API_URL)
+    if api_response.status_code == 200:
+        duco_price = round(float(api_response.json()["Duco price"]), 6)
+    else:
+        duco_price = .003
+    return duco_price
 
 class api_actions:
     """
