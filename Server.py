@@ -117,7 +117,9 @@ def createBackup():
             copyfile(blockchain, "backups/"+str(today)+"/"+blockchain)
             copyfile(database, "backups/"+str(today)+"/"+database)
             with open("prices.txt", "a") as pricesfile:
-                pricesfile.write("," + str(round(getDucoPrice(), 4)).rstrip("\n"))
+                pricesfile.write("," + str(getDucoPrice()).rstrip("\n"))
+            with open("pricesNodeS.txt", "a") as pricesNodeSfile:
+                pricesNodeSfile.write("," + str(getDucoPriceNodeS()).rstrip("\n"))
         time.sleep(3600*6) # Run every 6h
 def getDucoPrice():
     coingecko = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=magi&vs_currencies=usd", data=None)
@@ -130,6 +132,15 @@ def getDucoPrice():
     ducousdLong = float(xmgusd) * float(random.randint(97,103) / 100)
     ducoPrice = round(float(ducousdLong) / 10, 8) # 1:10 rate
     return ducoPrice
+def getDucoPriceNodeS():
+    nodeS = requests.get("http://www.node-s.co.za/api/v1/duco/exchange_rate", data=None)
+    if nodeS.status_code == 200:
+        nodeScontent = nodeS.content.decode()
+        nodeScontentjson = json.loads(nodeScontent)
+        ducousd = float(nodeScontentjson["value"])
+    else:
+        ducousd = .015
+    return ducousd
 def getDucoPriceBTC():
     cryptoid = requests.get("https://chainz.cryptoid.info/explorer/api.dws?q=summary")
     if cryptoid.status_code == 200:
@@ -216,17 +227,15 @@ def getBlocks():
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Blocks")
                 for row in datab.fetchall():
-                    transactiondata[str(row[3]).replace("\n", "")] = {
+                    transactiondata[row[3]] = {
                         "Date": str(row[0].split(" ")[0]),
                         "Time": str(row[0].split(" ")[1]),
                         "Finder": str(row[1]),
-                        "Amount": float(row[2])}
-            break
+                        "Amount generated": float(row[2])}
         except Exception as e:
             print(e)
-            pass
         with open('foundBlocks.json', 'w') as outfile: # Write JSON big blocks to file
-            json.dump(getBlocks(), outfile, indent=4, ensure_ascii=False)
+            json.dump(transactiondata, outfile, indent=4, ensure_ascii=False)
         time.sleep(60)
 def getCpuUsage():
     import psutil
@@ -304,22 +313,37 @@ def API():
 
 def UpdateDatabase():
     while True:
-        with sqlite3.connect(database, timeout = 10) as conn:
-            datab = conn.cursor()
-            for user in balancesToUpdate.copy():
-                datab.execute("SELECT * FROM Users WHERE username = ?",(user,))
-                balance = str(datab.fetchone()[3]) # Fetch balance of user
-                if not float(balancesToUpdate[user]) < 0:
-                    datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
-                if float(balance) < 0:
-                    datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(0), user))
-                balancesToUpdate.pop(user)
-            conn.commit()
-        with sqlite3.connect(blockchain, timeout = 10) as blockconn: # Update blocks counter and lastblock's hash
-            blockdatab = blockconn.cursor()
-            blockdatab.execute("UPDATE Server set blocks = ? ", (blocks,))
-            blockdatab.execute("UPDATE Server set lastBlockHash = ?", (lastBlockHash,))
-            blockconn.commit()
+        while True:
+            try:
+                with sqlite3.connect(database, timeout = 10) as conn:
+                    datab = conn.cursor()
+                    for user in balancesToUpdate.copy():
+                        try:
+                            datab.execute("SELECT * FROM Users WHERE username = ?",(user,))
+                            balance = str(datab.fetchone()[3]) # Fetch balance of user
+                            if not float(balancesToUpdate[user]) < 0:
+                                datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
+                            if float(balance) < 0:
+                                datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(0), user))
+                            balancesToUpdate.pop(user)
+                        except:
+                            continue
+                    conn.commit()
+                    break
+            except Exception as e:
+                print(e)
+                pass
+        while True:
+            try:
+                with sqlite3.connect(blockchain, timeout = 10) as blockconn: # Update blocks counter and lastblock's hash
+                    blockdatab = blockconn.cursor()
+                    blockdatab.execute("UPDATE Server set blocks = ? ", (blocks,))
+                    blockdatab.execute("UPDATE Server set lastBlockHash = ?", (lastBlockHash,))
+                    blockconn.commit()
+                    break
+            except Exception as e:
+                print(e)
+                pass
         time.sleep(5)
 
 def InputManagement():
@@ -586,7 +610,7 @@ def handle(c):
                     rand = random.randint(1, diff)
                 else:
                     rand = random.randint(1, 100 * diff)
-                    shareTimeRequired = int(rand / 700)
+                    shareTimeRequired = int(rand / 7500)
                     
                 newBlockHash = hashlib.sha1(str(lastBlockHash_copy + str(rand)).encode("utf-8")).hexdigest()
                 try:
@@ -619,11 +643,15 @@ def handle(c):
                     minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
                 except:
                     pass
-                if result == str(rand) and int(sharetime) > int(shareTimeRequired) and int(sharetime) < 3500:
-                    reward = int(int(sharetime) **2) / 5000000000 # Calculate reward dependent on share submission time
+                if result == str(rand) and int(sharetime) > int(shareTimeRequired):
+                    sharetimesquared = int(sharetime **2)
+                    if int(sharetime) < 2500:
+                        reward = sharetimesquared / 5000000000 # Calculate reward dependent on share submission time
+                    else:
+                        reward = int(sharetimesquared / sharetime) / 5000000000 # Calculate reward dependent on share submission time
                     acceptedShares += 1
                     try:
-                        blockfound = random.randint(1, 100000) # Low probability to find a "big block"
+                        blockfound = random.randint(1, 1000000) # Low probability to find a "big block"
                         if int(blockfound) == 1:
                             reward += 7 # Add 7 DUCO to the reward
                             with sqlite3.connect("config/foundBlocks.db", timeout = 10) as bigblockconn:
@@ -722,7 +750,7 @@ def handle(c):
                         c.send(bytes("NO,You're sending funds to yourself", encoding='utf8'))
                     except:
                         break
-                if float(balance) <= float(amount) or float(amount) <= 0:
+                if str(amount) == "" or str(recipient) == "" or float(balance) <= float(amount) or float(amount) <= 0:
                     try:
                         c.send(bytes("NO,Incorrect amount", encoding='utf8'))
                         print("NO,Incorrect amount")
@@ -766,7 +794,7 @@ def handle(c):
                                         formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
                                         datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (formatteddatetime, username, recipient, amount, lastBlockHash))
                                         tranconn.commit()
-                                    c.send(bytes("OK,Successfully transferred funds!", encoding='utf8'))
+                                    c.send(bytes("OK,Successfully transferred funds,"+str(lastBlockHash), encoding='utf8'))
                                     break
                                 except Exception as e:
                                     print(e)
