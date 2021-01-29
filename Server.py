@@ -607,7 +607,7 @@ def handle(c):
                     hashrateEstimated = False
                 except: # If not, estimate it ourselves
                     try:
-                        hashrate = int(rand) / int(sharetime) * 2000000 / int(diff) # This formula gives a rough estimation of the hashrate
+                        hashrate = int(rand / (sharetime / 1000)) # This formula gives a rough estimation of the hashrate
                     except ZeroDivisionError:
                         hashrate = 1000
                     hashrateEstimated = True
