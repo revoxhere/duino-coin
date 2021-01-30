@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # ---------- Duino-Coin Multithreaded PC Miner (v1.7) ----------- #
-# https://github.com/revoxhere/duino-coin 
+# https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2020
 # --------------------------------------------------------------- #
@@ -48,7 +48,7 @@ hash_mean = []
 
 def hashrateCalculator():
     global last_hash_count, hash_count, khash_count, hash_mean
-  
+    
     last_hash_count = hash_count
     khash_count = last_hash_count / 1000
     if khash_count == 0:
