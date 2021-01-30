@@ -96,11 +96,14 @@ After sucessfull registration server will send `OK`.
 If registration fails, server will send `NO,Reason of failed registration`.
 
 After loging-in you have access to the following commands:
+
 *   `BALA` - Server will return balance of current user
 *   `JOB` - Server will return job for mining - you can also use `JOB,username` to mine without loging-in
     *   When sending result, you can pass hashrate count and miner name to display in the API, e.g.(6801,250000,My Cool Miner v4.20) indicates that result 6801 was found, hashrate was 250000H/S (250kH/s) and software name was My Cool Miner v4.20
+    
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
         *   If software name is not received, server uses `"Software": "Unknown"` in the API
+        
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
 *   `CHGP,oldPassword,newPassword` - Change password of current user
 
@@ -182,7 +185,6 @@ print(current_balance)
 api_connection.close()
 ```
 
-
 <h2 align="center">Duino-coin for the AUR!</h2><br>
 
 You can get the whole duino-coin bundle now on the AUR.
@@ -190,28 +192,27 @@ You can get the whole duino-coin bundle now on the AUR.
 Just install it with your favourite AUR Helper (for example: yay).
 
 To get it faster, i will help y'all here:
-1. Install git
+ 1. Install git
 
 ```sudo pacman -S git```
 
-2. You have to clone the yay repo.
+ 2. You have to clone the yay repo.
 
 ```sudo git clone https://aur.archlinux.org/yay-git.git```
 
-3. Get into the Folder
+ 3. Get into the Folder
 
 ```cd yay-git```
 
-4. Next, build the package using the makepkg command below.
+ 4. Next, build the package using the makepkg command below.
 
 ```makepkg -si```
 
-5. Now you can use yay to install AUR packages
+ 5. Now you can use yay to install AUR packages
 
 ```yay -S duino-coin```
 
-6. Have fun mining!
-
+ 6. Have fun mining!
 
 <h2 align="center">License</h2><br>
 
