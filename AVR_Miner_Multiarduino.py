@@ -275,7 +275,7 @@ def Greeting():  # Greeting message depending on time
         + "AVR board on port(s): "
         + Style.BRIGHT
         + Fore.YELLOW
-        + str(avrport)
+        + " ".join(avrport)
     )
     if os.name == "nt" or os.name == "posix":
         print(
