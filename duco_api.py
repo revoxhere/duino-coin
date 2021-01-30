@@ -6,10 +6,11 @@
 ##########################################
 import socket
 from requests import get
+from threading import Timer
 
 API_URL = "https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json"
 SERVER_URL = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
-
+duco_price = 0.003
 socket.setdefaulttimeout(10)
 
 
@@ -17,9 +18,24 @@ def decode_response(rec):
     """
     Decodes a response from the server
     """
-    response = rec.decode()
-    response = response.split(",")
-    return response
+    return rec.decode().split(",")
+
+def start_duco_price_timer(tkinter_label=None, interval=15):
+    """
+    A function that starts a timer with a specified interval and updates duco_price variable with the current price.
+    Arguments:
+        tkinter_label: Tkinter label that will be updated with the price (optional)
+        interval: Interval between price updates (default: 15)
+    """
+    global duco_price
+    api_response = get(API_URL)
+    if api_response.status_code == 200:
+        duco_price = round(api_response.json()["Duco price"], 6)
+    else:
+        duco_price = .003
+    if tkinter_label:
+        tkinter_label.set(f"1 Duco = ${duco_price}")
+    Timer(interval, start_duco_price_timer, args=(tkinter_label, interval)).start()
 
 def get_duco_price():
     """
@@ -27,7 +43,7 @@ def get_duco_price():
     """
     api_response = get(API_URL)
     if api_response.status_code == 200:
-        duco_price = round(float(api_response.json()["Duco price"]), 6)
+        duco_price = round(api_response.json()["Duco price"], 6)
     else:
         duco_price = .003
     return duco_price
