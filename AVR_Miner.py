@@ -20,7 +20,6 @@ try: # Check if pyserial is installed
   import serial
   import serial.tools.list_ports
 except:
-  now = datetime.datetime.now()
   print(now().strftime("%H:%M:%S ") + "Pyserial is not installed. Miner will try to install it. If it fails, please manually install \"pyserial\" python3 package.\nIf you can't install it, use the Minimal-PC_Miner.")
   install("pyserial")
 
@@ -229,7 +228,6 @@ def checkVersion():
 
 def ConnectToAVR():
   global com
-  avr_was_unplugged = False
   try: # Close previous serial connections (if any)
     com.close()
   except:
