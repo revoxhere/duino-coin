@@ -4,108 +4,130 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2021
 ##########################################
-from urllib.request import urlopen
 import socket
 from requests import get
-from json import loads
 from threading import Timer
 
+API_URL = "https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json"
+SERVER_URL = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+duco_price = 0.003
 socket.setdefaulttimeout(10)
-ducofiat = .003
 
 
-def decode_soc(rec):
-    response = rec.decode("utf8")
-    response = response.split(",")
-    return response
+def decode_response(rec):
+    """
+    Decodes a response from the server
+    """
+    return rec.decode().split(",")
 
-
-def decode_soc_no_utf(rec):
-    response = rec.decode()
-    response = response.split(",")
-    return response
-
-
-def GetDucoPrice():
-    global ducofiat
-    jsonapi = get("https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json", data = None)
-    if jsonapi.status_code == 200:
-        content = jsonapi.content.decode()
-        contentjson = loads(content)
-        ducofiat = round(float(contentjson["Duco price"]), 6)
+def start_duco_price_timer(tkinter_label=None, interval=15):
+    """
+    A function that starts a timer with a specified interval and updates duco_price variable with the current price.
+    Arguments:
+        tkinter_label: Tkinter label that will be updated with the price (optional)
+        interval: Interval between price updates (default: 15)
+    """
+    global duco_price
+    api_response = get(API_URL)
+    if api_response.status_code == 200:
+        duco_price = round(api_response.json()["Duco price"], 6)
     else:
-        ducofiat = .003
-    Timer(15, GetDucoPrice).start()
+        duco_price = .003
+    if tkinter_label:
+        tkinter_label.set(f"1 Duco = ${duco_price}")
+    Timer(interval, start_duco_price_timer, args=(tkinter_label, interval)).start()
 
+def get_duco_price():
+    """
+    A function for getting the current price of DUCO
+    """
+    api_response = get(API_URL)
+    if api_response.status_code == 200:
+        duco_price = round(api_response.json()["Duco price"], 6)
+    else:
+        duco_price = .003
+    return duco_price
 
-class api_actions():
-
+class api_actions:
+    """
+    A class that provides an interface for interacting with the DUCO server
+    """
     def __init__(self):
         """
-
-        Initiate connection with socket server.
-
-
-        This is to initiate the connection with the server.
-        args: none
+        A class constructor that initiates the connection with the server.
         """
-        with urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as self.content:
-            self.content = self.content.read().decode().splitlines()
-            self.pool_address = self.content[0]
-            self.pool_port = int(self.content[1])
-
-        socket.setdefaulttimeout(10)
+        serverinfo = get(SERVER_URL).text.splitlines()
+        self.pool_address = serverinfo[0]
+        self.pool_port = int(serverinfo[1])
         self.sock = socket.socket()
         self.sock.connect((self.pool_address, self.pool_port))
         self.sock.recv(3)
         self.username = None
         self.password = None
 
-
-    def register(self, username, password, email, send_email=False):
-        self.sock.send(bytes(f"REGI,{str(username)},{str(password)},{str(email)}", encoding="utf8"))
-        self.register_result = decode_soc(self.sock.recv(128))
-        if 'NO' in self.register_result:
-            raise Exception(self.register_result[1])
-        return self.register_result
+    def register(self, username, password, email):
+        """
+        A function for registering an account
+        """
+        self.sock.send(f"REGI,{username},{password},{email}".encode())
+        register_result = decode_response(self.sock.recv(128))
+        if 'NO' in register_result:
+            raise Exception(register_result[1])
+        return register_result
 
     def login(self, username, password):
+        """
+        A function for logging into an account
+        """
         self.username = username
         self.password = password
 
-        self.sock.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
-        self.login_result = decode_soc(self.sock.recv(64))
+        self.sock.send(f"LOGI,{username},{password}".encode())
+        login_result = decode_response(self.sock.recv(64))
 
-        if 'NO' in self.login_result:
-            raise Exception(self.login_result[1])
+        if 'NO' in login_result:
+            raise Exception(login_result[1])
 
-        return self.login_result
+        return login_result
 
     def logout(self):
+        """
+        A function for disconnecting from the server
+        """
         self.sock.close()
 
     def balance(self):
-        if self.password == None or self.username == None:
+        """
+        A function for getting account balance
+        """
+        if not self.password or not self.username:
             raise Exception("User not logged in")
-        self.sock.send(bytes("BALA", encoding="utf8"))
-        self.user_balance = self.sock.recv(1024).decode()
-        return self.user_balance
-
+        self.sock.send("BALA".encode())
+        user_balance = self.sock.recv(1024).decode()
+        return user_balance
 
     def transfer(self, recipient_username, amount):
-        if self.password == None or self.username == None:
+        """
+        A function for transfering balance between two accounts
+        """
+        if not self.password or not self.username:
             raise Exception("User not logged in")
-        self.sock.send(bytes(f"SEND,-,{str(recipient_username)},{str(amount)}", encoding="utf8"))
-        self.transfer_response = self.sock.recv(128).decode()
-        return self.transfer_response
+        self.sock.send(f"SEND,-,{recipient_username},{amount}".encode())
+        transfer_response = self.sock.recv(128).decode()
+        return transfer_response
 
     def reset_pass(self, old_password, new_password):
-        if self.password == None or self.username == None:
+        """
+        A function for resetting the password of an account
+        """
+        if not self.password or not self.username:
             raise Exception("User not logged in")
-        self.sock.send(bytes(f"CHGP,{str(old_password)},{str(new_password)}", encoding="utf8"))
-        self.reset_password_response = self.sock.recv(128).decode("utf8")
-        return self.reset_password_response
+        self.sock.send(f"CHGP,{old_password},{new_password}".encode())
+        reset_password_response = self.sock.recv(128).decode()
+        return reset_password_response
 
     def close(self):
+        """
+        A function for disconnecting from the server
+        """
         self.sock.close()
-
