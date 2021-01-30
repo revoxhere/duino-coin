@@ -51,7 +51,7 @@ except:
 	os._exit(1)
 
 try: # Check if colorama is installed
-	from colorama import init, Fore, Back, Style
+	from colorama import Fore, Back, Style
 except:
 	now = datetime.datetime.now()
 	print(now.strftime("%H:%M:%S ") + "Colorama is not installed. Please install it using: python3 -m pip install colorama.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
@@ -236,7 +236,7 @@ while True:
 						print(Style.RESET_ALL + Fore.YELLOW + Style.BRIGHT + "Successfully registered new account")
 						break
 					elif regiFeedback[0] == "NO":
-						print(Style.RESET_ALL + Fore.RED + 
+						print(Style.RESET_ALL + Fore.RED +
 							"\nCouldn't register new user, reason: " + Style.BRIGHT + str(regiFeedback[1]))
 						time.sleep(15)
 						os._exit(1)
