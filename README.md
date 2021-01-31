@@ -161,10 +161,20 @@ api_connection.reset_pass(old_password='123', new_password='abc')
 Use of this functions does not require being loged-in.
 
 <h4>Get Duco Price</h4>
-starts a thread with a loop that runs every 15 seconds
+returns the current Duco price as a float
 
 ```python
-duco_api.GetDucoPrice() # access the value by using the global variable <ducofiat>
+>>> duco_api.get_duco_price() 
+0.01249
+```
+
+<h4>Duco price update timer</h4>
+starts a timer that updates the price at a specified interval in seconds (default is 15)
+
+```python
+>>> duco_api.start_duco_price_timer(interval = 5) # start the timer that updates the price every 5 seconds
+>>> duco_api.duco_price # you can get the updated price from a global variable <duco_price>
+0.01249
 ```
 
 <h4>Example API script</h4>
