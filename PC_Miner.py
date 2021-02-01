@@ -64,6 +64,7 @@ serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/
 config = configparser.ConfigParser()
 autorestart = 0
 donationlevel = 0
+useLowerDiff = False
 freeze_support()  # If not used, pyinstaller hangs when checking cpuinfo
 cpu = cpuinfo.get_cpu_info()  # Processor info
 
@@ -257,7 +258,7 @@ def autorestarter():  # Autorestarter
 
 
 def loadConfig():  # Config loading section
-    global username, efficiency, autorestart, donationlevel, debug, threadcount
+    global username, efficiency, autorestart, donationlevel, debug, threadcount, useLowerDiff
 
     if not Path(
         resourcesFolder + "/Miner_config.cfg"
@@ -294,6 +295,12 @@ def loadConfig():  # Config loading section
             + "): "
             + Style.BRIGHT
         )
+        useLowerDiff = input(
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + "Do you want to use lower difficulty for mining (for slower systems)? (y/N) "
+            + Style.BRIGHT
+        )
         autorestart = input(
             Style.RESET_ALL
             + Fore.YELLOW
@@ -323,6 +330,11 @@ def loadConfig():  # Config loading section
         if int(threadcount) < int(1):
             threadcount = 1
 
+        if useLowerDiff == "y" or useLowerDiff == "Y":
+            useLowerDiff = "y"
+        else:
+            useLowerDiff = "n"
+
         donationlevel = re.sub(
             "\D", "", donationlevel
         )  # Check wheter donationlevel is correct
@@ -335,6 +347,7 @@ def loadConfig():  # Config loading section
             "username": username,
             "efficiency": efficiency,
             "threads": threadcount,
+            "useLowerDiff": useLowerDiff,
             "autorestart": autorestart,
             "donate": donationlevel,
             "debug": False,
@@ -357,9 +370,9 @@ def loadConfig():  # Config loading section
             100 - float(efficiency)
         ) * 0.01  # Calulate efficiency for use with sleep function
         threadcount = config["miner"]["threads"]
+        useLowerDiff = config["miner"]["useLowerDiff"]
         autorestart = config["miner"]["autorestart"]
         donationlevel = config["miner"]["donate"]
-        print(donationlevel)
         debug = config["miner"]["debug"]
 
 
@@ -533,7 +546,8 @@ def Thread(threadid):
                 if debug == True:
                     raise
         print(
-            now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+            now().strftime(Style.DIM + "%H:%M:%S ")
+            + Style.RESET_ALL
             + Style.BRIGHT
             + Back.GREEN
             + Fore.WHITE
@@ -559,9 +573,14 @@ def Thread(threadid):
                         float(efficiency)
                     )  # Sleep to achieve lower efficiency if less than 100 selected
                 while True:
-                    soc.send(
-                        bytes(f"JOB,{str(username)}", encoding="utf8")
-                    )  # Send job request
+                    if useLowerDiff == "n":
+                        soc.send(
+                            bytes(f"JOB,{str(username)}", encoding="utf8")
+                        )  # Send job request
+                    else:
+                        soc.send(
+                            bytes(f"JOB,{str(username)},MEDIUM", encoding="utf8")
+                        )  # Send job request with lower diff
                     job = soc.recv(128).decode()  # Get work from pool
                     job = job.split(",")  # Split received data to job and difficulty
                     diff = job[2]
@@ -812,6 +831,7 @@ def Thread(threadid):
                     + " Master server timeout - restarting in 5s."
                     + Style.RESET_ALL
                 )
+                raise
                 if debug == True:
                     raise
                 time.sleep(5)
@@ -836,7 +856,7 @@ if __name__ == "__main__":
             + Style.RESET_ALL
             + Style.BRIGHT
             + Fore.RED
-            + "Error loading the configfile ("
+            + " Error loading the configfile ("
             + resourcesFolder
             + "/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s"
             + Style.RESET_ALL
@@ -884,3 +904,4 @@ if __name__ == "__main__":
             raise
     for x in range(int(threadcount)):  # Launch duco mining threads
         threading.Thread(target=Thread, args=(x,)).start()
+        time.sleep(0.05)
