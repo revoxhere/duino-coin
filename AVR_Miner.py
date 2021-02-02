@@ -330,7 +330,7 @@ def AVRMine(): # Mining section
       wrong_results = 0
       while wrong_avr_result:
         result = com.readline().decode() # Read the result
-        debugOutput(str("result: ")+str(result))
+        debugOutput(str("received: ")+str(result))
         if result == "":
           wrong_avr_result = True
           wrong_results = wrong_results + 1
