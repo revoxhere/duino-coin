@@ -29,7 +29,7 @@ import socket, sys
 import sqlite3
 from threading import Timer
 from PIL import Image, ImageTk
-from time import sleep
+from time import sleep, time
 from os import _exit, mkdir, execl
 import datetime
 from tkinter import messagebox
@@ -38,6 +38,7 @@ from requests import get
 from json import loads
 from configparser import ConfigParser
 import json
+import subprocess, os
 
 version = 2.0
 config = ConfigParser()
@@ -47,6 +48,12 @@ fontColor = "#eee"
 foregroundColor = "#F79F1F"
 foregroundColorSecondary = "#F8EFBA"
 min_trans_difference = 0.000000001  # Minimum transaction amount to be saved
+
+try:
+    from pypresence import Presence
+except:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "pypresence"])
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
 try:
     mkdir(resources)
@@ -1256,6 +1263,28 @@ def sendFunds(handler):
         else:
             MsgBox = messagebox.showwarning(response[0], response[1])
     root.update()
+
+
+def initRichPresence():
+    global RPC
+
+    RPC = Presence(806985845320056884)
+    RPC.connect()
+
+
+def updateRichPresence():
+    RPC.update(
+        details=str(round(getBalance(), 4)) + " ᕲ",
+        large_image="duco",
+        large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
+        buttons=[{"label": "Learn more", "url": "https://duinocoin.com"}, {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"}]
+    )
+
+    Timer(15, updateRichPresence).start()
+
+
+initRichPresence()
+updateRichPresence()
 
 
 class Wallet:
