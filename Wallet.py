@@ -876,16 +876,16 @@ def openSettings(handler):
                                 encoding="utf8",
                             )
                         )
-                        response = soc.recv(128).decode("utf8")
+                        response = soc.recv(128).decode("utf8").split(",")
                         soc.close()
 
-                        if not "Success" in response:
+                        if not "OK" in response[0]:
                             messagebox.showerror(
-                                title="Error changing password", message=response
+                                title="Error changing password", message=response[1]
                             )
                         else:
                             messagebox.showinfo(
-                                title="Password changed", message=response
+                                title="Password changed", message=response[1]
                             )
                             try:
                                 try:
