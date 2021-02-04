@@ -1,6 +1,6 @@
 @echo off
-set /p port=Enter port for the Arduino:
+echo Make sure that python(3.x) is installed on your system!
 cd Arduino_Code
-.\avrdude\avrdude.exe -c arduino -P %port% -p ATMEGA328P -b 115200 -U flash:w:avrminer.hex
+python3 uploadavrminer.py
 PAUSE
 EXIT
