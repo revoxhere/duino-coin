@@ -1282,22 +1282,27 @@ def sendFunds(handler):
 
 def initRichPresence():
     global RPC
-
-    RPC = Presence(806985845320056884)
-    RPC.connect()
+    try:
+        RPC = Presence(806985845320056884)
+        RPC.connect()
+    except:  # Discord not launched
+        pass
 
 
 def updateRichPresence():
-    balance = round(getBalance(), 4)
-    RPC.update(
-        details=str(balance) + " ᕲ ($" + str(round(ducofiat * balance, 2)) + ")",
-        large_image="duco",
-        large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
-        buttons=[
-            {"label": "Learn more", "url": "https://duinocoin.com"},
-            {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
-        ],
-    )
+    try:
+        balance = round(getBalance(), 4)
+        RPC.update(
+            details=str(balance) + " ᕲ ($" + str(round(ducofiat * balance, 2)) + ")",
+            large_image="duco",
+            large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
+            buttons=[
+                {"label": "Learn more", "url": "https://duinocoin.com"},
+                {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
+            ],
+        )
+    except:  # Discord not launched
+        pass
 
     Timer(15, updateRichPresence).start()
 
