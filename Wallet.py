@@ -28,7 +28,6 @@ from pathlib import Path
 import socket, sys
 import sqlite3
 from threading import Timer
-from PIL import Image, ImageTk
 from time import sleep, time
 from os import _exit, mkdir, execl
 import datetime
@@ -49,11 +48,27 @@ foregroundColor = "#F79F1F"
 foregroundColorSecondary = "#F8EFBA"
 min_trans_difference = 0.000000001  # Minimum transaction amount to be saved
 
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+
 try:
     from pypresence import Presence
 except:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "pypresence"])
-    os.execl(sys.executable, sys.executable, *sys.argv)
+    print(
+        'Pypresence is not installed. Wallet will try to install it. If it fails, please manually install "pypresence" python3 package.'
+    )
+    install("pypresence")
+
+try:
+    from PIL import Image, ImageTk
+except:
+    print(
+        'Pillow is not installed. Wallet will try to install it. If it fails, please manually install "Pillow" python3 package.'
+    )
+    install("Pillow")
 
 try:
     mkdir(resources)
@@ -1273,11 +1288,15 @@ def initRichPresence():
 
 
 def updateRichPresence():
+    balance = round(getBalance(), 4)
     RPC.update(
-        details=str(round(getBalance(), 4)) + " ᕲ",
+        details=str(balance) + " ᕲ ($" + str(round(ducofiat * balance, 2)) + ")",
         large_image="duco",
         large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
-        buttons=[{"label": "Learn more", "url": "https://duinocoin.com"}, {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"}]
+        buttons=[
+            {"label": "Learn more", "url": "https://duinocoin.com"},
+            {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
+        ],
     )
 
     Timer(15, updateRichPresence).start()
