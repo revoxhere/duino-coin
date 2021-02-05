@@ -52,9 +52,9 @@ minerVersion = "2.0"  # Version number
 connectionMessageShown = False
 timeout = 5  # Socket timeout
 resourcesFolder = "PCMiner_" + str(minerVersion) + "_resources"
-shares = [0, 0]
 diff = 0
 last_hash_count = 0
+shares = [0, 0]
 khash_count = 0
 hash_count = 0
 hash_mean = []
@@ -443,7 +443,8 @@ def Donate():
             )
 
 
-def Thread(threadid):
+def Thread(threadid, shares):
+    hashrateCalculator()
     global hash_count, connectionMessageShown
     while True:
         while True:
@@ -568,10 +569,10 @@ def Thread(threadid):
         )
         while True:  # Mining section
             try:
-                if float(efficiency) < 100:
-                    time.sleep(
-                        float(efficiency)
-                    )  # Sleep to achieve lower efficiency if less than 100 selected
+                # if float(efficiency) < 100:
+                # time.sleep(
+                # float(efficiency)
+                # )  # Sleep to achieve lower efficiency if less than 100 selected
                 while True:
                     if useLowerDiff == "n":
                         soc.send(
@@ -585,7 +586,7 @@ def Thread(threadid):
                     job = job.split(",")  # Split received data to job and difficulty
                     diff = job[2]
                     if job[0] and job[1] and job[2]:
-                        debugOutput("Job received: " + str(job))
+                        debugOutput(str(threadid) + "Job received: " + str(job))
                         break  # If job received, continue to hashing algo
                 for ducos1res in range(
                     100 * int(diff) + 1
@@ -595,7 +596,7 @@ def Thread(threadid):
                     ).hexdigest()  # Generate hash
                     hash_count = hash_count + 1  # Increment hash counter
                     if job[1] == ducos1:  # If result is even with job, send the result
-                        debugOutput("Result found: " + str(ducos1res))
+                        debugOutput(str(threadid) + "Result found: " + str(ducos1res))
                         while True:
                             soc.send(
                                 bytes(
@@ -608,7 +609,9 @@ def Thread(threadid):
                             responsetimestop = now()  # Measure server ping
                             ping = responsetimestop - responsetimetart  # Calculate ping
                             ping = str(int(ping.microseconds / 1000))  # Convert to ms
-                            debugOutput("Feedback received: " + str(feedback))
+                            debugOutput(
+                                str(threadid) + "Feedback received: " + str(feedback)
+                            )
                             if feedback == "GOOD":  # If result was good
                                 shares[
                                     0
@@ -831,7 +834,6 @@ def Thread(threadid):
                     + " Master server timeout - restarting in 5s."
                     + Style.RESET_ALL
                 )
-                raise
                 if debug == True:
                     raise
                 time.sleep(5)
@@ -903,5 +905,5 @@ if __name__ == "__main__":
         if debug == True:
             raise
     for x in range(int(threadcount)):  # Launch duco mining threads
-        threading.Thread(target=Thread, args=(x,)).start()
+        multiprocessing.Process(target=Thread, args=(x, shares)).start()
         time.sleep(0.05)
