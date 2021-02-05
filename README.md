@@ -103,6 +103,15 @@ After loging-in you have access to the following commands:
         *   If software name is not received, server uses `"Software": "Unknown"` in the API
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
 *   `CHGP,oldPassword,newPassword` - Change password of current user
+*   `WRAP,amount,tronAddress` - Wrap some DUCO on tron
+*  Unwrapping protocol is more complicated
+
+    First, send a tron transaction with method `initiateWithdraw(ducoUsername,amount)`
+
+    Then, send a server call to - `UNWRAP,amount,tronAddress`
+
+
+
 
 <h2 align="center">Python3 DUCO API module</h2><br>
 
