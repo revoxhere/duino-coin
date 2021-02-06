@@ -179,39 +179,42 @@ def loadConfig(): # Config loading section
     debug = config["arduminer"]["debug"]
 
 def Connect(): # Connect to master server section
-  global soc, masterServer_address, masterServer_port
-  try:
-    res = requests.get(serveripfile, data = None) # Use request to grab data from raw github file
-    if res.status_code == 200: # Check for response
-      content = res.content.decode().splitlines() # Read content and split into lines
-      masterServer_address = content[0] # Line 1 = pool address
-      masterServer_port = content[1] # Line 2 = pool port
-      debugOutput("Retrieved pool IP: " + masterServer_address + ":" + str(masterServer_port))
-      should_try_socket = True
-  except: # If it wasn't, display a message
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Back.RESET + Fore.RED + " Error retrieving data from GitHub! Retrying in 10s.")
-    time.sleep(10)
-    Connect()
-    should_try_socket = False
-  if should_try_socket:
-    try: # Try to connect
-      try: # Shutdown previous connections (if any)
-        soc.shutdown(socket.SHUT_RDWR)
-        soc.close()
-      except:
-        debugOutput("No previous connections to close")
-      soc = socket.socket()
-      soc.connect((str(masterServer_address), int(masterServer_port)))
-      debugOutput("Connected to server !")
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-        + Back.RESET + Fore.GREEN + " Successfully connected to the server !")
-      soc.settimeout(timeout)
+  global soc, masterServer_address, masterServer_ports
+  should_retry = True
+  while should_retry:
+    try:
+      res = requests.get(serveripfile, data = None) # Use request to grab data from raw github file
+      if res.status_code == 200: # Check for response
+        content = res.content.decode().splitlines() # Read content and split into lines
+        masterServer_address = content[0] # Line 1 = pool address
+        masterServer_port = content[1] # Line 2 = pool port
+        debugOutput("Retrieved pool IP: " + masterServer_address + ":" + str(masterServer_port))
+        should_try_socket = True
     except: # If it wasn't, display a message
       print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-        + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
+        + Back.RESET + Fore.RED + " Error retrieving data from GitHub! Retrying in 10s.")
       time.sleep(10)
-      Connect()
+      should_try_socket = False
+      should_retry = True
+    if should_try_socket:
+      try: # Try to connect
+        try: # Shutdown previous connections (if any)
+          soc.shutdown(socket.SHUT_RDWR)
+          soc.close()
+        except:
+          debugOutput("No previous connections to close")
+        soc = socket.socket()
+        soc.connect((str(masterServer_address), int(masterServer_port)))
+        debugOutput("Connected to server !")
+        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+          + Back.RESET + Fore.GREEN + " Successfully connected to the server !")
+        soc.settimeout(timeout)
+        should_retry = False
+      except: # If it wasn't, display a message
+        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
+          + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
+        time.sleep(10)
+        should_retry = True
 
 def checkVersion():
   serverVersion = soc.recv(3).decode() # Check server version
@@ -228,19 +231,23 @@ def checkVersion():
 
 def ConnectToAVR():
   global com
-  try: # Close previous serial connections (if any)
-    com.close()
-  except:
-    pass
-  try:
-    com = serial.Serial(avrport, 115200, timeout=30, write_timeout=30, inter_byte_timeout=1)
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr " + Style.RESET_ALL + Style.BRIGHT + Fore.GREEN + " AVR is connected :D" + Style.RESET_ALL)
-  except:
-    debugOutput("Error connecting to AVR")
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
-      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " AVR connection error, please check wether it's plugged or not" + Style.RESET_ALL)
-    time.sleep(10)
-    ConnectToAVR()
+  should_retry = True
+  while should_retry:
+    try: # Close previous serial connections (if any)
+      com.close()
+    except:
+      pass
+    try:
+      com = serial.Serial(avrport, 115200, timeout=30, write_timeout=30, inter_byte_timeout=1)
+      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr " + Style.RESET_ALL + Style.BRIGHT + Fore.GREEN + " AVR is connected :D" + Style.RESET_ALL)
+    except:
+      debugOutput("Error connecting to AVR")
+      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
+        + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " AVR connection error, please check wether it's plugged or not" + Style.RESET_ALL)
+      time.sleep(10)
+      should_retry = True
+    else:
+      should_retry = False
 
 
 def AVRMine(): # Mining section
