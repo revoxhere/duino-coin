@@ -120,7 +120,9 @@ After loging-in you have access to the following commands:
     Then, send a server call to - `UNWRAP,amount,tronAddress`
 
 
+<h2 align="center">C DUCO library</h2><br>
 
+If you want to easily access Duino-Coin API with your C apps, [@Yanis](https://github.com/Yanis) is working on a library for that here: [duino-coin-C-lib](https://github.com/ygboucherk/duino-coin-C-lib)
 
 <h2 align="center">Python3 DUCO API module</h2><br>
 
