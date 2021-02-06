@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Master Server Remastered (v1.9)
+# Duino-Coin Master Server Remastered (v2.0)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -13,7 +13,7 @@ from email.mime.multipart import MIMEMultipart
 
 host = "" # Server will use this as hostname to bind to (localhost on Windows, 0.0.0.0 on Linux in most cases)
 port = 2811 # Server will listen on this port - 2811 for official Duino-Coin server (14808 for old one)
-serverVersion = 1.9 # Server version which will be sent to the clients
+serverVersion = 2.0 # Server version which will be sent to the clients
 diff_incrase_per = 2000 # Difficulty will increase every x blocks (official server uses 2k)
 use_wrapper = True # Choosing if you want to use wrapper or not
 wrapper_permission = False # set to false for declaration, will be updated by checking smart contract
@@ -258,6 +258,11 @@ def API():
                 hashrate = 0
                 for x in minerapi.copy():
                     lista = minerapi[x] # Convert list to strings
+                    lastsharetimestamp = datetime.datetime.strptime(lista[8],"%d/%m/%Y %H:%M:%S") # Convert string back to datetime format
+                    now = datetime.datetime.now()
+                    timedelta = now - lastsharetimestamp # Get time delta
+                    if int(timedelta.total_seconds()) > 15: # Remove workers inactive for mroe than 15 seconds from the API
+                        minerapi.pop(x)
                     hashrate = lista[1]
                     serverHashrate += float(hashrate) # Add user hashrate to the server hashrate
                 if serverHashrate >= 1000000:
@@ -295,7 +300,8 @@ def API():
                     "Accepted":      int(lista[3]),
                     "Rejected":      int(lista[4]),
                     "Diff":          int(lista[5]),
-                    "Software":      str(lista[7])}
+                    "Software":      str(lista[7]),
+                    "Last share timestamp":      str(lista[8])}
                 for thread in formattedMinerApi["Miners"]:
                     minerList.append(formattedMinerApi["Miners"][thread]["User"]) # Append miners to formattedMinerApi["Miners"][id of thread]
                 for i in minerList:
@@ -307,7 +313,8 @@ def API():
                     json.dump(formattedBalances, outfile, indent=4, ensure_ascii=False)
                 with open('transactions.json', 'w') as outfile: # Write JSON transactions to file
                     json.dump(getTransactions(), outfile, indent=4, ensure_ascii=False)
-        except:
+        except Exception as e:
+            print(e)
             pass
         time.sleep(5)
 
@@ -596,22 +603,33 @@ def handle(c):
                 try:
                     customDiff = str(data[2])
                     if str(customDiff) == "AVR":
-                        diff = 400 # Use 400 - optimal diff for very low power devices like arduino
+                        diff = 3 # optimal diff for very low power devices like arduino
+                        basereward = 0.0003
                         shareTimeRequired = 85
                     elif str(customDiff) == "ESP":
-                        diff = 3500 # Use 3500 - optimal diff for low power devices like ESP
+                        diff = 75 # optimal diff for low power devices like ESP
+                        basereward = 0.00025
                         shareTimeRequired = 85
                     elif str(customDiff) == "MEDIUM":
-                        diff = 4000 # Use 4000 - diff for low power computers
+                        diff = 10000 # Diff for computers 10k
+                        basereward = 0.000095
                         shareTimeRequired = 120
+                    elif str(customDiff) == "5000":
+                        diff = 5000 # Custom difficulty 5k
+                        basereward = 0.000085
+                    elif str(customDiff) == "2500":
+                        diff = 2500 # Custom difficulty 2.5k
+                        basereward = 0.000075
+                    elif str(customDiff) == "500":
+                        diff = 500 # Custom difficulty 0.5k
+                        basereward = 0.000065
                 except:
                     diff = math.ceil(blocks / diff_incrase_per) # Use "standard" difficulty
-                if diff < 3600:
-                    rand = random.randint(1, diff)
-                else:
-                    rand = random.randint(1, 100 * diff)
-                    shareTimeRequired = int(rand / 7500)
-                    
+                    basereward = 0.00025
+
+                rand = random.randint(1, 100 * diff)
+                if diff >= 500:
+                    shareTimeRequired = int(rand / 2500)
                 newBlockHash = hashlib.sha1(str(lastBlockHash_copy + str(rand)).encode("utf-8")).hexdigest()
                 try:
                     c.send(bytes(str(lastBlockHash_copy) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
@@ -620,12 +638,9 @@ def handle(c):
                     result = response[0]
                 except:
                     break
-                # Kolka system - reward dependent on share submission time and rejection of very fast shares
                 resultreceived = datetime.datetime.now()
                 sharetime = resultreceived - jobsent # Time from start of hash computing to finding the result
                 sharetime = int(sharetime.total_seconds() * 1000) # Get total ms
-                #print("Time:   :", sharetime)
-                #print("Required:", shareTimeRequired)
                 try: # If client submitted hashrate, use it
                     hashrate = float(response[1])
                     hashrateEstimated = False
@@ -638,17 +653,15 @@ def handle(c):
                 try:
                     minerUsed = str(response[2])
                 except:
-                    minerUsed = "Unknown"
+                    minerUsed = "Unknown miner"
                 try:
-                    minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed)]})
+                    now = datetime.datetime.now()
+                    lastsharetimestamp = now.strftime("%d/%m/%Y %H:%M:%S")
+                    minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed), str(lastsharetimestamp)]})
                 except:
                     pass
                 if result == str(rand) and int(sharetime) > int(shareTimeRequired):
-                    sharetimesquared = int(sharetime **2)
-                    if int(sharetime) < 2500:
-                        reward = sharetimesquared / 5000000000 # Calculate reward dependent on share submission time
-                    else:
-                        reward = int(sharetimesquared / sharetime) / 5000000000 # Calculate reward dependent on share submission time
+                    reward = basereward + float(sharetime) / 100000000 + float(diff) / 100000000 # Kolka system v2
                     acceptedShares += 1
                     try:
                         blockfound = random.randint(1, 1000000) # Low probability to find a "big block"
@@ -673,6 +686,8 @@ def handle(c):
                         balancesToUpdate[username] = reward
                     blocks += 1
                     lastBlockHash = newBlockHash
+                    if diff < 1000:
+                        time.sleep(diff / 1000) # Kolka system v2
                 else: # Incorrect result received
                     try:
                         rejectedShares += 1
@@ -699,30 +714,52 @@ def handle(c):
                     newPassword_encrypted = bcrypt.hashpw(newPassword, bcrypt.gensalt())
                 except:
                     c.send(bytes("NO,Bcrypt error", encoding="utf8"))
+                    print("Bcrypt error")
                     break
                 try:
                     with sqlite3.connect(database, timeout = 10) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                         old_password_database = datab.fetchone()[1]
+                    print("Fetched old pass")
                 except:
                     c.send(bytes("NO,Incorrect username", encoding="utf8"))
+                    print("Incorrect username? Most likely a DB error")
                     break
-
-                if bcrypt.checkpw(oldPassword, old_password_database) or oldPassword == duco_password.encode('utf-8'):
-                    with sqlite3.connect(database, timeout = 10) as conn:
-                        datab = conn.cursor()
-                        datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
-                        conn.commit()
+                try:
+                    if bcrypt.checkpw(oldPassword, old_password_database.encode('utf-8')) or oldPassword == duco_password.encode('utf-8'):
+                        with sqlite3.connect(database, timeout = 10) as conn:
+                            datab = conn.cursor()
+                            datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
+                            conn.commit()
+                            print("Changed pass")
+                            try:
+                                c.send(bytes("OK,Your password has been changed", encoding='utf8'))
+                            except:
+                                break
+                    else:
+                        print("Passwords dont match")
                         try:
-                            c.send(bytes("OK,Your password has been changed", encoding='utf8'))
+                            server.send(bytes("NO,Your old password doesn't match!", encoding='utf8'))
                         except:
                             break
-                else:
-                    try:
-                        server.send(bytes("NO,Your old password doesn't match!", encoding='utf8'))
-                    except:
-                        break
+                except:
+                    if bcrypt.checkpw(oldPassword, old_password_database) or oldPassword == duco_password.encode('utf-8'):
+                        with sqlite3.connect(database, timeout = 10) as conn:
+                            datab = conn.cursor()
+                            datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
+                            conn.commit()
+                            print("Changed pass")
+                            try:
+                                c.send(bytes("OK,Your password has been changed", encoding='utf8'))
+                            except:
+                                break
+                    else:
+                        print("Passwords dont match")
+                        try:
+                            server.send(bytes("NO,Your old password doesn't match!", encoding='utf8'))
+                        except:
+                            break
 
             ######################################################################
             if str(data[0]) == "SEND" and str(username) != "":
@@ -979,10 +1016,11 @@ def unbanip(ip):
 
 IPS = {}
 bannedIPS = {}
+whitelisted = ["169.0.111.39", "169.0.53.175", "51.15.127.80", "105.186.176.154"]
 def countips():
     while True:
         for ip in IPS.copy():
-            if IPS[ip] > 60 and not ip == "51.15.127.80" and not ip == "169.0.53.175":
+            if IPS[ip] > 60 and not ip in whitelisted:
                 try:
                     print("Banning IP:", ip)
                     os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
