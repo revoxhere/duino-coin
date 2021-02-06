@@ -97,7 +97,16 @@ If registration fails, server will send `NO,Reason of failed registration`.
 
 After loging-in you have access to the following commands:
 *   `BALA` - Server will return balance of current user
-*   `JOB` - Server will return job for mining - you can also use `JOB,username` to mine without loging-in
+*   `JOB` - Server will return job for mining
+    * You can also use `JOB,username` to mine without loging-in
+    * You can ask for a specific difficulty for mining: `JOB,username,DIFF` (if you don't ask for specific difficulty, you'll get the high, network diff) where diff is one of the below:
+        * `AVR` - diff 3 - used for official AVR boards mining
+        * `ESP` - diff 75 - used for official ESP boards mining
+        * `MEDIUM` - diff 10000 - used as lower-diff PC mining
+        * `5000` - custom 5k diff
+        * `2500` - custom 2.5k diff
+        * `500` - custom 0.5k diff
+    
     *   When sending result, you can pass hashrate count and miner name to display in the API, e.g.(6801,250000,My Cool Miner v4.20) indicates that result 6801 was found, hashrate was 250000H/S (250kH/s) and software name was My Cool Miner v4.20
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
         *   If software name is not received, server uses `"Software": "Unknown"` in the API
