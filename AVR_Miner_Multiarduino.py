@@ -47,6 +47,14 @@ except:
     )
     install("requests")
 
+try:
+    from pypresence import Presence
+except:
+    print(
+        'Pypresence is not installed. Wallet will try to install it. If it fails, please manually install "pypresence" python3 package.'
+    )
+    install("pypresence")
+
 # Global variables
 minerVersion = "2.0"  # Version number
 timeout = 60  # Socket timeout
@@ -60,6 +68,7 @@ serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/
 config = configparser.ConfigParser()
 autorestart = 0
 donationlevel = 0
+hashrate = 0
 connectionMessageShown = False
 
 if not os.path.exists(resourcesFolder):
@@ -392,8 +401,37 @@ def Donate():
             )
 
 
+def initRichPresence():
+    global RPC
+    try:
+        RPC = Presence(808056068113563701)
+        RPC.connect()
+    except:  # Discord not launched
+        pass
+
+def updateRichPresence():
+    while True:
+        try:
+            RPC.update(
+                details="Hashrate: " + str(hashrate) + " H/s",
+                state="Acc. shares: "
+                + str(shares[0])
+                + "/"
+                + str(shares[0] + shares[1]),
+                large_image="ducol",
+                large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
+                buttons=[
+                    {"label": "Learn more", "url": "https://duinocoin.com"},
+                    {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
+                ],
+            )
+        except:  # Discord not launched
+            pass
+        time.sleep(15)  # 15 seconds to respect discord's rate limit
+
+
 def AVRMine(com):  # Mining section
-    global hash_count, connectionMessageShown
+    global hash_count, connectionMessageShown, hashrate
     while True:
         while True:
             try:
@@ -978,3 +1016,6 @@ if __name__ == "__main__":
             ).start()  # Launch avr duco mining threads
     except Exception as e:
         debugOutput("Error:" + str(e))
+
+    initRichPresence()
+    threading.Thread(target=updateRichPresence).start()
