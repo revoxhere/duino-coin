@@ -55,10 +55,13 @@ resourcesFolder = "PCMiner_" + str(minerVersion) + "_resources"
 hash_mean = []
 donatorrunning = False
 debug = False
+useLowerDiff = "n"
+username = ""
 serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"  # Serverip file
 config = configparser.ConfigParser()
 autorestart = 0
 donationlevel = 0
+efficiency = 0
 freeze_support()  # If not used, pyinstaller hangs when checking cpuinfo
 cpu = cpuinfo.get_cpu_info()  # Processor info
 
@@ -437,7 +440,7 @@ def Donate():
             )
 
 
-def Thread(threadid, hashcount, accepted, rejected):
+def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount):
     while True:
         while True:
             try:
@@ -898,6 +901,7 @@ if __name__ == "__main__":
     khashcount = multiprocessing.Value("i", 0)
     accepted = multiprocessing.Value("i", 0)
     rejected = multiprocessing.Value("i", 0)
+
     threading.Thread(
         target=hashrateCalculator, args=(hashcount, khashcount)
     ).start()  # Start hashrate calculator
@@ -905,7 +909,7 @@ if __name__ == "__main__":
     for x in range(int(threadcount)):  # Launch duco mining threads
         thread.append(x)
         thread[x] = multiprocessing.Process(
-            target=Thread, args=(x, hashcount, accepted, rejected)
+            target=Thread, args=(x, hashcount, accepted, rejected, useLowerDiff, khashcount)
         )
         thread[x].start()
         time.sleep(0.05)
