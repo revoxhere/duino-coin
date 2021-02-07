@@ -851,7 +851,7 @@ def initRichPresence():
         pass
 
 
-def updateRichPresence(accepted, rejected):
+def updateRichPresence():
     while True:
         try:
             RPC.update(
@@ -954,5 +954,5 @@ if __name__ == "__main__":
 
     initRichPresence()
     threading.Thread(
-        target=updateRichPresence, args=(accepted, rejected)
+        target=updateRichPresence
     ).start()
