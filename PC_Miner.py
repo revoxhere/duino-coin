@@ -47,6 +47,15 @@ except:
     )
     install("requests")
 
+try:
+    from pypresence import Presence
+except:
+    print(
+        'Pypresence is not installed. Wallet will try to install it. If it fails, please manually install "pypresence" python3 package.'
+    )
+    install("pypresence")
+
+
 # Global variables
 minerVersion = "2.0"  # Version number
 connectionMessageShown = False
@@ -833,9 +842,37 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount):
                 break
 
 
+def initRichPresence():
+    global RPC
+    try:
+        RPC = Presence(808045598447632384)
+        RPC.connect()
+    except:  # Discord not launched
+        pass
+
+
+def updateRichPresence(accepted, rejected):
+    while True:
+        try:
+            RPC.update(
+                details="Hashrate: " + str(int(statistics.mean(hash_mean))) + " kH/s",
+                state="Acc. shares: " + str(accepted.value) + "/" + str(rejected.value + accepted.value),
+                large_image="ducol",
+                large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
+                buttons=[
+                    {"label": "Learn more", "url": "https://duinocoin.com"},
+                    {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
+                ],
+            )
+        except:  # Discord not launched
+            pass
+        time.sleep(15) # 15 seconds to respect discord's rate limit
+
+
 if __name__ == "__main__":
     init(autoreset=True)  # Enable colorama
     title("Duino-Coin Python Miner (v" + str(minerVersion) + ")")
+
     try:
         loadConfig()  # Load config file or create new one
         debugOutput("Config file loaded")
@@ -905,6 +942,7 @@ if __name__ == "__main__":
     threading.Thread(
         target=hashrateCalculator, args=(hashcount, khashcount)
     ).start()  # Start hashrate calculator
+
     thread = []
     for x in range(int(threadcount)):  # Launch duco mining threads
         thread.append(x)
@@ -913,3 +951,8 @@ if __name__ == "__main__":
         )
         thread[x].start()
         time.sleep(0.05)
+
+    initRichPresence()
+    threading.Thread(
+        target=updateRichPresence, args=(accepted, rejected)
+    ).start()
