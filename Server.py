@@ -908,8 +908,19 @@ def handle(c):
 
                                 if trontxfeedback:
                                     try:
-                                        c.send(bytes("OK,Success, check your balances !", encoding="utf8"))
+                                        c.send(bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
                                         print("Successful wrapping")
+                                        try:
+                                            with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
+                                                datab = tranconn.cursor()
+                                                now = datetime.datetime.now()
+                                                formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
+                                                datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (formatteddatetime, username, str("wrapper - ")+str(tron_address), amount, lastBlockHash))
+                                                tranconn.commit()
+                                            c.send(bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
+                                            break
+                                        except:
+                                            break
                                     except:
                                         break
                                 else:
@@ -968,8 +979,16 @@ def handle(c):
                                     onchaintx = txn.result
 
                                     if onchaintx:
+                                        print("Successful unwrapping")
                                         try:
-                                            c.send(bytes("OK,Success !", encoding="utf8"))
+                                            with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
+                                                datab = tranconn.cursor()
+                                                now = datetime.datetime.now()
+                                                formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
+                                                datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (formatteddatetime, str("Wrapper - ")+str(tron_address), username, amount, lastBlockHash))
+                                                tranconn.commit()
+                                            c.send(bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
+                                            break
                                         except:
                                             break
                                     else:
