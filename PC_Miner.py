@@ -71,8 +71,6 @@ config = configparser.ConfigParser()
 autorestart = 0
 donationlevel = 0
 efficiency = 0
-freeze_support()  # If not used, pyinstaller hangs when checking cpuinfo
-cpu = cpuinfo.get_cpu_info()  # Processor info
 
 if not os.path.exists(resourcesFolder):
     os.mkdir(resourcesFolder)  # Create resources folder if it doesn't exist
@@ -856,7 +854,10 @@ def updateRichPresence():
         try:
             RPC.update(
                 details="Hashrate: " + str(int(statistics.mean(hash_mean))) + " kH/s",
-                state="Acc. shares: " + str(accepted.value) + "/" + str(rejected.value + accepted.value),
+                state="Acc. shares: "
+                + str(accepted.value)
+                + "/"
+                + str(rejected.value + accepted.value),
                 large_image="ducol",
                 large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
                 buttons=[
@@ -866,10 +867,12 @@ def updateRichPresence():
             )
         except:  # Discord not launched
             pass
-        time.sleep(15) # 15 seconds to respect discord's rate limit
+        time.sleep(15)  # 15 seconds to respect discord's rate limit
 
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
+    cpu = cpuinfo.get_cpu_info()  # Processor info
     init(autoreset=True)  # Enable colorama
     title("Duino-Coin Python Miner (v" + str(minerVersion) + ")")
 
@@ -946,13 +949,11 @@ if __name__ == "__main__":
     thread = []
     for x in range(int(threadcount)):  # Launch duco mining threads
         thread.append(x)
-        thread[x] = multiprocessing.Process(
-            target=Thread, args=(x, hashcount, accepted, rejected, useLowerDiff, khashcount)
-        )
-        thread[x].start()
+        multiprocessing.Process(
+            target=Thread,
+            args=(x, hashcount, accepted, rejected, useLowerDiff, khashcount),
+        ).start()
         time.sleep(0.05)
 
     initRichPresence()
-    threading.Thread(
-        target=updateRichPresence
-    ).start()
+    threading.Thread(target=updateRichPresence).start()
