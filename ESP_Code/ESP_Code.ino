@@ -5,8 +5,8 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards v1.8
-//  © Duino-Coin Community 2019-2020
+//  Code for ESP8266 boards v2.0
+//  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
 //  https://github.com/revoxhere/duino-coin - GitHub
@@ -112,13 +112,19 @@ void loop() {
     String job = client.readStringUntil(','); // Read expected hash
     unsigned int diff =  (1500) * 100 + 1; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
     Serial.println("Job received: " + String(hash) + " " + String(job) + " " + String(diff));
+    unsigned long StartTime = micros(); // Start time measurement
 
     for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
       ArduinoOTA.handle(); // Enable OTA handler
       yield(); // uncomment if ESP watchdog triggers
       String result = sha1(String(hash) + String(iJob)); // Hash previous block hash and current iJob
       if (result == job) { // If result is found
-        client.print(String(iJob) + ",2150,ESP Miner v1.8"); // Send result to server
+        unsigned long EndTime = micros(); // End time measurement
+        unsigned long ElapsedTime = EndTime - StartTime; // Calculate elapsed time
+        float ElapsedTimeMiliSeconds = ElapsedTime / 1000; // Convert to miliseconds
+        float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
+        float HashRate = ElapsedTimeSeconds / iJob; // Calculate hashrate
+        client.print(String(iJob) + "," + String(HashRate) + ",ESP Miner v2.0"); // Send result to server
 
         String feedback = client.readStringUntil('D'); // Receive feedback
         if (feedback.indexOf("GOOD")) {
