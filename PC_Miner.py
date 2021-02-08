@@ -949,10 +949,11 @@ if __name__ == "__main__":
     thread = []
     for x in range(int(threadcount)):  # Launch duco mining threads
         thread.append(x)
-        multiprocessing.Process(
+        thread[x] = multiprocessing.Process(
             target=Thread,
             args=(x, hashcount, accepted, rejected, useLowerDiff, khashcount),
-        ).start()
+        )
+        thread[x].start()
         time.sleep(0.05)
 
     initRichPresence()
