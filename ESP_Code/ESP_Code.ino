@@ -123,7 +123,7 @@ void loop() {
         unsigned long ElapsedTime = EndTime - StartTime; // Calculate elapsed time
         float ElapsedTimeMiliSeconds = ElapsedTime / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
-        float HashRate = ElapsedTimeSeconds / iJob; // Calculate hashrate
+        float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
         client.print(String(iJob) + "," + String(HashRate) + ",ESP Miner v2.0"); // Send result to server
 
         String feedback = client.readStringUntil('D'); // Receive feedback
