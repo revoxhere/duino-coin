@@ -36,7 +36,7 @@ const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Define built-in led as output
   Serial.begin(115200); // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP Miner v1.8");
+  Serial.println("\n\nDuino-Coin ESP Miner v2.0");
 
   Serial.println("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
