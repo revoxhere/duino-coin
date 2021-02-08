@@ -1237,7 +1237,7 @@ def calculateProfit(start_bal):
         tensec = curr_bal - prev_bal
         minute = tensec * 6
         hourly = minute * 60
-        daily = hourly * 12
+        daily = hourly * 24
 
         if tensec >= 0:
             profit_array = [
