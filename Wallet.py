@@ -709,14 +709,6 @@ def openStats(handler):
     textFont3 = Font(statsWindow, size=14, weight="bold")
     textFont = Font(statsWindow, size=12, weight="normal")
 
-    Label(
-        statsWindow,
-        text="YOUR MINERS",
-        font=textFont3,
-        foreground=foregroundColor,
-        background=backgroundColor,
-    ).grid(row=0, column=0, columnspan=2, sticky=S + W, pady=5, padx=5)
-
     Active_workers_listbox = Listbox(
         statsWindow,
         exportselection=False,
@@ -731,10 +723,12 @@ def openStats(handler):
         row=1, columnspan=2, sticky=N + E + S + W, pady=(0, 5), padx=5
     )
     i = 0
+    totalHashrate = 0
     for threadid in statsApi["Miners"]:
         if username in statsApi["Miners"][threadid]["User"]:
             software = statsApi["Miners"][threadid]["Software"]
             hashrate = str(round(statsApi["Miners"][threadid]["Hashrate"] / 1000, 2))
+            totalHashrate += float(hashrate)
             difficulty = str(statsApi["Miners"][threadid]["Diff"])
             shares = (
                 str(statsApi["Miners"][threadid]["Accepted"])
@@ -766,6 +760,14 @@ def openStats(handler):
     Active_workers_listbox.configure(height=i)
     Active_workers_listbox.select_set(32)
     Active_workers_listbox.event_generate("<<ListboxSelect>>")
+
+    Label(
+        statsWindow,
+        text="YOUR MINERS - " + str(totalHashrate) + " kH/s",
+        font=textFont3,
+        foreground=foregroundColor,
+        background=backgroundColor,
+    ).grid(row=0, column=0, columnspan=2, sticky=S + W, pady=5, padx=5)
 
     Label(
         statsWindow,
