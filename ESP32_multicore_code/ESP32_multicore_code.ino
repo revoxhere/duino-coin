@@ -28,9 +28,11 @@
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 
-const char* ssid     = "SONY_BRAVIA-55xf8505"; // Change this to your WiFi SSID
-const char* password = "abcdef123456"; // Change this to your WiFi password
-const char* ducouser = "JoyBed"; // Change this to your Duino-Coin username
+// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
+const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
+const char* password = "Your WiFi password"; // Change this to your WiFi password
+const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
+// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
 
 const char * host = "51.15.127.80"; // Static server IP
 const int port = 2811;
