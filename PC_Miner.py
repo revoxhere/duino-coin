@@ -447,7 +447,16 @@ def Donate():
             )
 
 
-def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount):
+def Thread(
+    threadid,
+    hashcount,
+    accepted,
+    rejected,
+    useLowerDiff,
+    khashcount,
+    username,
+    efficiency,
+):
     while True:
         while True:
             try:
@@ -951,7 +960,16 @@ if __name__ == "__main__":
         thread.append(x)
         thread[x] = multiprocessing.Process(
             target=Thread,
-            args=(x, hashcount, accepted, rejected, useLowerDiff, khashcount),
+            args=(
+                x,
+                hashcount,
+                accepted,
+                rejected,
+                useLowerDiff,
+                khashcount,
+                username,
+                efficiency,
+            ),
         )
         thread[x].start()
         time.sleep(0.05)
