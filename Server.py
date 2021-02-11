@@ -918,9 +918,8 @@ def handle(c):
                                                 datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (formatteddatetime, username, str("wrapper - ")+str(tron_address), amount, lastBlockHash))
                                                 tranconn.commit()
                                             c.send(bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
-                                            break
                                         except:
-                                            break
+                                            pass
                                     except:
                                         break
                                 else:
@@ -928,9 +927,9 @@ def handle(c):
                                         datab.execute("UPDATE Users set balance = ? where username = ?", (balancebackup, username))
                                         c.send(bytes("NO,Unknown error, transaction reverted", encoding="utf8"))
                                     except:
-                                        break
+                                        pass
                             except:
-                                break
+                                pass
                     else:
                         c.send(bytes("NO,Wrapper disabled", emcoding="utf8"))
                         print("NO,Wrapper disabled")
@@ -988,9 +987,8 @@ def handle(c):
                                                 datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (formatteddatetime, str("Wrapper - ")+str(tron_address), username, amount, lastBlockHash))
                                                 tranconn.commit()
                                             c.send(bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
-                                            break
                                         except:
-                                            break
+                                            pass
                                     else:
                                         while True:
                                             try:
