@@ -83,8 +83,12 @@ Any contributions you make are greatly appreciated.
 
 To build your own Duino-Coin apps, here's a list of of commands the master server accepts.
 To start communication however, firstly you need to connect to the server. For now you have two options:
-*   TCP connection (recommended) - server IP and port are now static (but can change) and can be found [here](https://github.com/revoxhere/duino-coin/blob/gh-pages/serverip.txt)
-*   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static and are `ws://51.15.127.80:15808`
+*   TCP connection (recommended) - server IP and port are static:`tcp://51.15.127.80:2811`
+*   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static: `ws://51.15.127.80:15808`
+
+**Make sure you don't create more than 24 connections per IP address and don't make more than 10 connections in time shorter than 30 seconds.**
+If you do that, server may ban your IP for creating too much traffic and being a potential DDoS attacker.
+If you happen to get banned, wait about 30 seconds to get unbanned automatically.
 
 After connecting, the server will send version number it's currently on (2.0).
 At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
@@ -99,13 +103,14 @@ After loging-in you have access to the following commands:
 *   `BALA` - Server will return balance of current user
 *   `JOB` - Server will return job for mining
     * You can also use `JOB,username` to mine without loging-in
-    * You can ask for a specific difficulty for mining: `JOB,username,DIFF` (if you don't ask for specific difficulty, you'll get the high, network diff) where diff is one of the below:
+    * You can ask for a specific difficulty for mining: `JOB,username,DIFF` (if you don't ask for specific difficulty, you'll get the network diff) where diff is one of the below:
         * `AVR` - diff 3 - used for official AVR boards mining
         * `ESP` - diff 75 - used for official ESP boards mining
-        * `MEDIUM` - diff 10000 - used as lower-diff PC mining
-        * `5000` - custom 5k diff
-        * `2500` - custom 2.5k diff
         * `500` - custom 0.5k diff
+        * `2500` - custom 2.5k diff
+        * `5000` - custom 5k diff
+        * `MEDIUM` - diff 10k - used as lower-diff PC mining
+        * `EXTREME` - diff 75k - for custom high performance miners
     
     *   When sending result, you can pass hashrate count and miner name to display in the API, e.g.(6801,250000,My Cool Miner v4.20) indicates that result 6801 was found, hashrate was 250000H/S (250kH/s) and software name was My Cool Miner v4.20
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
