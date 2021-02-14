@@ -28,6 +28,7 @@ from pathlib import Path
 import socket, sys
 import sqlite3
 from threading import Timer
+import threading
 from time import sleep, time
 from os import _exit, mkdir, execl
 import datetime
@@ -38,6 +39,7 @@ from json import loads
 from configparser import ConfigParser
 import json
 import subprocess, os
+
 
 version = 2.0
 config = ConfigParser()
@@ -69,6 +71,12 @@ except:
         'Pillow is not installed. Wallet will try to install it. If it fails, please manually install "Pillow" python3 package.'
     )
     install("Pillow")
+
+try:
+    import pystray
+except:
+    print("Pystray is not installed. Continuing without using tray support")
+    disableTray = True
 
 try:
     mkdir(resources)
@@ -1223,8 +1231,8 @@ def updateBalanceLabel():
                 hourlyprofittext.set("")
                 dailyprofittext.set("")
             profitCheck += 1
-    except Exception as e:
-        print(e)
+    except:
+        pass
         _exit(0)
     Timer(1, updateBalanceLabel).start()
 
@@ -1560,6 +1568,29 @@ class Wallet:
         curr_bal = start_balance
         calculateProfit(start_balance)
         updateBalanceLabel()
+
+        if not disableTray:
+
+            def quit_window(icon, item):
+                master.destroy()
+
+            def show_window(icon, item):
+                master.after(0, root.deiconify)
+
+            def withdraw_window():
+                image = Image.open(resources + "duco.png")
+                menu = (
+                    pystray.MenuItem("Show", show_window),
+                    pystray.MenuItem("Quit", quit_window),
+                )
+                icon = pystray.Icon(
+                    "Duino-coin GUI Wallet", image, "Duino-coin GUI Wallet", menu
+                )
+                icon.run()
+
+            t = threading.Thread(target=withdraw_window)
+            t.setDaemon(True)
+            t.start()
 
         root.mainloop()
 
