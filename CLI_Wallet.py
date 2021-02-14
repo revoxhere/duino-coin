@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v2.0)
+# Duino-Coin CLI Wallet (v1.9)
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -10,7 +10,7 @@ from signal import signal, SIGINT
 from pathlib import Path
 
 try:
-	from cryptography.fernet import Fernet
+	from cryptography.fernet import Fernet, InvalidToken
 	from cryptography.hazmat.backends import default_backend
 	from cryptography.hazmat.primitives import hashes
 	from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -51,7 +51,7 @@ except:
 	os._exit(1)
 
 try: # Check if colorama is installed
-	from colorama import Fore, Back, Style
+	from colorama import init, Fore, Back, Style
 except:
 	now = datetime.datetime.now()
 	print(now.strftime("%H:%M:%S ") + "Colorama is not installed. Please install it using: python3 -m pip install colorama.\nIf you can't install it, use Minimal-PC_Miner.\nExiting in 15s.")
@@ -67,7 +67,7 @@ except ModuleNotFoundError:
 	now = datetime.datetime.now()
 	print(now.strftime("%H:%M:%S ") + "Tronpy is not installed. Please install it using: python3 -m pip install tronpy.\nWrapper was disabled because of tronpy is needed for !")
 
-timeout = 5 # Socket timeout
+timeout = 15 # Socket timeout
 VER = 2.0
 use_wrapper = False # default value for preventing error
 ipfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
@@ -206,21 +206,26 @@ while True:
 		if int(choice) <= 1:
 			username = input(Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT)
 			password = getpass.getpass(prompt=Style.RESET_ALL + Fore.YELLOW + "Enter your password: " + Style.BRIGHT, stream=None)
+			server_timeout = True
+			while server_timeout:
+				try:
+					s.send(bytes("LOGI," + str(username) + "," + str(password) + str(",placeholder"), encoding="utf8"))
+					loginFeedback = s.recv(64).decode().split(",")
+					server_timeout = False
+					if loginFeedback[0] == "OK":
+						print(Style.RESET_ALL + Fore.YELLOW + "Successfull login")
 
-			s.send(bytes("LOGI," + str(username) + "," + str(password), encoding="utf8"))
-			loginFeedback = s.recv(64).decode().split(",")
-			if loginFeedback[0] == "OK":
-				print(Style.RESET_ALL + Fore.YELLOW + "Successfull login")
-
-				config['wallet'] = {"username": username, "password": password}
-				config['wrapper'] = {"use_wrapper": "false"}
-	
-				with open("CLIWallet_config.cfg", "w") as configfile: # Write data to file
-					config.write(configfile)
-			else:
-				print(Style.RESET_ALL + Fore.RED + "Couldn't login, reason: " + Style.BRIGHT + str(loginFeedback[1]))
-				time.sleep(15)
-				os._exit(1)
+						config['wallet'] = {"username": username, "password": password}
+						config['wrapper'] = {"use_wrapper": "false"}
+			
+						with open("CLIWallet_config.cfg", "w") as configfile: # Write data to file
+							config.write(configfile)
+					else:
+						print(Style.RESET_ALL + Fore.RED + "Couldn't login, reason: " + Style.BRIGHT + str(loginFeedback[1]))
+						time.sleep(15)
+						os._exit(1)
+				except socket.timeout:
+					server_timeout = True
 
 		if int(choice) == 2:
 			username = input(Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT)
@@ -236,7 +241,7 @@ while True:
 						print(Style.RESET_ALL + Fore.YELLOW + Style.BRIGHT + "Successfully registered new account")
 						break
 					elif regiFeedback[0] == "NO":
-						print(Style.RESET_ALL + Fore.RED +
+						print(Style.RESET_ALL + Fore.RED + 
 							"\nCouldn't register new user, reason: " + Style.BRIGHT + str(regiFeedback[1]))
 						time.sleep(15)
 						os._exit(1)
@@ -269,7 +274,7 @@ while True:
 			config.read("CLIWallet_config.cfg")
 			username = config["wallet"]["username"]
 			password = config["wallet"]["password"]
-			s.send(bytes("LOGI," + str(username) + "," + str(password), encoding="utf8"))
+			s.send(bytes("LOGI," + str(username) + "," + str(password) + str(",placeholder"), encoding="utf8"))
 			loginFeedback = s.recv(128).decode().split(",")
 			if loginFeedback[0] == "OK":
 				break
@@ -302,6 +307,9 @@ while True:
 			print(Style.RESET_ALL + Fore.YELLOW + "DUCO price : " + Style.BRIGHT + str(ducofiat) + " USD")
 			if use_wrapper:
 				print(Style.RESET_ALL + Fore.YELLOW + "And also " + Style.BRIGHT + str(wbalance) + " wDUCO")
+				pendingbalance = float(wduco.functions.pendingWithdrawals(pub_key, username))/(10**6)
+				if pendingbalance > 0:
+					print(Style.RESET_ALL + Fore.YELLOW + "Pending unwraps " + Style.BRIGHT + str(pendingbalance) + " wDUCO")
 				print(Style.RESET_ALL + Fore.YELLOW + "Tron address for receiving : " + Style.BRIGHT + str(pub_key))
 				print(Style.RESET_ALL + Fore.YELLOW + "TRX balance (useful for fees) : " + Style.BRIGHT + str(trx_balance))
 			print(Style.RESET_ALL + Fore.YELLOW + "Type `help` to list available commands")
@@ -311,7 +319,14 @@ while True:
 
 			elif command == "send":
 				recipient = input(Style.RESET_ALL + Fore.WHITE + "Enter recipients' username: " + Style.BRIGHT)
-				amount = input(Style.RESET_ALL + Fore.WHITE + "Enter amount to transfer: " + Style.BRIGHT)
+				try:
+					amount = float(input(Style.RESET_ALL + Fore.WHITE + "Enter amount to transfer: " + Style.BRIGHT))
+				except ValueError:
+					print("NO, Amount should be numeric... aborting")
+					continue
+				
+				
+				
 				s.send(bytes("SEND,deprecated,"+str(recipient)+","+str(amount), encoding="utf8"))
 				while True:
 					message = s.recv(1024).decode()
@@ -410,7 +425,12 @@ while True:
 
 			elif command == "wrap":
 				if use_wrapper:
-					amount = input(Style.RESET_ALL + Fore.WHITE + "Enter amount to wrap (minimum is 10): " + Style.BRIGHT)
+					try:
+						amount = float(input(Style.RESET_ALL + Fore.WHITE + "Enter amount to wrap (minimum is 10): " + Style.BRIGHT))
+					except ValueError:
+						print("NO, Amount should be numeric... aborting")
+						continue
+						
 					try:
 						s.send(bytes("BALA", encoding="utf8"))
 						balance = round(float(s.recv(256).decode()), 8)
@@ -432,14 +452,38 @@ while True:
 				
 			elif command == "unwrap":
 				if use_wrapper:
-					amount = input(Style.RESET_ALL + Fore.WHITE + "Enter amount to unwrap: " + Style.BRIGHT)
-					txn = wduco.functions.initiateWithdraw(username,int(float(amount)*10**6)).with_owner(pub_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(priv_key)))
-					print("Initiating unwrap...\nTXid :", txn.txid)
-					txn = txn.broadcast()
-					if txn.wait():
+					pendingvalues = wduco.functions.pendingWithdrawals(pub_key, username)
+					txn_success = False # transaction wasn't initiated, but variable should be declared
+					try:
+						amount = float(input(Style.RESET_ALL + Fore.WHITE + "Enter amount to unwrap: " + Style.BRIGHT))
+					except ValueError:
+						print("NO, Value should be numeric... aborting")
+						continue
+					if int(float(amount)*10**6) >= pendingvalues:
+						toInit = int(float(amount)*10**6)-pendingvalues
+					else:
+						toInit = amount*10**6
+					if toInit > 0:
+						txn = wduco.functions.initiateWithdraw(username,toInit).with_owner(pub_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(priv_key)))
+						print("Initiating unwrap...\nTXid :", txn.txid)
+						txn = txn.broadcast()
+						txnfeedback = txn.result()
+						if txnfeedback:
+							txn_success = True
+						else:
+							txn_success = False
+							
+					if amount <= pendingvalues:
+						print("Amount is over pending values, using pending values in order to save txn fees")
+						
+					if txn_success or amount <= pendingvalues:
 						s.send(bytes(str("UNWRAP,")+str(amount)+str(",")+str(pub_key), encoding='utf8'))
 					else:
-						print("There was an error while initiating unwrap...")
+						print("There was an error while initiating unwrap, aborting")
+
+					if amount <= pendingvalues:
+						print("Amount is over pending values, using pending values in order to save txn fees")
+
 				elif wrong_passphrase:
 					print("Wrapper disabled, you entered a wrong passphrase")
 				else:
@@ -450,7 +494,7 @@ while True:
 					txn = wduco.functions.cancelWithdrawals(pub_key,username).with_owner(pub_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(priv_key)))
 					print("Transaction sent, txid :", txn.txid)
 					txn = txn.broadcast()
-					if txn.wait():
+					if txn.result():
 						print("Success")
 					else:
 						print("Failed, you should have enough energy or trx")
@@ -458,7 +502,20 @@ while True:
 					print("Wrapper disabled, you entered a wrong passphrase")
 				else:
 					print("Wrapper disabled, configure it using `wrapperconf`")
-
+					
+					
+					
+			elif command == "finishunwraps":
+				if use_wrapper:
+					pendingvalues = float(wduco.functions.pendingWithdrawals(pub_key, username))/(10**6)
+					s.send(bytes(str("UNWRAP,")+str(pendingvalues)+str(",")+str(pub_key), encoding='utf8'))
+					print("Finished unwrapping", str(pendingvalues), "DUCOs")
+				elif wrong_passphrase:
+					print("Wrapper disabled, you entered a wrong passphrase")
+				else:
+					print("Wrapper disabled, configure it using `wrapperconf`")
+					
+					
 
 			elif command == "pendingunwraps":
 				if use_wrapper:
@@ -483,7 +540,11 @@ while True:
 			elif command == "wsend":
 				if use_wrapper:
 					recipient = input(Style.RESET_ALL + Fore.WHITE + "Enter recipients' TRON address: " + Style.BRIGHT)
-					amount = input(Style.RESET_ALL + Fore.WHITE + "Enter amount to transfer: " + Style.BRIGHT)
+					try:
+						amount = float(input(Style.RESET_ALL + Fore.WHITE + "Enter amount to transfer: " + Style.BRIGHT))
+					except ValueError:
+						print("NO, Amount should be numeric... aborting")
+						continue
 					wbalance = float(wduco.functions.balanceOf(pub_key))/10**6
 					if float(amount) <= wbalance:
 						txn = wduco.functions.transfer(recipient,int(float(amount)*10**6)).with_owner(pub_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(priv_key)))
@@ -540,4 +601,5 @@ while True:
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " unwrap" + Style.RESET_ALL + " - unwrap wDUCO - you should have some TRX or tron energy for txn fees")
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " pendingvalues" + Style.RESET_ALL + " - shows balances that're waiting for being unwrapped")
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " cancelunwrap" + Style.RESET_ALL + " - sends back pending unwrap values to wallet - you should have some trx or tron energy for txn fees")
+				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " finishunwraps" + Style.RESET_ALL + " - completes pending unwraps")
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " exportwrapkey" + Style.RESET_ALL + " - exports wrapper private key")
