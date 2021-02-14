@@ -1457,7 +1457,7 @@ class Wallet:
             background=backgroundColor,
         )
         amount.grid(row=6, column=1, sticky=N + W + S + E, columnspan=3, padx=(0, 5))
-        amount.insert("0", "2.0")
+        amount.insert("0", "2.1")
         amount.bind("<FocusIn>", clear_amount_placeholder)
 
         sendLabel = Button(
