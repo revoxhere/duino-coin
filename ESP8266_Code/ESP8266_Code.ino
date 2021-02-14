@@ -19,12 +19,9 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
 const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
 const char* password = "Your WiFi password"; // Change this to your WiFi password
 const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
-// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
-
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
