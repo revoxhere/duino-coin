@@ -56,7 +56,7 @@ except:
     install("pypresence")
 
 # Global variables
-minerVersion = "2.0"  # Version number
+minerVersion = "2.1"  # Version number
 timeout = 30  # Socket timeout
 resourcesFolder = "AVRMiner_" + str(minerVersion) + "_resources"
 shares = [0, 0]
