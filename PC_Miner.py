@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python Miner (v2.0)
+# Duino-Coin Python Miner (v2.1)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
@@ -57,27 +57,25 @@ except:
 
 
 # Global variables
-minerVersion = "2.0"  # Version number
+minerVersion = "2.1"  # Version number
 connectionMessageShown = False
-timeout = 5  # Socket timeout
+timeout = 10  # Socket timeout
 resourcesFolder = "PCMiner_" + str(minerVersion) + "_resources"
 hash_mean = []
 donatorrunning = False
-debug = False
+debug = "n"
 useLowerDiff = "n"
-username = ""
 serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"  # Serverip file
 config = configparser.ConfigParser()
 autorestart = 0
 donationlevel = 0
-efficiency = 0
 
 if not os.path.exists(resourcesFolder):
     os.mkdir(resourcesFolder)  # Create resources folder if it doesn't exist
 
 
 def debugOutput(text):
-    if debug == True:
+    if debug == "y":
         print(now().strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
 
 
@@ -93,7 +91,7 @@ def handler(
     signal_received, frame
 ):  # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
     print(
-        now().strftime(Style.RESET_ALL + Style.DIM + "\n%H:%M:%S ")
+        now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
         + Style.BRIGHT
         + Back.GREEN
         + Fore.WHITE
@@ -105,6 +103,7 @@ def handler(
         + Fore.WHITE
         + " See you soon!"
     )
+    handlerShown = True
     try:
         soc.close()
     except:
@@ -169,18 +168,22 @@ def Greeting():  # Greeting message depending on time
             + str(cpu["brand_raw"])
         )
     except:
-        if debug == True:
+        if debug == "y":
             raise
     if os.name == "nt" or os.name == "posix":
         print(
             Style.RESET_ALL
             + " > "
             + Fore.WHITE
-            + "Donation level: "
+            + "Developer donation level: "
             + Style.BRIGHT
             + Fore.YELLOW
             + str(donationlevel)
         )
+    if useLowerDiff == "y":
+        diffName = "Medium diff"
+    else:
+        diffName = "Network diff"
     print(
         Style.RESET_ALL
         + " > "
@@ -188,7 +191,8 @@ def Greeting():  # Greeting message depending on time
         + "Algorithm: "
         + Style.BRIGHT
         + Fore.YELLOW
-        + "DUCO-S1"
+        + "DUCO-S1 @ "
+        + diffName
     )
     print(
         Style.RESET_ALL
@@ -283,12 +287,15 @@ def loadConfig():  # Config loading section
         )
 
         username = input(
-            Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + "Enter your Duino-Coin username: "
+            + Style.BRIGHT
         )
         efficiency = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + "Set mining intensity (1-100)% (recommended: 100): "
+            + "Set mining intensity (1-100)% (recommended: 95): "
             + Style.BRIGHT
         )
         threadcount = input(
@@ -308,7 +315,7 @@ def loadConfig():  # Config loading section
         autorestart = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + "If you want, set after how many minutes miner will restart (recommended: 30): "
+            + "If you want, set after how many minutes miner will restart (recommended: 120 (0 to disable)): "
             + Style.BRIGHT
         )
         donationlevel = "0"
@@ -329,8 +336,8 @@ def loadConfig():  # Config loading section
         threadcount = re.sub(
             "\D", "", threadcount
         )  # Check wheter threadcount is correct
-        if int(threadcount) > int(24):
-            threadcount = 24
+        if int(threadcount) > int(16):
+            threadcount = 16
         if int(threadcount) < int(1):
             threadcount = 1
 
@@ -354,7 +361,7 @@ def loadConfig():  # Config loading section
             "useLowerDiff": useLowerDiff,
             "autorestart": autorestart,
             "donate": donationlevel,
-            "debug": False,
+            "debug": "n",
         }
 
         with open(
@@ -416,18 +423,18 @@ def Donate():
             + Fore.YELLOW
             + " to learn more about how you can help :)"
         )
-        time.sleep(5)
+        time.sleep(10)
     if donatorrunning == False:
         if int(donationlevel) == 5:
             cmd += "100"
         elif int(donationlevel) == 4:
-            cmd += "75"
+            cmd += "85"
         elif int(donationlevel) == 3:
-            cmd += "50"
+            cmd += "60"
         elif int(donationlevel) == 2:
-            cmd += "25"
+            cmd += "30"
         elif int(donationlevel) == 1:
-            cmd += "10"
+            cmd += "15"
         if int(donationlevel) > 0:  # Launch CMD as subprocess
             debugOutput("Starting donation process")
             donatorrunning = True
@@ -489,7 +496,7 @@ def Thread(
                     + Fore.RED
                     + " Error retrieving data from GitHub! Retrying in 10s."
                 )
-                if debug == True:
+                if debug == "y":
                     raise
                 time.sleep(10)
         while True:  # This section connects to the server
@@ -509,7 +516,9 @@ def Thread(
                         + Style.BRIGHT
                         + Back.BLUE
                         + Fore.WHITE
-                        + " net0 "
+                        + " net"
+                        + str(threadid)
+                        + " "
                         + Back.RESET
                         + Fore.YELLOW
                         + " Connected"
@@ -526,7 +535,9 @@ def Thread(
                         + Style.BRIGHT
                         + Back.GREEN
                         + Fore.WHITE
-                        + " sys0 "
+                        + " sys"
+                        + str(threadid)
+                        + " "
                         + Back.RESET
                         + Fore.RED
                         + " Miner is outdated (v"
@@ -546,14 +557,16 @@ def Thread(
                     + Style.BRIGHT
                     + Back.BLUE
                     + Fore.WHITE
-                    + " net0 "
+                    + " net"
+                    + str(threadid)
+                    + " "
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Fore.RED
                     + " Error connecting to the server. Retrying in 10s"
                     + Style.RESET_ALL
                 )
-                if debug == True:
+                if debug == "y":
                     raise
         print(
             now().strftime(Style.DIM + "%H:%M:%S ")
@@ -573,14 +586,14 @@ def Thread(
             + Fore.WHITE
             + " using DUCO-S1 algorithm with "
             + Fore.YELLOW
-            + str(100 - (100 * int(efficiency)))
+            + str(100 - efficiency * 100)
             + "% efficiency"
         )
         while True:  # Mining section
             try:
-                if float(efficiency) < 100:
+                if float(100 - efficiency * 100) < 100:
                     time.sleep(
-                        float(efficiency)
+                        float(efficiency * 5)
                     )  # Sleep to achieve lower efficiency if less than 100 selected
                 while True:
                     if useLowerDiff == "n":
@@ -839,11 +852,10 @@ def Thread(
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Fore.MAGENTA
-                    + " Master server timeout - restarting in 5s."
+                    + " Error while mining - most likely a connection error - restarting in 5s."
                     + Style.RESET_ALL
                 )
-                raise
-                if debug == True:
+                if debug == "y":
                     raise
                 time.sleep(5)
                 break
@@ -904,7 +916,7 @@ if __name__ == "__main__":
             + "/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s"
             + Style.RESET_ALL
         )
-        if debug == True:
+        if debug == "y":
             raise
         time.sleep(10)
         os._exit(1)
@@ -912,7 +924,7 @@ if __name__ == "__main__":
         Greeting()  # Display greeting message
         debugOutput("Greeting displayed")
     except:
-        if debug == True:
+        if debug == "y":
             raise
     try:  # Setup autorestarter
         if float(autorestart) > 0:
@@ -936,14 +948,14 @@ if __name__ == "__main__":
             + "/Miner_config.cfg). Exiting in 10s"
             + Style.RESET_ALL
         )
-        if debug == True:
+        if debug == "y":
             raise
         time.sleep(10)
         os._exit(1)
     try:
         Donate()  # Start donation thread
     except:
-        if debug == True:
+        if debug == "y":
             raise
 
     hashcount = multiprocessing.Value("i", 0)
@@ -972,7 +984,7 @@ if __name__ == "__main__":
             ),
         )
         thread[x].start()
-        time.sleep(0.05)
+        time.sleep(0.1)
 
     initRichPresence()
     threading.Thread(target=updateRichPresence).start()
