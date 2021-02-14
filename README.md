@@ -1,6 +1,6 @@
 <!--
 *** Official Duino Coin README
-*** by revox, 2019-2020
+*** by revox, 2019-2021
 -->
 
 <p align = "center">
@@ -19,8 +19,8 @@
     <img src="https://img.shields.io/codacy/grade/a995acf7cd4c4211af6da874fe549ee5?color=f68e09&style=for-the-badge" /></a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-f97606.svg?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/releases/tag/1.9.5">
-    <img src="https://img.shields.io/badge/release-1.9.5-fb6404.svg?style=for-the-badge" /></a>
+  <a href="https://github.com/revoxhere/duino-coin/releases/tag/2.0">
+    <img src="https://img.shields.io/badge/release-2.0-fb6404.svg?style=for-the-badge" /></a>
   <a href="https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015">
     <img src="https://img.shields.io/badge/Bitcointalk-555555.svg?style=for-the-badge&logo=bitcoin" /></a>
 </p>
@@ -83,10 +83,14 @@ Any contributions you make are greatly appreciated.
 
 To build your own Duino-Coin apps, here's a list of of commands the master server accepts.
 To start communication however, firstly you need to connect to the server. For now you have two options:
-*   TCP connection (recommended) - server IP and port are now static (but can change) and can be found [here](https://github.com/revoxhere/duino-coin/blob/gh-pages/serverip.txt)
-*   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static and are `ws://51.15.127.80:15808`
+*   TCP connection (recommended) - server IP and port are static: `tcp://51.15.127.80:2811`
+*   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static: `ws://51.15.127.80:15808`
 
-After connecting, the server will send version number it's currently on (1.7).
+**Make sure you don't create more than 24 connections per IP address and don't make more than 10 connections in time shorter than 30 seconds.**
+If you do that, server may ban your IP for creating too much traffic and being a potential DDoS attacker.
+If you happen to get banned, wait about 30 seconds to get unbanned automatically.
+
+After connecting, the server will send version number it's currently on (2.0).
 At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
 To login, send `LOGI,username,password` - replace username and password with credentials. After sucessfull login server will send `OK`.
 If login fails, server will send `NO,Reason of failed login`.
@@ -97,12 +101,35 @@ If registration fails, server will send `NO,Reason of failed registration`.
 
 After loging-in you have access to the following commands:
 *   `BALA` - Server will return balance of current user
-*   `JOB` - Server will return job for mining - you can also use `JOB,username` to mine without loging-in
+*   `JOB` - Server will return job for mining
+    * You can also use `JOB,username` to mine without loging-in
+    * You can ask for a specific difficulty for mining: `JOB,username,DIFF` (if you don't ask for specific difficulty, you'll get the network diff) where diff is one of the below:
+        * `AVR`     - diff     3 - used for official AVR boards mining
+        * `ESP`     - diff    75 - used for official ESP boards mining
+        * `500`     - custom 0.5k diff
+        * `2500`    - custom 2.5k diff
+        * `5000`    - custom   5k diff
+        * `10000`   - custom  10k diff
+        * `MEDIUM`  - diff    20k - used as lower-diff PC mining
+        * `HIGH`    - custom  80k diff
+        * `EXTREME` - diff   750k - for custom high performance miners
+    
     *   When sending result, you can pass hashrate count and miner name to display in the API, e.g.(6801,250000,My Cool Miner v4.20) indicates that result 6801 was found, hashrate was 250000H/S (250kH/s) and software name was My Cool Miner v4.20
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
         *   If software name is not received, server uses `"Software": "Unknown"` in the API
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
 *   `CHGP,oldPassword,newPassword` - Change password of current user
+*   `WRAP,amount,tronAddress` - Wrap some DUCO on tron
+*  Unwrapping protocol is more complicated
+
+    First, send a tron transaction with method `initiateWithdraw(ducoUsername,amount)`
+
+    Then, send a server call to - `UNWRAP,amount,tronAddress`
+
+
+<h2 align="center">C DUCO library</h2><br>
+
+If you want to easily access Duino-Coin API with your C apps, [@ygboucherk](https://github.com/ygboucherk) is working on a library for that here: [duino-coin-C-lib](https://github.com/ygboucherk/duino-coin-C-lib)
 
 <h2 align="center">Python3 DUCO API module</h2><br>
 
@@ -237,10 +264,10 @@ Major frameworks used by Duino-Coin:
 
 <h2 align="center">Officially tested devices</h2><br>
 
-*   Arduino Uno Rev3 (ATmega328p @ 16MHz 5V) - Unkown Hashrate - Arduino Code & Miner
-*   Arduino Pro Mini (ATmega328p @ 16MHz 5V) - 150 H/s - Arduino Code & Miner
-*   NodeMCU (ESP8266 @ 80 MHz) - 1,15 kH/s - ESP Code
-*   NodeMCU (ESP8266 @ 160 MHz) - 2,15 kH/s - ESP Code
+*   Arduino Uno Rev3 (ATmega328p @ 16MHz 5V) - ~170 H/s - Arduino Code & Miner
+*   Arduino Pro Mini (ATmega328p @ 16MHz 5V) - ~170 H/s - Arduino Code & Miner
+*   NodeMCU (ESP8266 @ 80 MHz) - ~1,15 kH/s - ESP8266 Code
+*   NodeMCU (ESP8266 @ 160 MHz) - ~2,15 kH/s - ESP8266 Code
 
 Hashrate Calculators for AVR/ESP platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
 
@@ -251,12 +278,16 @@ Hashrate Calculators for AVR/ESP platforms are available in the [Useful tools br
     *   [@Bilaboz](https://github.com/bilaboz/)
     *   [@connorhess](https://github.com/connorhess)
     *   [@JoyBed](https://github.com/JoyBed)
+    *   [@LDarki](https://github.com/LDarki)
+    *   [@travelmode](https://github.com/colonelwatch)
 
 *   **Webmaster:**
     *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io
 
 *   **Contributors:**
     *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
+    *   [@HGEcode](https://github.com/HGEcode)
+    *   [@5Q](https://github.com/its5Q)
     *   [@kyngs](https://github.com/kyngs)
     *   [@httsmvkcom](https://github.com/httsmvkcom)
     *   [@Nosh-Ware](https://github.com/Nosh-Ware)

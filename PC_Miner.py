@@ -47,26 +47,30 @@ except:
     )
     install("requests")
 
+try:
+    from pypresence import Presence
+except:
+    print(
+        'Pypresence is not installed. Wallet will try to install it. If it fails, please manually install "pypresence" python3 package.'
+    )
+    install("pypresence")
+
+
 # Global variables
 minerVersion = "2.0"  # Version number
 connectionMessageShown = False
 timeout = 5  # Socket timeout
 resourcesFolder = "PCMiner_" + str(minerVersion) + "_resources"
-shares = [0, 0]
-diff = 0
-last_hash_count = 0
-khash_count = 0
-hash_count = 0
 hash_mean = []
 donatorrunning = False
 debug = False
+useLowerDiff = "n"
+username = ""
 serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"  # Serverip file
 config = configparser.ConfigParser()
 autorestart = 0
 donationlevel = 0
-useLowerDiff = False
-freeze_support()  # If not used, pyinstaller hangs when checking cpuinfo
-cpu = cpuinfo.get_cpu_info()  # Processor info
+efficiency = 0
 
 if not os.path.exists(resourcesFolder):
     os.mkdir(resourcesFolder)  # Create resources folder if it doesn't exist
@@ -227,14 +231,12 @@ def Greeting():  # Greeting message depending on time
                 f.write(r.content)
 
 
-def hashrateCalculator():  # Hashes/sec calculation
-    global last_hash_count, hash_count, khash_count, hash_mean
-    last_hash_count = hash_count
-    khash_count = last_hash_count / 1000
-    hash_mean.append(khash_count)  # Calculate average hashrate
-    khash_count = round(statistics.mean(hash_mean), 3)
-    hash_count = 0  # Reset counter
-    threading.Timer(1.0, hashrateCalculator).start()  # Run this def every 1s
+def hashrateCalculator(hashcount, khashcount):  # Hashes/sec calculation
+    while True:
+        hash_mean.append(hashcount.value / 1000)  # Append last hashcount to the list
+        khashcount.value = int(statistics.mean(hash_mean))  # Calculate average hashrate
+        hashcount.value = 0  # Reset the counter
+        time.sleep(1)
 
 
 def autorestarter():  # Autorestarter
@@ -243,6 +245,8 @@ def autorestarter():  # Autorestarter
         donateExecutable.terminate()  # Stop the donation process (if running)
     except:
         pass
+    for x in thread:
+        x.terminate()
     print(
         now().strftime(Style.DIM + "%H:%M:%S ")
         + Style.RESET_ALL
@@ -325,8 +329,8 @@ def loadConfig():  # Config loading section
         threadcount = re.sub(
             "\D", "", threadcount
         )  # Check wheter threadcount is correct
-        if int(threadcount) > int(16):
-            threadcount = 16
+        if int(threadcount) > int(24):
+            threadcount = 24
         if int(threadcount) < int(1):
             threadcount = 1
 
@@ -401,7 +405,7 @@ def Donate():
             + " sys0 "
             + Back.RESET
             + Fore.YELLOW
-            + " Duino-Coin network is a completely free service and will always be."
+            + " Duino-Coin network is a completely free service and will always be"
             + Style.BRIGHT
             + Fore.YELLOW
             + "\nWe don't take any fees from your mining.\nYou can really help us maintain the server and low-fee exchanges by donating.\nVisit "
@@ -443,8 +447,16 @@ def Donate():
             )
 
 
-def Thread(threadid):
-    global hash_count, connectionMessageShown
+def Thread(
+    threadid,
+    hashcount,
+    accepted,
+    rejected,
+    useLowerDiff,
+    khashcount,
+    username,
+    efficiency,
+):
     while True:
         while True:
             try:
@@ -491,9 +503,7 @@ def Thread(threadid):
                 if (
                     float(serverVersion) <= float(minerVersion)
                     and len(serverVersion) == 3
-                    and connectionMessageShown != True
                 ):  # If miner is up-to-date, display a message and continue
-                    connectionMessageShown = True
                     print(
                         now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
                         + Style.BRIGHT
@@ -510,7 +520,7 @@ def Thread(threadid):
                         + ")"
                     )
 
-                elif connectionMessageShown != True:
+                else:
                     print(
                         now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
                         + Style.BRIGHT
@@ -584,42 +594,51 @@ def Thread(threadid):
                     job = soc.recv(128).decode()  # Get work from pool
                     job = job.split(",")  # Split received data to job and difficulty
                     diff = job[2]
+
                     if job[0] and job[1] and job[2]:
-                        debugOutput("Job received: " + str(job))
+                        debugOutput(str(threadid) + "Job received: " + str(job))
                         break  # If job received, continue to hashing algo
+
+                threadhashcount = 0  # Reset hash counter for this thread
                 for ducos1res in range(
                     100 * int(diff) + 1
                 ):  # Loop from 1 too 100*diff)
                     ducos1 = hashlib.sha1(
                         str(job[0] + str(ducos1res)).encode("utf-8")
                     ).hexdigest()  # Generate hash
-                    hash_count = hash_count + 1  # Increment hash counter
+                    threadhashcount += (
+                        1  # Increment hash counter for hashrate calculator
+                    )
                     if job[1] == ducos1:  # If result is even with job, send the result
-                        debugOutput("Result found: " + str(ducos1res))
+                        hashcount.value += threadhashcount  # Add this thread hash counter to the global counter\
+
+                        debugOutput(str(threadid) + "Result found: " + str(ducos1res))
                         while True:
                             soc.send(
                                 bytes(
-                                    f"{str(ducos1res)},{str(khash_count*1000)},Official Python Miner v{str(minerVersion)}",
+                                    f"{str(ducos1res)},{str(threadhashcount)},Official Python Miner v{str(minerVersion)}",
                                     encoding="utf8",
                                 )
-                            )  # Send result of hashing algorithm to pool
+                            )  # Send result of hashing algorithm to the server
                             responsetimetart = now()
                             feedback = soc.recv(4).decode()  # Get feedback
+                            debugOutput(
+                                str(threadid) + "Feedback received: " + str(feedback)
+                            )
                             responsetimestop = now()  # Measure server ping
                             ping = responsetimestop - responsetimetart  # Calculate ping
                             ping = str(int(ping.microseconds / 1000))  # Convert to ms
-                            debugOutput("Feedback received: " + str(feedback))
+                            debugOutput("Ping: " + ping)
+
                             if feedback == "GOOD":  # If result was good
-                                shares[
-                                    0
-                                ] += 1  # Share accepted = increment feedback shares counter by 1
+                                accepted.value += 1  # Share accepted = increment feedback shares counter by 1
                                 title(
                                     "Duino-Coin Python Miner (v"
                                     + str(minerVersion)
                                     + ") - "
-                                    + str(shares[0])
+                                    + str(accepted.value)
                                     + "/"
-                                    + str(shares[0] + shares[1])
+                                    + str(accepted.value + rejected.value)
                                     + " accepted shares"
                                 )
                                 print(
@@ -636,14 +655,20 @@ def Thread(threadid):
                                     + Fore.GREEN
                                     + " Accepted "
                                     + Fore.WHITE
-                                    + str(shares[0])
+                                    + str(accepted.value)
                                     + "/"
-                                    + str(shares[0] + shares[1])
+                                    + str(accepted.value + rejected.value)
                                     + Back.RESET
                                     + Fore.YELLOW
                                     + " ("
                                     + str(
-                                        int((shares[0] / (shares[0] + shares[1]) * 100))
+                                        int(
+                                            (
+                                                accepted.value
+                                                / (accepted.value + rejected.value)
+                                                * 100
+                                            )
+                                        )
                                     )
                                     + "%)"
                                     + Style.NORMAL
@@ -651,7 +676,7 @@ def Thread(threadid):
                                     + " ⁃ "
                                     + Style.BRIGHT
                                     + Fore.WHITE
-                                    + str("%6.2f" % khash_count)
+                                    + str(khashcount.value)
                                     + " kH/s"
                                     + Style.NORMAL
                                     + " @ diff "
@@ -665,16 +690,14 @@ def Thread(threadid):
                                 break  # Repeat
 
                             elif feedback == "BLOCK":  # If block was found
-                                shares[
-                                    0
-                                ] += 1  # Share accepted = increment feedback shares counter by 1
+                                accepted.value += 1  # Share accepted = increment feedback shares counter by 1
                                 title(
                                     "Duino-Coin Python Miner (v"
                                     + str(minerVersion)
                                     + ") - "
-                                    + str(shares[0])
+                                    + str(accepted.value)
                                     + "/"
-                                    + str(shares[0] + shares[1])
+                                    + str(accepted.value + rejected.value)
                                     + " accepted shares"
                                 )
                                 print(
@@ -691,14 +714,20 @@ def Thread(threadid):
                                     + Fore.CYAN
                                     + " Block found "
                                     + Fore.WHITE
-                                    + str(shares[0])
+                                    + str(accepted.value)
                                     + "/"
-                                    + str(shares[0] + shares[1])
+                                    + str(accepted.value + rejected.value)
                                     + Back.RESET
                                     + Fore.YELLOW
                                     + " ("
                                     + str(
-                                        int((shares[0] / (shares[0] + shares[1]) * 100))
+                                        int(
+                                            (
+                                                accepted.value
+                                                / (accepted.value + rejected.value)
+                                                * 100
+                                            )
+                                        )
                                     )
                                     + "%)"
                                     + Style.NORMAL
@@ -706,7 +735,7 @@ def Thread(threadid):
                                     + " ⁃ "
                                     + Style.BRIGHT
                                     + Fore.WHITE
-                                    + str("%6.2f" % khash_count)
+                                    + str(khashcount.value)
                                     + " kH/s"
                                     + Style.NORMAL
                                     + " @ diff "
@@ -718,28 +747,6 @@ def Thread(threadid):
                                     + "ms"
                                 )
                                 break  # Repeat
-
-                            elif feedback == "INVU":  # If this user doesn't exist
-                                print(
-                                    now().strftime(
-                                        Style.RESET_ALL + Style.DIM + "%H:%M:%S "
-                                    )
-                                    + Style.BRIGHT
-                                    + Back.BLUE
-                                    + Fore.WHITE
-                                    + " net"
-                                    + str(threadid)
-                                    + " "
-                                    + Back.RESET
-                                    + Fore.RED
-                                    + " User "
-                                    + str(username)
-                                    + " doesn't exist."
-                                    + Style.RESET_ALL
-                                    + Fore.RED
-                                    + " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s"
-                                )
-                                time.sleep(10)
 
                             elif feedback == "ERR":  # If server reports internal error
                                 print(
@@ -762,16 +769,14 @@ def Thread(threadid):
                                 time.sleep(10)
 
                             else:  # If result was bad
-                                shares[
-                                    1
-                                ] += 1  # Share rejected = increment bad shares counter by 1
+                                rejected.value += 1  # Share rejected = increment bad shares counter by 1
                                 title(
                                     "Duino-Coin Python Miner (v"
                                     + str(minerVersion)
                                     + ") - "
-                                    + str(shares[0])
+                                    + str(accepted.value)
                                     + "/"
-                                    + str(shares[0] + shares[1])
+                                    + str(accepted.value + rejected.value)
                                     + " accepted shares"
                                 )
                                 print(
@@ -787,14 +792,20 @@ def Thread(threadid):
                                     + Fore.RED
                                     + " Rejected "
                                     + Fore.WHITE
-                                    + str(shares[0])
+                                    + str(accepted.value)
                                     + "/"
-                                    + str(shares[0] + shares[1])
+                                    + str(accepted.value + rejected.value)
                                     + Back.RESET
                                     + Fore.YELLOW
                                     + " ("
                                     + str(
-                                        int((shares[0] / (shares[0] + shares[1]) * 100))
+                                        int(
+                                            (
+                                                accepted.value
+                                                / (accepted.value + rejected.value)
+                                                * 100
+                                            )
+                                        )
                                     )
                                     + "%)"
                                     + Style.NORMAL
@@ -802,7 +813,7 @@ def Thread(threadid):
                                     + " ⁃ "
                                     + Style.BRIGHT
                                     + Fore.WHITE
-                                    + str("%6.2f" % khash_count)
+                                    + str(khashcount.value)
                                     + " kH/s"
                                     + Style.NORMAL
                                     + " @ diff "
@@ -838,10 +849,42 @@ def Thread(threadid):
                 break
 
 
+def initRichPresence():
+    global RPC
+    try:
+        RPC = Presence(808045598447632384)
+        RPC.connect()
+    except:  # Discord not launched
+        pass
+
+
+def updateRichPresence():
+    while True:
+        try:
+            RPC.update(
+                details="Hashrate: " + str(int(statistics.mean(hash_mean))) + " kH/s",
+                state="Acc. shares: "
+                + str(accepted.value)
+                + "/"
+                + str(rejected.value + accepted.value),
+                large_image="ducol",
+                large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
+                buttons=[
+                    {"label": "Learn more", "url": "https://duinocoin.com"},
+                    {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
+                ],
+            )
+        except:  # Discord not launched
+            pass
+        time.sleep(15)  # 15 seconds to respect discord's rate limit
+
+
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
+    cpu = cpuinfo.get_cpu_info()  # Processor info
     init(autoreset=True)  # Enable colorama
-    hashrateCalculator()  # Start hashrate calculator
     title("Duino-Coin Python Miner (v" + str(minerVersion) + ")")
+
     try:
         loadConfig()  # Load config file or create new one
         debugOutput("Config file loaded")
@@ -902,6 +945,34 @@ if __name__ == "__main__":
     except:
         if debug == True:
             raise
+
+    hashcount = multiprocessing.Value("i", 0)
+    khashcount = multiprocessing.Value("i", 0)
+    accepted = multiprocessing.Value("i", 0)
+    rejected = multiprocessing.Value("i", 0)
+
+    threading.Thread(
+        target=hashrateCalculator, args=(hashcount, khashcount)
+    ).start()  # Start hashrate calculator
+
+    thread = []
     for x in range(int(threadcount)):  # Launch duco mining threads
-        threading.Thread(target=Thread, args=(x,)).start()
+        thread.append(x)
+        thread[x] = multiprocessing.Process(
+            target=Thread,
+            args=(
+                x,
+                hashcount,
+                accepted,
+                rejected,
+                useLowerDiff,
+                khashcount,
+                username,
+                efficiency,
+            ),
+        )
+        thread[x].start()
         time.sleep(0.05)
+
+    initRichPresence()
+    threading.Thread(target=updateRichPresence).start()

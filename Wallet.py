@@ -28,8 +28,8 @@ from pathlib import Path
 import socket, sys
 import sqlite3
 from threading import Timer
-from PIL import Image, ImageTk
-from time import sleep
+import threading
+from time import sleep, time
 from os import _exit, mkdir, execl
 import datetime
 from tkinter import messagebox
@@ -38,6 +38,8 @@ from requests import get
 from json import loads
 from configparser import ConfigParser
 import json
+import subprocess, os
+
 
 version = 2.0
 config = ConfigParser()
@@ -47,6 +49,37 @@ fontColor = "#eee"
 foregroundColor = "#F79F1F"
 foregroundColorSecondary = "#F8EFBA"
 min_trans_difference = 0.000000001  # Minimum transaction amount to be saved
+
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+
+try:
+    from pypresence import Presence
+except:
+    print(
+        'Pypresence is not installed. Wallet will try to install it. If it fails, please manually install "pypresence" python3 package.'
+    )
+    install("pypresence")
+
+try:
+    from PIL import Image, ImageTk
+except:
+    print(
+        'Pillow is not installed. Wallet will try to install it. If it fails, please manually install "Pillow" python3 package.'
+    )
+    install("Pillow")
+
+try:
+    import pystray
+except:
+    print(
+        'Pystray is not installed. Wallet will try to install it. If it fails, please manually install "pystray" python3 package.'
+    )
+    install("pystray")
+
 
 try:
     mkdir(resources)
@@ -91,6 +124,7 @@ class LoginFrame(Frame):
         super().__init__(master)
         master.title("Login")
         master.resizable(False, False)
+
 
         textFont2 = Font(size=12, weight="bold")
         textFont = Font(size=12, weight="normal")
@@ -687,14 +721,6 @@ def openStats(handler):
     textFont3 = Font(statsWindow, size=14, weight="bold")
     textFont = Font(statsWindow, size=12, weight="normal")
 
-    Label(
-        statsWindow,
-        text="YOUR MINERS",
-        font=textFont3,
-        foreground=foregroundColor,
-        background=backgroundColor,
-    ).grid(row=0, column=0, columnspan=2, sticky=S + W, pady=5, padx=5)
-
     Active_workers_listbox = Listbox(
         statsWindow,
         exportselection=False,
@@ -709,10 +735,12 @@ def openStats(handler):
         row=1, columnspan=2, sticky=N + E + S + W, pady=(0, 5), padx=5
     )
     i = 0
+    totalHashrate = 0
     for threadid in statsApi["Miners"]:
         if username in statsApi["Miners"][threadid]["User"]:
             software = statsApi["Miners"][threadid]["Software"]
             hashrate = str(round(statsApi["Miners"][threadid]["Hashrate"] / 1000, 2))
+            totalHashrate += float(hashrate)
             difficulty = str(statsApi["Miners"][threadid]["Diff"])
             shares = (
                 str(statsApi["Miners"][threadid]["Accepted"])
@@ -744,6 +772,14 @@ def openStats(handler):
     Active_workers_listbox.configure(height=i)
     Active_workers_listbox.select_set(32)
     Active_workers_listbox.event_generate("<<ListboxSelect>>")
+
+    Label(
+        statsWindow,
+        text="YOUR MINERS - " + str(totalHashrate) + " kH/s",
+        font=textFont3,
+        foreground=foregroundColor,
+        background=backgroundColor,
+    ).grid(row=0, column=0, columnspan=2, sticky=S + W, pady=5, padx=5)
 
     Label(
         statsWindow,
@@ -876,16 +912,16 @@ def openSettings(handler):
                                 encoding="utf8",
                             )
                         )
-                        response = soc.recv(128).decode("utf8")
+                        response = soc.recv(128).decode("utf8").split(",")
                         soc.close()
 
-                        if not "Success" in response:
+                        if not "OK" in response[0]:
                             messagebox.showerror(
-                                title="Error changing password", message=response
+                                title="Error changing password", message=response[1]
                             )
                         else:
                             messagebox.showinfo(
-                                title="Password changed", message=response
+                                title="Password changed", message=response[1]
                             )
                             try:
                                 try:
@@ -1215,7 +1251,7 @@ def calculateProfit(start_bal):
         tensec = curr_bal - prev_bal
         minute = tensec * 6
         hourly = minute * 60
-        daily = hourly * 12
+        daily = hourly * 24
 
         if tensec >= 0:
             profit_array = [
@@ -1256,6 +1292,37 @@ def sendFunds(handler):
         else:
             MsgBox = messagebox.showwarning(response[0], response[1])
     root.update()
+
+
+def initRichPresence():
+    global RPC
+    try:
+        RPC = Presence(806985845320056884)
+        RPC.connect()
+    except:  # Discord not launched
+        pass
+
+
+def updateRichPresence():
+    try:
+        balance = round(getBalance(), 4)
+        RPC.update(
+            details=str(balance) + " ᕲ ($" + str(round(ducofiat * balance, 2)) + ")",
+            large_image="duco",
+            large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
+            buttons=[
+                {"label": "Learn more", "url": "https://duinocoin.com"},
+                {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
+            ],
+        )
+    except:  # Discord not launched
+        pass
+
+    Timer(15, updateRichPresence).start()
+
+
+initRichPresence()
+updateRichPresence()
 
 
 class Wallet:
@@ -1505,6 +1572,23 @@ class Wallet:
         curr_bal = start_balance
         calculateProfit(start_balance)
         updateBalanceLabel()
+
+        def quit_window(icon, item):
+            master.destroy()
+
+        def show_window(icon, item):
+            master.after(0,root.deiconify)
+
+
+        def withdraw_window():  
+            image = Image.open("Resources\\duco.png")
+            menu = (pystray.MenuItem('Show', show_window), pystray.MenuItem('Quit', quit_window))
+            icon = pystray.Icon("Duino-coin GUI Wallet", image, "Duino-coin GUI Wallet", menu)
+            icon.run()
+
+        t = threading.Thread(target=withdraw_window)
+        t.setDaemon(True)
+        t.start()
 
         root.mainloop()
 
