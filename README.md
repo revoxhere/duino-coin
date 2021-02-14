@@ -48,7 +48,7 @@ Technical specifications:
 
 | Official Wallet | Official Miners |
 :----------------:|:----------------:
-[<img src="https://i.imgur.com/JGhXFCW.png">](https://duinocoin.com/getting-started#register)  |  [<img src="https://i.imgur.com/WLVDljU.png">](https://duinocoin.com/getting-started#pc)
+[<img src="https://i.imgur.com/OEh0JxK.png">](https://duinocoin.com/getting-started#register)  |  [<img src="https://i.imgur.com/QNWkoee.png">](https://duinocoin.com/getting-started#pc)
 
 Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a> (or <a href="http://duinoyliedtvs4zp7wtz2o7uqmv4tfcyvdlclbwr3zbez2hxwolry7ad.onion/">.onion version</a>).
 
