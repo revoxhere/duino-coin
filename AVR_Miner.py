@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin AVR Miner (v2.0)
+# Duino-Coin AVR Miner (v2.1)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
@@ -57,13 +57,13 @@ except:
 
 # Global variables
 minerVersion = "2.0"  # Version number
-timeout = 60  # Socket timeout
+timeout = 30  # Socket timeout
 resourcesFolder = "AVRMiner_" + str(minerVersion) + "_resources"
 shares = [0, 0]
 diff = 0
 donatorrunning = False
 job = ""
-debug = True
+debug = "n"
 serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"  # Serverip file
 config = configparser.ConfigParser()
 autorestart = 0
@@ -76,7 +76,7 @@ if not os.path.exists(resourcesFolder):
 
 
 def debugOutput(text):
-    if debug == True:
+    if debug == "y":
         print(
             now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S.%f ")
             + "DEBUG: "
@@ -160,7 +160,10 @@ def loadConfig():  # Config loading section
         )
 
         username = input(
-            Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + "Enter your Duino-Coin username: "
+            + Style.BRIGHT
         )
 
         print(
@@ -181,7 +184,7 @@ def loadConfig():  # Config loading section
             avrport += input(
                 Style.RESET_ALL
                 + Fore.YELLOW
-                + "Enter your board serial port (e.g. COM1 or /dev/ttyUSB1): "
+                + "Enter your board serial port (e.g. COM1 (Windows) or /dev/ttyUSB1 (Unix)): "
                 + Style.BRIGHT
             )
             confirmation = input(
@@ -198,7 +201,7 @@ def loadConfig():  # Config loading section
         autorestart = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + "If you want, set after how many minutes miner will restart (recommended: 30): "
+            + "If you want, set after how many minutes miner will restart (recommended: 30 (0 to disable)): "
             + Style.BRIGHT
         )
         donationlevel = "0"
@@ -222,7 +225,7 @@ def loadConfig():  # Config loading section
             "avrport": avrport,
             "autorestart": autorestart,
             "donate": donationlevel,
-            "debug": False,
+            "debug": "n",
         }
 
         with open(
@@ -280,7 +283,7 @@ def Greeting():  # Greeting message depending on time
     print(
         " > "
         + Fore.WHITE
-        + "AVR board on port(s): "
+        + "AVR board(s) on port(s): "
         + Style.BRIGHT
         + Fore.YELLOW
         + " ".join(avrport)
@@ -294,7 +297,14 @@ def Greeting():  # Greeting message depending on time
             + Fore.YELLOW
             + str(donationlevel)
         )
-    print(" > " + Fore.WHITE + "Algorithm: " + Style.BRIGHT + Fore.YELLOW + "DUCO-S1A")
+    print(
+        " > "
+        + Fore.WHITE
+        + "Algorithm: "
+        + Style.BRIGHT
+        + Fore.YELLOW
+        + "DUCO-S1A @ AVR diff"
+    )
     print(
         " > "
         + Fore.WHITE
@@ -370,17 +380,18 @@ def Donate():
             + " to learn more about how you can help :)"
             + Style.RESET_ALL
         )
+        time.sleep(10)
     if donatorrunning == False:
         if int(donationlevel) == 5:
             cmd += "100"
         elif int(donationlevel) == 4:
-            cmd += "75"
+            cmd += "85"
         elif int(donationlevel) == 3:
-            cmd += "50"
+            cmd += "60"
         elif int(donationlevel) == 2:
-            cmd += "25"
+            cmd += "30"
         elif int(donationlevel) == 1:
-            cmd += "10"
+            cmd += "15"
         if int(donationlevel) > 0:  # Launch CMD as subprocess
             debugOutput("Starting donation process")
             donatorrunning = True
@@ -408,6 +419,7 @@ def initRichPresence():
         RPC.connect()
     except:  # Discord not launched
         pass
+
 
 def updateRichPresence():
     while True:
@@ -464,7 +476,7 @@ def AVRMine(com):  # Mining section
                     + Fore.RED
                     + " Error retrieving data from GitHub! Retrying in 10s."
                 )
-                if debug == True:
+                if debug == "y":
                     raise
                 time.sleep(10)
         while True:  # This section connects to the server
@@ -529,7 +541,7 @@ def AVRMine(com):  # Mining section
                     + " Error connecting to the server. Retrying in 10s"
                     + Style.RESET_ALL
                 )
-                if debug == True:
+                if debug == "y":
                     raise
                 time.sleep(10)
         while True:
@@ -565,7 +577,7 @@ def AVRMine(com):  # Mining section
                 break
             except:
                 debugOutput("Error connecting to AVR")
-                if debug == True:
+                if debug == "y":
                     raise
                 print(
                     now().strftime(Style.DIM + "%H:%M:%S ")
@@ -657,7 +669,7 @@ def AVRMine(com):  # Mining section
                     except IndexError:
                         debugOutput("IndexError, retrying")
                 except:
-                    if debug == True:
+                    if debug == "y":
                         raise
                     break
 
@@ -967,8 +979,7 @@ if __name__ == "__main__":
             + "/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s"
             + Style.RESET_ALL
         )
-        raise
-        if debug == True:
+        if debug == "y":
             raise
         time.sleep(10)
         os._exit(1)
@@ -976,7 +987,7 @@ if __name__ == "__main__":
         Greeting()  # Display greeting message
         debugOutput("Greeting displayed")
     except:
-        if debug == True:
+        if debug == "y":
             raise
     try:  # Setup autorestarter
         if float(autorestart) > 0:
@@ -1000,22 +1011,23 @@ if __name__ == "__main__":
             + "/Miner_config.cfg). Exiting in 10s"
             + Style.RESET_ALL
         )
-        if debug == True:
+        if debug == "y":
             raise
         time.sleep(10)
         os._exit(1)
     try:
         Donate()  # Start donation thread
     except:
-        if debug == True:
+        if debug == "y":
             raise
     try:
         for port in avrport:
             threading.Thread(
                 target=AVRMine, args=(port,)
             ).start()  # Launch avr duco mining threads
-    except Exception as e:
-        debugOutput("Error:" + str(e))
+    except:
+        if debug == "y":
+            raise
 
     initRichPresence()
     threading.Thread(target=updateRichPresence).start()
