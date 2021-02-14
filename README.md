@@ -25,7 +25,7 @@
     <img src="https://img.shields.io/badge/Bitcointalk-555555.svg?style=for-the-badge&logo=bitcoin" /></a>
 </p>
 
-<h2 align="center">Duino-Coin is a cryptocurrency that can be mined with AVR boards.</h2><br />
+<h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduino and ESP boards and many more.</h2><br />
 
 Key features:
 *   Supported by a large number of platforms 💻
@@ -60,7 +60,7 @@ Official getting started guides for creating an account and setting up miners on
 *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) by phantom32
 *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
 *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
-*   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners) by various authors
+*   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
 
 **Other tools:**
 *   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
@@ -86,9 +86,9 @@ To start communication however, firstly you need to connect to the server. For n
 *   TCP connection (recommended) - server IP and port are static: `tcp://51.15.127.80:2811`
 *   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static: `ws://51.15.127.80:15808`
 
-**Make sure you don't create more than 24 connections per IP address and don't make more than 10 connections in time shorter than 30 seconds.**
+**Make sure you don't create more than 24 connections per IP address and don't make more than 24 connections in time shorter than 30 seconds.**
 If you do that, server may ban your IP for creating too much traffic and being a potential DDoS attacker.
-If you happen to get banned, wait about 30 seconds to get unbanned automatically.
+If you happen to get banned, wait about 315 seconds to get unbanned automatically.
 
 After connecting, the server will send version number it's currently on (2.0).
 At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
@@ -268,8 +268,9 @@ Major frameworks used by Duino-Coin:
 *   Arduino Pro Mini (ATmega328p @ 16MHz 5V) - ~170 H/s - Arduino Code & Miner
 *   NodeMCU (ESP8266 @ 80 MHz) - ~1,15 kH/s - ESP8266 Code
 *   NodeMCU (ESP8266 @ 160 MHz) - ~2,15 kH/s - ESP8266 Code
+*   ESP32 dual-threaded - ~13 kH/s (6 kH/s (core1) + 7 kH/s (core2)) - Multithreaded ESP32 code
 
-Hashrate Calculators for AVR/ESP platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
+Hashrate Calculators for AVR/ESP8266 platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
 
 <h2 align="center">Developers</h2><br>
 
@@ -280,12 +281,12 @@ Hashrate Calculators for AVR/ESP platforms are available in the [Useful tools br
     *   [@JoyBed](https://github.com/JoyBed)
     *   [@LDarki](https://github.com/LDarki)
     *   [@travelmode](https://github.com/colonelwatch)
+    *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
 
 *   **Webmaster:**
     *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io
 
 *   **Contributors:**
-    *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
     *   [@HGEcode](https://github.com/HGEcode)
     *   [@5Q](https://github.com/its5Q)
     *   [@kyngs](https://github.com/kyngs)
