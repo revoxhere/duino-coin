@@ -512,7 +512,7 @@ def handle(c, ip):
         txn = wduco.functions.wrap(address,duco_username,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
         txn = txn.broadcast()
         print("Sent wrap tx to TRON network")
-        feedback = txn.wait()
+        feedback = txn.result()
         return feedback
 
     def unwraptx(duco_username, recipient, amount, private_key, public_key):
@@ -955,7 +955,7 @@ def handle(c, ip):
                                 print("txid :", txn.txid)
                                 txn = txn.broadcast()
                                 print("Sent wrap tx to TRON network")
-                                trontxfeedback = txn.wait()
+                                trontxfeedback = txn.result()
 
                                 if trontxfeedback:
                                     try:
@@ -982,7 +982,7 @@ def handle(c, ip):
                             except:
                                 pass
                     else:
-                        c.send(bytes("NO,Wrapper disabled", emcoding="utf8"))
+                        c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
                         print("NO,Wrapper disabled")
                         
             ######################################################################
@@ -1026,7 +1026,7 @@ def handle(c, ip):
                                     print("txid :", txn.txid)
                                     txn = txn.broadcast()
                                     print("Sent confirm tx to tron network")
-                                    onchaintx = txn.result
+                                    onchaintx = txn.result()
 
                                     if onchaintx:
                                         print("Successful unwrapping")
