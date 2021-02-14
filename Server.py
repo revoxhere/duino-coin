@@ -657,8 +657,11 @@ def handle(c, ip):
                         diff = 3 # optimal diff for very low power devices like arduino
                         basereward = 0.00035
                     elif str(customDiff) == "ESP":
-                        diff = 75 # optimal diff for low power devices like ESP
+                        diff = 75 # optimal diff for low power devices like ESP8266
                         basereward = 0.000175
+                    elif str(customDiff) == "ESP32":
+                        diff = 100 # optimal diff for low power devices like ESP32
+                        basereward = 0.000155
                     elif str(customDiff) == "10000":
                         diff = 10000 # Custom difficulty 10k
                         basereward = 0.000045
@@ -683,23 +686,27 @@ def handle(c, ip):
                         basereward = 0.000065
                         shareTimeRequired = 600
                     elif str(customDiff) == "EXTREME":
-                        diff = 750000 # Custom difficulty 750k
-                        basereward = 0.000015
+                        diff = 950000 # Custom difficulty 950k
+                        basereward = 0.00001
                         shareTimeRequired = 10
                 except:
-                    diff = math.ceil(blocks / diff_incrase_per) # Use network difficulty
+                    customDiff = "NET"
+                    diff = int(blocks / diff_incrase_per) # Use network difficulty
                     basereward = 0.000075
-                    shareTimeRequired = 1200
-
+                    
                 rand = fastrand.pcg32bounded(100 * diff)
                 newBlockHash = hashlib.sha1(str(lastBlockHash_copy + str(rand)).encode("utf-8")).hexdigest()
                 
                 if str(customDiff) == "AVR": # Arduino chips take about 6ms to generate one sha1 hash
                     shareTimeRequired = 6 * rand 
-                elif str(customDiff) == "ESP": # ESP8266 chips take about 0.0085ms to generate one sha1 hash
+                elif str(customDiff) == "ESP": # ESP8266 chips take about 850us to generate one sha1 hash
                     shareTimeRequired = 0.0085 * rand 
+                elif str(customDiff) == "ESP32": # ESP32 chips take about 130us to generate one sha1 hash
+                    shareTimeRequired = 0.00013 * rand 
                 elif str(customDiff) == "MEDIUM":
                     shareTimeRequired = 200
+                elif customDiff == "NET":
+                    shareTimeRequired = 1200
                 
                 try:
                     c.send(bytes(str(lastBlockHash_copy) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
@@ -860,51 +867,63 @@ def handle(c, ip):
                         print("NO,Incorrect amount")
                     except:
                         break
-                elif float(balance) >= float(amount) and str(recipient) != str(username) and float(amount) >= 0:
+                try:
+                    with sqlite3.connect(database, timeout = 10) as conn:
+                        datab = conn.cursor()
+                        datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
+                        recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
+                    if float(balance) >= float(amount) and str(recipient) != str(username) and float(amount) >= 0:
+                        try:
+                            balance -= float(amount) # Remove amount from senders' balance
+                            with lock:
+                                while True:
+                                    try:
+                                        with sqlite3.connect(database, timeout = 15) as conn:
+                                            datab = conn.cursor()
+                                            datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
+                                            conn.commit()
+                                            print("Updated senders balance:", balance)
+                                            break
+                                    except:
+                                        pass
+                                while True:
+                                    try:
+                                        with sqlite3.connect(database, timeout = 10) as conn:
+                                            datab = conn.cursor()
+                                            datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
+                                            recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
+                                            print("Read recipients balance:", recipientbal)
+                                            break
+                                    except:
+                                        pass
+                                recipientbal += float(amount)
+                                while True:
+                                    try:
+                                        with sqlite3.connect(database, timeout = 10) as conn:
+                                            datab = conn.cursor() # Update receipents' balance
+                                            datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
+                                            conn.commit()
+                                            print("Updated recipients balance:", recipientbal)
+                                        with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
+                                            datab = tranconn.cursor()
+                                            now = datetime.datetime.now()
+                                            formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
+                                            datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (formatteddatetime, username, recipient, amount, lastBlockHash))
+                                            tranconn.commit()
+                                        c.send(bytes("OK,Successfully transferred funds,"+str(lastBlockHash), encoding='utf8'))
+                                        break
+                                    except:
+                                        pass
+                        except:
+                            try:
+                                c.send(bytes("NO,Error occured while sending funds", encoding='utf8'))
+                            except:
+                                break
+                except:
                     try:
-                        balance -= float(amount) # Remove amount from senders' balance
-                        with lock:
-                            while True:
-                                try:
-                                    with sqlite3.connect(database, timeout = 15) as conn:
-                                        datab = conn.cursor()
-                                        datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
-                                        conn.commit()
-                                        print("Updated senders balance:", balance)
-                                        break
-                                except:
-                                    pass
-                            while True:
-                                try:
-                                    with sqlite3.connect(database, timeout = 10) as conn:
-                                        datab = conn.cursor()
-                                        datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
-                                        recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
-                                        print("Read recipients balance:", recipientbal)
-                                        break
-                                except:
-                                    pass
-                            recipientbal += float(amount)
-                            while True:
-                                try:
-                                    with sqlite3.connect(database, timeout = 10) as conn:
-                                        datab = conn.cursor() # Update receipents' balance
-                                        datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
-                                        conn.commit()
-                                        print("Updated recipients balance:", recipientbal)
-                                    with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
-                                        datab = tranconn.cursor()
-                                        now = datetime.datetime.now()
-                                        formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
-                                        datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (formatteddatetime, username, recipient, amount, lastBlockHash))
-                                        tranconn.commit()
-                                    c.send(bytes("OK,Successfully transferred funds,"+str(lastBlockHash), encoding='utf8'))
-                                    break
-                                except Exception as e:
-                                    print(e)
-                                    pass
+                        print("NO,Recipient doesn't exist")
+                        c.send(bytes("NO,Recipient doesn't exist", encoding='utf8'))
                     except:
-                        c.send(bytes("NO,Error occured while sending funds", encoding='utf8'))
                         break
 
             ######################################################################
