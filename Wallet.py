@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin GUI Wallet (v2.0)
+# Duino-Coin GUI Wallet (v2.1)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
@@ -41,14 +41,14 @@ import json
 import subprocess, os
 
 
-version = 2.0
+version = 2.1
 config = ConfigParser()
 resources = "Wallet_" + str(version) + "_resources/"
-backgroundColor = "#121012"
-fontColor = "#eee"
-foregroundColor = "#F79F1F"
-foregroundColorSecondary = "#F8EFBA"
-min_trans_difference = 0.000000001  # Minimum transaction amount to be saved
+backgroundColor = "#121212"
+fontColor = "#FAFAFA"
+foregroundColor = "#f0932b"
+foregroundColorSecondary = "#ffbe76"
+min_trans_difference = 0.00000000001  # Minimum transaction amount to be saved
 
 
 def install(package):
@@ -389,6 +389,39 @@ class LoginFrame(Frame):
         register.configure(background=backgroundColor)
 
 
+def LoadingWindow():
+    global loading, status
+    loading = Tk()
+    loading.resizable(False, False)
+    loading.configure(background=backgroundColor)
+    loading.title("Loading")
+    try:
+        loading.iconphoto(True, PhotoImage(file=resources + "duco.png"))
+    except:
+        pass
+    textFont = Font(loading, size=10, weight="bold")
+    textFont2 = Font(loading, size=14, weight="bold")
+
+    Label(
+        loading,
+        text="DUINO-COIN WALLET",
+        font=textFont2,
+        foreground=foregroundColor,
+        background=backgroundColor,
+    ).grid(row=0, column=0, sticky=S + W, pady=5, padx=5)
+    loading.update()
+
+    status = Label(
+        loading,
+        background=backgroundColor,
+        foreground=fontColor,
+        text="Loading database...",
+        font=textFont,
+    )
+    status.grid(row=1, column=0, sticky=S + W, pady=(0, 5), padx=5)
+    loading.update()
+
+
 if not Path(resources + "duco.png").is_file():
     urlretrieve("https://i.imgur.com/9JzxR0B.png", resources + "duco.png")
 if not Path(resources + "calculator.png").is_file():
@@ -415,6 +448,7 @@ if userdata_count != 1:
     lf = LoginFrame(root)
     root.mainloop()
 else:
+    LoadingWindow()
     with sqlite3.connect(f"{resources}/wallet.db") as con:
         cur = con.cursor()
         cur.execute("SELECT * FROM UserData")
@@ -422,6 +456,8 @@ else:
         username = userdata_query[0]
         passwordEnc = (userdata_query[1]).decode("utf-8")
         password = b64decode(passwordEnc).decode("utf8")
+    status.config(text="Preparing wallet window...")
+    loading.update()
 
 
 def openGitHub(handler):
@@ -1164,7 +1200,6 @@ def getBalance():
             except ValueError:
                 pass
         except Exception as e:
-            print(e)
             print("Retrying in 5s.")
             sleep(5)
 
@@ -1328,6 +1363,10 @@ class Wallet:
         global balanceusdtext, ducopricetext
         global transactionstext
         global curr_bal, profit_array
+        try:
+            loading.destroy()
+        except:
+            pass
 
         textFont3 = Font(size=12, weight="bold")
         textFont2 = Font(size=22, weight="bold")
@@ -1596,6 +1635,7 @@ class Wallet:
 
 
 try:
+    loading.destroy()
     root = Tk()
     my_gui = Wallet(root)
 except ValueError:
