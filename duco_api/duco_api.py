@@ -1,5 +1,5 @@
 ##########################################
-# Duino-Coin Api Module
+# Duino-Coin API Module
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
