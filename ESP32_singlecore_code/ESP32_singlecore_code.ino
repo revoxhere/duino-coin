@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP32 boards v2.0
+//  Code for ESP32 boards v2.1
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-
 
 void setup() {
   Serial.begin(115200); // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP32 Miner v2.0");
+  Serial.println("\n\nDuino-Coin ESP32 Miner v2.1");
   Serial.println("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
   WiFi.begin(ssid, password); // Connect to wifi
@@ -48,8 +48,7 @@ void setup() {
 void loop() {
   const char * host = "51.15.127.80"; // Static server IP
   const int port = 2811;
-  unsigned int acceptedShares = 0; // Shares variables
-  unsigned int rejectedShares = 0;
+  unsigned int Shares = 0; // Share variable
 
   Serial.println("\nConnecting to Duino-Coin server...");
   // Use WiFiClient class to create TCP connection
@@ -62,7 +61,7 @@ void loop() {
 
   while (client.connected()) {
     Serial.println("Asking for a new job for user: " + String(ducouser));
-    client.print("JOB," + String(ducouser) + ",ESP"); // Ask for new job
+    client.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
 
     String hash = client.readStringUntil(','); // Read last block hash
     String job = client.readStringUntil(','); // Read expected hash
@@ -70,7 +69,7 @@ void loop() {
     const char * c = job.c_str();
     unsigned char* job1 = hexstr_to_char(c);
     byte shaResult[20];
-    unsigned long diff =  7501; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
+    unsigned long diff =  10001; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
     Serial.println("Job received: " + String(hash) + " " + String(job) + " " + String(diff));
     unsigned long StartTime = micros(); // Start time measurement
 
@@ -90,15 +89,9 @@ void loop() {
         float ElapsedTimeMiliSeconds = ElapsedTime / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
         float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
-        client.print(String(iJob) + "," + String(HashRate) + ",ESP32 Miner v2.0"); // Send result to server
+        client.print(String(iJob) + "," + String(HashRate) + ",ESP32 Miner v2.1"); // Send result to server
         String feedback = client.readStringUntil('D'); // Receive feedback
-        if (feedback.indexOf("GOOD")) {
-          acceptedShares++;
-          Serial.println("Accepted share #" + String(acceptedShares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate));
-        } else {
-          rejectedShares++;
-          Serial.println("Rejected share #" + String(acceptedShares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate));
-        }
+        Serial.println(String(feedback) + "D share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
         break; // Stop and ask for more work
       }
     }  
@@ -122,9 +115,7 @@ unsigned char* hexstr_to_char(const char* hexstr) {
 void blink(int times) {
   for (int i = 0; i < times; i++) {
     digitalWrite(LED_BUILTIN, HIGH);   // Turn off built-in led
-    delay(150);
+    delay(3);
     digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
-    delay(150);
-    digitalWrite(LED_BUILTIN, HIGH);   // Turn off built-in led
   }
 }
