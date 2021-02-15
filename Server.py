@@ -381,7 +381,10 @@ def InputManagement():
             - add <user> <number> - add number to user balance
             - clear - clears console
             - exit - exits DUCO server
-            - restart - restarts DUCO server""")
+            - restart - restarts DUCO server
+            - ip - prints connections
+            - ban <ip> - ban's an ip address
+            - unban <ip> - Unban's an ip address""")
         elif userInput[0] == "clear":
             os.system('clear')
         elif userInput[0] == "ip":
