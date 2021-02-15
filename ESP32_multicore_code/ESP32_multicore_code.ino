@@ -97,7 +97,7 @@ void Task1code( void * pvParameters ){
         float HashRate1 = iJob1 / ElapsedTimeSeconds1; // Calculate hashrate
         client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.1"); // Send result to server
         String feedback1 = client1.readStringUntil('D'); // Receive feedback
-        Shares++;
+        Shares1++;
         Serial.println(String(feedback1) + "D share #" + String(Shares1) + " (" + String(iJob1) + ")" + " Hashrate: " + String(HashRate1) + " Free RAM: " + String(ESP.getFreeHeap()));
         break; // Stop and ask for more work
       }
@@ -176,6 +176,7 @@ void Task2code( void * pvParameters ){
         float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
         client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.1"); // Send result to server
         String feedback = client.readStringUntil('D'); // Receive feedback
+        Shares++;
         Serial.println(String(feedback) + "D share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
         break; // Stop and ask for more work
       }
