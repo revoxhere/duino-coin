@@ -139,7 +139,7 @@ def autorestarter():  # Autorestarter
 
 
 def loadConfig():  # Config loading section
-    global pool_address, pool_port, username, autorestart, donationlevel, avrport, debug
+    global pool_address, pool_port, username, autorestart, donationlevel, avrport, debug, requestedDiff
 
     if not Path(
         str(resourcesFolder) + "/Miner_config.cfg"
@@ -190,7 +190,7 @@ def loadConfig():  # Config loading section
             confirmation = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
-                + "Do you want to add another board? (y/N) "
+                + "Do you want to add another board? (y/N): "
                 + Style.BRIGHT
             )
             if confirmation == "y" or confirmation == "Y":
@@ -213,6 +213,17 @@ def loadConfig():  # Config loading section
                 + Style.BRIGHT
             )
 
+        requestedDiffSelection = input(
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + "Do you want to use a higher difficulty (only for Arduino DUE boards) (y/N): "
+            + Style.BRIGHT
+        )
+        if requestedDiffSelection == "y" or requestedDiffSelection == "Y":
+            requestedDiff = "ESP32"
+        else:
+            requestedDiff = "AVR"
+
         donationlevel = re.sub(
             "\D", "", donationlevel
         )  # Check wheter donationlevel is correct
@@ -226,6 +237,7 @@ def loadConfig():  # Config loading section
             "autorestart": autorestart,
             "donate": donationlevel,
             "debug": "n",
+            "difficulty": requestedDiff,
         }
 
         with open(
@@ -243,6 +255,7 @@ def loadConfig():  # Config loading section
         autorestart = config["arduminer"]["autorestart"]
         donationlevel = config["arduminer"]["donate"]
         debug = config["arduminer"]["debug"]
+        requestedDiff = config["arduminer"]["difficulty"]
 
 
 def Greeting():  # Greeting message depending on time
@@ -303,7 +316,9 @@ def Greeting():  # Greeting message depending on time
         + "Algorithm: "
         + Style.BRIGHT
         + Fore.YELLOW
-        + "DUCO-S1A @ AVR diff"
+        + "DUCO-S1A @ "
+        + str(requestedDiff)
+        + " diff"
     )
     print(
         " > "
@@ -650,7 +665,7 @@ def AVRMine(com):  # Mining section
                     while job_not_received:
                         socId.send(
                             bytes(
-                                "JOB," + str(username) + ",AVR",
+                                "JOB," + str(username) + "," + str(requestedDiff),
                                 encoding="utf8",
                             )
                         )  # Send job request
