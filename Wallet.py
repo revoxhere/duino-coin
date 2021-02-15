@@ -74,6 +74,7 @@ except:
 
 try:
     import pystray
+    disableTray = False
 except:
     print("Pystray is not installed. Continuing without using tray support")
     disableTray = True
