@@ -59,7 +59,7 @@ except:
 # Global variables
 minerVersion = "2.1"  # Version number
 connectionMessageShown = False
-timeout = 10  # Socket timeout
+timeout = 30  # Socket timeout
 resourcesFolder = "PCMiner_" + str(minerVersion) + "_resources"
 hash_mean = []
 donatorrunning = False
@@ -336,8 +336,8 @@ def loadConfig():  # Config loading section
         threadcount = re.sub(
             "\D", "", threadcount
         )  # Check wheter threadcount is correct
-        if int(threadcount) > int(16):
-            threadcount = 16
+        if int(threadcount) > int(8):
+            threadcount = 8
         if int(threadcount) < int(1):
             threadcount = 1
 
