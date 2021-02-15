@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards v2.0
+//  Code for ESP8266 boards v2.1
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -33,7 +33,7 @@ const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Define built-in led as output
   Serial.begin(115200); // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP Miner v2.0");
+  Serial.println("\n\nDuino-Coin ESP Miner v2.1");
 
   Serial.println("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
@@ -82,8 +82,7 @@ void loop() {
   ArduinoOTA.handle(); // Enable OTA handler
   const char * host = "51.15.127.80"; // Static server IP
   const int port = 2811;
-  unsigned int acceptedShares = 0; // Shares variables
-  unsigned int rejectedShares = 0;
+  unsigned int Shares = 0; // Share variable
 
   Serial.println("\nConnecting to Duino-Coin server...");
   // Use WiFiClient class to create TCP connection
@@ -121,16 +120,11 @@ void loop() {
         float ElapsedTimeMiliSeconds = ElapsedTime / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
         float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
-        client.print(String(iJob) + "," + String(HashRate) + ",ESP Miner v2.0"); // Send result to server
+        client.print(String(iJob) + "," + String(HashRate) + ",ESP Miner v2.1"); // Send result to server
 
         String feedback = client.readStringUntil('D'); // Receive feedback
-        if (feedback.indexOf("GOOD")) {
-          acceptedShares++;
-          Serial.println("Accepted share #" + String(acceptedShares) + " (" + String(iJob) + ")");
-        } else {
-          rejectedShares++;
-          Serial.println("Rejected share #" + String(acceptedShares) + " (" + String(iJob) + ")");
-        }
+        Shares++;
+        Serial.println(String(feedback) + "D share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
         digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
         delay(3); // Wait shortly so LED flash isn't distracting
         digitalWrite(LED_BUILTIN, HIGH); // Turn off built-in led
