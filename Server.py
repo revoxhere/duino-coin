@@ -1148,6 +1148,10 @@ try: # Read whitelisted IPs from text file
     with open("config/whitelisted.txt", "r") as whitelistfile:
         whitelisted = whitelistfile.read().splitlines()
     #print("Loaded whitelisted IPs:", " ".join(whitelisted))
+    whitelisted_ip = []
+    for ip in whitelisted:
+        whitelisted_ip.append(socket.gethostbyname(str(ip)))
+
 except Exception as e:
     print("Error reading whitelisted IPs file:")
     print(e)
@@ -1155,7 +1159,7 @@ def countips():
     while True:
         for ip in IPS.copy():
             try:
-                if IPS[ip] > 24 and not ip in whitelisted:
+                if IPS[ip] > 24 and not ip in whitelisted_ip:
                     print("IP DDoSing:", ip)
                     ban(ip)
             except:
