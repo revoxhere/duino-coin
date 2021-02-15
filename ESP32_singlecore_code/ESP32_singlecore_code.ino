@@ -91,6 +91,7 @@ void loop() {
         float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
         client.print(String(iJob) + "," + String(HashRate) + ",ESP32 Miner v2.1"); // Send result to server
         String feedback = client.readStringUntil('D'); // Receive feedback
+        Shares++;
         Serial.println(String(feedback) + "D share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
         break; // Stop and ask for more work
       }
