@@ -25,13 +25,15 @@ try:
     duco_password = config["main"]["duco_password"]
     NodeS_Overide = config["main"]["NodeS_Overide"]
     wrapper_private_key = config["main"]["wrapper_private_key"]
+    NodeS_Username = config["main"]["NodeS_Username"]
 except:
     print("""Please create AdminData.ini config file first:
         [main]
         duco_email = ???
         duco_password = ???
         NodeS_Overide = ???
-        wrapper_private_key = ???""")
+        wrapper_private_key = ???
+        NodeS_Username = ???""")
     exit()
 # Registration email - text version
 text = """\
@@ -322,7 +324,7 @@ def API():
             print(e)
             pass
         time.sleep(5)
-        
+
 def UpdateOtherAPIFiles():
     while True:
         with open('balances.json', 'w') as outfile: # Write JSON balances to file
@@ -640,6 +642,27 @@ def handle(c, ip):
                         pass
 
             ######################################################################
+            elif str(data[0]) == "NODES":
+                try:
+                    password = str(data[1])
+                    amount = float(data[2])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                if password == NodeS_Overide:
+                    while True:
+                        try:
+                            with sqlite3.connect(database, timeout = 15) as conn:
+                                datab = conn.cursor()
+                                datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (amount, NodeS_Username))
+                                conn.commit()
+                                print("Updated senders balance:", balance)
+                                break
+                        except:
+                            pass
+
+            ######################################################################
             if str(data[0]) == "JOB":
                 if username == "":
                     try:
@@ -693,21 +716,21 @@ def handle(c, ip):
                     customDiff = "NET"
                     diff = int(blocks / diff_incrase_per) # Use network difficulty
                     basereward = 0.000075
-                    
+
                 rand = fastrand.pcg32bounded(100 * diff)
                 newBlockHash = hashlib.sha1(str(lastBlockHash_copy + str(rand)).encode("utf-8")).hexdigest()
-                
+
                 if str(customDiff) == "AVR": # Arduino chips take about 6ms to generate one sha1 hash
-                    shareTimeRequired = 6 * rand 
+                    shareTimeRequired = 6 * rand
                 elif str(customDiff) == "ESP": # ESP8266 chips take about 850us to generate one sha1 hash
-                    shareTimeRequired = 0.0085 * rand 
+                    shareTimeRequired = 0.0085 * rand
                 elif str(customDiff) == "ESP32": # ESP32 chips take about 130us to generate one sha1 hash
-                    shareTimeRequired = 0.00013 * rand 
+                    shareTimeRequired = 0.00013 * rand
                 elif str(customDiff) == "MEDIUM":
                     shareTimeRequired = 200
                 elif customDiff == "NET":
                     shareTimeRequired = 1200
-                
+
                 try:
                     c.send(bytes(str(lastBlockHash_copy) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
                     jobsent = datetime.datetime.now()
@@ -759,7 +782,7 @@ def handle(c, ip):
                         break
                     try:
                         balancesToUpdate[username] += reward
-                    except: 
+                    except:
                         balancesToUpdate[username] = reward
                     blocks += 1
                     lastBlockHash = newBlockHash
@@ -772,7 +795,7 @@ def handle(c, ip):
                     penalty = float(int(int(sharetime) **2) / 1000000000) * -1 # Calculate penalty dependent on share submission time
                     try:
                         balancesToUpdate[username] += penalty
-                    except: 
+                    except:
                         balancesToUpdate[username] = penalty
 
             ######################################################################
@@ -855,7 +878,7 @@ def handle(c, ip):
                             break
                     except:
                         pass
-                    
+
                 if str(recipient) == str(username): # Verify that the balance is higher or equal to transfered amount
                     try:
                         c.send(bytes("NO,You're sending funds to yourself", encoding='utf8'))
@@ -1003,7 +1026,7 @@ def handle(c, ip):
                     else:
                         c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
                         print("NO,Wrapper disabled")
-                        
+
             ######################################################################
             elif str(data[0]) == "UNWRAP" and str(username) != "":
                 if use_wrapper and wrapper_permission:
