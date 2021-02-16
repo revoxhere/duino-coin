@@ -3,3 +3,4 @@ res/wallet.db
 Flask Server/mainDB.db
 PCMiner_2.1_resources/Donate_executable.exe
 PCMiner_2.1_resources/Miner_config.cfg
+PC_Miner.py
