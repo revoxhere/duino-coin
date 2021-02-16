@@ -690,6 +690,34 @@ def handle(c, ip):
                             pass
 
             ######################################################################
+            elif str(data[0]) == "ADDB":
+                try:
+                    password = str(data[1])
+                    username = str(data[2])
+                    reward = str(data[3])
+                    newBlockHash = str(data[4])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                if password == NodeS_Overide:
+                    while True:
+                        try:
+                            reward += 7 # Add 7 DUCO to the reward
+                            with sqlite3.connect("config/foundBlocks.db", timeout = 10) as bigblockconn:
+                                datab = bigblockconn.cursor()
+                                now = datetime.datetime.now()
+                                formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
+                                datab.execute('''INSERT INTO Blocks(timestamp, finder, amount, hash) VALUES(?, ?, ?, ?)''', (formatteddatetime, username, reward, newBlockHash))
+                                bigblockconn.commit()
+                            print("Block found", formatteddatetime, username, reward, newBlockHash)
+
+                            c.send(bytes("YES,Successful", encoding='utf8'))
+                            break
+                        except:
+                            pass
+
+            ######################################################################
             if str(data[0]) == "JOB":
                 if username == "":
                     try:
