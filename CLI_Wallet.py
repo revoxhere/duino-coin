@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v1.9)
+# Duino-Coin CLI Wallet (v2.1)
 # https://github.com/revoxhere/duino-coin 
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -67,8 +67,8 @@ except ModuleNotFoundError:
 	now = datetime.datetime.now()
 	print(now.strftime("%H:%M:%S ") + "Tronpy is not installed. Please install it using: python3 -m pip install tronpy.\nWrapper was disabled because of tronpy is needed for !")
 
-timeout = 15 # Socket timeout
-VER = 2.0
+timeout = 30 # Socket timeout
+VER = 2.1
 use_wrapper = False # default value for preventing error
 ipfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
 config = configparser.ConfigParser()
@@ -515,15 +515,6 @@ while True:
 				else:
 					print("Wrapper disabled, configure it using `wrapperconf`")
 					
-					
-
-			elif command == "pendingunwraps":
-				if use_wrapper:
-					print("Pending balance :", str(float(wduco.functions.pendingWithdrawals(pub_key, username))/10**6))
-				elif wrong_passphrase:
-					print("Wrapper disabled, you entered a wrong passphrase")
-				else:
-					print("Wrapper disabled, configure it using `wrapperconf`")
 			
 			elif command == "exportwrapkey":
 				if use_wrapper:
@@ -599,7 +590,6 @@ while True:
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " wrapperconf" + Style.RESET_ALL + " - set wrapper config")
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " wrap" + Style.RESET_ALL + " - wrap DUCO on tron")
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " unwrap" + Style.RESET_ALL + " - unwrap wDUCO - you should have some TRX or tron energy for txn fees")
-				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " pendingvalues" + Style.RESET_ALL + " - shows balances that're waiting for being unwrapped")
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " cancelunwrap" + Style.RESET_ALL + " - sends back pending unwrap values to wallet - you should have some trx or tron energy for txn fees")
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " finishunwraps" + Style.RESET_ALL + " - completes pending unwraps")
 				print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " exportwrapkey" + Style.RESET_ALL + " - exports wrapper private key")
