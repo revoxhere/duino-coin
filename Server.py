@@ -660,7 +660,7 @@ def handle(c, ip):
                                 datab = conn.cursor()
                                 datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (amount, NodeS_Username))
                                 conn.commit()
-                                print("Updated senders balance:", balance)
+                                print("Updated NodeSBroker's balance with:", amount)
                                 c.send(bytes("YES,Successful", encoding='utf8'))
                                 break
                         except:
