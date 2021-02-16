@@ -5,7 +5,7 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
 #############################################
-import requests, smtplib, sys, ssl, socket, re, math, random, hashlib, datetime,  requests, smtplib, ssl, sqlite3, bcrypt, time, os.path, json, logging, threading, configparser, fastrand, os, psutil, statistics
+import requests, smtplib, sys, ast, ssl, socket, re, math, random, hashlib, datetime,  requests, smtplib, ssl, sqlite3, bcrypt, time, os.path, json, logging, threading, configparser, fastrand, os, psutil, statistics
 from _thread import *
 from shutil import copyfile
 from email.mime.text import MIMEText
@@ -663,6 +663,29 @@ def handle(c, ip):
                                 print("Updated NodeSBroker's balance with:", amount)
                                 c.send(bytes("YES,Successful", encoding='utf8'))
                                 break
+                        except:
+                            pass
+            ######################################################################
+            elif str(data[0]) == "POOL":
+                try:
+                    password = str(data[1])
+                    data = str(data[2])
+                    data = ast.literal_eval(data)
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                if password == NodeS_Overide:
+                    while True:
+                        try:
+                            with sqlite3.connect(database, timeout = 15) as conn:
+                                datab = conn.cursor()
+                                for user in data.keys():
+                                    datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (float(data[user]), user))
+                                conn.commit()
+                            print("Updated Pool balance")
+                            c.send(bytes("YES,Successful", encoding='utf8'))
+                            break
                         except:
                             pass
 
