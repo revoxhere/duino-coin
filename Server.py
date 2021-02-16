@@ -717,6 +717,26 @@ def handle(c, ip):
                         except:
                             pass
 
+
+            ######################################################################
+            elif str(data[0]) == "INCB":
+                global blocks
+                try:
+                    password = str(data[1])
+                    amount = str(data[2])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                if password == NodeS_Overide:
+                    while True:
+                        try:
+                            blocks += amount
+                            c.send(bytes("YES,Successful", encoding='utf8'))
+                            break
+                        except:
+                            pass
+
             ######################################################################
             if str(data[0]) == "JOB":
                 if username == "":
