@@ -5,7 +5,7 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
 #############################################
-import requests, smtplib, sys, ast, ssl, socket, re, math, random, hashlib, datetime,  requests, smtplib, ssl, sqlite3, bcrypt, time, os.path, json, logging, threading, configparser, fastrand, os, psutil, statistics
+import requests, ast, smtplib, sys, ssl, socket, re, math, random, hashlib, datetime,  requests, smtplib, ssl, sqlite3, bcrypt, time, os.path, json, logging, threading, configparser, fastrand, os, psutil, statistics
 from _thread import *
 from shutil import copyfile
 from email.mime.text import MIMEText
@@ -13,8 +13,8 @@ from email.mime.multipart import MIMEMultipart
 
 host = "" # Server will use this as hostname to bind to (localhost on Windows, 0.0.0.0 on Linux in most cases)
 port = 2811 # Server will listen on this port - 2811 for official Duino-Coin server
-serverVersion = 2.0 # Server version which will be sent to the clients
-diff_incrase_per = 2000 # Difficulty will increase every x blocks (official server uses 2k)
+serverVersion = 2.1 # Server version which will be sent to the clients
+diff_incrase_per = 5000 # Difficulty will increase every x blocks (official server uses 5k)
 use_wrapper = True # Choosing if you want to use wrapper or not
 wrapper_permission = False # set to false for declaration, will be updated by checking smart contract
 lock = threading.Lock()
@@ -249,11 +249,13 @@ def getBlocks():
         with open('foundBlocks.json', 'w') as outfile: # Write JSON big blocks to file
             json.dump(transactiondata, outfile, indent=4, ensure_ascii=False)
         time.sleep(60)
+def cpuUsageThread():
+    while True:
+        percarray.append(round(psutil.cpu_percent(), 2))
+        time.sleep(3)
 def getCpuUsage():
-    import psutil
     while True:
         try:
-            percarray.append(round(psutil.cpu_percent())
             cpuperc = round(statistics.mean(percarray), 2)
             break
         except:
@@ -278,7 +280,10 @@ def API():
                         minerapi.pop(x)
                     hashrate = lista[1]
                     serverHashrate += float(hashrate) # Add user hashrate to the server hashrate
-                if serverHashrate >= 1000000:
+                if serverHashrate >= 1000000000:
+                    prefix = " GH/s"
+                    serverHashrate = serverHashrate / 1000000000
+                elif serverHashrate >= 1000000:
                     prefix = " MH/s"
                     serverHashrate = serverHashrate / 1000000
                 elif serverHashrate >= 1000:
@@ -324,7 +329,7 @@ def API():
             print(e)
             pass
         time.sleep(5)
-
+        
 def UpdateOtherAPIFiles():
     while True:
         with open('balances.json', 'w') as outfile: # Write JSON balances to file
@@ -643,8 +648,7 @@ def handle(c, ip):
                             break
                     except:
                         pass
-
-            ######################################################################
+                 ######################################################################
             elif str(data[0]) == "NODES":
                 try:
                     password = str(data[1])
@@ -654,6 +658,7 @@ def handle(c, ip):
                     break
 
                 if password == NodeS_Overide:
+                    print("NodeS Usage")
                     while True:
                         try:
                             with sqlite3.connect(database, timeout = 15) as conn:
@@ -665,6 +670,28 @@ def handle(c, ip):
                                 break
                         except:
                             pass
+
+            ######################################################################
+            elif str(data[0]) == "INCB":
+                global blocks
+                try:
+                    password = str(data[1])
+                    amount = int(data[2])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                if password == NodeS_Overide:
+                    while True:
+                        try:
+                            blocks += amount
+                            print("Successfully increased block size")
+                            c.send(bytes("YES,Successful", encoding='utf8'))
+                            break
+                        except Exception as e:
+                            c.send(bytes("NO,Something went wrong: " + e, encoding='utf8'))
+                            break
+
             ######################################################################
             elif str(data[0]) == "POOL":
                 try:
@@ -686,7 +713,7 @@ def handle(c, ip):
                             print("Updated Pool balance")
                             c.send(bytes("YES,Successful", encoding='utf8'))
                             break
-                        except:
+                        except Exception as e:
                             pass
 
             ######################################################################
@@ -694,7 +721,7 @@ def handle(c, ip):
                 try:
                     password = str(data[1])
                     username = str(data[2])
-                    reward = str(data[3])
+                    reward = float(data[3])
                     newBlockHash = str(data[4])
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
@@ -717,26 +744,6 @@ def handle(c, ip):
                         except:
                             pass
 
-
-            ######################################################################
-            elif str(data[0]) == "INCB":
-                global blocks
-                try:
-                    password = str(data[1])
-                    amount = str(data[2])
-                except IndexError:
-                    c.send(bytes("NO,Not enough data", encoding='utf8'))
-                    break
-
-                if password == NodeS_Overide:
-                    while True:
-                        try:
-                            blocks += amount
-                            c.send(bytes("YES,Successful", encoding='utf8'))
-                            break
-                        except:
-                            pass
-
             ######################################################################
             if str(data[0]) == "JOB":
                 if username == "":
@@ -745,6 +752,8 @@ def handle(c, ip):
                         if username == "":
                             c.send(bytes("NO,Not enough data", encoding='utf8'))
                             break
+                        if username == "TOG":
+                            print(ip)
                     except IndexError:
                         c.send(bytes("NO,Not enough data", encoding='utf8'))
                         break
@@ -752,7 +761,7 @@ def handle(c, ip):
                 try:
                     customDiff = str(data[2])
                     if str(customDiff) == "AVR":
-                        diff = 3 # optimal diff for very low power devices like arduino
+                        diff = 5 # optimal diff for very low power devices like arduino
                         basereward = 0.00035
                     elif str(customDiff) == "ESP":
                         diff = 75 # optimal diff for low power devices like ESP8266
@@ -765,7 +774,7 @@ def handle(c, ip):
                         basereward = 0.000045
                         shareTimeRequired = 400
                     elif str(customDiff) == "MEDIUM":
-                        diff = 20000 # Diff for computers 20k
+                        diff = 30000 # Diff for computers 20k
                         basereward = 0.000095
                     elif str(customDiff) == "5000":
                         diff = 5000 # Custom difficulty 5k
@@ -791,24 +800,25 @@ def handle(c, ip):
                     customDiff = "NET"
                     diff = int(blocks / diff_incrase_per) # Use network difficulty
                     basereward = 0.000075
-
+                    
                 rand = fastrand.pcg32bounded(100 * diff)
                 newBlockHash = hashlib.sha1(str(lastBlockHash_copy + str(rand)).encode("utf-8")).hexdigest()
-
+                
                 if str(customDiff) == "AVR": # Arduino chips take about 6ms to generate one sha1 hash
-                    shareTimeRequired = 6 * rand
+                    shareTimeRequired = 6 * rand 
                 elif str(customDiff) == "ESP": # ESP8266 chips take about 850us to generate one sha1 hash
-                    shareTimeRequired = 0.0085 * rand
+                    shareTimeRequired = 0.0085 * rand 
                 elif str(customDiff) == "ESP32": # ESP32 chips take about 130us to generate one sha1 hash
-                    shareTimeRequired = 0.00013 * rand
+                    shareTimeRequired = 0.00013 * rand 
                 elif str(customDiff) == "MEDIUM":
                     shareTimeRequired = 200
                 elif customDiff == "NET":
                     shareTimeRequired = 1200
-
+                
                 try:
                     c.send(bytes(str(lastBlockHash_copy) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
                     jobsent = datetime.datetime.now()
+                    time.sleep(shareTimeRequired / 1000)
                     response = c.recv(128).decode().split(",") # Wait until client solves hash
                     result = response[0]
                 except:
@@ -835,7 +845,7 @@ def handle(c, ip):
                     minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed), str(lastsharetimestamp)]})
                 except:
                     pass
-                if result == str(rand) and int(sharetime) > int(shareTimeRequired):
+                if result == str(rand): # and int(sharetime) > int(shareTimeRequired):
                     reward = basereward + float(sharetime) / 100000000 + float(diff) / 100000000 # Kolka system v2
                     acceptedShares += 1
                     try:
@@ -857,7 +867,7 @@ def handle(c, ip):
                         break
                     try:
                         balancesToUpdate[username] += reward
-                    except:
+                    except: 
                         balancesToUpdate[username] = reward
                     blocks += 1
                     lastBlockHash = newBlockHash
@@ -870,7 +880,7 @@ def handle(c, ip):
                     penalty = float(int(int(sharetime) **2) / 1000000000) * -1 # Calculate penalty dependent on share submission time
                     try:
                         balancesToUpdate[username] += penalty
-                    except:
+                    except: 
                         balancesToUpdate[username] = penalty
 
             ######################################################################
@@ -953,7 +963,7 @@ def handle(c, ip):
                             break
                     except:
                         pass
-
+                    
                 if str(recipient) == str(username): # Verify that the balance is higher or equal to transfered amount
                     try:
                         c.send(bytes("NO,You're sending funds to yourself", encoding='utf8'))
@@ -1023,6 +1033,51 @@ def handle(c, ip):
                         c.send(bytes("NO,Recipient doesn't exist", encoding='utf8'))
                     except:
                         break
+                    
+            ######################################################################
+            elif str(data[0]) == "GTXL":
+                try:
+                    username = str(data[1])
+                    num = int(data[2])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    print("NED")
+                    break
+                while True:
+                    try:
+                        transactiondata = {}
+                        with sqlite3.connect("config/transactions.db", timeout = 10) as conn:
+                            datab = conn.cursor()
+                            datab.execute("SELECT * FROM Transactions")
+                            for row in datab.fetchall():
+                                transactiondata[str(row[4])] = {
+                                    "Date": str(row[0].split(" ")[0]),
+                                    "Time": str(row[0].split(" ")[1]),
+                                    "Sender": str(row[1]),
+                                    "Recipient": str(row[2]),
+                                    "Amount": float(row[3])}
+                        break
+                    except Exception as e:
+                        print(e)
+                        pass
+                try:
+                    transactionsToReturn = {}
+                    i = 0
+                    for transaction in transactiondata:
+                        if transactiondata[transaction]["Recipient"] == username or transactiondata[transaction]["Sender"] == username:
+                            transactionsToReturn[str(i)] = transactiondata[transaction]
+                            i += 1
+                            if i >= num:
+                                break
+                    try:
+                        transactionsToReturnStr = str(transactionsToReturn)
+                        c.send(bytes(str(transactionsToReturnStr), encoding='utf8'))
+                    except Exception as e:
+                        print(e)
+                        break
+                except Exception as e:
+                    print(e)
+                    pass
 
             ######################################################################
             elif str(data[0]) == "WRAP" and str(username) != "":
@@ -1101,7 +1156,7 @@ def handle(c, ip):
                     else:
                         c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
                         print("NO,Wrapper disabled")
-
+                        
             ######################################################################
             elif str(data[0]) == "UNWRAP" and str(username) != "":
                 if use_wrapper and wrapper_permission:
@@ -1247,6 +1302,7 @@ def resetips():
 if __name__ == '__main__':
     print("Duino-Coin Master Server", serverVersion, "is starting")
     threading.Thread(target=API).start() # Create JSON API thread
+    threading.Thread(target=cpuUsageThread).start() # Create CPU perc measurement
     threading.Thread(target=createBackup).start() # Create Backup generator thread
     threading.Thread(target=countips).start() # Start anti-DDoS thread
     threading.Thread(target=resetips).start() # Start connection counter reseter for the ant-DDoS thread
