@@ -1089,7 +1089,7 @@ def openUnWrapper(handler):
                 
                 soc.close()
                 sleep(2)
-                wrapperWindow.quit()
+                unWrapperWindow.quit()
         
     try:
         pubkeyfile = open(str(f"{resources}/DUCOPubKey.pub"), "r")
