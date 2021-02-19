@@ -118,6 +118,7 @@ After loging-in you have access to the following commands:
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
         *   If software name is not received, server uses `"Software": "Unknown"` in the API
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
+*   `GTXL,username,num` - Get last *num* of transactions involving *username* (both deposits and withdrawals)
 *   `CHGP,oldPassword,newPassword` - Change password of current user
 *   `WRAP,amount,tronAddress` - Wrap some DUCO on tron
 *  Unwrapping protocol is more complicated
