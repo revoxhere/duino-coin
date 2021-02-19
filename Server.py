@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python3
 #############################################
 # Duino-Coin Master Server Remastered (v2.1)
@@ -251,7 +252,7 @@ def getBlocks():
         time.sleep(60)
 def cpuUsageThread():
     while True:
-        percarray.append(round(psutil.cpu_percent(), 2))
+        percarray.append(round(psutil.cpu_percent() - 8.55))
         time.sleep(3)
 def getCpuUsage():
     while True:
@@ -752,8 +753,6 @@ def handle(c, ip):
                         if username == "":
                             c.send(bytes("NO,Not enough data", encoding='utf8'))
                             break
-                        if username == "TOG":
-                            print(ip)
                     except IndexError:
                         c.send(bytes("NO,Not enough data", encoding='utf8'))
                         break
@@ -1061,9 +1060,10 @@ def handle(c, ip):
                         print(e)
                         pass
                 try:
+                    from collections import OrderedDict
                     transactionsToReturn = {}
                     i = 0
-                    for transaction in transactiondata:
+                    for transaction in OrderedDict(reversed(list(transactiondata.items()))):
                         if transactiondata[transaction]["Recipient"] == username or transactiondata[transaction]["Sender"] == username:
                             transactionsToReturn[str(i)] = transactiondata[transaction]
                             i += 1
