@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python Miner (v2.1)
+# Duino-Coin Python Miner (v2.2)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
@@ -57,17 +57,16 @@ except:
 
 
 # Global variables
-minerVersion = "2.1"  # Version number
-connectionMessageShown = False
+minerVersion = "2.2"  # Version number
 timeout = 30  # Socket timeout
 resourcesFolder = "PCMiner_" + str(minerVersion) + "_resources"
 hash_mean = []
 donatorrunning = False
 debug = "n"
+rigIdentifier = "None"
 useLowerDiff = "n"
 serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"  # Serverip file
 config = configparser.ConfigParser()
-autorestart = 0
 donationlevel = 0
 
 if not os.path.exists(resourcesFolder):
@@ -115,14 +114,8 @@ signal(SIGINT, handler)  # Enable signal handler
 
 
 def Greeting():  # Greeting message depending on time
-    global autorestart, greeting
+    global greeting
     print(Style.RESET_ALL)
-
-    if float(autorestart) <= 0:
-        autorestart = 0
-        autorestartmessage = "disabled"
-    if float(autorestart) > 0:
-        autorestartmessage = "every " + str(autorestart) + " minutes"
 
     current_hour = time.strptime(time.ctime(time.time())).tm_hour
 
@@ -198,10 +191,10 @@ def Greeting():  # Greeting message depending on time
         Style.RESET_ALL
         + " > "
         + Fore.WHITE
-        + "Autorestarter: "
+        + "Rig identifier: "
         + Style.BRIGHT
         + Fore.YELLOW
-        + str(autorestartmessage)
+        + rigIdentifier
     )
     print(
         Style.RESET_ALL
@@ -238,35 +231,15 @@ def Greeting():  # Greeting message depending on time
 def hashrateCalculator(hashcount, khashcount):  # Hashes/sec calculation
     while True:
         hash_mean.append(hashcount.value / 1000)  # Append last hashcount to the list
-        khashcount.value = int(statistics.mean(hash_mean))  # Calculate average hashrate
         hashcount.value = 0  # Reset the counter
+        khashcount.value = int(
+            statistics.mean(hash_mean[-20:])
+        )  # Calculate average hashrate from last 20 hashrate measurements
         time.sleep(1)
 
 
-def autorestarter():  # Autorestarter
-    time.sleep(float(autorestart) * 60)
-    try:
-        donateExecutable.terminate()  # Stop the donation process (if running)
-    except:
-        pass
-    for x in thread:
-        x.terminate()
-    print(
-        now().strftime(Style.DIM + "%H:%M:%S ")
-        + Style.RESET_ALL
-        + Style.BRIGHT
-        + Back.GREEN
-        + Fore.WHITE
-        + " sys0 "
-        + Back.RESET
-        + Fore.YELLOW
-        + " Autorestarting the miner"
-    )
-    os.execl(sys.executable, sys.executable, *sys.argv)
-
-
 def loadConfig():  # Config loading section
-    global username, efficiency, autorestart, donationlevel, debug, threadcount, useLowerDiff
+    global username, efficiency, donationlevel, debug, threadcount, useLowerDiff, rigIdentifier
 
     if not Path(
         resourcesFolder + "/Miner_config.cfg"
@@ -277,6 +250,7 @@ def loadConfig():  # Config loading section
             + resourcesFolder
             + "/Miner_config.cfg file later if you want to change it."
         )
+
         print(
             Style.RESET_ALL
             + "Don't have an Duino-Coin account yet? Use "
@@ -292,12 +266,14 @@ def loadConfig():  # Config loading section
             + "Enter your Duino-Coin username: "
             + Style.BRIGHT
         )
+
         efficiency = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + "Set mining intensity (1-100)% (recommended: 95): "
             + Style.BRIGHT
         )
+
         threadcount = input(
             Style.RESET_ALL
             + Fore.YELLOW
@@ -306,18 +282,30 @@ def loadConfig():  # Config loading section
             + "): "
             + Style.BRIGHT
         )
+
         useLowerDiff = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + "Do you want to use lower difficulty for mining (for slower systems)? (y/N) "
             + Style.BRIGHT
         )
-        autorestart = input(
+
+        rigIdentifier = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + "If you want, set after how many minutes miner will restart (recommended: 120 (0 to disable)): "
+            + "Do you want to add an identifier (name) to this rig? (y/N) "
             + Style.BRIGHT
         )
+        if rigIdentifier == "y" or rigIdentifier == "Y":
+            rigIdentifier = input(
+                Style.RESET_ALL
+                + Fore.YELLOW
+                + "Enter desired rig name: "
+                + Style.BRIGHT
+            )
+        else:
+            rigIdentifier = "None"
+
         donationlevel = "0"
         if os.name == "nt" or os.name == "posix":
             donationlevel = input(
@@ -359,8 +347,8 @@ def loadConfig():  # Config loading section
             "efficiency": efficiency,
             "threads": threadcount,
             "useLowerDiff": useLowerDiff,
-            "autorestart": autorestart,
             "donate": donationlevel,
+            "identifier": rigIdentifier,
             "debug": "n",
         }
 
@@ -382,8 +370,8 @@ def loadConfig():  # Config loading section
         ) * 0.01  # Calulate efficiency for use with sleep function
         threadcount = config["miner"]["threads"]
         useLowerDiff = config["miner"]["useLowerDiff"]
-        autorestart = config["miner"]["autorestart"]
         donationlevel = config["miner"]["donate"]
+        rigIdentifier = config["miner"]["identifier"]
         debug = config["miner"]["debug"]
 
 
@@ -463,6 +451,7 @@ def Thread(
     khashcount,
     username,
     efficiency,
+    rigIdentifier,
 ):
     while True:
         while True:
@@ -586,7 +575,7 @@ def Thread(
             + Fore.WHITE
             + " using DUCO-S1 algorithm with "
             + Fore.YELLOW
-            + str(100 - efficiency * 100)
+            + str(int(100 - efficiency * 100))
             + "% efficiency"
         )
         while True:  # Mining section
@@ -606,7 +595,7 @@ def Thread(
                         )  # Send job request with lower diff
                     job = soc.recv(128).decode()  # Get work from pool
                     job = job.split(",")  # Split received data to job and difficulty
-                    diff = job[2]
+                    diff = int(job[2])
 
                     if job[0] and job[1] and job[2]:
                         debugOutput(str(threadid) + "Job received: " + str(job))
@@ -623,13 +612,12 @@ def Thread(
                         1  # Increment hash counter for hashrate calculator
                     )
                     if job[1] == ducos1:  # If result is even with job, send the result
-                        hashcount.value += threadhashcount  # Add this thread hash counter to the global counter\
-
+                        hashcount.value += threadhashcount  # Add this thread hash counter to the global counter
                         debugOutput(str(threadid) + "Result found: " + str(ducos1res))
                         while True:
                             soc.send(
                                 bytes(
-                                    f"{str(ducos1res)},{str(threadhashcount)},Official Python Miner v{str(minerVersion)}",
+                                    f"{str(ducos1res)},{str(threadhashcount)},Official Python Miner v{str(minerVersion)},{str(rigIdentifier)}",
                                     encoding="utf8",
                                 )
                             )  # Send result of hashing algorithm to the server
@@ -641,6 +629,12 @@ def Thread(
                             responsetimestop = now()  # Measure server ping
                             ping = responsetimestop - responsetimetart  # Calculate ping
                             ping = str(int(ping.microseconds / 1000))  # Convert to ms
+                            if khashcount.value > 1000:
+                                formattedhashcount = (
+                                    str(round(khashcount.value / 1000, 2)) + " MH/s"
+                                )
+                            else:
+                                formattedhashcount = str(khashcount.value) + " kH/s"
                             debugOutput("Ping: " + ping)
 
                             if feedback == "GOOD":  # If result was good
@@ -686,15 +680,14 @@ def Thread(
                                     + "%)"
                                     + Style.NORMAL
                                     + Fore.WHITE
-                                    + " ⁃ "
+                                    + " ∙ "
                                     + Style.BRIGHT
                                     + Fore.WHITE
-                                    + str(khashcount.value)
-                                    + " kH/s"
+                                    + str(formattedhashcount)
                                     + Style.NORMAL
                                     + " @ diff "
                                     + str(diff)
-                                    + " ⁃ "
+                                    + " ∙ "
                                     + Fore.BLUE
                                     + "ping "
                                     + ping
@@ -745,15 +738,14 @@ def Thread(
                                     + "%)"
                                     + Style.NORMAL
                                     + Fore.WHITE
-                                    + " ⁃ "
+                                    + " ∙ "
                                     + Style.BRIGHT
                                     + Fore.WHITE
-                                    + str(khashcount.value)
-                                    + " kH/s"
+                                    + str(formattedhashcount)
                                     + Style.NORMAL
                                     + " @ diff "
                                     + str(diff)
-                                    + " ⁃ "
+                                    + " ∙ "
                                     + Fore.BLUE
                                     + "ping "
                                     + ping
@@ -823,15 +815,14 @@ def Thread(
                                     + "%)"
                                     + Style.NORMAL
                                     + Fore.WHITE
-                                    + " ⁃ "
+                                    + " ∙ "
                                     + Style.BRIGHT
                                     + Fore.WHITE
-                                    + str(khashcount.value)
-                                    + " kH/s"
+                                    + str(formattedhashcount)
                                     + Style.NORMAL
                                     + " @ diff "
                                     + str(diff)
-                                    + " ⁃ "
+                                    + " ∙ "
                                     + Fore.BLUE
                                     + "ping "
                                     + ping
@@ -867,14 +858,22 @@ def initRichPresence():
         RPC = Presence(808045598447632384)
         RPC.connect()
     except:  # Discord not launched
+        raise
         pass
 
 
 def updateRichPresence():
+    startTime = int(time.time())
     while True:
         try:
+            hashcount = statistics.mean(hash_mean[-20:])
+            if hashcount > 1000:
+                hashcount = str(round(hashcount, 2)) + " MH/s"
+            else:
+                hashcount = str(int(hashcount)) + " kH/s"
             RPC.update(
-                details="Hashrate: " + str(int(statistics.mean(hash_mean))) + " kH/s",
+                details="Hashrate: " + str(hashcount),
+                start = startTime,
                 state="Acc. shares: "
                 + str(accepted.value)
                 + "/"
@@ -886,9 +885,11 @@ def updateRichPresence():
                     {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
                 ],
             )
-        except:  # Discord not launched
+            debugOutput("Rich presence updated")
+        except Exception as e:  # Discord not launched
+            print(e)
             pass
-        time.sleep(15)  # 15 seconds to respect discord's rate limit
+        time.sleep(15)  # 15 seconds to respect Discord rate limit
 
 
 if __name__ == "__main__":
@@ -926,32 +927,6 @@ if __name__ == "__main__":
     except:
         if debug == "y":
             raise
-    try:  # Setup autorestarter
-        if float(autorestart) > 0:
-            debugOutput("Enabled autorestarter for " + str(autorestart) + " minutes")
-            threading.Thread(target=autorestarter).start()
-        else:
-            debugOutput("Autorestarter is disabled")
-    except:
-        print(
-            now().strftime(Style.DIM + "%H:%M:%S ")
-            + Style.RESET_ALL
-            + Style.BRIGHT
-            + Back.GREEN
-            + Fore.WHITE
-            + " sys0 "
-            + Style.RESET_ALL
-            + Style.BRIGHT
-            + Fore.RED
-            + " Error in the autorestarter. Check configuration file ("
-            + resources
-            + "/Miner_config.cfg). Exiting in 10s"
-            + Style.RESET_ALL
-        )
-        if debug == "y":
-            raise
-        time.sleep(10)
-        os._exit(1)
     try:
         Donate()  # Start donation thread
     except:
@@ -981,10 +956,10 @@ if __name__ == "__main__":
                 khashcount,
                 username,
                 efficiency,
+                rigIdentifier,
             ),
         )
         thread[x].start()
         time.sleep(0.1)
-
     initRichPresence()
     threading.Thread(target=updateRichPresence).start()
