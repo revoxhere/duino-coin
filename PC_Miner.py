@@ -371,7 +371,7 @@ def loadConfig():  # Config loading section
         threadcount = config["miner"]["threads"]
         useLowerDiff = config["miner"]["useLowerDiff"]
         donationlevel = config["miner"]["donate"]
-        rigIdentifier = config["miner"]["identifier"]
+
         debug = config["miner"]["debug"]
 
 
@@ -873,7 +873,7 @@ def updateRichPresence():
                 hashcount = str(int(hashcount)) + " kH/s"
             RPC.update(
                 details="Hashrate: " + str(hashcount),
-                start = startTime,
+                start=startTime,
                 state="Acc. shares: "
                 + str(accepted.value)
                 + "/"
@@ -886,8 +886,7 @@ def updateRichPresence():
                 ],
             )
             debugOutput("Rich presence updated")
-        except Exception as e:  # Discord not launched
-            print(e)
+        except:  # Discord not launched
             pass
         time.sleep(15)  # 15 seconds to respect Discord rate limit
 
