@@ -371,7 +371,7 @@ def loadConfig():  # Config loading section
         threadcount = config["miner"]["threads"]
         useLowerDiff = config["miner"]["useLowerDiff"]
         donationlevel = config["miner"]["donate"]
-
+        rigIdentifier = config["miner"]["identifier"]
         debug = config["miner"]["debug"]
 
 
