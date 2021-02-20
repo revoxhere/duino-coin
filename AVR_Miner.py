@@ -245,7 +245,7 @@ def loadConfig():  # Config loading section
         avrport = avrport.split(",")
         donationlevel = config["arduminer"]["donate"]
         debug = config["arduminer"]["debug"]
-        rigIdentifier = config["miner"]["identifier"]
+        rigIdentifier = config["arduminer"]["identifier"]
         requestedDiff = config["arduminer"]["difficulty"]
 
 
