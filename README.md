@@ -131,6 +131,7 @@ After loging-in you have access to the following commands:
 <h2 align="center">C DUCO library</h2><br>
 
 If you want to easily access Duino-Coin API with your C apps, [@ygboucherk](https://github.com/ygboucherk) is working on a library for that here: [duino-coin-C-lib](https://github.com/ygboucherk/duino-coin-C-lib)
+There is also [libduco](https://github.com/SarahIsWeird/libduco) you can use with C apps made by [@Sarah](https://github.com/SarahIsWeird/)
 
 <h2 align="center">Python3 DUCO API module</h2><br>
 
