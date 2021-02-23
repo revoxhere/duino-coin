@@ -7,6 +7,7 @@
 import socket
 from requests import get
 from threading import Timer
+import json
 
 API_URL = "http://51.15.127.80/api.json"
 SERVER_URL = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
@@ -115,6 +116,16 @@ class api_actions:
         self.sock.send(f"SEND,-,{recipient_username},{amount}".encode())
         transfer_response = self.sock.recv(128).decode()
         return transfer_response
+		
+    def getTransactions(self, amount):
+        """
+        A function for get last (amount) of transactions
+        """
+        if not self.password or not self.username:
+            raise Exception("User not logged in")
+        self.sock.send(f"GTXL,{self.username},{amount}".encode())
+        transactions = self.sock.recv(1024).decode()
+        return json.loads(json.dumps(transactions))
 
     def reset_pass(self, old_password, new_password):
         """
