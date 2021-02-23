@@ -50,6 +50,14 @@ Resets the password of the logged-in user
 api_connection.reset_pass(old_password='123', new_password='abc')
 ```
 
+<h4>Get Latests Transactions</h4>
+Get the latests transactions
+
+```python
+api_connection.getTransactions(7) # 7 is the number of transactions to get
+# returns JSON
+```
+
 <h3>Other Functions</h3>
 Use of this functions does not require being loged-in.
 
