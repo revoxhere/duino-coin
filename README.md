@@ -188,15 +188,15 @@ Major frameworks used by Duino-Coin:
 Hashrate Calculators for AVR/ESP8266 platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
 
 <h2 align="center">Terms of usage</h2><br>
-1. Duino-Coins are earned by miners with a process called mining.
-2. Mining is described as using DUCO-S1 algorithm (explained in Duino-Coin Whitepaper), in which finding a correct result to a mathematical problem gives miner a reward.
-3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the preffered usage of official miners (other officially allowed miners are described in the upper part of README). 
-4. Even though Duino-Coin aims to fairly reward all the miners, mining with GPUs, ASICs, FPGAs is not allowed due to obvious reasons.
-5. Any users spotted using inappropriate/overpowered hardware can be banned from the network.
-6. Banning involves blocking user from accessing his account and removing his coins.
-7. Only coins earned legally are elgible for the exchange.
-8. These terms of usage can change at any time without prior notice and will be expanded in the future.
-9. User using Duino-Coin agrees to comply with the above rules.
+1. Duino-Coins are earned by miners with a process called mining.<br/>
+2. Mining is described as using DUCO-S1 algorithm (explained in Duino-Coin Whitepaper), in which finding a correct result to a mathematical problem gives miner a reward.<br/>
+3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the preffered usage of official miners (other officially allowed miners are described in the upper part of README). <br/>
+4. Even though Duino-Coin aims to fairly reward all the miners, mining with GPUs, ASICs, FPGAs is not allowed due to obvious reasons.<br/>
+5. Any users spotted using inappropriate/overpowered hardware can be banned from the network.<br/>
+6. Banning involves blocking user from accessing his account and removing his coins.<br/>
+7. Only coins earned legally are elgible for the exchange.<br/>
+8. These terms of usage can change at any time without prior notice and will be expanded in the future.<br/>
+9. User using Duino-Coin agrees to comply with the above rules.<br/>
 
 <h2 align="center">Developers</h2><br>
 
