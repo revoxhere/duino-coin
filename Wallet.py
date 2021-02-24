@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin GUI Wallet (v2.2)
+# Duino-Coin Tkinter GUI Wallet (v2.2)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2021
+# © Duino-Coin Community 2019-2021
 ##########################################
 from tkinter import (
     Tk,
@@ -50,6 +50,8 @@ foregroundColor = "#f0932b"
 foregroundColorSecondary = "#ffbe76"
 min_trans_difference = 0.00000000001  # Minimum transaction amount to be saved
 min_trans_difference_notify = 0.5  # Minimum transaction amount to show a notification
+wrong_passphrase = False
+iterations = 100_000
 
 
 def install(package):
@@ -94,6 +96,8 @@ try:
     from cryptography.hazmat.backends import default_backend
     from cryptography.hazmat.primitives import hashes
     from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
+    backend = default_backend()
 except ModuleNotFoundError:
     now = datetime.datetime.now()
     print(
@@ -142,34 +146,6 @@ else:
     tron = tronpy.Tron()
     tron = tronpy.Tron()
     wduco = tron.get_contract("TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U")
-
-
-wrong_passphrase = False
-backend = default_backend()
-iterations = 100_000
-
-
-try:
-    mkdir(resources)
-except FileExistsError:
-    pass
-
-with sqlite3.connect(f"{resources}/wallet.db") as con:
-    cur = con.cursor()
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS Transactions(Transaction_Date TEXT, amount REAL)"""
-    )
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS UserData(username TEXT, password TEXT, useWrapper TEXT)"""
-    )
-    con.commit()
-
-with urlopen(
-    "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
-) as content:
-    content = content.read().decode().splitlines()
-    pool_address = content[0]
-    pool_port = content[1]
 
 
 def GetDucoPrice():
@@ -1768,10 +1744,6 @@ def updateRichPresence():
     Timer(15, updateRichPresence).start()
 
 
-initRichPresence()
-updateRichPresence()
-
-
 class Wallet:
     def __init__(self, master):
         global recipient, amount, balancetext, wbalancetext
@@ -2108,8 +2080,32 @@ class Wallet:
 
 
 try:
+    mkdir(resources)
+except FileExistsError:
+    pass
+
+with sqlite3.connect(f"{resources}/wallet.db") as con:
+    cur = con.cursor()
+    cur.execute(
+        """CREATE TABLE IF NOT EXISTS Transactions(Transaction_Date TEXT, amount REAL)"""
+    )
+    cur.execute(
+        """CREATE TABLE IF NOT EXISTS UserData(username TEXT, password TEXT, useWrapper TEXT)"""
+    )
+    con.commit()
+
+with urlopen(
+    "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+) as content:
+    content = content.read().decode().splitlines()
+    pool_address = content[0]
+    pool_port = content[1]
+
+try:
     GetDucoPrice()  # Start duco price updater
     getBalance()  # Start balance updater
+    initRichPresence()
+    updateRichPresence()
     try:
         loading.destroy()  # Destroy loading dialog and start the main wallet window
     except:
