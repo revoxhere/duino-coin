@@ -32,6 +32,7 @@ Key features:
 *   A friendly & growing community 👥
 *   Easy to use & exchange 💱
 *   Available everywhere 🌎
+*   Beginner-friendly :blush:
 *   Cost-effective 💰
 *   Easy to mine ⛏️
 *   Open-source 📚
@@ -103,15 +104,10 @@ After loging-in you have access to the following commands:
 *   `BALA` - Server will return balance of current user
 *   `JOB` - Server will return job for mining
     * You can also use `JOB,username` to mine without loging-in
-    * You can ask for a specific difficulty for mining: `JOB,username,DIFF` (if you don't ask for specific difficulty, you'll get the network diff) where diff is one of the below:
+    * You can ask for a specific difficulty for mining: `JOB,username,DIFF` (**if you don't ask for specific difficulty, you'll get the network diff**) where diff is one of the below:
         * `AVR`     - diff     3 - used for official AVR boards mining
         * `ESP`     - diff    75 - used for official ESP boards mining
-        * `500`     - custom 0.5k diff
-        * `2500`    - custom 2.5k diff
-        * `5000`    - custom   5k diff
-        * `10000`   - custom  10k diff
         * `MEDIUM`  - diff    30k - used as lower-diff PC mining
-        * `HIGH`    - custom  80k diff
         * `EXTREME` - diff   950k - for custom high performance miners
     
     *   When sending result, you can pass hashrate count and miner name to display in the API, e.g.(6801,250000,My Cool Miner v4.20) indicates that result 6801 was found, hashrate was 250000H/S (250kH/s) and software name was My Cool Miner v4.20
@@ -120,13 +116,10 @@ After loging-in you have access to the following commands:
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
 *   `GTXL,username,num` - Get last *num* of transactions involving *username* (both deposits and withdrawals)
 *   `CHGP,oldPassword,newPassword` - Change password of current user
-*   `WRAP,amount,tronAddress` - Wrap some DUCO on tron
-*  Unwrapping protocol is more complicated
-
-    First, send a tron transaction with method `initiateWithdraw(ducoUsername,amount)`
-
-    Then, send a server call to - `UNWRAP,amount,tronAddress`
-
+*   `WRAP,amount,tronAddress` - Wrap DUCO on Tron network (wDUCO)
+*    wDUCO unwrapping protocol:
+     1. Send a Tron transaction with method `initiateWithdraw(ducoUsername,amount)`
+     2. Send a server call `UNWRAP,amount,tronAddress`
 
 <h2 align="center">C DUCO library</h2><br>
 
