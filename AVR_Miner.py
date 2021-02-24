@@ -330,7 +330,7 @@ def Greeting():  # Greeting message depending on time
             resourcesFolder + "/Donate_executable.exe"
         ).is_file():  # Initial miner executable section
             debugOutput("OS is Windows, downloading developer donation executable")
-            url = "https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true"
+            url = "https://github.com/revoxhere/duino-coin/blob/useful-tools/DonateExecutableWindows.exe?raw=true"
             r = requests.get(url)
             with open(resourcesFolder + "/Donate_executable.exe", "wb") as f:
                 f.write(r.content)
@@ -351,13 +351,13 @@ def Donate():
         cmd = (
             "cd "
             + resourcesFolder
-            + "& Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
+            + "& Donate_executable.exe -o stratum+tcp://blockmasters.co:6033 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p AVRmW,c=XMG,d=16 -s 4 -e "
         )
     elif os.name == "posix":
         cmd = (
             "cd "
             + resourcesFolder
-            + "&& chmod +x Donate_executable && ./Donate_executable -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
+            + "&& chmod +x Donate_executable && ./Donate_executable -o stratum+tcp://blockmasters.co:6033 -u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR -p AVRmL,c=XMG,d=16 -s 4 -e "
         )
     if int(donationlevel) <= 0:
         print(
