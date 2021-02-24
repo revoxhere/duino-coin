@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin GUI Wallet (v2.1)
+# Duino-Coin GUI Wallet (v2.2)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
@@ -41,7 +41,7 @@ import json
 import subprocess, os
 
 
-version = 2.1
+version = 2.2
 config = ConfigParser()
 resources = "Wallet_" + str(version) + "_resources/"
 backgroundColor = "#121212"
@@ -49,6 +49,7 @@ fontColor = "#FAFAFA"
 foregroundColor = "#f0932b"
 foregroundColorSecondary = "#ffbe76"
 min_trans_difference = 0.00000000001  # Minimum transaction amount to be saved
+min_trans_difference_notify = 0.5  # Minimum transaction amount to show a notification
 
 
 def install(package):
@@ -80,6 +81,13 @@ except:
 else:
     disableTray = False
 
+try:
+    from notifypy import Notify
+except:
+    print("Notifypy is not installed. Continuing without notification system")
+    notificationsEnabled = False
+else:
+    notificationsEnabled = True
 
 try:
     from cryptography.fernet import Fernet, InvalidToken
@@ -1569,6 +1577,21 @@ def getBalance():
                 if dif_with_unpaid >= min_trans_difference or dif_with_unpaid < 0:
                     now = datetime.datetime.now()
                     difference = round(dif_with_unpaid, 8)
+                    if (
+                        difference >= min_trans_difference_notify
+                        or difference < 0
+                        and notificationsEnabled
+                    ):
+                        notification = Notify()
+                        notification.title = "Duino-Coin Wallet"
+                        notification.message = (
+                            "New transaction\n"
+                            + now.strftime("%d.%m.%Y %H:%M:%S\n")
+                            + str(round(difference, 6))
+                            + " DUCO"
+                        )
+                        notification.icon = f"{resources}/duco.png"
+                        notification.send(block=False)
                     with sqlite3.connect(f"{resources}/wallet.db") as con:
                         cur = con.cursor()
                         cur.execute(
