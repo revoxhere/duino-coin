@@ -159,7 +159,10 @@ with sqlite3.connect(f"{resources}/wallet.db") as con:
     cur.execute(
         """CREATE TABLE IF NOT EXISTS Transactions(Transaction_Date TEXT, amount REAL)"""
     )
-    cur.execute("""CREATE TABLE IF NOT EXISTS UserData(username TEXT, password TEXT)""")
+    cur.execute(
+        """CREATE TABLE IF NOT EXISTS UserData(username TEXT, password TEXT, useWrapper TEXT)"""
+    )
+    con.commit()
 
 with urlopen(
     "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
@@ -883,8 +886,13 @@ def openStats(handler):
     totalHashrate = 0
     for threadid in statsApi["Miners"]:
         if username in statsApi["Miners"][threadid]["User"]:
+            rigId = statsApi["Miners"][threadid]["Identifier"]
+            if rigId == "None":
+                rigId = ""
+            else:
+                rigId += ": "
             software = statsApi["Miners"][threadid]["Software"]
-            hashrate = str(round(statsApi["Miners"][threadid]["Hashrate"] / 1000, 2))
+            hashrate = str(round(statsApi["Miners"][threadid]["Hashrate"], 2))
             totalHashrate += float(hashrate)
             difficulty = str(statsApi["Miners"][threadid]["Diff"])
             shares = (
@@ -900,27 +908,37 @@ def openStats(handler):
                 "#"
                 + str(i + 1)
                 + ": "
+                + rigId
                 + software
                 + " "
-                + hashrate
+                + str(round(float(hashrate) / 1000, 2))
                 + " kH/s @ diff "
                 + difficulty
                 + ", "
                 + shares
-                + " acc. shares",
+                + " acc.",
             )
             i += 1
     if i == 0:
         Active_workers_listbox.insert(
             i, "Couldn't detect any miners mining on your account"
         )
+
+    totalHashrateString = str(int(totalHashrate)) + " H/s"
+    if totalHashrate > 1000000000:
+        totalHashrateString = str(round(totalHashrate / 1000000000, 2)) + " GH/s"
+    elif totalHashrate > 1000000:
+        totalHashrateString = str(round(totalHashrate / 1000000, 2)) + " MH/s"
+    elif totalHashrate > 1000:
+        totalHashrateString = str(round(totalHashrate / 1000, 2)) + " kH/s"
+
     Active_workers_listbox.configure(height=i)
     Active_workers_listbox.select_set(32)
     Active_workers_listbox.event_generate("<<ListboxSelect>>")
 
     Label(
         statsWindow,
-        text="YOUR MINERS - " + str(totalHashrate) + " kH/s",
+        text="YOUR MINERS - " + totalHashrateString,
         font=textFont3,
         foreground=foregroundColor,
         background=backgroundColor,
@@ -2092,7 +2110,10 @@ class Wallet:
 try:
     GetDucoPrice()  # Start duco price updater
     getBalance()  # Start balance updater
-    loading.destroy()  # Destroy loading dialog and start the main wallet window
+    try:
+        loading.destroy()  # Destroy loading dialog and start the main wallet window
+    except:
+        pass
     root = Tk()
     my_gui = Wallet(root)
 except ValueError:
