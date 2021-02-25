@@ -858,8 +858,8 @@ def initRichPresence():
         RPC = Presence(808045598447632384)
         RPC.connect()
     except:  # Discord not launched
-        raise
-        pass
+        if debug == "y":
+            raise
 
 
 def updateRichPresence():
@@ -887,7 +887,8 @@ def updateRichPresence():
             )
             debugOutput("Rich presence updated")
         except:  # Discord not launched
-            pass
+            if debug == "y":
+                raise
         time.sleep(15)  # 15 seconds to respect Discord rate limit
 
 
