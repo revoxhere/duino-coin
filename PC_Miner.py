@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python Miner (v2.2)
+# Duino-Coin Python PC Miner (v2.2)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2021
+# © Duino-Coin Community 2019-2021
 ##########################################
 import socket, statistics, threading, multiprocessing, time, re, subprocess, hashlib, configparser, sys, datetime, os  # Import libraries
 from pathlib import Path
@@ -868,7 +868,7 @@ def updateRichPresence():
         try:
             hashcount = statistics.mean(hash_mean[-20:])
             if hashcount > 1000:
-                hashcount = str(round(hashcount, 2)) + " MH/s"
+                hashcount = str(round(hashcount / 1000, 2)) + " MH/s"
             else:
                 hashcount = str(int(hashcount)) + " kH/s"
             RPC.update(
