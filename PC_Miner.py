@@ -230,10 +230,12 @@ def Greeting():  # Greeting message depending on time
 
 def hashrateCalculator(hashcount, khashcount):  # Hashes/sec calculation
     while True:
-        hash_mean.append(hashcount.value / 1000)  # Append last hashcount to the list
+        hash_mean.append(
+            hashcount.value / 1000
+        )  # Append last hashcount in kH to the list
         hashcount.value = 0  # Reset the counter
         khashcount.value = int(
-            statistics.mean(hash_mean[-20:])
+            statistics.mean(hash_mean[-50:])
         )  # Calculate average hashrate from last 20 hashrate measurements
         time.sleep(1)
 
@@ -866,7 +868,7 @@ def updateRichPresence():
     startTime = int(time.time())
     while True:
         try:
-            hashcount = statistics.mean(hash_mean[-20:])
+            hashcount = statistics.mean(hash_mean[-50:])
             if hashcount > 1000:
                 hashcount = str(round(hashcount / 1000, 2)) + " MH/s"
             else:
