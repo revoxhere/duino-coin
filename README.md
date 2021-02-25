@@ -110,9 +110,10 @@ After loging-in you have access to the following commands:
         * `MEDIUM`  - diff    30k - used as lower-diff PC mining
         * `EXTREME` - diff   950k - for custom high performance miners
     
-    *   When sending result, you can pass hashrate count and miner name to display in the API, e.g.(6801,250000,My Cool Miner v4.20) indicates that result 6801 was found, hashrate was 250000H/S (250kH/s) and software name was My Cool Miner v4.20
+    *   When sending result, you can pass hashrate count and miner name along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, hashrate was 250000H/s (250kH/s) and software name was My Cool Miner v4.20 with rig named House Miner
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
         *   If software name is not received, server uses `"Software": "Unknown"` in the API
+        *   If rig name is not received, server uses `"Identifier": "None"` in the API
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
 *   `GTXL,username,num` - Get last *num* of transactions involving *username* (both deposits and withdrawals)
 *   `CHGP,oldPassword,newPassword` - Change password of current user
