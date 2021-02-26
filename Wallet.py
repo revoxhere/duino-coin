@@ -515,6 +515,28 @@ def LoadingWindow():
     loading.update()
 
 
+with urlopen(
+    "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+) as content:
+    content = content.read().decode().splitlines()
+    pool_address = content[0]
+    pool_port = content[1]
+
+try:
+    mkdir(resources)
+except FileExistsError:
+    pass
+
+with sqlite3.connect(f"{resources}/wallet.db") as con:
+    cur = con.cursor()
+    cur.execute(
+        """CREATE TABLE IF NOT EXISTS Transactions(Transaction_Date TEXT, amount REAL)"""
+    )
+    cur.execute(
+        """CREATE TABLE IF NOT EXISTS UserData(username TEXT, password TEXT, useWrapper TEXT)"""
+    )
+    con.commit()
+
 if not Path(resources + "duco.png").is_file():
     urlretrieve("https://i.imgur.com/9JzxR0B.png", resources + "duco.png")
 if not Path(resources + "calculator.png").is_file():
@@ -2089,28 +2111,6 @@ class Wallet:
 
         root.mainloop()
 
-
-try:
-    mkdir(resources)
-except FileExistsError:
-    pass
-
-with sqlite3.connect(f"{resources}/wallet.db") as con:
-    cur = con.cursor()
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS Transactions(Transaction_Date TEXT, amount REAL)"""
-    )
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS UserData(username TEXT, password TEXT, useWrapper TEXT)"""
-    )
-    con.commit()
-
-with urlopen(
-    "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
-) as content:
-    content = content.read().decode().splitlines()
-    pool_address = content[0]
-    pool_port = content[1]
 
 try:
     GetDucoPrice()  # Start duco price updater
