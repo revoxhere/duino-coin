@@ -52,6 +52,7 @@ min_trans_difference = 0.00000000001  # Minimum transaction amount to be saved
 min_trans_difference_notify = 0.5  # Minimum transaction amount to show a notification
 wrong_passphrase = False
 iterations = 100_000
+globalBalance = 0
 
 
 def install(package):
@@ -1550,60 +1551,70 @@ def getBalance():
             soc.recv(3)
             soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
             _ = soc.recv(2)
-            soc.send(bytes("BALA", encoding="utf8"))
-            oldbalance = balance
-            balance = soc.recv(1024).decode()
-            soc.close()
-            try:
-                balance = float(balance)
-                break
-            except ValueError:
-                pass
-        except Exception as e:
+            while True:
+                while True:
+                    try:
+                        soc.send(bytes("BALA", encoding="utf8"))
+                        oldbalance = balance
+                        balance = soc.recv(1024).decode()
+                        try:
+                            balance = float(balance)
+                            break
+                        except ValueError:
+                            pass
+                    except Exception as e:
+                        print("Retrying in 5s.")
+                        sleep(5)
+
+                try:
+                    if oldbalance != balance:
+                        difference = float(balance) - float(oldbalance)
+                        dif_with_unpaid = (
+                            float(balance) - float(oldbalance)
+                        ) + unpaid_balance
+                        if float(balance) != float(difference):
+                            if (
+                                dif_with_unpaid >= min_trans_difference
+                                or dif_with_unpaid < 0
+                            ):
+                                now = datetime.datetime.now()
+                                difference = round(dif_with_unpaid, 8)
+                                if (
+                                    difference >= min_trans_difference_notify
+                                    or difference < 0
+                                    and notificationsEnabled
+                                ):
+                                    notification = Notify()
+                                    notification.title = "Duino-Coin Wallet"
+                                    notification.message = (
+                                        "New transaction\n"
+                                        + now.strftime("%d.%m.%Y %H:%M:%S\n")
+                                        + str(round(difference, 6))
+                                        + " DUCO"
+                                    )
+                                    notification.icon = f"{resources}/duco.png"
+                                    notification.send(block=False)
+                                with sqlite3.connect(f"{resources}/wallet.db") as con:
+                                    cur = con.cursor()
+                                    cur.execute(
+                                        """INSERT INTO Transactions(Transaction_Date, amount) VALUES(?, ?)""",
+                                        (
+                                            now.strftime("%d.%m.%Y %H:%M:%S"),
+                                            round(difference, 8),
+                                        ),
+                                    )
+                                    con.commit()
+                                    unpaid_balance = 0
+                            else:
+                                unpaid_balance += float(balance) - float(oldbalance)
+                except Exception as e:
+                    print(e)
+
+                globalBalance = round(float(balance), 8)
+                sleep(3)
+        except:
             print("Retrying in 5s.")
             sleep(5)
-
-    try:
-        if oldbalance != balance:
-            difference = float(balance) - float(oldbalance)
-            dif_with_unpaid = (float(balance) - float(oldbalance)) + unpaid_balance
-            if float(balance) != float(difference):
-                if dif_with_unpaid >= min_trans_difference or dif_with_unpaid < 0:
-                    now = datetime.datetime.now()
-                    difference = round(dif_with_unpaid, 8)
-                    if (
-                        difference >= min_trans_difference_notify
-                        or difference < 0
-                        and notificationsEnabled
-                    ):
-                        notification = Notify()
-                        notification.title = "Duino-Coin Wallet"
-                        notification.message = (
-                            "New transaction\n"
-                            + now.strftime("%d.%m.%Y %H:%M:%S\n")
-                            + str(round(difference, 6))
-                            + " DUCO"
-                        )
-                        notification.icon = f"{resources}/duco.png"
-                        notification.send(block=False)
-                    with sqlite3.connect(f"{resources}/wallet.db") as con:
-                        cur = con.cursor()
-                        cur.execute(
-                            """INSERT INTO Transactions(Transaction_Date, amount) VALUES(?, ?)""",
-                            (
-                                now.strftime("%d.%m.%Y %H:%M:%S"),
-                                round(difference, 8),
-                            ),
-                        )
-                        con.commit()
-                        unpaid_balance = 0
-                else:
-                    unpaid_balance += float(balance) - float(oldbalance)
-    except Exception as e:
-        print(e)
-
-    globalBalance = round(float(balance), 8)
-    Timer(3, getBalance).start()
 
 
 def getwbalance():
@@ -2103,7 +2114,7 @@ with urlopen(
 
 try:
     GetDucoPrice()  # Start duco price updater
-    getBalance()  # Start balance updater
+    threading.Thread(target=getBalance).start()
     initRichPresence()
     updateRichPresence()
     try:
