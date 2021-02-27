@@ -87,11 +87,22 @@ with open(f"{resourcesFolder}/langs.json") as lang_file:
     lang_file = json.load(lang_file)
 
 if locale == "es_ES":
-    lang_file = lang_file["spanish"]
+    lang = "spanish"
 elif locale == "pl_PL":
-    lang_file = lang_file["polish"]
+    lang = "polish"
+elif locale == "fr_FR":
+    lang = "french"
 else:
-    lang_file = lang_file["english"]
+    lang = "french"
+
+
+def getString(string_name):
+    if string_name in lang_file[lang]:
+        return lang_file[lang][string_name]
+    elif string_name in lang_file["english"]:
+        return lang_file["english"][string_name]
+    else:
+        return "String not found: " + string_name
 
 
 def debugOutput(text):
@@ -118,10 +129,10 @@ def handler(
         + " sys0 "
         + Back.RESET
         + Fore.YELLOW
-        + lang_file["sigint_detected"]
+        + getString("sigint_detected")
         + Style.NORMAL
         + Fore.WHITE
-        + lang_file["goodbye"]
+        + getString("goodbye")
     )
     handlerShown = True
     try:
@@ -141,22 +152,22 @@ def Greeting():  # Greeting message depending on time
     current_hour = time.strptime(time.ctime(time.time())).tm_hour
 
     if current_hour < 12:
-        greeting = lang_file["greeting_morning"]
+        greeting = getString("greeting_morning")
     elif current_hour == 12:
-        greeting = lang_file["greeting_noon"]
+        greeting = getString("greeting_noon")
     elif current_hour > 12 and current_hour < 18:
-        greeting = lang_file["greeting_afternoon"]
+        greeting = getString("greeting_afternoon")
     elif current_hour >= 18:
-        greeting = lang_file["greeting_evening"]
+        greeting = getString("greeting_evening")
     else:
-        greeting = lang_file["greeting_back"]
+        greeting = getString("greeting_back")
 
     print(
         Style.RESET_ALL
         + " > "
         + Fore.YELLOW
         + Style.BRIGHT
-        + lang_file["banner"]
+        + getString("banner")
         + Style.RESET_ALL
         + Fore.WHITE
         + " (v"
@@ -189,20 +200,20 @@ def Greeting():  # Greeting message depending on time
             Style.RESET_ALL
             + " > "
             + Fore.WHITE
-            + lang_file["donation_level"]
+            + getString("donation_level")
             + Style.BRIGHT
             + Fore.YELLOW
             + str(donationlevel)
         )
     if useLowerDiff == "y":
-        diffName = lang_file["medium_diff"]
+        diffName = getString("medium_diff")
     else:
-        diffName = lang_file["net_diff"]
+        diffName = getString("net_diff")
     print(
         Style.RESET_ALL
         + " > "
         + Fore.WHITE
-        + lang_file["algorithm"]
+        + getString("algorithm")
         + Style.BRIGHT
         + Fore.YELLOW
         + "DUCO-S1 @ "
@@ -212,7 +223,7 @@ def Greeting():  # Greeting message depending on time
         Style.RESET_ALL
         + " > "
         + Fore.WHITE
-        + lang_file["rig_identifier"]
+        + getString("rig_identifier")
         + Style.BRIGHT
         + Fore.YELLOW
         + rigIdentifier
@@ -269,32 +280,32 @@ def loadConfig():  # Config loading section
     ).is_file():  # Initial configuration section
         print(
             Style.BRIGHT
-            + lang_file["basic_config_tool"]
+            + getString("basic_config_tool")
             + resourcesFolder
-            + lang_file["edit_config_file_warning"]
+            + getString("edit_config_file_warning")
         )
 
         print(
             Style.RESET_ALL
-            + lang_file["dont_have_account"]
+            + getString("dont_have_account")
             + Fore.YELLOW
-            + lang_file["wallet"]
+            + getString("wallet")
             + Fore.WHITE
-            + lang_file["register_warning"]
+            + getString("register_warning")
         )
 
         username = input(
-            Style.RESET_ALL + Fore.YELLOW + lang_file["ask_username"] + Style.BRIGHT
+            Style.RESET_ALL + Fore.YELLOW + getString("ask_username") + Style.BRIGHT
         )
 
         efficiency = input(
-            Style.RESET_ALL + Fore.YELLOW + lang_file["ask_intensity"] + Style.BRIGHT
+            Style.RESET_ALL + Fore.YELLOW + getString("ask_intensity") + Style.BRIGHT
         )
 
         threadcount = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + lang_file["ask_threads"]
+            + getString("ask_threads")
             + str(multiprocessing.cpu_count())
             + "): "
             + Style.BRIGHT
@@ -303,19 +314,19 @@ def loadConfig():  # Config loading section
         useLowerDiff = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + lang_file["ask_lower_difficulty"]
+            + getString("ask_lower_difficulty")
             + Style.BRIGHT
         )
 
         rigIdentifier = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + lang_file["ask_rig_identifier"]
+            + getString("ask_rig_identifier")
             + Style.BRIGHT
         )
         if rigIdentifier == "y" or rigIdentifier == "Y":
             rigIdentifier = input(
-                Style.RESET_ALL + Fore.YELLOW + lang_file["ask_rig_name"] + Style.BRIGHT
+                Style.RESET_ALL + Fore.YELLOW + getString("ask_rig_name") + Style.BRIGHT
             )
         else:
             rigIdentifier = "None"
@@ -325,7 +336,7 @@ def loadConfig():  # Config loading section
             donationlevel = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
-                + lang_file["ask_donation_level"]
+                + getString("ask_donation_level")
                 + Style.BRIGHT
             )
 
@@ -373,7 +384,7 @@ def loadConfig():  # Config loading section
         efficiency = (
             100 - float(efficiency)
         ) * 0.01  # Calulate efficiency for use with sleep function
-        print(Style.RESET_ALL + lang_file["config_saved"])
+        print(Style.RESET_ALL + getString("config_saved"))
 
     else:  # If config already exists, load from it
         config.read(resourcesFolder + "/Miner_config.cfg")
@@ -414,16 +425,16 @@ def Donate():
             + " sys0 "
             + Back.RESET
             + Fore.YELLOW
-            + lang_file["free_network_warning"]
+            + getString("free_network_warning")
             + Style.BRIGHT
             + Fore.YELLOW
-            + lang_file["donate_warning"]
+            + getString("donate_warning")
             + Style.RESET_ALL
             + Fore.GREEN
             + "https://duinocoin.com/donate"
             + Style.BRIGHT
             + Fore.YELLOW
-            + lang_file["learn_more_donate"]
+            + getString("learn_more_donate")
         )
         time.sleep(10)
     if donatorrunning == False:
@@ -452,7 +463,7 @@ def Donate():
                 + " sys0 "
                 + Back.RESET
                 + Fore.RED
-                + lang_file["thanks_donation"]
+                + getString("thanks_donation")
             )
 
 
@@ -497,7 +508,7 @@ def Thread(
                     + " "
                     + Back.RESET
                     + Fore.RED
-                    + lang_file["data_error"]
+                    + getString("data_error")
                 )
                 if debug == "y":
                     raise
@@ -524,10 +535,10 @@ def Thread(
                         + " "
                         + Back.RESET
                         + Fore.YELLOW
-                        + lang_file["connected"]
+                        + getString("connected")
                         + Style.RESET_ALL
                         + Fore.WHITE
-                        + lang_file["connected_server"]
+                        + getString("connected_server")
                         + str(serverVersion)
                         + ")"
                     )
@@ -543,14 +554,14 @@ def Thread(
                         + " "
                         + Back.RESET
                         + Fore.RED
-                        + lang_file["outdated_miner"]
+                        + getString("outdated_miner")
                         + minerVersion
                         + "),"
                         + Style.RESET_ALL
                         + Fore.RED
-                        + lang_file["server_is_on_version"]
+                        + getString("server_is_on_version")
                         + serverVersion
-                        + lang_file["update_warning"]
+                        + getString("update_warning")
                     )
                 break
             except:
@@ -566,7 +577,7 @@ def Thread(
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Fore.RED
-                    + lang_file["connecting_error"]
+                    + getString("connecting_error")
                     + Style.RESET_ALL
                 )
                 if debug == "y":
@@ -582,12 +593,12 @@ def Thread(
             + " "
             + Back.RESET
             + Fore.YELLOW
-            + lang_file["mining_thread"]
+            + getString("mining_thread")
             + str(threadid)
-            + lang_file["mining_thread_starting"]
+            + getString("mining_thread_starting")
             + Style.RESET_ALL
             + Fore.WHITE
-            + lang_file["using_algo"]
+            + getString("using_algo")
             + Fore.YELLOW
             + str(int(100 - efficiency * 100))
             + f"% {lang_file['efficiency']}"
@@ -654,13 +665,13 @@ def Thread(
                             if feedback == "GOOD":  # If result was good
                                 accepted.value += 1  # Share accepted = increment feedback shares counter by 1
                                 title(
-                                    lang_file["duco_python_miner"]
+                                    getString("duco_python_miner")
                                     + str(minerVersion)
                                     + ") - "
                                     + str(accepted.value)
                                     + "/"
                                     + str(accepted.value + rejected.value)
-                                    + lang_file["accepted_shares"]
+                                    + getString("accepted_shares")
                                 )
                                 print(
                                     now().strftime(
@@ -674,7 +685,7 @@ def Thread(
                                     + " "
                                     + Back.RESET
                                     + Fore.GREEN
-                                    + lang_file["accepted"]
+                                    + getString("accepted")
                                     + Fore.WHITE
                                     + str(accepted.value)
                                     + "/"
@@ -712,13 +723,13 @@ def Thread(
                             elif feedback == "BLOCK":  # If block was found
                                 accepted.value += 1  # Share accepted = increment feedback shares counter by 1
                                 title(
-                                    lang_file["duco_python_miner"]
+                                    getString("duco_python_miner")
                                     + str(minerVersion)
                                     + ") - "
                                     + str(accepted.value)
                                     + "/"
                                     + str(accepted.value + rejected.value)
-                                    + lang_file["accepted_shares"]
+                                    + getString("accepted_shares")
                                 )
                                 print(
                                     now().strftime(
@@ -732,7 +743,7 @@ def Thread(
                                     + " "
                                     + Back.RESET
                                     + Fore.CYAN
-                                    + lang_file["block_found"]
+                                    + getString("block_found")
                                     + Fore.WHITE
                                     + str(accepted.value)
                                     + "/"
@@ -780,23 +791,23 @@ def Thread(
                                     + " "
                                     + Back.RESET
                                     + Fore.RED
-                                    + lang_file["internal_server_error"]
+                                    + getString("internal_server_error")
                                     + Style.RESET_ALL
                                     + Fore.RED
-                                    + lang_file["retrying"]
+                                    + getString("retrying")
                                 )
                                 time.sleep(10)
 
                             else:  # If result was bad
                                 rejected.value += 1  # Share rejected = increment bad shares counter by 1
                                 title(
-                                    lang_file["duco_python_miner"]
+                                    getString("duco_python_miner")
                                     + str(minerVersion)
                                     + ") - "
                                     + str(accepted.value)
                                     + "/"
                                     + str(accepted.value + rejected.value)
-                                    + lang_file["accepted_shares"]
+                                    + getString("accepted_shares")
                                 )
                                 print(
                                     now().strftime(Style.DIM + "%H:%M:%S ")
@@ -809,7 +820,7 @@ def Thread(
                                     + " "
                                     + Back.RESET
                                     + Fore.RED
-                                    + lang_file["rejected"]
+                                    + getString("rejected")
                                     + Fore.WHITE
                                     + str(accepted.value)
                                     + "/"
@@ -857,7 +868,7 @@ def Thread(
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Fore.MAGENTA
-                    + lang_file["error_while_mining"]
+                    + getString("error_while_mining")
                     + Style.RESET_ALL
                 )
                 if debug == "y":
@@ -910,7 +921,7 @@ if __name__ == "__main__":
     multiprocessing.freeze_support()
     cpu = cpuinfo.get_cpu_info()  # Processor info
     init(autoreset=True)  # Enable colorama
-    title(lang_file["duco_python_miner"] + str(minerVersion) + ")")
+    title(getString("duco_python_miner") + str(minerVersion) + ")")
 
     try:
         loadConfig()  # Load config file or create new one
@@ -926,9 +937,9 @@ if __name__ == "__main__":
             + Style.RESET_ALL
             + Style.BRIGHT
             + Fore.RED
-            + lang_file["load_config_error"]
+            + getString("load_config_error")
             + resourcesFolder
-            + lang_file["load_config_error_warning"]
+            + getString("load_config_error_warning")
             + Style.RESET_ALL
         )
         if debug == "y":
