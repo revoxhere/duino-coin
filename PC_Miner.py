@@ -93,7 +93,7 @@ elif locale == "pl_PL":
 elif locale == "fr_FR":
     lang = "french"
 else:
-    lang = "french"
+    lang = "english"
 
 
 def getString(string_name):
