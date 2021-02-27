@@ -120,8 +120,8 @@ if use_wrapper:
     wduco = tron.get_contract("TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U") # wDUCO contract
     wrapper_permission = wduco.functions.checkWrapperStatus(wrapper_public_key)
     
-def adminLog(messagetype, *message): # TODO
-    print(" ".join(message))
+def adminLog(messagetype, message): # TODO
+    print(message)
     
 def createBackup():
     if not os.path.isdir('backups/'):
@@ -569,10 +569,10 @@ def createHashes():
         time.sleep(10) # Refresh every 10s
         
 def wraptx(duco_username, address, amount):
-    adminLog("wrapper", "TRON wrapper called by", duco_username)
+    adminLog("wrapper", "TRON wrapper called by " + duco_username)
     txn = wduco.functions.wrap(address,duco_username,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
     txn = txn.broadcast()
-    adminLog("wrapper", "Sent wrap tx to TRON network by", duco_username)
+    adminLog("wrapper", "Sent wrap tx to TRON network by " + duco_username)
     feedback = txn.result()
     return feedback
 
@@ -634,7 +634,7 @@ def handle(c, ip):
                                         datab = conn.cursor()
                                         datab.execute('''INSERT INTO Users(username, password, email, balance) VALUES(?, ?, ?, ?)''',(username, password, email, 0.0))
                                         conn.commit()
-                                    adminLog("duco", "New user registered:", username, "with email:", email)
+                                    adminLog("duco", "New user registered: " + username + " with email: " + email)
                                     c.send(bytes("OK", encoding='utf8'))
                                     try:
                                         part1 = MIMEText(text, "plain") # Turn email data into plain/html MIMEText objects
@@ -646,7 +646,7 @@ def handle(c, ip):
                                             smtpserver.login(duco_email, duco_password)
                                             smtpserver.sendmail(duco_email, email, message.as_string())
                                     except:
-                                        adminLog("duco", "Error sending registration email to", email)
+                                        adminLog("duco", "Error sending registration email to" + email)
                                 except:
                                     c.send(bytes("NO,Error registering user", encoding='utf8'))
                                     break
@@ -666,7 +666,7 @@ def handle(c, ip):
                     username = str(data[1])
                     password = str(data[2]).encode('utf-8')
                     if connections[ip] > max_login_connections and not ip in whitelisted and not username in whitelistedUsernames:
-                        adminLog("system", "Banning IP:", ip, "in login section, account:", username)
+                        adminLog("system", "Banning IP: " + ip + " in login section, account: " + username)
                         ban(ip)
                         break
                 except IndexError:
@@ -737,7 +737,7 @@ def handle(c, ip):
                                 datab = conn.cursor()
                                 datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (amount, NodeS_Username))
                                 conn.commit()
-                                adminLog("nodes", "Updated NodeS Broker balance with:", amount)
+                                adminLog("nodes", "Updated NodeS Broker balance with: " + str(amount))
                                 c.send(bytes("YES,Successful", encoding='utf8'))
                                 break
                         except:
@@ -757,7 +757,7 @@ def handle(c, ip):
                     while True:
                         try:
                             blocks += amount
-                            adminLog("nodes", "Incremented block counter by NodeS:", amount)
+                            adminLog("nodes", "Incremented block counter by NodeS: " + str(amount))
                             c.send(bytes("YES,Successful", encoding='utf8'))
                             break
                         except Exception as e:
@@ -782,7 +782,7 @@ def handle(c, ip):
                                 for user in data.keys():
                                     datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (float(data[user]), user))
                                 conn.commit()
-                            adminLog("nodes", "Updated balance through NodeS:", amount)
+                            adminLog("nodes", "Updated balance through NodeS: " + str(amount))
                             c.send(bytes("YES,Successful", encoding='utf8'))
                             break
                         except Exception as e:
@@ -809,7 +809,7 @@ def handle(c, ip):
                                 formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
                                 datab.execute('''INSERT INTO Blocks(timestamp, finder, amount, hash) VALUES(?, ?, ?, ?)''', (formatteddatetime, username, reward, newBlockHash))
                                 bigblockconn.commit()
-                            adminLog("nodes", "Block found", formatteddatetime, username, reward, newBlockHash)
+                            adminLog("nodes", "Block found " + formatteddatetime + " by " + username + " generated " + str(reward) + " DUCO " + newBlockHash)
                             c.send(bytes("YES,Successful", encoding='utf8'))
                             break
                         except:
@@ -824,7 +824,7 @@ def handle(c, ip):
                             c.send(bytes("NO,Not enough data", encoding='utf8'))
                             break
                         if connections[ip] > max_mining_connections and not ip in whitelisted and not username in whitelistedUsernames:
-                            adminLog("system", "Banning IP:", ip, "in mining section, account:", username)
+                            adminLog("system", "Banning IP: " + ip + " in mining section, account: " + username)
                             ban(ip)
                             break
                     except IndexError:
@@ -962,7 +962,7 @@ def handle(c, ip):
                                 formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
                                 datab.execute('''INSERT INTO Blocks(timestamp, finder, amount, hash) VALUES(?, ?, ?, ?)''', (formatteddatetime, username, reward, newBlockHash))
                                 bigblockconn.commit()
-                            adminLog("duco", "Block found", formatteddatetime, username, reward, newBlockHash)
+                            adminLog("duco", "Block found " + formatteddatetime + " by " + username + " generated " + str(reward) + " DUCO " + newBlockHash)
                             c.send(bytes("BLOCK", encoding="utf8")) # Send feedback that block was found
                         else:
                             c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
@@ -1001,7 +1001,7 @@ def handle(c, ip):
                     newPassword_encrypted = bcrypt.hashpw(newPassword, bcrypt.gensalt(rounds=4))
                 except:
                     c.send(bytes("NO,Bcrypt error", encoding="utf8"))
-                    adminLog("duco", "Bcrypt error when changing password of user", username)
+                    adminLog("duco", "Bcrypt error when changing password of user " + username)
                     break
                 try:
                     with sqlite3.connect(database, timeout = 10) as conn:
@@ -1019,13 +1019,13 @@ def handle(c, ip):
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
                             conn.commit()
-                            adminLog("duco", "Changed password of user", username)
+                            adminLog("duco", "Changed password of user " + username)
                             try:
                                 c.send(bytes("OK,Your password has been changed", encoding='utf8'))
                             except:
                                 break
                     else:
-                        adminLog("duco", "Passwords of user", username, "don't match")
+                        adminLog("duco", "Passwords of user " + username + " don't match")
                         try:
                             server.send(bytes("NO,Your old password doesn't match!", encoding='utf8'))
                         except:
@@ -1036,7 +1036,7 @@ def handle(c, ip):
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
                             conn.commit()
-                            adminLog("duco", "Changed password of user", username)
+                            adminLog("duco", "Changed password of user " + username)
                             try:
                                 c.send(bytes("OK,Your password has been changed", encoding='utf8'))
                             except:
@@ -1056,14 +1056,14 @@ def handle(c, ip):
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
-                adminLog("duco", "Sending protocol called by", username)
+                adminLog("duco", "Sending protocol called by " + username)
                 while True:
                     try:
                         with sqlite3.connect(database, timeout = 10) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                             balance = float(datab.fetchone()[3]) # Get current balance of sender
-                            adminLog("duco", "Read senders balance:", balance)
+                            adminLog("duco", "Read senders balance: " + str(balance))
                             break
                     except:
                         pass
@@ -1076,7 +1076,7 @@ def handle(c, ip):
                 if str(amount) == "" or str(recipient) == "" or float(balance) <= float(amount) or float(amount) <= 0:
                     try:
                         c.send(bytes("NO,Incorrect amount", encoding='utf8'))
-                        adminLog("duco", "Incorrect amount supplied:", amount)
+                        adminLog("duco", "Incorrect amount supplied: " + str(amount))
                     except:
                         break
                 try:
@@ -1094,7 +1094,7 @@ def handle(c, ip):
                                             datab = conn.cursor()
                                             datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
                                             conn.commit()
-                                            adminLog("duco", "Updated senders balance:", balance)
+                                            adminLog("duco", "Updated senders balance: " + str(balance))
                                             break
                                     except:
                                         pass
@@ -1104,7 +1104,7 @@ def handle(c, ip):
                                             datab = conn.cursor()
                                             datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
                                             recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
-                                            adminLog("duco", "Read recipients balance:", recipientbal)
+                                            adminLog("duco", "Read recipients balance: " + str(recipientbal))
                                             break
                                     except:
                                         pass
@@ -1115,7 +1115,7 @@ def handle(c, ip):
                                             datab = conn.cursor() # Update receipents' balance
                                             datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
                                             conn.commit()
-                                            adminLog("duco", "Updated recipients balance:", recipientbal)
+                                            adminLog("duco", "Updated recipients balance: " + str(recipientbal))
                                         with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
                                             datab = tranconn.cursor()
                                             now = datetime.datetime.now()
@@ -1134,7 +1134,7 @@ def handle(c, ip):
                                 break
                 except:
                     try:
-                        adminLog("duco", "Invalid recipient:", recipient)
+                        adminLog("duco", "Invalid recipient: " + recipient)
                         c.send(bytes("NO,Recipient doesn't exist", encoding='utf8'))
                     except:
                         break
@@ -1186,7 +1186,7 @@ def handle(c, ip):
             ######################################################################
             elif str(data[0]) == "WRAP" and str(username) != "":
                 if use_wrapper and wrapper_permission:
-                    adminLog("wrapper", "Starting wrapping protocol by", username)
+                    adminLog("wrapper", "Starting wrapping protocol by " + username)
                     try:
                         amount = str(data[1])
                         tron_address = str(data[2])
@@ -1216,7 +1216,7 @@ def handle(c, ip):
                                 break
                         else:
                             balancebackup = balance
-                            adminLog("wrapper", "Backed up balance:", balancebackup)
+                            adminLog("wrapper", "Backed up balance: " + str(balancebackup))
                             try:
                                 adminLog("wrapper", "All checks done, initiating wrapping routine")
                                 balance -= float(amount) # Remove amount from senders' balance
@@ -1226,9 +1226,9 @@ def handle(c, ip):
                                     datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
                                     conn.commit()
                                 adminLog("wrapper", "DUCO balance sent to DB, sending tron transaction")
-                                adminLog("wrapper", "Tron wrapper called !")
+                                adminLog("wrapper", "Tron wrapper called")
                                 txn = wduco.functions.wrap(tron_address,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
-                                adminLog("wrapper", "txid :", txn.txid)
+                                adminLog("wrapper", "Txid: " + txn.txid)
                                 txn = txn.broadcast()
                                 adminLog("wrapper", "Sent wrap tx to TRON network")
                                 trontxfeedback = txn.result()
@@ -1264,7 +1264,7 @@ def handle(c, ip):
             ######################################################################
             elif str(data[0]) == "UNWRAP" and str(username) != "":
                 if use_wrapper and wrapper_permission:
-                    adminLog("unwrapper", "Starting unwraping protocol by", username)
+                    adminLog("unwrapper", "Starting unwraping protocol by " + username)
                     amount = str(data[1])
                     tron_address = str(data[2])
                     while True:
@@ -1297,9 +1297,9 @@ def handle(c, ip):
                                     except:
                                         pass
                                 try:
-                                    adminLog("unwrapper", "Sending tron transaction !")
+                                    adminLog("unwrapper", "Sending tron transaction")
                                     txn = wduco.functions.confirmWithdraw(username,tron_address,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
-                                    adminLog("unwrapper", "txid :", txn.txid)
+                                    adminLog("unwrapper", "Txid: " + txn.txid)
                                     txn = txn.broadcast()
                                     adminLog("unwrapper", "Sent confirm tx to tron network")
                                     onchaintx = txn.result()
@@ -1379,7 +1379,7 @@ def countips():
         for ip in IPS.copy():
             try:
                 if IPS[ip] > max_unauthorized_connections and not ip in whitelisted_ip:
-                    adminLog("system", "Banning DDoSing IP:", ip)
+                    adminLog("system", "Banning DDoSing IP: " + ip)
                     ban(ip)
             except:
                 pass
@@ -1409,9 +1409,9 @@ if __name__ == '__main__':
                 for username in whitelistedusr:
                     whitelistedUsernames.append(username)
         except Exception as e:
-            adminLog("system", "Error reading whitelisted usernames file:", str(e))
+            adminLog("system", "Error reading whitelisted usernames file: " + str(e))
     except Exception as e:
-        adminLog("system", "Error reading whitelisted IPs file:", str(e))
+        adminLog("system", "Error reading whitelisted IPs file: " + str(e))
     threading.Thread(target=API).start() # Create JSON API thread
     threading.Thread(target=getDucoPrice).start() # Create duco price calculator
     threading.Thread(target=cpuUsageThread).start() # Create CPU perc measurement
