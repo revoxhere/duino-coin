@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*-coding=utf-8 -*-
 ##########################################
 # Duino-Coin Python PC Miner (v2.2)
 # https://github.com/revoxhere/duino-coin
@@ -18,7 +19,6 @@ def install(package):
 
 def now():
     return datetime.datetime.now()
-
 
 try:  # Check if cpuinfo is installed
     import cpuinfo
@@ -80,10 +80,10 @@ if not Path(  # Check if languages file exists
 ).is_file():  # Initial miner executable section
     url = "https://raw.githubusercontent.com/revoxhere/duino-coin/master/Resources/PC_Miner_langs.json"
     r = requests.get(url)
-    with open(resourcesFolder + "/langs.json", "wb") as f:
+    with open(resourcesFolder + "/langs.json", "wb", encoding="utf8") as f:
         f.write(r.content)
 
-with open(f"{resourcesFolder}/langs.json") as lang_file:
+with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = json.load(lang_file)
 
 if locale == "es_ES":
@@ -601,7 +601,7 @@ def Thread(
             + getString("using_algo")
             + Fore.YELLOW
             + str(int(100 - efficiency * 100))
-            + f"% {lang_file['efficiency']}"
+            + f"% {getString('efficiency')}"
         )
         while True:  # Mining section
             try:
