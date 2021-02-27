@@ -80,7 +80,7 @@ except:
 try:
     import pystray
 except:
-    print("Pystray is not installed. Continuing without using tray support")
+    print("Pystray is not installed. Continuing without system tray support")
     disableTray = True
 else:
     disableTray = False
@@ -462,7 +462,7 @@ class LoginFrame(Frame):
 
         Label(
             register,
-            text="E-MAIL",
+            text=getString("email"),
             background=backgroundColor,
             foreground=fontColor,
             font=textFont2,
@@ -520,13 +520,14 @@ def LoadingWindow():
     status.grid(row=1, column=0, sticky=S + W, pady=(0, 5), padx=5)
     loading.update()
 
+
 def getString(string_name):
-    if (string_name in lang_file[lang]):
+    if string_name in lang_file[lang]:
         return lang_file[lang][string_name]
-    elif (string_name in lang_file["english"]):
+    elif string_name in lang_file["english"]:
         return lang_file["english"][string_name]
     else:
-        return "String not found"
+        return "String not found: " + string_name
 
 
 with urlopen(
@@ -576,7 +577,8 @@ if not Path(resources + "langs.json").is_file():
 
 locale = locale.getdefaultlocale()[0]
 with open(
-    f"{resources}langs.json", "r", encoding='utf-8') as lang_file:  # Load language strings depending on system locale
+    f"{resources}langs.json", "r", encoding="utf-8"
+) as lang_file:  # Load language strings depending on system locale
     lang_file = json.load(lang_file)
 if locale == "es_ES":
     lang = "spanish"
@@ -586,26 +588,6 @@ elif locale == "fr_FR":
     lang = "french"
 else:
     lang = "english"
-
-with sqlite3.connect(f"{resources}/wallet.db") as con:
-    cur = con.cursor()
-    cur.execute("SELECT COUNT(username) FROM UserData")
-    userdata_count = cur.fetchall()[0][0]
-if userdata_count != 1:
-    root = Tk()
-    lf = LoginFrame(root)
-    root.mainloop()
-else:
-    LoadingWindow()
-    with sqlite3.connect(f"{resources}/wallet.db") as con:
-        cur = con.cursor()
-        cur.execute("SELECT * FROM UserData")
-        userdata_query = cur.fetchone()
-        username = userdata_query[0]
-        passwordEnc = (userdata_query[1]).decode("utf-8")
-        password = b64decode(passwordEnc).decode("utf8")
-    status.config(text=getString("preparing_wallet_window"))
-    loading.update()
 
 
 def openGitHub(handler):
@@ -947,8 +929,7 @@ def openStats(handler):
                 + " kH/s @ diff "
                 + difficulty
                 + ", "
-                + shares
-                + " acc.",
+                + shares,
             )
             i += 1
     if i == 0:
@@ -1066,7 +1047,7 @@ def openStats(handler):
 def openWrapper(handler):
     def Wrap():
         amount = amountWrap.get()
-        print("Got amount :", amount)
+        print("Got amount: ", amount)
         soc = socket.socket()
         soc.connect((pool_address, int(pool_port)))
         soc.recv(3)
@@ -1158,7 +1139,7 @@ def openUnWrapper(handler):
                 try:
                     amount = float(amount)
                 except ValueError:
-                    print("NO, Value should be numeric... aborting")
+                    print("Value should be numeric - aborting")
                 else:
                     if int(float(amount) * 10 ** 6) >= pendingvalues:
                         toInit = int(float(amount) * 10 ** 6) - pendingvalues
@@ -1218,7 +1199,9 @@ def openUnWrapper(handler):
             passphraseEntry = Entry(unWrapperWindow, border="0", font=Font(size=15))
             passphraseEntry.grid(row=5, column=0, sticky=N + W)
 
-            wrapButton = Button(unWrapperWindow, text="Unwrap", command=UnWrap)
+            wrapButton = Button(
+                unWrapperWindow, text=getString("unwrap_duco"), command=UnWrap
+            )
             wrapButton.grid(row=7, column=0, sticky=N + W)
         else:
             messagebox.showerror(
@@ -1545,15 +1528,22 @@ def openSettings(handler):
     ).grid(row=7, column=0, columnspan=4, padx=5, sticky=S + W)
     Label(
         settingsWindow,
-        text=getString("config_dev_warning"),
+        text=f'{getString("translation_author_message")}: {getString("translation_author")}',
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
     ).grid(row=8, column=0, columnspan=4, padx=5, sticky=S + W)
+    Label(
+        settingsWindow,
+        text=getString("config_dev_warning"),
+        font=textFont,
+        background=backgroundColor,
+        foreground=fontColor,
+    ).grid(row=9, column=0, columnspan=4, padx=5, sticky=S + W)
 
     separator = ttk.Separator(settingsWindow, orient="horizontal")
     separator.grid(
-        row=9, column=0, columnspan=4, sticky=N + S + E + W, padx=(5, 5), pady=5
+        row=10, column=0, columnspan=4, sticky=N + S + E + W, padx=(5, 5), pady=5
     )
 
     original = Image.open(resources + "duco.png")
@@ -1563,7 +1553,7 @@ def openSettings(handler):
     websiteLabel = Label(
         settingsWindow, image=website, background=backgroundColor, foreground=fontColor
     )
-    websiteLabel.grid(row=10, column=0, sticky=N + S + E + W, padx=(5, 0), pady=(0, 5))
+    websiteLabel.grid(row=11, column=0, sticky=N + S + E + W, padx=(5, 0), pady=(0, 5))
     websiteLabel.bind("<Button-1>", openWebsite)
 
     original = Image.open(resources + "github.png")
@@ -1573,7 +1563,7 @@ def openSettings(handler):
     githubLabel = Label(
         settingsWindow, image=github, background=backgroundColor, foreground=fontColor
     )
-    githubLabel.grid(row=10, column=1, sticky=N + S + E + W, pady=(0, 5))
+    githubLabel.grid(row=11, column=1, sticky=N + S + E + W, pady=(0, 5))
     githubLabel.bind("<Button-1>", openGitHub)
 
     original = Image.open(resources + "exchange.png")
@@ -1583,7 +1573,7 @@ def openSettings(handler):
     exchangeLabel = Label(
         settingsWindow, image=exchange, background=backgroundColor, foreground=fontColor
     )
-    exchangeLabel.grid(row=10, column=2, sticky=N + S + E + W, pady=(0, 5))
+    exchangeLabel.grid(row=11, column=2, sticky=N + S + E + W, pady=(0, 5))
     exchangeLabel.bind("<Button-1>", openExchange)
 
     original = Image.open(resources + "discord.png")
@@ -1593,7 +1583,7 @@ def openSettings(handler):
     discordLabel = Label(
         settingsWindow, image=discord, background=backgroundColor, foreground=fontColor
     )
-    discordLabel.grid(row=10, column=3, sticky=N + S + E + W, padx=(0, 5), pady=(0, 5))
+    discordLabel.grid(row=11, column=3, sticky=N + S + E + W, padx=(0, 5), pady=(0, 5))
     discordLabel.bind("<Button-1>", openDiscord)
 
 
@@ -1647,7 +1637,8 @@ def getBalance():
                                     notification = Notify()
                                     notification.title = getString("duino_coin_wallet")
                                     notification.message = (
-                                        "New transaction\n"
+                                        getString("notification_new_transaction")
+                                        + "\n"
                                         + now.strftime("%d.%m.%Y %H:%M:%S\n")
                                         + str(round(difference, 6))
                                         + " DUCO"
@@ -1733,8 +1724,8 @@ def updateBalanceLabel():
             )
         else:
             if profitCheck > 10:
-                sessionprofittext.set("Launch your miners")
-                minuteprofittext.set("first to see estimated profit.")
+                sessionprofittext.set(getString("sessionprofit_unavailable1"))
+                minuteprofittext.set(getString("sessionprofit_unavailable2"))
                 hourlyprofittext.set("")
                 dailyprofittext.set("")
             profitCheck += 1
@@ -2148,11 +2139,14 @@ class Wallet:
             def withdraw_window():
                 image = Image.open(resources + "duco.png")
                 menu = (
-                    pystray.MenuItem("Show", show_window),
-                    pystray.MenuItem("Quit", quit_window),
+                    pystray.MenuItem(getString("tray_show"), show_window),
+                    pystray.MenuItem(getString("tray_exit"), quit_window),
                 )
                 icon = pystray.Icon(
-                    "Duino-coin GUI Wallet", image, "Duino-coin GUI Wallet", menu
+                    getString("duino_coin_wallet"),
+                    image,
+                    getString("duino_coin_wallet"),
+                    menu,
                 )
                 icon.run()
 
@@ -2163,17 +2157,39 @@ class Wallet:
         root.mainloop()
 
 
-try:
-    GetDucoPrice()  # Start duco price updater
-    threading.Thread(target=getBalance).start()
-    initRichPresence()
-    threading.Thread(target=updateRichPresence).start()
-    try:
-        loading.destroy()  # Destroy loading dialog and start the main wallet window
-    except:
-        pass
-    root = Tk()
-    my_gui = Wallet(root)
-except ValueError:
-    print("ValueError")
-    _exit(0)
+with sqlite3.connect(f"{resources}/wallet.db") as con:
+    cur = con.cursor()
+    cur.execute("SELECT COUNT(username) FROM UserData")
+    userdata_count = cur.fetchall()[0][0]
+    if userdata_count < 1:
+        root = Tk()
+        lf = LoginFrame(root)
+        root.mainloop()
+        cur = con.cursor()
+        cur.execute("SELECT COUNT(username) FROM UserData")
+        userdata_count = cur.fetchall()[0][0]
+    if userdata_count >= 1:
+        LoadingWindow()
+        with sqlite3.connect(f"{resources}/wallet.db") as con:
+            cur = con.cursor()
+            cur.execute("SELECT * FROM UserData")
+            userdata_query = cur.fetchone()
+            username = userdata_query[0]
+            passwordEnc = (userdata_query[1]).decode("utf-8")
+            password = b64decode(passwordEnc).decode("utf8")
+        status.config(text=getString("preparing_wallet_window"))
+        loading.update()
+        try:
+            GetDucoPrice()  # Start duco price updater
+            threading.Thread(target=getBalance).start()
+            initRichPresence()
+            threading.Thread(target=updateRichPresence).start()
+            try:
+                loading.destroy()  # Destroy loading dialog and start the main wallet window
+            except:
+                pass
+            root = Tk()
+            my_gui = Wallet(root)
+        except ValueError:
+            print("ValueError")
+            _exit(0)
