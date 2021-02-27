@@ -236,7 +236,7 @@ def hashrateCalculator(hashcount, khashcount):  # Hashes/sec calculation
         hashcount.value = 0  # Reset the counter
         khashcount.value = int(
             statistics.mean(hash_mean[-50:])
-        )  # Calculate average hashrate from last 20 hashrate measurements
+        )  # Calculate average hashrate from last 50 measurements
         time.sleep(1)
 
 
@@ -247,7 +247,8 @@ def loadConfig():  # Config loading section
         resourcesFolder + "/Miner_config.cfg"
     ).is_file():  # Initial configuration section
         print(
-            Style.BRIGHT
+            Style.RESET_ALL
+            + Style.BRIGHT
             + "\nDuino-Coin basic configuration tool\nEdit "
             + resourcesFolder
             + "/Miner_config.cfg file later if you want to change it."
@@ -394,7 +395,7 @@ def Donate():
         )
     if int(donationlevel) <= 0:
         print(
-            now().strftime(Style.DIM + "%H:%M:%S ")
+            now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
             + Style.RESET_ALL
             + Style.BRIGHT
             + Back.GREEN
@@ -432,7 +433,7 @@ def Donate():
                 cmd, shell=True, stderr=subprocess.DEVNULL
             )
             print(
-                now().strftime(Style.DIM + "%H:%M:%S ")
+                now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
                 + Style.RESET_ALL
                 + Style.BRIGHT
                 + Back.GREEN
@@ -543,7 +544,7 @@ def Thread(
                 break
             except:
                 print(
-                    now().strftime(Style.DIM + "%H:%M:%S ")
+                    now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Back.BLUE
@@ -560,7 +561,7 @@ def Thread(
                 if debug == "y":
                     raise
         print(
-            now().strftime(Style.DIM + "%H:%M:%S ")
+            now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
             + Style.RESET_ALL
             + Style.BRIGHT
             + Back.GREEN
@@ -787,7 +788,9 @@ def Thread(
                                     + " accepted shares"
                                 )
                                 print(
-                                    now().strftime(Style.DIM + "%H:%M:%S ")
+                                    now().strftime(
+                                        Style.RESET_ALL + Style.DIM + "%H:%M:%S "
+                                    )
                                     + Style.RESET_ALL
                                     + Style.BRIGHT
                                     + Back.YELLOW
@@ -834,7 +837,7 @@ def Thread(
                         break  # Repeat
             except Exception as e:
                 print(
-                    now().strftime(Style.DIM + "%H:%M:%S ")
+                    now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Back.BLUE
@@ -881,7 +884,11 @@ def updateRichPresence():
                 + "/"
                 + str(rejected.value + accepted.value),
                 large_image="ducol",
-                large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
+                large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards"
+                + "\nUsername: "
+                + str(username)
+                + "\nThreads: "
+                + str(threadcount),
                 buttons=[
                     {"label": "Learn more", "url": "https://duinocoin.com"},
                     {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
@@ -905,7 +912,7 @@ if __name__ == "__main__":
         debugOutput("Config file loaded")
     except:
         print(
-            now().strftime(Style.DIM + "%H:%M:%S ")
+            now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
             + Style.RESET_ALL
             + Style.BRIGHT
             + Back.GREEN
