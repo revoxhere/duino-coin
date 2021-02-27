@@ -196,13 +196,13 @@
         "day": "DÍA",
         "input_amount": "INTRODUCE CANTIDAD",
         "email": "E-MAIL",
-        "wrapper_error_tronpy": "Error with Tronpy",
-        "translation_author_message": "Wallet translated by:",
-        "notification_new_transaction": "New transaction",
-        "sessionprofit_unavailable1": "Launch your miners",
-        "sessionprofit_unavailable2": "first to see estimated profit.",
-        "tray_show": "Show window",
-        "tray_exit": "Exit window"
+        "wrapper_error_tronpy": "Error con Tronpy",
+        "translation_author_message": "Monedero traducido por:",
+        "notification_new_transaction": "Nueva transacción",
+        "sessionprofit_unavailable1": "Lanza tus mineros",
+        "sessionprofit_unavailable2": "primero para ver el beneficio estimado.",
+        "tray_show": "Muestra la app",
+        "tray_exit": "Cierra la app"
     },
     "polish": {
         "translation_author": "revox",
