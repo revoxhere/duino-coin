@@ -55,18 +55,6 @@ wrong_passphrase = False
 iterations = 100_000
 globalBalance = 0
 
-locale = locale.getdefaultlocale()[0]
-with open(
-    f"{resources}langs.json"
-) as lang_file:  # Load language strings depending on system locale
-    lang_file = json.load(lang_file)
-if locale == "es_ES":
-    lang_file = lang_file["spanish"]
-elif locale == "pl_PL":
-    lang_file = lang_file["polish"]
-else:
-    lang_file = lang_file["english"]
-
 
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
@@ -571,6 +559,24 @@ if not Path(resources + "transactions.png").is_file():
     urlretrieve("https://i.imgur.com/nbVPlKk.png", resources + "transactions.png")
 if not Path(resources + "stats.png").is_file():
     urlretrieve("https://i.imgur.com/KRfHZUM.png", resources + "stats.png")
+if not Path(resources + "langs.json").is_file():
+    urlretrieve(
+        "https://raw.githubusercontent.com/revoxhere/duino-coin/master/Resources/Wallet_langs.json",
+        resources + "langs.json",
+    )
+
+
+locale = locale.getdefaultlocale()[0]
+with open(
+    f"{resources}langs.json"
+) as lang_file:  # Load language strings depending on system locale
+    lang_file = json.load(lang_file)
+if locale == "es_ES":
+    lang_file = lang_file["spanish"]
+elif locale == "pl_PL":
+    lang_file = lang_file["polish"]
+else:
+    lang_file = lang_file["english"]
 
 with sqlite3.connect(f"{resources}/wallet.db") as con:
     cur = con.cursor()
