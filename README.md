@@ -25,7 +25,7 @@
     <img src="https://img.shields.io/badge/Bitcointalk-555555.svg?style=for-the-badge&logo=bitcoin" /></a> bitcointalk thread is VERY outdated-->
 </p>
 
-<h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduino and ESP boards and many more.</h2><br />
+<h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards and many more.</h2><br />
 
 Key features:
 *   Supported by a large number of platforms 💻
@@ -137,7 +137,7 @@ If you want to easily access Duino-Coin API with your Python3 apps, [@connorhess
 
 <h2 align="center">Duino-coin for the AUR</h2><br>
 
-You can get the whole duino-coin bundle now on the AUR - just install it with your favourite AUR Helper (for example usign **yay**):
+You can get the whole duino-coin bundle now on the AUR - just install it with your favourite AUR Helper (for example using **yay**):
 
 1. Install git (if you haven't already)
 
