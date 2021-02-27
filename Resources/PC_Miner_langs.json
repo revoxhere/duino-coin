@@ -1,6 +1,5 @@
 {
     "english":{
-
         "sigint_detected": " SIGINT detected - Exiting gracefully.",
         "goodbye": " See you soon!",
         "greeting_morning": "Have a wonderful morning",
@@ -60,10 +59,69 @@
         "retrying": " Retrying in 10s",
         "rejected": " Rejected ",
         "error_while_mining": " Error while mining - most likely a connection error - restarting in 5s."
-
-
     },
+    "polish":{
+        "translation_autor": "revox",
+        "sigint_detected": " SIGINT wykryty - Wyłączam koparkę.",
+        "goodbye": " Do zobaczenia wkrótce!",
+        "greeting_morning": "Miłego ranka",
+        "greeting_noon": "Miłego południa",
+        "greeting_afternoon": "Miłego popołudnia",
+        "greeting_evening": "Miłego wieczoru",
+        "greeting_back": "Witaj ponownie",
 
+        "banner": "Official Duino-Coin © Python Miner",
+        "donation_level": "Poziom dotacji dla deweloperów: ",
+
+        "medium_diff": "Trudność zmniejszona",
+        "net_diff": "Trudność sieci",
+        "algorithm": "Algorytm: ",
+        "rig_identifier": "Identyfikator koparki: ",
+
+        "basic_config_tool": "\nKreator pliku konfiguracyjnego Duino-Coin\nEdytuj plik ",
+        "edit_config_file_warning": "/Miner_config.cfg jeżeli chcesz coś poźniej zmienić.",
+        "dont_have_account": "Nie posiadasz konta Duino-Coin? Użyj ",
+        "wallet": "Wallet (Portfel)",
+        "register_warning": " aby zarejestrować się na sieci.\n",
+        "ask_username": "Wprowadź swoją nazwę użytkownika Duino-Coin: ",
+        "ask_intensity": "Wprowadź intensywność kopania (1-100)% (zalecane: 95): ",
+        "ask_threads": "Ile wątków chcesz użyć do kopania? (zalecane dla twojego systemu: ",
+        "ask_lower_difficulty": "Chcesz użyć zmniejszonej trudności kopania (dla wolniejszych komputerów)? (y/N) ",
+        "ask_rig_identifier": "Chcesz dodać identyfikator (nazwę) dla tej koparki? (y/N) ",
+        "ask_rig_name": "Wprowadź nazwę dla koparki: ",
+        "ask_donation_level": "Ustaw poziom dotacji dla deweloperów (0-5) (zalecane: 1), nie zmniejszy to Twoich zysków: ",
+        "config_saved": "Konfiguracja zapisana! Uruchamianie koparki",
+        "load_config_error": " Problem z ładowaniem pliku konfiguracyjnego (",
+        "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s",
+
+        "free_network_warning": " Sieć Duino-Coin jest darmową usługą i zawsze takową będzie",
+        "donate_warning": "\nNie bierzemy żadnych prowizji z kopania.\nMożesz nam pomóc utrzymać serwer i zapewnić małe prowizje przy wymiane.\nOdwiedź ",
+        "learn_more_donate": " aby dowiedzieć się jak możesz nam pomóc :)",
+        "starting_donation": "Włączanie procesu dotacji",
+        "thanks_donation": " Dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
+
+        "data_error": " Problem pobierania danych z GitHuba! Ponowna próba za 10s.",
+
+        "connected": " Połączono",
+        "connected_server": " z głównym serwerem Duino-Coin (v",
+        "outdated_miner": " Koparka jest nieaktualna (v",
+        "server_is_on_version": " serwer jest na v",
+        "update_warning": ", proszę pobrać najnowszą wersję z https://github.com/revoxhere/duino-coin/releases/",
+        "connecting_error": " Problem podczas łączenia z serwerem. Ponowna próba za 10s",
+        "mining_thread": " Wątek koparki #",
+        "mining_thread_starting": " uruchamia się",
+        "using_algo": " używając algorytmu DUCO-S1 ze ",
+        "efficiency": "efektywnością",
+
+        "duco_python_miner": "Duino-Coin Python Miner (v",
+        "accepted_shares": " zaakceptowanych share'ów",
+        "accepted": " Zaakceptowano ",
+        "block_found": " Znaleziono blok ",
+        "internal_server_error": " Wewnętrzny błąd serwera.",
+        "retrying": " Ponowna próba za 10s",
+        "rejected": " Odrzucono ",
+        "error_while_mining": " Błąd podczas kopania - prawdopodobnie problem z połączeniem - ponowna próba za 5s."
+    },
     "spanish":{
         "translation_autor": "HGEpro",
         "sigint_detected": " SIGINT detectado - Saliendo correctamente.",
@@ -125,7 +183,5 @@
         "retrying": " Reintentando en 10s",
         "rejected": " Rechazadas ",
         "error_while_mining": " Error durante el minado - probablemente un error de conexión - reiniciando en 5s."
-
-
     }
 }
