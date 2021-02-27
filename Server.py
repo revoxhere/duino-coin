@@ -1,7 +1,6 @@
-
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Master Server Remastered (v2.1)
+# Duino-Coin Master Server Remastered (v2.2)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -16,11 +15,15 @@ host = "" # Server will use this as hostname to bind to (localhost on Windows, 0
 port = 2811 # Server will listen on this port - 2811 for official Duino-Coin server
 serverVersion = 2.1 # Server version which will be sent to the clients
 diff_incrase_per = 5000 # Difficulty will increase every x blocks (official server uses 5k)
-use_wrapper = True # Choosing if you want to use wrapper or not
-wrapper_permission = False # set to false for declaration, will be updated by checking smart contract
+max_mining_connections = 24 # Maximum number of clients using mining protocol per IP (official server uses 24)
+max_login_connections = 34 # Maximum number of logged-in clients per IP (official server uses 34)
+max_unauthorized_connections = 34 # Maximum number of connections that haven't sent any data yet (official server uses 34)
+hashes_num = 1000 # Number of pregenerated hashes for every difficulty in mining section; used to massively reduce load on the server
+use_wrapper = True # Enable wDUCO wrapper or not
+wrapper_permission = False # Set to false for declaration, will be updated when checking smart contract
 lock = threading.Lock()
 config = configparser.ConfigParser()
-try:
+try: # Read sensitive data from config file
     config.read('AdminData.ini')
     duco_email = config["main"]["duco_email"]
     duco_password = config["main"]["duco_password"]
@@ -64,7 +67,10 @@ minerapi = {}
 connections = {}
 balancesToUpdate = {}
 connectedUsers = 0
+globalCpuUsage = 0
+ducoPrice = 0.03
 percarray = []
+memarray = []
 database = 'crypto_database.db' # User data database location
 if not os.path.isfile(database): # Create it if it doesn't exist
     with sqlite3.connect(database, timeout = 15) as conn:
@@ -105,13 +111,18 @@ if not os.path.isfile("config/foundBlocks.db"): # Create transactions database i
         datab = conn.cursor()
         datab.execute('''CREATE TABLE IF NOT EXISTS Blocks(timestamp TEXT, finder TEXT, amount REAL, hash TEXT)''')
         conn.commit()
+        
 if use_wrapper:
-    import tronpy # tronpy isn't default installed, install it with "pip install tronpy"
+    import tronpy # Tronpy isn't default installed, install it with "python3 -m pip install tronpy"
     from tronpy.keys import PrivateKey, PublicKey
-    wrapper_public_key = PrivateKey(bytes.fromhex(wrapper_private_key)).public_key.to_base58check_address() # wrapper's public key
+    wrapper_public_key = PrivateKey(bytes.fromhex(wrapper_private_key)).public_key.to_base58check_address() # Wrapper public key
     tron = tronpy.Tron(network="mainnet")
     wduco = tron.get_contract("TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U") # wDUCO contract
     wrapper_permission = wduco.functions.checkWrapperStatus(wrapper_public_key)
+    
+def adminLog(messagetype, *message): # TODO
+    print(" ".join(message))
+    
 def createBackup():
     if not os.path.isdir('backups/'):
         os.mkdir('backups/')
@@ -122,23 +133,28 @@ def createBackup():
             copyfile(blockchain, "backups/"+str(today)+"/"+blockchain)
             copyfile(database, "backups/"+str(today)+"/"+database)
             with open("prices.txt", "a") as pricesfile:
-                pricesfile.write("," + str(getDucoPrice()).rstrip("\n"))
+                pricesfile.write("," + str(ducoPrice).rstrip("\n"))
             with open("pricesNodeS.txt", "a") as pricesNodeSfile:
                 pricesNodeSfile.write("," + str(getDucoPriceNodeS()).rstrip("\n"))
             with open("pricesJustSwap.txt", "a") as pricesJustSwapfile:
                 pricesJustSwapfile.write("," + str(getDucoPriceJustSwap()).rstrip("\n"))
         time.sleep(3600*6) # Run every 6h
+        adminLog("system", "Backup finished")
+        
 def getDucoPrice():
-    coingecko = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=magi&vs_currencies=usd", data=None)
-    if coingecko.status_code == 200:
-        geckocontent = coingecko.content.decode()
-        geckocontentjson = json.loads(geckocontent)
-        xmgusd = float(geckocontentjson["magi"]["usd"])
-    else:
-        xmgusd = .015
-    ducousdLong = float(xmgusd) * float(random.randint(97,103) / 100)
-    ducoPrice = round(float(ducousdLong) / 10, 8) # 1:10 rate
-    return ducoPrice
+    global ducoPrice
+    while True:
+        coingecko = requests.get("https://api.coingecko.com/api/v3/simple/price?ids=magi&vs_currencies=usd", data=None)
+        if coingecko.status_code == 200:
+            geckocontent = coingecko.content.decode()
+            geckocontentjson = json.loads(geckocontent)
+            xmgusd = float(geckocontentjson["magi"]["usd"])
+        else:
+            xmgusd = .03
+        ducousdLong = float(xmgusd) * float(random.randint(99,101) / 100)
+        ducoPrice = round(float(ducousdLong) / 10, 8) # 1:10 rate
+        time.sleep(120)
+        
 def getDucoPriceNodeS():
     nodeS = requests.get("http://www.node-s.co.za/api/v1/duco/exchange_rate", data=None)
     if nodeS.status_code == 200:
@@ -148,6 +164,7 @@ def getDucoPriceNodeS():
     else:
         ducousd = .015
     return ducousd
+
 def getDucoPriceJustSwap():
     justswap = requests.get("https://api.justswap.io/v2/allpairs?page_size=9000&page_num=2", data=None)
     if justswap.status_code == 200:
@@ -165,10 +182,11 @@ def getDucoPriceJustSwap():
         trxusd = .05
     ducousd = round(ducotrx * trxusd, 8);
     return ducousd
+
 def getRegisteredUsers():
     while True:
         try:
-            with sqlite3.connect(database, timeout = 15) as conn:
+            with sqlite3.connect(database, timeout = 10) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT COUNT(username) FROM Users")
                 registeredUsers = datab.fetchone()[0]
@@ -176,6 +194,7 @@ def getRegisteredUsers():
         except:
             pass
     return registeredUsers
+
 def getMinedDuco():
     while True:
         try:
@@ -187,6 +206,7 @@ def getMinedDuco():
         except:
             pass
     return allMinedDuco
+
 def getLeaders():
     while True:
         try:
@@ -200,6 +220,7 @@ def getLeaders():
         except:
             pass
     return(leadersdata[:10])
+
 def getAllBalances():
     while True:
         try:
@@ -214,6 +235,7 @@ def getAllBalances():
         except:
             pass
     return(leadersdata)
+
 def getTransactions():
     while True:
         try:
@@ -232,6 +254,7 @@ def getTransactions():
         except:
             pass
     return transactiondata
+
 def getBlocks():
     while True:
         try:
@@ -249,22 +272,20 @@ def getBlocks():
             print(e)
         with open('foundBlocks.json', 'w') as outfile: # Write JSON big blocks to file
             json.dump(transactiondata, outfile, indent=4, ensure_ascii=False)
-        time.sleep(60)
+        adminLog("system", "Updated block JSON data")
+        time.sleep(120)
+        
 def cpuUsageThread():
     while True:
-        percarray.append(round(psutil.cpu_percent() - 8.55))
-        time.sleep(3)
-def getCpuUsage():
-    while True:
-        try:
-            cpuperc = round(statistics.mean(percarray), 2)
-            break
-        except:
-            pass
-    return(cpuperc)
+        percarray.append(round(psutil.cpu_percent(interval=None)))
+        process = psutil.Process(os.getpid())
+        memarray.append(round(process.memory_percent()))
+        time.sleep(2.5)
+
 def API():
     while True:
         try:
+            time.sleep(2.75)
             with lock:
                 diff = math.ceil(blocks / diff_incrase_per) # Calculate difficulty
                 now = datetime.datetime.now()
@@ -293,12 +314,14 @@ def API():
                 else:
                     prefix = " H/s"
                 formattedMinerApi = { # Prepare server API data
+                        "_Duino-Coin Public master server JSON API": "https://github.com/revoxhere/duino-coin",
                         "Server version":        float(serverVersion),
                         "Active connections":    int(connectedUsers),
-                        "Server CPU usage":      float(getCpuUsage()),
+                        "Server CPU usage":      float(round(statistics.mean(percarray[-100:]), 2)),
+                        "Server RAM usage":      float(round(statistics.mean(memarray[-100:]), 2)),
                         "Last update":           str(now.strftime("%d/%m/%Y %H:%M (UTC)")),
                         "Pool hashrate":         str(round(serverHashrate, 2))+prefix,
-                        "Duco price":            float(round(getDucoPrice(), 6)), # Call getDucoPrice function
+                        "Duco price":            float(round(ducoPrice, 6)), # Get price from global
                         "Registered users":      int(getRegisteredUsers()), # Call getRegisteredUsers function
                         "All-time mined DUCO":   float(round(getMinedDuco(), 2)), # Call getMinedDuco function
                         "Current difficulty":    int(diff),
@@ -319,6 +342,7 @@ def API():
                     "Rejected":      int(lista[4]),
                     "Diff":          int(lista[5]),
                     "Software":      str(lista[7]),
+                    "Identifier":      str(lista[9]),
                     "Last share timestamp":      str(lista[8])}
                 for thread in formattedMinerApi["Miners"]:
                     minerList.append(formattedMinerApi["Miners"][thread]["User"]) # Append miners to formattedMinerApi["Miners"][id of thread]
@@ -326,10 +350,10 @@ def API():
                     usernameMinerCounter[i]=minerList.count(i) # Count miners for every username
                 with open('api.json', 'w') as outfile: # Write JSON to file
                     json.dump(formattedMinerApi, outfile, indent=4, ensure_ascii=False)
+                time.sleep(2.15)
         except Exception as e:
             print(e)
             pass
-        time.sleep(5)
         
 def UpdateOtherAPIFiles():
     while True:
@@ -338,7 +362,7 @@ def UpdateOtherAPIFiles():
         with open('transactions.json', 'w') as outfile: # Write JSON transactions to file
             json.dump(getTransactions(), outfile, indent=4, ensure_ascii=False)
         time.sleep(30)
-
+            
 def UpdateDatabase():
     while True:
         while True:
@@ -352,7 +376,7 @@ def UpdateDatabase():
                             if not float(balancesToUpdate[user]) < 0:
                                 datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
                             if float(balance) < 0:
-                                datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(0), user))
+                                datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(0.0), user))
                             balancesToUpdate.pop(user)
                         except:
                             continue
@@ -503,6 +527,65 @@ def InputManagement():
                         print("Canceled")
                 except:
                     print("User '" + str(userInput[1]) + "' doesn't exist or you've entered wrong number ("+str(userInput[2])+")")
+                    
+readyHashesMedium = {}
+readyHashesNet = {}
+readyHashesAVR = {}
+readyHashesESP = {}
+readyHashesESP32 = {}
+readyHashesEXTREME = {}
+def createHashes():
+    while True:
+        for i in range(hashes_num):
+                rand = fastrand.pcg32bounded(100 * 3)
+                readyHashesAVR[i] = {"Result": rand,
+                                  "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
+                                  "LastBlockHash": str(lastBlockHash)}
+        for i in range(hashes_num):
+                rand = fastrand.pcg32bounded(100 * 75)
+                readyHashesESP[i] = {"Result": rand,
+                                  "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
+                                  "LastBlockHash": str(lastBlockHash)}
+        for i in range(hashes_num):
+                rand = fastrand.pcg32bounded(100 * 100)
+                readyHashesESP32[i] = {"Result": rand,
+                                  "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
+                                  "LastBlockHash": str(lastBlockHash)}
+        for i in range(hashes_num):
+                rand = fastrand.pcg32bounded(100 * 30000)
+                readyHashesMedium[i] = {"Result": rand,
+                                  "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
+                                  "LastBlockHash": str(lastBlockHash)}
+        for i in range(hashes_num):
+                rand = fastrand.pcg32bounded(100 * 50391)
+                readyHashesNet[i] = {"Result": rand,
+                                  "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
+                                  "LastBlockHash": str(lastBlockHash)}
+        for i in range(hashes_num):
+                rand = fastrand.pcg32bounded(100 * 50391)
+                readyHashesEXTREME[i] = {"Result": rand,
+                                  "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
+                                  "LastBlockHash": str(lastBlockHash)}
+        time.sleep(10) # Refresh every 10s
+        
+def wraptx(duco_username, address, amount):
+    adminLog("wrapper", "TRON wrapper called by", duco_username)
+    txn = wduco.functions.wrap(address,duco_username,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+    txn = txn.broadcast()
+    adminLog("wrapper", "Sent wrap tx to TRON network by", duco_username)
+    feedback = txn.result()
+    return feedback
+
+def unwraptx(duco_username, recipient, amount, private_key, public_key):
+    txn = wduco.functions.initiateWithdraw(duco_username,recipient,int(float(amount)*10**6)).with_owner(PublicKey(PrivateKey(bytes.fromhex(wrapper_public_key)))).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+    feedback = txn.broadcast().wait()
+    return feedback
+
+def confirmunwraptx(duco_username, recipient, amount):
+    txn = wduco.functions.confirmWithdraw(duco_username,recipient,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+    txn = txn.broadcast()
+    adminLog("unwrapper", "Sent confirm tx to tron network by", duco_username)
+    return feedback
 
 def handle(c, ip):
     global connectedUsers, minerapi # These globals are used in the statistics API
@@ -510,32 +593,13 @@ def handle(c, ip):
     c.send(bytes(str(serverVersion), encoding="utf8")) # Send server version
     connectedUsers += 1 # Count new opened connection
     username = "" # Variables for every thread
+    firstshare = True
     acceptedShares = 0
     rejectedShares = 0
     try:
         connections[ip] += 1
     except:
         connections[ip] = 1
-    if connections[ip] > 24 and not ip in whitelisted:
-        ban(ip)
-    def wraptx(duco_username, address, amount):
-        print("Tron wrapper called !")
-        txn = wduco.functions.wrap(address,duco_username,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
-        txn = txn.broadcast()
-        print("Sent wrap tx to TRON network")
-        feedback = txn.result()
-        return feedback
-
-    def unwraptx(duco_username, recipient, amount, private_key, public_key):
-        txn = wduco.functions.initiateWithdraw(duco_username,recipient,int(float(amount)*10**6)).with_owner(PublicKey(PrivateKey(bytes.fromhex(wrapper_public_key)))).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
-        feedback = txn.broadcast().wait()
-        return feedback
-
-    def confirmunwraptx(duco_username, recipient, amount):
-        txn = wduco.functions.confirmWithdraw(duco_username,recipient,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
-        txn = txn.broadcast()
-        print("Sent confirm tx to tron network")
-        return feedback
 
     while True:
         try:
@@ -555,7 +619,7 @@ def handle(c, ip):
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
                 if re.match("^[A-Za-z0-9_-]*$", username) and len(username) < 64 and len(unhashed_pass) < 64 and len(email) < 128:
-                    password = bcrypt.hashpw(unhashed_pass, bcrypt.gensalt()) # Encrypt password
+                    password = bcrypt.hashpw(unhashed_pass, bcrypt.gensalt(rounds=4)) # Encrypt password
                     with sqlite3.connect(database, timeout = 10) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT COUNT(username) FROM Users WHERE username = ?",(username,))
@@ -570,6 +634,7 @@ def handle(c, ip):
                                         datab = conn.cursor()
                                         datab.execute('''INSERT INTO Users(username, password, email, balance) VALUES(?, ?, ?, ?)''',(username, password, email, 0.0))
                                         conn.commit()
+                                    adminLog("duco", "New user registered:", username, "with email:", email)
                                     c.send(bytes("OK", encoding='utf8'))
                                     try:
                                         part1 = MIMEText(text, "plain") # Turn email data into plain/html MIMEText objects
@@ -581,7 +646,7 @@ def handle(c, ip):
                                             smtpserver.login(duco_email, duco_password)
                                             smtpserver.sendmail(duco_email, email, message.as_string())
                                     except:
-                                        print("Error sending registration email")
+                                        adminLog("duco", "Error sending registration email to", email)
                                 except:
                                     c.send(bytes("NO,Error registering user", encoding='utf8'))
                                     break
@@ -600,6 +665,10 @@ def handle(c, ip):
                 try:
                     username = str(data[1])
                     password = str(data[2]).encode('utf-8')
+                    if connections[ip] > max_login_connections and not ip in whitelisted and not username in whitelistedUsernames:
+                        adminLog("system", "Banning IP:", ip, "in login section, account:", username)
+                        ban(ip)
+                        break
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
@@ -613,7 +682,9 @@ def handle(c, ip):
                         c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
                         break
                     try:
-                        if bcrypt.checkpw(password, stored_password) or password == duco_password.encode('utf-8') or password == NodeS_Overide.encode('utf-8'):
+                        if password == stored_password or password == duco_password.encode('utf-8') or password == NodeS_Overide.encode('utf-8'): # User can supply bcrypt version of the password
+                            c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
+                        elif bcrypt.checkpw(password, stored_password):
                             c.send(bytes("OK", encoding='utf8')) # Send feedback about sucessfull login
                         else: # Disconnect user which password isn't valid, close the connection
                             c.send(bytes("NO,Password is invalid", encoding='utf8'))
@@ -666,7 +737,7 @@ def handle(c, ip):
                                 datab = conn.cursor()
                                 datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (amount, NodeS_Username))
                                 conn.commit()
-                                print("Updated NodeSBroker's balance with:", amount)
+                                adminLog("nodes", "Updated NodeS Broker balance with:", amount)
                                 c.send(bytes("YES,Successful", encoding='utf8'))
                                 break
                         except:
@@ -686,7 +757,7 @@ def handle(c, ip):
                     while True:
                         try:
                             blocks += amount
-                            print("Successfully increased block size")
+                            adminLog("nodes", "Incremented block counter by NodeS:", amount)
                             c.send(bytes("YES,Successful", encoding='utf8'))
                             break
                         except Exception as e:
@@ -711,7 +782,7 @@ def handle(c, ip):
                                 for user in data.keys():
                                     datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (float(data[user]), user))
                                 conn.commit()
-                            print("Updated Pool balance")
+                            adminLog("nodes", "Updated balance through NodeS:", amount)
                             c.send(bytes("YES,Successful", encoding='utf8'))
                             break
                         except Exception as e:
@@ -738,8 +809,7 @@ def handle(c, ip):
                                 formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
                                 datab.execute('''INSERT INTO Blocks(timestamp, finder, amount, hash) VALUES(?, ?, ?, ?)''', (formatteddatetime, username, reward, newBlockHash))
                                 bigblockconn.commit()
-                            print("Block found", formatteddatetime, username, reward, newBlockHash)
-
+                            adminLog("nodes", "Block found", formatteddatetime, username, reward, newBlockHash)
                             c.send(bytes("YES,Successful", encoding='utf8'))
                             break
                         except:
@@ -753,9 +823,24 @@ def handle(c, ip):
                         if username == "":
                             c.send(bytes("NO,Not enough data", encoding='utf8'))
                             break
+                        if connections[ip] > max_mining_connections and not ip in whitelisted and not username in whitelistedUsernames:
+                            adminLog("system", "Banning IP:", ip, "in mining section, account:", username)
+                            ban(ip)
+                            break
                     except IndexError:
                         c.send(bytes("NO,Not enough data", encoding='utf8'))
                         break
+                if firstshare:
+                    try:
+                        with sqlite3.connect(database, timeout = 10) as conn: # User exists, read his password
+                            datab = conn.cursor()
+                            datab.execute("SELECT * FROM Users WHERE username = ?",(str(username),))
+                            stored_password = datab.fetchone()[1]
+                    except: # Disconnect user which username doesn't exist, close the connection
+                        c.send(bytes("BAD,This user doesn't exist", encoding='utf8'))
+                        break
+                else:
+                    time.sleep(globalCpuUsage / 500)
                 lastBlockHash_copy = lastBlockHash # lastBlockHash liable to be changed by other threads, so we use a copy
                 try:
                     customDiff = str(data[2])
@@ -766,42 +851,57 @@ def handle(c, ip):
                         diff = 75 # optimal diff for low power devices like ESP8266
                         basereward = 0.000175
                     elif str(customDiff) == "ESP32":
-                        diff = 100 # optimal diff for low power devices like ESP32
+                        diff = 150 # optimal diff for low power devices like ESP32
                         basereward = 0.000155
-                    elif str(customDiff) == "10000":
-                        diff = 10000 # Custom difficulty 10k
-                        basereward = 0.000045
-                        shareTimeRequired = 400
                     elif str(customDiff) == "MEDIUM":
                         diff = 30000 # Diff for computers 20k
                         basereward = 0.000095
-                    elif str(customDiff) == "5000":
-                        diff = 5000 # Custom difficulty 5k
-                        basereward = 0.000065
-                        shareTimeRequired = 300
-                    elif str(customDiff) == "2500":
-                        diff = 2500 # Custom difficulty 2.5k
-                        basereward = 0.000065
-                        shareTimeRequired = 200
-                    elif str(customDiff) == "500":
-                        diff = 500 # Custom difficulty 0.5k
-                        basereward = 0.000045
-                        shareTimeRequired = 100
-                    elif str(customDiff) == "HIGH":
-                        diff = 80000 # Custom difficulty 80k
-                        basereward = 0.000065
-                        shareTimeRequired = 600
                     elif str(customDiff) == "EXTREME":
                         diff = 950000 # Custom difficulty 950k
-                        basereward = 0.00001
-                        shareTimeRequired = 10
-                except:
+                        basereward = 0
+                        shareTimeRequired = 1200
+                    else:
+                        customDiff = "NET"
+                        diff = int(blocks / diff_incrase_per) # Use network difficulty
+                        basereward = 0.000065
+                except IndexError:
                     customDiff = "NET"
                     diff = int(blocks / diff_incrase_per) # Use network difficulty
-                    basereward = 0.000075
-                    
-                rand = fastrand.pcg32bounded(100 * diff)
-                newBlockHash = hashlib.sha1(str(lastBlockHash_copy + str(rand)).encode("utf-8")).hexdigest()
+                    basereward = 0.000065
+                
+                if str(customDiff) == "MEDIUM":
+                    randomChoice = random.randint(0, len(readyHashesMedium)-1)
+                    rand = readyHashesMedium[randomChoice]["Result"]
+                    newBlockHash = readyHashesMedium[randomChoice]["Hash"]
+                    lastBlockHash_copy = readyHashesMedium[randomChoice]["LastBlockHash"]
+                elif str(customDiff) == "NET":
+                    randomChoice = random.randint(0, len(readyHashesNet)-1)
+                    rand = readyHashesNet[randomChoice]["Result"]
+                    newBlockHash = readyHashesNet[randomChoice]["Hash"]
+                    lastBlockHash_copy = readyHashesNet[randomChoice]["LastBlockHash"]
+                elif str(customDiff) == "AVR":
+                    randomChoice = random.randint(0, len(readyHashesAVR)-1)
+                    rand = readyHashesAVR[randomChoice]["Result"]
+                    newBlockHash = readyHashesAVR[randomChoice]["Hash"]
+                    lastBlockHash_copy = readyHashesAVR[randomChoice]["LastBlockHash"]
+                elif str(customDiff) == "ESP":
+                    randomChoice = random.randint(0, len(readyHashesESP)-1)
+                    rand = readyHashesESP[randomChoice]["Result"]
+                    newBlockHash = readyHashesESP[randomChoice]["Hash"]
+                    lastBlockHash_copy = readyHashesESP[randomChoice]["LastBlockHash"]
+                elif str(customDiff) == "ESP32":
+                    randomChoice = random.randint(0, len(readyHashesESP32)-1)
+                    rand = readyHashesESP32[randomChoice]["Result"]
+                    newBlockHash = readyHashesESP32[randomChoice]["Hash"]
+                    lastBlockHash_copy = readyHashesESP32[randomChoice]["LastBlockHash"]
+                elif str(customDiff) == "EXTREME":
+                    randomChoice = random.randint(0, len(readyHashesEXTREME)-1)
+                    rand = readyHashesEXTREME[randomChoice]["Result"]
+                    newBlockHash = readyHashesEXTREME[randomChoice]["Hash"]
+                    lastBlockHash_copy = readyHashesEXTREME[randomChoice]["LastBlockHash"]
+                else:
+                    rand = fastrand.pcg32bounded(100 * diff)
+                    newBlockHash = hashlib.sha1(str(lastBlockHash_copy + str(rand)).encode("utf-8")).hexdigest()
                 
                 if str(customDiff) == "AVR": # Arduino chips take about 6ms to generate one sha1 hash
                     shareTimeRequired = 6 * rand 
@@ -810,10 +910,10 @@ def handle(c, ip):
                 elif str(customDiff) == "ESP32": # ESP32 chips take about 130us to generate one sha1 hash
                     shareTimeRequired = 0.00013 * rand 
                 elif str(customDiff) == "MEDIUM":
-                    shareTimeRequired = 200
+                    shareTimeRequired = rand / 65000
                 elif customDiff == "NET":
-                    shareTimeRequired = 1200
-                
+                    shareTimeRequired = rand / 150000
+
                 try:
                     c.send(bytes(str(lastBlockHash_copy) + "," + str(newBlockHash) + "," + str(diff), encoding='utf8')) # Send hashes and diff hash to the miner
                     jobsent = datetime.datetime.now()
@@ -835,16 +935,21 @@ def handle(c, ip):
                         hashrate = 1000
                     hashrateEstimated = True
                 try:
-                    minerUsed = str(response[2])
+                    minerUsed = re.sub('[^A-Za-z0-9 .]+', ' ', response[2]) # Check miner software for unallowed characters
                 except:
                     minerUsed = "Unknown miner"
                 try:
+                    minerIdentifier = re.sub('[^A-Za-z0-9 .]+', ' ', response[3]) # Check miner software for unallowed characters
+                except:
+                    minerIdentifier = "None"
+                try:
                     now = datetime.datetime.now()
                     lastsharetimestamp = now.strftime("%d/%m/%Y %H:%M:%S")
-                    minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed), str(lastsharetimestamp)]})
+                    minerapi.update({str(threading.get_ident()): [str(username), str(hashrate), str(sharetime), str(acceptedShares), str(rejectedShares), str(diff), str(hashrateEstimated), str(minerUsed), str(lastsharetimestamp), str(minerIdentifier)]})
                 except:
                     pass
                 if result == str(rand): # and int(sharetime) > int(shareTimeRequired):
+                    firstshare = False
                     reward = basereward + float(sharetime) / 100000000 + float(diff) / 100000000 # Kolka system v2
                     acceptedShares += 1
                     try:
@@ -857,7 +962,7 @@ def handle(c, ip):
                                 formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
                                 datab.execute('''INSERT INTO Blocks(timestamp, finder, amount, hash) VALUES(?, ?, ?, ?)''', (formatteddatetime, username, reward, newBlockHash))
                                 bigblockconn.commit()
-                            print("Block found", formatteddatetime, username, reward, newBlockHash)
+                            adminLog("duco", "Block found", formatteddatetime, username, reward, newBlockHash)
                             c.send(bytes("BLOCK", encoding="utf8")) # Send feedback that block was found
                         else:
                             c.send(bytes("GOOD", encoding="utf8")) # Send feedback that result was correct
@@ -893,20 +998,20 @@ def handle(c, ip):
                 try:
                     oldPassword = oldPassword.encode('utf-8')
                     newPassword = newPassword.encode("utf-8")
-                    newPassword_encrypted = bcrypt.hashpw(newPassword, bcrypt.gensalt())
+                    newPassword_encrypted = bcrypt.hashpw(newPassword, bcrypt.gensalt(rounds=4))
                 except:
                     c.send(bytes("NO,Bcrypt error", encoding="utf8"))
-                    print("Bcrypt error")
+                    adminLog("duco", "Bcrypt error when changing password of user", username)
                     break
                 try:
                     with sqlite3.connect(database, timeout = 10) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                         old_password_database = datab.fetchone()[1]
-                    print("Fetched old pass")
+                    adminLog("duco", "Fetched old password")
                 except:
                     c.send(bytes("NO,Incorrect username", encoding="utf8"))
-                    print("Incorrect username? Most likely a DB error")
+                    adminLog("duco", "Incorrect username reported, most likely a DB error")
                     break
                 try:
                     if bcrypt.checkpw(oldPassword, old_password_database.encode('utf-8')) or oldPassword == duco_password.encode('utf-8'):
@@ -914,13 +1019,13 @@ def handle(c, ip):
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
                             conn.commit()
-                            print("Changed pass")
+                            adminLog("duco", "Changed password of user", username)
                             try:
                                 c.send(bytes("OK,Your password has been changed", encoding='utf8'))
                             except:
                                 break
                     else:
-                        print("Passwords dont match")
+                        adminLog("duco", "Passwords of user", username, "don't match")
                         try:
                             server.send(bytes("NO,Your old password doesn't match!", encoding='utf8'))
                         except:
@@ -931,7 +1036,7 @@ def handle(c, ip):
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
                             conn.commit()
-                            print("Changed pass")
+                            adminLog("duco", "Changed password of user", username)
                             try:
                                 c.send(bytes("OK,Your password has been changed", encoding='utf8'))
                             except:
@@ -951,14 +1056,14 @@ def handle(c, ip):
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
-                print("Sending protocol called")
+                adminLog("duco", "Sending protocol called by", username)
                 while True:
                     try:
                         with sqlite3.connect(database, timeout = 10) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                             balance = float(datab.fetchone()[3]) # Get current balance of sender
-                            print("Read senders balance:", balance)
+                            adminLog("duco", "Read senders balance:", balance)
                             break
                     except:
                         pass
@@ -971,7 +1076,7 @@ def handle(c, ip):
                 if str(amount) == "" or str(recipient) == "" or float(balance) <= float(amount) or float(amount) <= 0:
                     try:
                         c.send(bytes("NO,Incorrect amount", encoding='utf8'))
-                        print("NO,Incorrect amount")
+                        adminLog("duco", "Incorrect amount supplied:", amount)
                     except:
                         break
                 try:
@@ -985,11 +1090,11 @@ def handle(c, ip):
                             with lock:
                                 while True:
                                     try:
-                                        with sqlite3.connect(database, timeout = 15) as conn:
+                                        with sqlite3.connect(database, timeout = 10) as conn:
                                             datab = conn.cursor()
                                             datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
                                             conn.commit()
-                                            print("Updated senders balance:", balance)
+                                            adminLog("duco", "Updated senders balance:", balance)
                                             break
                                     except:
                                         pass
@@ -999,7 +1104,7 @@ def handle(c, ip):
                                             datab = conn.cursor()
                                             datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
                                             recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
-                                            print("Read recipients balance:", recipientbal)
+                                            adminLog("duco", "Read recipients balance:", recipientbal)
                                             break
                                     except:
                                         pass
@@ -1010,7 +1115,7 @@ def handle(c, ip):
                                             datab = conn.cursor() # Update receipents' balance
                                             datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
                                             conn.commit()
-                                            print("Updated recipients balance:", recipientbal)
+                                            adminLog("duco", "Updated recipients balance:", recipientbal)
                                         with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
                                             datab = tranconn.cursor()
                                             now = datetime.datetime.now()
@@ -1018,6 +1123,7 @@ def handle(c, ip):
                                             datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (formatteddatetime, username, recipient, amount, lastBlockHash))
                                             tranconn.commit()
                                         c.send(bytes("OK,Successfully transferred funds,"+str(lastBlockHash), encoding='utf8'))
+                                        adminLog("duco", "Funds transferred successfully")
                                         break
                                     except:
                                         pass
@@ -1028,7 +1134,7 @@ def handle(c, ip):
                                 break
                 except:
                     try:
-                        print("NO,Recipient doesn't exist")
+                        adminLog("duco", "Invalid recipient:", recipient)
                         c.send(bytes("NO,Recipient doesn't exist", encoding='utf8'))
                     except:
                         break
@@ -1040,7 +1146,6 @@ def handle(c, ip):
                     num = int(data[2])
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
-                    print("NED")
                     break
                 while True:
                     try:
@@ -1058,7 +1163,6 @@ def handle(c, ip):
                         break
                     except Exception as e:
                         print(e)
-                        pass
                 try:
                     from collections import OrderedDict
                     transactionsToReturn = {}
@@ -1082,7 +1186,7 @@ def handle(c, ip):
             ######################################################################
             elif str(data[0]) == "WRAP" and str(username) != "":
                 if use_wrapper and wrapper_permission:
-                    print("Starting Wrapping protocol")
+                    adminLog("wrapper", "Starting wrapping protocol by", username)
                     try:
                         amount = str(data[1])
                         tron_address = str(data[2])
@@ -1107,32 +1211,32 @@ def handle(c, ip):
                         if float(amount) < 10:
                             try:
                                 c.send(bytes("NO,minimum amount is 10 DUCO", encoding="utf8"))
-                                print("NO, minimum amount is 10 DUCO")
+                                adminLog("wrapper", "Amount is below 10 DUCO")
                             except:
                                 break
                         else:
                             balancebackup = balance
-                            print("Backed up balance")
+                            adminLog("wrapper", "Backed up balance:", balancebackup)
                             try:
-                                print("All checks done, initiating wrapping routine")
+                                adminLog("wrapper", "All checks done, initiating wrapping routine")
                                 balance -= float(amount) # Remove amount from senders' balance
-                                print("DUCO removed from pending balance")
+                                adminLog("wrapper", "DUCO removed from pending balance")
                                 with sqlite3.connect(database) as conn:
                                     datab = conn.cursor()
                                     datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
                                     conn.commit()
-                                print("DUCO balance sent to DB, sending tron transaction")
-                                print("Tron wrapper called !")
+                                adminLog("wrapper", "DUCO balance sent to DB, sending tron transaction")
+                                adminLog("wrapper", "Tron wrapper called !")
                                 txn = wduco.functions.wrap(tron_address,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
-                                print("txid :", txn.txid)
+                                adminLog("wrapper", "txid :", txn.txid)
                                 txn = txn.broadcast()
-                                print("Sent wrap tx to TRON network")
+                                adminLog("wrapper", "Sent wrap tx to TRON network")
                                 trontxfeedback = txn.result()
 
                                 if trontxfeedback:
                                     try:
                                         c.send(bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
-                                        print("Successful wrapping")
+                                        adminLog("wrapper", "Successful wrapping")
                                         try:
                                             with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
                                                 datab = tranconn.cursor()
@@ -1155,18 +1259,18 @@ def handle(c, ip):
                                 pass
                     else:
                         c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
-                        print("NO,Wrapper disabled")
+                        adminLog("wrapper", "Wrapper is disabled")
                         
             ######################################################################
             elif str(data[0]) == "UNWRAP" and str(username) != "":
                 if use_wrapper and wrapper_permission:
-                    print("Starting unwraping protocol")
+                    adminLog("unwrapper", "Starting unwraping protocol by", username)
                     amount = str(data[1])
                     tron_address = str(data[2])
                     while True:
                         try:
                             with sqlite3.connect(database) as conn:
-                                print("Retrieving user balance...")
+                                adminLog("unwrapper", "Retrieving user balance")
                                 datab = conn.cursor()
                                 datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                                 balance = float(datab.fetchone()[3]) # Get current balance
@@ -1178,9 +1282,9 @@ def handle(c, ip):
                     if float(amount) <= float(wbalance) and float(amount) > 0:
                         if float(amount) >= 10:
                             if float(amount) <= float(wbalance):
-                                print("Correct amount")
+                                adminLog("unwrapper", "Correct amount")
                                 balancebackup = balance
-                                print("Updating DUCO Balance")
+                                adminLog("unwrapper", "Updating DUCO Balance")
                                 balancebackup = balance
                                 balance = str(float(balance)+float(amount))
                                 while True:
@@ -1193,15 +1297,15 @@ def handle(c, ip):
                                     except:
                                         pass
                                 try:
-                                    print("Sending tron transaction !")
+                                    adminLog("unwrapper", "Sending tron transaction !")
                                     txn = wduco.functions.confirmWithdraw(username,tron_address,int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
-                                    print("txid :", txn.txid)
+                                    adminLog("unwrapper", "txid :", txn.txid)
                                     txn = txn.broadcast()
-                                    print("Sent confirm tx to tron network")
+                                    adminLog("unwrapper", "Sent confirm tx to tron network")
                                     onchaintx = txn.result()
 
                                     if onchaintx:
-                                        print("Successful unwrapping")
+                                        adminLog("unwrapper", "Successful unwrapping")
                                         try:
                                             with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
                                                 datab = tranconn.cursor()
@@ -1223,7 +1327,7 @@ def handle(c, ip):
                                             except:
                                                 pass
                                 except:
-                                    print("NO,Error with tron blockchain")
+                                    adminLog("unwrapper", "Error with Tron blockchain")
                                     try:
                                         c.send(bytes("NO,error with Tron blockchain", encoding="utf8"))
                                         break
@@ -1235,7 +1339,7 @@ def handle(c, ip):
                                 except:
                                     break
                 else:
-                    print("Wrapper disabled")
+                    adminLog("unwrapper", "Wrapper disabled")
                     try:
                         c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
                     except:
@@ -1265,43 +1369,51 @@ def unbanip(ip):
 def ban(ip):
     try:
         os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
-        threading.Timer(15.0, unbanip, [ip]).start() # Start auto-unban thread for this IP
+        threading.Timer(30.0, unbanip, [ip]).start() # Start auto-unban thread for this IP
         IPS.pop(ip)
     except:
         pass
-
-IPS = {}
-bannedIPS = {}
-whitelisted = []
-try: # Read whitelisted IPs from text file
-    with open("config/whitelisted.txt", "r") as whitelistfile:
-        whitelisted = whitelistfile.read().splitlines()
-    #print("Loaded whitelisted IPs:", " ".join(whitelisted))
-    whitelisted_ip = []
-    for ip in whitelisted:
-        whitelisted_ip.append(socket.gethostbyname(str(ip)))
-
-except Exception as e:
-    print("Error reading whitelisted IPs file:")
-    print(e)
+    
 def countips():
     while True:
         for ip in IPS.copy():
             try:
-                if IPS[ip] > 24 and not ip in whitelisted_ip:
-                    print("IP DDoSing:", ip)
+                if IPS[ip] > max_unauthorized_connections and not ip in whitelisted_ip:
+                    adminLog("system", "Banning DDoSing IP:", ip)
                     ban(ip)
             except:
                 pass
-        time.sleep(5)
+        time.sleep(10)
 def resetips():
     while True:
         time.sleep(30)
         IPS.clear()
 
+IPS = {}
+bannedIPS = {}
+whitelisted = []
 if __name__ == '__main__':
     print("Duino-Coin Master Server", serverVersion, "is starting")
+    try: # Read whitelisted IPs from text file
+        with open("config/whitelisted.txt", "r") as whitelistfile:
+            whitelisted = whitelistfile.read().splitlines()
+        adminLog("system", "Loaded whitelisted IPs file")
+        whitelisted_ip = []
+        for ip in whitelisted:
+            whitelisted_ip.append(socket.gethostbyname(str(ip)))
+        try:
+            with open("config/whitelistedUsernames.txt", "r") as whitelistusrfile:
+                whitelistedusr = whitelistusrfile.read().splitlines()
+                adminLog("system", "Loaded whitelisted usernames file")
+                whitelistedUsernames = []
+                for username in whitelistedusr:
+                    whitelistedUsernames.append(username)
+        except Exception as e:
+            adminLog("system", "Error reading whitelisted usernames file:", str(e))
+    except Exception as e:
+        adminLog("system", "Error reading whitelisted IPs file:", str(e))
     threading.Thread(target=API).start() # Create JSON API thread
+    threading.Thread(target=getDucoPrice).start() # Create duco price calculator
     threading.Thread(target=cpuUsageThread).start() # Create CPU perc measurement
     threading.Thread(target=createBackup).start() # Create Backup generator thread
     threading.Thread(target=countips).start() # Start anti-DDoS thread
@@ -1309,26 +1421,23 @@ if __name__ == '__main__':
     threading.Thread(target=getBlocks).start() # Start database updater
     threading.Thread(target=UpdateDatabase).start() # Start database updater
     threading.Thread(target=UpdateOtherAPIFiles).start() # Start transactions and balance api updater
+    print("Background threads started")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((host, port))
-    print("Socket binded to port", port)
-    # Put the socket into listening mode
-    s.listen(24) # Queue of 24 connections
+    threading.Thread(target=createHashes).start() # Start database updater
+    print("TCP Socket binded to port", port)
+    s.listen(1) # Put the socket into listening mode; reuse connection after one is closed
     print("wDUCO address", wrapper_public_key)
     threading.Thread(target=InputManagement).start() # Admin input management thread
-    # a forever loop until client wants to exit
     try:
-        while True:
-            # Establish connection with client
-            c, addr = s.accept()
+        while True: # A forever loop until client wants to exit
+            c, addr = s.accept() # Establish connection with client
             try:
                 IPS[addr[0]] += 1
             except:
                 IPS[addr[0]] = 1
-            #print('Connected to :', addr[0], ':', addr[1])
-            # Start a new thread and return its identifier
-            start_new_thread(handle, (c, addr[0]))
+            start_new_thread(handle, (c, addr[0])) # Start a new thread
     finally:
         print("Exiting")
         s.close()
