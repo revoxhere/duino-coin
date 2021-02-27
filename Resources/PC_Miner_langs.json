@@ -257,8 +257,8 @@
         "rejected": " Refusé ",
         "error_while_mining": " Erreur durant le minage - probablement une erreur de connection - Redémarrage dans 5s.",
 
-        "mining_user": " User ",
-        "mining_not_exist": " doesn't exist.",
-        "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s"
+        "mining_user": " L'utilisateur ",
+        "mining_not_exist": " n'existe pas.",
+        "mining_not_exist_warning": " Vérifiez que vous avez entré votre nom d'utilisateur correctement dans le fichier de configuration. Nouvel essai dans 10s"
     }
 }
