@@ -582,8 +582,8 @@ with open(
     lang_file = json.load(lang_file)
 if locale == "es_ES":
     lang = "spanish"
-elif locale == "pl_PL":
-    lang = "polish"
+# elif locale == "pl_PL":
+# lang = "polish"
 elif locale == "fr_FR":
     lang = "french"
 else:
@@ -1528,7 +1528,7 @@ def openSettings(handler):
     ).grid(row=7, column=0, columnspan=4, padx=5, sticky=S + W)
     Label(
         settingsWindow,
-        text=f'{getString("translation_author_message")}: {getString("translation_author")}',
+        text=f'{getString("translation_author_message")} {getString("translation_author")}',
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
