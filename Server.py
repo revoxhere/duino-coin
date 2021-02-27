@@ -12,13 +12,14 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 host = "" # Server will use this as hostname to bind to (localhost on Windows, 0.0.0.0 on Linux in most cases)
-port = 2811 # Server will listen on this port - 2811 for official Duino-Coin server
-serverVersion = 2.1 # Server version which will be sent to the clients
+port = 2811 # Server will listen on this port (official server uses 2811)
+serverVersion = 2.1 # Server version which will be sent to the clients (official server uses latest release version number)
 diff_incrase_per = 5000 # Difficulty will increase every x blocks (official server uses 5k)
 max_mining_connections = 24 # Maximum number of clients using mining protocol per IP (official server uses 24)
 max_login_connections = 34 # Maximum number of logged-in clients per IP (official server uses 34)
 max_unauthorized_connections = 34 # Maximum number of connections that haven't sent any data yet (official server uses 34)
-hashes_num = 1000 # Number of pregenerated hashes for every difficulty in mining section; used to massively reduce load on the server
+hashes_num = 1000 # Number of pregenerated jobs for every difficulty in mining section; used to massively reduce load on the server (official server uses 1000)
+database_timeout = 7 # Database access times out after this many seconds (official server uses 7)
 use_wrapper = True # Enable wDUCO wrapper or not
 wrapper_permission = False # Set to false for declaration, will be updated when checking smart contract
 lock = threading.Lock()
@@ -55,7 +56,7 @@ html = """\
     <img src="https://github.com/revoxhere/duino-coin/raw/master/Resources/ducobanner.png?raw=true" width="360px" height="auto"><br>
     <h3>Hi there!</h3>
     <h4>Your e-mail address has been successfully verified and you are now registered on the Duino-Coin network!</h4>
-    <p>We hope you'll have a great time using Duino-Coin.<br>If you have any difficulties there are a lot of <a href="https://duinocoin.com/getting-started">guides on our website</a>.<br>
+    <p>We hope you'll have a great time using Duino-5Coin.<br>If you have any difficulties there are a lot of <a href="https://duinocoin.com/getting-started">guides on our website</a>.<br>
        You can also join our <a href="https://discord.gg/kvBkccy">Discord server</a> to chat, take part in giveaways, trade and get help from other Duino-Coin users.<br><br>
        Happy mining!<br>
        <italic>Duino-Coin Team</italic>
@@ -198,7 +199,7 @@ def getRegisteredUsers():
 def getMinedDuco():
     while True:
         try:
-            with sqlite3.connect(database, timeout = 15) as conn:
+            with sqlite3.connect(database, timeout = 10) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT SUM(balance) FROM Users")
                 allMinedDuco = datab.fetchone()[0]
@@ -211,7 +212,7 @@ def getLeaders():
     while True:
         try:
             leadersdata = []
-            with sqlite3.connect(database, timeout = 15) as conn:
+            with sqlite3.connect(database, timeout = 10) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Users ORDER BY balance DESC")
                 for row in datab.fetchall():
@@ -225,7 +226,7 @@ def getAllBalances():
     while True:
         try:
             leadersdata = {}
-            with sqlite3.connect(database, timeout = 15) as conn:
+            with sqlite3.connect(database, timeout = 10) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Users ORDER BY balance DESC")
                 for row in datab.fetchall():
@@ -451,7 +452,7 @@ def InputManagement():
         elif userInput[0] == "balance":
             with lock:
                 try:
-                    with sqlite3.connect(database, timeout = 15) as conn:
+                    with sqlite3.connect(database, timeout = 10) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
@@ -461,18 +462,18 @@ def InputManagement():
         elif userInput[0] == "set":
             with lock:
                 try:
-                    with sqlite3.connect(database, timeout = 15) as conn:
+                    with sqlite3.connect(database, timeout = 10) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
                     print("  " + userInput[1] + "'s balance is " + str(balance) + ", set it to " + str(float(userInput[2])) + "?")
                     confirm = input("  Y/n")
                     if confirm == "Y" or confirm == "y" or confirm == "":
-                        with sqlite3.connect(database, timeout = 15) as conn:
+                        with sqlite3.connect(database, timeout = 10) as conn:
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set balance = ? where username = ?", (float(userInput[2]), userInput[1]))
                             conn.commit()
-                        with sqlite3.connect(database, timeout = 15) as conn:
+                        with sqlite3.connect(database, timeout = 10) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                             balance = str(datab.fetchone()[3]) # Fetch balance of user
@@ -484,18 +485,18 @@ def InputManagement():
         elif userInput[0] == "subtract":
             with lock:
                 try:
-                    with sqlite3.connect(database, timeout = 15) as conn:
+                    with sqlite3.connect(database, timeout = 10) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
                     print("  " + userInput[1] + "'s balance is " + str(balance) + ", subtract " + str(float(userInput[2])) + "?")
                     confirm = input("  Y/n")
                     if confirm == "Y" or confirm == "y" or confirm == "":
-                        with sqlite3.connect(database, timeout = 15) as conn:
+                        with sqlite3.connect(database, timeout = 10) as conn:
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set balance = ? where username = ?", (float(balance)-float(userInput[2]), userInput[1]))
                             conn.commit()
-                        with sqlite3.connect(database, timeout = 15) as conn:
+                        with sqlite3.connect(database, timeout = 10) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                             balance = str(datab.fetchone()[3]) # Fetch balance of user
@@ -507,18 +508,18 @@ def InputManagement():
         elif userInput[0] == "add":
             with lock:
                 try:
-                    with sqlite3.connect(database, timeout = 15) as conn:
+                    with sqlite3.connect(database, timeout = 10) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
                     print("  " + userInput[1] + "'s balance is " + str(balance) + ", add " + str(float(userInput[2])) + "?")
                     confirm = input("  Y/n")
                     if confirm == "Y" or confirm == "y" or confirm == "":
-                        with sqlite3.connect(database, timeout = 15) as conn:
+                        with sqlite3.connect(database, timeout = 10) as conn:
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set balance = ? where username = ?", (float(balance)+float(userInput[2]), userInput[1]))
                             conn.commit()
-                        with sqlite3.connect(database, timeout = 15) as conn:
+                        with sqlite3.connect(database, timeout = 10) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                             balance = str(datab.fetchone()[3]) # Fetch balance of user
@@ -733,7 +734,7 @@ def handle(c, ip):
                     print("NodeS Usage")
                     while True:
                         try:
-                            with sqlite3.connect(database, timeout = 15) as conn:
+                            with sqlite3.connect(database, timeout = 10) as conn:
                                 datab = conn.cursor()
                                 datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (amount, NodeS_Username))
                                 conn.commit()
@@ -777,7 +778,7 @@ def handle(c, ip):
                 if password == NodeS_Overide:
                     while True:
                         try:
-                            with sqlite3.connect(database, timeout = 15) as conn:
+                            with sqlite3.connect(database, timeout = 10) as conn:
                                 datab = conn.cursor()
                                 for user in data.keys():
                                     datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (float(data[user]), user))
@@ -1441,4 +1442,4 @@ if __name__ == '__main__':
     finally:
         print("Exiting")
         s.close()
-        os._exit(1) # error code 1 so it will autorestart with systemd
+        os._exit(1) # error code 1 so server will autorestart with systemd
