@@ -404,12 +404,12 @@
         "wrapper_success": "Wrapping effectué",
         "wrapper_amount_to_wrap": "Montant à wrap",
         "email": "E-MAIL",
-        "wrapper_error_tronpy": "Error with Tronpy",
-        "translation_author_message": "Wallet translated by:",
-        "notification_new_transaction": "New transaction",
-        "sessionprofit_unavailable1": "Launch your miners",
-        "sessionprofit_unavailable2": "first to see estimated profit.",
-        "tray_show": "Show window",
-        "tray_exit": "Exit window"
+        "wrapper_error_tronpy": "Erreur avec Tronpy",
+        "translation_author_message": "Traduction française par:",
+        "notification_new_transaction": "Nouvelle transaction",
+        "sessionprofit_unavailable1": "Lancez vos mineurs",
+        "sessionprofit_unavailable2": "pour voir le profit estimé.",
+        "tray_show": "Afficher la fenêtre",
+        "tray_exit": "Quitter la fenêtre"
     }
 }
