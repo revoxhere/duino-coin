@@ -183,5 +183,66 @@
         "retrying": " Reintentando en 10s",
         "rejected": " Rechazadas ",
         "error_while_mining": " Error durante el minado - probablemente un error de conexión - reiniciando en 5s."
+    },
+    "french": {
+        "sigint_detected": " SIGINT détecté - Fermeture...",
+        "goodbye": " A bientôt!",
+        "greeting_morning": "J'espère que vous passez une bonne matinée!",
+        "greeting_noon": "J'espère que vous passez un bon après-midi",
+        "greeting_afternoon": "J'espère que vous passez un bon après-midi",
+        "greeting_evening": "Passez une bonne soirée!",
+        "greeting_back": "Content de te revoir",
+
+        "banner": "Mineur Officiel (Python) Duino-Coin ©",
+        "donation_level": "Niveau de donation pour le développeur: ",
+
+        "medium_diff": "Difficutlé moyenne",
+        "net_diff": "Difficutlé du réseau",
+        "algorithm": "Algorithme: ",
+        "rig_identifier": "Nom du mineur/rig: ",
+
+        "basic_config_tool": "\nEditeur de configuration Duino-Coin\nEditez ",
+        "edit_config_file_warning": "le fichier /Miner_config.cfg si vous voulez le changer ultérieurement.",
+        "dont_have_account": "Vous n'avez pas encore de compte Duino-Coin? Utilisez ",
+        "wallet": "Wallet",
+        "register_warning": " pour en créer un.\n",
+        "ask_username": "Entrez votre nom d'utilisateur Duino-Coin: ",
+        "ask_intensity": "Choisissez l'intensité de minage (1-100)% (recommandé: 95): ",
+        "ask_threads": "Choisissez le nombre de threads (recommandé pour votre système: ",
+        "ask_lower_difficulty": "Voulez vous utiliser une difficulté de minage plus basse (pour les systèmes les plus lents)? (y/N) ",
+        "ask_rig_identifier": "Voulez vous ajouter un indentifieur (un nom) à ce mineur/rig? (y/N) ",
+        "ask_rig_name": "Entrez le nom du mineur/rig désiré: ",
+        "ask_donation_level": "Choisissez le niveau de donation (0-5) (recommandé: 1), cela ne réduira pas vos gains: ",
+        "config_saved": "Configuration sauvegardée! Lancement du mineur",
+        "load_config_error": " Erreur durant le chargement du fichier de configuration (",
+        "load_config_error_warning": "/Miner_config.cfg). Essayer de le supprimer et relancer le mineur. Exiting in 10s",
+
+        "free_network_warning": " Le réseau Duino-Coin est un service complètement gratuit et le sera toujours",
+        "donate_warning": "\nNous ne prenons aucun frais sur votre minage.\nVous pouvez réellement nous aider à maintenir le serveur et garder un exchange avec peu de frais en activant la donation.\nVisitez ",
+        "learn_more_donate": " pour en apprendre plus sur comment vous pouvez nous aider :)",
+        "starting_donation": "Démarrage du service de donation",
+        "thanks_donation": " Merci d'être un super donateur ❤️ \nVotre don nous aidera a maintenir le serveur et permettra un développement ultérieur",
+
+        "data_error": " Erreur lors de la récupération des données depuis GitHub! Nouvel essai dans 10s.",
+
+        "connected": " Connecté",
+        "connected_server": " au serveur principal Duino-Coin (v",
+        "outdated_miner": " Mineur obsolète (v",
+        "server_is_on_version": " le serveur est en v",
+        "update_warning": ", vous pouvez télécharger la nouvelle version ici https://github.com/revoxhere/duino-coin/releases/",
+        "connecting_error": " Impossible de se connecter au serveur. Nouvel essai dans 10s",
+        "mining_thread": " Thread de minage #",
+        "mining_thread_starting": " est en train de démarrer",
+        "using_algo": " utilisant l'algorithme DUCO-S1 avec ",
+        "efficiency": "d'intensité",
+
+        "duco_python_miner": "Duino-Coin Python Miner (v",
+        "accepted_shares": " shares acceptées",
+        "accepted": " Accepté ",
+        "block_found": " Block trouvé ",
+        "internal_server_error": " Erreur interne au serveur.",
+        "retrying": " Nouvel essai dans 10s",
+        "rejected": " Refusé ",
+        "error_while_mining": " Erreur durant le minage - probablement une erreur de connection - Redémarrage dans 5s."
     }
 }
