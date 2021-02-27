@@ -110,7 +110,7 @@
         "connecting_error": " Problem podczas łączenia z serwerem. Ponowna próba za 10s",
         "mining_thread": " Wątek koparki #",
         "mining_thread_starting": " uruchamia się",
-        "using_algo": " używając algorytmu DUCO-S1 ze ",
+        "using_algo": " używając algorytmu DUCO-S1 z ",
         "efficiency": "efektywnością",
 
         "duco_python_miner": "Duino-Coin Python Miner (v",
