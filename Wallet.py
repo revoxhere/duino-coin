@@ -142,7 +142,7 @@ except ModuleNotFoundError:
     now = datetime.datetime.now()
     print(
         now.strftime("%H:%M:%S ")
-        + "Tronpy is not installed. Please install it using: python3 -m pip install tronpy.\nWrapper was disabled because of tronpy is needed for !"
+        + "Tronpy is not installed. Please install it using: python3 -m pip install tronpy to use the Wrapper.\nwDUCO Wrapper was disabled because Tronpy is missing"
     )
 else:
     tron = tronpy.Tron()
@@ -575,7 +575,6 @@ if not Path(resources + "langs.json").is_file():
 
 
 locale = locale.getdefaultlocale()[0]
-print(locale)
 with open(
     f"{resources}langs.json", "r", encoding='utf-8') as lang_file:  # Load language strings depending on system locale
     lang_file = json.load(lang_file)
@@ -1685,10 +1684,12 @@ def getwbalance():
             pub_key = pubkeyfile.read()
             pubkeyfile.close()
         except:
-            return 0
+            return 0.0
         else:
             wBalance = float(wduco.functions.balanceOf(pub_key)) / (10 ** 6)
             return wBalance
+    else:
+        return 0.0
 
 
 profitCheck = 0
