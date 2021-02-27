@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin AVR Miner (v2.2)
+# Duino-Coin Python AVR Miner (v2.2)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2021
+# © Duino-Coin Community 2019-2021
 ##########################################
 import socket, threading, time, re, subprocess, configparser, sys, datetime, os, json  # Import libraries
 from pathlib import Path
@@ -434,7 +434,7 @@ def updateRichPresence():
                 + "/"
                 + str(shares[0] + shares[1]),
                 large_image="ducol",
-                large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
+                large_text="Duino-Coin, a coin that can be mined with almost everything, including AVR boards"
                 buttons=[
                     {"label": "Learn more", "url": "https://duinocoin.com"},
                     {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
