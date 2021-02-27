@@ -560,6 +560,7 @@ def Thread(
                 )
                 if debug == "y":
                     raise
+                time.sleep(10)
         print(
             now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
             + Style.RESET_ALL
@@ -848,12 +849,12 @@ def Thread(
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Fore.MAGENTA
-                    + " Error while mining - most likely a connection error - restarting in 5s."
+                    + " Error while mining - most likely a connection error - restarting in 10s."
                     + Style.RESET_ALL
                 )
                 if debug == "y":
                     raise
-                time.sleep(5)
+                time.sleep(10)
                 break
 
 
