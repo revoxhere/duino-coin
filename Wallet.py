@@ -284,7 +284,7 @@ class LoginFrame(Frame):
             borderwidth="0",
             highlightthickness="0",
         )
-        self.checkbox.grid(columnspan=2, sticky=W, pady=(5))
+        self.checkbox.grid(columnspan=2, sticky=W, pady=(5), padx=5)
 
         self.logbtn = Button(
             self,
@@ -575,9 +575,9 @@ if not Path(resources + "langs.json").is_file():
 
 
 locale = locale.getdefaultlocale()[0]
+print(locale)
 with open(
-    f"{resources}langs.json"
-) as lang_file:  # Load language strings depending on system locale
+    f"{resources}langs.json", "r", encoding='utf-8') as lang_file:  # Load language strings depending on system locale
     lang_file = json.load(lang_file)
 if locale == "es_ES":
     lang = "spanish"
