@@ -82,7 +82,7 @@ if not Path(  # Check if languages file exists
 ).is_file():  # Initial miner executable section
     url = "https://raw.githubusercontent.com/revoxhere/duino-coin/master/Resources/AVR_Miner_langs.json"
     r = requests.get(url)
-    with open(resourcesFolder + "/langs.json", "wb", encoding="utf8") as f:
+    with open(resourcesFolder + "/langs.json", "wb") as f:
         f.write(r.content)
 
 with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
