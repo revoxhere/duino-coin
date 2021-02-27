@@ -582,10 +582,12 @@ with open(
     lang_file = json.load(lang_file)
 if locale == "es_ES":
     lang = "spanish"
-# elif locale == "pl_PL":
-# lang = "polish"
+elif locale == "pl_PL":
+    lang = "polish"
 elif locale == "fr_FR":
     lang = "french"
+elif locale == "de_DE":
+    lang = "german"
 else:
     lang = "english"
 
