@@ -8,6 +8,7 @@
 import socket, statistics, threading, multiprocessing, time, re, subprocess, hashlib, configparser, sys, datetime, os  # Import libraries
 from pathlib import Path
 from signal import signal, SIGINT
+import locale, json
 
 
 def install(package):
@@ -68,6 +69,17 @@ useLowerDiff = "n"
 serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"  # Serverip file
 config = configparser.ConfigParser()
 donationlevel = 0
+locale = locale.getdefaultlocale()[0]
+
+with open(f"{resourcesFolder}/langs.json") as lang_file:
+    lang_file = json.load(lang_file)
+
+
+if locale == 'es_ES':
+    lang_file = lang_file["spanish"]
+else:
+    lang_file = lang_file["english"]
+
 
 if not os.path.exists(resourcesFolder):
     os.mkdir(resourcesFolder)  # Create resources folder if it doesn't exist
@@ -97,10 +109,10 @@ def handler(
         + " sys0 "
         + Back.RESET
         + Fore.YELLOW
-        + " SIGINT detected - Exiting gracefully."
+        + lang_file["sigint_detected"]
         + Style.NORMAL
         + Fore.WHITE
-        + " See you soon!"
+        + lang_file["goodbye"]
     )
     handlerShown = True
     try:
@@ -120,22 +132,22 @@ def Greeting():  # Greeting message depending on time
     current_hour = time.strptime(time.ctime(time.time())).tm_hour
 
     if current_hour < 12:
-        greeting = "Have a wonderful morning"
+        greeting = lang_file["greeting_morning"]
     elif current_hour == 12:
-        greeting = "Have a tasty noon"
+        greeting = lang_file["greeting_noon"]
     elif current_hour > 12 and current_hour < 18:
-        greeting = "Have a peaceful afternoon"
+        greeting = lang_file["greeting_afternoon"]
     elif current_hour >= 18:
-        greeting = "Have a cozy evening"
+        greeting = lang_file["greeting_evening"]
     else:
-        greeting = "Welcome back"
+        greeting = lang_file["greeting_back"]
 
     print(
         Style.RESET_ALL
         + " > "
         + Fore.YELLOW
         + Style.BRIGHT
-        + "Official Duino-Coin © Python Miner"
+        + lang_file["banner"]
         + Style.RESET_ALL
         + Fore.WHITE
         + " (v"
@@ -168,20 +180,20 @@ def Greeting():  # Greeting message depending on time
             Style.RESET_ALL
             + " > "
             + Fore.WHITE
-            + "Developer donation level: "
+            + lang_file["donation_level"]
             + Style.BRIGHT
             + Fore.YELLOW
             + str(donationlevel)
         )
     if useLowerDiff == "y":
-        diffName = "Medium diff"
+        diffName = lang_file["medium_diff"]
     else:
-        diffName = "Network diff"
+        diffName = lang_file["net_diff"]
     print(
         Style.RESET_ALL
         + " > "
         + Fore.WHITE
-        + "Algorithm: "
+        + lang_file["algorithm"]
         + Style.BRIGHT
         + Fore.YELLOW
         + "DUCO-S1 @ "
@@ -191,7 +203,7 @@ def Greeting():  # Greeting message depending on time
         Style.RESET_ALL
         + " > "
         + Fore.WHITE
-        + "Rig identifier: "
+        + lang_file["rig_identifier"]
         + Style.BRIGHT
         + Fore.YELLOW
         + rigIdentifier
@@ -236,7 +248,7 @@ def hashrateCalculator(hashcount, khashcount):  # Hashes/sec calculation
         hashcount.value = 0  # Reset the counter
         khashcount.value = int(
             statistics.mean(hash_mean[-50:])
-        )  # Calculate average hashrate from last 50 measurements
+        )  # Calculate average hashrate from last 20 hashrate measurements
         time.sleep(1)
 
 
@@ -247,40 +259,39 @@ def loadConfig():  # Config loading section
         resourcesFolder + "/Miner_config.cfg"
     ).is_file():  # Initial configuration section
         print(
-            Style.RESET_ALL
-            + Style.BRIGHT
-            + "\nDuino-Coin basic configuration tool\nEdit "
+            Style.BRIGHT
+            + lang_file["basic_config_tool"]
             + resourcesFolder
-            + "/Miner_config.cfg file later if you want to change it."
+            + lang_file["edit_config_file_warning"]
         )
 
         print(
             Style.RESET_ALL
-            + "Don't have an Duino-Coin account yet? Use "
+            + lang_file["dont_have_account"]
             + Fore.YELLOW
-            + "Wallet"
+            + lang_file["wallet"]
             + Fore.WHITE
-            + " to register on server.\n"
+            + lang_file["register_warning"]
         )
 
         username = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + "Enter your Duino-Coin username: "
+            + lang_file["ask_username"]
             + Style.BRIGHT
         )
 
         efficiency = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + "Set mining intensity (1-100)% (recommended: 95): "
+            + lang_file["ask_intensity"]
             + Style.BRIGHT
         )
 
         threadcount = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + "Set mining threads (recommended for your system: "
+            + lang_file["ask_threads"]
             + str(multiprocessing.cpu_count())
             + "): "
             + Style.BRIGHT
@@ -289,21 +300,21 @@ def loadConfig():  # Config loading section
         useLowerDiff = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + "Do you want to use lower difficulty for mining (for slower systems)? (y/N) "
+            + lang_file["ask_lower_difficulty"]
             + Style.BRIGHT
         )
 
         rigIdentifier = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + "Do you want to add an identifier (name) to this rig? (y/N) "
+            + lang_file["ask_rig_identifier"]
             + Style.BRIGHT
         )
         if rigIdentifier == "y" or rigIdentifier == "Y":
             rigIdentifier = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
-                + "Enter desired rig name: "
+                + lang_file["ask_rig_name"]
                 + Style.BRIGHT
             )
         else:
@@ -314,7 +325,7 @@ def loadConfig():  # Config loading section
             donationlevel = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
-                + "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: "
+                + lang_file["ask_donation_level"]
                 + Style.BRIGHT
             )
 
@@ -362,7 +373,7 @@ def loadConfig():  # Config loading section
         efficiency = (
             100 - float(efficiency)
         ) * 0.01  # Calulate efficiency for use with sleep function
-        print(Style.RESET_ALL + "Config saved! Launching the miner")
+        print(Style.RESET_ALL + lang_file["config_saved"])
 
     else:  # If config already exists, load from it
         config.read(resourcesFolder + "/Miner_config.cfg")
@@ -395,7 +406,7 @@ def Donate():
         )
     if int(donationlevel) <= 0:
         print(
-            now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+            now().strftime(Style.DIM + "%H:%M:%S ")
             + Style.RESET_ALL
             + Style.BRIGHT
             + Back.GREEN
@@ -403,16 +414,16 @@ def Donate():
             + " sys0 "
             + Back.RESET
             + Fore.YELLOW
-            + " Duino-Coin network is a completely free service and will always be"
+            + lang_file["free_network_warning"]
             + Style.BRIGHT
             + Fore.YELLOW
-            + "\nWe don't take any fees from your mining.\nYou can really help us maintain the server and low-fee exchanges by donating.\nVisit "
+            + lang_file["donate_warning"]
             + Style.RESET_ALL
             + Fore.GREEN
             + "https://duinocoin.com/donate"
             + Style.BRIGHT
             + Fore.YELLOW
-            + " to learn more about how you can help :)"
+            + lang_file["learn_more_donate"]
         )
         time.sleep(10)
     if donatorrunning == False:
@@ -433,7 +444,7 @@ def Donate():
                 cmd, shell=True, stderr=subprocess.DEVNULL
             )
             print(
-                now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+                now().strftime(Style.DIM + "%H:%M:%S ")
                 + Style.RESET_ALL
                 + Style.BRIGHT
                 + Back.GREEN
@@ -441,7 +452,7 @@ def Donate():
                 + " sys0 "
                 + Back.RESET
                 + Fore.RED
-                + " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development"
+                + lang_file["thanks_donation"]
             )
 
 
@@ -486,7 +497,7 @@ def Thread(
                     + " "
                     + Back.RESET
                     + Fore.RED
-                    + " Error retrieving data from GitHub! Retrying in 10s."
+                    + lang_file["data_error"]
                 )
                 if debug == "y":
                     raise
@@ -513,10 +524,10 @@ def Thread(
                         + " "
                         + Back.RESET
                         + Fore.YELLOW
-                        + " Connected"
+                        + lang_file["connected"]
                         + Style.RESET_ALL
                         + Fore.WHITE
-                        + " to master Duino-Coin server (v"
+                        + lang_file["connected_server"]
                         + str(serverVersion)
                         + ")"
                     )
@@ -532,19 +543,19 @@ def Thread(
                         + " "
                         + Back.RESET
                         + Fore.RED
-                        + " Miner is outdated (v"
+                        + lang_file["outdated_miner"]
                         + minerVersion
                         + "),"
                         + Style.RESET_ALL
                         + Fore.RED
-                        + " server is on v"
+                        + lang_file["server_is_on_version"]
                         + serverVersion
-                        + ", please download latest version from https://github.com/revoxhere/duino-coin/releases/"
+                        + lang_file["update_warning"]
                     )
                 break
             except:
                 print(
-                    now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+                    now().strftime(Style.DIM + "%H:%M:%S ")
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Back.BLUE
@@ -555,14 +566,13 @@ def Thread(
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Fore.RED
-                    + " Error connecting to the server. Retrying in 10s"
+                    + lang_file["connecting_error"]
                     + Style.RESET_ALL
                 )
                 if debug == "y":
                     raise
-                time.sleep(10)
         print(
-            now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+            now().strftime(Style.DIM + "%H:%M:%S ")
             + Style.RESET_ALL
             + Style.BRIGHT
             + Back.GREEN
@@ -572,15 +582,15 @@ def Thread(
             + " "
             + Back.RESET
             + Fore.YELLOW
-            + " Mining thread #"
+            + lang_file["mining_thread"]
             + str(threadid)
-            + " is starting"
+            + lang_file["mining_thread_starting"]
             + Style.RESET_ALL
             + Fore.WHITE
-            + " using DUCO-S1 algorithm with "
+            + lang_file["using_algo"]
             + Fore.YELLOW
             + str(int(100 - efficiency * 100))
-            + "% efficiency"
+            + f"% {lang_file['efficiency']}"
         )
         while True:  # Mining section
             try:
@@ -644,13 +654,13 @@ def Thread(
                             if feedback == "GOOD":  # If result was good
                                 accepted.value += 1  # Share accepted = increment feedback shares counter by 1
                                 title(
-                                    "Duino-Coin Python Miner (v"
+                                    lang_file["duco_python_miner"]
                                     + str(minerVersion)
                                     + ") - "
                                     + str(accepted.value)
                                     + "/"
                                     + str(accepted.value + rejected.value)
-                                    + " accepted shares"
+                                    + lang_file["accepted_shares"]
                                 )
                                 print(
                                     now().strftime(
@@ -664,7 +674,7 @@ def Thread(
                                     + " "
                                     + Back.RESET
                                     + Fore.GREEN
-                                    + " Accepted "
+                                    + lang_file["accepted"]
                                     + Fore.WHITE
                                     + str(accepted.value)
                                     + "/"
@@ -702,13 +712,13 @@ def Thread(
                             elif feedback == "BLOCK":  # If block was found
                                 accepted.value += 1  # Share accepted = increment feedback shares counter by 1
                                 title(
-                                    "Duino-Coin Python Miner (v"
+                                    lang_file["duco_python_miner"]
                                     + str(minerVersion)
                                     + ") - "
                                     + str(accepted.value)
                                     + "/"
                                     + str(accepted.value + rejected.value)
-                                    + " accepted shares"
+                                    + lang_file["accepted_shares"]
                                 )
                                 print(
                                     now().strftime(
@@ -722,7 +732,7 @@ def Thread(
                                     + " "
                                     + Back.RESET
                                     + Fore.CYAN
-                                    + " Block found "
+                                    + lang_file["block_found"]
                                     + Fore.WHITE
                                     + str(accepted.value)
                                     + "/"
@@ -770,28 +780,26 @@ def Thread(
                                     + " "
                                     + Back.RESET
                                     + Fore.RED
-                                    + " Internal server error."
+                                    + lang_file["internal_server_error"]
                                     + Style.RESET_ALL
                                     + Fore.RED
-                                    + " Retrying in 10s"
+                                    + lang_file["retrying"]
                                 )
                                 time.sleep(10)
 
                             else:  # If result was bad
                                 rejected.value += 1  # Share rejected = increment bad shares counter by 1
                                 title(
-                                    "Duino-Coin Python Miner (v"
+                                    lang_file["duco_python_miner"]
                                     + str(minerVersion)
                                     + ") - "
                                     + str(accepted.value)
                                     + "/"
                                     + str(accepted.value + rejected.value)
-                                    + " accepted shares"
+                                    + lang_file["accepted_shares"]
                                 )
                                 print(
-                                    now().strftime(
-                                        Style.RESET_ALL + Style.DIM + "%H:%M:%S "
-                                    )
+                                    now().strftime(Style.DIM + "%H:%M:%S ")
                                     + Style.RESET_ALL
                                     + Style.BRIGHT
                                     + Back.YELLOW
@@ -801,7 +809,7 @@ def Thread(
                                     + " "
                                     + Back.RESET
                                     + Fore.RED
-                                    + " Rejected "
+                                    + lang_file["rejected"]
                                     + Fore.WHITE
                                     + str(accepted.value)
                                     + "/"
@@ -838,7 +846,7 @@ def Thread(
                         break  # Repeat
             except Exception as e:
                 print(
-                    now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+                    now().strftime(Style.DIM + "%H:%M:%S ")
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Back.BLUE
@@ -849,12 +857,12 @@ def Thread(
                     + Style.RESET_ALL
                     + Style.BRIGHT
                     + Fore.MAGENTA
-                    + " Error while mining - most likely a connection error - restarting in 10s."
+                    + lang_file["error_while_mining"]
                     + Style.RESET_ALL
                 )
                 if debug == "y":
                     raise
-                time.sleep(10)
+                time.sleep(5)
                 break
 
 
@@ -885,7 +893,7 @@ def updateRichPresence():
                 + "/"
                 + str(rejected.value + accepted.value),
                 large_image="ducol",
-                large_text="Duino-Coin, a coin that can be mined with almost everything, including AVR boards",
+                large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
                 buttons=[
                     {"label": "Learn more", "url": "https://duinocoin.com"},
                     {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
@@ -902,14 +910,14 @@ if __name__ == "__main__":
     multiprocessing.freeze_support()
     cpu = cpuinfo.get_cpu_info()  # Processor info
     init(autoreset=True)  # Enable colorama
-    title("Duino-Coin Python Miner (v" + str(minerVersion) + ")")
+    title(lang_file["duco_python_miner"] + str(minerVersion) + ")")
 
     try:
         loadConfig()  # Load config file or create new one
         debugOutput("Config file loaded")
     except:
         print(
-            now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+            now().strftime(Style.DIM + "%H:%M:%S ")
             + Style.RESET_ALL
             + Style.BRIGHT
             + Back.GREEN
@@ -918,9 +926,9 @@ if __name__ == "__main__":
             + Style.RESET_ALL
             + Style.BRIGHT
             + Fore.RED
-            + " Error loading the configfile ("
+            + lang_file["load_config_error"]
             + resourcesFolder
-            + "/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s"
+            + lang_file["load_config_error_warning"]
             + Style.RESET_ALL
         )
         if debug == "y":
@@ -969,3 +977,4 @@ if __name__ == "__main__":
         time.sleep(0.1)
     initRichPresence()
     threading.Thread(target=updateRichPresence).start()
+
