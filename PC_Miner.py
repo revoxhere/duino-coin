@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*-coding=utf-8 -*-
 ##########################################
 # Duino-Coin Python PC Miner (v2.2)
 # https://github.com/revoxhere/duino-coin
@@ -19,6 +18,7 @@ def install(package):
 
 def now():
     return datetime.datetime.now()
+
 
 try:  # Check if cpuinfo is installed
     import cpuinfo
@@ -795,6 +795,29 @@ def Thread(
                                     + Style.RESET_ALL
                                     + Fore.RED
                                     + getString("retrying")
+                                )
+                                time.sleep(10)
+
+                            elif feedback == "INVU":  # If user doesn't exist
+                                print(
+                                    now().strftime(
+                                        Style.RESET_ALL + Style.DIM + "%H:%M:%S "
+                                    )
+                                    + Style.RESET_ALL
+                                    + Style.BRIGHT
+                                    + Back.BLUE
+                                    + Fore.WHITE
+                                    + " cpu"
+                                    + str(threadid)
+                                    + " "
+                                    + Back.RESET
+                                    + Fore.RED
+                                    + getString("mining_user")
+                                    + str(username)
+                                    + getString("mining_not_exist")
+                                    + Style.RESET_ALL
+                                    + Fore.RED
+                                    + getString("mining_not_exist_warning")
                                 )
                                 time.sleep(10)
 
