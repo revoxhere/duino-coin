@@ -1,5 +1,6 @@
 {
-    "english":{
+    "english": {
+        "translation_autor": "Duino-Coin developers",
         "sigint_detected": " SIGINT detected - Exiting gracefully.",
         "goodbye": " See you soon!",
         "greeting_morning": "Have a wonderful morning",
@@ -39,7 +40,6 @@
         "thanks_donation": " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development",
 
         "data_error": " Error retrieving data from GitHub! Retrying in 10s.",
-
         "connected": " Connected",
         "connected_server": " to master Duino-Coin server (v",
         "outdated_miner": " Miner is outdated (v",
@@ -58,9 +58,13 @@
         "internal_server_error": " Internal server error.",
         "retrying": " Retrying in 10s",
         "rejected": " Rejected ",
-        "error_while_mining": " Error while mining - most likely a connection error - restarting in 5s."
+        "error_while_mining": " Error while mining - most likely a connection error - restarting in 5s.",
+
+        "mining_user": " User ",
+        "mining_not_exist": " doesn't exist.",
+        "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s"
     },
-    "polish":{
+    "polish": {
         "translation_autor": "revox",
         "sigint_detected": " SIGINT wykryty - Wyłączam koparkę.",
         "goodbye": " Do zobaczenia wkrótce!",
@@ -70,7 +74,7 @@
         "greeting_evening": "Miłego wieczoru",
         "greeting_back": "Witaj ponownie",
 
-        "banner": "Official Duino-Coin © Python Miner",
+        "banner": "Oficjalna Python-koparka Duino-Coin ©",
         "donation_level": "Poziom dotacji dla deweloperów: ",
 
         "medium_diff": "Trudność zmniejszona",
@@ -101,7 +105,7 @@
         "thanks_donation": " Dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
 
         "data_error": " Problem pobierania danych z GitHuba! Ponowna próba za 10s.",
-
+        
         "connected": " Połączono",
         "connected_server": " z głównym serwerem Duino-Coin (v",
         "outdated_miner": " Koparka jest nieaktualna (v",
@@ -120,9 +124,13 @@
         "internal_server_error": " Wewnętrzny błąd serwera.",
         "retrying": " Ponowna próba za 10s",
         "rejected": " Odrzucono ",
-        "error_while_mining": " Błąd podczas kopania - prawdopodobnie problem z połączeniem - ponowna próba za 5s."
+        "error_while_mining": " Błąd podczas kopania - prawdopodobnie problem z połączeniem - ponowna próba za 5s.",
+
+        "mining_user": " Użytkownik ",
+        "mining_not_exist": " nie jest zarejestrowany.",
+        "mining_not_exist_warning": " Upewnij się że poprawnie wprowadziłeś nazwę użytkownika. Sprawdź swój plik konfiguracyjny. Ponowna próba za 10s"
     },
-    "spanish":{
+    "spanish": {
         "translation_autor": "HGEpro",
         "sigint_detected": " SIGINT detectado - Saliendo correctamente.",
         "goodbye": " ¡Hasta pronto!",
@@ -182,7 +190,11 @@
         "internal_server_error": " Error interno del servidor.",
         "retrying": " Reintentando en 10s",
         "rejected": " Rechazadas ",
-        "error_while_mining": " Error durante el minado - probablemente un error de conexión - reiniciando en 5s."
+        "error_while_mining": " Error durante el minado - probablemente un error de conexión - reiniciando en 5s.",
+
+        "mining_user": " User ",
+        "mining_not_exist": " doesn't exist.",
+        "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s"
     },
     "french": {
         "sigint_detected": " SIGINT détecté - Fermeture...",
@@ -243,6 +255,10 @@
         "internal_server_error": " Erreur interne au serveur.",
         "retrying": " Nouvel essai dans 10s",
         "rejected": " Refusé ",
-        "error_while_mining": " Erreur durant le minage - probablement une erreur de connection - Redémarrage dans 5s."
+        "error_while_mining": " Erreur durant le minage - probablement une erreur de connection - Redémarrage dans 5s.",
+
+        "mining_user": " User ",
+        "mining_not_exist": " doesn't exist.",
+        "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s"
     }
 }
