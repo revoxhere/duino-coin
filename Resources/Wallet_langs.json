@@ -1,5 +1,6 @@
 {
     "english": {
+        "translation_author": "Duino-Coin developers",
         "welcome_message": "Welcome to the\nDuino-Coin\nTkinter GUI Wallet",
         "warning": "Warning",
         "duino_coin_wallet": "Duino-Coin Wallet",
@@ -185,6 +186,7 @@
         "minute": "MINUTO",
         "hour": "HORA",
         "day": "DÍA",
+        "input_amount": "INTRODUCE CANTIDAD"
     },
     "polish": {
         "translation_author": "revox",
@@ -283,6 +285,7 @@
         "wrapper_amount_to_wrap": "Ilość do zamiany"
     },
     "french": {
+        "translation_author": "Bilaboz",
         "welcome_message": "Bienvenue sur le\nportefeuille Tkinter\nDuino-Coin",
         "warning": "Attention",
         "duino_coin_wallet": "Portefeuille Duino-Coin",
