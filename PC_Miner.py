@@ -71,9 +71,20 @@ config = configparser.ConfigParser()
 donationlevel = 0
 locale = locale.getdefaultlocale()[0]
 
+
+if not os.path.exists(resourcesFolder):
+    os.mkdir(resourcesFolder)  # Create resources folder if it doesn't exist
+
+if not Path(  # Check if languages file exists
+    resourcesFolder + "/langs.json"
+).is_file():  # Initial miner executable section
+    url = "https://raw.githubusercontent.com/revoxhere/duino-coin/master/Resources/PC_Miner_langs.json"
+    r = requests.get(url)
+    with open(resourcesFolder + "/langs.json", "wb") as f:
+        f.write(r.content)
+
 with open(f"{resourcesFolder}/langs.json") as lang_file:
     lang_file = json.load(lang_file)
-
 
 if locale == "es_ES":
     lang_file = lang_file["spanish"]
@@ -81,10 +92,6 @@ elif locale == "pl_PL":
     lang_file = lang_file["polish"]
 else:
     lang_file = lang_file["english"]
-
-
-if not os.path.exists(resourcesFolder):
-    os.mkdir(resourcesFolder)  # Create resources folder if it doesn't exist
 
 
 def debugOutput(text):
