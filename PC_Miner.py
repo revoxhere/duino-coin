@@ -75,8 +75,10 @@ with open(f"{resourcesFolder}/langs.json") as lang_file:
     lang_file = json.load(lang_file)
 
 
-if locale == 'es_ES':
+if locale == "es_ES":
     lang_file = lang_file["spanish"]
+elif locale == "pl_PL":
+    lang_file = lang_file["polish"]
 else:
     lang_file = lang_file["english"]
 
@@ -275,17 +277,11 @@ def loadConfig():  # Config loading section
         )
 
         username = input(
-            Style.RESET_ALL
-            + Fore.YELLOW
-            + lang_file["ask_username"]
-            + Style.BRIGHT
+            Style.RESET_ALL + Fore.YELLOW + lang_file["ask_username"] + Style.BRIGHT
         )
 
         efficiency = input(
-            Style.RESET_ALL
-            + Fore.YELLOW
-            + lang_file["ask_intensity"]
-            + Style.BRIGHT
+            Style.RESET_ALL + Fore.YELLOW + lang_file["ask_intensity"] + Style.BRIGHT
         )
 
         threadcount = input(
@@ -312,10 +308,7 @@ def loadConfig():  # Config loading section
         )
         if rigIdentifier == "y" or rigIdentifier == "Y":
             rigIdentifier = input(
-                Style.RESET_ALL
-                + Fore.YELLOW
-                + lang_file["ask_rig_name"]
-                + Style.BRIGHT
+                Style.RESET_ALL + Fore.YELLOW + lang_file["ask_rig_name"] + Style.BRIGHT
             )
         else:
             rigIdentifier = "None"
@@ -977,4 +970,3 @@ if __name__ == "__main__":
         time.sleep(0.1)
     initRichPresence()
     threading.Thread(target=updateRichPresence).start()
-
