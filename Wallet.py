@@ -586,7 +586,7 @@ elif locale == "pl_PL":
 elif locale == "fr_FR":
     lang = "french"
 else:
-    lang = "french"
+    lang = "english"
 
 with sqlite3.connect(f"{resources}/wallet.db") as con:
     cur = con.cursor()
