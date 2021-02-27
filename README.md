@@ -55,19 +55,24 @@ Official getting started guides for creating an account and setting up miners on
 
 <h3 align="center">Community-made software</h3><br>
 
-**Other miners:**
+**Other miners known to work with Duino-Coin:**
 *   [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch
 *   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) by DarkThinking
 *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) by phantom32
 *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
 *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
 *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
+    *   [NodeJS Miner](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners/NodeJS_Miner) by Bilaboz
+    *   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) by revox
+    *   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) by revox
+    *   [Minimal Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) by revox
+    *   [(Old) Multithreaded Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Multithreaded_PC_Miner.py) by Bilaboz
 
 **Other tools:**
 *   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
 *   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz
 
-This list will be actively updated.
+This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
 
 <h2 align="center">Contributing</h2><br>
 
@@ -130,34 +135,36 @@ If you want to easily access Duino-Coin API with your C apps, there is [libduco]
 
 If you want to easily access Duino-Coin API with your Python3 apps, [@connorhess](https://github.com/connorhess) made an official module for that here: [duco_api.py](https://github.com/revoxhere/duino-coin/blob/master/duco_api/duco_api.py) and you can find the documentation for it here: [README.md](https://github.com/revoxhere/duino-coin/blob/master/duco_api/README.md)
 
-<h2 align="center">Duino-coin for the AUR!</h2><br>
+<h2 align="center">Duino-coin for the AUR</h2><br>
 
-You can get the whole duino-coin bundle now on the AUR.
+You can get the whole duino-coin bundle now on the AUR - just install it with your favourite AUR Helper (for example usign **yay**):
 
-Just install it with your favourite AUR Helper (for example: yay):
+1. Install git (if you haven't already)
 
-1. Install git
+```BASH
+sudo pacman -S git
+```
 
-```sudo pacman -S git```
+2. Clone the yay repo
 
-2. You have to clone the yay repo.
+```BASH
+sudo git clone https://aur.archlinux.org/yay-git.git
+cd yay-git
+```
 
-```sudo git clone https://aur.archlinux.org/yay-git.git```
+3. Build the package using the makepkg
 
-3. Get into the Folder
+```BASH
+makepkg -si
+```
 
-```cd yay-git```
+5. Use yay to install AUR package
 
-4. Next, build the package using the makepkg command below.
+```BASH
+yay -S duino-coin
+```
 
-```makepkg -si```
-
-5. Now you can use yay to install AUR packages
-
-```yay -S duino-coin```
-
-6. Have fun mining!
-
+Have fun mining!
 
 <h2 align="center">License</h2><br>
 
