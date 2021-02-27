@@ -93,7 +93,15 @@
         "your_miners": "YOUR MINERS",
         "session": "SESSION",
         "wrapper_success": "Successfull wrapping",
-        "wrapper_amount_to_wrap": "Amount to wrap"
+        "wrapper_amount_to_wrap": "Amount to wrap",
+        "email": "E-MAIL",
+        "wrapper_error_tronpy": "Error with Tronpy",
+        "translation_author_message": "Wallet translated by:",
+        "notification_new_transaction": "New transaction",
+        "sessionprofit_unavailable1": "Launch your miners",
+        "sessionprofit_unavailable2": "first to see estimated profit.",
+        "tray_show": "Show window",
+        "tray_exit": "Exit window"
     },
     "spanish": {
         "translation_author": "HGEpro",
@@ -186,7 +194,15 @@
         "minute": "MINUTO",
         "hour": "HORA",
         "day": "DÍA",
-        "input_amount": "INTRODUCE CANTIDAD"
+        "input_amount": "INTRODUCE CANTIDAD",
+        "email": "E-MAIL",
+        "wrapper_error_tronpy": "Error with Tronpy",
+        "translation_author_message": "Wallet translated by:",
+        "notification_new_transaction": "New transaction",
+        "sessionprofit_unavailable1": "Launch your miners",
+        "sessionprofit_unavailable2": "first to see estimated profit.",
+        "tray_show": "Show window",
+        "tray_exit": "Exit window"
     },
     "polish": {
         "translation_author": "revox",
@@ -265,7 +281,7 @@
         "settings": "Ustawienia",
         "uppercase_settings": "USTAWIENIA",
         "settings_title": "Portfel Duino-Coin - Ustawienia",
-        "logout": "WYOLGUJ",
+        "logout": "WYLOGUJ",
         "change_passwd": "ZMIEŃ HASŁO",
         "change_passwd_lowercase": "Zmień hasło",
         "change_passwd_error": "Błąd podczas zmieniania hasła",
@@ -282,7 +298,15 @@
         "hour": "GODZINĘ",
         "day": "DZIEŃ",
         "wrapper_success": "Wrappowanie zakończone pomyślnie",
-        "wrapper_amount_to_wrap": "Ilość do zamiany"
+        "wrapper_amount_to_wrap": "Ilość do zamiany",
+        "email": "E-MAIL",
+        "wrapper_error_tronpy": "Wystąpił błąd z Tronpy",
+        "translation_author_message": "Tłumacz portfela:",
+        "notification_new_transaction": "Nowa transakcja",
+        "sessionprofit_unavailable1": "Włącz swoje koparki",
+        "sessionprofit_unavailable2": "aby widzieć szacowany zysk.",
+        "tray_show": "Pokaż okno",
+        "tray_exit": "Zamknij okno"
     },
     "french": {
         "translation_author": "Bilaboz",
@@ -378,6 +402,14 @@
         "your_miners": "VOS MINEURS",
         "session": "SESSION",
         "wrapper_success": "Wrapping effectué",
-        "wrapper_amount_to_wrap": "Montant à wrap"
+        "wrapper_amount_to_wrap": "Montant à wrap",
+        "email": "E-MAIL",
+        "wrapper_error_tronpy": "Error with Tronpy",
+        "translation_author_message": "Wallet translated by:",
+        "notification_new_transaction": "New transaction",
+        "sessionprofit_unavailable1": "Launch your miners",
+        "sessionprofit_unavailable2": "first to see estimated profit.",
+        "tray_show": "Show window",
+        "tray_exit": "Exit window"
     }
 }
