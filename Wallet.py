@@ -575,6 +575,8 @@ if locale == "es_ES":
     lang_file = lang_file["spanish"]
 elif locale == "pl_PL":
     lang_file = lang_file["polish"]
+elif locale == "fr_FR":
+    lang_file = lang_file["french"]
 else:
     lang_file = lang_file["english"]
 
