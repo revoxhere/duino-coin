@@ -434,7 +434,7 @@ def updateRichPresence():
                 + "/"
                 + str(shares[0] + shares[1]),
                 large_image="ducol",
-                large_text="Duino-Coin, a coin that can be mined with almost everything, including AVR boards"
+                large_text="Duino-Coin, a coin that can be mined with almost everything, including AVR boards",
                 buttons=[
                     {"label": "Learn more", "url": "https://duinocoin.com"},
                     {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
