@@ -106,6 +106,7 @@
         "preparing_wallet_window": "Preparando ventana del monedero...",
         "username": "USUARIO",
         "passwd": "CONTRASEÑA",
+        "session": "SESIÓN",
         "keep_me_logged_in": "Manténme iniciado",
         "login": "ACCEDER",
         "register": "REGISTRAR",
@@ -127,6 +128,7 @@
         "amount": "CANTIDAD",
         "send_funds": "ENVIAR FONDOS", 
         "send_funds_warning": "Estás segur@ de que quieres enviar",
+        "send_funds_to": "a",
         "wrap_duco": "WRAP DUCO",
         "unwrap_duco": "UNWRAP DUCO", 
         "estimated_profit": "BENEFICIO ESTIMADO",
@@ -179,7 +181,10 @@
         "clear_transactions": "LIMPIAR TRANSACCIONES",
         "logged_in_as": "Iniciado como usuario",
         "wallet_version": "Versión del monedero",
-        "config_dev_warning": "Más opciones vendrán en el futuro"
+        "config_dev_warning": "Más opciones vendrán en el futuro",
+        "minute": "MINUTO",
+        "hour": "HORA",
+        "day": "DÍA",
     },
     "polish": {
         "translation_author": "revox",
