@@ -20,6 +20,7 @@ from tkinter import (
     Toplevel,
     ttk,
 )
+from time import time
 from tkinter.font import Font
 from tkinter import LEFT, BOTH, RIGHT, END, N, E, S, W
 from webbrowser import open_new_tab
@@ -1760,21 +1761,26 @@ def initRichPresence():
 
 
 def updateRichPresence():
-    try:
-        balance = round(globalBalance, 4)
-        RPC.update(
-            details=str(balance) + " ᕲ ($" + str(round(ducofiat * balance, 2)) + ")",
-            large_image="duco",
-            large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
-            buttons=[
-                {"label": "Learn more", "url": "https://duinocoin.com"},
-                {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
-            ],
-        )
-    except:  # Discord not launched
-        pass
-
-    Timer(15, updateRichPresence).start()
+    startTime = int(time())
+    while True:
+        try:
+            balance = round(globalBalance, 4)
+            RPC.update(
+                details=str(balance)
+                + " ᕲ ($"
+                + str(round(ducofiat * balance, 2))
+                + ")",
+                start=startTime,
+                large_image="duco",
+                large_text="Duino-Coin, a coin that can be mined with almost everything, including AVR boards",
+                buttons=[
+                    {"label": "Learn more", "url": "https://duinocoin.com"},
+                    {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"},
+                ],
+            )
+        except:  # Discord not launched
+            pass
+        sleep(15)
 
 
 class Wallet:
@@ -2116,7 +2122,7 @@ try:
     GetDucoPrice()  # Start duco price updater
     threading.Thread(target=getBalance).start()
     initRichPresence()
-    updateRichPresence()
+    threading.Thread(target=updateRichPresence).start()
     try:
         loading.destroy()  # Destroy loading dialog and start the main wallet window
     except:
