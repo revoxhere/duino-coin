@@ -20,7 +20,6 @@ from tkinter import (
     Toplevel,
     ttk,
 )
-from time import time
 from tkinter.font import Font
 from tkinter import LEFT, BOTH, RIGHT, END, N, E, S, W
 from webbrowser import open_new_tab
@@ -40,6 +39,7 @@ from json import loads
 from configparser import ConfigParser
 import json
 import subprocess, os
+import locale
 
 
 version = 2.2
@@ -54,6 +54,18 @@ min_trans_difference_notify = 0.5  # Minimum transaction amount to show a notifi
 wrong_passphrase = False
 iterations = 100_000
 globalBalance = 0
+
+locale = locale.getdefaultlocale()[0]
+with open(
+    f"{resources}langs.json"
+) as lang_file:  # Load language strings depending on system locale
+    lang_file = json.load(lang_file)
+if locale == "es_ES":
+    lang_file = lang_file["spanish"]
+elif locale == "pl_PL":
+    lang_file = lang_file["polish"]
+else:
+    lang_file = lang_file["english"]
 
 
 def install(package):
@@ -228,14 +240,14 @@ class LoginFrame(Frame):
             self,
             background=foregroundColor,
             foreground=fontColor,
-            text="Welcome to the\nDuino-Coin\nTkinter GUI Wallet",
+            text=lang_file["welcome_message"],
             font=textFont2,
         )
         self.spacer = Label(self)
 
         self.label_username = Label(
             self,
-            text="USERNAME",
+            text=lang_file["username"],
             font=textFont2,
             background=backgroundColor,
             foreground=fontColor,
@@ -243,7 +255,7 @@ class LoginFrame(Frame):
         )
         self.label_password = Label(
             self,
-            text="PASSWORD",
+            text=lang_file["passwd"],
             font=textFont2,
             background=backgroundColor,
             foreground=fontColor,
@@ -273,7 +285,7 @@ class LoginFrame(Frame):
         self.var = IntVar()
         self.checkbox = Checkbutton(
             self,
-            text="Keep me logged in",
+            text=lang_file["keep_me_logged_in"],
             background=backgroundColor,
             activebackground=backgroundColor,
             selectcolor=backgroundColor,
@@ -288,7 +300,7 @@ class LoginFrame(Frame):
 
         self.logbtn = Button(
             self,
-            text="LOGIN",
+            text=lang_file["login"],
             foreground=foregroundColor,
             background=backgroundColor,
             activebackground=backgroundColor,
@@ -299,7 +311,7 @@ class LoginFrame(Frame):
 
         self.regbtn = Button(
             self,
-            text="REGISTER",
+            text=lang_file["register"],
             foreground=foregroundColor,
             background=backgroundColor,
             activebackground=backgroundColor,
@@ -337,10 +349,13 @@ class LoginFrame(Frame):
                         con.commit()
                 root.destroy()
             else:
-                messagebox.showerror(title="Error loging-in", message=response[1])
+                messagebox.showerror(
+                    title=lang_file["login_error"], message=response[1]
+                )
         else:
             messagebox.showerror(
-                title="Error loging-in", message="Fill in the blanks first"
+                title=lang_file["login_error"],
+                message=lang_file["fill_the_blanks_warning"],
             )
 
     def _registerprotocol(self):
@@ -365,29 +380,31 @@ class LoginFrame(Frame):
 
                 if response[0] == "OK":
                     messagebox.showinfo(
-                        title="Registration successfull",
-                        message="New user has been registered sucessfully. You can now login",
+                        title=lang_file["registration_success"],
+                        message=lang_file["registration_success_msg"],
                     )
                     register.destroy()
                     execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     messagebox.showerror(
-                        title="Error registering user", message=response[1]
+                        title=lang_file["register_error"], message=response[1]
                     )
             else:
                 messagebox.showerror(
-                    title="Error registering user", message="Passwords don't match"
+                    title=lang_file["register_error"],
+                    message=lang_file["error_passwd_dont_match"],
                 )
         else:
             messagebox.showerror(
-                title="Error registering user", message="Fill in the blanks first"
+                title=lang_file["register_error"],
+                message=lang_file["fill_the_blanks_warning"],
             )
 
     def _register_btn_clicked(self):
         global username, password, confpassword, email, register
         root.destroy()
         register = Tk()
-        register.title("Register")
+        register.title(lang_file["register"])
         register.resizable(False, False)
 
         textFont2 = Font(register, size=12, weight="bold")
@@ -402,7 +419,7 @@ class LoginFrame(Frame):
             register,
             background=foregroundColor,
             foreground=fontColor,
-            text="Register on network",
+            text=lang_file["register_on_network"],
             font=textFont2,
         )
         ducoLabel.grid(row=0, padx=5, pady=(5, 0), sticky="nswe")
@@ -410,7 +427,7 @@ class LoginFrame(Frame):
 
         Label(
             register,
-            text="USERNAME",
+            text=lang_file["username"],
             background=backgroundColor,
             foreground=fontColor,
             font=textFont2,
@@ -425,7 +442,7 @@ class LoginFrame(Frame):
 
         Label(
             register,
-            text="PASSWORD",
+            text=lang_file["passwd"],
             background=backgroundColor,
             foreground=fontColor,
             font=textFont2,
@@ -441,7 +458,7 @@ class LoginFrame(Frame):
 
         Label(
             register,
-            text="CONFIRM PASSWORD",
+            text=lang_file["confirm_passwd"],
             background=backgroundColor,
             foreground=fontColor,
             font=textFont2,
@@ -472,7 +489,7 @@ class LoginFrame(Frame):
 
         self.logbtn = Button(
             register,
-            text="REGISTER",
+            text=lang_file["register"],
             activebackground=backgroundColor,
             foreground=foregroundColor,
             background=backgroundColor,
@@ -488,7 +505,7 @@ def LoadingWindow():
     loading = Tk()
     loading.resizable(False, False)
     loading.configure(background=backgroundColor)
-    loading.title("Loading")
+    loading.title(lang_file["loading"])
     try:
         loading.iconphoto(True, PhotoImage(file=resources + "duco.png"))
     except:
@@ -498,7 +515,7 @@ def LoadingWindow():
 
     Label(
         loading,
-        text="DUINO-COIN WALLET",
+        text=lang_file["duino_coin_wallet"],
         font=textFont2,
         foreground=foregroundColor,
         background=backgroundColor,
@@ -509,7 +526,7 @@ def LoadingWindow():
         loading,
         background=backgroundColor,
         foreground=fontColor,
-        text="Loading database...",
+        text=lang_file["loading_database"],
         font=textFont,
     )
     status.grid(row=1, column=0, sticky=S + W, pady=(0, 5), padx=5)
@@ -572,7 +589,7 @@ else:
         username = userdata_query[0]
         passwordEnc = (userdata_query[1]).decode("utf-8")
         password = b64decode(passwordEnc).decode("utf8")
-    status.config(text="Preparing wallet window...")
+    status.config(text=lang_file["preparing_wallet_window"])
     loading.update()
 
 
@@ -595,7 +612,7 @@ def openDiscord(handler):
 def openTransactions(handler):
     transactionsWindow = Toplevel()
     transactionsWindow.resizable(False, False)
-    transactionsWindow.title("Duino-Coin Wallet - Transactions")
+    transactionsWindow.title(lang_file["wallet_transactions"])
     transactionsWindow.transient([root])
     transactionsWindow.configure(background=backgroundColor)
 
@@ -604,14 +621,14 @@ def openTransactions(handler):
 
     Label(
         transactionsWindow,
-        text="LOCAL TRANSACTION LIST",
+        text=lang_file["local_transactions_list"],
         font=textFont3,
         background=backgroundColor,
         foreground=foregroundColor,
     ).grid(row=0, column=0, columnspan=2, sticky=S + W, pady=(5, 0), padx=5)
     Label(
         transactionsWindow,
-        text="Still a work in progress version",
+        text=lang_file["local_transactions_list_warning"],
         font=textFont,
         foreground=fontColor,
         background=backgroundColor,
@@ -702,8 +719,8 @@ def currencyConvert():
                         + str(tocurrency)
                     )
     except:
-        result = "Incorrect calculation"
-    result = "RESULT: " + result
+        result = lang_file["calculate_error"]
+    result = lang_file["result"] + ": " + result
     conversionresulttext.set(str(result))
     calculatorWindow.update()
 
@@ -718,7 +735,7 @@ def openCalculator(handler):
 
     calculatorWindow = Toplevel()
     calculatorWindow.resizable(False, False)
-    calculatorWindow.title("Duino-Coin Wallet - Calculator")
+    calculatorWindow.title(lang_file["wallet_calculator"])
     calculatorWindow.transient([root])
     calculatorWindow.configure(background=backgroundColor)
 
@@ -728,7 +745,7 @@ def openCalculator(handler):
 
     Label(
         calculatorWindow,
-        text="CURRENCY CONVERTER",
+        text=lang_file["currency_converter"],
         font=textFont3,
         foreground=foregroundColor,
         background=backgroundColor,
@@ -736,7 +753,7 @@ def openCalculator(handler):
 
     Label(
         calculatorWindow,
-        text="FROM",
+        text=lang_file["from"],
         font=textFont2,
         foreground=foregroundColor,
         background=backgroundColor,
@@ -771,7 +788,7 @@ def openCalculator(handler):
 
     Label(
         calculatorWindow,
-        text="TO",
+        text=lang_file["to"],
         font=textFont2,
         foreground=foregroundColor,
         background=backgroundColor,
@@ -806,7 +823,7 @@ def openCalculator(handler):
 
     Label(
         calculatorWindow,
-        text="INPUT AMOUNT",
+        text=lang_file["input_amount"],
         font=textFont2,
         foreground=foregroundColor,
         background=backgroundColor,
@@ -830,7 +847,7 @@ def openCalculator(handler):
 
     Button(
         calculatorWindow,
-        text="CALCULATE",
+        text=lang_file["calculate"],
         font=textFont2,
         foreground=foregroundColor,
         activebackground=backgroundColor,
@@ -839,7 +856,7 @@ def openCalculator(handler):
     ).grid(row=3, columnspan=2, column=2, sticky=N + S + W + E, pady=(5, 0), padx=5)
 
     conversionresulttext = StringVar(calculatorWindow)
-    conversionresulttext.set("RESULT: 0.0")
+    conversionresulttext.set(f'{lang_file["result"]}: 0.0')
     conversionresultLabel = Label(
         calculatorWindow,
         textvariable=conversionresulttext,
@@ -862,7 +879,7 @@ def openStats(handler):
 
     statsWindow = Toplevel()
     statsWindow.resizable(False, False)
-    statsWindow.title("Duino-Coin Wallet - Statistics")
+    statsWindow.title(lang_file["statistics_title"])
     statsWindow.transient([root])
     statsWindow.configure(background=backgroundColor)
 
@@ -920,9 +937,7 @@ def openStats(handler):
             )
             i += 1
     if i == 0:
-        Active_workers_listbox.insert(
-            i, "Couldn't detect any miners mining on your account"
-        )
+        Active_workers_listbox.insert(i, lang_file["statistics_miner_warning"])
 
     totalHashrateString = str(int(totalHashrate)) + " H/s"
     if totalHashrate > 1000000000:
@@ -938,7 +953,7 @@ def openStats(handler):
 
     Label(
         statsWindow,
-        text="YOUR MINERS - " + totalHashrateString,
+        text=f'{lang_file["your_miners"]} - ' + totalHashrateString,
         font=textFont3,
         foreground=foregroundColor,
         background=backgroundColor,
@@ -946,7 +961,7 @@ def openStats(handler):
 
     Label(
         statsWindow,
-        text="RICHLIST",
+        text=lang_file["richlist"],
         font=textFont3,
         foreground=foregroundColor,
         background=backgroundColor,
@@ -973,56 +988,58 @@ def openStats(handler):
 
     Label(
         statsWindow,
-        text="NETWORK INFO",
+        text=lang_file["network_info"],
         font=textFont3,
         foreground=foregroundColor,
         background=backgroundColor,
     ).grid(row=2, column=1, sticky=S + W, padx=5, pady=5)
     Label(
         statsWindow,
-        text="Difficulty: " + str(statsApi["Current difficulty"]),
+        text=f'{lang_file["difficulty"]}: ' + str(statsApi["Current difficulty"]),
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
     ).grid(row=3, column=1, sticky=S + W, padx=5)
     Label(
         statsWindow,
-        text="Mined blocks: " + str(statsApi["Mined blocks"]),
+        text=f'{lang_file["mined_blocks"]}: ' + str(statsApi["Mined blocks"]),
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
     ).grid(row=4, column=1, sticky=S + W, padx=5)
     Label(
         statsWindow,
-        text="Network hashrate: " + str(statsApi["Pool hashrate"]),
+        text=f'{lang_file["network_hashrate"]}: ' + str(statsApi["Pool hashrate"]),
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
     ).grid(row=5, column=1, sticky=S + W, padx=5)
     Label(
         statsWindow,
-        text="Active miners: " + str(len(statsApi["Miners"])),
+        text=f'{lang_file["active_miners"]}: ' + str(len(statsApi["Miners"])),
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
     ).grid(row=6, column=1, sticky=S + W, padx=5)
     Label(
         statsWindow,
-        text="1 DUCO est. price: $" + str(statsApi["Duco price"]),
+        text=f'1 DUCO {lang_file["estimated_price"]}: $' + str(statsApi["Duco price"]),
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
     ).grid(row=7, column=1, sticky=S + W, padx=5)
     Label(
         statsWindow,
-        text="Registered users: " + str(statsApi["Registered users"]),
+        text=f'{lang_file["registered_users"]}: ' + str(statsApi["Registered users"]),
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
     ).grid(row=8, column=1, sticky=S + W, padx=5)
     Label(
         statsWindow,
-        text="All-time mined DUCO: " + str(statsApi["All-time mined DUCO"]) + " ᕲ",
+        text=f'{lang_file["mined_duco"]}: '
+        + str(statsApi["All-time mined DUCO"])
+        + " ᕲ",
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
@@ -1059,8 +1076,8 @@ def openWrapper(handler):
         pubkeyfile = open(str(f"{resources}/DUCOPubKey.pub"), "r")
     except:
         messagebox.showerror(
-            title="Wrapper error",
-            message="Wrapper is not configured. Please configure it in settings !",
+            title=lang_file["wrapper_error_title"],
+            message=lang_file["wrapper_error"],
         )
     else:
         if tronpy_installed:
@@ -1069,11 +1086,13 @@ def openWrapper(handler):
 
             wrapperWindow = Toplevel()
             wrapperWindow.resizable(False, False)
-            wrapperWindow.title("Duino-Coin Wallet - Wrapper")
+            wrapperWindow.title(lang_file["wrapper_title"])
             wrapperWindow.transient([root])
             wrapperWindow.configure()
 
-            askWrapAmount = Label(wrapperWindow, text="Amount to wrap :")
+            askWrapAmount = Label(
+                wrapperWindow, text=lang_file["wrapper_amount_to_wrap"] + ":"
+            )
             askWrapAmount.grid(row=0, column=0, sticky=N + W)
             amountWrap = Entry(wrapperWindow, border="0", font=Font(size=15))
             amountWrap.grid(row=1, column=0, sticky=N + W)
@@ -1081,8 +1100,8 @@ def openWrapper(handler):
             wrapButton.grid(row=2, column=0, sticky=N + W)
         else:
             messagebox.showerror(
-                title="Wrapper error",
-                message="Tronpy is not installed, please install it using `pip install tronpy`",
+                title=lang_file["wrapper_error_title"],
+                message=lang_file["wrapper_error_tronpy"],
             )
 
 
@@ -1102,12 +1121,12 @@ def openUnWrapper(handler):
             wrong_passphrase = False
             use_wrapper = True
         except InvalidToken:
-            print("Invalid passphrase, disabling wrapper for this session")
+            print(lang_file["invalid_passphrase"])
             use_wrapper = False
             wrong_passphrase = True
 
         amount = amountUnWrap.get()
-        print("Got amount :", amount)
+        print("Got amount:", amount)
         soc = socket.socket()
         soc.connect((pool_address, int(pool_port)))
         soc.recv(3)
@@ -1162,25 +1181,23 @@ def openUnWrapper(handler):
         pubkeyfile.close()
     except:
         messagebox.showerror(
-            title="Wrapper error",
-            message="Wrapper is not configured. Please configure it in settings !",
+            title=lang_file["wrapper_error_title"],
+            message=lang_file["wrapper_error"],
         )
     else:
         if tronpy_installed:
             unWrapperWindow = Toplevel()
             unWrapperWindow.resizable(False, False)
-            unWrapperWindow.title("Duino-Coin Wallet - Unwrapper")
+            unWrapperWindow.title(lang_file["unwrapper_title"])
             unWrapperWindow.transient([root])
             unWrapperWindow.configure()
-            askAmount = Label(unWrapperWindow, text="Amount to unwrap : ")
+            askAmount = Label(unWrapperWindow, text=lang_file["unwrap_amount"])
             askAmount.grid(row=1, column=0, sticky=N + W)
 
             amountUnWrap = Entry(unWrapperWindow, border="0", font=Font(size=15))
             amountUnWrap.grid(row=2, column=0, sticky=N + W)
 
-            askPassphrase = Label(
-                unWrapperWindow, text="Passphrase (for accessing private key) :"
-            )
+            askPassphrase = Label(unWrapperWindow, text=lang_file["ask_passphrase"])
             askPassphrase.grid(row=4, column=0, sticky=N + W)
 
             passphraseEntry = Entry(unWrapperWindow, border="0", font=Font(size=15))
@@ -1190,8 +1207,8 @@ def openUnWrapper(handler):
             wrapButton.grid(row=7, column=0, sticky=N + W)
         else:
             messagebox.showerror(
-                title="Wrapper error",
-                message="Tronpy is not installed, please install it using : `pip install tronpy`",
+                title=lang_file["wrapper_error"],
+                message=lang_file["wrapper_error_tronpy"],
             )
 
 
@@ -1202,16 +1219,16 @@ def openSettings(handler):
             passphrase_input = StringVar()
             wrapconfWindow = Toplevel()
             wrapconfWindow.resizable(False, False)
-            wrapconfWindow.title("Duino-Coin Wallet - Wrapper")
+            wrapconfWindow.title(lang_file["wrapper_title"])
             wrapconfWindow.transient([root])
             wrapconfWindow.configure()
 
             def setwrapper():
                 if privkey_input and passphrase_input:
                     priv_key = privkey_entry.get()
-                    print("Got priv key :", priv_key)
+                    print("Got priv key:", priv_key)
                     passphrase = passphrase_entry.get()
-                    print("Got passphrase :", passphrase)
+                    print("Got passphrase:", passphrase)
                     try:
                         pub_key = PrivateKey(
                             bytes.fromhex(priv_key)
@@ -1238,15 +1255,17 @@ def openSettings(handler):
                             pubkeyfile.write(pub_key)
                             pubkeyfile.close()
 
-                        Label(wrapconfWindow, text="Success !").pack()
+                        Label(wrapconfWindow, text=lang_file["wrapper_success"]).pack()
                         wrapconfWindow.quit()
 
             title = Label(
-                wrapconfWindow, text="DUCO Wrapper config", font=Font(size=20)
+                wrapconfWindow,
+                text=lang_file["wrapper_config_title"],
+                font=Font(size=20),
             )
             title.grid(row=0, column=0, sticky=N + W, padx=5)
 
-            askprivkey = Label(wrapconfWindow, text="Private key : ")
+            askprivkey = Label(wrapconfWindow, text=lang_file["ask_private_key"])
             askprivkey.grid(row=1, column=0, sticky=N + W)
 
             privkey_entry = Entry(
@@ -1254,7 +1273,7 @@ def openSettings(handler):
             )
             privkey_entry.grid(row=2, column=0, sticky=N + W)
 
-            askpassphrase = Label(wrapconfWindow, text="Passphrase : ")
+            askpassphrase = Label(wrapconfWindow, text=lang_file["passphrase"])
             askpassphrase.grid(row=3, column=0, sticky=N + W)
 
             passphrase_entry = Entry(
@@ -1263,7 +1282,9 @@ def openSettings(handler):
             passphrase_entry.grid(row=4, column=0, sticky=N + W)
 
             wrapConfigButton = Button(
-                wrapconfWindow, text="Configure wrapper", command=setwrapper
+                wrapconfWindow,
+                text=lang_file["configure_wrapper_lowercase"],
+                command=setwrapper,
             )
             wrapConfigButton.grid(row=5, column=0, sticky=N + W)
 
@@ -1271,8 +1292,8 @@ def openSettings(handler):
 
         else:
             messagebox.showerror(
-                title="Wrapper error",
-                message="Tronpy is not installed, please install it using `pip install tronpy`",
+                title=lang_file["wrapper_error"],
+                message=lang_file["wrapper_error_tronpy"],
             )
 
     def _logout():
@@ -1323,11 +1344,12 @@ def openSettings(handler):
 
                         if not "OK" in response[0]:
                             messagebox.showerror(
-                                title="Error changing password", message=response[1]
+                                title=lang_file["change_passwd_error"],
+                                message=response[1],
                             )
                         else:
                             messagebox.showinfo(
-                                title="Password changed", message=response[1]
+                                title=lang_file["change_passwd_ok"], message=response[1]
                             )
                             try:
                                 try:
@@ -1344,23 +1366,23 @@ def openSettings(handler):
                             execl(sys.executable, sys.executable, *sys.argv)
                     else:
                         messagebox.showerror(
-                            title="Error changing password",
-                            message="New passwords don't match",
+                            title=lang_file["change_passwd_error"],
+                            message=lang_file["error_passwd_dont_match"],
                         )
                 else:
                     messagebox.showerror(
-                        title="Error changing password",
-                        message="Fill in the blanks first",
+                        title=lang_file["change_passwd_error"],
+                        message=lang_file["fill_the_blanks_warning"],
                     )
             else:
                 messagebox.showerror(
-                    title="Error changing password",
-                    message="New password is the same as the old one",
+                    title=lang_file["change_passwd_error"],
+                    message=lang_file["same_passwd_error"],
                 )
 
         settingsWindow.destroy()
         changepassWindow = Toplevel()
-        changepassWindow.title("Change password")
+        changepassWindow.title(lang_file["change_passwd_lowercase"])
         changepassWindow.resizable(False, False)
         changepassWindow.transient([root])
         changepassWindow.configure(background=backgroundColor)
@@ -1370,7 +1392,7 @@ def openSettings(handler):
 
         Label(
             changepassWindow,
-            text="OLD PASSWORD",
+            text=lang_file["old_passwd"],
             font=textFont2,
             background=backgroundColor,
             foreground=fontColor,
@@ -1386,7 +1408,7 @@ def openSettings(handler):
 
         Label(
             changepassWindow,
-            text="NEW PASSWORD",
+            text=lang_file["new_passwd"],
             font=textFont2,
             background=backgroundColor,
             foreground=fontColor,
@@ -1402,7 +1424,7 @@ def openSettings(handler):
 
         Label(
             changepassWindow,
-            text="CONFIRM NEW PASSWORD",
+            text=lang_file["confirm_new_passwd"],
             font=textFont2,
             background=backgroundColor,
             foreground=fontColor,
@@ -1418,7 +1440,7 @@ def openSettings(handler):
 
         chgpbtn = Button(
             changepassWindow,
-            text="CHANGE PASSWORD",
+            text=lang_file["change_passwd"],
             command=_changepassprotocol,
             foreground=foregroundColor,
             font=textFont2,
@@ -1429,7 +1451,7 @@ def openSettings(handler):
 
     settingsWindow = Toplevel()
     settingsWindow.resizable(False, False)
-    settingsWindow.title("Duino-Coin Wallet - Settings")
+    settingsWindow.title(lang_file["settings_title"])
     settingsWindow.transient([root])
     settingsWindow.configure(background=backgroundColor)
     textFont = Font(settingsWindow, size=12, weight="normal")
@@ -1437,7 +1459,7 @@ def openSettings(handler):
 
     Label(
         settingsWindow,
-        text="SETTINGS",
+        text=lang_file["uppercase_settings"],
         font=textFont3,
         foreground=foregroundColor,
         background=backgroundColor,
@@ -1445,7 +1467,7 @@ def openSettings(handler):
 
     logoutbtn = Button(
         settingsWindow,
-        text="LOGOUT",
+        text=lang_file["logout"],
         command=_logout,
         font=textFont,
         background=backgroundColor,
@@ -1456,7 +1478,7 @@ def openSettings(handler):
 
     chgpassbtn = Button(
         settingsWindow,
-        text="CHANGE PASSWORD",
+        text=lang_file["change_passwd"],
         command=_chgpass,
         font=textFont,
         background=backgroundColor,
@@ -1467,7 +1489,7 @@ def openSettings(handler):
 
     wrapperconfbtn = Button(
         settingsWindow,
-        text="CONFIGURE WRAPPER",
+        text=lang_file["configure_wrapper"],
         command=_wrapperconf,
         font=textFont,
         background=backgroundColor,
@@ -1478,7 +1500,7 @@ def openSettings(handler):
 
     cleartransbtn = Button(
         settingsWindow,
-        text="CLEAR TRANSACTIONS",
+        text=lang_file["clear_transactions"],
         command=_cleartrs,
         font=textFont,
         background=backgroundColor,
@@ -1494,21 +1516,21 @@ def openSettings(handler):
 
     Label(
         settingsWindow,
-        text="Logged-in as user: " + str(username),
+        text=f'{lang_file["logged_in_as"]}: ' + str(username),
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
     ).grid(row=6, column=0, columnspan=4, padx=5, sticky=S + W)
     Label(
         settingsWindow,
-        text="Wallet version: " + str(version),
+        text=f'{lang_file["wallet_version"]}: ' + str(version),
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
     ).grid(row=7, column=0, columnspan=4, padx=5, sticky=S + W)
     Label(
         settingsWindow,
-        text="More options will come in the future",
+        text=lang_file["config_dev_warning"],
         font=textFont,
         background=backgroundColor,
         foreground=fontColor,
@@ -1608,7 +1630,7 @@ def getBalance():
                                     and notificationsEnabled
                                 ):
                                     notification = Notify()
-                                    notification.title = "Duino-Coin Wallet"
+                                    notification.title = lang_file["duino_coin_wallet"]
                                     notification.message = (
                                         "New transaction\n"
                                         + now.strftime("%d.%m.%Y %H:%M:%S\n")
@@ -1676,13 +1698,19 @@ def updateBalanceLabel():
         transactionstext.set(transactionstext_format)
 
         if profit_array[2] != 0:
-            sessionprofittext.set("SESSION: " + str(profit_array[0]) + " ᕲ")
-            minuteprofittext.set("≈" + str(profit_array[1]) + " ᕲ/MINUTE")
-            hourlyprofittext.set("≈" + str(profit_array[2]) + " ᕲ/HOUR")
+            sessionprofittext.set(
+                lang_file["session"] + ": " + str(profit_array[0]) + " ᕲ"
+            )
+            minuteprofittext.set(
+                "≈" + str(profit_array[1]) + " ᕲ/" + lang_file["minute"]
+            )
+            hourlyprofittext.set("≈" + str(profit_array[2]) + " ᕲ/" + lang_file["hour"])
             dailyprofittext.set(
                 "≈"
                 + str(profit_array[3])
-                + " ᕲ/DAY ($"
+                + " ᕲ/"
+                + lang_file["day"]
+                + " ($"
                 + str(round(profit_array[3] * ducofiat, 4))
                 + ")"
             )
@@ -1727,8 +1755,8 @@ def sendFunds(handler):
     amountStr = amount.get()
 
     MsgBox = messagebox.askquestion(
-        "Warning",
-        f"Are you sure you want to send {amountStr} DUCO to {recipientStr}",
+        lang_file["warning"],
+        f'{lang_file["send_funds_warning"]} {amountStr} DUCO {lang_file["send_funds_to"]} {recipientStr}',
         icon="warning",
     )
     if MsgBox == "yes":
@@ -1803,11 +1831,11 @@ class Wallet:
         self.master = master
         master.resizable(False, False)
         master.configure(background=backgroundColor)
-        master.title("Duino-Coin Wallet")
+        master.title(lang_file["duino_coin_wallet"])
 
         Label(
             master,
-            text="DUINO-COIN WALLET: " + str(username),
+            text=f'{lang_file["uppercase_duino_coin_wallet"]}: ' + str(username),
             font=textFont3,
             foreground=foregroundColor,
             background=backgroundColor,
@@ -1815,9 +1843,9 @@ class Wallet:
 
         balancetext = StringVar()
         wbalancetext = StringVar()
-        balancetext.set("Please wait...")
+        balancetext.set(lang_file["please_wait"])
         if tronpy_installed:
-            wbalancetext.set("Please wait...")
+            wbalancetext.set(lang_file["please_wait"])
         else:
             wbalancetext.set("0.00")
         balanceLabel = Label(
@@ -1839,7 +1867,7 @@ class Wallet:
         wbalanceLabel.grid(row=2, column=0, columnspan=3, sticky=S + W, padx=(5, 0))
 
         balanceusdtext = StringVar()
-        balanceusdtext.set("Please wait...")
+        balanceusdtext.set(lang_file["please_wait"])
 
         Label(
             master,
@@ -1867,7 +1895,7 @@ class Wallet:
 
         Label(
             master,
-            text="RECIPIENT",
+            text=lang_file["recipient"],
             font=textFont,
             background=backgroundColor,
             foreground=fontColor,
@@ -1886,7 +1914,7 @@ class Wallet:
 
         Label(
             master,
-            text="AMOUNT",
+            text=lang_file["amount"],
             font=textFont,
             background=backgroundColor,
             foreground=fontColor,
@@ -1905,7 +1933,7 @@ class Wallet:
 
         sendLabel = Button(
             master,
-            text="SEND FUNDS",
+            text=lang_file["send_funds"],
             font=textFont3,
             foreground=foregroundColor,
             background=backgroundColor,
@@ -1923,7 +1951,7 @@ class Wallet:
 
         wrapLabel = Button(
             master,
-            text="WRAP DUCO",
+            text=lang_file["wrap_duco"],
             font=textFont3,
             foreground=foregroundColor,
             background=backgroundColor,
@@ -1941,7 +1969,7 @@ class Wallet:
 
         wrapLabel = Button(
             master,
-            text="UNWRAP DUCO",
+            text=lang_file["unwrap_duco"],
             font=textFont3,
             foreground=foregroundColor,
             background=backgroundColor,
@@ -1962,14 +1990,14 @@ class Wallet:
 
         Label(
             master,
-            text="ESTIMATED PROFIT",
+            text=lang_file["estimated_profit"],
             font=textFont3,
             foreground=foregroundColor,
             background=backgroundColor,
         ).grid(row=10, column=0, sticky=S + W, columnspan=4, pady=(5, 0), padx=(5, 0))
 
         sessionprofittext = StringVar()
-        sessionprofittext.set("Please wait - calculating...")
+        sessionprofittext.set(lang_file["please_wait_calculating"])
         sessionProfitLabel = Label(
             master,
             textvariable=sessionprofittext,
@@ -2015,7 +2043,7 @@ class Wallet:
 
         Label(
             master,
-            text="LOCAL TRANSACTIONS",
+            text=lang_file["local_transactions"],
             font=textFont3,
             foreground=foregroundColor,
             background=backgroundColor,
