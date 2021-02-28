@@ -90,6 +90,8 @@ with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
 
 if locale == "pl_PL":
     lang = "polish"
+elif locale == "ru_RU":
+    lang = "russian"
 else:
     lang = "english"
 
