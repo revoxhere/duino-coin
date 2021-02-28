@@ -88,7 +88,7 @@ else:
 try:
     from notifypy import Notify
 except:
-    print("Notifypy is not installed. Continuing without notification system")
+    print("Notify-py is not installed. Continuing without notification system")
     notificationsEnabled = False
 else:
     notificationsEnabled = True
@@ -219,7 +219,7 @@ class LoginFrame(Frame):
         textFont2 = Font(size=12, weight="bold")
         textFont = Font(size=12, weight="normal")
 
-        self.duco = ImageTk.PhotoImage(Image.open(resources + "duco_color.png"))
+        self.duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
         self.duco.image = self.duco
         self.ducoLabel = Label(
             self, background=foregroundColor, foreground=fontColor, image=self.duco
