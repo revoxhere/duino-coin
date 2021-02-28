@@ -586,7 +586,7 @@ elif locale == "pl_PL":
     lang = "polish"
 elif locale == "fr_FR":
     lang = "french"
-elif locale == "bg_BG:
+elif locale == "bg_BG":
     lang = "bulgarian"
 elif locale == "nl_NL":
     lang = "dutch"
