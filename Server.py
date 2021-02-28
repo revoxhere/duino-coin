@@ -17,9 +17,10 @@ serverVersion = 2.1 # Server version which will be sent to the clients (official
 diff_incrase_per = 5000 # Difficulty will increase every x blocks (official server uses 5k)
 max_mining_connections = 24 # Maximum number of clients using mining protocol per IP (official server uses 24)
 max_login_connections = 34 # Maximum number of logged-in clients per IP (official server uses 34)
-max_unauthorized_connections = 34 # Maximum number of connections that haven't sent any data yet (official server uses 34)
+max_unauthorized_connections = 44 # Maximum number of connections that haven't sent any data yet (official server uses 44)
 hashes_num = 1000 # Number of pregenerated jobs for every difficulty in mining section; used to massively reduce load on the server (official server uses 1000)
-database_timeout = 7 # Database access times out after this many seconds (official server uses 7)
+database_timeout = 7 # Database access times out after this many seconds (default: 5)
+socket_listen_num = 8
 use_wrapper = True # Enable wDUCO wrapper or not
 wrapper_permission = False # Set to false for declaration, will be updated when checking smart contract
 lock = threading.Lock()
@@ -842,7 +843,6 @@ def handle(c, ip):
                         break
                 else:
                     time.sleep(globalCpuUsage / 500)
-                lastBlockHash_copy = lastBlockHash # lastBlockHash liable to be changed by other threads, so we use a copy
                 try:
                     customDiff = str(data[2])
                     if str(customDiff) == "AVR":
@@ -1428,7 +1428,7 @@ if __name__ == '__main__':
     s.bind((host, port))
     threading.Thread(target=createHashes).start() # Start database updater
     print("TCP Socket binded to port", port)
-    s.listen(1) # Put the socket into listening mode; reuse connection after one is closed
+    s.listen(socket_listen_num) # Put the socket into listening mode; reuse connection after one is closed
     print("wDUCO address", wrapper_public_key)
     threading.Thread(target=InputManagement).start() # Admin input management thread
     try:
