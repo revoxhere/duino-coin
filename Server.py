@@ -15,12 +15,12 @@ host = "" # Server will use this as hostname to bind to (localhost on Windows, 0
 port = 2811 # Server will listen on this port (official server uses 2811)
 serverVersion = 2.1 # Server version which will be sent to the clients (official server uses latest release version number)
 diff_incrase_per = 5000 # Difficulty will increase every x blocks (official server uses 5k)
-max_mining_connections = 24 # Maximum number of clients using mining protocol per IP (official server uses 24)
-max_login_connections = 34 # Maximum number of logged-in clients per IP (official server uses 34)
-max_unauthorized_connections = 44 # Maximum number of connections that haven't sent any data yet (official server uses 44)
-hashes_num = 1000 # Number of pregenerated jobs for every difficulty in mining section; used to massively reduce load on the server (official server uses 1000)
-database_timeout = 7 # Database access times out after this many seconds (default: 5)
-socket_listen_num = 8
+max_mining_connections = 24 # Maximum number of clients using mining protocol per IP 
+max_login_connections = 24 # Maximum number of logged-in clients per IP 
+max_unauthorized_connections = 24 # Maximum number of connections that haven't sent any data yet 
+hashes_num = 1500 # Number of pregenerated jobs for every difficulty in mining section; used to massively reduce load on the server (official server uses 1500)
+database_timeout = 15 # Database access times out after this many seconds (default: 5)
+socket_listen_num = 1024
 use_wrapper = True # Enable wDUCO wrapper or not
 wrapper_permission = False # Set to false for declaration, will be updated when checking smart contract
 lock = threading.Lock()
@@ -97,7 +97,7 @@ if not os.path.isfile(blockchain): # Create it if it doesn't exist
         blockdatab.execute("INSERT INTO Server(blocks, lastBlockHash) VALUES(?, ?)", (blocks, lastBlockHash))
         blockconn.commit()
 else:
-    with sqlite3.connect(blockchain, timeout = 10) as blockconn:
+    with sqlite3.connect(blockchain, timeout = database_timeout) as blockconn:
         blockdatab = blockconn.cursor()
         blockdatab.execute("SELECT blocks FROM Server") # Read amount of mined blocks
         blocks = int(blockdatab.fetchone()[0])
@@ -188,7 +188,7 @@ def getDucoPriceJustSwap():
 def getRegisteredUsers():
     while True:
         try:
-            with sqlite3.connect(database, timeout = 10) as conn:
+            with sqlite3.connect(database, timeout = database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT COUNT(username) FROM Users")
                 registeredUsers = datab.fetchone()[0]
@@ -200,7 +200,7 @@ def getRegisteredUsers():
 def getMinedDuco():
     while True:
         try:
-            with sqlite3.connect(database, timeout = 10) as conn:
+            with sqlite3.connect(database, timeout = database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT SUM(balance) FROM Users")
                 allMinedDuco = datab.fetchone()[0]
@@ -213,11 +213,15 @@ def getLeaders():
     while True:
         try:
             leadersdata = []
-            with sqlite3.connect(database, timeout = 10) as conn:
+            with sqlite3.connect(database, timeout = database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Users ORDER BY balance DESC")
+                i = 0
                 for row in datab.fetchall():
                     leadersdata.append(f"{round((float(row[3])), 4)} DUCO - {row[0]}")
+                    i += 1
+                    if i > 10:
+                        break
                 break
         except:
             pass
@@ -227,7 +231,7 @@ def getAllBalances():
     while True:
         try:
             leadersdata = {}
-            with sqlite3.connect(database, timeout = 10) as conn:
+            with sqlite3.connect(database, timeout = database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Users ORDER BY balance DESC")
                 for row in datab.fetchall():
@@ -242,7 +246,7 @@ def getTransactions():
     while True:
         try:
             transactiondata = {}
-            with sqlite3.connect("config/transactions.db", timeout = 10) as conn:
+            with sqlite3.connect("config/transactions.db", timeout = database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Transactions")
                 for row in datab.fetchall():
@@ -261,7 +265,7 @@ def getBlocks():
     while True:
         try:
             transactiondata = {}
-            with sqlite3.connect("config/foundBlocks.db", timeout = 10) as conn:
+            with sqlite3.connect("config/foundBlocks.db", timeout = database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Blocks")
                 for row in datab.fetchall():
@@ -274,7 +278,7 @@ def getBlocks():
             print(e)
         with open('foundBlocks.json', 'w') as outfile: # Write JSON big blocks to file
             json.dump(transactiondata, outfile, indent=4, ensure_ascii=False)
-        adminLog("system", "Updated block JSON data")
+        #adminLog("system", "Updated block JSON data")
         time.sleep(120)
         
 def cpuUsageThread():
@@ -282,12 +286,11 @@ def cpuUsageThread():
         percarray.append(round(psutil.cpu_percent(interval=None)))
         process = psutil.Process(os.getpid())
         memarray.append(round(process.memory_percent()))
-        time.sleep(2.5)
+        time.sleep(3)
 
 def API():
     while True:
         try:
-            time.sleep(2.75)
             with lock:
                 diff = math.ceil(blocks / diff_incrase_per) # Calculate difficulty
                 now = datetime.datetime.now()
@@ -352,10 +355,9 @@ def API():
                     usernameMinerCounter[i]=minerList.count(i) # Count miners for every username
                 with open('api.json', 'w') as outfile: # Write JSON to file
                     json.dump(formattedMinerApi, outfile, indent=4, ensure_ascii=False)
-                time.sleep(2.15)
+                time.sleep(5)
         except Exception as e:
             print(e)
-            pass
         
 def UpdateOtherAPIFiles():
     while True:
@@ -369,35 +371,28 @@ def UpdateDatabase():
     while True:
         while True:
             try:
-                with sqlite3.connect(database, timeout = 10) as conn:
+                with sqlite3.connect(database, timeout = database_timeout) as conn:
                     datab = conn.cursor()
                     for user in balancesToUpdate.copy():
                         try:
-                            datab.execute("SELECT * FROM Users WHERE username = ?",(user,))
-                            balance = str(datab.fetchone()[3]) # Fetch balance of user
-                            if not float(balancesToUpdate[user]) < 0:
-                                datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
-                            if float(balance) < 0:
-                                datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(0.0), user))
+                            datab.execute("UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
                             balancesToUpdate.pop(user)
                         except:
                             continue
                     conn.commit()
                     break
             except Exception as e:
-                print(e)
-                pass
+                print("Error updating balances:", str(e))
         while True:
             try:
-                with sqlite3.connect(blockchain, timeout = 10) as blockconn: # Update blocks counter and lastblock's hash
+                with sqlite3.connect(blockchain, timeout = database_timeout) as blockconn: # Update blocks counter and lastblock's hash
                     blockdatab = blockconn.cursor()
                     blockdatab.execute("UPDATE Server set blocks = ? ", (blocks,))
                     blockdatab.execute("UPDATE Server set lastBlockHash = ?", (lastBlockHash,))
                     blockconn.commit()
                     break
             except Exception as e:
-                print(e)
-                pass
+                print("Error updating blockchain:", str(e))
         time.sleep(5)
 
 def InputManagement():
@@ -453,7 +448,7 @@ def InputManagement():
         elif userInput[0] == "balance":
             with lock:
                 try:
-                    with sqlite3.connect(database, timeout = 10) as conn:
+                    with sqlite3.connect(database, timeout = database_timeout) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
@@ -463,18 +458,18 @@ def InputManagement():
         elif userInput[0] == "set":
             with lock:
                 try:
-                    with sqlite3.connect(database, timeout = 10) as conn:
+                    with sqlite3.connect(database, timeout = database_timeout) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
                     print("  " + userInput[1] + "'s balance is " + str(balance) + ", set it to " + str(float(userInput[2])) + "?")
                     confirm = input("  Y/n")
                     if confirm == "Y" or confirm == "y" or confirm == "":
-                        with sqlite3.connect(database, timeout = 10) as conn:
+                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set balance = ? where username = ?", (float(userInput[2]), userInput[1]))
                             conn.commit()
-                        with sqlite3.connect(database, timeout = 10) as conn:
+                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                             balance = str(datab.fetchone()[3]) # Fetch balance of user
@@ -486,18 +481,18 @@ def InputManagement():
         elif userInput[0] == "subtract":
             with lock:
                 try:
-                    with sqlite3.connect(database, timeout = 10) as conn:
+                    with sqlite3.connect(database, timeout = database_timeout) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
                     print("  " + userInput[1] + "'s balance is " + str(balance) + ", subtract " + str(float(userInput[2])) + "?")
                     confirm = input("  Y/n")
                     if confirm == "Y" or confirm == "y" or confirm == "":
-                        with sqlite3.connect(database, timeout = 10) as conn:
+                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set balance = ? where username = ?", (float(balance)-float(userInput[2]), userInput[1]))
                             conn.commit()
-                        with sqlite3.connect(database, timeout = 10) as conn:
+                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                             balance = str(datab.fetchone()[3]) # Fetch balance of user
@@ -509,18 +504,18 @@ def InputManagement():
         elif userInput[0] == "add":
             with lock:
                 try:
-                    with sqlite3.connect(database, timeout = 10) as conn:
+                    with sqlite3.connect(database, timeout = database_timeout) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                         balance = str(datab.fetchone()[3]) # Fetch balance of user
                     print("  " + userInput[1] + "'s balance is " + str(balance) + ", add " + str(float(userInput[2])) + "?")
                     confirm = input("  Y/n")
                     if confirm == "Y" or confirm == "y" or confirm == "":
-                        with sqlite3.connect(database, timeout = 10) as conn:
+                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set balance = ? where username = ?", (float(balance)+float(userInput[2]), userInput[1]))
                             conn.commit()
-                        with sqlite3.connect(database, timeout = 10) as conn:
+                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(userInput[1],))
                             balance = str(datab.fetchone()[3]) # Fetch balance of user
@@ -622,7 +617,7 @@ def handle(c, ip):
                     break
                 if re.match("^[A-Za-z0-9_-]*$", username) and len(username) < 64 and len(unhashed_pass) < 64 and len(email) < 128:
                     password = bcrypt.hashpw(unhashed_pass, bcrypt.gensalt(rounds=4)) # Encrypt password
-                    with sqlite3.connect(database, timeout = 10) as conn:
+                    with sqlite3.connect(database, timeout = database_timeout) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT COUNT(username) FROM Users WHERE username = ?",(username,))
                         if int(datab.fetchone()[0]) == 0:
@@ -632,7 +627,7 @@ def handle(c, ip):
                                 message["From"] = duco_email
                                 message["To"] = email
                                 try:
-                                    with sqlite3.connect(database, timeout = 10) as conn:
+                                    with sqlite3.connect(database, timeout = database_timeout) as conn:
                                         datab = conn.cursor()
                                         datab.execute('''INSERT INTO Users(username, password, email, balance) VALUES(?, ?, ?, ?)''',(username, password, email, 0.0))
                                         conn.commit()
@@ -676,7 +671,7 @@ def handle(c, ip):
                     break
                 if re.match(r'^[\w\d_()]*$', username): # Check username for unallowed characters
                     try:
-                        with sqlite3.connect(database, timeout = 10) as conn: # User exists, read his password
+                        with sqlite3.connect(database, timeout = database_timeout) as conn: # User exists, read his password
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(str(username),))
                             stored_password = datab.fetchone()[1]
@@ -735,7 +730,7 @@ def handle(c, ip):
                     print("NodeS Usage")
                     while True:
                         try:
-                            with sqlite3.connect(database, timeout = 10) as conn:
+                            with sqlite3.connect(database, timeout = database_timeout) as conn:
                                 datab = conn.cursor()
                                 datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (amount, NodeS_Username))
                                 conn.commit()
@@ -779,7 +774,7 @@ def handle(c, ip):
                 if password == NodeS_Overide:
                     while True:
                         try:
-                            with sqlite3.connect(database, timeout = 10) as conn:
+                            with sqlite3.connect(database, timeout = database_timeout) as conn:
                                 datab = conn.cursor()
                                 for user in data.keys():
                                     datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (float(data[user]), user))
@@ -805,7 +800,7 @@ def handle(c, ip):
                     while True:
                         try:
                             reward += 7 # Add 7 DUCO to the reward
-                            with sqlite3.connect("config/foundBlocks.db", timeout = 10) as bigblockconn:
+                            with sqlite3.connect("config/foundBlocks.db", timeout = database_timeout) as bigblockconn:
                                 datab = bigblockconn.cursor()
                                 now = datetime.datetime.now()
                                 formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -834,7 +829,7 @@ def handle(c, ip):
                         break
                 if firstshare:
                     try:
-                        with sqlite3.connect(database, timeout = 10) as conn: # User exists, read his password
+                        with sqlite3.connect(database, timeout = database_timeout) as conn: # User exists, read his password
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(str(username),))
                             stored_password = datab.fetchone()[1]
@@ -957,7 +952,7 @@ def handle(c, ip):
                         blockfound = random.randint(1, 1000000) # Low probability to find a "big block"
                         if int(blockfound) == 1:
                             reward += 7 # Add 7 DUCO to the reward
-                            with sqlite3.connect("config/foundBlocks.db", timeout = 10) as bigblockconn:
+                            with sqlite3.connect("config/foundBlocks.db", timeout = database_timeout) as bigblockconn:
                                 datab = bigblockconn.cursor()
                                 now = datetime.datetime.now()
                                 formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -1005,7 +1000,7 @@ def handle(c, ip):
                     adminLog("duco", "Bcrypt error when changing password of user " + username)
                     break
                 try:
-                    with sqlite3.connect(database, timeout = 10) as conn:
+                    with sqlite3.connect(database, timeout = database_timeout) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                         old_password_database = datab.fetchone()[1]
@@ -1016,7 +1011,7 @@ def handle(c, ip):
                     break
                 try:
                     if bcrypt.checkpw(oldPassword, old_password_database.encode('utf-8')) or oldPassword == duco_password.encode('utf-8'):
-                        with sqlite3.connect(database, timeout = 10) as conn:
+                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
                             conn.commit()
@@ -1033,7 +1028,7 @@ def handle(c, ip):
                             break
                 except:
                     if bcrypt.checkpw(oldPassword, old_password_database) or oldPassword == duco_password.encode('utf-8'):
-                        with sqlite3.connect(database, timeout = 10) as conn:
+                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
                             conn.commit()
@@ -1060,7 +1055,7 @@ def handle(c, ip):
                 adminLog("duco", "Sending protocol called by " + username)
                 while True:
                     try:
-                        with sqlite3.connect(database, timeout = 10) as conn:
+                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Users WHERE username = ?",(username,))
                             balance = float(datab.fetchone()[3]) # Get current balance of sender
@@ -1081,7 +1076,7 @@ def handle(c, ip):
                     except:
                         break
                 try:
-                    with sqlite3.connect(database, timeout = 10) as conn:
+                    with sqlite3.connect(database, timeout = database_timeout) as conn:
                         datab = conn.cursor()
                         datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
                         recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
@@ -1091,7 +1086,7 @@ def handle(c, ip):
                             with lock:
                                 while True:
                                     try:
-                                        with sqlite3.connect(database, timeout = 10) as conn:
+                                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                                             datab = conn.cursor()
                                             datab.execute("UPDATE Users set balance = ? where username = ?", (balance, username))
                                             conn.commit()
@@ -1101,7 +1096,7 @@ def handle(c, ip):
                                         pass
                                 while True:
                                     try:
-                                        with sqlite3.connect(database, timeout = 10) as conn:
+                                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                                             datab = conn.cursor()
                                             datab.execute("SELECT * FROM Users WHERE username = ?",(recipient,))
                                             recipientbal = float(datab.fetchone()[3]) # Get receipents' balance
@@ -1112,12 +1107,12 @@ def handle(c, ip):
                                 recipientbal += float(amount)
                                 while True:
                                     try:
-                                        with sqlite3.connect(database, timeout = 10) as conn:
+                                        with sqlite3.connect(database, timeout = database_timeout) as conn:
                                             datab = conn.cursor() # Update receipents' balance
                                             datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
                                             conn.commit()
                                             adminLog("duco", "Updated recipients balance: " + str(recipientbal))
-                                        with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
+                                        with sqlite3.connect("config/transactions.db", timeout = database_timeout) as tranconn:
                                             datab = tranconn.cursor()
                                             now = datetime.datetime.now()
                                             formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -1151,7 +1146,7 @@ def handle(c, ip):
                 while True:
                     try:
                         transactiondata = {}
-                        with sqlite3.connect("config/transactions.db", timeout = 10) as conn:
+                        with sqlite3.connect("config/transactions.db", timeout = database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Transactions")
                             for row in datab.fetchall():
@@ -1239,7 +1234,7 @@ def handle(c, ip):
                                         c.send(bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
                                         adminLog("wrapper", "Successful wrapping")
                                         try:
-                                            with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
+                                            with sqlite3.connect("config/transactions.db", timeout = database_timeout) as tranconn:
                                                 datab = tranconn.cursor()
                                                 now = datetime.datetime.now()
                                                 formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -1308,7 +1303,7 @@ def handle(c, ip):
                                     if onchaintx:
                                         adminLog("unwrapper", "Successful unwrapping")
                                         try:
-                                            with sqlite3.connect("config/transactions.db", timeout = 10) as tranconn:
+                                            with sqlite3.connect("config/transactions.db", timeout = database_timeout) as tranconn:
                                                 datab = tranconn.cursor()
                                                 now = datetime.datetime.now()
                                                 formatteddatetime = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -1384,7 +1379,7 @@ def countips():
                     ban(ip)
             except:
                 pass
-        time.sleep(10)
+        time.sleep(5)
 def resetips():
     while True:
         time.sleep(30)
@@ -1413,14 +1408,14 @@ if __name__ == '__main__':
             adminLog("system", "Error reading whitelisted usernames file: " + str(e))
     except Exception as e:
         adminLog("system", "Error reading whitelisted IPs file: " + str(e))
-    threading.Thread(target=API).start() # Create JSON API thread
-    threading.Thread(target=getDucoPrice).start() # Create duco price calculator
     threading.Thread(target=cpuUsageThread).start() # Create CPU perc measurement
+    threading.Thread(target=getDucoPrice).start() # Create duco price calculator
     threading.Thread(target=createBackup).start() # Create Backup generator thread
     threading.Thread(target=countips).start() # Start anti-DDoS thread
     threading.Thread(target=resetips).start() # Start connection counter reseter for the ant-DDoS thread
     threading.Thread(target=getBlocks).start() # Start database updater
     threading.Thread(target=UpdateDatabase).start() # Start database updater
+    threading.Thread(target=API).start() # Create JSON API thread
     threading.Thread(target=UpdateOtherAPIFiles).start() # Start transactions and balance api updater
     print("Background threads started")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
