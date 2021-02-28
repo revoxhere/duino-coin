@@ -219,7 +219,7 @@ class LoginFrame(Frame):
         textFont2 = Font(size=12, weight="bold")
         textFont = Font(size=12, weight="normal")
 
-        self.duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
+        self.duco = ImageTk.PhotoImage(Image.open(resources + "duco_color.png"))
         self.duco.image = self.duco
         self.ducoLabel = Label(
             self, background=foregroundColor, foreground=fontColor, image=self.duco
@@ -495,11 +495,20 @@ def LoadingWindow():
     loading.configure(background=backgroundColor)
     loading.title(getString("loading"))
     try:
-        loading.iconphoto(True, PhotoImage(file=resources + "duco.png"))
+        loading.iconphoto(True, PhotoImage(file=resources + "duco_color.png"))
     except:
         pass
     textFont = Font(loading, size=10, weight="bold")
     textFont2 = Font(loading, size=14, weight="bold")
+
+    original = Image.open(resources + "duco_color.png")
+    resized = original.resize((128, 128), Image.ANTIALIAS)
+    github = ImageTk.PhotoImage(resized)
+    github.image = github
+    githubLabel = Label(
+        loading, image=github, background=backgroundColor, foreground=fontColor
+    )
+    githubLabel.grid(row=0, column=0, sticky=N + S + E + W, pady=(5, 0), padx=(5))
 
     Label(
         loading,
@@ -507,7 +516,7 @@ def LoadingWindow():
         font=textFont2,
         foreground=foregroundColor,
         background=backgroundColor,
-    ).grid(row=0, column=0, sticky=S + W, pady=5, padx=5)
+    ).grid(row=1, column=0, sticky=S + W, pady=(5, 0), padx=5)
     loading.update()
 
     status = Label(
@@ -517,7 +526,7 @@ def LoadingWindow():
         text=getString("loading_database"),
         font=textFont,
     )
-    status.grid(row=1, column=0, sticky=S + W, pady=(0, 5), padx=5)
+    status.grid(row=2, column=0, sticky=S + W, pady=(0, 5), padx=5)
     loading.update()
 
 
@@ -554,6 +563,11 @@ with sqlite3.connect(f"{resources}/wallet.db") as con:
 
 if not Path(resources + "duco.png").is_file():
     urlretrieve("https://i.imgur.com/9JzxR0B.png", resources + "duco.png")
+if not Path(resources + "duco_color.png").is_file():
+    urlretrieve(
+        "https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true",
+        resources + "duco_color.png",
+    )
 if not Path(resources + "calculator.png").is_file():
     urlretrieve("https://i.imgur.com/iqE28Ej.png", resources + "calculator.png")
 if not Path(resources + "exchange.png").is_file():
@@ -1602,78 +1616,69 @@ unpaid_balance = 0
 
 def getBalance():
     global oldbalance, balance, unpaid_balance, globalBalance
-    while True:
-        try:
-            soc = socket.socket()
-            soc.connect((pool_address, int(pool_port)))
-            soc.recv(3)
-            soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
-            _ = soc.recv(2)
-            while True:
-                while True:
-                    try:
-                        soc.send(bytes("BALA", encoding="utf8"))
-                        oldbalance = balance
-                        balance = soc.recv(1024).decode()
-                        try:
-                            balance = float(balance)
-                            break
-                        except ValueError:
-                            pass
-                    except Exception as e:
-                        print("Retrying in 5s.")
-                        sleep(5)
-
+    try:
+        soc = socket.socket()
+        soc.connect((pool_address, int(pool_port)))
+        soc.recv(3)
+        soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
+        _ = soc.recv(2)
+        while True:
+            try:
+                soc.send(bytes("BALA", encoding="utf8"))
+                oldbalance = balance
+                balance = soc.recv(1024).decode()
                 try:
-                    if oldbalance != balance:
-                        difference = float(balance) - float(oldbalance)
-                        dif_with_unpaid = (
-                            float(balance) - float(oldbalance)
-                        ) + unpaid_balance
-                        if float(balance) != float(difference):
-                            if (
-                                dif_with_unpaid >= min_trans_difference
-                                or dif_with_unpaid < 0
-                            ):
-                                now = datetime.datetime.now()
-                                difference = round(dif_with_unpaid, 8)
-                                if (
-                                    difference >= min_trans_difference_notify
-                                    or difference < 0
-                                    and notificationsEnabled
-                                ):
-                                    notification = Notify()
-                                    notification.title = getString("duino_coin_wallet")
-                                    notification.message = (
-                                        getString("notification_new_transaction")
-                                        + "\n"
-                                        + now.strftime("%d.%m.%Y %H:%M:%S\n")
-                                        + str(round(difference, 6))
-                                        + " DUCO"
-                                    )
-                                    notification.icon = f"{resources}/duco.png"
-                                    notification.send(block=False)
-                                with sqlite3.connect(f"{resources}/wallet.db") as con:
-                                    cur = con.cursor()
-                                    cur.execute(
-                                        """INSERT INTO Transactions(Transaction_Date, amount) VALUES(?, ?)""",
-                                        (
-                                            now.strftime("%d.%m.%Y %H:%M:%S"),
-                                            round(difference, 8),
-                                        ),
-                                    )
-                                    con.commit()
-                                    unpaid_balance = 0
-                            else:
-                                unpaid_balance += float(balance) - float(oldbalance)
-                except Exception as e:
-                    print(e)
-
-                globalBalance = round(float(balance), 8)
-                sleep(3)
-        except:
-            print("Retrying in 5s.")
-            sleep(5)
+                    balance = float(balance)
+                    globalBalance = round(float(balance), 8)
+                    break
+                except ValueError:
+                    pass
+            except Exception as e:
+                print("Retrying in 5s.")
+                sleep(5)
+        try:
+            if oldbalance != balance:
+                difference = float(balance) - float(oldbalance)
+                dif_with_unpaid = (float(balance) - float(oldbalance)) + unpaid_balance
+                if float(balance) != float(difference):
+                    if dif_with_unpaid >= min_trans_difference or dif_with_unpaid < 0:
+                        now = datetime.datetime.now()
+                        difference = round(dif_with_unpaid, 8)
+                        if (
+                            difference >= min_trans_difference_notify
+                            or difference < 0
+                            and notificationsEnabled
+                        ):
+                            notification = Notify()
+                            notification.title = getString("duino_coin_wallet")
+                            notification.message = (
+                                getString("notification_new_transaction")
+                                + "\n"
+                                + now.strftime("%d.%m.%Y %H:%M:%S\n")
+                                + str(round(difference, 6))
+                                + " DUCO"
+                            )
+                            notification.icon = f"{resources}/duco_color.png"
+                            notification.send(block=False)
+                        with sqlite3.connect(f"{resources}/wallet.db") as con:
+                            cur = con.cursor()
+                            cur.execute(
+                                """INSERT INTO Transactions(Transaction_Date, amount) VALUES(?, ?)""",
+                                (
+                                    now.strftime("%d.%m.%Y %H:%M:%S"),
+                                    round(difference, 8),
+                                ),
+                            )
+                            con.commit()
+                            unpaid_balance = 0
+                    else:
+                        unpaid_balance += float(balance) - float(oldbalance)
+        except Exception as e:
+            print(e)
+    except:
+        print("Retrying in 5s.")
+        sleep(5)
+    Timer(3, getBalance).start()
 
 
 def getwbalance():
@@ -2130,7 +2135,7 @@ class Wallet:
         )
         settingsLabel.bind("<Button>", openSettings)
 
-        root.iconphoto(True, PhotoImage(file=resources + "duco.png"))
+        root.iconphoto(True, PhotoImage(file=resources + "duco_color.png"))
         start_balance = globalBalance
         curr_bal = start_balance
         calculateProfit(start_balance)
@@ -2189,7 +2194,7 @@ with sqlite3.connect(f"{resources}/wallet.db") as con:
         loading.update()
         try:
             GetDucoPrice()  # Start duco price updater
-            threading.Thread(target=getBalance).start()
+            getBalance()
             initRichPresence()
             threading.Thread(target=updateRichPresence).start()
             try:
