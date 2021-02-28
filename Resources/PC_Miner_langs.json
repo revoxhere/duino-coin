@@ -260,5 +260,70 @@
         "mining_user": " L'utilisateur ",
         "mining_not_exist": " n'existe pas.",
         "mining_not_exist_warning": " Vérifiez que vous avez entré votre nom d'utilisateur correctement dans le fichier de configuration. Nouvel essai dans 10s"
-    }
+    },
+	"russian": {
+        "translation_autor": "5Q",
+        "sigint_detected": " Обнаружен SIGINT - завершаем работу.",
+        "goodbye": " До скорой встречи!",
+        "greeting_morning": "Желаю вам прекрасного утра",
+        "greeting_noon": "Приятного вам полудня",
+        "greeting_afternoon": "Приятного вам дня",
+        "greeting_evening": "Приятного вам вечера",
+        "greeting_back": "С возвращением",
+
+        "banner": "Официальный Duino-Coin © Python майнер",
+        "donation_level": "Уровень пожертвования разработчикам: ",
+
+        "medium_diff": "Средняя сложность",
+        "net_diff": "Сложность сети",
+        "algorithm": "Алгоритм: ",
+        "rig_identifier": "Идентификатор устройства: ",
+
+        "basic_config_tool": "\nИнструмент базовой настройки Duino-Coin\nОтредактируйте файл ",
+        "edit_config_file_warning": "/Miner_config.cfg если вы захотите их изменить.",
+        "dont_have_account": "Еще нет аккаунта Duino-Coin? Используйте ",
+        "wallet": "Кошелек",
+        "register_warning": " для регистрации на сервере.\n",
+        "ask_username": "Введите ваше имя пользователя Duino-Coin: ",
+        "ask_intensity": "Установите мощность майнинга (1-100)% (рекомендуется: 95): ",
+        "ask_threads": "Установите количество потоков майнера (рекомендуется для вашего устройства: ",
+        "ask_lower_difficulty": "Вы хотите использовать пониженную сложность майнинга (для более медленных устройств)? (y/N) ",
+        "ask_rig_identifier": "Хотите ли вы добавить идентификатор (имя) этому устройству? (y/N) ",
+        "ask_rig_name": "Введите желаемое имя устройства: ",
+        "ask_donation_level": "Установите уровень пожертвования разработчикам (0-5) (рекомендуется: 1), это не уменьшит ваш заработок: ",
+        "config_saved": "Настройки сохранены! Запускаем майнер",
+        "load_config_error": " Ошибка загрузки файла настроек (",
+        "load_config_error_warning": "/Miner_config.cfg). Попробуйте удалить его и перезапустить настройку. Выход через 10с",
+
+        "free_network_warning": " Сеть Duino-Coin это абсолютно бесплатный сервис и всегда будет таким",
+        "donate_warning": "\nМы не берем никаких комиссий с вашего майнинга.\nВы можете очень сильно помочь нам поддерживать сервер и обменники с низкой комиссией своим пожертвованием.\nПосетите ",
+        "learn_more_donate": " чтобы узнать больше о том, как вы можете помочь :)",
+        "starting_donation": "Начинаем процесс пожертвования",
+        "thanks_donation": " Спасибо вам за пожертвования ❤️ \nВаше пожертвование поможет нам подерживать сервер и продолжать разработку",
+
+        "data_error": " Ошибка получения данных с GitHub! Повтор через 10с.",
+        "connected": " Подключено",
+        "connected_server": " к главному серверу Duino-Coin (v",
+        "outdated_miner": " Майнер устарел (v",
+        "server_is_on_version": " сервер имеет версию v",
+        "update_warning": ", пожалуйста скачайте последнюю версию с https://github.com/revoxhere/duino-coin/releases/",
+        "connecting_error": " Ошибка подключения к серверу. Повтор через 10с",
+        "mining_thread": " Поток майнера #",
+        "mining_thread_starting": " запускается",
+        "using_algo": " используя алгоритм DUCO-S1 с ",
+        "efficiency": "эффективностью",
+
+        "duco_python_miner": "Duino-Coin Python майнер (v",
+        "accepted_shares": " принятых шар",
+        "accepted": " Принято ",
+        "block_found": " Найден блок ",
+        "internal_server_error": " Внутренняя ошибка сервера.",
+        "retrying": " Повтор через 10с",
+        "rejected": " Отклонено ",
+        "error_while_mining": " Ошибка во время майнинга - скорее всего, ошибка подключения - перезапуск через 5с.",
+
+        "mining_user": " Пользователь ",
+        "mining_not_exist": " не существует.",
+        "mining_not_exist_warning": " Убедитесь в том, что вы правильно ввели имя пользователя. Пожалуйста, проверьте ваш файл настроек. Пробуем еще раз через 10с"
+    }	
 }
