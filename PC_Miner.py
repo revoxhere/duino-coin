@@ -69,8 +69,6 @@ useLowerDiff = "n"
 serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"  # Serverip file
 config = configparser.ConfigParser()
 donationlevel = 0
-locale = locale.getdefaultlocale()[0]
-
 
 if not os.path.exists(resourcesFolder):
     os.mkdir(resourcesFolder)  # Create resources folder if it doesn't exist
@@ -86,16 +84,26 @@ if not Path(  # Check if languages file exists
 with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = json.load(lang_file)
 
-if locale == "es_ES":
-    lang = "spanish"
-elif locale == "pl_PL":
-    lang = "polish"
-elif locale == "fr_FR":
-    lang = "french"
-elif locale == "ru_RU":
-    lang = "russian"
+if not Path(  # Check if miner is configured, if it isn't, autodetect language
+    resourcesFolder + "/Miner_config.ini"
+).is_file():
+    locale = locale.getdefaultlocale()[0]
+    if locale == "es_ES":
+        lang = "spanish"
+    elif locale == "pl_PL":
+        lang = "polish"
+    elif locale == "fr_FR":
+        lang = "french"
+    elif locale == "ru_RU":
+        lang = "russian"
+    else:
+        lang = "english"
 else:
-    lang = "english"
+    try:  # Read language from configfile
+        config.read(resourcesFolder + "/Miner_config.cfg")
+        lang = config["miner"]["language"]
+    except:  # If it fails, fallback to english
+        lang = "english"
 
 
 def getString(string_name):
@@ -275,7 +283,7 @@ def hashrateCalculator(hashcount, khashcount):  # Hashes/sec calculation
 
 
 def loadConfig():  # Config loading section
-    global username, efficiency, donationlevel, debug, threadcount, useLowerDiff, rigIdentifier
+    global username, efficiency, donationlevel, debug, threadcount, useLowerDiff, rigIdentifier, lang
 
     if not Path(
         resourcesFolder + "/Miner_config.cfg"
@@ -376,9 +384,9 @@ def loadConfig():  # Config loading section
             "useLowerDiff": useLowerDiff,
             "donate": donationlevel,
             "identifier": rigIdentifier,
+            "language": lang,
             "debug": "n",
         }
-
         with open(
             resourcesFolder + "/Miner_config.cfg", "w"
         ) as configfile:  # Write data to file
