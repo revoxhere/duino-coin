@@ -92,6 +92,8 @@ elif locale == "pl_PL":
     lang = "polish"
 elif locale == "fr_FR":
     lang = "french"
+elif locale == "ru_RU":
+    lang = "russian"
 else:
     lang = "english"
 
