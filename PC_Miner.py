@@ -85,7 +85,7 @@ with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = json.load(lang_file)
 
 if not Path(  # Check if miner is configured, if it isn't, autodetect language
-    resourcesFolder + "/Miner_config.ini"
+    resourcesFolder + "/Miner_config.cfg"
 ).is_file():
     locale = locale.getdefaultlocale()[0]
     if locale == "es_ES":
@@ -305,11 +305,19 @@ def loadConfig():  # Config loading section
         )
 
         username = input(
-            Style.RESET_ALL + Fore.YELLOW + getString("ask_username") + Style.BRIGHT
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + getString("ask_username")
+            + Fore.WHITE
+            + Style.BRIGHT
         )
 
         efficiency = input(
-            Style.RESET_ALL + Fore.YELLOW + getString("ask_intensity") + Style.BRIGHT
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + getString("ask_intensity")
+            + Fore.WHITE
+            + Style.BRIGHT
         )
 
         threadcount = input(
@@ -318,6 +326,7 @@ def loadConfig():  # Config loading section
             + getString("ask_threads")
             + str(multiprocessing.cpu_count())
             + "): "
+            + Fore.WHITE
             + Style.BRIGHT
         )
 
@@ -325,6 +334,7 @@ def loadConfig():  # Config loading section
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_lower_difficulty")
+            + Fore.WHITE
             + Style.BRIGHT
         )
 
@@ -332,11 +342,16 @@ def loadConfig():  # Config loading section
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_rig_identifier")
+            + Fore.WHITE
             + Style.BRIGHT
         )
         if rigIdentifier == "y" or rigIdentifier == "Y":
             rigIdentifier = input(
-                Style.RESET_ALL + Fore.YELLOW + getString("ask_rig_name") + Style.BRIGHT
+                Style.RESET_ALL
+                + Fore.YELLOW
+                + getString("ask_rig_name")
+                + Fore.WHITE
+                + Style.BRIGHT
             )
         else:
             rigIdentifier = "None"
@@ -347,6 +362,7 @@ def loadConfig():  # Config loading section
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_donation_level")
+                + Fore.WHITE
                 + Style.BRIGHT
             )
 
