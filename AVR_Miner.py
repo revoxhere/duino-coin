@@ -71,7 +71,6 @@ config = configparser.ConfigParser()
 donationlevel = 0
 hashrate = 0
 connectionMessageShown = False
-locale = locale.getdefaultlocale()[0]
 
 
 if not os.path.exists(resourcesFolder):
@@ -88,12 +87,22 @@ if not Path(  # Check if languages file exists
 with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = json.load(lang_file)
 
-if locale == "pl_PL":
-    lang = "polish"
-elif locale == "ru_RU":
-    lang = "russian"
+if not Path(  # Check if miner is configured, if it isn't, autodetect language
+    resourcesFolder + "/Miner_config.cfg"
+).is_file():
+    locale = locale.getdefaultlocale()[0]
+    if locale == "pl_PL":
+        lang = "polish"
+    elif locale == "ru_RU":
+        lang = "russian"
+    else:
+        lang = "english"
 else:
-    lang = "english"
+    try:  # Read language from configfile
+        config.read(resourcesFolder + "/Miner_config.cfg")
+        lang = config["arduminer"]["language"]
+    except:  # If it fails, fallback to english
+        lang = "english"
 
 
 def getString(string_name):
@@ -172,24 +181,33 @@ def loadConfig():  # Config loading section
         )
 
         username = input(
-            Style.RESET_ALL + Fore.YELLOW + getString("ask_username") + Style.BRIGHT
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + getString("ask_username")
+            + Fore.WHITE
+            + Style.BRIGHT
         )
 
         print(Style.RESET_ALL + Fore.YELLOW + getString("ports_message"))
         portlist = serial.tools.list_ports.comports()
         for port in portlist:
-            print(Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "  " + str(port))
+            print(Style.RESET_ALL + Style.BRIGHT + Fore.WHITE + "  " + str(port))
         print(Style.RESET_ALL + Fore.YELLOW + getString("ports_notice"))
 
         avrport = ""
         while True:
             avrport += input(
-                Style.RESET_ALL + Fore.YELLOW + getString("ask_avrport") + Style.BRIGHT
+                Style.RESET_ALL
+                + Fore.YELLOW
+                + getString("ask_avrport")
+                + Fore.WHITE
+                + Style.BRIGHT
             )
             confirmation = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_anotherport")
+                + Fore.WHITE
                 + Style.BRIGHT
             )
             if confirmation == "y" or confirmation == "Y":
@@ -198,7 +216,11 @@ def loadConfig():  # Config loading section
                 break
 
         requestedDiffSelection = input(
-            Style.RESET_ALL + Fore.YELLOW + getString("ask_higherdiff") + Style.BRIGHT
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + getString("ask_higherdiff")
+            + Fore.WHITE
+            + Style.BRIGHT
         )
         if requestedDiffSelection == "y" or requestedDiffSelection == "Y":
             requestedDiff = "ESP32"
@@ -209,11 +231,16 @@ def loadConfig():  # Config loading section
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_rig_identifier")
+            + Fore.WHITE
             + Style.BRIGHT
         )
         if rigIdentifier == "y" or rigIdentifier == "Y":
             rigIdentifier = input(
-                Style.RESET_ALL + Fore.YELLOW + getString("ask_rig_name") + Style.BRIGHT
+                Style.RESET_ALL
+                + Fore.YELLOW
+                + getString("ask_rig_name")
+                + Fore.WHITE
+                + Style.BRIGHT
             )
         else:
             rigIdentifier = "None"
@@ -224,6 +251,7 @@ def loadConfig():  # Config loading section
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_donation_level")
+                + Fore.WHITE
                 + Style.BRIGHT
             )
 
@@ -238,9 +266,10 @@ def loadConfig():  # Config loading section
             "username": username,
             "avrport": avrport,
             "donate": donationlevel,
-            "debug": "n",
+            "language": lang,
             "identifier": rigIdentifier,
             "difficulty": requestedDiff,
+            "debug": "n",
         }
 
         with open(
