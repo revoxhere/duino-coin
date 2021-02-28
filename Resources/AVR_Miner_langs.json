@@ -215,5 +215,78 @@
 
         "load_config_error": " Ошибка загрузки файла настроек (",
         "load_config_error_warning": "/Miner_config.cfg). Попробуйте удалить его и перезапустить настройку. Выход через 10с"
+    },
+    
+    "spanish": {
+        "sigint_detected": " SIGINT detectado - Saliendo correctamente.",
+        "goodbye": " ¡Hasta pronto!",
+        "greeting_morning": "Tenga una maravillosa mañana",
+        "greeting_noon": "Tenga un buen mediodía",
+        "greeting_afternoon": "Tenga una plácida tarde",
+        "greeting_evening": "Tenga una increíble noche",
+        "greeting_back": "Bienvenido de vuelta",
+
+        "banner": "Oficial Duino-Coin © AVR Miner",
+        "donation_level": "Nivel de donación al desarrolador: ",
+        "avr_on_port": "Placa(s) AVR(s) en el(los) puerto(s): ",
+        "algorithm": "Algoritmo: ",
+        "rig_identifier": "Identificador del rig: ",
+
+        "basic_config_tool": "\nHerramienta de configuración básica de Duino-Coin\nEdita ",
+        "edit_config_file_warning": "el archivo /Miner_config.cfg si deseas cambiar después la configuración.",
+        "dont_have_account": "¿No tienes una cuenta Duino-Coin todavía? Usa ",
+        "wallet": "Monedero",
+        "register_warning": " para registrarte en el servidor.\n",
+        "ask_username": "Introduce tu usuario Duino-Coin: ",
+        "ports_message": "La herramienta de configuración ha descubierto estos puertos:",
+        "ports_notice": "Si no puedes ver tu placa ahí, comprueba que esté bien conectada y el programa tenga acceso (admin/sudo).",
+        "ask_avrport": "Introduce el puerto serial de tu placa(ej. COM1 (Windows) o /dev/ttyUSB1 (Unix)): ",
+        "ask_anotherport": "¿Deseas añadir otra placa? (y/N): ",
+        "ask_higherdiff": "¿Deseas usar una dificultad más alta? (solo para las placas Arduino DUE) (y/N): ",
+        "ask_rig_identifier": "¿Deseas añadir un identificador (name) a este rig? (y/N) ",
+        "ask_rig_name": "Introduce el nombre del rig deseado: ",
+        "ask_donation_level": "Ajusta el nivel de donación al desarrollador (0-5) (recomendado: 1), esto no reducirá tus ganancias: ",
+        "config_saved": "Configuración guardada! Lanzando el minero",
+        "load_config_error": " Error cargando el archivo de configuración (",
+        "load_config_error_warning": "/Miner_config.cfg). Prueba eliminándolo y volviendo a ejecutar la configuración. Saliendo en 10s",
+
+        "free_network_warning": " La red Duino-Coin es gratis, y siempre lo será",
+        "donate_warning": "\nNo obtenemos ningún tipo de comisión de tu minado.\nPuedes ayudarnos mucho a mantener el servidor y el exchange de baja comisión donando.\nVisita ",
+        "learn_more_donate": " para saber más sobre como puedes ayudar :)",
+        "starting_donation": "Empezando el proceso de donación",
+        "thanks_donation": " Gracías por ser un asombroso donador ❤️ \nTu donación nos ayudará a mantener el servidor y permitir el desarrollo",
+
+        "data_error": " Error extrayendo datos desde GitHub! Reintentando en 10s.",
+        "connected": " Conectado",
+        "connected_server": " al servidor maestro de Duino-Coin (v",
+        "outdated_miner": " El minero está desactualizado (v",
+        "server_is_on_version": " el servidor está en la versión",
+        "update_warning": ", porfavor descarga la última versión desde https://github.com/revoxhere/duino-coin/releases/",
+        "connecting_error": " Error conectando al servidor. Reintentando en 10s",
+
+        "duco_avr_miner": "Minero AVR Duino-Coin (v",
+        "accepted_shares": " shares aceptadas",
+        "accepted": " Aceptado ",
+        "block_found": " Bloque encontrado ",
+        "rejected": " Rechazado ",
+        "error_while_mining": " Error durante el minado - probablemente un error de conexión - reiniciando en 5s.",
+
+        "board_on_port": " AVR en el puerto ",
+        "board_is_connected": " está conectado",
+        "board_connection_error": " Conexión errónea del AVR en el puerto ",
+        "board_connection_error2": ", porfavor, comprueba si está conectado o no",
+
+        "mining_start": " El hilo de minado AVR está empezando",
+        "mining_algorithm": " usando el algoritmo DUCO-S1A (",
+        "mining_avr_connection_error": " ¡Error tratando de conectarse al AVR! Reintentando en 10s",
+        "mining_avr_not_responding": " Arduino se está tomando más tiempo del que se esperaba, enviándole un nuevo trabajo ",
+        "internal_server_error": " Error interno del servidor.",
+        "retrying": " Reintentando en 10s",
+        "mining_user": " Usuario ",
+        "mining_not_exist": " no existe.",
+        "mining_not_exist_warning": " Comprueba que has introducido el nombre de usuario correctamente. Porfavor, comprueba tu archivo de configuración. Reintentando en 10s",
+
+        "load_config_error": " Error cargando el archivo de configuración (",
+        "load_config_error_warning": "/Miner_config.cfg). Prueba eliminándolo y volviendo a ejecutar la configuración. Saliendo en 10s"
     }
 }
