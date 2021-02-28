@@ -144,7 +144,7 @@
         "load_config_error": " Problem z ładowaniem pliku konfiguracyjnego (",
         "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s"
     },
-	"russian": {
+    "russian": {
         "sigint_detected": " Обнаружен SIGINT - завершаем работу.",
         "goodbye": " До скорой встречи!",
         "greeting_morning": "Желаю вам прекрасного утра",
@@ -214,6 +214,6 @@
         "mining_not_exist_warning": " Убедитесь в том, что вы правильно ввели имя пользователя. Пожалуйста, проверьте ваш файл настроек. Пробуем еще раз через 10с",
 
         "load_config_error": " Ошибка загрузки файла настроек (",
-        "load_config_error_warning": "/Miner_config.cfg). Попробуйте удалить его и перезапустить настройку. Выход через 10с",
+        "load_config_error_warning": "/Miner_config.cfg). Попробуйте удалить его и перезапустить настройку. Выход через 10с"
     }
 }
