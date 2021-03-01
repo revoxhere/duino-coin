@@ -129,13 +129,13 @@
 
         "board_on_port": " Płytka AVR na porcie ",
         "board_is_connected": " jest podłączona",
-        "board_connection_error": " Problem z połączeniem z płytką AVR na porcie ",
+        "board_connection_error": " Problem z płytką AVR na porcie ",
         "board_connection_error2": ", upewnij się że jest ona poprawnie podłączona",
 
         "mining_start": " Wątek AVR koparki uruchamia się",
         "mining_algorithm": " używając algorytmu DUCO-S1A (",
-        "mining_avr_connection_error": " Problem z połączeniem z płytką AVR! Ponowna próba za 10s",
-        "mining_avr_not_responding": " Arduino nie odpowiada, wysyłanie nowej pracy ",
+        "mining_avr_connection_error": " Problem z płytką AVR! Ponowna próba za 10s",
+        "mining_avr_not_responding": " Płytka AVR nie odpowiada, wysyłanie nowej pracy ",
         "internal_server_error": " Wewnętrzny błąd serwera.",
         "retrying": " Ponowna próba za 10s",
         "mining_user": " Użytkownik ",
