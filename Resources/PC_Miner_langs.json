@@ -260,7 +260,7 @@
 
         "mining_user": " L'utilisateur ",
         "mining_not_exist": " n'existe pas.",
-        "mining_not_exist_warning": " Vérifiez que vous avez entré votre nom d'utilisateur correctement dans le fichier de configuration. Nouvel essai dans 10s"
+        "mining_not_exist_warning": " Vérifiez que vous avez correctement entré votre nom d'utilisateur dans le fichier de configuration. Nouvel essai dans 10s"
     },
     "russian": {
         "translation_autor": "5Q",
