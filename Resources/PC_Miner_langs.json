@@ -327,7 +327,7 @@
         "mining_not_exist": " не существует.",
         "mining_not_exist_warning": " Убедитесь в том, что вы правильно ввели имя пользователя. Пожалуйста, проверьте ваш файл настроек. Пробуем еще раз через 10с"
     },    
-    "english": {
+    "german": {
         "translation_autor": "BastelPichi",
         "sigint_detected": " Einloggen erkannt - erfolgreicher start.",
         "goodbye": " Bis Bald!",
