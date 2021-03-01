@@ -197,6 +197,7 @@
         "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s"
     },
     "french": {
+	"translation_autor": "Bilaboz",
         "sigint_detected": " SIGINT détecté - Fermeture...",
         "goodbye": " A bientôt!",
         "greeting_morning": "J'espère que vous passez une bonne matinée!",
@@ -261,7 +262,7 @@
         "mining_not_exist": " n'existe pas.",
         "mining_not_exist_warning": " Vérifiez que vous avez entré votre nom d'utilisateur correctement dans le fichier de configuration. Nouvel essai dans 10s"
     },
-	"russian": {
+    "russian": {
         "translation_autor": "5Q",
         "sigint_detected": " Обнаружен SIGINT - завершаем работу.",
         "goodbye": " До скорой встречи!",
