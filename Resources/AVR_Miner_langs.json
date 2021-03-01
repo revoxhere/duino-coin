@@ -256,9 +256,7 @@
         "donate_warning": "\nNo obtenemos ningún tipo de comisión de tu minado.\nPuedes ayudarnos mucho a mantener el servidor y el exchange de baja comisión donando.\nVisita ",
         "learn_more_donate": " para saber más sobre como puedes ayudar :)",
         "starting_donation": "Empezando el proceso de donación",
-        "thanks_donation": " Gracías por ser un asombroso donador ❤️ \nTu donación nos ayudará a mantener el servidor y permitir el desarrollo",
-
-        "data_error": " Error extrayendo datos desde GitHub! Reintentando en 10s.",
+        "thanks_donation": " Gracías por ser un asombroso donador ❤️ \nTu donación nos ayudará a mantener el servidor y permitir el desarrollo",        "data_error": " Error extrayendo datos desde GitHub! Reintentando en 10s.",
         "connected": " Conectado",
         "connected_server": " al servidor maestro de Duino-Coin (v",
         "outdated_miner": " El minero está desactualizado (v",
@@ -290,5 +288,80 @@
 
         "load_config_error": " Error cargando el archivo de configuración (",
         "load_config_error_warning": "/Miner_config.cfg). Prueba eliminándolo y volviendo a ejecutar la configuración. Saliendo en 10s"
+        
+       
+    },
+    "german": {
+        "translation_autor": "BastelPichi",
+        "sigint_detected": " Einloggen erkannt - Start erfolgreich.",
+        "goodbye": " Bis bald!",
+        "greeting_morning": "Guten Morgen!",
+        "greeting_noon": "Guten Mittag",
+        "greeting_afternoon": "einen schönen Nachmittag!",
+        "greeting_evening": "Einen schönen Abend",
+        "greeting_back": "Wilkommen zurück",
+
+        "banner": "Offizieller Duino-Coin © AVR Miner",
+        "donation_level": "Entwickler Spende Level: ",
+        "avr_on_port": "AVR board(s) auf dem/n Port(s): ",
+        "algorithm": "Algorythmus: ",
+        "rig_identifier": "Rig identifizierer: ",
+
+        "basic_config_tool": "\nDuino-Coin basic configuration tool\nEdit ",
+        "edit_config_file_warning": "/Miner_config.cfg file later if you want to change it.",
+        "dont_have_account": "Du hast noch keinen DUCO Acount? Benutze ",
+        "wallet": "Wallet",
+        "register_warning": " um dich zu registrieren.\n",
+        "ask_username": "Was ist dein DUCO Benutzername?: ",
+        "ports_message": "Das Konfigurationstool hat folgende Ports gefunden:",
+        "ports_notice": "Wenn du dein Board hier nicht sehen kannst, prüfe ob dein Board richtig verbunden ist und ob das Skript die erforderlichen Rechte hat(admin/sudo rechte).",
+        "ask_avrport": "Gebe den Seriellen Portan, den du benutzen öchtest (z.B. COM1 (Windows) oder /dev/ttyUSB1 (Linux)): ",
+        "ask_anotherport": "Willst du ein weiteres Board hinzufügen? (y/N): ",
+        "ask_higherdiff": " Willst du die höhere Schwirigkeit benutzen? (nur für arduino DUE Boards) (y/N): ",
+        "ask_rig_identifier": "Willst du einen Indentifizirer (Name) zu diesem rig hinzufügen? (y/N) ",
+        "ask_rig_name": "Gebe deinen gewünschten RIG Name ein: ",
+        "ask_donation_level": "Setze Entwickler Spenden level (0-5) (empfohlen: 1), Dies wird dein Einnahmen nich veändern: ",
+        "config_saved": "Konfiguration gespeichert! Starte den Miner...",
+        "load_config_error": " Fehler beim Laden der Konfigurationsdatei (",
+        "load_config_error_warning": "/Miner_config.cfg). Versuche sie zu entfernen und neu hinzuzufügen. Miner schließt sich in 10s",
+
+        "free_network_warning": " Duino-Coin ist immer ksotenlos und wird es auch bleiben.",
+        "donate_warning": "\nWir erheben keine Gebühren.\nDu kannst uns helfen den Server zu verwalten und für günstige Umtauschgebühren sorgen, indem du spendest.\nVisit ",
+        "learn_more_donate": " lerne mehr wie du uns helfen kannst:)",
+        "starting_donation": "Starte Spende Prozess",
+        "thanks_donation": " Danke dass du spendest ❤️ \nDeine Spende wird uns helfen den Server zu verwalten und DUCO weiter zu entwickeln",
+
+        "data_error": " Fehler beim Empfangen der Daten von GitHub! Neuversuch in 10s.",
+        "connected": " Verbunden",
+        "connected_server": " mit dem Haupt-Server (v",
+        "outdated_miner": " Miner ist nicht mehr aktuell! (v",
+        "server_is_on_version": " Server ist auf Version",
+        "update_warning": ", Bitte lade die neuste Version hier runter: https://github.com/revoxhere/duino-coin/releases/",
+        "connecting_error": " Fehler beim Verbinden mit dem Server. Neuversuch in 10s",
+
+        "duco_avr_miner": "Duino-Coin AVR Miner (v",
+        "accepted_shares": " ac",
+        "accepted": " Accepted ",
+        "block_found": " Block found ",
+        "rejected": " Rejected ",
+        "error_while_mining": " Error while mining - most likely a connection error - restarting in 5s.",
+
+        "board_on_port": " AVR on port ",
+        "board_is_connected": " is connected",
+        "board_connection_error": " AVR connection error on port ",
+        "board_connection_error2": ", please check whether it's plugged in or not",
+
+        "mining_start": " AVR mining thread is starting",
+        "mining_algorithm": " using DUCO-S1A algorithm (",
+        "mining_avr_connection_error": " Error connecting to the AVR! Retrying in 10s",
+        "mining_avr_not_responding": " Arduino is taking longer than expected, sending it a new job ",
+        "internal_server_error": " Internal server error.",
+        "retrying": " Retrying in 10s",
+        "mining_user": " User ",
+        "mining_not_exist": " doesn't exist.",
+        "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s",
+
+        "load_config_error": " Error loading the configfile (",
+        "load_config_error_warning": "/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s"
     }
 }
