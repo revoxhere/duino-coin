@@ -608,6 +608,8 @@ elif locale == "ru_RU":
     lang = "russian"
 elif locale == "de_DE":
     lang = "german"
+elif locale == "tr_TR":
+    lang = "turkish"
 else:
     lang = "english"
 
