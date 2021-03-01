@@ -1,5 +1,6 @@
 {
     "english": {
+        "translation_autor": "Duino-Coin developers",
         "sigint_detected": " SIGINT detected - Exiting gracefully.",
         "goodbye": " See you soon!",
         "greeting_morning": "Have a wonderful morning",
@@ -145,6 +146,7 @@
         "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s"
     },
     "russian": {
+        "translation_autor": "5Q",
         "sigint_detected": " Обнаружен SIGINT - завершаем работу.",
         "goodbye": " До скорой встречи!",
         "greeting_morning": "Желаю вам прекрасного утра",
@@ -216,8 +218,8 @@
         "load_config_error": " Ошибка загрузки файла настроек (",
         "load_config_error_warning": "/Miner_config.cfg). Попробуйте удалить его и перезапустить настройку. Выход через 10с"
     },
-    
     "spanish": {
+        "translation_autor": "HGEpro",
         "sigint_detected": " SIGINT detectado - Saliendo correctamente.",
         "goodbye": " ¡Hasta pronto!",
         "greeting_morning": "Tenga una maravillosa mañana",
