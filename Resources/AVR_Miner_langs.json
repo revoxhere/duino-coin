@@ -106,11 +106,11 @@
         "load_config_error": " Problem z ładowaniem pliku konfiguracyjnego (",
         "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s",
 
-        "free_network_warning": " Sieć Duino-Coin jest darmową usługą i zawsze takową będzie",
-        "donate_warning": "\nNie bierzemy żadnych prowizji z kopania.\nMożesz nam pomóc utrzymać serwer i zapewnić małe prowizje przy wymiane.\nOdwiedź ",
-        "learn_more_donate": " aby dowiedzieć się jak możesz nam pomóc :)",
+        "free_network_warning": " Sieć Duino-Coin jest w pełni darmową usługą i zawsze taka będzie",
+        "donate_warning": "\nNie bierzemy żadnych prowizji z Twojego kopania, a utrzymanie serwera i opłacanie wymian jest kosztowne.\nMożesz nam bardzo pomóc w utrzymaniu odwiedzając ",
+        "learn_more_donate": " aby złożyć dotację :)",
         "starting_donation": "Włączanie procesu dotacji",
-        "thanks_donation": " Dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
+        "thanks_donation": " Bardzo dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
 
         "data_error": " Problem pobierania danych z GitHuba! Ponowna próba za 10s.",
         "connected": " Połączono",
