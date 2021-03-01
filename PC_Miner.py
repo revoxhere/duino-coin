@@ -94,6 +94,8 @@ if not Path(  # Check if miner is configured, if it isn't, autodetect language
         lang = "polish"
     elif locale == "fr_FR":
         lang = "french"
+    elif locale == "de_DE":
+        lang = "german"
     elif locale == "ru_RU":
         lang = "russian"
     else:
