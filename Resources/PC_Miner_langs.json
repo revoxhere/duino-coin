@@ -376,7 +376,7 @@
         "connecting_error": " Fehler beim Verbinden zum Server. Neuversuch in 10 sekunden",
         "mining_thread": " Mining thread #",
         "mining_thread_starting": " startet",
-        "using_algo": " mit DUCO-S1 Algorythmus und",
+        "using_algo": " mit DUCO-S1 Algorythmus und ",
         "efficiency": "effizienz",
 
         "duco_python_miner": "Duino-Coin Python Miner (v",
