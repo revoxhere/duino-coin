@@ -94,10 +94,10 @@ if not Path(  # Check if miner is configured, if it isn't, autodetect language
         lang = "polish"
     elif locale == "fr_FR":
         lang = "french"
-    elif locale == "de_DE":
-        lang = "german"
     elif locale == "ru_RU":
         lang = "russian"
+    elif locale == "de_DE":
+        lang = "german"
     else:
         lang = "english"
 else:
@@ -683,11 +683,14 @@ def Thread(
                             ping = responsetimestop - responsetimetart  # Calculate ping
                             ping = str(int(ping.microseconds / 1000))  # Convert to ms
                             if khashcount.value > 1000:
-                                formattedhashcount = (
-                                    str(round(khashcount.value / 1000, 2)) + " MH/s"
+                                formattedhashcount = str(
+                                    f"%01.2f" % round(khashcount.value / 1000, 2)
+                                    + " MH/s"
                                 )
                             else:
-                                formattedhashcount = str(khashcount.value) + " kH/s"
+                                formattedhashcount = str(
+                                    f"%03.0f" % float(khashcount.value) + " kH/s"
+                                )
                             debugOutput("Ping: " + ping)
 
                             if feedback == "GOOD":  # If result was good
@@ -715,9 +718,9 @@ def Thread(
                                     + Fore.GREEN
                                     + getString("accepted")
                                     + Fore.WHITE
-                                    + str(accepted.value)
+                                    + str(int(accepted.value))
                                     + "/"
-                                    + str(accepted.value + rejected.value)
+                                    + str(int(accepted.value + rejected.value))
                                     + Back.RESET
                                     + Fore.YELLOW
                                     + " ("
@@ -735,15 +738,16 @@ def Thread(
                                     + Fore.WHITE
                                     + " ∙ "
                                     + Style.BRIGHT
-                                    + Fore.WHITE
+                                    + Fore.BLUE
                                     + str(formattedhashcount)
+                                    + Fore.WHITE
                                     + Style.NORMAL
                                     + " @ diff "
                                     + str(diff)
                                     + " ∙ "
-                                    + Fore.BLUE
+                                    + Fore.CYAN
                                     + "ping "
-                                    + ping
+                                    + str(f"%02.0f" % int(ping))
                                     + "ms"
                                 )
                                 break  # Repeat
@@ -793,15 +797,16 @@ def Thread(
                                     + Fore.WHITE
                                     + " ∙ "
                                     + Style.BRIGHT
-                                    + Fore.WHITE
+                                    + Fore.BLUE
                                     + str(formattedhashcount)
+                                    + Fore.WHITE
                                     + Style.NORMAL
                                     + " @ diff "
                                     + str(diff)
                                     + " ∙ "
-                                    + Fore.BLUE
+                                    + Fore.CYAN
                                     + "ping "
-                                    + ping
+                                    + str(f"%02.0f" % int(ping))
                                     + "ms"
                                 )
                                 break  # Repeat
@@ -893,15 +898,16 @@ def Thread(
                                     + Fore.WHITE
                                     + " ∙ "
                                     + Style.BRIGHT
-                                    + Fore.WHITE
+                                    + Fore.BLUE
                                     + str(formattedhashcount)
+                                    + Fore.WHITE
                                     + Style.NORMAL
                                     + " @ diff "
                                     + str(diff)
                                     + " ∙ "
-                                    + Fore.BLUE
+                                    + Fore.CYAN
                                     + "ping "
-                                    + ping
+                                    + str(f"%02.0f" % int(ping))
                                     + "ms"
                                 )
                                 break  # Repeat
