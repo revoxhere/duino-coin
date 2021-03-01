@@ -839,9 +839,9 @@ def AVRMine(com):  # Mining section
                         + Fore.GREEN
                         + getString("accepted")
                         + Fore.WHITE
-                        + str(shares[0])
+                        + str(int(shares[0]))
                         + "/"
-                        + str(shares[0] + shares[1])
+                        + str(int(shares[0] + shares[1]))
                         + Back.RESET
                         + Fore.YELLOW
                         + " ("
@@ -849,20 +849,23 @@ def AVRMine(com):  # Mining section
                         + "%)"
                         + Style.NORMAL
                         + Fore.WHITE
-                        + " ⁃ "
-                        + Style.BRIGHT
-                        + Fore.WHITE
-                        + str(computetime)
+                        + " ∙ "
+                        + str(f"%01.3f" % float(computetime))
                         + "s"
                         + Style.NORMAL
-                        + " - "
-                        + str(hashrate)
-                        + " H/s @ diff "
-                        + str(diff)
-                        + " ⁃ "
+                        + " ∙ "
                         + Fore.BLUE
+                        + Style.BRIGHT
+                        + str(f"%05.1f" % float(hashrate))
+                        + " H/s"
+                        + Style.NORMAL
+                        + Fore.WHITE
+                        + " @ diff "
+                        + str(diff)
+                        + " ∙ "
+                        + Fore.CYAN
                         + "ping "
-                        + ping
+                        + str(f"%02.0f" % int(ping))
                         + "ms"
                     )
                     break  # Repeat
@@ -893,9 +896,9 @@ def AVRMine(com):  # Mining section
                         + Fore.CYAN
                         + getString("block_found")
                         + Fore.WHITE
-                        + str(shares[0])
+                        + str(int(shares[0]))
                         + "/"
-                        + str(shares[0] + shares[1])
+                        + str(int(shares[0] + shares[1]))
                         + Back.RESET
                         + Fore.YELLOW
                         + " ("
@@ -903,23 +906,26 @@ def AVRMine(com):  # Mining section
                         + "%)"
                         + Style.NORMAL
                         + Fore.WHITE
-                        + " ⁃ "
-                        + Style.BRIGHT
-                        + Fore.WHITE
-                        + str(computetime)
+                        + " ∙ "
+                        + str(f"%01.3f" % float(computetime))
                         + "s"
                         + Style.NORMAL
-                        + " - "
-                        + str(hashrate)
-                        + " H/s @ diff "
-                        + str(diff)
-                        + " ⁃ "
+                        + " ∙ "
                         + Fore.BLUE
+                        + Style.BRIGHT
+                        + str(f"%05.1f" % float(hashrate))
+                        + " H/s"
+                        + Style.NORMAL
+                        + Fore.WHITE
+                        + " @ diff "
+                        + str(diff)
+                        + " ∙ "
+                        + Fore.CYAN
                         + "ping "
-                        + ping
+                        + str(f"%02.0f" % int(ping))
                         + "ms"
                     )
-                    break  # Repeat
+                    break
 
                 elif feedback == "INVU":  # If user doesn't exist
                     print(
@@ -962,7 +968,18 @@ def AVRMine(com):  # Mining section
                     time.sleep(10)
 
                 else:  # If result was bad
-                    shares[1] += 1  # Share rejected = increment bad shares counter by 1
+                    shares[1] = (
+                        shares[1] + 1
+                    )  # Share rejected = increment bad shares counter by 1
+                    title(
+                        getString("duco_avr_miner")
+                        + str(minerVersion)
+                        + ") - "
+                        + str(shares[0])
+                        + "/"
+                        + str(shares[0] + shares[1])
+                        + getString("accepted_shares")
+                    )
                     print(
                         now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
                         + Style.RESET_ALL
@@ -976,9 +993,9 @@ def AVRMine(com):  # Mining section
                         + Fore.RED
                         + getString("rejected")
                         + Fore.WHITE
-                        + str(shares[0])
+                        + str(int(shares[0]))
                         + "/"
-                        + str(shares[0] + shares[1])
+                        + str(int(shares[0] + shares[1]))
                         + Back.RESET
                         + Fore.YELLOW
                         + " ("
@@ -986,20 +1003,23 @@ def AVRMine(com):  # Mining section
                         + "%)"
                         + Style.NORMAL
                         + Fore.WHITE
-                        + " ⁃ "
-                        + Style.BRIGHT
-                        + Fore.WHITE
-                        + str(computetime)
+                        + " ∙ "
+                        + str(f"%01.3f" % float(computetime))
                         + "s"
                         + Style.NORMAL
-                        + " - "
-                        + str(hashrate)
-                        + " H/s @ diff "
-                        + str(diff)
-                        + " ⁃ "
+                        + " ∙ "
                         + Fore.BLUE
+                        + Style.BRIGHT
+                        + str(f"%05.1f" % float(hashrate))
+                        + " H/s"
+                        + Style.NORMAL
+                        + Fore.WHITE
+                        + " @ diff "
+                        + str(diff)
+                        + " ∙ "
+                        + Fore.CYAN
                         + "ping "
-                        + ping
+                        + str(f"%02.0f" % int(ping))
                         + "ms"
                     )
                     break  # Repeat
