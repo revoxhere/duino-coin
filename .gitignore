@@ -5,3 +5,5 @@ Wallet_2.0_resources/stats.png
 *.png
 PCMiner_2.0_resources/Miner_config.cfg
 PCMiner_2.0_resources/Donate_executable.exe
+Wallet_2.2_resources/wallet.db
+Wallet_2.2_resources/langs.json
