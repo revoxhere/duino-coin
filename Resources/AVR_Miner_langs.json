@@ -416,17 +416,17 @@
         "accepted": " Accepté ",
         "block_found": " Block trouvé ",
         "rejected": " Refusé ",
-        "error_while_mining": " Erreur durant le minage - probablement une erreur de connection - Redémarrage dans 5s.",
+        "error_while_mining": " Erreur durant le minage - probablement une erreur de connexion - Redémarrage dans 5s.",
 
         "board_on_port": " La carte AVR sur le port ",
         "board_is_connected": " est connectée",
-        "board_connection_error": " Erreur de connection à la carte AVR sur le port ",
-        "board_connection_error2": ", veuillez vérifiez si il elle est bien branchée",
+        "board_connection_error": " Erreur de connexion à la carte AVR sur le port ",
+        "board_connection_error2": ", veuillez vérifiez si elle est bien branchée",
 
         "mining_start": " Le thread de minage AVR est en train de démarrer",
         "mining_algorithm": " en utilisant l'algorithme DUCO-S1A (",
-        "mining_avr_connection_error": " Erreur lors de la connection à la carte AVR! Nouvel essai dans 10s",
-        "mining_avr_not_responding": " La carte AVR prends plus de temps que prévu, envoi d'un nouveau travail ",
+        "mining_avr_connection_error": " Erreur lors de la connexion à la carte AVR! Nouvel essai dans 10s",
+        "mining_avr_not_responding": " La carte AVR prend plus de temps que prévu, envoi d'un nouveau travail ",
         "internal_server_error": " Erreur interne au serveur.",
         "retrying": " Nouvel essai dans 10s",
         "mining_user": " L'utilisateur ",
@@ -434,6 +434,6 @@
         "mining_not_exist_warning": " Vérifiez que vous avez correctement entré votre nom d'utilisateur dans le fichier de configuration. Nouvel essai dans 10s",
 
         "load_config_error": " Erreur durant le chargement du fichier de configuration (",
-        "load_config_error_warning": "/Miner_config.cfg). Essayer de le supprimer et relancer le mineur. Exiting in 10s"
+        "load_config_error_warning": "/Miner_config.cfg). Essayer de le supprimer et relancer le mineur. Fermeture du programme dans 10s"
     }
 }
