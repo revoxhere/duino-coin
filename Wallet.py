@@ -594,22 +594,62 @@ with open(
     f"{resources}langs.json", "r", encoding="utf-8"
 ) as lang_file:  # Load language strings depending on system locale
     lang_file = json.load(lang_file)
-if locale == "es_ES":
+if (
+    locale == "es_ES"
+    or locale == "es_AR"
+    or locale == "es_BO"
+    or locale == "es_CL"
+    or locale == "es_CO"
+    or locale == "es_CR"
+    or locale == "es_DO"
+    or locale == "es_EC"
+    or locale == "es_SV"
+    or locale == "es_GT"
+    or locale == "es_HN"
+    or locale == "es_MX"
+    or locale == "es_NI"
+    or locale == "es_PA"
+    or locale == "es_PY"
+    or locale == "es_PE"
+    or locale == "es_PR"
+    or locale == "es_UY"
+    or locale == "es_VE"
+):
     lang = "spanish"
+
 elif locale == "pl_PL":
     lang = "polish"
-elif locale == "fr_FR":
+
+elif (
+    locale == "fr_FR"
+    or locale == "fr_BE"
+    or locale == "fr_CA"
+    or locale == "fr_LU"
+    or locale == "fr_CH"
+):
     lang = "french"
+
 elif locale == "bg_BG":
     lang = "bulgarian"
-elif locale == "nl_NL":
+
+elif locale == "nl_NL" or locale == "nl_BE":
     lang = "dutch"
-elif locale == "ru_RU":
+
+elif locale == "ru_RU" or locale == "ru_MO":
     lang = "russian"
-elif locale == "de_DE":
+
+elif (
+    locale == "de_DE"
+    or locale == "de_AT"
+    or locale == "de_LI"
+    or locale == "de_LU"
+    or locale == "de_CH"
+):
     lang = "german"
+
 elif locale == "tr_TR":
     lang = "turkish"
+
 else:
     lang = "english"
 

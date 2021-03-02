@@ -288,8 +288,6 @@
 
         "load_config_error": " Error cargando el archivo de configuración (",
         "load_config_error_warning": "/Miner_config.cfg). Prueba eliminándolo y volviendo a ejecutar la configuración. Saliendo en 10s"
-        
-       
     },
     "german": {
         "translation_autor": "BastelPichi",
@@ -363,5 +361,79 @@
 
         "load_config_error": " Error loading the configfile (",
         "load_config_error_warning": "/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s"
+
+    },
+    "french": {
+        "translation_autor": "Bilaboz",
+        "sigint_detected": " SIGINT détecté - Fermeture...",
+        "goodbye": " A bientôt!",
+        "greeting_morning": "J'espère que vous passez une bonne matinée!",
+        "greeting_noon": "J'espère que vous passez un bon après-midi",
+        "greeting_afternoon": "J'espère que vous passez un bon après-midi",
+        "greeting_evening": "Passez une bonne soirée!",
+        "greeting_back": "Content de te revoir",
+
+        "banner": "Mineur Officiel AVR Duino-Coin ©",
+        "donation_level": "Niveau de donation pour le développeur: ",
+        "avr_on_port": "Carte(s) AVR sur les port(s): ",
+        "algorithm": "Algorithme: ",
+        "rig_identifier": "Nom du mineur/rig: ",
+
+        "basic_config_tool": "\nEditeur de configuration Duino-Coin\nEditez ",
+        "edit_config_file_warning": "le fichier /Miner_config.cfg si vous voulez le changer ultérieurement.",
+        "dont_have_account": "Vous n'avez pas encore de compte Duino-Coin? Utilisez ",
+        "wallet": "Wallet",
+        "register_warning": " pour en créer un.\n",
+        "ask_username": "Entrez votre nom d'utilisateur Duino-Coin: ",
+        "ports_message": "L'outil de configuration a trouvé les ports suivants:",
+        "ports_notice": "Si vous ne voyez pas votre carte ici, vérifier si elle est bien connectée et que le programme y a accès (permissions admin/sudo).",
+        "ask_avrport": "Entrez le port sur lequel est branché votre carte (e.g. COM1 (Windows) or /dev/ttyUSB1 (Unix)): ",
+        "ask_anotherport": "Voulez vous ajouter une autre carte? (y/N): ",
+        "ask_higherdiff": "Voulez vous utiliser une difficulté plus haute (seulement pour les cartes Arduino DUE) (y/N): ",
+        "ask_rig_identifier": "Voulez vous ajouter un indentifieur (un nom) à ce mineur/rig? (y/N) ",
+        "ask_rig_name": "Entrez le nom du mineur/rig désiré: ",
+        "ask_donation_level": "Choisissez le niveau de donation (0-5) (recommandé: 1), cela ne réduira pas vos gains: ",
+        "config_saved": "Configuration sauvegardée! Lancement du mineur",
+        "load_config_error": " Erreur durant le chargement du fichier de configuration (",
+        "load_config_error_warning": "/Miner_config.cfg). Essayer de le supprimer et relancer le mineur. Exiting in 10s",
+
+        "free_network_warning": " Le réseau Duino-Coin est un service complètement gratuit et le sera toujours",
+        "donate_warning": "\nNous ne prenons aucun frais sur votre minage.\nVous pouvez réellement nous aider à maintenir le serveur et garder un exchange avec peu de frais en activant la donation.\nVisitez ",
+        "learn_more_donate": " pour en apprendre plus sur comment vous pouvez nous aider :)",
+        "starting_donation": "Démarrage du service de donation",
+        "thanks_donation": " Merci d'être un super donateur ❤️ \nVotre don nous aidera a maintenir le serveur et permettra un développement ultérieur",
+
+        "data_error": " Erreur lors de la récupération des données depuis GitHub! Nouvel essai dans 10s.",
+        "connected": " Connecté",
+        "connected_server": " au serveur principal Duino-Coin (v",
+        "outdated_miner": " Mineur obsolète (v",
+        "server_is_on_version": " le serveur est en v",
+        "update_warning": ", vous pouvez télécharger la nouvelle version ici https://github.com/revoxhere/duino-coin/releases/",
+        "connecting_error": " Impossible de se connecter au serveur. Nouvel essai dans 10s",
+
+        "duco_avr_miner": "Duino-Coin AVR Miner (v",
+        "accepted_shares": " shares acceptées",
+        "accepted": " Accepté ",
+        "block_found": " Block trouvé ",
+        "rejected": " Refusé ",
+        "error_while_mining": " Erreur durant le minage - probablement une erreur de connection - Redémarrage dans 5s.",
+
+        "board_on_port": " La carte AVR sur le port ",
+        "board_is_connected": " est connectée",
+        "board_connection_error": " Erreur de connection à la carte AVR sur le port ",
+        "board_connection_error2": ", veuillez vérifiez si il elle est bien branchée",
+
+        "mining_start": " Le thread de minage AVR est en train de démarrer",
+        "mining_algorithm": " en utilisant l'algorithme DUCO-S1A (",
+        "mining_avr_connection_error": " Erreur lors de la connection à la carte AVR! Nouvel essai dans 10s",
+        "mining_avr_not_responding": " La carte AVR prends plus de temps que prévu, envoi d'un nouveau travail ",
+        "internal_server_error": " Erreur interne au serveur.",
+        "retrying": " Nouvel essai dans 10s",
+        "mining_user": " L'utilisateur ",
+        "mining_not_exist": " n'existe pas.",
+        "mining_not_exist_warning": " Vérifiez que vous avez correctement entré votre nom d'utilisateur dans le fichier de configuration. Nouvel essai dans 10s",
+
+        "load_config_error": " Erreur durant le chargement du fichier de configuration (",
+        "load_config_error_warning": "/Miner_config.cfg). Essayer de le supprimer et relancer le mineur. Exiting in 10s"
     }
 }
