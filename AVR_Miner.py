@@ -91,51 +91,19 @@ if not Path(  # Check if miner is configured, if it isn't, autodetect language
     resourcesFolder + "/Miner_config.cfg"
 ).is_file():
     locale = locale.getdefaultlocale()[0]
-    if (
-        locale == "es_ES"
-        or locale == "es_AR"
-        or locale == "es_BO"
-        or locale == "es_CL"
-        or locale == "es_CO"
-        or locale == "es_CR"
-        or locale == "es_DO"
-        or locale == "es_EC"
-        or locale == "es_SV"
-        or locale == "es_GT"
-        or locale == "es_HN"
-        or locale == "es_MX"
-        or locale == "es_NI"
-        or locale == "es_PA"
-        or locale == "es_PY"
-        or locale == "es_PE"
-        or locale == "es_PR"
-        or locale == "es_UY"
-        or locale == "es_VE"
-    ):
+    if locale.startswith("es"):
         lang = "spanish"
 
-    elif locale == "ru_RU" or locale == "ru_MO":
+    elif locale.startswith("ru"):
         lang = "russian"
 
-    if locale == "pl_PL":
+    if locale.startswith("pl"):
         lang = "polish"
 
-    elif (
-        locale == "fr_FR"
-        or locale == "fr_BE"
-        or locale == "fr_CA"
-        or locale == "fr_LU"
-        or locale == "fr_CH"
-    ):
+    elif locale.startswith("fr"):
         lang = "french"
         
-    elif (
-        locale == "de_DE"
-        or locale == "de_AT"
-        or locale == "de_LI"
-        or locale == "de_LU"
-        or locale == "de_CH"
-    ):
+    elif locale.startswith("de"):
         lang = "german"
 
     else:
