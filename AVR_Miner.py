@@ -128,6 +128,15 @@ if not Path(  # Check if miner is configured, if it isn't, autodetect language
         or locale == "fr_CH"
     ):
         lang = "french"
+        
+    elif (
+        locale == "de_DE"
+        or locale == "de_AT"
+        or locale == "de_LI"
+        or locale == "de_LU"
+        or locale == "de_CH"
+    ):
+        lang = "german"
 
     else:
         lang = "english"
