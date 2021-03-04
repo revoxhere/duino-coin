@@ -435,5 +435,78 @@
 
         "load_config_error": " Erreur durant le chargement du fichier de configuration (",
         "load_config_error_warning": "/Miner_config.cfg). Essayer de le supprimer et relancer le mineur. Fermeture du programme dans 10s"
+    },
+    "slovak": {
+        "translation_autor": "JoyBed",
+        "sigint_detected": " Ukoncujem.",
+        "goodbye": " Dovidenia!",
+        "greeting_morning": "Prajem prijemne rano",
+        "greeting_noon": "Prajem chutny obed",
+        "greeting_afternoon": "Prajem mierumilovne poobedie",
+        "greeting_evening": "Prajem pohodlny vecer",
+        "greeting_back": "Vitaj naspat",
+
+        "banner": "Oficialny Duino-Coin © AVR Miner",
+        "donation_level": "Uroven prispevku pre vyvojarov: ",
+        "avr_on_port": "AVR doska(y) na porte(och): ",
+        "algorithm": "Algoritmus: ",
+        "rig_identifier": "Rig identifikator: ",
+
+        "basic_config_tool": "\nDuino-Coin zakladne nastavenie\nEdit ",
+        "edit_config_file_warning": "/Miner_config.cfg subor neskor pre zmenu.",
+        "dont_have_account": "Nemas Duino-Coin ucet? Pouzi ",
+        "wallet": "Penazenka",
+        "register_warning": " na zaregistrovanie na serveri.\n",
+        "ask_username": "Zadaj svoje Duino-Coin meno: ",
+        "ports_message": "Nastroj nasiel na nasledujucich portoch:",
+        "ports_notice": "If you can't see your board here, make sure the it is properly connected and the program has access to it (admin/sudo rights).",
+        "ask_avrport": "Enter your board serial port (e.g. COM1 (Windows) or /dev/ttyUSB1 (Unix)): ",
+        "ask_anotherport": "Do you want to add another board? (y/N): ",
+        "ask_higherdiff": "Do you want to use a higher difficulty (only for Arduino DUE boards) (y/N): ",
+        "ask_rig_identifier": "Do you want to add an identifier (name) to this rig? (y/N) ",
+        "ask_rig_name": "Enter desired rig name: ",
+        "ask_donation_level": "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: ",
+        "config_saved": "Config saved! Launching the miner",
+        "load_config_error": " Error loading the configfile (",
+        "load_config_error_warning": "/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s",
+
+        "free_network_warning": " Duino-Coin network is a completely free service and will always be",
+        "donate_warning": "\nWe don't take any fees from your mining.\nYou can really help us maintain the server and low-fee exchanges by donating.\nVisit ",
+        "learn_more_donate": " to learn more about how you can help :)",
+        "starting_donation": "Starting donation process",
+        "thanks_donation": " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development",
+
+        "data_error": " Error retrieving data from GitHub! Retrying in 10s.",
+        "connected": " Connected",
+        "connected_server": " to master Duino-Coin server (v",
+        "outdated_miner": " Miner is outdated (v",
+        "server_is_on_version": " server is on v",
+        "update_warning": ", please download latest version from https://github.com/revoxhere/duino-coin/releases/",
+        "connecting_error": " Error connecting to the server. Retrying in 10s",
+
+        "duco_avr_miner": "Duino-Coin AVR Miner (v",
+        "accepted_shares": " prijate riesenia",
+        "accepted": " Prijate ",
+        "block_found": " Blok najdeny ",
+        "rejected": " Odmietnuty ",
+        "error_while_mining": " Chyba pocas miningu - pravdepodobne chyba pripojenia - restart za 5s.",
+
+        "board_on_port": " AVR na poste ",
+        "board_is_connected": " je pripojena",
+        "board_connection_error": " AVR pripojenie chybne na porte ",
+        "board_connection_error2": ", skontrolujte ci je pripojene alebo nie.",
+
+        "mining_start": " AVR mining sa zacina na ",
+        "mining_algorithm": " pouzitim DUCO-S1A algoritmu (",
+        "mining_avr_connection_error": " Chyba pripojenia k AVR! Odznova o 10s",
+        "mining_avr_not_responding": " Arduino dlho neodpoveda, posielam novu pracu ",
+        "internal_server_error": " Vnutorna chyba serveru.",
+        "retrying": " Odznova o 10s",
+        "mining_user": " Uzivatel ",
+        "mining_not_exist": " Neexistuje.",
+        "mining_not_exist_warning": " Skontrolujte ci mate spravne zadane meno. Skontrolujte konfiguracny subor. Odznova o 10s",
+
+        "load_config_error": " chyba nacitavania konfiguracneho suboru (",
+        "load_config_error_warning": "/Miner_config.cfg). Skuste ho odstranit a spustit odznova konfiguraciu. Ukoncenie o 10s"
     }
 }
