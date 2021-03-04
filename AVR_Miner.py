@@ -102,6 +102,9 @@ if not Path(  # Check if miner is configured, if it isn't, autodetect language
 
     elif locale.startswith("fr"):
         lang = "french"
+    
+    elif locale.startswith("sk"):
+        lang = "slovak"
         
     elif locale.startswith("de"):
         lang = "german"
