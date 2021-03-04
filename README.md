@@ -71,6 +71,7 @@ Official getting started guides for creating an account and setting up miners on
     *   [(Old) Multithreaded Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Multithreaded_PC_Miner.py) by Bilaboz
 
 **Other tools:**
+*   [DUCO Monitor](https://siunus.github.io/duco-monitor/) by siunus
 *   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
 *   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz
 
