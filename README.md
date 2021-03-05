@@ -65,20 +65,14 @@ Official getting started guides for creating an account and setting up miners on
 *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
 *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
     *   [NodeJS Miner](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners/NodeJS_Miner) by Bilaboz
-     
     *   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) by revox
-     
     *   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) by revox
-    
     *   [Minimal Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) by revox
-    
     *   [(Old) Multithreaded Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Multithreaded_PC_Miner.py) by Bilaboz
 
 **Other tools:**
 *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) by siunus
-*   
 *   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
-*   
 *   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz
 
 This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
@@ -120,19 +114,15 @@ After loging-in you have access to the following commands:
     *   You can also use `JOB,username` to mine without loging-in
 
     *   You can ask for a specific difficulty for mining: `JOB,username,DIFF` (**if you don't ask for specific difficulty, you'll get the network diff**) where diff is one of the below:
-        * `AVR`     - diff     3 - used for official AVR boards mining
-         
-        * `ESP`     - diff    75 - used for official ESP boards mining
-        
+        * `AVR`     - diff      3 - used for official AVR boards mining
+        * `ESP`     - diff     75 - used for official ESP boards mining
+        * `ESP32`   - diff    100 - used for official ESP boards mining
         * `MEDIUM`  - diff    30k - used as lower-diff PC mining
-        
         * `EXTREME` - diff   950k - for custom high performance miners
     
     *   When sending result, you can pass hashrate count and miner name along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, hashrate was 250000H/s (250kH/s) and software name was My Cool Miner v4.20 with rig named House Miner
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
-           
         *   If software name is not received, server uses `"Software": "Unknown"` in the API
-         
         *   If rig name is not received, server uses `"Identifier": "None"` in the API
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
 *   `GTXL,username,num` - Get last *num* of transactions involving *username* (both deposits and withdrawals)
