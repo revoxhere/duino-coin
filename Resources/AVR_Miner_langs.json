@@ -30,8 +30,6 @@
         "ask_rig_name": "Enter desired rig name: ",
         "ask_donation_level": "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: ",
         "config_saved": "Config saved! Launching the miner",
-        "load_config_error": " Error loading the configfile (",
-        "load_config_error_warning": "/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s",
 
         "free_network_warning": " Duino-Coin network is a completely free service and will always be",
         "donate_warning": "\nWe don't take any fees from your mining.\nYou can really help us maintain the server and low-fee exchanges by donating.\nVisit ",
@@ -103,8 +101,6 @@
         "ask_rig_name": "Wprowadź nazwę dla koparki: ",
         "ask_donation_level": "Ustaw poziom dotacji dla deweloperów (0-5) (zalecane: 1), nie zmniejszy to Twoich zysków: ",
         "config_saved": "Konfiguracja zapisana! Uruchamianie koparki",
-        "load_config_error": " Problem z ładowaniem pliku konfiguracyjnego (",
-        "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s",
 
         "free_network_warning": " Sieć Duino-Coin jest w pełni darmową usługą i zawsze taka będzie",
         "donate_warning": "\nNie bierzemy żadnych prowizji z Twojego kopania, a utrzymanie serwera i opłacanie wymian jest kosztowne.\nMożesz nam bardzo pomóc w utrzymaniu odwiedzając ",
@@ -176,8 +172,6 @@
         "ask_rig_name": "Введите желаемое имя устройства: ",
         "ask_donation_level": "Установите уровень пожертвования разработчикам (0-5) (рекомендуется: 1), это не уменьшит ваш заработок: ",
         "config_saved": "Настройки сохранены! Запускаем майнер",
-        "load_config_error": " Ошибка загрузки файла настроек (",
-        "load_config_error_warning": "/Miner_config.cfg). Попробуйте удалить его и перезапустить настройку. Выход через 10с",
 
         "free_network_warning": " Сеть Duino-Coin это абсолютно бесплатный сервис и всегда будет таким",
         "donate_warning": "\nМы не берем никаких комиссий с вашего майнинга.\nВы можете очень сильно помочь нам поддерживать сервер и обменники с низкой комиссией своим пожертвованием.\nПосетите ",
@@ -249,8 +243,6 @@
         "ask_rig_name": "Introduce el nombre del rig deseado: ",
         "ask_donation_level": "Ajusta el nivel de donación al desarrollador (0-5) (recomendado: 1), esto no reducirá tus ganancias: ",
         "config_saved": "Configuración guardada! Lanzando el minero",
-        "load_config_error": " Error cargando el archivo de configuración (",
-        "load_config_error_warning": "/Miner_config.cfg). Prueba eliminándolo y volviendo a ejecutar la configuración. Saliendo en 10s",
 
         "free_network_warning": " La red Duino-Coin es gratis, y siempre lo será",
         "donate_warning": "\nNo obtenemos ningún tipo de comisión de tu minado.\nPuedes ayudarnos mucho a mantener el servidor y el exchange de baja comisión donando.\nVisita ",
@@ -322,8 +314,6 @@
         "ask_donation_level": "Setze Entwickler Spenden level (0-5) (empfohlen: 1), Dies wird dein Einnahmen nich verändern: ",
 
         "config_saved": "Konfiguration gespeichert! Starte den Miner...",
-        "load_config_error": " Fehler beim Laden der Konfigurationsdatei (",
-        "load_config_error_warning": "/Miner_config.cfg). Versuchen Sie die Datei zu löschen und den Miner neu zu starten. Programm schließt sich in 10s",
 
         "free_network_warning": " Duino-Coin ist immer kostenlos und wird es auch bleiben.",
         "donate_warning": "\nWir erheben keine Gebühren.\nDu kannst uns helfen den Server zu verwalten und für günstige Umtauschgebühren sorgen, indem du spendest.\nVisit ",
@@ -395,8 +385,6 @@
         "ask_rig_name": "Entrez le nom du mineur/rig désiré: ",
         "ask_donation_level": "Choisissez le niveau de donation (0-5) (recommandé: 1), cela ne réduira pas vos gains: ",
         "config_saved": "Configuration sauvegardée! Lancement du mineur",
-        "load_config_error": " Erreur durant le chargement du fichier de configuration (",
-        "load_config_error_warning": "/Miner_config.cfg). Essayer de le supprimer et relancer le mineur. Exiting in 10s",
 
         "free_network_warning": " Le réseau Duino-Coin est un service complètement gratuit et le sera toujours",
         "donate_warning": "\nNous ne prenons aucun frais sur votre minage.\nVous pouvez réellement nous aider à maintenir le serveur et garder un exchange avec peu de frais en activant la donation.\nVisitez ",
@@ -468,8 +456,6 @@
         "ask_rig_name": "Zadajte meno rigu: ",
         "ask_donation_level": "Zadajte uroven prispievania (0-5) (odporucane: 1), neznizi to vas zisk: ",
         "config_saved": "Nastavenie ulozene! Spusta sa miner",
-        "load_config_error": " Chyba nacitania konfiguracie (",
-        "load_config_error_warning": "/Miner_config.cfg). Znazte konfiguracny subor a spustite konfiguraciu odznova. Ukoncenie o 10s",
 
         "free_network_warning": " Duino-Coin je uplne bez poplatkov a vzdy aj bude",
         "donate_warning": "\nNeberieme ziadne poplatky z vasho miningu.\nNaozaj na pomozete vasim stedrym prispevkom.\nNavstivte ",
