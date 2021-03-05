@@ -21,7 +21,7 @@ from tkinter import (
     ttk,
 )
 from tkinter.font import Font
-from tkinter import LEFT, BOTH, RIGHT, END, N, E, S, W
+from tkinter import LEFT, BOTH, RIGHT, END, N, S, W
 from webbrowser import open_new_tab
 from urllib.request import urlopen, urlretrieve
 from pathlib import Path
@@ -594,28 +594,60 @@ with open(
     f"{resources}langs.json", "r", encoding="utf-8"
 ) as lang_file:  # Load language strings depending on system locale
     lang_file = json.load(lang_file)
-if locale.startswith("es"):
+if (
+    locale == "es_ES"
+    or locale == "es_AR"
+    or locale == "es_BO"
+    or locale == "es_CL"
+    or locale == "es_CO"
+    or locale == "es_CR"
+    or locale == "es_DO"
+    or locale == "es_EC"
+    or locale == "es_SV"
+    or locale == "es_GT"
+    or locale == "es_HN"
+    or locale == "es_MX"
+    or locale == "es_NI"
+    or locale == "es_PA"
+    or locale == "es_PY"
+    or locale == "es_PE"
+    or locale == "es_PR"
+    or locale == "es_UY"
+    or locale == "es_VE"
+):
     lang = "spanish"
 
-elif locale.startswith("pl"):
+elif locale == "pl_PL":
     lang = "polish"
 
-elif locale.startswith("fr"):
+elif (
+    locale == "fr_FR"
+    or locale == "fr_BE"
+    or locale == "fr_CA"
+    or locale == "fr_LU"
+    or locale == "fr_CH"
+):
     lang = "french"
 
-elif locale.startswith("bg"):
+elif locale == "bg_BG":
     lang = "bulgarian"
 
-elif locale.startswith("nl"):
+elif locale == "nl_NL" or locale == "nl_BE":
     lang = "dutch"
 
-elif locale.startswith("ru"):
+elif locale == "ru_RU" or locale == "ru_MO":
     lang = "russian"
 
-elif locale.startswith("de"):
+elif (
+    locale == "de_DE"
+    or locale == "de_AT"
+    or locale == "de_LI"
+    or locale == "de_LU"
+    or locale == "de_CH"
+):
     lang = "german"
 
-elif locale.startswith("tr"):
+elif locale == "tr_TR":
     lang = "turkish"
 
 else:
@@ -1784,6 +1816,7 @@ def calculateProfit(start_bal):
 def sendFunds(handler):
     recipientStr = recipient.get()
     amountStr = amount.get()
+    memoStr = memo.get()
 
     MsgBox = messagebox.askquestion(
         getString("warning"),
@@ -1797,7 +1830,12 @@ def sendFunds(handler):
 
         soc.send(bytes(f"LOGI,{str(username)},{str(password)}", encoding="utf8"))
         response = soc.recv(2)
-        soc.send(bytes(f"SEND,-,{str(recipientStr)},{str(amountStr)}", encoding="utf8"))
+        soc.send(
+            bytes(
+                f"SEND,{str(memoStr)},{str(recipientStr)},{str(amountStr)}",
+                encoding="utf8",
+            )
+        )
         response = soc.recv(128).decode().split(",")
         soc.close()
 
@@ -1962,6 +2000,25 @@ class Wallet:
         amount.insert("0", "2.2")
         amount.bind("<FocusIn>", clear_amount_placeholder)
 
+        Label(
+            master,
+            text=getString("amount"),
+            font=textFont,
+            background=backgroundColor,
+            foreground=fontColor,
+        ).grid(row=7, column=0, sticky=W + S, padx=(5, 0))
+
+        memo = Entry(
+            master,
+            border="0",
+            font=textFont,
+            foreground=foregroundColorSecondary,
+            background=backgroundColor,
+        )
+        memo.grid(row=7, column=1, sticky=N + W + S + E, columnspan=3, padx=(0, 5))
+        memo.insert("0", "...")
+        memo.bind("<FocusIn>", clear_amount_placeholder)
+
         sendLabel = Button(
             master,
             text=getString("send_funds"),
@@ -1971,7 +2028,7 @@ class Wallet:
             activebackground=backgroundColor,
         )
         sendLabel.grid(
-            row=7,
+            row=8,
             column=0,
             sticky=N + S + E + W,
             columnspan=4,
@@ -1989,7 +2046,7 @@ class Wallet:
             activebackground=backgroundColor,
         )
         wrapLabel.grid(
-            row=8,
+            row=9,
             column=0,
             sticky=N + S + E + W,
             columnspan=2,
@@ -2007,7 +2064,7 @@ class Wallet:
             activebackground=backgroundColor,
         )
         wrapLabel.grid(
-            row=8,
+            row=9,
             column=2,
             sticky=N + S + E + W,
             columnspan=2,
@@ -2017,7 +2074,9 @@ class Wallet:
         wrapLabel.bind("<Button-1>", openUnWrapper)
 
         separator = ttk.Separator(master, orient="horizontal")
-        separator.grid(row=9, column=0, sticky=N + S + E + W, columnspan=4, padx=(5, 5))
+        separator.grid(
+            row=10, column=0, sticky=N + S + E + W, columnspan=4, padx=(5, 5)
+        )
 
         Label(
             master,
@@ -2025,7 +2084,7 @@ class Wallet:
             font=textFont3,
             foreground=foregroundColor,
             background=backgroundColor,
-        ).grid(row=10, column=0, sticky=S + W, columnspan=4, pady=(5, 0), padx=(5, 0))
+        ).grid(row=11, column=0, sticky=S + W, columnspan=4, pady=(5, 0), padx=(5, 0))
 
         sessionprofittext = StringVar()
         sessionprofittext.set(getString("please_wait_calculating"))
@@ -2036,7 +2095,7 @@ class Wallet:
             background=backgroundColor,
             foreground=fontColor,
         )
-        sessionProfitLabel.grid(row=11, column=0, sticky=W, columnspan=4, padx=5)
+        sessionProfitLabel.grid(row=12, column=0, sticky=W, columnspan=4, padx=5)
 
         minuteprofittext = StringVar()
         minuteProfitLabel = Label(
@@ -2046,7 +2105,7 @@ class Wallet:
             background=backgroundColor,
             foreground=fontColor,
         )
-        minuteProfitLabel.grid(row=12, column=0, sticky=W, columnspan=4, padx=5)
+        minuteProfitLabel.grid(row=13, column=0, sticky=W, columnspan=4, padx=5)
 
         hourlyprofittext = StringVar()
         hourlyProfitLabel = Label(
@@ -2056,7 +2115,7 @@ class Wallet:
             background=backgroundColor,
             foreground=fontColor,
         )
-        hourlyProfitLabel.grid(row=13, column=0, sticky=W, columnspan=4, padx=5)
+        hourlyProfitLabel.grid(row=14, column=0, sticky=W, columnspan=4, padx=5)
 
         dailyprofittext = StringVar()
         dailyprofittext.set("")
@@ -2067,10 +2126,10 @@ class Wallet:
             background=backgroundColor,
             foreground=fontColor,
         )
-        dailyProfitLabel.grid(row=14, column=0, sticky=W, columnspan=4, padx=5)
+        dailyProfitLabel.grid(row=15, column=0, sticky=W, columnspan=4, padx=5)
 
         separator = ttk.Separator(master, orient="horizontal")
-        separator.grid(row=15, column=0, sticky=N + S + E + W, columnspan=4, padx=5)
+        separator.grid(row=16, column=0, sticky=N + S + E + W, columnspan=4, padx=5)
 
         Label(
             master,
@@ -2078,7 +2137,7 @@ class Wallet:
             font=textFont3,
             foreground=foregroundColor,
             background=backgroundColor,
-        ).grid(row=16, column=0, sticky=S + W, columnspan=4, pady=(5, 0), padx=(5, 0))
+        ).grid(row=17, column=0, sticky=S + W, columnspan=4, pady=(5, 0), padx=(5, 0))
 
         transactionstext = StringVar()
         transactionstext.set("")
@@ -2091,12 +2150,12 @@ class Wallet:
             foreground=fontColor,
         )
         transactionstextLabel.grid(
-            row=17, column=0, sticky=W, columnspan=4, padx=5, pady=(0, 5)
+            row=18, column=0, sticky=W, columnspan=4, padx=5, pady=(0, 5)
         )
 
         separator = ttk.Separator(master, orient="horizontal")
         separator.grid(
-            row=18, column=0, sticky=N + S + E + W, columnspan=4, padx=5, pady=(0, 10)
+            row=19, column=0, sticky=N + S + E + W, columnspan=4, padx=5, pady=(0, 10)
         )
 
         original = Image.open(resources + "transactions.png")
@@ -2106,7 +2165,7 @@ class Wallet:
         transactionsLabel = Label(
             master, image=transactions, background=backgroundColor, foreground=fontColor
         )
-        transactionsLabel.grid(row=19, column=0, sticky=N + S + W + E, pady=(0, 5))
+        transactionsLabel.grid(row=20, column=0, sticky=N + S + W + E, pady=(0, 5))
         transactionsLabel.bind("<Button>", openTransactions)
 
         original = Image.open(resources + "calculator.png")
@@ -2117,7 +2176,7 @@ class Wallet:
             master, image=calculator, background=backgroundColor, foreground=fontColor
         )
         calculatorLabel.grid(
-            row=19, column=1, sticky=N + S + W + E, padx=(0, 5), pady=(0, 5)
+            row=20, column=1, sticky=N + S + W + E, padx=(0, 5), pady=(0, 5)
         )
         calculatorLabel.bind("<Button>", openCalculator)
 
@@ -2129,7 +2188,7 @@ class Wallet:
             master, image=stats, background=backgroundColor, foreground=fontColor
         )
         statsLabel.grid(
-            row=19, column=2, sticky=N + S + W + E, padx=(0, 5), pady=(0, 5)
+            row=20, column=2, sticky=N + S + W + E, padx=(0, 5), pady=(0, 5)
         )
         statsLabel.bind("<Button>", openStats)
 
@@ -2141,7 +2200,7 @@ class Wallet:
             master, image=settings, background=backgroundColor, foreground=fontColor
         )
         settingsLabel.grid(
-            row=19, column=3, sticky=N + S + W + E, padx=(0, 10), pady=(0, 5)
+            row=20, column=3, sticky=N + S + W + E, padx=(0, 10), pady=(0, 5)
         )
         settingsLabel.bind("<Button>", openSettings)
 
