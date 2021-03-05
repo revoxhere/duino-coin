@@ -5,7 +5,7 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
 ##########################################
-import socket, threading, time, re, subprocess, configparser, sys, datetime, os, json  # Import libraries
+import socket, threading, time, re, subprocess, configparser, sys, datetime, os  # Import libraries
 from pathlib import Path
 from signal import signal, SIGINT
 import locale, json
@@ -91,23 +91,43 @@ if not Path(  # Check if miner is configured, if it isn't, autodetect language
     resourcesFolder + "/Miner_config.cfg"
 ).is_file():
     locale = locale.getdefaultlocale()[0]
-    if locale.startswith("es"):
+    if (
+        locale == "es_ES"
+        or locale == "es_AR"
+        or locale == "es_BO"
+        or locale == "es_CL"
+        or locale == "es_CO"
+        or locale == "es_CR"
+        or locale == "es_DO"
+        or locale == "es_EC"
+        or locale == "es_SV"
+        or locale == "es_GT"
+        or locale == "es_HN"
+        or locale == "es_MX"
+        or locale == "es_NI"
+        or locale == "es_PA"
+        or locale == "es_PY"
+        or locale == "es_PE"
+        or locale == "es_PR"
+        or locale == "es_UY"
+        or locale == "es_VE"
+    ):
         lang = "spanish"
 
-    elif locale.startswith("ru"):
+    elif locale == "ru_RU" or locale == "ru_MO":
         lang = "russian"
 
-    if locale.startswith("pl"):
+    if locale == "pl_PL":
         lang = "polish"
 
-    elif locale.startswith("fr"):
+    elif (
+        locale == "fr_FR"
+        or locale == "fr_BE"
+        or locale == "fr_CA"
+        or locale == "fr_LU"
+        or locale == "fr_CH"
+    ):
         lang = "french"
-    
-    elif locale.startswith("sk"):
-        lang = "slovak"
-        
-    elif locale.startswith("de"):
-        lang = "german"
 
     else:
         lang = "english"
@@ -161,7 +181,6 @@ def handler(
         + Fore.WHITE
         + getString("goodbye")
     )
-    handlerShown = True
     try:
         soc.close()
     except:
@@ -682,25 +701,21 @@ def AVRMine(com):  # Mining section
                 )
                 avr_not_initialized = False
             except:
-                while connection_error:
-                    connection_error = True
-                    time.sleep(10)
-                    print(
-                        now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.RESET_ALL
-                        + Style.BRIGHT
-                        + Back.MAGENTA
-                        + Fore.WHITE
-                        + " "
-                        + str(com[-4:].toLower())
-                        + " "
-                        + Back.RESET
-                        + Fore.RED
-                        + getString("mining_avr_connection_error")
-                    )
-                else:
-                    connection_error = False
-                    avr_not_initialized = True
+                print(
+                    now().strftime(Style.DIM + "%H:%M:%S ")
+                    + Style.RESET_ALL
+                    + Style.BRIGHT
+                    + Back.MAGENTA
+                    + Fore.WHITE
+                    + " "
+                    + str(com[-4:].toLower())
+                    + " "
+                    + Back.RESET
+                    + Fore.RED
+                    + getString("mining_avr_connection_error")
+                )
+                time.sleep(5)
+                avr_not_initialized = True
         while True:
             while True:
                 try:
