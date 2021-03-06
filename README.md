@@ -57,7 +57,7 @@ Official getting started guides for creating an account and setting up miners on
 
 <h3 align="center">Installing Duino-Coin</h2><br>
 
-The easiest way to get started with Duino-Coin is to download [latest release](github.com/revoxhere/duino-coin/releases/) for your OS.<br>
+The easiest way to get started with Duino-Coin is to download [latest release](https://github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
 After downloading, unzip it and launch the desired program.<br>
 No dependencies required.
 
