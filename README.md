@@ -55,6 +55,27 @@ Technical specifications:
 
 Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a> (or <a href="http://duinoyliedtvs4zp7wtz2o7uqmv4tfcyvdlclbwr3zbez2hxwolry7ad.onion/">.onion version</a>).
 
+<h3 align="center">Installing Duino-Coin</h2><br>
+
+The easiest way to get started with Duino-Coin is to download [latest release](github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
+After downloading, unzip it and launch the desired program.<br>
+No dependencies required.
+
+<hr>
+
+If you want to run the programs from source, you may need to install some dependencies, here's how to do it on debian-based distros:
+```BASH
+sudo apt install python3 python3-pip git
+git clone https://github.com/revoxhere/duino-coin
+cd duino-coin
+python3 -m pip install -r requirements.txt
+```
+If you are on Windows, download [Python 3](https://www.python.org/downloads/), then [our repository](https://github.com/revoxhere/duino-coin/archive/master.zip), extract it and open the folder in command prompt. In CMD, type:
+```BASH
+py -m pip install -r requirements.txt
+```
+After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py` OR `py PC_Miner.py`). 
+
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
