@@ -21,7 +21,7 @@ from tkinter import (
     ttk,
 )
 from tkinter.font import Font
-from tkinter import LEFT, BOTH, RIGHT, END, N, S, W
+from tkinter import LEFT, BOTH, RIGHT, END, N, S, W, E
 from webbrowser import open_new_tab
 from urllib.request import urlopen, urlretrieve
 from pathlib import Path
@@ -1784,7 +1784,6 @@ def calculateProfit(start_bal):
 def sendFunds(handler):
     recipientStr = recipient.get()
     amountStr = amount.get()
-    memoStr = memo.get()
 
     MsgBox = messagebox.askquestion(
         getString("warning"),
@@ -1800,7 +1799,7 @@ def sendFunds(handler):
         response = soc.recv(2)
         soc.send(
             bytes(
-                f"SEND,{str(memoStr)},{str(recipientStr)},{str(amountStr)}",
+                f"SEND,-,{str(recipientStr)},{str(amountStr)}",
                 encoding="utf8",
             )
         )
@@ -1967,25 +1966,6 @@ class Wallet:
         amount.grid(row=6, column=1, sticky=N + W + S + E, columnspan=3, padx=(0, 5))
         amount.insert("0", "2.2")
         amount.bind("<FocusIn>", clear_amount_placeholder)
-
-        Label(
-            master,
-            text=getString("amount"),
-            font=textFont,
-            background=backgroundColor,
-            foreground=fontColor,
-        ).grid(row=7, column=0, sticky=W + S, padx=(5, 0))
-
-        memo = Entry(
-            master,
-            border="0",
-            font=textFont,
-            foreground=foregroundColorSecondary,
-            background=backgroundColor,
-        )
-        memo.grid(row=7, column=1, sticky=N + W + S + E, columnspan=3, padx=(0, 5))
-        memo.insert("0", "...")
-        memo.bind("<FocusIn>", clear_amount_placeholder)
 
         sendLabel = Button(
             master,
