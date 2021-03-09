@@ -153,6 +153,16 @@ After loging-in you have access to the following commands:
      1.  Send a Tron transaction with method `initiateWithdraw(ducoUsername,amount)`
      2.  Send a server call `UNWRAP,amount,tronAddress`
 
+<br>
+
+<h3 align="center">Master server HTML API</h3><br>
+
+You can use one of the following links to get API info from Duino-Coin Server:
+*   General statistics & worker API: [api.json](http://51.15.127.80/api.json) - refreshed every 5s
+*   User balances API: [balances.json](http://51.15.127.80/balances.json) - refreshed every 30s
+*   Transactions API: [transactions.json](http://51.15.127.80/transactions.json) - refreshed every 2m
+*   Found blocks API: [foundBlocks.json](http://51.15.127.80/foundBlocks.json) - refreshed every 2m
+
 <h2 align="center">C DUCO library</h2><br>
 
 If you want to easily access Duino-Coin API with your C apps, there is [libduco](https://github.com/SarahIsWeird/libduco) made by [@Sarah](https://github.com/SarahIsWeird/). [@ygboucherk](https://github.com/ygboucherk) is also working on one wich you can access here [duino-coin-C-lib](https://github.com/ygboucherk/duino-coin-C-lib)
