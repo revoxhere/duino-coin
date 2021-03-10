@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <html lang="en">
+    <title>Duino-Coin | Donate</title>
+    <link rel="icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+    <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+
+    <meta name="description" content="Donate to Duino-Coin - coin that can be mined with almost everything.">
+    <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency, bitcoin">
+    <link rel="canonical" href="https://duinocoin.com" />
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#EE5A24">
+
+    <!-- Open Graph Metadata -->
+    <meta property="og:site_name" content="Duino-Coin | Donate" />
+    <meta property="og:site" content="https://duinocoin.com" />
+    <meta property="og:title" content="Duino-Coin | Donate"/>
+    <meta property="og:description" content="Donate to Duino-Coin - coin that can be mined with almost everything." /> 
+    <meta property="og:image" content="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" />
+    <meta property="og:url" content="https://duinocoin.com" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Metadata -->
+    <meta name="twitter:title" content="Duino-Coin | Donate">
+    <meta name="twitter:description" content="Donate to Duino-Coin - coin that can be mined with almost everything.">
+    <meta name="twitter:image" content="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
+    <meta name="twitter:site" content="@CoinDuino">
+    <meta name="twitter:creator" content="@CoinDuino">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-pageloader@0.3.0/dist/css/bulma-pageloader.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js" integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+      .is-primary { 
+        /* Override Bulmas primary color to Duco-Colored gradient*/
+        background: linear-gradient(160deg, #e74c3c, #f39c12) !important;
+      }
+      .gradienttext {
+        /* Gradient text */
+        background: -webkit-linear-gradient(160deg, #EA2027, #EE5A24) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        color: #EA2027 !important;
+      }
+      .grid-list {
+        /* Split unordered lists */
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="pageloader" class="pageloader is-active is-primary is-bottom-to-top">
+      <span class="title">Duino-Coin Donate</span>
+    </div>
+
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="index.html">
+          <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" height="172">
+          &nbsp;&nbsp;&nbsp;Home
+        </a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarDuinoCoin">
+          <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="navbarDuinoCoin" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
+            <i class="fas fa-book" style="color:#f6b93b;"></i>&nbsp;Whitepaper
+          </a>
+          <a class="navbar-item" href="https://explorer.duinocoin.com">
+            <i class="fas fa-poll" style="color:#ff9f43;"></i>&nbsp;Network
+          </a>
+          <a class="navbar-item is-active" href="donate.html">
+            <i class="fas fa-heart" style="color:#ee5253;"></i>&nbsp;Donate
+          </a>
+          <a class="navbar-item" href="contact.html">
+            <i class="fas fa-user" style="color:#eb2f06;"></i>&nbsp;Our Team/Contact
+          </a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item" href="https://twitter.com/CoinDuino/">
+            <i class="fab fa-lg fa-twitter"></i></a></li>
+          </a>
+          <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
+            <i class="fab fa-lg fa-reddit"></i></a></li>
+          </a>
+          <a class="navbar-item" href="https://discord.gg/kvBkccy">
+            <i class="fab fa-lg fa-discord"></i></a></li>
+          </a>
+          <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
+            <i class="fab fa-lg fa-github"></i></a></li>
+          </a>
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="button is-primary" href="getting-started.html">
+                <strong>Get started</strong>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <br>
+
+    <div class="container">
+      <p class="title is-size-1" align="center">
+        <i class="fa fa-heart" style="color:#e74c3c;"></i>
+        Want to support us financially?
+      </p>
+      <p class="subtitle is-size-2" align="center">
+        This is the right place to do so!
+      </p>
+
+      <p class="subtitle is-size-5" align="center">
+        We maintain Duino-Coin mainly with our own money, which is sometimes insufficient or limited <i class="fa fa-business-time" style="color:#eb4d4b;"></i>.<br>
+        That's why we're asking everyone who likes this project to donate a cup of coffee <i class="fa fa-coffee" style="color:#6f4e37;"></i> (or a piece of pizza <i class="fa fa-pizza-slice" style="color:#f0932b;"></i>!)<br>
+        so we can continue to maintain the servers, make exchanges and keep the development going strong <i class="fa fa-code" style="color:#6ab04c;"></i>.
+      </p>
+
+      <hr>
+      <p class="subtitle is-size-5" align="center">
+        You can donate us by just sending funds to one of these addresses:
+      </p>
+      <div class="columns ml-6 mr-6 is-multiline">
+        <div class="column is-multiline">
+          <div class="box">
+            <i class="fab fa-lg fa-bitcoin" style="color:#f39c12"></i>
+            <span class="title is-size-5">Bitcoin</span><br>
+            <span class="subtitle is-size-6">39GpTtgCNNwFbPnhEbCCBzNBewG3bA7oso</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <i class="fab fa-lg fa-bitcoin" style="color:#2ecc71"></i>
+            <span class="title is-size-5">Bitcoin Cash</span><br>
+            <span class="subtitle is-size-6">bitcoincash:qqv4g8e2nkpwg6dkzdfuyf0zzrfts9qe350t2epfay</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <img src="https://wiki.trezor.io/images/Litecoin.png" width="16em">
+            <span class="title is-size-5">Litecoin</span><br>
+            <span class="subtitle is-size-6">LUgz5FArRpjma52jjEQAYjBK9VVV2Z9d3D</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <img src="http://www.beingcrypto.com/wp-content/uploads/2018/02/tether.png" width="16em">
+            <span class="title is-size-5">Tether</span><br>
+            <span class="subtitle is-size-6">3BBnfqSc9f37vXNSyusTGDXe53vhtx4MLg</span>
+          </div>
+        </div>
+      </div>
+      <div class="columns ml-6 mr-6 is-multiline">
+        <div class="column">
+          <div class="box">
+            <img src="https://ludu-assets.s3.amazonaws.com/lesson-icons/26/CwSMaokbSgaw3ZX58S7i" width="16em">
+            <span class="title is-size-5">Ethereum</span><br>
+            <span class="subtitle is-size-6">0x6f8333ecc3e6eeb2008d56503db1cf4b3bafa695</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <img src="https://xmg.minerclaim.net/site_assets/global/images/magi-blue_256x256.png" width="16em">
+            <span class="title is-size-5">Coin Magi</span><br>
+            <span class="subtitle is-size-6">93qJ8j93ibCye7pTWKTu88pr6a8xy7EUqC</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <img src="https://en.bitcoinwiki.org/upload/en/images/thumb/5/51/Beyondcoin-Logo.png/250px-Beyondcoin-Logo.png" width="16em">
+            <span class="title is-size-5">Beyondcoin</span><br>
+            <span class="subtitle is-size-6">BTCpcG6JXYkn52pQGgDM11Fd7qEMxrHAGW</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" width="16em">
+            <span class="title is-size-5">Duino-Coin</span>
+            <span class="subtitle is-size-6">
+              <ul class="grid-list">
+                <li>revox</li>
+                <li>Bilaboz</li>
+                <li>connorhess</li>
+                <li>JoyBed</li>
+              </ul>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="columns ml-6 mr-6 is-multiline">
+        <div class="column">
+          <div class="box">
+            <img src="https://brandslogos.com/wp-content/uploads/thumbs/dogecoin-logo-vector.svg" width="16em">
+            <span class="title is-size-5">Dogecoin</span><br>
+            <span class="subtitle is-size-6">DHnvi18rxbQMToZXxqndCGnEqLzifRAzin</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <img src="https://cryptologos.cc/logos/monero-xmr-logo.png" width="16em">
+            <span class="title is-size-5">Monero</span><br>
+            <span class="subtitle is-size-6">84HAJVEokXxU8hFgy7BcmjDRW53ywteKRPWNe4BnHu1WNjTngqp8BHj1yhrjRHbTREivzxmXZTkuCdFGb5xFQ3EeBWwDca6</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <img src="https://icons.iconarchive.com/icons/cjdowner/cryptocurrency-flat/1024/TRON-TRX-icon.png" width="16em">
+            <span class="title is-size-5">Tron</span><br>
+            <span class="subtitle is-size-6">TJsSD29FXfbq6BtGRmnfYGDUfrF9DPVGSq</span>
+          </div>
+        </div>
+        <div class="column">
+          <div class="box">
+            <i class="fa fa-question-circle"></i>
+            <span class="title is-size-5">Other</span><br>
+            <span class="subtitle is-size-6">
+              Contact us if you want to help in another way.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <p class="title is-size-5" align="center">
+        We're very thankful even for the smallest donations
+        <i class="fa fa-heart" style="color:#e74c3c;"></i>
+        <br>
+      </p>
+      <p class="subtitle is-size-5" align="center">
+        
+      </p>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer"> 
+      <div class="content has-text-centered">
+        <p>
+          <strong>Duino-Coin Website</strong> (v2) by <a href="https://github.com/revoxhere">Robert "revox" Piotrowski </a>2019-2021
+          <br>Hosted by <a href="https://kristian-kramer.com">Kristian "Tech1k" Kramer</a> and/or GitHub Pages
+          <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a><br>
+          <a href="https://bulma.io">
+            <img
+              src="https://bulma.io/images/made-with-bulma.png"
+              alt="Made with Bulma"
+              width="188"
+              height="84">
+          </a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<script>
+  let pageloader = document.getElementById("pageloader"); // PAGE LOAGER
+  pageloader.setAttribute('class', "pageloader is-active is-primary is-bottom-to-top"); // Before page is loaded
+  window.addEventListener('load', function() {
+    pageloader.setAttribute('class', "pageloader is-primary is-bottom-to-top"); // After page is loaded
+  });
+
+  document.addEventListener('DOMContentLoaded', () => { // HAMBURGER MENU
+  const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+  if ($navbarBurgers.length > 0) {
+    $navbarBurgers.forEach( el => { // Add a click event on each of burger menus
+      el.addEventListener('click', () => {
+        const target = el.dataset.target; // Get the target from the "data-target" attribute
+        const $target = document.getElementById(target);
+        el.classList.toggle('is-active'); // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        $target.classList.toggle('is-active');
+        });
+      });
+    }
+  });
+</script>
