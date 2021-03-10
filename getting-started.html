@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <html lang="en">
+    <title>Duino-Coin | Get Started</title>
+    <link rel="icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+    <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" type="image/png"/>
+
+    <meta name="description" content="Getting started with Duino-Coin - coin that can be mined with almost everything.">
+    <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency, bitcoin">
+    <link rel="canonical" href="https://duinocoin.com" />
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#EE5A24">
+
+    <!-- Open Graph Metadata -->
+    <meta property="og:site_name" content="Duino-Coin | Get Started" />
+    <meta property="og:site" content="https://duinocoin.com" />
+    <meta property="og:title" content="Duino-Coin | Get Started"/>
+    <meta property="og:description" content="Getting started with Duino-Coin - coin that can be mined with almost everything." /> 
+    <meta property="og:image" content="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" />
+    <meta property="og:url" content="https://duinocoin.com" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Metadata -->
+    <meta name="twitter:title" content="Duino-Coin | Get Started">
+    <meta name="twitter:description" content="Getting started with Duino-Coin - coin that can be mined with almost everything.">
+    <meta name="twitter:image" content="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
+    <meta name="twitter:site" content="@CoinDuino">
+    <meta name="twitter:creator" content="@CoinDuino">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma-pageloader@0.3.0/dist/css/bulma-pageloader.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js" integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+      .is-primary { 
+        /* Override Bulmas primary color to Duco-Colored gradient*/
+        background: linear-gradient(160deg, #e74c3c, #f39c12) !important;
+      }
+      .gradienttext {
+        /* Gradient text */
+        background: -webkit-linear-gradient(160deg, #EA2027, #EE5A24) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        color: #EA2027 !important;
+      }
+      .grid-list {
+        /* Split unordered lists */
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="pageloader" class="pageloader is-active is-primary is-bottom-to-top">
+      <span class="title">Duino-Coin Getting Started</span>
+    </div>
+
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="index.html">
+          <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" height="172">
+          &nbsp;&nbsp;&nbsp;Home
+        </a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarDuinoCoin">
+          <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="navbarDuinoCoin" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
+            <i class="fas fa-book" style="color:#f6b93b;"></i>&nbsp;Whitepaper
+          </a>
+          <a class="navbar-item" href="https://explorer.duinocoin.com">
+            <i class="fas fa-poll" style="color:#ff9f43;"></i>&nbsp;Network
+          </a>
+          <a class="navbar-item" href="donate.html">
+            <i class="fas fa-heart" style="color:#ee5253;"></i>&nbsp;Donate
+          </a>
+          <a class="navbar-item" href="contact.html">
+            <i class="fas fa-user" style="color:#eb2f06;"></i>&nbsp;Our Team/Contact
+          </a>
+        </div>
+        <div class="navbar-end">
+          <a class="navbar-item" href="https://twitter.com/CoinDuino/">
+            <i class="fab fa-lg fa-twitter"></i></a></li>
+          </a>
+          <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
+            <i class="fab fa-lg fa-reddit"></i></a></li>
+          </a>
+          <a class="navbar-item" href="https://discord.gg/kvBkccy">
+            <i class="fab fa-lg fa-discord"></i></a></li>
+          </a>
+          <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
+            <i class="fab fa-lg fa-github"></i></a></li>
+          </a>
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="button is-primary is-active" href="getting-started.html">
+                <strong>Get started</strong>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <br>
+
+    <div class="container">
+      <p class="title is-size-1" align="center">
+        Get started with Duino-Coin
+        <i class="fa fa-coffee" style="color:#6f4e37;"></i>
+      </p>
+      <p class="subtitle" align="center">
+        Grab yourself a cup of coffee and read this tutorial to start your journey with our coin.
+      </p><br>
+
+      <div class="box">
+        <p class="title ">
+          <i class="fa fa-list-ul" style="color:#8e44ad;"></i>
+          Table of contents
+          <p class="subtitle is-size-6">These tutorials will allow you to easily start your exciting journey with Duino-Coin.<br>Feel free to jump straight into the section that interests you or read everything all the way.</p>
+          <ul class="subtitble is-size-5 ml-5">
+            <li><i class="fa fa-download fa-fw" style="color:#44bd32;"></i>&nbsp;<a href="#download">Download the latest release</a></li>
+            <li><i class="fa fa-users fa-fw" style="color:#8c7ae6;"></i>&nbsp;<a href="#register">Register an account</a></li>
+            <li><i class="fa fa-desktop fa-fw" style="color:#c23616;"></i>&nbsp;<a href="#computer">Mine with your computer</a></li>
+            <li><i class="fa fa-microchip fa-fw" style="color:#00878F;"></i>&nbsp;<a href="#arduino">Mine with your AVR (Arduino or compatible) board</a></li>
+            <li><i class="fab fa-raspberry-pi fa-fw" style="color:#ee5253;"></i>&nbsp;<a href="#raspberry">Mine with your Raspberry Pi board</a></li>
+            <li><i class="fa fa-microchip fa-fw" style="color:#feca57;"></i>&nbsp;<a href="#esp">Mine with your ESP8266/ESP32 (or compatible) board</a></li>
+            <li><i class="fa fa-mobile-alt fa-fw" style="color:#10ac84;"></i>&nbsp;<a href="#other">Mine with other devices (e.g. Smartphones)</a></li>
+            <li>... more guides coming soon!</li>
+          </ul>  
+        </p>
+      </div>
+    </div>
+    <br>
+
+    <div class="container" id="download">
+      <div class="box">
+        <p class="title">
+          <i class="fa fa-download" style="color:#44bd32;"></i>
+          Download the latest release
+        </p>
+        <span>Before you start doing anything with Duino-Coin and you don't intend on using the <a href="http://51.15.127.80">Web Services</a> you have to download the latest release containing everything you need.</span><br>
+        <span>To do so, visit <a href="github.com/revoxhere/duino-coin/releases/latest">latest releases page</a> on our GitHub, scroll down through the changelog and download release a for your OS.</span><br>
+        <div class="column" align="center">
+          <a href="github.com/revoxhere/duino-coin/releases/latest"><img class="image" src="https://i.imgur.com/5LHBWa6.png"></a>
+          <p class="subtitle is-size-6 mt-1"><i>Downloads section in the releases page</i></p>
+        </div>
+        <span>After downloading, unzip the zip archive (for example to your desktop) and proceed with the next steps.</span><br>
+        <span style="color:#c0392b;">Notice: The binaries in the release section are precompiled for 64-bit systems (most new computers).<br>If you want to launch them on another CPU architecture however (e.g. 32-bit PC), you need to <a href="https://github.com/revoxhere/duino-coin#installing-duino-coin">launch them from the source</a>.</span><br>
+      </div>
+    </div>
+    <br>
+
+    <div class="container" id="register">
+      <div class="box">
+        <p class="title">
+          <i class="fa fa-users" style="color:#8c7ae6;"></i>
+          Register an account on Duino-Coin network
+        </p>
+        <span>The first thing you have to do in order to use Duino-Coin is to register your account on the nework.</span><br><br>
+        <span>To do so, you can either use the <b>GUI Wallet</b> (recommended), <b>CLI Wallet</b> (both of them are included in every Duino-Coin release you've downloaded in the previous step) or <a href="http://51.15.127.80/register.html">Web Wallet</a> to register though your browser.</span><br><br>
+        <span>Everything is made to be as simple as possible, so you should have no trouble with registering.</span><br>
+        <span>Just launch any of the wallets, select the register option and fill in the blanks.</span><br>
+        <div class="columns mt-2 is-multiline is-mobile">
+          <div class="column" align="center">
+            <img class="image" src="https://i.imgur.com/oupKQL8.png">
+            <p class="subtitle is-size-6 mt-1"><i>Register section in the GUI Wallet</i></p>
+          </div>
+          <div class="column" align="center">
+            <a href="http://51.15.127.80/register.html"><img class="image" src="https://i.imgur.com/sgWpX91.png"></a>
+            <p class="subtitle is-size-6 mt-1"><i>Register section in the Web Wallet</i></p>
+          </div>
+        </div>
+        <div class="columns mt-2 is-multiline is-mobile">
+          <div class="column" align="center">
+            <img class="image" src="https://i.imgur.com/dKm9OY0.png">
+            <p class="subtitle is-size-6 mt-1"><i>Register section in the CLI Wallet</i></p>
+          </div>
+        </div>
+        <span>After registering you can proceed to use all of the Duino-Coin related software.</span>
+      </div>
+    </div>
+    <br>
+
+    <div class="container" id="computer">
+      <div class="box">
+        <p class="title">
+          <i class="fa fa-desktop" style="color:#c23616;"></i>
+          Start mining with your computer
+        </p>
+        <span>Mining with your computer is the easiest to setup way of earning Duino-Coin.<br><br>
+          To do so, simply launch the <b>PC_Miner</b> (included in every Duino-Coin release you've downloaded in the first step).<br>If you're launching it for the first time, it will ask you some details like your Duino-Coin username, nubmer of threads, etc. - you can set them how you like or stick to the recommended values.
+        <div class="column" align="center">
+          <img class="image" src="https://i.imgur.com/mLRx8LD.png">
+          <p class="subtitle is-size-6 mt-1"><i>Configuration tool when launching the miner for the first time</i></p>
+        </div>
+          When you successfully finish creating the config, miner will automatically start mining.<br><br>You are getting rewarded for every <b>Accepted</b> and <b>Block found</b> you see. The <b>share numbers</b> and <b>percentage</b> show your miner effectiveness. The <b>kH/s</b> (or MH/s) values tell the speed of mining. <b>Diff</b> means the difficulty you're mining at and <b>ping</b> is just the time of network delays.
+        </span>
+        <div class="column" align="center">
+          <img class="image" src="https://i.imgur.com/Y7A5udO.png">
+          <p class="subtitle is-size-6 mt-1"><i>PC Miner... mining!</i></p>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <div class="container" id="arduino">
+      <div class="box">
+        <p class="title">
+          <i class="fa fa-microchip" style="color:#00878F;"></i>
+          Start mining with your AVR (Arduino) board
+        </p>
+        <span>Mining with AVR boards is the main idea of Duino-Coin - there is <b>no other coin that supports it</b>.<br><br>
+          We assume you have <a href="https://www.arduino.cc/en/software">Arduino IDE</a> already installed on your PC, if you don't - do that right now. We need it to upload Duino-Coin code to your board.<br>
+          In every Duino-Coin release you'll find a folder called <b>Arduino_Code</b> and in it, a file named <b>Arduino_Code.ino</b> - open it with <b>Arduino IDE</b>.<br>
+          When Arduino IDE finishes loading, select your board (<b>Tools > Board</b>...), port (<b>Tools > Port</b>...) and upload the code.
+        </span>
+        <div class="column" align="center">
+          <img class="image" src="https://www.arduino.cc/en/uploads/Guide/UNO_Upload.png">
+          <p class="subtitle is-size-6 mt-1"><i>Upload button</i></p>
+        </div>
+        <span>After uploading the code, launch <b>AVR_Miner</b> program (yet again, included in every Duino-Coin release).<br>
+        The rest is similar to setting up the PC Miner. Config tool will ask you a few questions needed to organize everything and when it's finished, it will start mining automatically.</span>
+        <div class="column" align="center">
+          <img class="image" src="https://i.imgur.com/t8IMUFa.png">
+          <p class="subtitle is-size-6 mt-1"><i>Configuration tool when launching the miner for the first time</i></p>
+        </div>
+        <span>Similarly to the PC Miner, you are getting rewarded for every <b>Accepted</b> and <b>Block found</b> you see. The <b>share numbers</b> and <b>percentage</b> show your avr board effectiveness. Next value in seconds tells <b>how long finding the share took</b>. The <b>H/s</b> values tell the speed of mining. <b>Diff</b> means the difficulty you're mining at and <b>ping</b> is just the time of network delays.</span>
+        <div class="column" align="center">
+          <img class="image" src="https://i.imgur.com/UNDzqpC.png">
+          <p class="subtitle is-size-6 mt-1"><i>AVR Miner... mining!</i></p>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <div class="container" id="raspberry">
+      <div class="box">
+        <p class="title">
+          <i class="fab fa-raspberry-pi" style="color:#ee5253;"></i>
+          Start mining with your Raspberry Pi
+        </p>
+        <span>Raspberry Pi boards are great for mining - they can run headlessly, don't use a lot of power and are very powerful.<br><br>We assume you are using <b>Raspbian</b> or another Debian-based distro on your Raspi, if not, then these instructions may not work.<br>First thing you have to do is to open the <b>Terminal</b>. In it, paste the following commands, one by one:<br>
+          <pre>sudo apt install python3 python3-pip git # Install python3 and git<br>git clone https://github.com/revoxhere/duino-coin # Clone duino-coin repo<br>cd duino-coin<br>python3 PC_Miner.py # Launch the official miner</pre>
+        </span>
+        And that's it! If everything was successfull, miner should start with the configuration tool, after responding to a few questions it'll ask you your Raspberry Pi should start mining automatically.
+        <div class="column" align="center">
+          <img class="image" src="https://i.imgur.com/vLGmGMI.png">
+          <p class="subtitle is-size-6 mt-1"><i>Raspberry Pi... mining!</i></p>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <div class="container" id="esp">
+      <div class="box">
+        <p class="title">
+          <i class="fa fa-microchip" style="color:#feca57;"></i>
+          Start mining with your ESP8266/ESP32 (or compatible) board
+        </p>
+        <span>Mining with ESP boards allows you to mine headlessly - you don't need to have them connected to a computer as they have their own Wi-Fi capabilities that connect to the server.<br><br>Similarly to the Arduino mining, you have to locate the folder named <b>ESP8266_Code</b> (or <b>ESP32_Code</b>) and open <b>ESP8266_Code.ino</b> (or <b>ESP32_Code.ino</b>) file with <b>Arduino IDE</b> configured to support ESP boards.
+          <br>Before you click upload, you need to change a few things here. Near the top you should see lines which you need to edit according to your needs:<br>
+          <pre>const char* ssid = "WiFi name"; // Change this to your WiFi SSID<br>const char* password = "WiFi password"; // Change this to your WiFi password<br>const char* ducouser = "DUCO username"; // Change this to your Duino-Coin username</pre>
+          After changing them, select your board (<b>Tools > Board</b>...), port (<b>Tools > Port</b>...) and upload the code to your board.
+        </span>
+        <div class="column" align="center">
+          <img class="image" src="https://www.arduino.cc/en/uploads/Guide/UNO_Upload.png">
+          <p class="subtitle is-size-6 mt-1"><i>Upload button</i></p>
+        </div>
+        <span>After uploading the code it is a good idea to open the <b>Arduino Serial Monitor</b> (<b>Tools > Serial Monitor</b>), <span style="color:red;">set its baud rate to 115200</span> and see how's the ESP doing. If everything is correct, you should see messages saying that a share was accepted.
+        </span>
+        <div class="column" align="center">
+          <img class="image" src="https://i.imgur.com/lhahfjG.png">
+          <p class="subtitle is-size-6 mt-1"><i>ESP8266... mining!</i></p>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <div class="container" id="other">
+      <div class="box">
+        <p class="title">
+          <i class="fa fa-mobile-alt" style="color:#10ac84;"></i>
+          Mining on other devices
+        </p>
+          <span>
+            You can mine on other devices that have internet access (for example Smartphones, Smart TVs and more).<br>To do that, you can simply open the <a href="http://51.15.127.80/webminer.html">Duino-Coin Web Miner</a> on the device you want to mine on.<br>Enter your username, click <b>Start mining</b> and you're good to go!
+          </span>
+          <div class="column" align="center">
+            <a href="http://51.15.127.80/webminer.html"><img class="image" src="https://i.imgur.com/sbe5az2.png"></a>
+            <p class="subtitle is-size-6 mt-1"><i>Web Miner... mining!</i></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+
+    <p class="title" align="center">
+      You have finished reading the Duino-Coin Getting Started guide! <i class="fa fa-glass-cheers" style="color:#fab1a0;"></i>
+    </p>
+    <p class="subtitle" align="center">
+      It wasn't' as difficult as it might've seemed at the beginning, right?<br><br>
+      Fell free to tell your friends about Duino-Coin and have fun mining! <i class="fa fa-smile" style="color:orange;"></i>
+    </p>
+    <br>
+
+    <!-- FOOTER -->
+    <footer class="footer"> 
+      <div class="content has-text-centered">
+        <p>
+          <strong>Duino-Coin Website</strong> (v2) by <a href="https://github.com/revoxhere">Robert "revox" Piotrowski </a>2019-2021
+          <br>Hosted by <a href="https://kristian-kramer.com">Kristian "Tech1k" Kramer</a> and/or GitHub Pages
+          <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a><br>
+          <a href="https://bulma.io">
+            <img
+              src="https://bulma.io/images/made-with-bulma.png"
+              alt="Made with Bulma"
+              width="188"
+              height="84">
+          </a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<script>
+  let pageloader = document.getElementById("pageloader"); // PAGE LOAGER
+  pageloader.setAttribute('class', "pageloader is-active is-primary is-bottom-to-top"); // Before page is loaded
+  window.addEventListener('load', function() {
+    pageloader.setAttribute('class', "pageloader is-primary is-bottom-to-top"); // After page is loaded
+  });
+
+  document.addEventListener('DOMContentLoaded', () => { // HAMBURGER MENU
+  const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+  if ($navbarBurgers.length > 0) {
+    $navbarBurgers.forEach( el => { // Add a click event on each of burger menus
+      el.addEventListener('click', () => {
+        const target = el.dataset.target; // Get the target from the "data-target" attribute
+        const $target = document.getElementById(target);
+        el.classList.toggle('is-active'); // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        $target.classList.toggle('is-active');
+        });
+      });
+    }
+  });
+</script>
