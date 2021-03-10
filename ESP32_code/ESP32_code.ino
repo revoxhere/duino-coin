@@ -19,6 +19,13 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
+// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
+const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
+const char* password = "Your WiFi password"; // Change this to your WiFi password
+const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
+const char* rigname = "ESP32"; // Change this if you want a custom rig name
+// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
+
 #include "mbedtls/md.h" // Include software hashing library
 #include "hwcrypto/sha.h" // Include hardware accelerated hashing library
 #include <WiFi.h>
@@ -27,13 +34,6 @@
 
 TaskHandle_t Task1;
 TaskHandle_t Task2;
-
-// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
-const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
-const char* password = "Your WiFi password"; // Change this to your WiFi password
-const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
-const char* rigname = "ESP32"; // Change this if you want a custom rig name
-// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
 
 const char * host = "51.15.127.80"; // Static server IP
 const int port = 2811;
