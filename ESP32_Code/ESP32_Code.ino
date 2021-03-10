@@ -22,7 +22,7 @@
 const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
 const char* password = "Your WiFi password"; // Change this to your WiFi password
 const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
-const char* rigname = "ESP32"; // Change this if you want a custom rig name
+const char* rigname  = "ESP32"; // Change this if you want to display a custom rig name in the Wallet
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include "mbedtls/md.h" // Include software hashing library
@@ -35,7 +35,7 @@ TaskHandle_t Task2;
 const char * host = "51.15.127.80"; // Static server IP
 const int port = 2811;
 
-//Task1code
+// Task1code
 void Task1code( void * pvParameters ){
   unsigned int Shares1 = 0; // Share variable
 
@@ -101,7 +101,6 @@ void Task1code( void * pvParameters ){
       }
     }  
   }
-
   Serial.println("CORE1 Not connected. Restarting ESP");
   Serial.println();
   esp_restart(); // Restart the board
@@ -180,7 +179,6 @@ void Task2code( void * pvParameters ){
       }
     }  
   }
-
   Serial.println("CORE2 Not connected. Restarting ESP");
   Serial.println();
   esp_restart(); // Restart the board
