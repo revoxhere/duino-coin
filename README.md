@@ -29,23 +29,41 @@
 
 <h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards and many more.</h2><br />
 
-Key features:
-*   Supported by a large number of platforms 💻
-*   A friendly & growing community 👥
-*   Easy to use & exchange 💱
-*   Available everywhere 🌎
-*   Beginner-friendly :blush:
-*   Cost-effective 💰
-*   Easy to mine ⛏️
-*   Open-source 📚
+<table>
+  <tr>
+    <th>Key features</th>
+    <th>Technical specifications</th>
+  </tr>
+  <tr>
+    <td>
+      Supported by a large number of platforms 💻<br>
+      A friendly & growing community 👥<br>
+      Easy to use & exchange 💱<br>
+      Available everywhere 🌎<br>
+      Fully original project :new:<br>
+      Beginner-friendly :blush:<br>
+      Cost-effective 💰<br>
+      Easy to mine ⛏️<br>
+      Open-source 📚<br>
+    </td>
+    <td>
+      Coin supply: Infinite ♾️ (before December 2020: 350k coins)<br>
+      Premine: <5k blocks (<500coins) 😎<br>
+      Transaction time: Instant ⚡<br>
+      Decimals: 20 🔢<br>
+      Ticker: DUCO (ᕲ)<br>
+      Algorithms: DUCO-S1, DUCO-S1A (+more planned)<br>
+      Rewards: supported by <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png">Kolka system</a> helping reward miners fairly ♐<br>
+    </td>
+  </tr>
+</table>
 
-Technical specifications:
-*   Coin supply: Infinite ♾️ (before December 2020: 350k coins)
-*   Premine: <5k blocks (<500coins) 😎
-*   Block time: Instant ⚡
-*   Decimals: 20 🔢
-*   Ticker: DUCO (ᕲ)
-*   Algorithms: DUCO-S1, DUCO-S1A (+more planned) supported by [Kolka system](https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png) helping reward miners fairly ♐
+
+
+
+
+
+
 
 <h2 align="center">Get started</h2><br>
 
