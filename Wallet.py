@@ -602,6 +602,9 @@ elif locale.startswith("pl"):
 
 elif locale.startswith("fr"):
     lang = "french"
+    
+elif locale.startswith("pt"):
+    lang = "portugese"
 
 elif locale.startswith("bg"):
     lang = "bulgarian"
