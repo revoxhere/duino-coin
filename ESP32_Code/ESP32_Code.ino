@@ -19,18 +19,15 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
 const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
 const char* password = "Your WiFi password"; // Change this to your WiFi password
 const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
 const char* rigname = "ESP32"; // Change this if you want a custom rig name
-// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
+#define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include "mbedtls/md.h" // Include software hashing library
 #include "hwcrypto/sha.h" // Include hardware accelerated hashing library
 #include <WiFi.h>
-
-#define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 TaskHandle_t Task1;
 TaskHandle_t Task2;
