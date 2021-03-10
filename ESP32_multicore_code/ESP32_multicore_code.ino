@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP32 boards v2.1
+//  Code for ESP32 boards v2.3
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -32,6 +32,7 @@ TaskHandle_t Task2;
 const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
 const char* password = "Your WiFi password"; // Change this to your WiFi password
 const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
+const char* rigname = "ESP32"; // Change this if you want a custom rig name
 // TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
 
 const char * host = "51.15.127.80"; // Static server IP
@@ -95,7 +96,7 @@ void Task1code( void * pvParameters ){
         float ElapsedTimeMiliSeconds1 = ElapsedTime1 / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds1 = ElapsedTimeMiliSeconds1 / 1000; // Convert to seconds
         float HashRate1 = iJob1 / ElapsedTimeSeconds1; // Calculate hashrate
-        client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.1"); // Send result to server
+        client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.3," + String(rigname)); // Send result to server
         String feedback1 = client1.readStringUntil('D'); // Receive feedback
         Shares1++;
         Serial.println(String(feedback1) + "D share #" + String(Shares1) + " (" + String(iJob1) + ")" + " Hashrate: " + String(HashRate1) + " Free RAM: " + String(ESP.getFreeHeap()));
@@ -174,7 +175,7 @@ void Task2code( void * pvParameters ){
         float ElapsedTimeMiliSeconds = ElapsedTime / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
         float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
-        client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.1"); // Send result to server
+        client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.3," + String(rigname)); // Send result to server
         String feedback = client.readStringUntil('D'); // Receive feedback
         Shares++;
         Serial.println(String(feedback) + "D share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
@@ -192,7 +193,7 @@ void setup() {
   disableCore0WDT();
   disableCore1WDT();
   Serial.begin(115200); // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP32 Miner v2.1");
+  Serial.println("\n\nDuino-Coin ESP32 Miner v2.3");
   Serial.println("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
   WiFi.begin(ssid, password); // Connect to wifi
