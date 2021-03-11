@@ -35,8 +35,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js" integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">    
 
     <style>
       .is-primary { 
@@ -64,32 +62,13 @@
         animation: gradientAnim 1s ease infinite;
       }
       .rotating {
-        font-size: 72px;
-        background: -webkit-linear-gradient(#f9ca24, #eb4d4b);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: bold;
-        top: 0.11em;
-        right: 0.46em;
-        margin-top: 15%;
-        margin-right: 10%;
-        color: #ff9f43;
-        font-size: 11em;
+        width: 20em;
+        height: 20em;
+        right: 5em;
+        top: 10em;
         position: absolute;
         animation: rotation 2s ease infinite;
         transition: 0.1s;
-      }
-      .dot {
-        top: 0;
-        right: 0;
-        margin-top: 15%;
-        margin-right: 10%;
-        height: 19em;
-        width: 19em;
-        position: absolute;
-        background-color: #fff;
-        border-radius: 50%;
-        display: inline-block;
       }
       @keyframes rotation {
         0% {
@@ -134,10 +113,6 @@
         /* Split unordered lists */
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-      }
-      .monospace {
-        /* Monospace */
-        font-family: 'Source Code Pro', monospace !important;
       }
     </style>
   </head>
@@ -199,10 +174,10 @@
       <div class="hero-body">
         <div class="columns">
           <div class="column is-two-thirds ml-5 is-mobile is-multiline">
-            <p class="title" style="font-size:7em;color:white;">
+            <p class="title" style="font-size:6em;color:white;">
               Duino-Coin
             </p>
-            <p class="subtitle" style="font-size:1.5em;color:white;">
+            <p class="subtitle" style="font-size:1.35em;color:white;">
               The only coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards and many more.
             </p>
             <div class="columns">
@@ -229,8 +204,7 @@
             </div>
           </div>
           <div class="column is-hidden-touch is-multiline" align="center">
-            <p class="dot" align="center"></p>
-            <a href="https://youtu.be/bFnCdqMke34"><p class="rotating monospace" align="center">ᕲ</p></a>
+            <a href="https://youtu.be/bFnCdqMke34"><img class="rotating" align="center"  src="rotating.png"></p></a>
           </div>
         </div>
       </div>
