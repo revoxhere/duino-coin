@@ -1,0 +1,6 @@
+User-agent: *
+
+Disallow: /archive/
+Disallow: /serverip.txt
+
+Sitemap: https://duinocoin.com/sitemap.xml
