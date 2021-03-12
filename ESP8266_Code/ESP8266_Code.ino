@@ -22,7 +22,7 @@
 const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
 const char* password = "Your WiFi password"; // Change this to your WiFi password
 const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
-const char* rigname  = "ESP8266" // Change this if you want to display a custom rig name in the Wallet
+const char* rigname  = "ESP8266"; // Change this if you want to display a custom rig name in the Wallet
 #define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
@@ -121,7 +121,7 @@ void loop() {
         float ElapsedTimeMiliSeconds = ElapsedTime / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
         float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
-        client.print(String(iJob) + "," + String(HashRate) + ",ESP Miner v2.3", + String(rigname)); // Send result to server
+        client.print(String(iJob) + "," + String(HashRate) + ",ESP Miner v2.3," + String(rigname)); // Send result to server
 
         String feedback = client.readStringUntil('D'); // Receive feedback
         Shares++;
