@@ -97,6 +97,7 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
+*   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) by Alicia426
 *   [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch
 *   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) by DarkThinking
 *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) by phantom32
