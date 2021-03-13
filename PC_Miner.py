@@ -19,7 +19,6 @@ def install(package):
 def now():
     return datetime.datetime.now()
 
-
 try:  # Check if cpuinfo is installed
     import cpuinfo
     from multiprocessing import freeze_support

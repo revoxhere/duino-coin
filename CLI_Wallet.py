@@ -86,6 +86,24 @@ def _derive_key(password: bytes, salt: bytes, iterations: int = iterations) -> b
     return b64e(kdf.derive(password))
 
 
+def print_command(name,desc):
+    print(" " + Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + name + Style.RESET_ALL + desc)
+
+# Here, we want to print the command names and description using a json file
+def print_commands_norm():
+    with open('Resources/cli_wallet_commands.json') as f:
+        data = json.load(f)
+        for key, value in data.items():
+            if key == "wrapper_commands":
+                break
+            print_command(key,value)
+            
+def print_commands_wrapper():
+    with open('Resources/cli_wallet_commands.json') as f:
+        data = json.load(f)
+        for key in data["wrapper_commands"]:
+            print_command(key,data["wrapper_commands"][key])
+            
 def password_encrypt(message: bytes, password: str, iterations: int = iterations) -> bytes:
     salt = secrets.token_bytes(16)
     key = _derive_key(password.encode(), salt, iterations)
@@ -136,7 +154,8 @@ while True: # Grab data grom GitHub section
                     ducofiat = 0.0025 # If json api request fails, wallet will use this value
                 break # If connection was established, continue
     
-            except: # If it wasn't, display a message
+            except Exception as e: # If it wasn't, display a message
+                print(e)
                 print(Style.RESET_ALL + Fore.RED + "Cannot connect to the server. It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.")
                 time.sleep(15)
                 os.execl(sys.executable, sys.executable, *sys.argv)
@@ -557,19 +576,9 @@ while True:
 
             else:
                 print(Style.RESET_ALL + Fore.YELLOW + " DUCO commands:")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " help" + Style.RESET_ALL + " - shows this help message")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " refresh" + Style.RESET_ALL + " - refresh balance")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " send" + Style.RESET_ALL + " - send funds")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " changepass" + Style.RESET_ALL + " - changes account password")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " exit" + Style.RESET_ALL + " - exit Duino-Coin wallet")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " about" + Style.RESET_ALL + " - displays about message")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " donate" + Style.RESET_ALL + " - donate to developpers/maintainers of the program")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " logout" + Style.RESET_ALL + " - logs off the user\n")
+                
+                print_commands_norm()
+                
                 print(Style.RESET_ALL + Fore.YELLOW + " Wrapper-related commands:")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " wsend" + Style.RESET_ALL + " - sends wDUCO via tron - you should have some TRX or tron energy for txn fees")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " wrapperconf" + Style.RESET_ALL + " - set wrapper config")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " wrap" + Style.RESET_ALL + " - wrap DUCO on tron")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " unwrap" + Style.RESET_ALL + " - unwrap wDUCO - you should have some TRX or tron energy for txn fees")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " cancelunwrap" + Style.RESET_ALL + " - sends back pending unwrap values to wallet - you should have some trx or tron energy for txn fees")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " finishunwraps" + Style.RESET_ALL + " - completes pending unwraps")
-                print(Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + " exportwrapkey" + Style.RESET_ALL + " - exports wrapper private key")
+
+                print_commands_wrapper()
