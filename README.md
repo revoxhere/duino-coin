@@ -48,12 +48,12 @@
     </td>
     <td>
       Coin supply: Infinite ♾️ (before December 2020: 350k coins)<br>
-      Premine: <5k blocks (<500coins) 😎<br>
+      Premine: <5k blocks (<500 coins) 😎<br>
       Transaction time: Instant ⚡<br>
       Decimals: 20 🔢<br>
       Ticker: DUCO (ᕲ)<br>
       Algorithms: DUCO-S1, DUCO-S1A (+more planned)<br>
-      Rewards: supported by <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png">Kolka system</a> helping reward miners fairly ♐<br>
+      Rewards: supported by <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png">Kolka system</a> helping to reward miners fairly ♐<br>
     </td>
   </tr>
 </table>
@@ -75,13 +75,13 @@ Official getting started guides for creating an account and setting up miners on
 
 <h3 align="center">Installing Duino-Coin</h2><br>
 
-The easiest way to get started with Duino-Coin is to download [latest release](https://github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
+The easiest way to get started with Duino-Coin is to download [the latest release](https://github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
 After downloading, unzip it and launch the desired program.<br>
-No dependencies required.
+There are no dependencies required.
 
 <hr>
 
-If you want to run the programs from source, you may need to install some dependencies, here's how to do it on debian-based distros:
+If you want to run the programs from source, you may need to install some dependencies. Here's how to do it on debian-based distros:
 ```BASH
 sudo apt install python3 python3-pip git
 git clone https://github.com/revoxhere/duino-coin
@@ -136,35 +136,35 @@ To start communication however, firstly you need to connect to the server. For n
 *   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static: `ws://51.15.127.80:15808`
 
 **Make sure you don't create more than 24 connections per IP address and don't make more than 24 connections in time shorter than 30 seconds.**
-If you do that, server may ban your IP for creating too much traffic and being a potential DDoS attacker.
+If you do that, the server may ban your IP for creating too much traffic and being a potential DDoS attacker.
 If you happen to get banned, wait about 315 seconds to get unbanned automatically.
 
-After connecting, the server will send version number it's currently on (2.2).
+After connecting, the server will send its version number it's currently on (2.2).
 At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
 To login, send `LOGI,username,password` - replace username and password with credentials. After sucessfull login server will send `OK`.
 If login fails, server will send `NO,Reason of failed login`.
 
-To register, send `REGI,username,password,email` - again, by replacing words with respective data.
-After sucessfull registration server will send `OK`.
-If registration fails, server will send `NO,Reason of failed registration`.
+To register, send `REGI,username,password,email` - again, by replacing the placeholders with the respective data.
+After sucessful registration, the server will send `OK`.
+If the registration fails, the server will send `NO,Reason of failed registration`.
 
 After loging-in you have access to the following commands:
 *   `BALA` - Server will return balance of current user
 *   `JOB` - Server will return job for mining
     *   You can also use `JOB,username` to mine without loging-in
 
-    *   You can ask for a specific difficulty for mining: `JOB,username,DIFF` (**if you don't ask for specific difficulty, you'll get the network diff**) where diff is one of the below:
+    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (**if you don't ask for a specific difficulty, you'll get the network diff**) where diff is one of the below:
         * `AVR`     - diff      3 - used for official AVR boards mining
         * `ESP`     - diff     75 - used for official ESP boards mining
         * `ESP32`   - diff    100 - used for official ESP boards mining
-        * `MEDIUM`  - diff    30k - used as lower-diff PC mining
-        * `EXTREME` - diff   950k - for custom high performance miners
+        * `MEDIUM`  - diff    30k - used for lower-diff PC mining
+        * `EXTREME` - diff   950k - used for custom high performance miners
     
-    *   When sending result, you can pass hashrate count and miner name along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, hashrate was 250000H/s (250kH/s) and software name was My Cool Miner v4.20 with rig named House Miner
+    *   When sending the mining result, you can pass the hashrate count and the name of the miner along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s) and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner"
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
         *   If software name is not received, server uses `"Software": "Unknown"` in the API
         *   If rig name is not received, server uses `"Identifier": "None"` in the API
-*   `SEND,-,recipientUsername,amount` - Send funds to someone, server will return a message about state of the transaction
+*   `SEND,-,recipientUsername,amount` - Send funds to someone, the server will return a message about the state of the transaction
 *   `GTXL,username,num` - Get last *num* of transactions involving *username* (both deposits and withdrawals)
 *   `CHGP,oldPassword,newPassword` - Change password of current user
 *   `WRAP,amount,tronAddress` - Wrap DUCO on Tron network (wDUCO)
@@ -184,11 +184,11 @@ You can use one of the following links to get API info from Duino-Coin Server:
 
 <h2 align="center">C DUCO library</h2><br>
 
-If you want to easily access Duino-Coin API with your C apps, there is [libduco](https://github.com/SarahIsWeird/libduco) made by [@Sarah](https://github.com/SarahIsWeird/). [@ygboucherk](https://github.com/ygboucherk) is also working on one wich you can access here [duino-coin-C-lib](https://github.com/ygboucherk/duino-coin-C-lib)
+If you want to easily access the Duino-Coin API with your C apps, you can use [libduco](https://github.com/SarahIsWeird/libduco) which is made by [@Sarah](https://github.com/SarahIsWeird/). [@ygboucherk](https://github.com/ygboucherk) is also working on one wich you can access here [duino-coin-C-lib](https://github.com/ygboucherk/duino-coin-C-lib)
 
 <h2 align="center">Python3 DUCO API module</h2><br>
 
-If you want to easily access Duino-Coin API with your Python3 apps, [@connorhess](https://github.com/connorhess) made an official module for that here: [duco_api.py](https://github.com/revoxhere/duino-coin/blob/master/duco_api/duco_api.py) and you can find the documentation for it here: [README.md](https://github.com/revoxhere/duino-coin/blob/master/duco_api/README.md)
+If you want to easily access the Duino-Coin API with your Python3 apps, [@connorhess](https://github.com/connorhess) made an official module for that here: [duco_api.py](https://github.com/revoxhere/duino-coin/blob/master/duco_api/duco_api.py) and you can find the documentation for it here: [README.md](https://github.com/revoxhere/duino-coin/blob/master/duco_api/README.md)
 
 <h2 align="center">Duino-coin for the AUR</h2><br>
 
@@ -245,14 +245,14 @@ Hashrate Calculators for AVR/ESP8266 platforms are available in the [Useful tool
 
 <h2 align="center">Terms of usage</h2><br>
 1. Duino-Coins are earned by miners with a process called mining.<br/>
-2. Mining is described as using DUCO-S1 algorithm (explained in Duino-Coin Whitepaper), in which finding a correct result to a mathematical problem gives miner a reward.<br/>
-3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the preffered usage of official miners (other officially allowed miners are described in the upper part of README). <br/>
+2. Mining is described as using DUCO-S1 algorithm (explained in the Duino-Coin Whitepaper), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
+3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README). <br/>
 4. Even though Duino-Coin aims to fairly reward all the miners, mining with GPUs, ASICs, FPGAs is not allowed due to obvious reasons.<br/>
 5. Any users spotted using inappropriate/overpowered hardware can be banned from the network.<br/>
-6. Banning involves blocking user from accessing his account and removing his coins.<br/>
-7. Only coins earned legally are elgible for the exchange.<br/>
+6. Banning involves blocking the user from accessing his account and accessing his coins.<br/>
+7. Only coins earned legally are eligible for the exchange.<br/>
 8. These terms of usage can change at any time without prior notice and will be expanded in the future.<br/>
-9. User using Duino-Coin agrees to comply with the above rules.<br/>
+9. Users using Duino-Coin agree to comply with the above rules.<br/>
 
 <h2 align="center">Developers</h2><br>
 
