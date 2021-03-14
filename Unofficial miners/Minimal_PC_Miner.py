@@ -5,8 +5,8 @@ import socket, hashlib, urllib.request, time, os, sys  # Only python3 included l
 soc = socket.socket()
 soc.settimeout(10)
 
-username = "your username here"  # Edit this to your username, mind the quotes
-UseLowerDiff = False  # Set it to True to mine with lower difficulty
+username = "enter your username here"  # Edit this to your username, mind the quotes
+UseLowerDiff = True  # Set it to True to mine with lower difficulty
 
 while True:
     try:
@@ -37,6 +37,7 @@ while True:
             job = job.split(",")  # Split received data to job (job and difficulty)
             difficulty = job[2]
 
+            hashingStartTime = time.time()
             for result in range(
                 100 * int(difficulty) + 1
             ):  # Calculate hash with difficulty
@@ -44,15 +45,18 @@ while True:
                     str(job[0] + str(result)).encode("utf-8")
                 ).hexdigest()  # Generate hash
                 if job[1] == ducos1:  # If result is even with job
+                    hashingStopTime = time.time()
+                    difference = hashingStopTime - hashingStartTime
+                    hashrate = result / difference
                     soc.send(
-                        bytes(str(result) + ",,Minimal_PC_Miner", encoding="utf8")
+                        bytes(str(result) + "," + str(hashrate) + ",Minimal_PC_Miner", encoding="utf8")
                     )  # Send result of hashing algorithm to pool
                     feedback = soc.recv(1024).decode()  # Get feedback about the result
                     if feedback == "GOOD":  # If result was good
-                        print("Accepted share", result, "Difficulty", difficulty)
+                        print("Accepted share", result, "Hashrate", int(hashrate/1000), "kH/s", "Difficulty", difficulty)
                         break
                     elif feedback == "BAD":  # If result was bad
-                        print("Rejected share", result, "Difficulty", difficulty)
+                        print("Rejected share", result, "Hashrate", int(hashrate/1000), "kH/s", "Difficulty", difficulty)
                         break
     except Exception as e:
         print("Error occured: " + str(e) + ", restarting in 5s.")
