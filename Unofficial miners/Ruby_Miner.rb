@@ -4,8 +4,9 @@ require 'socket'
 require 'digest'
 require 'net/http'
 require 'json' # Only default ruby libraries
+require 'time'
 
-username = "username" # Replace this with your username
+username = "your username here" # Replace this with your username
 
 $VERBOSE = nil # Disable debug output
 url = 'https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt'
@@ -20,17 +21,22 @@ SERVER_VER = s.gets(3) # Read server version
 puts "Server is on version " + SERVER_VER
 
 loop do # Mining loop
-	s.puts("JOB,"+String(username)) # Send job request
-	job = s.read(86) # Read job
+	s.puts("JOB,"+String(username)+",MEDIUM,") # Send job request
+	job = s.read(87) # Read job
 	job = job.split(',') # Split into previous block hash, result hash and difficulty
 	difficulty = job[2]
+    
+    timeStart = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 	for result in 0..100 * Integer(difficulty) + 1 do # Find the numeric result
 		sha1 = Digest::SHA1.hexdigest String(String(job[0])+String(result)) # By checking if last block hash + n is result hash
 		if sha1 == String(job[1]) # If result is found
-			s.write(result) # Send numeric result to the server
+            timeStop = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+            timeDiff = timeStop - timeStart
+            hashrate = result / timeDiff
+			s.write(String(result) + "," + String(hashrate)) # Send numeric result to the server
 			SHAREFEED = s.read(4) # And receive result feedback
 			if SHAREFEED == "GOOD" or SHAREFEED == "BLOCK" # Check wheter it was accepted or not
-				puts "Accepted share " + String(result) + " (Difficulty " + String(difficulty) + ")"
+				puts "Accepted share " + String(result) + " Hashrate " + String(Integer(hashrate / 1000)) + "kH/s Difficulty " + String(difficulty)
 				break
 			if SHAREFEED == "INVU"
 				puts "Invalid username!"
