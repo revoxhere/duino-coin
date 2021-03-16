@@ -97,6 +97,7 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
+*   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) by PhereloHD & HGEpro
 *   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) by Alicia426
 *   [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch
 *   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) by DarkThinking
