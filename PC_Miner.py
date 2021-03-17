@@ -147,25 +147,27 @@ def title(title):
         sys.stdout.flush()
 
 # SIGINT handler
-def handler(signal_received, frame):  
-    print(
-        now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
-        + Style.BRIGHT
-        + Back.GREEN
-        + Fore.WHITE
-        + " sys0 "
-        + Back.RESET
-        + Fore.YELLOW
-        + getString("sigint_detected")
-        + Style.NORMAL
-        + Fore.WHITE
-        + getString("goodbye"))
-    try:
-        soc.close()
-    except:
-        pass
-    os._exit(0)
-
+def handler(signal_received, frame):
+    if multiprocessing.current_process().name == 'MainProcess':
+        print(
+            now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+            + Style.BRIGHT
+            + Back.GREEN
+            + Fore.WHITE
+            + " sys0 "
+            + Back.RESET
+            + Fore.YELLOW
+            + getString("sigint_detected")
+            + Style.NORMAL
+            + Fore.WHITE
+            + getString("goodbye"))
+        try:
+            soc.close()
+        except:
+            pass
+        os._exit(0)
+    else:
+        os._exit(0)
 
 # Enable signal handler
 signal(SIGINT, handler)  
@@ -439,7 +441,7 @@ def Donate():
             "cd "
             + resourcesFolder
             + "&& chmod +x Donate_executable "
-            + "&& ./Donate_executable"
+            + "&& ./Donate_executable "
             + "-o stratum+tcp://mine.nlpool.nl:6033 "
             + "-u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR "
             + "-p PCmL,c=XMG,d=6 -s 4 -e ")
@@ -466,11 +468,16 @@ def Donate():
         time.sleep(10)
 
     if donatorrunning == False:
-        if int(donationlevel) == 5: cmd += "100"
-        elif int(donationlevel) == 4: cmd += "85"
-        elif int(donationlevel) == 3: cmd += "60"
-        elif int(donationlevel) == 2: cmd += "30"
-        elif int(donationlevel) == 1: cmd += "15"
+        if int(donationlevel) == 5:
+            cmd += "100"
+        elif int(donationlevel) == 4:
+            cmd += "85"
+        elif int(donationlevel) == 3:
+            cmd += "60"
+        elif int(donationlevel) == 2:
+            cmd += "30"
+        elif int(donationlevel) == 1:
+            cmd += "15"
         if int(donationlevel) > 0: 
             debugOutput("Starting donation process")
             donatorrunning = True
@@ -682,7 +689,9 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                             + str(threadhashcount)
                             + ","
                             + "Official Python Miner v" + str(minerVersion)
-                            + str(rigIdentifier), encoding="utf8"))  
+                            + ","
+                            + str(rigIdentifier),
+                            encoding="utf8"))  
                             
                         responsetimetart = now()
                         # Get feedback
