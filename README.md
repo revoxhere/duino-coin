@@ -29,41 +29,34 @@
 
 <h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards and many more.</h2><br />
 
-<table>
+<table align="center">
   <tr>
     <th>Key features</th>
     <th>Technical specifications</th>
   </tr>
   <tr>
     <td>
-      Supported by a large number of platforms 💻<br>
-      A friendly & growing community 👥<br>
-      Easy to use & exchange 💱<br>
-      Available everywhere 🌎<br>
-      Fully original project :new:<br>
-      Beginner-friendly :blush:<br>
-      Cost-effective 💰<br>
-      Easy to mine ⛏️<br>
-      Open-source 📚<br>
+      💻 Supported by a large number of platforms<br>
+      👥 A friendly & growing community<br>
+      💱 Easy to use & exchange<br>
+      🌎 Available everywhere<br>
+      :new: Fully original project<br>
+      :blush: Beginner-friendly<br>
+      💰 Cost-effective<br>
+      ⛏️ Easy to mine<br>
+      📚 Open-source<br>
     </td>
     <td>
-      Coin supply: Infinite ♾️ (before December 2020: 350k coins)<br>
-      Premine: <5k blocks (<500 coins) 😎<br>
-      Transaction time: Instant ⚡<br>
-      Decimals: 20 🔢<br>
-      Ticker: DUCO (ᕲ)<br>
-      Algorithms: DUCO-S1, DUCO-S1A (+more planned)<br>
-      Rewards: supported by <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png">Kolka system</a> helping to reward miners fairly ♐<br>
+      ♾️ Coin supply: Infinite (before December 2020: 350k coins)<br>
+      😎 Premine: <5k blocks (<500 coins)<br>
+      ⚡ Transaction time: Instant<br>
+      🔢 Decimals: 7-9 (up to 20 when needed)<br>
+      🔤 Ticker: DUCO (ᕲ)<br>
+      ⚒️ Algorithms: DUCO-S1, DUCO-S1A (+more planned)<br>
+      ♐ Rewards: supported by <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png">Kolka system</a> helping to reward miners fairly<br>
     </td>
   </tr>
 </table>
-
-
-
-
-
-
-
 
 <h2 align="center">Get started</h2><br>
 
@@ -94,6 +87,20 @@ py -m pip install -r requirements.txt
 ```
 After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py` OR `py PC_Miner.py`). 
 
+<hr>
+
+You can also get the whole Duino-Coin bundle on the AUR - just install it with your favourite AUR Helper:
+
+```BASH
+sudo pacman -S git
+sudo git clone https://aur.archlinux.org/yay-git.git
+cd yay-git
+makepkg -si
+yay -S duino-coin
+```
+
+Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD).
+
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
@@ -119,7 +126,7 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 
 This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
 
-<h2 align="center">Contributing</h2><br>
+<h2 align="center">Development</h2><br>
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create.
 Any contributions you make are greatly appreciated.
@@ -130,123 +137,21 @@ Any contributions you make are greatly appreciated.
 *   Make sure everything works as intended
 *   Open a pull request
 
-<h2 align="center">Master server API</h2><br>
+Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch. 
 
-If needed, master server source code is available in a separate brach: [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools).
-To build your own Duino-Coin apps, here's a list of of commands the master server accepts.
-To start communication however, firstly you need to connect to the server. For now you have two options:
-*   TCP connection (recommended) - server IP and port are static: `tcp://51.15.127.80:2811`
-*   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static: `ws://51.15.127.80:15808`
 
-**Make sure you don't create more than 24 connections per IP address and don't make more than 24 connections in time shorter than 30 seconds.**
-If you do that, the server may ban your IP for creating too much traffic and being a potential DDoS attacker.
-If you happen to get banned, wait about 315 seconds to get unbanned automatically.
+<h2 align="center">Some officially tested devices</h2><br>
 
-After connecting, the server will send its version number it's currently on (2.2).
-At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
-To login, send `LOGI,username,password` - replace username and password with credentials. After sucessfull login server will send `OK`.
-If login fails, server will send `NO,Reason of failed login`.
+*   Arduino Pro Mini / Uno / Nano (ATmega328p @ 16 MHz 5V) - ~170 H/s
+*   NodeMCU (ESP8266 @ 160 MHz) - ~2.6 kH/s (~1.6 kH/s at 80 MHz clock)
+*   ESP32 (dual-threaded) - ~13 kH/s (6 kH/s (core1) + 7 kH/s (core2)) (WIP)
 
-To register, send `REGI,username,password,email` - again, by replacing the placeholders with the respective data.
-After sucessful registration, the server will send `OK`.
-If the registration fails, the server will send `NO,Reason of failed registration`.
-
-After loging-in you have access to the following commands:
-*   `BALA` - Server will return balance of current user
-*   `JOB` - Server will return job for mining
-    *   You can also use `JOB,username` to mine without loging-in
-
-    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (**if you don't ask for a specific difficulty, you'll get the network diff**) where diff is one of the below:
-        * `AVR`     - diff      3 - used for official AVR boards mining
-        * `ESP`     - diff     75 - used for official ESP boards mining
-        * `ESP32`   - diff    100 - used for official ESP32 boards mining
-        * `LOW`     - diff   8.5k - used for official Web Miner
-        * `MEDIUM`  - diff    30k - used for lower-diff PC mining
-        * `NET`     - diff   ~70k - used for PC mining - network difficulty
-        * `EXTREME` - diff   950k - not used anywhere officially
-    
-    *   When sending the mining result, you can pass the hashrate count and the name of the miner along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s) and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner"
-        *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
-        *   If software name is not received, server uses `"Software": "Unknown"` in the API
-        *   If rig name is not received, server uses `"Identifier": "None"` in the API
-*   `SEND,-,recipientUsername,amount` - Send funds to someone, the server will return a message about the state of the transaction
-*   `GTXL,username,num` - Get last *num* of transactions involving *username* (both deposits and withdrawals)
-*   `CHGP,oldPassword,newPassword` - Change password of current user
-*   `WRAP,amount,tronAddress` - Wrap DUCO on Tron network (wDUCO)
-*    wDUCO unwrapping protocol:
-     1.  Send a Tron transaction with method `initiateWithdraw(ducoUsername,amount)`
-     2.  Send a server call `UNWRAP,amount,tronAddress`
-
-<br>
-
-<h3 align="center">Master server HTTP JSON API</h3><br>
-
-You can use one of the following links to get some data from Duino-Coin Server:
-*   General statistics & worker API: [api.json](http://51.15.127.80/api.json) - refreshed every 5s
-*   User balances API: [balances.json](http://51.15.127.80/balances.json) - refreshed every 30s
-*   Transactions API: [transactions.json](http://51.15.127.80/transactions.json) - refreshed every 30s
-*   Found blocks API: [foundBlocks.json](http://51.15.127.80/foundBlocks.json) - refreshed every 2m
-
-<h2 align="center">C DUCO library</h2><br>
-
-If you want to easily access the Duino-Coin API with your C apps, you can use [libduco](https://github.com/SarahIsWeird/libduco) which is made by [@Sarah](https://github.com/SarahIsWeird/). [@ygboucherk](https://github.com/ygboucherk) is also working on one wich you can access here [duino-coin-C-lib](https://github.com/ygboucherk/duino-coin-C-lib)
-
-<h2 align="center">Python3 DUCO API module</h2><br>
-
-If you want to easily access the Duino-Coin API with your Python3 apps, [@connorhess](https://github.com/connorhess) made an official module for that here: [duco_api.py](https://github.com/revoxhere/duino-coin/blob/master/duco_api/duco_api.py) and you can find the documentation for it here: [README.md](https://github.com/revoxhere/duino-coin/blob/master/duco_api/README.md)
-
-<h2 align="center">Duino-coin for the AUR</h2><br>
-
-You can get the whole duino-coin bundle now on the AUR - just install it with your favourite AUR Helper (for example using **yay**):
-
-1.  Install git (if you haven't already)
-
-```BASH
-sudo pacman -S git
-```
-
-2.  Clone the yay repo
-
-```BASH
-sudo git clone https://aur.archlinux.org/yay-git.git
-cd yay-git
-```
-
-3.  Build the package using the makepkg
-
-```BASH
-makepkg -si
-```
-
-4.  Use yay to install AUR package
-
-```BASH
-yay -S duino-coin
-```
-
-Have fun mining!
+Hashrate Calculators for AVR/ESP8266 platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
 
 <h2 align="center">License</h2><br>
 
 Duino-Coin is mostly distributed under the MIT License. See `LICENSE` file for more information.
-
-Major frameworks used by Duino-Coin:
-*   [cryptosuite2](https://github.com/daknuett/cryptosuite2) - Arduino SHA1 hashing
-*   [Hash.h library](https://github.com/esp8266/Arduino/blob/master/libraries/Hash/src/Hash.h) - ESP8266 SHA1 hashing
-*   [pySerial](https://pythonhosted.org/pyserial/) - Arduino and Python communication
-*   [auto-py-to-exe](https://pypi.org/project/auto-py-to-exe/) - creating executables
-*   [PyGithub](https://github.com/PyGithub/PyGithub) - pool statistics API integration
-*   [m-cpuminer-v2](https://github.com/m-pays/m-cpuminer-v2/) - Developer donation
-
-<h2 align="center">Officially tested devices</h2><br>
-
-*   Arduino Uno Rev3 (ATmega328p @ 16MHz 5V) - ~170 H/s - Arduino Code & Miner
-*   Arduino Pro Mini (ATmega328p @ 16MHz 5V) - ~170 H/s - Arduino Code & Miner
-*   NodeMCU (ESP8266 @ 80 MHz) - ~1.6 kH/s - ESP8266 Code
-*   NodeMCU (ESP8266 @ 160 MHz) - ~2.6 kH/s - ESP8266 Code
-*   ESP32 dual-threaded - ~13 kH/s (6 kH/s (core1) + 7 kH/s (core2)) - Multithreaded ESP32 code (WIP)
-
-Hashrate Calculators for AVR/ESP8266 platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
+Some third-party included files may have different licenses - please check their `LICENSE` statements.
 
 <h2 align="center">Terms of usage</h2><br>
 1. Duino-Coins are earned by miners with a process called mining.<br/>
