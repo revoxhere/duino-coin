@@ -19,11 +19,11 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
-const char* password = "Your WiFi password"; // Change this to your WiFi password
-const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
-const char* rigname  = "ESP32"; // Change this if you want to display a custom rig name in the Wallet
-#define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
+const char* ssid     = "Your WiFi SSID";            // Change this to your WiFi SSID
+const char* password = "Your WiFi password";        // Change this to your WiFi password
+const char* ducouser = "Your Duino-Coin username";  // Change this to your Duino-Coin username
+const char* rigname  = "ESP32";                     // Change this if you want to display a custom rig name in the Wallet
+#define LED_BUILTIN     2                           // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include "mbedtls/md.h" // Include software hashing library
 #include "hwcrypto/sha.h" // Include hardware accelerated hashing library
@@ -60,8 +60,9 @@ void Task1code( void * pvParameters ){
     Serial.println();
     client1.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
 
-    String hash1 = client1.readStringUntil(','); // Read last block hash
-    String job1 = client1.readStringUntil(','); // Read expected hash
+    String       hash1 = client1.readStringUntil(','); // Read data to the first peroid - last block hash
+    String        job1 = client1.readStringUntil(','); // Read data to the next peroid - expected hash
+    unsigned int diff1 = client.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
     job1.toUpperCase();
     const char * c = job1.c_str();
 
@@ -72,7 +73,7 @@ void Task1code( void * pvParameters ){
         job11[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
     
     byte shaResult1[20];
-    unsigned long diff1 =  10001; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
+
     Serial.println("CORE1 Job received: " + String(hash1) + " " + String(job1) + " " + String(diff1));
     Serial.println();
     unsigned long StartTime1 = micros(); // Start time measurement
@@ -94,9 +95,9 @@ void Task1code( void * pvParameters ){
         float ElapsedTimeSeconds1 = ElapsedTimeMiliSeconds1 / 1000; // Convert to seconds
         float HashRate1 = iJob1 / ElapsedTimeSeconds1; // Calculate hashrate
         client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.3," + String(rigname)); // Send result to server
-        String feedback1 = client1.readStringUntil('D'); // Receive feedback
+        String feedback1 = client1.readStringUntil('\n'); // Receive feedback
         Shares1++;
-        Serial.println(String(feedback1) + "D share #" + String(Shares1) + " (" + String(iJob1) + ")" + " Hashrate: " + String(HashRate1) + " Free RAM: " + String(ESP.getFreeHeap()));
+        Serial.println(String(feedback1) + " share #" + String(Shares1) + " (" + String(iJob1) + ")" + " Hashrate: " + String(HashRate1) + " Free RAM: " + String(ESP.getFreeHeap()));
         break; // Stop and ask for more work
       }
     }  
@@ -126,13 +127,15 @@ void Task2code( void * pvParameters ){
   digitalWrite(LED_BUILTIN, HIGH);   // Turn off built-in led
   delay(150);
   digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
+  
   while (client.connected()) {
     Serial.println("CORE2 Asking for a new job for user: " + String(ducouser));
     Serial.println();
     client.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
 
-    String hash = client.readStringUntil(','); // Read last block hash
-    String job = client.readStringUntil(','); // Read expected hash
+    String       hash = client.readStringUntil(','); // Read data to the first peroid - last block hash
+    String        job = client.readStringUntil(','); // Read data to the next peroid - expected hash
+    unsigned int diff = client.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
     job.toUpperCase();
     const char * c = job.c_str();
 
@@ -143,7 +146,7 @@ void Task2code( void * pvParameters ){
         job1[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
     
     byte shaResult[20];
-    unsigned long diff =  10001; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
+    
     Serial.println("CORE2 Job received: " + String(hash) + " " + String(job) + " " + String(diff));
     Serial.println();
     unsigned long StartTime = micros(); // Start time measurement
@@ -172,9 +175,9 @@ void Task2code( void * pvParameters ){
         float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
         float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
         client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.3," + String(rigname)); // Send result to server
-        String feedback = client.readStringUntil('D'); // Receive feedback
+        String feedback = client.readStringUntil('\n'); // Receive feedback
         Shares++;
-        Serial.println(String(feedback) + "D share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
+        Serial.println(String(feedback) + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
         break; // Stop and ask for more work
       }
     }  
