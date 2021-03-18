@@ -23,8 +23,6 @@
     <img src="https://img.shields.io/badge/License-MIT-f97606.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/releases/tag/2.2">
     <img src="https://img.shields.io/badge/release-2.2-fb6404.svg?style=for-the-badge" /></a>
-  <!--<a href="https://bitcointalk.org/index.php?topic=5197656.msg52942015#msg52942015">
-    <img src="https://img.shields.io/badge/Bitcointalk-555555.svg?style=for-the-badge&logo=bitcoin" /></a> bitcointalk thread is VERY outdated-->
 </p>
 
 <h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards and many more.</h2><br />
@@ -64,7 +62,7 @@
 :----------------:|:----------------:
 [<img src="https://i.imgur.com/OEh0JxK.png">](https://duinocoin.com/getting-started#register)  |  [<img src="https://i.imgur.com/QNWkoee.png">](https://duinocoin.com/getting-started#pc)
 
-Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a> (or <a href="http://duinoyliedtvs4zp7wtz2o7uqmv4tfcyvdlclbwr3zbez2hxwolry7ad.onion/">.onion version</a>).
+#### Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a>.
 
 <h3 align="center">Installing Duino-Coin</h2><br>
 
