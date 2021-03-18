@@ -159,6 +159,7 @@ After loging-in you have access to the following commands:
         * `AVR`     - diff      3 - used for official AVR boards mining
         * `ESP`     - diff     75 - used for official ESP boards mining
         * `ESP32`   - diff    100 - used for official ESP boards mining
+        * `LOW`     - diff   8.5k - used for official Web Miner
         * `MEDIUM`  - diff    30k - used for lower-diff PC mining
         * `EXTREME` - diff   950k - used for custom high performance miners
     
