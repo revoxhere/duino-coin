@@ -132,6 +132,7 @@ Any contributions you make are greatly appreciated.
 
 <h2 align="center">Master server API</h2><br>
 
+If needed, master server source code is available in a separate brach: [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools).
 To build your own Duino-Coin apps, here's a list of of commands the master server accepts.
 To start communication however, firstly you need to connect to the server. For now you have two options:
 *   TCP connection (recommended) - server IP and port are static: `tcp://51.15.127.80:2811`
@@ -178,12 +179,12 @@ After loging-in you have access to the following commands:
 
 <br>
 
-<h3 align="center">Master server HTML API</h3><br>
+<h3 align="center">Master server HTTP JSON API</h3><br>
 
-You can use one of the following links to get API info from Duino-Coin Server:
+You can use one of the following links to get some data from Duino-Coin Server:
 *   General statistics & worker API: [api.json](http://51.15.127.80/api.json) - refreshed every 5s
 *   User balances API: [balances.json](http://51.15.127.80/balances.json) - refreshed every 30s
-*   Transactions API: [transactions.json](http://51.15.127.80/transactions.json) - refreshed every 2m
+*   Transactions API: [transactions.json](http://51.15.127.80/transactions.json) - refreshed every 30s
 *   Found blocks API: [foundBlocks.json](http://51.15.127.80/foundBlocks.json) - refreshed every 2m
 
 <h2 align="center">C DUCO library</h2><br>
@@ -241,9 +242,9 @@ Major frameworks used by Duino-Coin:
 
 *   Arduino Uno Rev3 (ATmega328p @ 16MHz 5V) - ~170 H/s - Arduino Code & Miner
 *   Arduino Pro Mini (ATmega328p @ 16MHz 5V) - ~170 H/s - Arduino Code & Miner
-*   NodeMCU (ESP8266 @ 80 MHz) - ~1,15 kH/s - ESP8266 Code
-*   NodeMCU (ESP8266 @ 160 MHz) - ~2,15 kH/s - ESP8266 Code
-*   ESP32 dual-threaded - ~13 kH/s (6 kH/s (core1) + 7 kH/s (core2)) - Multithreaded ESP32 code
+*   NodeMCU (ESP8266 @ 80 MHz) - ~1.6 kH/s - ESP8266 Code
+*   NodeMCU (ESP8266 @ 160 MHz) - ~2.6 kH/s - ESP8266 Code
+*   ESP32 dual-threaded - ~13 kH/s (6 kH/s (core1) + 7 kH/s (core2)) - Multithreaded ESP32 code (WIP)
 
 Hashrate Calculators for AVR/ESP8266 platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
 
