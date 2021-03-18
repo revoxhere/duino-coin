@@ -19,11 +19,11 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
-const char* password = "Your WiFi password"; // Change this to your WiFi password
-const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
-const char* rigname  = "ESP8266"; // Change this if you want to display a custom rig name in the Wallet
-#define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
+const char* ssid          = "Wifi Name";      // Change this to your WiFi SSID
+const char* password      = "Wifi Password";  // Change this to your WiFi password
+const char* ducouser      = "DUCO Username";  // Change this to your Duino-Coin username
+const char* rigIdentifier = "ESP8266";        // Change this if you want a custom miner name
+#define LED_BUILTIN         2                 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
 #include <ESP8266mDNS.h> // OTA libraries
@@ -104,13 +104,12 @@ void loop() {
     ArduinoOTA.handle(); // Enable OTA handler
     Serial.println("Asking for a new job for user: " + String(ducouser));
     client.print("JOB," + String(ducouser) + ",ESP"); // Ask for new job
-
-    String hash = client.readStringUntil(','); // Read last block hash
-    String job = client.readStringUntil(','); // Read expected hash
-    unsigned int diff =  (1500) * 100 + 1; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
+    String       hash = client.readStringUntil(','); // Read data to the first peroid - last block hash
+    String        job = client.readStringUntil(','); // Read data to the next peroid - expected hash
+    unsigned int diff = client.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
     Serial.println("Job received: " + String(hash) + " " + String(job) + " " + String(diff));
+    
     unsigned long StartTime = micros(); // Start time measurement
-
     for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
       ArduinoOTA.handle(); // Enable OTA handler
       yield(); // uncomment if ESP watchdog triggers
@@ -121,11 +120,11 @@ void loop() {
         float ElapsedTimeMiliSeconds = ElapsedTime / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
         float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
-        client.print(String(iJob) + "," + String(HashRate) + ",ESP Miner v2.3," + String(rigname)); // Send result to server
+        client.print(String(iJob) + "," + String(HashRate) + ",ESP Miner v2.3," + String(rigIdentifier)); // Send result to server
 
-        String feedback = client.readStringUntil('D'); // Receive feedback
+        String feedback = client.readStringUntil('\n'); // Receive feedback
         Shares++;
-        Serial.println(String(feedback) + "D share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
+        Serial.println(String(feedback) + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
         digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
         delay(3); // Wait shortly so LED flash isn't distracting
         digitalWrite(LED_BUILTIN, HIGH); // Turn off built-in led
