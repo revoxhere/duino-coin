@@ -82,6 +82,7 @@ serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/
 config = configparser.ConfigParser()
 donationlevel = 0
 hashrate = 0
+global connectionMessageShown
 connectionMessageShown = False
 
 # Create resources folder if it doesn't exist
@@ -144,6 +145,131 @@ def title(title):
     else:
         print("\33]0;" + title + "\a", end="")
         sys.stdout.flush()
+
+# server connection
+def Connect():
+    global masterServer_address, masterServer_port, connectionMessageShown
+    while True:
+        try:
+            try:
+                socId.close()
+            except:
+                pass
+            debugOutput("Connecting to " + str(masterServer_address) + str(":") + str(masterServer_port))
+            socId = socket.socket()
+            # Establish socket connection to the server
+            socId.connect((str(masterServer_address), int(masterServer_port)))
+            serverVersion = socId.recv(3).decode()  # Get server version
+            debugOutput("Server version: " + serverVersion)
+            if (float(serverVersion) <= float(minerVersion)and len(serverVersion) == 3 and connectionMessageShown != True):
+                # If miner is up-to-date, display a message and continue
+                connectionMessageShown = True
+                print(
+                    now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+                    + Style.BRIGHT
+                    + Back.BLUE
+                    + Fore.WHITE
+                    + " net0 "
+                    + Back.RESET
+                    + Fore.YELLOW
+                    + getString("connected")
+                    + Style.RESET_ALL
+                    + Fore.WHITE
+                    + getString("connected_server")
+                    + str(serverVersion)
+                    + ")")
+                break
+            elif connectionMessageShown != True:
+                print(
+                    now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+                    + Style.BRIGHT
+                    + Back.GREEN
+                    + Fore.WHITE
+                    + " sys0 "
+                    + Back.RESET
+                    + Fore.RED
+                    + " Miner is outdated (v"
+                    + minerVersion
+                    + "),"
+                    + Style.RESET_ALL
+                    + Fore.RED
+                    + getString("server_is_on_version")
+                    + serverVersion
+                    + getString("update_warning"))
+                time.sleep(10)
+        except:
+            print(
+                now().strftime(Style.DIM + "%H:%M:%S ")
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Back.BLUE
+                + Fore.WHITE
+                + " net0 "
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Fore.RED
+                + getString("connecting_error")
+                + Style.RESET_ALL)
+            if debug == "y":
+                raise
+            time.sleep(10)
+    return socId
+
+
+def connectToAVR(com):
+    while True:
+        try:
+            # Close previous serial connections (if any)
+            comConnection.close()
+        except:
+            pass
+        try:
+            # Establish serial connection
+            comConnection = serial.Serial(
+                com,
+                115200,
+                timeout=5,
+                write_timeout=5,
+                inter_byte_timeout=5)
+            print(
+                now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Back.MAGENTA
+                + Fore.WHITE
+                + " "
+                + str(com[-4:].lower())
+                + " "
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Fore.GREEN
+                + getString("board_on_port")
+                + str(com[-4:])
+                + getString("board_is_connected")
+                + Style.RESET_ALL)
+            return comConnection
+        except:
+            debugOutput("Error connecting to AVR")
+            if debug == "y":
+                raise
+            print(
+                now().strftime(Style.DIM + "%H:%M:%S ")
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Back.MAGENTA
+                + Fore.WHITE
+                + " "
+                + str(com[-4:].lower())
+                + " "
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Fore.RED
+                + getString("board_connection_error")
+                + str(com[-4:])
+                + getString("board_connection_error2")
+                + Style.RESET_ALL)
+            time.sleep(10)
+
 
 # SIGINT handler
 def handler(signal_received, frame):
@@ -510,7 +636,7 @@ def updateRichPresence():
 
 # Mining section
 def AVRMine(com):  
-    global hash_count, connectionMessageShown, hashrate
+    global hash_count, connectionMessageShown, hashrate, masterServer_address, masterServer_port
     while True:
         # Grab server IP and port
         while True:  
@@ -545,119 +671,12 @@ def AVRMine(com):
                 time.sleep(10)
 
          # Connect to the server
-        while True: 
-            try:
-                socId = socket.socket()
-                # Establish socket connection to the server
-                socId.connect((str(masterServer_address), int(masterServer_port)))
-                serverVersion = socId.recv(3).decode()  # Get server version
-                debugOutput("Server version: " + serverVersion)
-                if (float(serverVersion) <= float(minerVersion)and len(serverVersion) == 3 and connectionMessageShown != True):
-                     # If miner is up-to-date, display a message and continue
-                    connectionMessageShown = True
-                    print(
-                        now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.BLUE
-                        + Fore.WHITE
-                        + " net0 "
-                        + Back.RESET
-                        + Fore.YELLOW
-                        + getString("connected")
-                        + Style.RESET_ALL
-                        + Fore.WHITE
-                        + getString("connected_server")
-                        + str(serverVersion)
-                        + ")")
-                    break
-                elif connectionMessageShown != True:
-                    print(
-                        now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.GREEN
-                        + Fore.WHITE
-                        + " sys0 "
-                        + Back.RESET
-                        + Fore.RED
-                        + " Miner is outdated (v"
-                        + minerVersion
-                        + "),"
-                        + Style.RESET_ALL
-                        + Fore.RED
-                        + getString("server_is_on_version")
-                        + serverVersion
-                        + getString("update_warning"))
-                    time.sleep(10)
-            except:
-                print(
-                    now().strftime(Style.DIM + "%H:%M:%S ")
-                    + Style.RESET_ALL
-                    + Style.BRIGHT
-                    + Back.BLUE
-                    + Fore.WHITE
-                    + " net0 "
-                    + Style.RESET_ALL
-                    + Style.BRIGHT
-                    + Fore.RED
-                    + getString("connecting_error")
-                    + Style.RESET_ALL)
-                if debug == "y":
-                    raise
-                time.sleep(10)
+        socId = Connect()
 
         # Connect to the serial port
-        while True:
-            try:
-                # Close previous serial connections (if any)
-                comConnection.close()
-            except:
-                pass
-            try:
-                # Establish serial connection
-                comConnection = serial.Serial(
-                    com,
-                    115200,
-                    timeout=5,
-                    write_timeout=5,
-                    inter_byte_timeout=5)
-                print(
-                    now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
-                    + Style.RESET_ALL
-                    + Style.BRIGHT
-                    + Back.MAGENTA
-                    + Fore.WHITE
-                    + " "
-                    + str(com[-4:].lower())
-                    + " "
-                    + Style.RESET_ALL
-                    + Style.BRIGHT
-                    + Fore.GREEN
-                    + getString("board_on_port")
-                    + str(com[-4:])
-                    + getString("board_is_connected")
-                    + Style.RESET_ALL)
-                break
-            except:
-                debugOutput("Error connecting to AVR")
-                if debug == "y":
-                    raise
-                print(
-                    now().strftime(Style.DIM + "%H:%M:%S ")
-                    + Style.RESET_ALL
-                    + Style.BRIGHT
-                    + Back.MAGENTA
-                    + Fore.WHITE
-                    + " "
-                    + str(com[-4:].lower())
-                    + " "
-                    + Style.RESET_ALL
-                    + Style.BRIGHT
-                    + Fore.RED
-                    + getString("board_connection_error")
-                    + str(com[-4:])
-                    + getString("board_connection_error2")
-                    + Style.RESET_ALL)
-                time.sleep(10)
+        
+        comConnection = connectToAVR(com)
+
 
         while True:  
             try:
@@ -695,12 +714,13 @@ def AVRMine(com):
                     + Back.RESET
                     + Fore.RED
                     + getString("mining_avr_connection_error"))
-                time.sleep(5)
+                comConnection = connectToAVR(com)
 
         while True:
             while True:
                 try:
                     # Send job request
+                    debugOutput("Requested job")
                     socId.send(
                         bytes(
                             "JOB,"
@@ -736,12 +756,12 @@ def AVRMine(com):
                         debugOutput("Job received: " + str(job))
                         break  
                 except:
-                    pass
+                    sockId = Connect()
 
             while True:
                 # Write data to AVR board
                 while True:
-                    try: 
+                    try:
                         # Send start word
                         comConnection.write(bytes("start\n", encoding="utf8"))  
                         debugOutput("Written start word")
@@ -758,7 +778,12 @@ def AVRMine(com):
                         debugOutput("Sent job to arduino")
                         break
                     except:
-                        debugOutput("Retrying sending job to arduino...")
+                        try:
+                            comConnection.close()
+                        except:
+                            pass
+                        comConnection = connectToAVR(com)
+                        debugOutput("Reconnecting to avr")
                 wrong_results = 0
                 while True:
                     try:
@@ -777,6 +802,7 @@ def AVRMine(com):
                                     + Back.RESET
                                     + Fore.RED
                                     + getString("mining_avr_not_responding"))
+                                break
                         else:
                             break
                     except:
@@ -795,7 +821,7 @@ def AVRMine(com):
                             # AVR will send ready signal
                             ready = (comConnection.readline().decode())
                         except:
-                            pass
+                            comConnection = connectToAVR(com)
 
                 try:
                     # Receive result from AVR
@@ -822,6 +848,7 @@ def AVRMine(com):
                             + str(rigIdentifier),
                             encoding="utf8",)) 
                 except:
+                    socId = Connect()
                     break
 
                 while True:
@@ -836,7 +863,7 @@ def AVRMine(com):
                         debugOutput("Successfully retrieved feedback")
                         break
                     except:
-                        debugOutput("Error getting feedback")
+                        sockId = Connect()
 
                 if feedback == "GOOD":
                     # If result was correct
