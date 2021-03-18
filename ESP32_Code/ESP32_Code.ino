@@ -62,7 +62,7 @@ void Task1code( void * pvParameters ){
 
     String       hash1 = client1.readStringUntil(','); // Read data to the first peroid - last block hash
     String        job1 = client1.readStringUntil(','); // Read data to the next peroid - expected hash
-    unsigned int diff1 = client.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
+    unsigned int diff1 = client1.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
     job1.toUpperCase();
     const char * c = job1.c_str();
 
