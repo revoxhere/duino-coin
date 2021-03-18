@@ -158,10 +158,11 @@ After loging-in you have access to the following commands:
     *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (**if you don't ask for a specific difficulty, you'll get the network diff**) where diff is one of the below:
         * `AVR`     - diff      3 - used for official AVR boards mining
         * `ESP`     - diff     75 - used for official ESP boards mining
-        * `ESP32`   - diff    100 - used for official ESP boards mining
+        * `ESP32`   - diff    100 - used for official ESP32 boards mining
         * `LOW`     - diff   8.5k - used for official Web Miner
         * `MEDIUM`  - diff    30k - used for lower-diff PC mining
-        * `EXTREME` - diff   950k - used for custom high performance miners
+        * `NET`     - diff   ~70k - used for PC mining - network difficulty
+        * `EXTREME` - diff   950k - not used anywhere officially
     
     *   When sending the mining result, you can pass the hashrate count and the name of the miner along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s) and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner"
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
