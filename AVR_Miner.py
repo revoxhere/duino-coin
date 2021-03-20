@@ -73,7 +73,6 @@ except:
 # Global variables
 minerVersion = "2.3"  # Version number
 timeout = 15  # Socket timeout
-autorestart_mins = 1147895 # Autorestarter time in minutes
 resourcesFolder = "AVRMiner_" + str(minerVersion) + "_resources"
 shares = [0, 0]
 diff = 0
@@ -517,29 +516,6 @@ def Greeting():  # Greeting message depending on time
             r = requests.get(url)
             with open(resourcesFolder + "/Donate_executable", "wb") as f:
                 f.write(r.content)
-
-
-def Autorestart():
-    time.sleep(60 * autorestart_mins) 
-    try:
-        # Exit donate exe to stop multiple instances of it launching
-        donateExecutable.terminate()
-    except:
-        pass
-    print(
-        now().strftime(Style.DIM + "%H:%M:%S ")
-        + Style.RESET_ALL
-        + Style.BRIGHT
-        + Back.GREEN
-        + Fore.WHITE
-        + " sys0 "
-        + Style.RESET_ALL
-        + Style.BRIGHT
-        + Fore.RED
-        + " Autorestart"
-        + Style.RESET_ALL)
-    restart_miner()
-
 
 def restart_miner():
     try:
@@ -1078,17 +1054,6 @@ if __name__ == "__main__":
             raise
     try:
         Donate()  # Start donation thread
-    except:
-        if debug == "y":
-            raise
-    try:
-        # Start autorestart thread
-        threading.Thread(target=Autorestart).start()  
-        # Launch avr duco mining threads
-        for port in avrport:
-            threading.Thread(
-                target=AVRMine,
-                args=(port,)).start()  
     except:
         if debug == "y":
             raise
