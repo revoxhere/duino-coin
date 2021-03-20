@@ -63,7 +63,8 @@ try:
     from pypresence import Presence
 except:
     print(
-        'Pypresence is not installed. '
+        now().strftime("%H:%M:%S ")
+        + 'Pypresence is not installed. '
         + 'Wallet will try to install it. '
         + 'If it fails, please manually install "pypresence" python3 package.'
         + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
@@ -100,7 +101,7 @@ with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = json.load(lang_file)
 
 # Check if miner is configured, if it isn't, autodetect language
-if not Path(  resourcesFolder + "/Miner_config.cfg").is_file():
+if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
     locale = locale.getdefaultlocale()[0]
     if locale.startswith("es"):
         lang = "spanish"
@@ -544,7 +545,7 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
         while True:  
             try:
                 soc = socket.socket()
-                 # Establish socket connection to the server
+                # Establish socket connection to the server
                 soc.connect((str(masterServer_address), int(masterServer_port))) 
                 serverVersion = soc.recv(3).decode()  # Get server version
                 debugOutput("Server version: " + serverVersion)
@@ -669,8 +670,14 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
 
                 while True:
                     # Call DUCOS-1 hasher
+                    computetimeStart = time.time()
                     result = ducos1(job[0], job[1], diff)
-                    # Read result from it
+                    computetimeStop = time.time()
+                    # Measure compute time
+                    computetime = computetimeStop - computetimeStart
+                    # Convert it to miliseconds
+                    computetime = computetime
+                    # Read result from ducos1 hasher
                     ducos1res = result[0]
                     debugOutput("Thread "
                         + str(threadid)
@@ -734,6 +741,7 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                                 + " "
                                 + Back.RESET
                                 + Fore.GREEN
+                                + " ✓"
                                 + getString("accepted")
                                 + Fore.WHITE
                                 + str(int(accepted.value))
@@ -747,8 +755,12 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                                 + Style.NORMAL
                                 + Fore.WHITE
                                 + " ∙ "
-                                + Style.BRIGHT
+                                + str(f"%01.3f" % float(computetime))
+                                + "s"
+                                + Style.NORMAL
+                                + " ∙ "
                                 + Fore.BLUE
+                                + Style.BRIGHT
                                 + str(formattedhashcount)
                                 + Fore.WHITE
                                 + Style.NORMAL
@@ -782,6 +794,7 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                                 + " "
                                 + Back.RESET
                                 + Fore.CYAN
+                                + " ✓"
                                 + getString("block_found")
                                 + Fore.WHITE
                                 + str(accepted.value)
@@ -795,8 +808,12 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                                 + Style.NORMAL
                                 + Fore.WHITE
                                 + " ∙ "
-                                + Style.BRIGHT
+                                + str(f"%01.3f" % float(computetime))
+                                + "s"
+                                + Style.NORMAL
+                                + " ∙ "
                                 + Fore.BLUE
+                                + Style.BRIGHT
                                 + str(formattedhashcount)
                                 + Fore.WHITE
                                 + Style.NORMAL
@@ -831,6 +848,7 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                                 + " "
                                 + Back.RESET
                                 + Fore.RED
+                                + " ✗"
                                 + getString("rejected")
                                 + Fore.WHITE
                                 + str(accepted.value)
@@ -844,8 +862,12 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                                 + Style.NORMAL
                                 + Fore.WHITE
                                 + " ∙ "
-                                + Style.BRIGHT
+                                + str(f"%01.3f" % float(computetime))
+                                + "s"
+                                + Style.NORMAL
+                                + " ∙ "
                                 + Fore.BLUE
+                                + Style.BRIGHT
                                 + str(formattedhashcount)
                                 + Fore.WHITE
                                 + Style.NORMAL
@@ -879,7 +901,7 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                 time.sleep(5)
                 break
 
-
+# Initialize Discord rich presence
 def initRichPresence():
     global RPC
     try:
@@ -890,7 +912,7 @@ def initRichPresence():
         if debug == "y":
             raise
 
-
+# Update rich presence status
 def updateRichPresence():
     startTime = int(time.time())
     while True:
@@ -909,7 +931,7 @@ def updateRichPresence():
                 + "/"
                 + str(rejected.value + accepted.value),
                 large_image="ducol",
-                large_text="Duino-Coin, a cryptocurrency that can be mined with Arduino boards",
+                large_text="Duino-Coin, a coin that can be mined with almost everything, including AVR boards",
                 buttons=[
                     {"label": "Learn more", "url": "https://duinocoin.com"},
                     {"label": "Discord Server", "url": "https://discord.gg/k48Ht5y"}])
