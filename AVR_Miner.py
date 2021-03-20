@@ -536,7 +536,7 @@ def Autorestart():
         + " Autorestart"
         + Style.RESET_ALL)
     try:
-        os.execv(sys.argv[0], sys.argv)
+        os.execl(sys.executable, sys.executable, *sys.argv)
     except:
         print("Permission error")
 
@@ -809,7 +809,6 @@ def AVRMine(com):
                                     + Back.RESET
                                     + Fore.RED
                                     + getString("mining_avr_not_responding"))
-                                break
                         else:
                             break
                     except:
