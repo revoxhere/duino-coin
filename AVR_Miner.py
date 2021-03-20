@@ -8,7 +8,7 @@
 # Import libraries
 import socket, threading, time, sys, os
 import re, subprocess, configparser, datetime
-import locale, json 
+import locale, json, platform
 from pathlib import Path
 from signal import signal, SIGINT
 
@@ -73,7 +73,7 @@ except:
 # Global variables
 minerVersion = "2.3"  # Version number
 timeout = 15  # Socket timeout
-autorestart_mins = 15 # Autorestarter time in minutes
+autorestart_mins = 1147895 # Autorestarter time in minutes
 resourcesFolder = "AVRMiner_" + str(minerVersion) + "_resources"
 shares = [0, 0]
 diff = 0
@@ -85,8 +85,6 @@ serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/
 config = configparser.ConfigParser()
 donationlevel = 0
 hashrate = 0
-global connectionMessageShown
-connectionMessageShown = False
 
 # Create resources folder if it doesn't exist
 if not os.path.exists(resourcesFolder):
@@ -102,6 +100,11 @@ if not Path(resourcesFolder + "/langs.json").is_file():
 # Load language file
 with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = json.load(lang_file)
+
+# OS X invalid locale hack
+if platform.system() == 'Darwin':
+    if locale.getlocale()[0] is None:
+        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 # Check if miner is configured, if it isn't, autodetect language
 if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
@@ -151,22 +154,22 @@ def title(title):
 
 # server connection
 def Connect():
-    global masterServer_address, masterServer_port, connectionMessageShown
+    global masterServer_address, masterServer_port
     while True:
         try:
             try:
-                socId.close()
+                socket.close()
             except:
                 pass
             debugOutput("Connecting to " + str(masterServer_address) + str(":") + str(masterServer_port))
             socId = socket.socket()
             # Establish socket connection to the server
             socId.connect((str(masterServer_address), int(masterServer_port)))
-            serverVersion = socId.recv(3).decode()  # Get server version
+            # Get server version
+            serverVersion = socId.recv(3).decode()
             debugOutput("Server version: " + serverVersion)
-            if (float(serverVersion) <= float(minerVersion)and len(serverVersion) == 3 and connectionMessageShown != True):
+            if (float(serverVersion) <= float(minerVersion)and len(serverVersion) == 3):
                 # If miner is up-to-date, display a message and continue
-                connectionMessageShown = True
                 print(
                     now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
                     + Style.BRIGHT
@@ -182,7 +185,7 @@ def Connect():
                     + str(serverVersion)
                     + ")")
                 break
-            elif connectionMessageShown != True:
+            else:
                 print(
                     now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
                     + Style.BRIGHT
@@ -200,6 +203,7 @@ def Connect():
                     + serverVersion
                     + getString("update_warning"))
                 time.sleep(10)
+                break
         except:
             print(
                 now().strftime(Style.DIM + "%H:%M:%S ")
@@ -215,7 +219,7 @@ def Connect():
                 + Style.RESET_ALL)
             if debug == "y":
                 raise
-            time.sleep(10)
+            time.sleep(5)
     return socId
 
 
@@ -516,7 +520,6 @@ def Greeting():  # Greeting message depending on time
 
 
 def Autorestart():
-    # Due to weird nature of AVR mining, restart every 15 mins helps to improve the stability
     time.sleep(60 * autorestart_mins) 
     try:
         # Exit donate exe to stop multiple instances of it launching
@@ -535,6 +538,10 @@ def Autorestart():
         + Fore.RED
         + " Autorestart"
         + Style.RESET_ALL)
+    restart_miner()
+
+
+def restart_miner():
     try:
         os.execl(sys.executable, sys.executable, *sys.argv)
     except:
@@ -643,7 +650,7 @@ def updateRichPresence():
 
 # Mining section
 def AVRMine(com):  
-    global hash_count, connectionMessageShown, hashrate, masterServer_address, masterServer_port
+    global hash_count, hashrate, masterServer_address, masterServer_port
     while True:
         # Grab server IP and port
         while True:  
@@ -677,12 +684,11 @@ def AVRMine(com):
                     raise
                 time.sleep(10)
 
-         # Connect to the server
-        socId = Connect()
-        # Connect to the serial port
-        comConnection = connectToAVR(com)
-
-        while True:  
+        while True:
+            # Connect to the server
+            socId = Connect()
+            # Connect to the serial port
+            comConnection = connectToAVR(com)
             try:
                 # Receive ready signal from AVR
                 ready = comConnection.readline().decode()
@@ -757,13 +763,13 @@ def AVRMine(com):
 
                         # If job received, continue
                         elif job[0] and job[1] and job[2]:
-                            diff = job[2]
+                            diff = int(job[2])
                             debugOutput("Job received: " + str(job))
                             break
                     except:
-                        sockId = Connect()
+                        restart_miner()
                 except:
-                    sockId = Connect()
+                    restart_miner()
 
             while True:
                 # Write data to AVR board
@@ -809,6 +815,10 @@ def AVRMine(com):
                                     + Back.RESET
                                     + Fore.RED
                                     + getString("mining_avr_not_responding"))
+                                try:
+                                    os.execl(sys.executable, sys.executable, *sys.argv)
+                                except:
+                                    print("Permission error")
                         else:
                             break
                     except:
@@ -824,10 +834,9 @@ def AVRMine(com):
                             + getString("mining_avr_connection_error"))
                         time.sleep(5)
                         try:
-                            # AVR will send ready signal
-                            ready = (comConnection.readline().decode())
+                            os.execl(sys.executable, sys.executable, *sys.argv)
                         except:
-                            comConnection = connectToAVR(com)
+                            print("Permission error")
 
                 try:
                     # Receive result from AVR
@@ -854,8 +863,7 @@ def AVRMine(com):
                             + str(rigIdentifier),
                             encoding="utf8")) 
                 except:
-                    socId = Connect()
-                    break
+                    restart_miner()
 
                 while True:
                     try:
@@ -869,7 +877,7 @@ def AVRMine(com):
                         debugOutput("Successfully retrieved feedback")
                         break
                     except:
-                        sockId = Connect()
+                        restart_miner()
 
                 if feedback == "GOOD":
                     # If result was correct
