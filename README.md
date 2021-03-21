@@ -155,10 +155,10 @@ Some third-party included files may have different licenses - please check their
 
 <h2 align="center">Terms of usage</h2><br>
 1. Duino-Coins are earned by miners with a process called mining.<br/>
-2. Mining is described as using DUCO-S1 algorithm (explained in the [Duino-Coin Whitepaper](https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
+2. Mining is described as using DUCO-S1 algorithm (explained in the <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
 3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README).<br/>
 4. Mining on GPUs, FPGAs and other high-efficiency hardware is allowed, but using only the `EXTREME` mining difficulty.<br/>
-5. Any users using miners on difficulty not suited for their hardware (see the [difficulty list](https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf)) will be automatically throttled and/or blocked.
+5. Any users using miners on difficulty not suited for their hardware (see the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">difficulty list</a>) will be automatically throttled and/or blocked.
 6. Any users spotted using inappropriate and/or overpowered hardware will be banned manually or automatically from the network withour prior notice.<br/>
 7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
 8. Only coins earned legally are eligible for the exchange.<br/>
@@ -167,8 +167,8 @@ Some third-party included files may have different licenses - please check their
 11. This list will be expanded in the future.<br/>
 <h4 align="center">Privacy policy</h2><br>
 1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
-2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the [DUCO-Exchange](https://revoxhere.github.io/duco-exchange/) and receiving an occasional newsletter (planned for the future).<br/>
-3. Balances, transactions and mining-related data is publicly available in the public [JSON APIs](https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api).<br/>
+2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
+3. Balances, transactions and mining-related data is publicly available in the public <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
 4. The privacy policy may be changed in the future with a prior notification.
 
 <h2 align="center">Developers</h2><br>
