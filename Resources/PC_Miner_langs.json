@@ -328,7 +328,7 @@
         "mining_not_exist_warning": " Убедитесь в том, что вы правильно ввели имя пользователя. Пожалуйста, проверьте ваш файл настроек. Пробуем еще раз через 10с"
     },    
     "german": {
-        "translation_autor": "BastelPichi",
+        "translation_autor": "BastelPichi, EinWildesPanda",
         "sigint_detected": " SIGINT erkannt - Schliesse Miner.",
         "goodbye": " Bis Bald!",
         "greeting_morning": "Guten Morgen!",
@@ -350,7 +350,7 @@
         "dont_have_account": "Du hast noch kein Duino-Coin-Account? Benutze ",
         "wallet": "Wallet",
         "register_warning": " um dich zu registrieren.\n",
-        "ask_username": "Gebe deinen Duino-Coin Nutzernamen ein: ",
+        "ask_username": "Gib deinen Duino-Coin Nutzernamen ein: ",
         "ask_intensity": "Wie viel Prozent der Leistung soll Duino-Coin verwenden? (1-100)% (empfohlen: 95): ",
         "ask_threads": "Wie viele Threads willst du benutzen? (für dein System empfohlen: ",
         "ask_lower_difficulty": "Willst du eine niedrigere Schwierigkeit verwenden (für langsamere Systeme)? (y/N) ",
@@ -359,8 +359,7 @@
         "ask_donation_level": "Setze das Entwickler-Spendenlevel (0-5) (empfohlen: 1), das wird nicht deinen Ertrag reduzieren: ",
         "config_saved": "Konfiguration gespeichert! Der Miner wird gestartet...",
         "load_config_error": " Fehler beim Laden der Konfigurationsdatei (",
-        "load_config_error_warning": "/Miner_config.cfg). Versuche sie zu entfernen und neu zu konfigurieren. Miner schliesst in 10s",
-
+        "load_config_error_warning": "/Miner_config.cfg). Versuche sie zu entfernen und neu zu konfigurieren. Miner schließt in 10s",
         "free_network_warning": " das Duino-Coin Netzwerk ist immer kostenlos und wird es immer bleiben",
         "donate_warning": "\nWir nehmen keine Gebühren, wenn du schürfst.\nDu kannst uns mit der Weiterentwicklung helfen, indem du spendest.\nBesuche ",
         "learn_more_donate": " um zu lernen wie du helfen kannst :)",
@@ -390,7 +389,7 @@
 
         "mining_user": " Benutzer ",
         "mining_not_exist": " existiert nicht.",
-        "mining_not_exist_warning": " Stelle sicher, dass du den Nuternamen korrekt geschrieben hast. Ü¨berprüfe deine Konfigurationsdatei. Neuversuch in 10s"
+        "mining_not_exist_warning": " Stelle sicher, dass du den Nuternamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s"
 
     }	
 }
