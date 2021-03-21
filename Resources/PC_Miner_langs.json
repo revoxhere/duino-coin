@@ -329,7 +329,7 @@
     },    
     "german": {
         "translation_autor": "BastelPichi",
-        "sigint_detected": " Einloggen erkannt - erfolgreicher Start.",
+        "sigint_detected": " SIGINT erkannt - Schliesse Miner.",
         "goodbye": " Bis Bald!",
         "greeting_morning": "Guten Morgen!",
         "greeting_noon": "Schönen Mittag",
@@ -338,14 +338,14 @@
         "greeting_back": "Willkommen zurück",
 
         "banner": "Ofizieller Duino-Coin © Python Miner",
-        "donation_level": "Entwickler Spende: ",
+        "donation_level": "Entwickler-Spendenlevel: ",
 
         "medium_diff": "Medium diff",
         "net_diff": "Network diff",
         "algorithm": "Algorithmus: ",
-        "rig_identifier": "Rig Identifizierer: ",
+        "rig_identifier": "Rig Identifikation: ",
 
-        "basic_config_tool": "\nDuino-Coin Standart Konfigurationstool\nBearbeite ",
+        "basic_config_tool": "\nDuino-Coin simples Konfigurationstool\nBearbeite ",
         "edit_config_file_warning": "/Miner_config.cfg wenn du später Einstellungen verändern möchtest.",
         "dont_have_account": "Du hast noch kein Duino-Coin-Account? Benutze ",
         "wallet": "Wallet",
@@ -354,18 +354,18 @@
         "ask_intensity": "Wie viel Prozent der Leistung soll Duino-Coin verwenden? (1-100)% (empfohlen: 95): ",
         "ask_threads": "Wie viele Threads willst du benutzen? (für dein System empfohlen: ",
         "ask_lower_difficulty": "Willst du eine niedrigere Schwierigkeit verwenden (für langsamere Systeme)? (y/N) ",
-        "ask_rig_identifier": "Willst du einen identifizierer (Name) zu diesem rig hinzufügen? (y/N) ",
-        "ask_rig_name": "Dein rig Name: ",
-        "ask_donation_level": "Wie viel willst du den Entwicklern Spenden (0-5) (empfohlen: 1), das wird nicht dein Gehalt reduzieren: ",
+        "ask_rig_identifier": "Willst du eine Identifikation (Name) zu diesem Rig hinzufügen? (y/N) ",
+        "ask_rig_name": "Dein Rig Name: ",
+        "ask_donation_level": "Setze das Entwickler-Spendenlevel (0-5) (empfohlen: 1), das wird nicht deinen Ertrag reduzieren: ",
         "config_saved": "Konfiguration gespeichert! Der Miner wird gestartet...",
         "load_config_error": " Fehler beim Laden der Konfigurationsdatei (",
-        "load_config_error_warning": "/Miner_config.cfg). Versuche den Miner zu entfernen und wieder hinzuzufügen. Miner schliesst in 10s",
+        "load_config_error_warning": "/Miner_config.cfg). Versuche sie zu entfernen und neu zu konfigurieren. Miner schliesst in 10s",
 
-        "free_network_warning": " das Duino-Coin Netzwerk ist immer Kostenlos und wird es immer bleiben",
-        "donate_warning": "\nWir nehmen keine Gebühren, wenn du minst.\nDu kannst uns aber mit der Weiterentwicklung helfen, indem du spendest.\nBesuche ",
-        "learn_more_donate": " um mehr zu lernen wie du uns helfen kannst schaue dir an:)",
-        "starting_donation": "Spende Prozess wird gestartet",
-        "thanks_donation": " Danke das du ein Spender bist ❤️ \nDeine Spende hilft uns den Server zu verwalten und Duino-Coin weiterzuentwickeln",
+        "free_network_warning": " das Duino-Coin Netzwerk ist immer kostenlos und wird es immer bleiben",
+        "donate_warning": "\nWir nehmen keine Gebühren, wenn du schürfst.\nDu kannst uns mit der Weiterentwicklung helfen, indem du spendest.\nBesuche ",
+        "learn_more_donate": " um zu lernen wie du helfen kannst :)",
+        "starting_donation": "Spendeminer wird gestartet",
+        "thanks_donation": " Danke, dass du ein Spender bist ❤️ \nDeine Spende hilft uns den Server zu verwalten und Duino-Coin weiterzuentwickeln",
 
         "data_error": " Fehler bei der Verbindung zu Github!  Versuche nochmal in 10 Sekunden.",
         "connected": " Verbunden",
@@ -374,23 +374,23 @@
         "server_is_on_version": " Server ist auf Version",
         "update_warning": ", Bitte lade den aktuellsten Miner von Github runter: https://github.com/revoxhere/duino-coin/releases/",
         "connecting_error": " Fehler beim Verbinden zum Server. Neuversuch in 10 Sekunden",
-        "mining_thread": " Mining thread ",
+        "mining_thread": " Mining thread #",
         "mining_thread_starting": " startet",
         "using_algo": " mit DUCO-S1 Algorithmus und ",
         "efficiency": "Effizienz",
 
         "duco_python_miner": "Duino-Coin Python Miner (v",
-        "accepted_shares": " Akzeptierte Shares",
+        "accepted_shares": " akzeptierte Shares",
         "accepted": " Akzeptiert ",
         "block_found": " Block gefunden ",
-        "internal_server_error": " Interner Server Fehler.",
+        "internal_server_error": " Interner Serverfehler.",
         "retrying": " Neuversuch in 10 Sekunden",
-        "rejected": " abgelehnt ",
-        "error_while_mining": " Fehler beim Minen - Neustart in 5s.",
+        "rejected": " Abgelehnt ",
+        "error_while_mining": " Fehler beim Minen - sehr wahrscheinlich ein Verbindungsfehler - Neustart in 5s.",
 
         "mining_user": " Benutzer ",
         "mining_not_exist": " existiert nicht.",
-        "mining_not_exist_warning": " Ist dein Benutzername richtig geschrieben? Checke deine Konfigurationsdatei. Neuversuch in 10s"
+        "mining_not_exist_warning": " Stelle sicher, dass du den Nuternamen korrekt geschrieben hast. Ü¨berprüfe deine Konfigurationsdatei. Neuversuch in 10s"
 
     }	
 }
