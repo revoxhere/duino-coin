@@ -303,7 +303,7 @@
         "wallet": "Wallet",
         "register_warning": " um dich zu registrieren.\n",
 
-        "ask_username": "Gebe deinen Duino-Coin Benutzernamen ein: ",
+        "ask_username": "Gib deinen Duino-Coin Benutzernamen ein: ",
         "ports_message": "Das Konfigurationstool hat Arduinos auf folgenden Ports gefunden:",
         "ports_notice": "Wenn du dein Board hier nicht sehen kannst, prüfe ob dein Board richtig verbunden ist und ob das Skript die erforderlichen Rechte hat(admin/sudo rechte).",
         "ask_avrport": "Gib den seriellen Port an, den du benutzen möchtest (z.B. COM1 (Windows) oder /dev/ttyUSB1 (Linux)): ",
