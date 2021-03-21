@@ -350,7 +350,7 @@
         "dont_have_account": "Du hast noch kein Duino-Coin-Account? Benutze ",
         "wallet": "Wallet",
         "register_warning": " um dich zu registrieren.\n",
-        "ask_username": "Gebe deinen Duino-Coin Nutzernamen ein: ",
+        "ask_username": "Gib deinen Duino-Coin Nutzernamen ein: ",
         "ask_intensity": "Wie viel Prozent der Leistung soll Duino-Coin verwenden? (1-100)% (empfohlen: 95): ",
         "ask_threads": "Wie viele Threads willst du benutzen? (für dein System empfohlen: ",
         "ask_lower_difficulty": "Willst du eine niedrigere Schwierigkeit verwenden (für langsamere Systeme)? (y/N) ",
