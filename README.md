@@ -48,10 +48,10 @@
       ♾️ Coin supply: Infinite (before December 2020: 350k coins)<br>
       😎 Premine: <5k blocks (<500 coins)<br>
       ⚡ Transaction time: Instant<br>
-      🔢 Decimals: 7-9 (up to 20 when needed)<br>
+      🔢 Decimals: up to 20<br>
       🔤 Ticker: DUCO (ᕲ)<br>
       ⚒️ Algorithms: DUCO-S1, DUCO-S1A (+more planned)<br>
-      ♐ Rewards: supported by <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/kolkasystem.png">Kolka system</a> helping to reward miners fairly<br>
+      ♐ Rewards: supported by "Kolka system" helping to reward miners fairly<br>
     </td>
   </tr>
 </table>
@@ -162,7 +162,7 @@ Some third-party included files may have different licenses - please check their
 6. Any users spotted using inappropriate and/or overpowered hardware will be banned manually or automatically from the network withour prior notice.<br/>
 7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
 8. Only coins earned legally are eligible for the exchange.<br/>
-9. These terms of usage can change at any time without prior notice. 
+9. These terms of usage can change at any time without prior notice.<br/>
 10. Every user using Duino-Coin agrees to comply with the above rules.<br/>
 11. This list will be expanded in the future.<br/>
 
