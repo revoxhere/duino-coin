@@ -121,14 +121,16 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 *   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) by LDarki
 *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) by siunus
 *   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
-*   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz
+<!--*   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz (DEPRECATED) -->
 
 This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
 
 <h2 align="center">Development</h2><br>
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create.
-Any contributions you make are greatly appreciated.
+Any contributions you make to the Duino-Coin project are greatly appreciated.
+
+How to help?
 
 *   Fork the Project
 *   Create your feature branch
@@ -138,59 +140,55 @@ Any contributions you make are greatly appreciated.
 
 Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch. 
 
+<h2 align="center">Some of the officially tested devices</h2><br>
 
-<h2 align="center">Some officially tested devices</h2><br>
-
-*   Arduino Pro Mini / Uno / Nano (ATmega328p @ 16 MHz 5V) - ~170 H/s
-*   NodeMCU (ESP8266 @ 160 MHz) - ~2.6 kH/s (~1.6 kH/s at 80 MHz clock)
-*   ESP32 (dual-threaded) - ~13 kH/s (6 kH/s (core1) + 7 kH/s (core2)) (WIP)
+*   Arduino Pro Mini / Uno / Nano (ATmega328p @ 16 MHz 5V): ~170 H/s
+*   NodeMCU (ESP8266 @ 160 MHz): ~2.6 kH/s (~1.6 kH/s at 80 MHz clock)
+*   ESP32 (dual-threaded): ~13 kH/s (6 kH/s (core1) and 7 kH/s (core2)) (WIP)
 
 Hashrate Calculators for AVR/ESP8266 platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
 
 <h2 align="center">License</h2><br>
 
 Duino-Coin is mostly distributed under the MIT License. See `LICENSE` file for more information.
-Some third-party included files may have different licenses - please check their `LICENSE` statements.
+Some third-party included files may have different licenses - please check their `LICENSE` statements (usually at the top of the source code files).
 
 <h2 align="center">Terms of usage</h2><br>
 1. Duino-Coins are earned by miners with a process called mining.<br/>
-2. Mining is described as using DUCO-S1 algorithm (explained in the Duino-Coin Whitepaper), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
-3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README). <br/>
-4. Even though Duino-Coin aims to fairly reward all the miners, mining with GPUs, ASICs, FPGAs is not allowed due to obvious reasons.<br/>
-5. Any users spotted using inappropriate/overpowered hardware can be banned from the network.<br/>
-6. Banning involves blocking the user from accessing his account and accessing his coins.<br/>
-7. Only coins earned legally are eligible for the exchange.<br/>
-8. These terms of usage can change at any time without prior notice and will be expanded in the future.<br/>
-9. Users using Duino-Coin agree to comply with the above rules.<br/>
+2. Mining is described as using DUCO-S1 algorithm (explained in the [Duino-Coin Whitepaper](https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
+3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README).<br/>
+4. Mining on GPUs, FPGAs and other high-efficiency hardware is allowed, but using only the `EXTREME` mining difficulty.<br/>
+5. Any users using miners on difficulty not suited for their hardware (see the [difficulty list](https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf)) will be automatically throttled and/or blocked.
+6. Any users spotted using inappropriate and/or overpowered hardware will be banned manually or automatically from the network withour prior notice.<br/>
+7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
+8. Only coins earned legally are eligible for the exchange.<br/>
+9. These terms of usage can change at any time without prior notice. 
+10. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+11. This list will be expanded in the future.<br/>
 
 <h2 align="center">Developers</h2><br>
 
 *   **Developers:**
-    *   [@revox](https://github.com/revoxhere/) (Founder) - robik123.345@gmail.com
-    *   [@Bilaboz](https://github.com/bilaboz/)
-    *   [@connorhess](https://github.com/connorhess)
-    *   [@JoyBed](https://github.com/JoyBed)
-    *   [@LDarki](https://github.com/LDarki)
-    *   [@travelmode](https://github.com/colonelwatch)
+    *   [@revox](https://github.com/revoxhere/) (Founder/lead dev) - robik123.345@gmail.com
+    *   [@Bilaboz](https://github.com/bilaboz/) (Lead dev)
+    *   [@connorhess](https://github.com/connorhess) (Lead dev)
+    *   [@JoyBed](https://github.com/JoyBed) (Lead dev)
+    *   [@HGEcode](https://github.com/HGEcode) (Dev)
+    *   [@LDarki](https://github.com/LDarki) (Web dev)
+    *   [@travelmode](https://github.com/colonelwatch) (Dev)
     *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-
-*   **Webmaster:**
-    *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io
+    *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
 
 *   **Contributors:**
-    *   [@HGEcode](https://github.com/HGEcode)
     *   [@5Q](https://github.com/its5Q)
     *   [@kyngs](https://github.com/kyngs)
     *   [@httsmvkcom](https://github.com/httsmvkcom)
     *   [@Nosh-Ware](https://github.com/Nosh-Ware)
-    *   [@Furim](https://github.com/Furim)
-
-<h2 align="center">Special thanks</h2><br>
-
-*   [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg) for designing early logos
-*   [@Tech1k](https://github.com/Tech1k) for [Beyondcoin](https://beyondcoin.io) partnership and providing [duinocoin.com](https://duinocoin.com) domain
-*   [@MrKris7100](https://github.com/MrKris7100) for help with implementing SHA1 algorithm
-*   [@daknuett](https://github.com/daknuett) for help with Arduino SHA1 library
+    *   Thanks to [@Furim](https://github.com/Furim) for help in the early development stage
+    *   Thanks to [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg) for designing early logos
+    *   Thanks to [@Tech1k](https://github.com/Tech1k) for [Beyondcoin](https://beyondcoin.io) partnership and providing [duinocoin.com](https://duinocoin.com) domain
+    *   Thanks to [@MrKris7100](https://github.com/MrKris7100) for help with implementing SHA1 algorithm
+    *   Thanks to [@daknuett](https://github.com/daknuett) for help with Arduino SHA1 library
 
 <hr>
 
