@@ -60,53 +60,54 @@ def ducos1(lastBlockHash, expectedHash, difficulty):  # Loop from 1 too 100*diff
         if ducos1 == expectedHash:
             print("Hash found, sending for feedback...")
             return [ducos1res, hashcount]
-
-try:
-    # This sections grabs pool adress and port from Duino-Coin GitHub file
-    serverip = requests.get("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt")  # Serverip file
-    content = serverip.text.split("\n") # Read content and split into lines
-    pool_address = content[0]  # Line 1 = pool address
-    pool_port = content[1]  # Line 2 = pool port
-    
-    # This section connects and logs user to the server
-    soc.connect((str(pool_address), int(pool_port)))  # Connect to the server
-    server_version = soc.recv(3).decode()  # Get server version
-    print("Server is on version", server_version)
-    # Mining section
-    while True:
-        soc.send(
-            bytes("JOB," + username + ",AVR", "utf8")
-        )  # Send job request
-        job = soc.recv(1024).decode()  # Get work from pool
-        job = job.split(",")  # Split received data to job (job and difficulty)
-        difficulty = job[2]
-
-        hashingStartTime = time.time()
-        print("Calculating...")
-        result = ducos1(job[0], job[1], job[2])
-        hashingStopTime = time.time()
-        difference = hashingStopTime - hashingStartTime
-        try:
-            hashrate = result[1] / difference
-        except ZeroDivisionError:
-            hashrate = 0
+while True:
+    try:
+        # This sections grabs pool adress and port from Duino-Coin GitHub file
+        serverip = requests.get("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt")  # Serverip file
+        content = serverip.text.split("\n") # Read content and split into lines
+        pool_address = content[0]  # Line 1 = pool address
+        pool_port = content[1]  # Line 2 = pool port
+        
+        # This section connects and logs user to the server
+        soc.connect((str(pool_address), int(pool_port)))  # Connect to the server
+        server_version = soc.recv(3).decode()  # Get server version
+        print("Server is on version", server_version)
+        # Mining section
         while True:
             soc.send(
-                bytes(str(result[0]) + "," + str(hashrate) + ",ESPython Miner," + rigIdentifier, "utf8")
-            )  # Send result of hashing algorithm to pool
-            feedback = soc.recv(1024).decode()  # Get feedback about the result
-            if feedback == "GOOD":  # If result was good
-                print("Accepted share | Hashrate", int(hashrate/1000), "kH/s | Difficulty", difficulty)
-                break
-            elif feedback == "BLOCK":
-                print("Block found | Hashrate", int(hashrate/1000), "kH/s | Difficulty", difficulty)
-                break
-            elif feedback == "BAD":  # If result was bad
-                print("Rejected share | Hashrate", int(hashrate/1000), "kH/s | Difficulty", difficulty)
-                break
-            else:
-                print(feedback)
-except Exception as e:
-    # Uncomment the next line to get the full exception data
-    # raise
-    print("Error occured:\n\t" + str(e))
+                bytes("JOB," + username + ",AVR", "utf8")
+            )  # Send job request
+            job = soc.recv(1024).decode()  # Get work from pool
+            job = job.split(",")  # Split received data to job (job and difficulty)
+            difficulty = job[2]
+
+            hashingStartTime = time.time()
+            print("Calculating...")
+            result = ducos1(job[0], job[1], job[2])
+            hashingStopTime = time.time()
+            difference = hashingStopTime - hashingStartTime
+            try:
+                hashrate = result[1] / difference
+            except ZeroDivisionError:
+                hashrate = 0
+            while True:
+                soc.send(
+                    bytes(str(result[0]) + "," + str(hashrate) + ",ESPython Miner," + rigIdentifier, "utf8")
+                )  # Send result of hashing algorithm to pool
+                feedback = soc.recv(1024).decode()  # Get feedback about the result
+                if feedback == "GOOD":  # If result was good
+                    print("Accepted share | Hashrate", int(hashrate/1000), "kH/s | Difficulty", difficulty)
+                    break
+                elif feedback == "BLOCK":
+                    print("Block found | Hashrate", int(hashrate/1000), "kH/s | Difficulty", difficulty)
+                    break
+                elif feedback == "BAD":  # If result was bad
+                    print("Rejected share | Hashrate", int(hashrate/1000), "kH/s | Difficulty", difficulty)
+                    break
+                else:
+                    print(feedback)
+    except Exception as e:
+        # Uncomment the next line to get the full exception data
+        # raise
+        print("Error occured:\n\t" + str(e))
+
