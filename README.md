@@ -165,6 +165,11 @@ Some third-party included files may have different licenses - please check their
 9. These terms of usage can change at any time without prior notice.<br/>
 10. Every user using Duino-Coin agrees to comply with the above rules.<br/>
 11. This list will be expanded in the future.<br/>
+<h4 align="center">Privacy policy</h2><br>
+1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
+2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the [DUCO-Exchange](https://revoxhere.github.io/duco-exchange/) and receiving an occasional newsletter (planned for the future).<br/>
+3. Balances, transactions and mining-related data is publicly available in the public [JSON APIs](https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api).<br/>
+4. The privacy policy may be changed in the future with a prior notification.
 
 <h2 align="center">Developers</h2><br>
 
