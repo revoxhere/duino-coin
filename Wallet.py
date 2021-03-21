@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Tkinter GUI Wallet (v2.2)
+# Duino-Coin Tkinter GUI Wallet (v2.3)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -42,7 +42,7 @@ import subprocess, os
 import locale
 
 
-version = 2.2
+version = 2.3
 config = ConfigParser()
 resources = "Wallet_" + str(version) + "_resources/"
 backgroundColor = "#121212"
@@ -398,24 +398,45 @@ class LoginFrame(Frame):
         textFont2 = Font(register, size=12, weight="bold")
         textFont = Font(register, size=12, weight="normal")
 
+        tos_warning = getString("register_tos_warning")
+        import textwrap
+        tos_warning = textwrap.dedent(tos_warning)
+        tos_warning = '\n'.join(l for line in tos_warning.splitlines() 
+                  for l in textwrap.wrap(line, width=20))
+
         duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
         duco.image = duco
-        ducoLabel = Label(
-            register, background=foregroundColor, foreground=fontColor, image=duco
-        )
+        ducoLabel = Label(register, background=foregroundColor, foreground=fontColor, image=duco)
+        ducoLabel.grid(row=0, padx=5, pady=(5, 0), sticky="nswe")
+
         ducoLabel2 = Label(
             register,
             background=foregroundColor,
             foreground=fontColor,
             text=getString("register_on_network"),
-            font=textFont2,
-        )
-        ducoLabel.grid(row=0, padx=5, pady=(5, 0), sticky="nswe")
+            font=textFont2)
         ducoLabel2.grid(row=1, padx=5, sticky="nswe")
+
+
+        def colorLabelBlue(handler):
+            ducoLabel3.configure(foreground="#6c5ce7")
+        def colorLabelNormal(handler):
+            ducoLabel3.configure(foreground=fontColor)
+
+        ducoLabel3 = Label(
+            register,
+            background=foregroundColor,
+            foreground=fontColor,
+            text=tos_warning,
+            font=textFont)
+        ducoLabel3.grid(row=2, padx=5, sticky="nswe")
+        ducoLabel3.bind("<Button-1>", openTos)
+        ducoLabel3.bind("<Enter>", colorLabelBlue)
+        ducoLabel3.bind("<Leave>", colorLabelNormal)
 
         Label(
             register,
-            text=getString("username"),
+            text=getString("username").upper(),
             background=backgroundColor,
             foreground=fontColor,
             font=textFont2,
@@ -430,7 +451,7 @@ class LoginFrame(Frame):
 
         Label(
             register,
-            text=getString("passwd"),
+            text=getString("passwd").upper(),
             background=backgroundColor,
             foreground=fontColor,
             font=textFont2,
@@ -440,13 +461,12 @@ class LoginFrame(Frame):
             show="*",
             font=textFont,
             background=backgroundColor,
-            foreground=foregroundColorSecondary,
-        )
+            foreground=foregroundColorSecondary)
         password.grid(row=6, padx=5)
 
         Label(
             register,
-            text=getString("confirm_passwd"),
+            text=getString("confirm_passwd").upper(),
             background=backgroundColor,
             foreground=fontColor,
             font=textFont2,
@@ -456,23 +476,21 @@ class LoginFrame(Frame):
             show="*",
             font=textFont,
             background=backgroundColor,
-            foreground=foregroundColorSecondary,
-        )
+            foreground=foregroundColorSecondary)
         confpassword.grid(row=8, padx=5)
 
         Label(
             register,
-            text=getString("email"),
+            text=getString("email").upper(),
             background=backgroundColor,
             foreground=fontColor,
             font=textFont2,
-        ).grid(row=9, sticky=W)
+        ).grid(row=9, sticky=W, padx=5)
         email = Entry(
             register,
             font=textFont,
             background=backgroundColor,
-            foreground=foregroundColorSecondary,
-        )
+            foreground=foregroundColorSecondary)
         email.grid(row=10, padx=5)
 
         self.logbtn = Button(
@@ -482,8 +500,7 @@ class LoginFrame(Frame):
             foreground=foregroundColor,
             background=backgroundColor,
             command=self._registerprotocol,
-            font=textFont2,
-        )
+            font=textFont2)
         self.logbtn.grid(columnspan=2, sticky="nswe", padx=(5, 5), pady=(5, 5))
         register.configure(background=backgroundColor)
 
@@ -505,9 +522,7 @@ def LoadingWindow():
     resized = original.resize((128, 128), Image.ANTIALIAS)
     github = ImageTk.PhotoImage(resized)
     github.image = github
-    githubLabel = Label(
-        loading, image=github, background=backgroundColor, foreground=fontColor
-    )
+    githubLabel = Label(loading, image=github, background=backgroundColor, foreground=fontColor)
     githubLabel.grid(row=0, column=0, sticky=N + S + E + W, pady=(5, 0), padx=(5))
 
     Label(
@@ -588,41 +603,33 @@ if not Path(resources + "langs.json").is_file():
         resources + "langs.json",
     )
 
+# Load language strings depending on system locale
+with open(f"{resources}langs.json", "r", encoding="utf-8") as lang_file:
+    lang_file = json.load(lang_file)
 
 locale = locale.getdefaultlocale()[0]
-with open(
-    f"{resources}langs.json", "r", encoding="utf-8"
-) as lang_file:  # Load language strings depending on system locale
-    lang_file = json.load(lang_file)
 if locale.startswith("es"):
     lang = "spanish"
-
 elif locale.startswith("pl"):
     lang = "polish"
-
 elif locale.startswith("fr"):
     lang = "french"
-    
-elif locale.startswith("pt"):
-    lang = "portugese"
-
 elif locale.startswith("bg"):
     lang = "bulgarian"
-
 elif locale.startswith("nl"):
     lang = "dutch"
-
 elif locale.startswith("ru"):
     lang = "russian"
-
 elif locale.startswith("de"):
     lang = "german"
-
 elif locale.startswith("tr"):
     lang = "turkish"
-
 else:
     lang = "english"
+
+
+def openTos(handler):
+    open_new_tab("https://github.com/revoxhere/duino-coin#terms-of-usage")
 
 
 def openGitHub(handler):
@@ -1967,7 +1974,7 @@ class Wallet:
             background=backgroundColor,
         )
         amount.grid(row=6, column=1, sticky=N + W + S + E, columnspan=3, padx=(0, 5))
-        amount.insert("0", "2.2")
+        amount.insert("0", "2.3")
         amount.bind("<FocusIn>", clear_amount_placeholder)
 
         sendLabel = Button(
@@ -2162,30 +2169,30 @@ class Wallet:
         updateBalanceLabel()
 
         if not disableTray:
+            try:
+                def quit_window(icon, item):
+                    master.destroy()
 
-            def quit_window(icon, item):
-                master.destroy()
+                def show_window(icon, item):
+                    master.after(0, root.deiconify)
 
-            def show_window(icon, item):
-                master.after(0, root.deiconify)
+                def withdraw_window():
+                    image = Image.open(resources + "duco.png")
+                    menu = (
+                        pystray.MenuItem(getString("tray_show"), show_window),
+                        pystray.MenuItem(getString("tray_exit"), quit_window))
+                    icon = pystray.Icon(
+                        getString("duino_coin_wallet"),
+                        image,
+                        getString("duino_coin_wallet"),
+                        menu)
+                    icon.run()
 
-            def withdraw_window():
-                image = Image.open(resources + "duco.png")
-                menu = (
-                    pystray.MenuItem(getString("tray_show"), show_window),
-                    pystray.MenuItem(getString("tray_exit"), quit_window),
-                )
-                icon = pystray.Icon(
-                    getString("duino_coin_wallet"),
-                    image,
-                    getString("duino_coin_wallet"),
-                    menu,
-                )
-                icon.run()
-
-            t = threading.Thread(target=withdraw_window)
-            t.setDaemon(True)
-            t.start()
+                t = threading.Thread(target=withdraw_window)
+                t.setDaemon(True)
+                t.start()
+            except:
+                pass
 
         root.mainloop()
 
