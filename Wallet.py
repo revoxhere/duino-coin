@@ -624,6 +624,8 @@ elif locale.startswith("de"):
     lang = "german"
 elif locale.startswith("tr"):
     lang = "turkish"
+elif locale.startswith("eo"):
+    lang = "esperanto"
 else:
     lang = "english"
 
