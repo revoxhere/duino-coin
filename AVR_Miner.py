@@ -564,8 +564,8 @@ def Donate():
             + Fore.YELLOW
             + getString("learn_more_donate")
             + Style.RESET_ALL)
-        time.sleep(10)
-    if donatorrunning == False:
+        time.sleep(5)
+    elif donatorrunning == False:
         if int(donationlevel) == 5:
             cmd += "95"
         elif int(donationlevel) == 4:
@@ -1057,6 +1057,15 @@ if __name__ == "__main__":
     except:
         if debug == "y":
             raise
+
+    try:
+        # Launch avr duco mining threads
+        for port in avrport:
+            threading.Thread(
+                target=AVRMine,
+                args=(port,)).start()  
+    except:
+        raise
 
     # Discord rich presence threads
     try:
