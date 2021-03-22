@@ -12,8 +12,14 @@
         "banner": "Official Duino-Coin © Python Miner",
         "donation_level": "Developer donation level: ",
 
-        "medium_diff": "Medium diff",
-        "net_diff": "Network diff",
+        "ask_difficulty": "Select mining difficulty you want to use (1-3): ",
+        "low_diff": "Low difficulty (for Raspberry Pis, older computers)",
+        "medium_diff": "Medium difficulty (for typical computers)",
+        "net_diff": "Network difficulty (for powerful computers)",
+
+        "low_diff_short": "Low diff",
+        "medium_diff_short": "Medium diff",
+        "net_diff_short": "Network diff",
         "algorithm": "Algorithm: ",
         "rig_identifier": "Rig identifier: ",
 
@@ -25,8 +31,8 @@
         "ask_username": "Enter your Duino-Coin username: ",
         "ask_intensity": "Set mining intensity (1-100)% (recommended: 95): ",
         "ask_threads": "Set mining threads (recommended for your system: ",
-        "ask_lower_difficulty": "Do you want to use lower difficulty for mining (for slower systems)? (y/N) ",
-        "ask_rig_identifier": "Do you want to add an identifier (name) to this rig? (y/N) ",
+        "ask_lower_difficulty": "Do you want to use lower difficulty for mining (for slower systems)? (y/N): ",
+        "ask_rig_identifier": "Do you want to add an identifier (name) to this rig? (y/N): ",
         "ask_rig_name": "Enter desired rig name: ",
         "ask_donation_level": "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: ",
         "config_saved": "Config saved! Launching the miner",
@@ -77,32 +83,38 @@
         "banner": "Oficjalna koparka Duino-Coin ©",
         "donation_level": "Poziom dotacji dla deweloperów: ",
 
-        "medium_diff": "Trudność zmniejszona",
-        "net_diff": "Trudność sieci",
+        "ask_difficulty": "Wybierz trudność kopania której chcesz użyć (1-3): ",
+        "low_diff": "Niska trudność (dla Raspberry Pi, starszych komputerów)",
+        "medium_diff": "Średnia trudność (dla typowych komputerów)",
+        "net_diff": "Trudność sieci (dla mocniejszych komputerów)",
+
+        "low_diff_short": "Niska trudność",
+        "medium_diff_short": "Średnia trudność",
+        "net_diff_short": "Trudność sieci",
         "algorithm": "Algorytm: ",
         "rig_identifier": "Identyfikator koparki: ",
 
         "basic_config_tool": "\nKreator pliku konfiguracyjnego Duino-Coin\nEdytuj plik ",
-        "edit_config_file_warning": "/Miner_config.cfg jeżeli chcesz coś poźniej zmienić.",
+        "edit_config_file_warning": "/Miner_config.cfg jeżeli chcesz coś poźniej zmienić.",
         "dont_have_account": "Nie posiadasz konta Duino-Coin? Użyj ",
         "wallet": "Wallet (Portfel)",
         "register_warning": " aby zarejestrować się na sieci.\n",
-        "ask_username": "Wprowadź swoją nazwę użytkownika Duino-Coin: ",
+        "ask_username": "Wprowadź swoją nazwę użytkownika Duino-Coin: ",
         "ask_intensity": "Wprowadź intensywność kopania (1-100)% (zalecane: 95): ",
-        "ask_threads": "Ile wątków chcesz użyć do kopania? (zalecane dla twojego systemu: ",
-        "ask_lower_difficulty": "Chcesz użyć zmniejszonej trudności kopania (dla wolniejszych komputerów)? (y/N) ",
-        "ask_rig_identifier": "Chcesz dodać identyfikator (nazwę) dla tej koparki? (y/N) ",
+        "ask_threads": "Ile wątków chcesz użyć do kopania? (zalecane dla twojego systemu: ",
+        "ask_lower_difficulty": "Chcesz użyć zmniejszonej trudności kopania (dla wolniejszych komputerów)? (y/N): ",
+        "ask_rig_identifier": "Chcesz dodać identyfikator (nazwę) dla tej koparki? (y/N): ",
         "ask_rig_name": "Wprowadź nazwę dla koparki: ",
         "ask_donation_level": "Ustaw poziom dotacji dla deweloperów (0-5) (zalecane: 1), nie zmniejszy to Twoich zysków: ",
         "config_saved": "Konfiguracja zapisana! Uruchamianie koparki",
         "load_config_error": " Problem z ładowaniem pliku konfiguracyjnego (",
         "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s",
 
-        "free_network_warning": " Sieć Duino-Coin jest w pełni darmową usługą i zawsze taka będzie",
+        "free_network_warning": " Sieć Duino-Coin jest w pełni darmową usługą i zawsze taka będzie",
         "donate_warning": "\nNie bierzemy żadnych prowizji z Twojego kopania, a utrzymanie serwera i opłacanie wymian jest kosztowne.\nMożesz nam bardzo pomóc w utrzymaniu odwiedzając ",
         "learn_more_donate": " aby złożyć dotację :)",
         "starting_donation": "Włączanie procesu dotacji",
-        "thanks_donation": " Bardzo dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
+        "thanks_donation": " Bardzo dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
 
         "data_error": " Problem pobierania danych z GitHuba! Ponowna próba za 10s.",
         
@@ -110,7 +122,7 @@
         "connected_server": " z głównym serwerem Duino-Coin (v",
         "outdated_miner": " Koparka jest nieaktualna (v",
         "server_is_on_version": " serwer jest na v",
-        "update_warning": ", proszę pobrać najnowszą wersję z https://github.com/revoxhere/duino-coin/releases/",
+        "update_warning": ", proszę pobrać najnowszą wersję z https://github.com/revoxhere/duino-coin/releases/",
         "connecting_error": " Problem podczas łączenia z serwerem. Ponowna próba za 10s",
         "mining_thread": " Wątek koparki #",
         "mining_thread_starting": " uruchamia się",
@@ -128,7 +140,7 @@
 
         "mining_user": " Użytkownik ",
         "mining_not_exist": " nie jest zarejestrowany.",
-        "mining_not_exist_warning": " Upewnij się że poprawnie wprowadziłeś nazwę użytkownika. Sprawdź swój plik konfiguracyjny. Ponowna próba za 10s"
+        "mining_not_exist_warning": " Upewnij się że poprawnie wprowadziłeś nazwę użytkownika. Sprawdź swój plik konfiguracyjny. Ponowna próba za 10s"
     },
     "spanish": {
         "translation_autor": "HGEpro",
@@ -143,8 +155,14 @@
         "banner": "Oficial Duino-Coin © Python Miner",
         "donation_level": "Nivel de donación para los desarrolladores: ",
 
-        "medium_diff": "Dificultad media",
-        "net_diff": "Dificultad de la red",
+        "ask_difficulty": "Seleccione la dificultad de excavación que desea utilizar (1-3):",
+        "low_diff": "Dificultad baja (para Raspberry Pis o computadoras más antiguas",
+        "medium_diff": "Dificultad media (para computadoras normales)",
+        "net_diff": "Dificultad controlada por la red (para equipos potentes)",
+
+        "low_diff_short": "Umbral bajo",
+        "medium_diff_short": "Peso medio",
+        "net_diff_short": "Umbral controlado por la red", 
         "algorithm": "Algoritmo: ",
         "rig_identifier": "Identificador del rig: ",
 
@@ -156,8 +174,8 @@
         "ask_username": "Introduce tu usuario de Duino-Coin: ",
         "ask_intensity": "Ajusta la intensidad de minado (1-100)% (recomendado: 95): ",
         "ask_threads": "Ajusta los hilos para el minado (recomendado para tu sistema: ",
-        "ask_lower_difficulty": "¿Deseas usar una dificultad más baja (para sistemas de bajo rendimiento)? (y/N) ",
-        "ask_rig_identifier": "¿Deseas añadir un identificador (nombre) a este rig? (y/N) ",
+        "ask_lower_difficulty": "¿Deseas usar una dificultad más baja (para sistemas de bajo rendimiento)? (y/N): ",
+        "ask_rig_identifier": "¿Deseas añadir un identificador (nombre) a este rig? (y/N): ",
         "ask_rig_name": "Introduce el nombre del rig: ",
         "ask_donation_level": "Ajusta el nivel de donación a los desarrolladores (0-5) (recomendado: 1), esto no reducirá tus ganancias: ",
         "config_saved": "¡Configuración guardada! Lanzando el minero",
@@ -197,7 +215,7 @@
         "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s"
     },
     "french": {
-	"translation_autor": "Bilaboz",
+	   "translation_autor": "Bilaboz",
         "sigint_detected": " SIGINT détecté - Fermeture...",
         "goodbye": " A bientôt!",
         "greeting_morning": "J'espère que vous passez une bonne matinée!",
@@ -209,8 +227,14 @@
         "banner": "Mineur Officiel (Python) Duino-Coin ©",
         "donation_level": "Niveau de donation pour le développeur: ",
 
-        "medium_diff": "Difficulté moyenne",
-        "net_diff": "Difficulté du réseau",
+        "ask_difficulty" : "Veuillez sélectionner la difficulté d'exploitation que vous souhaitez utiliser (1-3): ",
+        "low_diff" : "Faible difficulté (pour les ordinateurs Raspberry Pis ou plus anciens)",
+        "medium_diff" : "Difficulté moyenne (pour les ordinateurs normaux)",
+        "net_diff" : "Difficulté du réseau (pour les ordinateurs puissants)",
+
+        "low_diff_short" : "Low Difficulty",
+        "medium_diff_short" : "Difficulté moyenne",
+        "net_diff_short" : "Difficulté en réseau",
         "algorithm": "Algorithme: ",
         "rig_identifier": "Nom du mineur/rig: ",
 
@@ -222,8 +246,8 @@
         "ask_username": "Entrez votre nom d'utilisateur Duino-Coin: ",
         "ask_intensity": "Choisissez l'intensité de minage (1-100)% (recommandé: 95): ",
         "ask_threads": "Choisissez le nombre de threads (recommandé pour votre système: ",
-        "ask_lower_difficulty": "Voulez vous utiliser une difficulté de minage plus basse (pour les systèmes les plus lents)? (y/N) ",
-        "ask_rig_identifier": "Voulez vous ajouter un indentifieur (un nom) à ce mineur/rig? (y/N) ",
+        "ask_lower_difficulty": "Voulez vous utiliser une difficulté de minage plus basse (pour les systèmes les plus lents)? (y/N): ",
+        "ask_rig_identifier": "Voulez vous ajouter un indentifieur (un nom) à ce mineur/rig? (y/N): ",
         "ask_rig_name": "Entrez le nom du mineur/rig désiré: ",
         "ask_donation_level": "Choisissez le niveau de donation (0-5) (recommandé: 1), cela ne réduira pas vos gains: ",
         "config_saved": "Configuration sauvegardée! Lancement du mineur",
@@ -275,8 +299,14 @@
         "banner": "Официальный Duino-Coin © Python майнер",
         "donation_level": "Уровень пожертвования разработчикам: ",
 
-        "medium_diff": "Средняя сложность",
-        "net_diff": "Сложность сети",
+        "ask_difficulty": "Выберите сложность которую вы хотите использовать (1-3): ",
+        "low_diff": "Низкая сложность (для Raspberry Pi, старых ПК)",
+        "medium_diff": "Средняя сложность (для средних ПК)",
+        "net_diff": "Сложность сети (для мощных ПК)",
+
+        "low_diff_short": "Низк. сложность",
+        "medium_diff_short": "Ср. сложность",
+        "net_diff_short": "Сложность сети",
         "algorithm": "Алгоритм: ",
         "rig_identifier": "Идентификатор устройства: ",
 
@@ -288,8 +318,8 @@
         "ask_username": "Введите ваше имя пользователя Duino-Coin: ",
         "ask_intensity": "Установите мощность майнинга (1-100)% (рекомендуется: 95): ",
         "ask_threads": "Установите количество потоков майнера (рекомендуется для вашего устройства: ",
-        "ask_lower_difficulty": "Вы хотите использовать пониженную сложность майнинга (для более медленных устройств)? (y/N) ",
-        "ask_rig_identifier": "Хотите ли вы добавить идентификатор (имя) этому устройству? (y/N) ",
+        "ask_lower_difficulty": "Вы хотите использовать пониженную сложность майнинга (для более медленных устройств)? (y/N): ",
+        "ask_rig_identifier": "Хотите ли вы добавить идентификатор (имя) этому устройству? (y/N): ",
         "ask_rig_name": "Введите желаемое имя устройства: ",
         "ask_donation_level": "Установите уровень пожертвования разработчикам (0-5) (рекомендуется: 1), это не уменьшит ваш заработок: ",
         "config_saved": "Настройки сохранены! Запускаем майнер",
@@ -340,8 +370,14 @@
         "banner": "Ofizieller Duino-Coin © Python Miner",
         "donation_level": "Entwickler-Spendenlevel: ",
 
-        "medium_diff": "Medium diff",
-        "net_diff": "Network diff",
+        "ask_difficulty": "Bitte wähle die Schürfschwierigkeit aus, die du benutzen willst (1-3): ",
+        "low_diff": "Niedrige Schwierigkeit (für Raspberry Pis oder ältere Computer",
+        "medium_diff": "Mittlere Schwierigkeit (für normale Computer)",
+        "net_diff": "Netzwerkgesteurte Schwierigkeit (für leistungsstarke Computer)",
+
+        "low_diff_short": "Niedrige Schw.",
+        "medium_diff_short": "Mittlere Schw.",
+        "net_diff_short": "Netzwerkgest. Schw.",
         "algorithm": "Algorithmus: ",
         "rig_identifier": "Rig Identifikation: ",
 
@@ -353,8 +389,8 @@
         "ask_username": "Gib deinen Duino-Coin Nutzernamen ein: ",
         "ask_intensity": "Wie viel Prozent der Leistung soll Duino-Coin verwenden? (1-100)% (empfohlen: 95): ",
         "ask_threads": "Wie viele Threads willst du benutzen? (für dein System empfohlen: ",
-        "ask_lower_difficulty": "Willst du eine niedrigere Schwierigkeit verwenden (für langsamere Systeme)? (y/N) ",
-        "ask_rig_identifier": "Willst du eine Identifikation (Name) zu diesem Rig hinzufügen? (y/N) ",
+        "ask_lower_difficulty": "Willst du eine niedrigere Schwierigkeit verwenden (für langsamere Systeme)? (y/N): ",
+        "ask_rig_identifier": "Willst du eine Identifikation (Name) zu diesem Rig hinzufügen? (y/N): ",
         "ask_rig_name": "Dein Rig Name: ",
         "ask_donation_level": "Setze das Entwickler-Spendenlevel (0-5) (empfohlen: 1), das wird nicht deinen Ertrag reduzieren: ",
         "config_saved": "Konfiguration gespeichert! Der Miner wird gestartet...",
@@ -390,6 +426,5 @@
         "mining_user": " Benutzer ",
         "mining_not_exist": " existiert nicht.",
         "mining_not_exist_warning": " Stelle sicher, dass du den Nuternamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s"
-
     }	
 }
