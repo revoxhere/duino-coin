@@ -12,7 +12,7 @@
 To build your own Duino-Coin apps, here's a list of of commands the master server accepts.
 To start communication however, firstly you need to connect to the server. For now you have two options:
 *   TCP connection (recommended) - server IP and port are static: `tcp://51.15.127.80:2811`
-*   Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static: `ws://51.15.127.80:15808`
+*   Secure Websocket connection (through proxy - may not be available 100% of the time) - server IP and port are static: `wss://51.15.127.80:15808`
 
 **Make sure you don't create more than 24 connections per IP address and don't make more than 24 connections in time shorter than 30 seconds.**
 If you do that, the server may ban your IP for creating too much traffic and being a potential DDoS attacker.
