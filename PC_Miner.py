@@ -8,7 +8,7 @@
 # Import libraries
 import socket, threading, multiprocessing, time, hashlib, sys, os
 import statistics, re, subprocess, configparser, datetime
-import locale, json
+import locale, json, platform
 from pathlib import Path
 from signal import signal, SIGINT
 
@@ -79,7 +79,7 @@ hash_mean = []
 donatorrunning = False
 debug = "n"
 rigIdentifier = "None"
-useLowerDiff = "n"
+requestedDiff = "NET"
 serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"  # Serverip file
 config = configparser.ConfigParser()
 donationlevel = 0
@@ -100,6 +100,11 @@ if not Path(resourcesFolder + "/langs.json").is_file():
 with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = json.load(lang_file)
 
+# OS X invalid locale hack
+if platform.system() == 'Darwin':
+    if locale.getlocale()[0] is None:
+        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+
 # Check if miner is configured, if it isn't, autodetect language
 if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
     locale = locale.getdefaultlocale()[0]
@@ -115,8 +120,8 @@ if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
         lang = "german"
     else:
         lang = "english"
-# Read language variable from configfile
 else:
+    # Read language variable from configfile
     try:  
         config.read(resourcesFolder + "/Miner_config.cfg")
         lang = config["miner"]["language"]
@@ -132,7 +137,6 @@ def getString(string_name):
         return lang_file["english"][string_name]
     else:
         return "String not found: " + string_name
-
 
 # Debug output
 def debugOutput(text): 
@@ -151,7 +155,8 @@ def title(title):
 def handler(signal_received, frame):
     if multiprocessing.current_process().name == 'MainProcess':
         print(
-            now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+            "\n"
+            + now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
             + Style.BRIGHT
             + Back.GREEN
             + Fore.WHITE
@@ -179,10 +184,12 @@ def Greeting():
     global greeting
     print(Style.RESET_ALL)
 
-    if useLowerDiff == "y":
-        diffName = getString("medium_diff")
+    if requestedDiff == "NET":
+        diffName = getString("net_diff_short")
+    elif requestedDiff == "MEDIUM":
+        diffName = getString("medium_diff_short")
     else:
-        diffName = getString("net_diff")
+        diffName = getString("low_diff_short")
 
     current_hour = time.strptime(time.ctime(time.time())).tm_hour
     if current_hour < 12:
@@ -198,7 +205,7 @@ def Greeting():
 
     print(
         Style.RESET_ALL
-        + " > "
+        + " ‖ "
         + Fore.YELLOW
         + Style.BRIGHT
         + getString("banner")
@@ -209,13 +216,13 @@ def Greeting():
         + ") 2019-2021")
     print(
         Style.RESET_ALL
-        + " > "
+        + " ‖ "
         + Fore.YELLOW
         + "https://github.com/revoxhere/duino-coin")
     try:
         print(
             Style.RESET_ALL
-            + " > "
+            + " ‖ "
             + Fore.WHITE
             + "CPU: "
             + Style.BRIGHT
@@ -229,7 +236,7 @@ def Greeting():
     if os.name == "nt" or os.name == "posix":
         print(
             Style.RESET_ALL
-            + " > "
+            + " ‖ "
             + Fore.WHITE
             + getString("donation_level")
             + Style.BRIGHT
@@ -237,7 +244,7 @@ def Greeting():
             + str(donationlevel))
     print(
         Style.RESET_ALL
-        + " > "
+        + " ‖ "
         + Fore.WHITE
         + getString("algorithm")
         + Style.BRIGHT
@@ -246,7 +253,7 @@ def Greeting():
         + diffName)
     print(
         Style.RESET_ALL
-        + " > "
+        + " ‖ "
         + Fore.WHITE
         + getString("rig_identifier")
         + Style.BRIGHT
@@ -254,7 +261,7 @@ def Greeting():
         + rigIdentifier)
     print(
         Style.RESET_ALL
-        + " > "
+        + " ‖ "
         + Fore.WHITE
         + str(greeting)
         + ", "
@@ -262,6 +269,7 @@ def Greeting():
         + Fore.YELLOW
         + str(username)
         + "!\n")
+
     if os.name == "nt":
         if not Path(resourcesFolder + "/Donate_executable.exe").is_file():  # Initial miner executable section
             debugOutput("OS is Windows, downloading developer donation executable")
@@ -293,7 +301,7 @@ def hashrateCalculator(hashcount, khashcount):
 
 # Config loading section
 def loadConfig():  
-    global username, efficiency, donationlevel, debug, threadcount, useLowerDiff, rigIdentifier, lang
+    global username, efficiency, donationlevel, debug, threadcount, requestedDiff, rigIdentifier, lang
 
     if not Path(resourcesFolder + "/Miner_config.cfg").is_file():  # Initial configuration section
         print(
@@ -315,12 +323,14 @@ def loadConfig():
             + getString("ask_username")
             + Fore.WHITE
             + Style.BRIGHT)
+
         efficiency = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_intensity")
             + Fore.WHITE
             + Style.BRIGHT)
+
         threadcount = input(
             Style.RESET_ALL
             + Fore.YELLOW
@@ -329,12 +339,39 @@ def loadConfig():
             + "): "
             + Fore.WHITE
             + Style.BRIGHT)
-        useLowerDiff = input(
+
+        print(
+            Style.RESET_ALL
+            + Style.BRIGHT
+            + Fore.WHITE
+            + "1"
+            + Style.NORMAL
+            + " - "
+            + getString("low_diff"))
+        print(
+            Style.RESET_ALL
+            + Style.BRIGHT
+            + Fore.WHITE
+            + "2"
+            + Style.NORMAL
+            + " - "
+            + getString("medium_diff"))
+        print(
+            Style.RESET_ALL
+            + Style.BRIGHT
+            + Fore.WHITE
+            + "3"
+            + Style.NORMAL
+            + " - "
+            + getString("net_diff"))
+
+        requestedDiff = input(
             Style.RESET_ALL
             + Fore.YELLOW
-            + getString("ask_lower_difficulty")
+            + getString("ask_difficulty")
             + Fore.WHITE
             + Style.BRIGHT)
+
         rigIdentifier = input(
             Style.RESET_ALL
             + Fore.YELLOW
@@ -380,10 +417,12 @@ def loadConfig():
             threadcount = 1
 
         # Check wheter diff setting is correct
-        if useLowerDiff == "y" or useLowerDiff == "Y":
-            useLowerDiff = "y"
+        if requestedDiff == "1":
+            requestedDiff = "LOW"
+        elif requestedDiff == "2":
+            requestedDiff = "MEDIUM"
         else:
-            useLowerDiff = "n"
+            requestedDiff = "NET"
 
         # Check wheter donationlevel is correct
         donationlevel = re.sub("\D", "", donationlevel)
@@ -399,7 +438,7 @@ def loadConfig():
             "username": username,
             "efficiency": efficiency,
             "threads": threadcount,
-            "useLowerDiff": useLowerDiff,
+            "requestedDiff": requestedDiff,
             "donate": donationlevel,
             "identifier": rigIdentifier,
             "language": lang,
@@ -419,7 +458,7 @@ def loadConfig():
         username = config["miner"]["username"]
         efficiency = config["miner"]["efficiency"]
         threadcount = config["miner"]["threads"]
-        useLowerDiff = config["miner"]["useLowerDiff"]
+        requestedDiff = config["miner"]["requestedDiff"]
         donationlevel = config["miner"]["donate"]
         rigIdentifier = config["miner"]["identifier"]
         debug = config["miner"]["debug"]
@@ -506,8 +545,9 @@ def ducos1(lastBlockHash, expectedHash, difficulty):  # Loop from 1 too 100*diff
         if ducos1 == expectedHash:
             return [ducos1res, hashcount]
 
+
 # Mining section for every thread
-def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, username, efficiency, rigIdentifier):
+def Thread(threadid, hashcount, accepted, rejected, requestedDiff, khashcount, username, efficiency, rigIdentifier):
     while True:
         # Grab server IP and port
         while True:
@@ -567,6 +607,7 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                         + getString("connected_server")
                         + str(serverVersion)
                         + ")")
+                    break
 
                 else:
                     # Miner is outdated
@@ -588,7 +629,7 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                         + getString("server_is_on_version")
                         + serverVersion
                         + getString("update_warning"))
-                break
+                    break
             except:
                 # Socket connection error
                 print(
@@ -636,10 +677,8 @@ def Thread(threadid, hashcount, accepted, rejected, useLowerDiff, khashcount, us
                 if float(100 - efficiency * 100) < 100:
                     time.sleep(float(efficiency * 5))  # Sleep to achieve lower efficiency if less than 100 selected
                 while True:
-                    if useLowerDiff == "n":   # Send job request
-                        soc.send(bytes(f"JOB,{str(username)}", encoding="utf8"))
-                    else:   # Send job request with lower diff
-                        soc.send(bytes(f"JOB,{str(username)},MEDIUM", encoding="utf8"))
+                    # Ask the server for job
+                    soc.send(bytes(f"JOB,{str(username)},{str(requestedDiff)}", encoding="utf8"))
 
                     job = soc.recv(128).decode().split(",")  # Get work from pool
                     if job[1] == "This user doesn't exist":
@@ -1001,7 +1040,7 @@ if __name__ == "__main__":
                 hashcount,
                 accepted,
                 rejected,
-                useLowerDiff,
+                requestedDiff,
                 khashcount,
                 username,
                 efficiency,
