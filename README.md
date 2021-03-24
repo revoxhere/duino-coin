@@ -62,16 +62,16 @@ You can use one of the following links to get some data from Duino-Coin Server:
     *   HTTP: `http://51.15.127.80/api.json`
     *   Small part of the response:
         ```JSON
-        {
-          "_Duino-Coin Public master server JSON API": "https://github.com/revoxhere/duino-coin",
-          "Server version": 2.2,
-          "Active connections": 1039,
-          "Open threads": 13,
-          "Server CPU usage": 61.0,
-          "Server RAM usage": 9.73,
-          "Last update": "24/03/2021 12:45 (UTC)"
-        }
-       ```
+         {
+            "_Duino-Coin Public master server JSON API": "https://github.com/revoxhere/duino-coin",
+            "Server version": 2.2,
+            "Active connections": 1039,
+            "Open threads": 13,
+            "Server CPU usage": 61.0,
+            "Server RAM usage": 9.73,
+            "Last update": "24/03/2021 12:45 (UTC)"
+         }
+        ```
 
 *   User balances API refreshed every 30s
     *   HTTPS: `https://server.duinocoin.com/balances.json`
@@ -79,11 +79,11 @@ You can use one of the following links to get some data from Duino-Coin Server:
     *   Small part of the response:
         ```JSON
          {
-           "magicsky": "3112.6 DUCO",
-           "lulkas": "3047.01 DUCO",
-           "revox": "2884.1194 DUCO",
-           "ethux": "2812.2677 DUCO",
-           "metal93": "2685.5714 DUCO"
+            "magicsky": "3112.6 DUCO",
+            "lulkas": "3047.01 DUCO",
+            "revox": "2884.1194 DUCO",
+            "ethux": "2812.2677 DUCO",
+            "metal93": "2685.5714 DUCO"
          }
         ```
         Note: only users who have account balance greater than 0 are listed in this API.
@@ -108,10 +108,10 @@ You can use one of the following links to get some data from Duino-Coin Server:
     *   Small part of the response:
         ```JSON
          "e39c8c290b3478d3d5c21a6caffd44d6799e0ae9": {
-          "Date": "09/02/2021",
-          "Time": "08:28:40",
-          "Finder": "revox",
-          "Amount generated": 7.00026306
+            "Date": "09/02/2021",
+            "Time": "08:28:40",
+            "Finder": "revox",
+            "Amount generated": 7.00026306
          }
         ```
 
