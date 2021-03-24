@@ -347,20 +347,12 @@ def loadConfig():
             + "1"
             + Style.NORMAL
             + " - "
-            + getString("low_diff"))
-        print(
-            Style.RESET_ALL
-            + Style.BRIGHT
-            + Fore.WHITE
-            + "2"
-            + Style.NORMAL
-            + " - "
             + getString("medium_diff"))
         print(
             Style.RESET_ALL
             + Style.BRIGHT
             + Fore.WHITE
-            + "3"
+            + "2"
             + Style.NORMAL
             + " - "
             + getString("net_diff"))
@@ -418,8 +410,6 @@ def loadConfig():
 
         # Check wheter diff setting is correct
         if requestedDiff == "1":
-            requestedDiff = "LOW"
-        elif requestedDiff == "2":
             requestedDiff = "MEDIUM"
         else:
             requestedDiff = "NET"
@@ -473,18 +463,18 @@ def Donate():
             "cd "
             + resourcesFolder
             + "& Donate_executable.exe "
-            + "-o stratum+tcp://mine.nlpool.nl:6033 "
-            + "-u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR "
-            + "-p PCmW,c=XMG,d=6 -s 4 -e ")
+            + "-o stratum+tcp://xmg.minerclaim.net:7008 "
+            + "-u revox.donate "
+            + "-p x -s 4 -e ")
     elif os.name == "posix":
         cmd = (
             "cd "
             + resourcesFolder
             + "&& chmod +x Donate_executable "
             + "&& ./Donate_executable "
-            + "-o stratum+tcp://mine.nlpool.nl:6033 "
-            + "-u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR "
-            + "-p PCmL,c=XMG,d=6 -s 4 -e ")
+            + "-o stratum+tcp://xmg.minerclaim.net:7008 "
+            + "-u revox.donate "
+            + "-p x -s 4 -e ")
     if int(donationlevel) <= 0:
         print(
             now().strftime(Style.DIM + "%H:%M:%S ")
@@ -536,12 +526,16 @@ def Donate():
 
 
 # DUCO-S1 algorithm
-def ducos1(lastBlockHash, expectedHash, difficulty):  # Loop from 1 too 100*diff
+def ducos1(lastBlockHash, expectedHash, difficulty):
     hashcount = 0
+    # Loop from 1 too 100*diff
     for ducos1res in range(100 * int(difficulty) + 1):
+        # Generate hash
         ducos1 = hashlib.sha1(str(lastBlockHash + str(ducos1res)).encode("utf-8"))
-        ducos1 = ducos1.hexdigest()  # Generate hash
-        hashcount += 1  # Increment hash counter for hashrate calculator
+        ducos1 = ducos1.hexdigest()
+        # Increment hash counter for hashrate calculator
+        hashcount += 1  
+        # Check if result was found
         if ducos1 == expectedHash:
             return [ducos1res, hashcount]
 
