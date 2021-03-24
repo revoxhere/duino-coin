@@ -519,6 +519,11 @@ def Greeting():  # Greeting message depending on time
 
 def restart_miner():
     try:
+        if donatorrunning:
+            try:
+                donateExecutable.terminate()
+            except:
+                pass
         os.execl(sys.executable, sys.executable, *sys.argv)
     except:
         print("Permission error")
