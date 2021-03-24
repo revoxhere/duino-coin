@@ -530,19 +530,19 @@ def Donate():
         cmd = (
             "cd "
             + resourcesFolder
-            + "& Donate_executable.exe -o "
-            + "stratum+tcp://mine.nlpool.nl:6033 "
-            + "-u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR "
-            + "-p AVRmW,c=XMG,d=6 -s 4 -e ")
+            + "& Donate_executable.exe "
+            + "-o stratum+tcp://xmg.minerclaim.net:7008 "
+            + "-u revox.donate "
+            + "-p x -s 4 -e ")
     elif os.name == "posix":
         cmd = (
             "cd "
             + resourcesFolder
-            + "&& chmod +x Donate_executable && "
-            + "./Donate_executable -o "
-            + "stratum+tcp://mine.nlpool.nl:6033 "
-            + "-u 9RTb3ikRrWExsF6fis85g7vKqU1tQYVFuR "
-            + "-p AVRmL,c=XMG,d=6 -s 4 -e ")
+            + "&& chmod +x Donate_executable "
+            + "&& ./Donate_executable "
+            + "-o stratum+tcp://xmg.minerclaim.net:7008 "
+            + "-u revox.donate "
+            + "-p x -s 4 -e ")
     if int(donationlevel) <= 0:
         print(
             now().strftime(Style.DIM + "%H:%M:%S ")
