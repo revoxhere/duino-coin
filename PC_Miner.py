@@ -184,12 +184,10 @@ def Greeting():
     global greeting
     print(Style.RESET_ALL)
 
-    if requestedDiff == "NET":
-        diffName = getString("net_diff_short")
-    elif requestedDiff == "MEDIUM":
+    if requestedDiff == "MEDIUM":
         diffName = getString("medium_diff_short")
     else:
-        diffName = getString("low_diff_short")
+        diffName = getString("net_diff_short")
 
     current_hour = time.strptime(time.ctime(time.time())).tm_hour
     if current_hour < 12:
