@@ -825,7 +825,7 @@ def Thread(
                             + ","
                             + str(threadhashcount)
                             + ","
-                            + "Official XXHASH Miner v" + str(minerVersion)
+                            + "Official PC Miner (XXHASH) v" + str(minerVersion)
                             + ","
                             + str(rigIdentifier),
                             encoding="utf8"))
@@ -873,7 +873,7 @@ def Thread(
                                     + Style.DIM
                                     + "%H:%M:%S ")
                                 + Style.BRIGHT
-                                + Back.YELLOW
+                                + Back.BLUE
                                 + Fore.WHITE
                                 + " cpu"
                                 + str(threadid)
