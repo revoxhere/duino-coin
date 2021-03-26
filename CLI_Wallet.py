@@ -282,8 +282,16 @@ while True:
                     server_timeout = True
 
         if int(choice) == 2:
-            username = input(Style.RESET_ALL + Fore.YELLOW +
-                             "Enter your username: " + Style.BRIGHT)
+            print(Style.RESET_ALL + Fore.YELLOW +
+                "By registering a new account you agree to the terms of service and privacy policy available at " 
+                + Fore.WHITE 
+                + "https://github.com/revoxhere/duino-coin#terms-of-usage"
+                + Fore.YELLOW)
+            username = input(
+                Style.RESET_ALL 
+                + Fore.YELLOW 
+                + "Enter your username: " 
+                + Style.BRIGHT)
             password = getpass.getpass(
                 prompt=Style.RESET_ALL + Fore.YELLOW + "Enter your password: " + Style.BRIGHT, stream=None)
             pconfirm = getpass.getpass(
