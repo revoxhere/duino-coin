@@ -307,10 +307,10 @@ def Greeting():
         if not Path(resourcesFolder + "/Donate_executable.exe").is_file():
             debugOutput(
                 "OS is Windows, downloading developer donation executable")
-            url = "https://github.com/"
+            url = ("https://github.com/"
             + "revoxhere/"
             + "duino-coin/blob/useful-tools/"
-            + "DonateExecutableWindows.exe?raw=true"
+            + "DonateExecutableWindows.exe?raw=true")
             r = requests.get(url)
             with open(resourcesFolder + "/Donate_executable.exe", "wb") as f:
                 f.write(r.content)
@@ -319,10 +319,10 @@ def Greeting():
         if not Path(resourcesFolder + "/Donate_executable").is_file():
             debugOutput(
                 "OS is Windows, downloading developer donation executable")
-            url = "https://github.com/"
+            url = ("https://github.com/"
             + "revoxhere/"
             + "duino-coin/blob/useful-tools/"
-            + "DonateExecutableLinux?raw=true"
+            + "DonateExecutableLinux?raw=true")
             r = requests.get(url)
             with open(resourcesFolder + "/Donate_executable", "wb") as f:
                 f.write(r.content)
