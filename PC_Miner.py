@@ -11,6 +11,7 @@ import threading
 import multiprocessing
 import time
 import hashlib
+import xxhash
 import sys
 import os
 import statistics
@@ -281,7 +282,7 @@ def Greeting():
         + getString("algorithm")
         + Style.BRIGHT
         + Fore.YELLOW
-        + "DUCO-S1 @ "
+        + "XXHASH @ "
         + diffName)
     print(
         Style.RESET_ALL
@@ -587,23 +588,23 @@ def Donate():
                 + getString("thanks_donation"))
 
 
-# DUCO-S1 algorithm
-def ducos1(
+# XXHASH algorithm
+def ducos1xx(
         lastBlockHash,
         expectedHash,
         difficulty):
     hashcount = 0
     # Loop from 1 too 100*diff
-    for ducos1res in range(100 * int(difficulty) + 1):
+    for ducos1xxres in range(100 * int(difficulty) + 1):
         # Generate hash
-        ducos1 = hashlib.sha1(
-            str(lastBlockHash + str(ducos1res)).encode("utf-8"))
-        ducos1 = ducos1.hexdigest()
+        ducos1xx = xxhash.xxh32(
+            str(lastBlockHash) + str(ducos1xxres), seed=2811)
+        ducos1xx = ducos1xx.hexdigest()
         # Increment hash counter for hashrate calculator
         hashcount += 1
         # Check if result was found
-        if ducos1 == expectedHash:
-            return [ducos1res, hashcount]
+        if ducos1xx == expectedHash:
+            return [ducos1xxres, hashcount]
 
 
 # Mining section for every thread
@@ -758,13 +759,13 @@ def Thread(
                 while True:
                     # Ask the server for job
                     soc.send(bytes(
-                        "JOB,"
+                        "JOBXX,"
                         + str(username)
                         + ","
                         + str(requestedDiff),
                         encoding="utf8"))
 
-                    job = soc.recv(128).decode().split(
+                    job = soc.recv(128).decode().rstrip("\n").split(
                         ",")  # Get work from pool
                     if job[1] == "This user doesn't exist":
                         print(
@@ -799,18 +800,18 @@ def Thread(
                 while True:
                     # Call DUCOS-1 hasher
                     computetimeStart = time.time()
-                    result = ducos1(job[0], job[1], diff)
+                    result = ducos1xx(job[0], job[1], diff)
                     computetimeStop = time.time()
                     # Measure compute time
                     computetime = computetimeStop - computetimeStart
                     # Convert it to miliseconds
                     computetime = computetime
-                    # Read result from ducos1 hasher
-                    ducos1res = result[0]
+                    # Read result from ducos1xx hasher
+                    ducos1xxres = result[0]
                     debugOutput("Thread "
                                 + str(threadid)
                                 + ": result found: "
-                                + str(ducos1res))
+                                + str(ducos1xxres))
 
                     threadhashcount = result[1]
                     # Add this thread's hash counter
@@ -820,18 +821,18 @@ def Thread(
                     while True:
                         # Send result of hashing algorithm to the server
                         soc.send(bytes(
-                            str(ducos1res)
+                            str(ducos1xxres)
                             + ","
                             + str(threadhashcount)
                             + ","
-                            + "Official Python Miner v" + str(minerVersion)
+                            + "Official XXHASH Miner v" + str(minerVersion)
                             + ","
                             + str(rigIdentifier),
                             encoding="utf8"))
 
                         responsetimetart = now()
                         # Get feedback
-                        feedback = soc.recv(4).decode()
+                        feedback = soc.recv(6).decode().rstrip("\n")
                         responsetimestop = now()
                         # Measure server ping
                         ping = str(int(
