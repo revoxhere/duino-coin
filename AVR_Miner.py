@@ -165,7 +165,7 @@ def Connect():
             # Establish socket connection to the server
             socId.connect((str(masterServer_address), int(masterServer_port)))
             # Get server version
-            serverVersion = socId.recv(3).decode()
+            serverVersion = socId.recv(3).decode().rstrip("\n")
             debugOutput("Server version: " + serverVersion)
             if (float(serverVersion) <= float(minerVersion)and len(serverVersion) == 3):
                 # If miner is up-to-date, display a message and continue
@@ -293,7 +293,7 @@ def handler(signal_received, frame):
         + Fore.WHITE
         + getString("goodbye"))
     try:
-        soc.close()
+        socket.close()
     except:
         pass
     os._exit(0)
@@ -719,7 +719,7 @@ def AVRMine(com):
                             + ","
                             + str(requestedDiff),
                             encoding="utf8")) 
-                    job = socId.recv(85).decode()  # Retrieve work
+                    job = socId.recv(85).decode().rstrip("\n")  # Retrieve work
                     job = job.split(",")  # Split received data
 
                     # Check if username is correct
@@ -850,7 +850,7 @@ def AVRMine(com):
                     try:
                         responsetimetart = now()
                         # Get feedback
-                        feedback = socId.recv(48).decode()  
+                        feedback = socId.recv(48).decode().rstrip("\n") 
                         responsetimestop = now()
                         # Measure server ping
                         ping = str(int((responsetimestop - responsetimetart).microseconds / 1000))
