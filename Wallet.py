@@ -371,7 +371,7 @@ class LoginFrame(Frame):
                 + ","
                 + str(password),
                 encoding="utf8"))
-            response = soc.recv(64).decode("utf8")
+            response = soc.recv(64).decode("utf8").rstrip("\n")
             response = response.split(",")
 
             if response[0] == "OK":
@@ -415,7 +415,7 @@ class LoginFrame(Frame):
                         + ","
                         + str(emailS),
                         encoding="utf8"))
-                response = soc.recv(128).decode("utf8")
+                response = soc.recv(128).decode("utf8").rstrip("\n")
                 response = response.split(",")
 
                 if response[0] == "OK":
@@ -1690,7 +1690,7 @@ def openSettings(handler):
                                 + ","
                                 + str(newpasswordS),
                                 encoding="utf8"))
-                        response = soc.recv(128).decode("utf8").split(",")
+                        response = soc.recv(128).decode("utf8").rstrip("\n").split(",")
                         soc.close()
 
                         if not "OK" in response[0]:
@@ -2049,7 +2049,7 @@ def getBalance():
                     "BALA",
                     encoding="utf8"))
                 oldbalance = balance
-                balance = soc.recv(1024).decode()
+                balance = soc.recv(1024).decode().rstrip("\n")
                 try:
                     balance = float(balance)
                     globalBalance = round(float(balance), 8)
@@ -2228,7 +2228,7 @@ def sendFunds(handler):
                 + ","
                 + str(amountStr),
                 encoding="utf8"))
-        response = soc.recv(128).decode().split(",")
+        response = soc.recv(128).decode().rstrip("\n").split(",")
         soc.close()
 
         if "OK" in str(response[0]):
