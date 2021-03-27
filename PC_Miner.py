@@ -657,7 +657,7 @@ def Thread(
                 # Establish socket connection to the server
                 soc.connect((str(masterServer_address),
                              int(masterServer_port)))
-                serverVersion = soc.recv(3).decode()  # Get server version
+                serverVersion = soc.recv(3).decode().rstrip("\n")  # Get server version
                 debugOutput("Server version: " + serverVersion)
                 if (float(serverVersion) <= float(minerVersion)
                         and len(serverVersion) == 3):
@@ -764,8 +764,8 @@ def Thread(
                         + str(requestedDiff),
                         encoding="utf8"))
 
-                    job = soc.recv(128).decode().split(
-                        ",")  # Get work from pool
+                    job = soc.recv(128).decode().rstrip("\n")
+                    job = job.split(",")  # Get work from pool
                     if job[1] == "This user doesn't exist":
                         print(
                             now().strftime(
@@ -824,14 +824,14 @@ def Thread(
                             + ","
                             + str(threadhashcount)
                             + ","
-                            + "Official Python Miner v" + str(minerVersion)
+                            + "Official PC Miner (DUCO-S1) v" + str(minerVersion)
                             + ","
                             + str(rigIdentifier),
                             encoding="utf8"))
 
                         responsetimetart = now()
                         # Get feedback
-                        feedback = soc.recv(4).decode()
+                        feedback = soc.recv(4).decode().rstrip("\n")
                         responsetimestop = now()
                         # Measure server ping
                         ping = str(int(
