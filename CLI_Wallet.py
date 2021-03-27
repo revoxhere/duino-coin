@@ -217,7 +217,7 @@ while True:
             try:  # Try to connect
                 s.connect((str(pool_address), int(pool_port)))
                 s.settimeout(timeout)
-                SERVER_VER = s.recv(3).decode()
+                SERVER_VER = s.recv(3).decode().rstrip("\n")
 
                 # Use request to grab data from raw github file
                 jsonapi = requests.get(
@@ -267,7 +267,7 @@ def reconnect():
                 try:  # Try to connect
                     s.connect((str(pool_address), int(pool_port)))
                     s.settimeout(timeout)
-                    SERVER_VER = s.recv(3).decode()
+                    SERVER_VER = s.recv(3).decode().rstrip("\n")
 
                     # Use request to grab data from raw github file
                     jsonapi = requests.get(
@@ -412,7 +412,7 @@ while True:
                         + str(email),
                         encoding="utf8"))
 
-                    regiFeedback = s.recv(256).decode().split(",")
+                    regiFeedback = s.recv(256).decode().rstrip("\n").split(",")
 
                     if regiFeedback[0] == "OK":
                         print(Style.RESET_ALL
@@ -481,7 +481,7 @@ while True:
                 + str(",placeholder"),
                 encoding="utf8"))
 
-            loginFeedback = s.recv(128).decode().split(",")
+            loginFeedback = s.recv(128).decode().rstrip("\n").split(",")
             if loginFeedback[0] == "OK":
                 break
             else:
@@ -508,7 +508,7 @@ while True:
                     except:
                         trx_balance = 0
                 try:
-                    balance = round(float(s.recv(256).decode()), 8)
+                    balance = round(float(s.recv(256).decode().rstrip("\n")), 8)
                     balanceusd = round(float(balance) * float(ducofiat), 6)
                     break
                 except:
@@ -606,7 +606,7 @@ while True:
                     + str(amount),
                     encoding="utf8"))
                 while True:
-                    message = s.recv(1024).decode()
+                    message = s.recv(1024).decode().rstrip("\n")
                     print(Style.RESET_ALL
                           + Fore.BLUE
                           + "Server message: "
@@ -635,7 +635,7 @@ while True:
                     encoding="utf8"))
 
                 while True:
-                    message = s.recv(1024).decode()
+                    message = s.recv(1024).decode().rstrip("\n")
                     print(Style.RESET_ALL
                           + Fore.BLUE
                           + "Server message: "
@@ -796,7 +796,7 @@ while True:
 
                     try:
                         s.send(bytes("BALA", encoding="utf8"))
-                        balance = round(float(s.recv(256).decode()), 8)
+                        balance = round(float(s.recv(256).decode().rstrip("\n")), 8)
                     except:
                         s = reconnect()
                     if float(amount) >= 10 and float(amount) <= balance:
