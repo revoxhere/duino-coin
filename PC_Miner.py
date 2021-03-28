@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.3)
+# Duino-Coin Python PC Miner (v2.4)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -25,15 +25,11 @@ from pathlib import Path
 from signal import signal, SIGINT
 
 # Install pip package automatically
-
-
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
     os.execl(sys.executable, sys.executable, *sys.argv)
 
 # Return datetime object
-
-
 def now():
     return datetime.datetime.now()
 
@@ -87,9 +83,21 @@ except:
         + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
     install("pypresence")
 
+# Check if xxhash is installed
+try:
+    import xxhash
+except:
+    print(
+        now().strftime("%H:%M:%S ")
+        + 'Xxhash is not installed. '
+        + 'Wallet will try to install it. '
+        + 'If it fails, please manually install "xxhash" python3 package.'
+        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
+    install("xxhash")
+
 
 # Global variables
-minerVersion = "2.3"  # Version number
+minerVersion = "2.4"  # Version number
 timeout = 15  # Socket timeout
 resourcesFolder = "PCMiner_" + str(minerVersion) + "_resources"
 hash_mean = []
@@ -97,6 +105,7 @@ donatorrunning = False
 debug = "n"
 rigIdentifier = "None"
 requestedDiff = "NET"
+algorithm = "DUCO-S1"
 serveripfile = ("https://raw.githubusercontent.com/"
     + "revoxhere/"
     + "duino-coin/gh-pages/"
@@ -153,8 +162,6 @@ else:
         lang = "english"
 
 # Get string form language file
-
-
 def getString(string_name):
     if string_name in lang_file[lang]:
         return lang_file[lang][string_name]
@@ -164,15 +171,11 @@ def getString(string_name):
         return "String not found: " + string_name
 
 # Debug output
-
-
 def debugOutput(text):
     if debug == "y":
         print(now().strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
 
 # Set window title
-
-
 def title(title):
     if os.name == "nt":
         os.system("title " + title)
@@ -181,8 +184,6 @@ def title(title):
         sys.stdout.flush()
 
 # SIGINT handler
-
-
 def handler(signal_received, frame):
     if multiprocessing.current_process().name == 'MainProcess':
         print(
@@ -281,7 +282,8 @@ def Greeting():
         + getString("algorithm")
         + Style.BRIGHT
         + Fore.YELLOW
-        + "DUCO-S1 @ "
+        + algorithm
+        + " @ "
         + diffName)
     print(
         Style.RESET_ALL
@@ -351,6 +353,7 @@ def loadConfig():
     global requestedDiff
     global rigIdentifier
     global lang
+    global algorithm
 
     # Initial configuration
     if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
@@ -371,6 +374,29 @@ def loadConfig():
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_username")
+            + Fore.WHITE
+            + Style.BRIGHT)
+
+
+        print(
+            Style.RESET_ALL
+            + Style.BRIGHT
+            + Fore.WHITE
+            + "1"
+            + Style.NORMAL
+            + " - DUCO-S1")
+        print(
+            Style.RESET_ALL
+            + Style.BRIGHT
+            + Fore.WHITE
+            + "2"
+            + Style.NORMAL
+            + " - XXHASH")
+
+        algorithm = input(
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + getString("ask_algorithm")
             + Fore.WHITE
             + Style.BRIGHT)
 
@@ -466,6 +492,12 @@ def loadConfig():
         elif int(threadcount) < int(1):
             threadcount = 1
 
+        # Check wheter algo setting is correct
+        if algorithm == "2":
+            algorithm = "XXHASH"
+        else:
+            algorithm = "DUCO-S1"
+
         # Check wheter diff setting is correct
         if requestedDiff == "1":
             requestedDiff = "LOW"
@@ -491,6 +523,7 @@ def loadConfig():
             "requestedDiff": requestedDiff,
             "donate": donationlevel,
             "identifier": rigIdentifier,
+            "algorithm": algorithm,
             "language": lang,
             "debug": "n"}
         # Write data to configfile
@@ -510,6 +543,7 @@ def loadConfig():
         threadcount = config["miner"]["threads"]
         requestedDiff = config["miner"]["requestedDiff"]
         donationlevel = config["miner"]["donate"]
+        algorithm = config["miner"]["algorithm"]
         rigIdentifier = config["miner"]["identifier"]
         debug = config["miner"]["debug"]
         # Calulate efficiency for use with sleep function
@@ -605,6 +639,24 @@ def ducos1(
         if ducos1 == expectedHash:
             return [ducos1res, hashcount]
 
+# XXHASH algorithm
+def ducos1xxh(
+        lastBlockHash,
+        expectedHash,
+        difficulty):
+    hashcount = 0
+    # Loop from 1 too 100*diff
+    for ducos1xxres in range(100 * int(difficulty) + 1):
+        # Generate hash
+        ducos1xx = xxhash.xxh64(
+            str(lastBlockHash) + str(ducos1xxres), seed=2811)
+        ducos1xx = ducos1xx.hexdigest()
+        # Increment hash counter for hashrate calculator
+        hashcount += 1
+        # Check if result was found
+        if ducos1xx == expectedHash:
+            return [ducos1xxres, hashcount]
+
 
 # Mining section for every thread
 def Thread(
@@ -616,7 +668,8 @@ def Thread(
         khashcount,
         username,
         efficiency,
-        rigIdentifier):
+        rigIdentifier,
+        algorithm):
     while True:
         # Grab server IP and port
         while True:
@@ -726,6 +779,11 @@ def Thread(
                 if debug == "y":
                     raise
                 time.sleep(5)
+
+        if algorithm == "XXHASH":
+            using_algo = getString("using_algo_xxh")
+        else:
+            using_algo = getString("using_algo")
         print(
             # Message about mining thread starting
             now().strftime(Style.DIM + "%H:%M:%S ")
@@ -743,7 +801,7 @@ def Thread(
             + getString("mining_thread_starting")
             + Style.RESET_ALL
             + Fore.WHITE
-            + getString("using_algo")
+            + using_algo
             + Fore.YELLOW
             + str(int(100 - efficiency * 100))
             + f"% {getString('efficiency')}")
@@ -757,15 +815,25 @@ def Thread(
                     time.sleep(float(efficiency * 5))
                 while True:
                     # Ask the server for job
-                    soc.send(bytes(
-                        "JOB,"
-                        + str(username)
-                        + ","
-                        + str(requestedDiff),
-                        encoding="utf8"))
+                    if algorithm == "XXHASH":
+                        soc.send(bytes(
+                            "JOBXX,"
+                            + str(username)
+                            + ","
+                            + str(requestedDiff),
+                            encoding="utf8"))
+                    else:
+                        soc.send(bytes(
+                            "JOB,"
+                            + str(username)
+                            + ","
+                            + str(requestedDiff),
+                            encoding="utf8"))
 
                     job = soc.recv(128).decode().rstrip("\n")
                     job = job.split(",")  # Get work from pool
+                    debugOutput("Received: " + str(job))
+
                     if job[1] == "This user doesn't exist":
                         print(
                             now().strftime(
@@ -792,14 +860,20 @@ def Thread(
                     elif job[0] and job[1] and job[2]:
                         diff = int(job[2])
                         debugOutput(str(threadid) +
-                                    "Job received: " + str(job))
+                                    "Job received: " 
+                                    + str(job))
                         # If job received, continue to hashing algo
                         break
 
                 while True:
                     # Call DUCOS-1 hasher
                     computetimeStart = time.time()
-                    result = ducos1(job[0], job[1], diff)
+                    if algorithm == "XXHASH":
+                        algo_back_color = Back.CYAN
+                        result = ducos1xxh(job[0], job[1], diff)
+                    else:
+                        algo_back_color = Back.CYAN
+                        result = ducos1(job[0], job[1], diff)
                     computetimeStop = time.time()
                     # Measure compute time
                     computetime = computetimeStop - computetimeStart
@@ -824,14 +898,17 @@ def Thread(
                             + ","
                             + str(threadhashcount)
                             + ","
-                            + "Official PC Miner (DUCO-S1) v" + str(minerVersion)
+                            + "Official PC Miner ("
+                            + str(algorithm)
+                            + ") v" 
+                            + str(minerVersion)
                             + ","
                             + str(rigIdentifier),
                             encoding="utf8"))
 
                         responsetimetart = now()
                         # Get feedback
-                        feedback = soc.recv(4).decode().rstrip("\n")
+                        feedback = soc.recv(8).decode().rstrip("\n")
                         responsetimestop = now()
                         # Measure server ping
                         ping = str(int(
@@ -872,7 +949,7 @@ def Thread(
                                     + Style.DIM
                                     + "%H:%M:%S ")
                                 + Style.BRIGHT
-                                + Back.YELLOW
+                                + algo_back_color
                                 + Fore.WHITE
                                 + " cpu"
                                 + str(threadid)
@@ -931,7 +1008,7 @@ def Thread(
                                     + Style.DIM
                                     + "%H:%M:%S ")
                                 + Style.BRIGHT
-                                + Back.YELLOW
+                                + algo_back_color
                                 + Fore.WHITE
                                 + " cpu"
                                 + str(threadid)
@@ -990,7 +1067,7 @@ def Thread(
                                     + Style.DIM
                                     + "%H:%M:%S ")
                                 + Style.RESET_ALL
-                                + Style.BRIGHT
+                                + algo_back_color
                                 + Back.YELLOW
                                 + Fore.WHITE
                                 + " cpu"
@@ -1055,8 +1132,6 @@ def Thread(
                 break
 
 # Initialize Discord rich presence
-
-
 def initRichPresence():
     global RPC
     try:
@@ -1068,8 +1143,6 @@ def initRichPresence():
             raise
 
 # Update rich presence status
-
-
 def updateRichPresence():
     startTime = int(time.time())
     while True:
@@ -1166,7 +1239,8 @@ if __name__ == "__main__":
                 khashcount,
                 username,
                 efficiency,
-                rigIdentifier))
+                rigIdentifier,
+                algorithm))
         thread[x].start()
         time.sleep(0.1)
 
