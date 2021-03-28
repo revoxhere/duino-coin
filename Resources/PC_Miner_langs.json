@@ -12,6 +12,7 @@
         "banner": "Official Duino-Coin © Python Miner",
         "donation_level": "Developer donation level: ",
 
+        "ask_algorithm": "Select mining algorithm you want to use (1-2): ",
         "ask_difficulty": "Select mining difficulty you want to use (1-3): ",
         "low_diff": "Low difficulty (for Raspberry Pis, older computers)",
         "medium_diff": "Medium difficulty (for typical computers)",
