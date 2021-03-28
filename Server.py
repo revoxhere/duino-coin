@@ -950,26 +950,16 @@ def handle(c, ip):
                         # Part of Kolka system V3 - variable difficulty section
                         # Calculate the diff multiplier
                         p = 2 - sharetime / expected_sharetime
-
-                        # Check if multiplier is higher than 10%
-                        if p > 1.1:
-                            # Calculate new difficulty
-                            new_diff = int(diff * p)
-                        else:
-                            new_diff = int(diff)
-                        
-                        # Checks whether sharetime was higher than expected 
+                 
+                        # Checks whether sharetime was higher than expected or has exceeded the buffer of 10%
                         # (p = 1 equals to sharetime = expected_sharetime)
-                        if p < 1:
-                            # If sharetime was longer than expected,
-                            # Lower the difficulty
-                            # Calculate the multiplier again for lowering
-                            new_diff = int(diff * p) * -1
+                        if p < 1 or p > 1.1:
+                            # Has met either condition thus the diff gets set
+                            new_diff = int(diff * p)
                             diff = int(new_diff)
                         else:
-                            # If sharetime was shorter than expected,
-                            # Raise the difficulty
-                            diff = int(new_diff)
+                            # Hasn't met any of the conditions ( > 1 and < 1.1) thus leave diff
+                            diff = int(diff)
 
                     # Generate result in range of the difficulty
                     rand = fastrand.pcg32bounded(100 * diff)
