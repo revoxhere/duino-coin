@@ -30,8 +30,8 @@ If the registration fails, the server will send `NO,Reason of failed registratio
 
 After loging-in you have access to the following commands:
 *   `BALA` - Server will return balance of current user
-*   `JOB` - Server will return job for mining
-    *   You can also use `JOB,username` to mine without loging-in
+*   `JOB` - Server will return job for mining using DUCO-S1 (-S1A)
+    *   You can also use `JOB,username` (or `JOBXX,username` for XXHASH) to mine without loging-in
 
     *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (**if you don't ask for a specific difficulty, you'll get the network diff**) where diff is one of the below:
         * `AVR`     - diff      4 - used for official AVR boards mining
@@ -46,6 +46,7 @@ After loging-in you have access to the following commands:
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
         *   If software name is not received, server uses `"Software": "Unknown"` in the API
         *   If rig name is not received, server uses `"Identifier": "None"` in the API
+*   `JOBXX` - Server will return job for mining using XXHASH algorithm; documentation is the same as with DUCO-S1 job protocol; for now the only available difficulty is `NET`.
 *   `SEND,-,recipientUsername,amount` - Send funds to someone, the server will return a message about the state of the transaction
 *   `GTXL,username,num` - Get last *num* of transactions involving *username* (both deposits and withdrawals)
 *   `CHGP,oldPassword,newPassword` - Change password of current user
