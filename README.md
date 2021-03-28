@@ -158,13 +158,15 @@ Some third-party included files may have different licenses - please check their
 2. Mining is described as using DUCO-S1 algorithm (explained in the <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
 3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README).<br/>
 4. Mining on GPUs, FPGAs and other high-efficiency hardware is allowed, but using only the `EXTREME` mining difficulty.<br/>
-5. Any users using miners on difficulty not suited for their hardware (see the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">difficulty list</a>) will be automatically throttled and/or blocked.
-6. Any users spotted using inappropriate and/or overpowered hardware will be banned manually or automatically from the network withour prior notice.<br/>
+5. Any users using miners on difficulty not suited for their hardware (see the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">difficulty list</a>) will be automatically throttled and/or blocked.<br/>
+6. Any users spotted using inappropriate and/or overpowered hardware will be banned manually or automatically from the network without prior notice.<br/>
 7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
 8. Only coins earned legally are eligible for the exchange.<br/>
-9. These terms of usage can change at any time without prior notice.<br/>
-10. Every user using Duino-Coin agrees to comply with the above rules.<br/>
-11. This list will be expanded in the future.<br/>
+9. Users spotted using a VPN (or similar) with malicious intents (e.g. bypassing limits) may be banned without prior notice.<br/>
+10. Multiple accounts used to evade bans will be banned without prior notice.<br/>
+11. These terms of usage can change at any time without prior notice.<br/>
+12. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+13. This list will be expanded in the future.<br/>
 <h4 align="center">Privacy policy</h2><br>
 1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
 2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
