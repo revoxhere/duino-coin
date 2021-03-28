@@ -50,7 +50,7 @@
       ⚡ Transaction time: Instant<br>
       🔢 Decimals: up to 20<br>
       🔤 Ticker: DUCO (ᕲ)<br>
-      ⚒️ Algorithms: DUCO-S1, DUCO-S1A, XXHASH (coming soon) +more planned<br>
+      ⚒️ Algorithms: DUCO-S1, DUCO-S1A, XXHASH +more planned<br>
       ♐ Rewards: supported by "Kolka system" helping to reward miners fairly<br>
     </td>
   </tr>
