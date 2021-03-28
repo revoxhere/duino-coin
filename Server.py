@@ -15,6 +15,7 @@ import re
 import math
 import random
 import hashlib
+import xxhash
 import datetime
 import requests
 import smtplib
@@ -42,15 +43,15 @@ import quickemailverification
 # Server will use this as hostname to bind to (localhost on Windows, 0.0.0.0 on Linux in most cases)
 host = ""
 # Server will listen on this port (official server uses 2811)
-port = 2811  
+port = 2811
 # Server version which will be sent to the clients (official server uses latest release version number)
-serverVersion = 2.2
+serverVersion = 2.3
 # Difficulty will increase every x blocks (official server uses 5k)
 diff_incrase_per = 5000
 # Maximum number of clients using mining protocol per IP and username
 max_mining_connections = 24
 # Maximum number of logged-in clients per IP
-max_login_connections = 28  
+max_login_connections = 28
 # Maximum number of connections that haven't sent any data yet
 max_unauthorized_connections = 28
 # Number of pregenerated jobs for AVR, ESP and ESP32 diffs in mining section;
@@ -63,11 +64,12 @@ big_block_reward = 7.77
 reward_multiplier = 0.77
 higher_diffs_basereward = 0.0002811
 expected_sharetime_sec = 5
+big_block_probability = 1000000
 # Database access times out after this many seconds (default: 5)
 database_timeout = 5
 socket_listen_num = 16
 # Wheter to enable wDUCO wrapper
-use_wrapper = True  
+use_wrapper = True
 wrapper_permission = False
 config = configparser.ConfigParser()
 lock = threading.Lock()
@@ -130,7 +132,6 @@ memarray = []
 readyHashesAVR = {}
 readyHashesESP = {}
 readyHashesESP32 = {}
-readyHashesEXTREME = {}
 
 database = 'crypto_database.db'  # User data database location
 if not os.path.isfile(database):
@@ -412,6 +413,8 @@ def API():
             diff = int(blocks / diff_incrase_per)
             minerList = []
             usernameMinerCounter = {}
+            minerapipublic = {}
+            usernameMinerCounter_sorted = {}
             serverHashrate = 0
             hashrate = 0
             for x in minerapi.copy():
@@ -439,9 +442,6 @@ def API():
             else:
                 prefix = " H/s"
 
-            minerapipublic = {}
-            usernameMinerCounter_sorted = {}
-
             for miner in minerapi.copy():
                 try:
                     minerapipublic[miner] = {
@@ -452,6 +452,7 @@ def API():
                         "Accepted":     minerapi[miner]["Accepted"],
                         "Rejected":     minerapi[miner]["Rejected"],
                         "Diff":         minerapi[miner]["Diff"],
+                        "Algorithm":    minerapi[miner]["Algorithm"],
                         "Software":     str(minerapi[miner]["Software"]),
                         "Identifier":   str(minerapi[miner]["Identifier"]),
                         "Last share timestamp": str(minerapi[miner]["Last share timestamp"])}
@@ -482,25 +483,29 @@ def API():
                 "Server CPU usage":      float(round(statistics.mean(percarray[-20:]), 2)),
                 "Server RAM usage":      float(round(statistics.mean(memarray[-20:]), 2)),
                 "Last update":           str(now.strftime("%d/%m/%Y %H:%M (UTC)")),
-                "Pool hashrate":         str(round(serverHashrate, 2))+prefix,
+                "Pool hashrate":         str(round(serverHashrate, 4))+prefix,
                 # Get price from global
                 "Duco price":            float(round(ducoPrice, 6)),
                 # Call getRegisteredUsers function
                 "Registered users":      int(getRegisteredUsers()),
                 # Call getMinedDuco function
-                "All-time mined DUCO":   float(round(getMinedDuco(), 2)),
+                "All-time mined DUCO":   int(getMinedDuco()),
                 "Current difficulty":    int(diff),
                 "Mined blocks":          int(blocks),
                 "Full last block hash":  str(lastBlockHash),
                 "Last block hash":       str(lastBlockHash)[:10]+"...",
-                "Top 10 richest miners": getLeaders(),  # Call getLeaders function
+                # Call getLeaders function
+                "Top 10 richest miners": getLeaders(),
                 "Active workers":        usernameMinerCounter_sorted,
                 "Miners":                minerapipublic}
 
             with open('api.json', 'w') as outfile:
                 # Write JSON to file
-                json.dump(formattedMinerApi, outfile,
-                          indent=2, ensure_ascii=False)
+                json.dump(
+                    formattedMinerApi,
+                    outfile,
+                    indent=2,
+                    ensure_ascii=False)
             time.sleep(5)
         except:
             pass
@@ -511,10 +516,18 @@ def UpdateOtherAPIFiles():
     while True:
         with open('balances.json', 'w') as outfile:
             # Write JSON balances to file
-            json.dump(getAllBalances(), outfile, indent=2, ensure_ascii=False)
+            json.dump(
+                getAllBalances(), 
+                outfile, 
+                indent=2, 
+                ensure_ascii=False)
         with open('transactions.json', 'w') as outfile:
             # Write JSON transactions to file
-            json.dump(getTransactions(), outfile, indent=2, ensure_ascii=False)
+            json.dump(
+                getTransactions(), 
+                outfile, 
+                indent=2, 
+                ensure_ascii=False)
         time.sleep(30)
 
 
@@ -527,15 +540,12 @@ def UpdateDatabase():
                 with sqlite3.connect(database, timeout=database_timeout) as conn:
                     datab = conn.cursor()
                     for user in balancesToUpdate.copy():
-                        try:
-                            if not float(balancesToUpdate[user]) <= 0:
-                                if float(balancesToUpdate[user]) > 0.0009:
-                                    balancesToUpdate[user] = 0.0009
-                                datab.execute(
-                                    "UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
-                            balancesToUpdate.pop(user)
-                        except:
-                            continue
+                        if not float(balancesToUpdate[user]) <= 0:
+                            if float(balancesToUpdate[user]) > 0.0009:
+                                balancesToUpdate[user] = 0.0009
+                            datab.execute(
+                                "UPDATE Users set balance = balance + ? where username = ?", (float(balancesToUpdate[user]), user))
+                        balancesToUpdate.pop(user)
             except Exception as e:
                 print("Error updating balances:", str(e))
                 error_counter += 1
@@ -724,29 +734,22 @@ def createHashes():
     # Generate DUCO-S1 jobs
     while True:
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 3)
+            rand = fastrand.pcg32bounded(100 * 4)
             readyHashesAVR[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
                 "LastBlockHash": str(lastBlockHash)}
 
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 75)
+            rand = fastrand.pcg32bounded(100 * 125)
             readyHashesESP[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
                 "LastBlockHash": str(lastBlockHash)}
 
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 100)
+            rand = fastrand.pcg32bounded(100 * 275)
             readyHashesESP32[i] = {
-                "Result": rand,
-                "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
-                "LastBlockHash": str(lastBlockHash)}
-
-        for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 950000)
-            readyHashesEXTREME[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
                 "LastBlockHash": str(lastBlockHash)}
@@ -814,13 +817,13 @@ def handle(c, ip):
 
     while True:
         try:
-            data = c.recv(512)  # Receive data from client
+            data = c.recv(256)  # Receive data from client
             if not data:
                 # Exit loop if no data received
                 break
             else:
                 # Split incoming data
-                data = data.decode().split(",")
+                data = data.decode().rstrip("\n").split(",")
 
             ######################################################################
             if str(data[0]) == "JOB":
@@ -861,125 +864,136 @@ def handle(c, ip):
                 except IndexError:
                     customDiff = "NET"
 
-
                 if overrideDiff == "EXTREME" or customDiff == "EXTREME":
                     # Custom difficulty 950k
                     diff = 950000
-                    basereward = 0
-                    randomChoice = random.randint(0, len(readyHashesEXTREME)-1)
-                    rand = readyHashesEXTREME[randomChoice]["Result"]
-                    newBlockHash = readyHashesEXTREME[randomChoice]["Hash"]
-                    lastBlockHash_copy = readyHashesEXTREME[randomChoice]["LastBlockHash"]
-                    max_shares_per_sec = 10
                     # Practically no limits
                     max_hashrate = 999999999
+                    max_shares_per_sec = 10
 
                 elif overrideDiff == "NET" or customDiff == "NET":
                     # Network difficulty
                     diff = int(blocks / diff_incrase_per)
-                    max_shares_per_sec = 1
                     # Max 2 MH/s
                     max_hashrate = 2000000
+                    max_shares_per_sec = 1
 
                 elif overrideDiff == "MEDIUM" or customDiff == "MEDIUM":
                     # Diff for medium computers 30k
                     diff = 30000
-                    max_shares_per_sec = 2
                     # Max 1 MH/s
                     max_hashrate = 1000000
+                    max_shares_per_sec = 2
 
                 elif customDiff == "LOW":
                     # Diff for webminers or slow computers 3k
                     diff = 3000
+                    # Max 200 kH/s
+                    max_hashrate = 200000
                     max_shares_per_sec = 2
-                    # Max 500 kH/s
-                    max_hashrate = 500000
 
                 elif customDiff == "ESP32":
                     # optimal diff for low power devices like ESP32
-                    diff = 100
-                    basereward = 0.00025
+                    diff = 275
+                    basereward = 0.00045
                     randomChoice = random.randint(0, len(readyHashesESP32)-1)
                     rand = readyHashesESP32[randomChoice]["Result"]
                     newBlockHash = readyHashesESP32[randomChoice]["Hash"]
                     lastBlockHash_copy = readyHashesESP32[randomChoice]["LastBlockHash"]
-                    max_shares_per_sec = 3
                     # Not overclocked ESP32 chips won't make more than 6-7 kH/s
                     max_hashrate = 8000
+                    max_shares_per_sec = 30
 
                 elif customDiff == "ESP":
                     # Optimal diff for low power devices like ESP8266
-                    diff = 75
-                    basereward = 0.00025
+                    diff = 125
+                    basereward = 0.00055
                     randomChoice = random.randint(0, len(readyHashesESP)-1)
                     rand = readyHashesESP[randomChoice]["Result"]
                     newBlockHash = readyHashesESP[randomChoice]["Hash"]
                     lastBlockHash_copy = readyHashesESP[randomChoice]["LastBlockHash"]
-                    max_shares_per_sec = 3
-                    # Not overclocked ESP8266 chips won't make more than 3 kH/s
+                    # Not overclocked ESP8266 chips won't make more than 2.8 kH/s
                     max_hashrate = 3000
+                    max_shares_per_sec = 30
 
                 elif customDiff == "AVR":
                     # Optimal diff for very low power devices like Arduino
-                    diff = 3
+                    diff = 4
                     basereward = 0.00035
                     randomChoice = random.randint(0, len(readyHashesAVR)-1)
                     rand = readyHashesAVR[randomChoice]["Result"]
                     newBlockHash = readyHashesAVR[randomChoice]["Hash"]
                     lastBlockHash_copy = readyHashesAVR[randomChoice]["LastBlockHash"]
-                    max_shares_per_sec = 3
                     # Not overclocked Arduino chips won't make more than 150 H/s
                     max_hashrate = 150
+                    max_shares_per_sec = 3
 
                 # Check if websocket proxy isn't used for anything else than webminer
                 if customDiff != "LOW" and ip == "51.15.127.80":
                     break
 
                 # Check if diffs that don't use pregenerated shares are used
-                if (customDiff == "LOW" 
-                    or customDiff == "MEDIUM" 
+                if (customDiff == "LOW"
+                    or customDiff == "MEDIUM"
                     or customDiff == "NET"
+                    or customDiff == "EXTREME"
                     or overrideDiff == "MEDIUM"
-                    or overrideDiff == "NET"):
+                    or overrideDiff == "NET"
+                    or overrideDiff == "EXTREME"):
+
                     # Copy the current block hash as it can be changed by other threads
                     lastBlockHash_copy = lastBlockHash
                     expected_sharetime = expected_sharetime_sec * 1000
                     basereward = higher_diffs_basereward
 
+                    if overrideDiff == "EXTREME" or customDiff == "EXTREME":
+                        basereward = 0
+
                     if not firstshare:
                         # Part of Kolka system V3 - variable difficulty section
                         # Calculate the diff multiplier
                         p = 2 - sharetime / expected_sharetime
-                 
+
                         # Checks whether sharetime was higher than expected or has exceeded the buffer of 10%
+                        if p > 1.1:
+                            # Calculate new difficulty
+                            new_diff = int(diff * p)
+                        else:
+                            new_diff = int(diff)
+
+                        # Checks whether sharetime was higher than expected 
                         # (p = 1 equals to sharetime = expected_sharetime)
                         if p < 1 or p > 1.1:
                             # Has met either condition thus the diff gets set
                             new_diff = int(diff * p)
+                            if new_diff < 0:
+                                new_diff = new_diff * -1
                             diff = int(new_diff)
                         else:
                             # Hasn't met any of the conditions ( > 1 and < 1.1) thus leave diff
                             diff = int(diff)
+                    else:
+                        time.sleep(3)
 
                     # Generate result in range of the difficulty
                     rand = fastrand.pcg32bounded(100 * diff)
                     # Create the DUCO-S1 hash
                     newBlockHash = hashlib.sha1(
                         str(str(lastBlockHash_copy)
-                          + str(rand)
-                        ).encode("utf-8")).hexdigest()
+                            + str(rand)
+                            ).encode("utf-8")).hexdigest()
 
                 if customDiff == "ESP32" or customDiff == "ESP":
                     # ESPs expect job ending with \n
                     # TODO: this will soon be pushed also to the other miners
                     try:
                         c.send(bytes(
-                            str(lastBlockHash_copy) 
-                            + "," 
-                            + str(newBlockHash) 
-                            + "," 
-                            + str(diff) 
-                            + "\n", 
+                            str(lastBlockHash_copy)
+                            + ","
+                            + str(newBlockHash)
+                            + ","
+                            + str(diff)
+                            + "\n",
                             encoding='utf8'))  # Send hashes and diff hash to the miner
                     except:
                         break
@@ -989,9 +1003,9 @@ def handle(c, ip):
                         # Send hashes and diff hash to the miner
                         c.send(bytes(
                             str(lastBlockHash_copy)
-                            + "," 
-                            + str(newBlockHash) 
-                            + "," 
+                            + ","
+                            + str(newBlockHash)
+                            + ","
                             + str(diff),
                             encoding='utf8'))
                     except:
@@ -1001,10 +1015,10 @@ def handle(c, ip):
                 jobsent = datetime.datetime.now()
                 try:
                     # Wait until client solves hash
-                    response = c.recv(128).decode().split(",")
+                    response = c.recv(256).decode().split(",")
+                    result = response[0]
                 except:
                     break
-                result = response[0]
                 # Measure ending time
                 resultreceived = datetime.datetime.now()
 
@@ -1028,10 +1042,10 @@ def handle(c, ip):
                 try:
                     # Check miner software for unallowed characters
                     minerUsed = re.sub(
-                        '[^A-Za-z0-9 .]+', ' ', response[2])
+                        '[^A-Za-z0-9 .()-]+', ' ', response[2])
                     # Check miner software for unallowed characters
                     minerIdentifier = re.sub(
-                        '[^A-Za-z0-9 .]+', ' ', response[3])
+                        '[^A-Za-z0-9 .()-]+', ' ', response[3])
                 except:
                     minerUsed = "Unknown miner"
                     minerIdentifier = "None"
@@ -1053,6 +1067,7 @@ def handle(c, ip):
                         "Sharerate":    shares_per_sec,
                         "Accepted":     acceptedShares,
                         "Rejected":     rejectedShares,
+                        "Algorithm":    "DUCO-S1",
                         "Diff":         diff,
                         "Software":     str(minerUsed),
                         "Identifier":   str(minerIdentifier),
@@ -1085,12 +1100,19 @@ def handle(c, ip):
                         pass
 
                     # Calculate the reward - Kolka system V1
-                    reward = reward_multiplier * \
-                        (basereward + float(sharetime) /
-                         100000000 + float(diff) / 100000000)
+                    if customDiff == "EXTREME" or overrideDiff == "EXTREME":
+                        reward = (float(sharetime) 
+                            / 100000000 
+                            + workers[username] 
+                            / 100000) / workers[username]
+                    else:
+                        reward = (reward_multiplier * basereward 
+                                + float(sharetime) / 10000000000 
+                                + float(diff) / 1000000000 
+                                - workers[username] / 10000000)
 
                     # Low probability to find a "big block"
-                    blockfound = random.randint(1, 1000000)
+                    blockfound = random.randint(1, big_block_probability)
                     if int(blockfound) == 1:
                         # Add some DUCO to the reward
                         reward += big_block_reward
@@ -1101,10 +1123,10 @@ def handle(c, ip):
                             formatteddatetime = now.strftime(
                                 "%d/%m/%Y %H:%M:%S")
                             datab.execute('''INSERT INTO Blocks(timestamp, finder, amount, hash) VALUES(?, ?, ?, ?)''', (
-                                formatteddatetime, username, reward, newBlockHash))
+                                formatteddatetime, username + " (DUCO-S1)", reward, newBlockHash))
                             bigblockconn.commit()
                         adminLog("duco", "Block found " + formatteddatetime + " by " +
-                                 username + " generated " + str(reward) + " DUCO " + newBlockHash)
+                                 username)
                         # Send feedback that block was found
                         try:
                             c.send(bytes("BLOCK", encoding="utf8"))
@@ -1115,6 +1137,7 @@ def handle(c, ip):
                             # ESPs expect newline in the feedback
                             # TODO: this will soon be added to all the miners
                             try:
+                                #print("Sending good esp feedback", username)
                                 c.send(bytes("GOOD\n", encoding="utf8"))
                             except:
                                 break
@@ -1159,6 +1182,237 @@ def handle(c, ip):
                             c.send(bytes("BAD", encoding="utf8"))
                         except:
                             break
+
+            ######################################################################
+            elif str(data[0]) == "JOBXX":
+                if username == "":
+                    try:
+                        username = str(data[1])
+                        if username == "":
+                            c.send(bytes("BAD,Not enough data\n", encoding='utf8'))
+                            break
+                    except IndexError:
+                        c.send(bytes("BAD,Not enough data\n", encoding='utf8'))
+                        break
+
+                if firstshare:
+                    try:
+                        workers[username] += 1
+                    except:
+                        workers[username] = 1
+
+                    # Check if there aren't too much connections per IP
+                    if (connections[ip] > max_mining_connections
+                            and not ip in whitelisted):
+                        c.send(bytes("BAD,Too many connections\n", encoding='utf8'))
+                        # Close this thread
+                        break
+
+                    # Check if there aren't too much connections per username
+                    if (workers[username] > max_mining_connections
+                            and not username in whitelistedUsernames):
+                        c.send(bytes("BAD,Too many connections\n", encoding='utf8'))
+                        # Close this thread
+                        break
+
+                # Network difficulty
+                diff = int(blocks / diff_incrase_per)
+                max_shares_per_sec = 1
+                # Max 3 MH/s
+                max_hashrate = 3000000
+
+                # Copy the current block hash as it can be changed by other threads
+                lastBlockHash_copy = lastBlockHash
+                expected_sharetime = expected_sharetime_sec * 1000
+                basereward = higher_diffs_basereward / 4
+
+                if not firstshare:
+                    try:
+                        # Part of Kolka system V3 - variable difficulty section
+                        # Calculate the diff multiplier
+                        p = 2 - sharetime / expected_sharetime
+
+                        # Check if multiplier is higher than 10%
+                        if p > 1.1:
+                            # Calculate new difficulty
+                            new_diff = int(diff * p)
+                        else:
+                            new_diff = int(diff)
+
+                        # Checks whether sharetime was higher than expected 
+                        # (p = 1 equals to sharetime = expected_sharetime)
+                        if p < 1:
+                            # If sharetime was longer than expected,
+                            # Lower the difficulty
+                            # Calculate the multiplier again for lowering
+                            new_diff = int(diff * p)
+                            if new_diff <= 0:
+                                new_diff = new_diff * -1
+                            diff = int(new_diff)
+                        else:
+                            # If sharetime was shorter than expected,
+                            # Raise the difficulty
+                            diff = int(new_diff)
+                    except Exception as e:
+                        print(e)
+
+                # Generate result in range of the difficulty
+                rand = fastrand.pcg32bounded(100 * diff)
+                # Create the xxhash hash
+                newBlockHash = xxhash.xxh64(str(str(lastBlockHash_copy) + str(rand)), seed=2811).hexdigest()
+
+                # Send lastblockhash, expectedhash and diff to the client
+                try:
+                    # Send hashes and diff hash to the miner
+                    c.send(bytes(
+                        str(lastBlockHash_copy)
+                        + ","
+                        + str(newBlockHash)
+                        + ","
+                        + str(diff)
+                        + "\n",
+                        encoding='utf8'))
+                except:
+                    break
+
+                # Measure starting time
+                jobsent = datetime.datetime.now()
+                try:
+                    # Wait until client solves hash
+                    response = c.recv(128).decode().split(",")
+                except:
+                    break
+                result = response[0]
+                # Measure ending time
+                resultreceived = datetime.datetime.now()
+
+                # Time from start of hash computing to finding the result
+                sharetime = resultreceived - jobsent
+                # Get total ms
+                sharetime = int(sharetime.total_seconds() * 1000)
+
+                try:
+                    hashrateCalculated = int(rand / (sharetime / 1000))
+                except:
+                    hashrateCalculated = 1
+                try:
+                    # If client submitted hashrate, use it for the API
+                    hashrate = float(response[1])
+                    hashrateEstimated = False
+                except:
+                    # If not, use the calculation
+                    hashrate = hashrateCalculated
+                    hashrateEstimated = True
+                try:
+                    # Check miner software for unallowed characters
+                    minerUsed = re.sub(
+                        '[^A-Za-z0-9 .()-]+', ' ', response[2])
+                    # Check miner software for unallowed characters
+                    minerIdentifier = re.sub(
+                        '[^A-Za-z0-9 .()-]+', ' ', response[3])
+                except:
+                    minerUsed = "Unknown miner"
+                    minerIdentifier = "None"
+
+                try:
+                    # Prepare miner API
+                    try:
+                        shares_per_sec = minerapi[str(
+                            threading.get_ident())]["Sharerate"] + 1
+                    except:
+                        shares_per_sec = 0
+                    now = datetime.datetime.now()
+                    lastsharetimestamp = now.strftime("%d/%m/%Y %H:%M:%S")
+                    minerapi[str(threading.get_ident())] = {
+                        "User":         str(username),
+                        "Hashrate":     hashrate,
+                        "Is estimated": str(hashrateEstimated),
+                        "Sharetime":    sharetime,
+                        "Sharerate":    shares_per_sec,
+                        "Accepted":     acceptedShares,
+                        "Rejected":     rejectedShares,
+                        "Algorithm":    "XXHASH",
+                        "Diff":         diff,
+                        "Software":     str(minerUsed),
+                        "Identifier":   str(minerIdentifier),
+                        "Last share timestamp": str(lastsharetimestamp)}
+                except:
+                    pass
+
+                # If the received result was correct
+                if str(result) == str(rand) and int(hashrateCalculated) <= int(max_hashrate):
+                    firstshare = False
+                    acceptedShares += 1
+
+                    try:
+                        # Check if miner didn't exceed max sharerate per second
+                        # Kolka system V2
+                        if minerapi[str(threading.get_ident())]["Sharerate"] > max_shares_per_sec:
+                            # If he did, throttle him
+                            time.sleep(15)
+                    except:
+                        pass
+
+                    reward = reward_multiplier * \
+                        (basereward + float(sharetime) /
+                             100000000 + float(diff) / 100000000)
+
+                    # Low probability to find a "big block"
+                    blockfound = random.randint(1, big_block_probability)
+                    if int(blockfound) == 1:
+                        # Add some DUCO to the reward
+                        reward += big_block_reward
+                        # Write to the big block database
+                        with sqlite3.connect("config/foundBlocks.db", timeout=database_timeout) as bigblockconn:
+                            datab = bigblockconn.cursor()
+                            now = datetime.datetime.now()
+                            formatteddatetime = now.strftime(
+                                "%d/%m/%Y %H:%M:%S")
+                            datab.execute('''INSERT INTO Blocks(timestamp, finder, amount, hash) VALUES(?, ?, ?, ?)''', (
+                                formatteddatetime, username + " (XXHASH)", reward, newBlockHash))
+                            bigblockconn.commit()
+                        adminLog("duco", "Block found " + formatteddatetime + " by " +
+                                 username)
+                        # Send feedback that block was found
+                        try:
+                            c.send(bytes("BLOCK\n", encoding="utf8"))
+                        except:
+                            break
+                    else:
+                        # Send feedback that result was correct
+                        try:
+                            c.send(bytes("GOOD\n", encoding="utf8"))
+                        except:
+                            print("Error sending feedback", username)
+                            break
+                        
+                    try:
+                        # Add username to the dict so it will be incremented in the next DB update
+                        balancesToUpdate[username] += reward
+                    except:
+                        balancesToUpdate[username] = reward
+
+                    # Increase global amount of shares and update block hash
+                    blocks += 1
+                    lastBlockHash = newBlockHash
+
+                # If incorrect result was received
+                else:
+                    rejectedShares += 1
+                    # Calculate penalty dependent on share submission time - "kolka system"
+                    penalty = float(int(int(sharetime) ** 2) / 1000000000) * -1
+                    try:
+                        # Add username to the dict so it will be decremented in the next DB update
+                        balancesToUpdate[username] += penalty
+                    except:
+                        balancesToUpdate[username] = penalty
+
+                    try:
+                        # Send feedback that incorrect result was received
+                        c.send(bytes("BAD\n", encoding="utf8"))
+                    except:
+                        break
+
 
             ######################################################################
             elif str(data[0]) == "LOGI":
@@ -1640,7 +1894,7 @@ def handle(c, ip):
                                     formatteddatetime, username, reward, newBlockHash))
                                 bigblockconn.commit()
                             adminLog("nodes", "Block found " + formatteddatetime + " by " +
-                                     username + " generated " + str(reward) + " DUCO " + newBlockHash)
+                                     username)
                             c.send(bytes("YES,Successful", encoding='utf8'))
                             break
                         except:
@@ -1909,7 +2163,7 @@ def countips():
 def resetips():
     # Clear IP counter
     while True:
-        time.sleep(15)
+        time.sleep(30)
         IPS.clear()
 
 
