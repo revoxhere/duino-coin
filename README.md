@@ -34,10 +34,10 @@ After loging-in you have access to the following commands:
     *   You can also use `JOB,username` to mine without loging-in
 
     *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (**if you don't ask for a specific difficulty, you'll get the network diff**) where diff is one of the below:
-        * `AVR`     - diff      3 - used for official AVR boards mining
-        * `ESP`     - diff     75 - used for official ESP boards mining
-        * `ESP32`   - diff    100 - used for official ESP32 boards mining
-        * `LOW`     - diff   8.5k - used for official Web Miner
+        * `AVR`     - diff      4 - used for official AVR boards mining
+        * `ESP`     - diff    125 - used for official ESP8266 boards mining
+        * `ESP32`   - diff    275 - used for official ESP32 boards mining
+        * `LOW`     - diff     3k - used for official Web Miner
         * `MEDIUM`  - diff    30k - used for lower-diff PC mining
         * `NET`     - diff   ~70k - used for PC mining - network difficulty
         * `EXTREME` - diff   950k - not used anywhere officially
