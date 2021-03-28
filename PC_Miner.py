@@ -872,7 +872,7 @@ def Thread(
                         algo_back_color = Back.CYAN
                         result = ducos1xxh(job[0], job[1], diff)
                     else:
-                        algo_back_color = Back.CYAN
+                        algo_back_color = Back.YELLOW
                         result = ducos1(job[0], job[1], diff)
                     computetimeStop = time.time()
                     # Measure compute time
