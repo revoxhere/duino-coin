@@ -189,7 +189,7 @@ Duino-Coin is mostly distributed under the MIT License. See `LICENSE` file for m
 Some third-party included files may have different licenses - please check their `LICENSE` statements (usually at the top of the source code files).
 
 <h2 align="center">Terms of service</h2><br>
-1. Duino-Coins are earned by miners with a process called mining.<br/>
+1. Duino-Coins ("DUCOs") are earned by miners with a process called mining.<br/>
 2. Mining is described as using DUCO-S1 algorithm (explained in the <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
 3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README).<br/>
 4. Mining on GPUs, FPGAs and other high-efficiency hardware is allowed, but using only the `EXTREME` mining difficulty.<br/>
@@ -199,10 +199,13 @@ Some third-party included files may have different licenses - please check their
 8. Only coins earned legally are eligible for the exchange.<br/>
 9. Users spotted using a VPN (or similar) with malicious intents (e.g. bypassing limits) may be banned without prior notice.<br/>
 10. Mulitple accounts used to bypass limits may be banned without prior notice.<br/>
-11. Accounts may be suspended temporarily to investigate ToS violations.<br/>
+11. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
 12. Multiple accounts used to evade bans will be banned without prior notice.<br/>
-13. These terms of service can change at any time without prior notice.<br/>
-14. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+13. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
+14. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/> 
+15. A user's DUCOs may be burnt if a violation can be proven.<br/>
+16. These terms of service can change at any time without prior notice.<br/>
+17. Every user using Duino-Coin agrees to comply with the above rules.<br/>
 <h4 align="center">Privacy policy</h2><br>
 1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
 2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
