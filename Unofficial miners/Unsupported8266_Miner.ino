@@ -156,7 +156,7 @@ void loop() {
 
   Serial.println("Asking for a new job for user: " + String(ducouser));
 
-  client.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
+  client.print("JOB," + String(ducouser) + ",ESP"); // Ask for new job
   String       hash = client.readStringUntil(','); // Read data to the first peroid - last block hash
   String        job = client.readStringUntil(','); // Read data to the next peroid - expected hash
   unsigned int diff = client.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
