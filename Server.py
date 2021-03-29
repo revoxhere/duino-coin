@@ -961,8 +961,10 @@ def handle(c, ip):
                             new_diff = int(diff * p)
                             # Checks whether the diff is lower than 0 (sharetime was way higher than expected)
                             if new_diff < 0:
-                                # Multiplied by -0.75 to slowly lower difficulty
-                                new_diff = new_diff * -0.75
+                                # Divided by p to drastically lower the diff
+								# +1 is added to avoid dividing by -0.x
+                                # 0.9 is used to decrease it when the sharetime is 3x higher than expected
+                                new_diff = int(diff / abs(p + 2)) * 0.9
                             # Check if sharetime was exactly double than expected
                             elif new_diff == 0:
                                 # Thus roughly half the difficulty
