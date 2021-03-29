@@ -111,7 +111,7 @@ namespace /* anonymous */ {
     pinMode(pin, FUNCTION_3); // Set to GPIO / OUTPUT mode 
     for (int x=0; x<(count << 1); ++x) {
       digitalWrite(pin, state ^= HIGH);
-      delay(250);
+      delay(50);
     }
 
     digitalWrite(pin, state); // NOTE: Is this really needed...?
@@ -166,7 +166,7 @@ void loop() {
 
   float StartTime = micros(); // Start time measurement
   for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
-    String result = SHA1::hash(String(hash) + String(iJob));
+    String result = SHA1::hash(hash + String(iJob));
 
     if (result == job) { // If result is found
       // Replaces two assignments and two divisions with a multiplication
@@ -182,5 +182,7 @@ void loop() {
       blink(BLINK_SHARE_FOUND);
       break; // Stop and ask for more work
     }
+    
+    ESP.wdtFeed();
   }
 }
