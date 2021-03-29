@@ -221,12 +221,14 @@ Some third-party included files may have different licenses - please check their
     *   [@travelmode](https://github.com/colonelwatch) (Dev)
     *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
     *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
+    *   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
 
 *   **Contributors:**
     *   [@5Q](https://github.com/its5Q)
     *   [@kyngs](https://github.com/kyngs)
     *   [@httsmvkcom](https://github.com/httsmvkcom)
     *   [@Nosh-Ware](https://github.com/Nosh-Ware)
+    *   [@BastelPichi](https://github.com/BastelPichi)
     *   Thanks to [@Furim](https://github.com/Furim) for help in the early development stage
     *   Thanks to [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg) for designing early logos
     *   Thanks to [@Tech1k](https://github.com/Tech1k) for [Beyondcoin](https://beyondcoin.io) partnership and providing [duinocoin.com](https://duinocoin.com) domain
