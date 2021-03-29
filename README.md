@@ -83,7 +83,7 @@ If you are on Windows, download [Python 3](https://www.python.org/downloads/), t
 ```BASH
 py -m pip install -r requirements.txt
 ```
-Note:Make shure python and pip are added to your PATH
+Note: Make shure python and pip are added to your PATH
 
 After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py` OR `py PC_Miner.py`). 
 
