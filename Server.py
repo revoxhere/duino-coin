@@ -864,69 +864,70 @@ def handle(c, ip):
                 except IndexError:
                     customDiff = "NET"
 
-                if overrideDiff == "EXTREME" or customDiff == "EXTREME":
-                    # Custom difficulty 950k
-                    diff = 950000
-                    # Practically no limits
-                    max_hashrate = 999999999
-                    max_shares_per_sec = 10
+                if firstshare:
+                    if overrideDiff == "EXTREME" or customDiff == "EXTREME":
+                        # Custom difficulty 950k
+                        diff = 950000
+                        # Practically no limits
+                        max_hashrate = 999999999
+                        max_shares_per_sec = 10
 
-                elif overrideDiff == "NET" or customDiff == "NET":
-                    # Network difficulty
-                    diff = int(blocks / diff_incrase_per)
-                    # Max 2 MH/s
-                    max_hashrate = 2000000
-                    max_shares_per_sec = 1
+                    elif overrideDiff == "NET" or customDiff == "NET":
+                        # Network difficulty
+                        diff = int(blocks / diff_incrase_per)
+                        # Max 2 MH/s
+                        max_hashrate = 2000000
+                        max_shares_per_sec = 1
 
-                elif overrideDiff == "MEDIUM" or customDiff == "MEDIUM":
-                    # Diff for medium computers 30k
-                    diff = 30000
-                    # Max 1 MH/s
-                    max_hashrate = 1000000
-                    max_shares_per_sec = 2
+                    elif overrideDiff == "MEDIUM" or customDiff == "MEDIUM":
+                        # Diff for medium computers 30k
+                        diff = 30000
+                        # Max 1 MH/s
+                        max_hashrate = 1000000
+                        max_shares_per_sec = 2
 
-                elif customDiff == "LOW":
-                    # Diff for webminers or slow computers 3k
-                    diff = 3000
-                    # Max 200 kH/s
-                    max_hashrate = 200000
-                    max_shares_per_sec = 2
+                    elif customDiff == "LOW":
+                        # Diff for webminers or slow computers 3k
+                        diff = 3000
+                        # Max 200 kH/s
+                        max_hashrate = 200000
+                        max_shares_per_sec = 2
 
-                elif customDiff == "ESP32":
-                    # optimal diff for low power devices like ESP32
-                    diff = 275
-                    basereward = 0.00045
-                    randomChoice = random.randint(0, len(readyHashesESP32)-1)
-                    rand = readyHashesESP32[randomChoice]["Result"]
-                    newBlockHash = readyHashesESP32[randomChoice]["Hash"]
-                    lastBlockHash_copy = readyHashesESP32[randomChoice]["LastBlockHash"]
-                    # Not overclocked ESP32 chips won't make more than 6-7 kH/s
-                    max_hashrate = 8000
-                    max_shares_per_sec = 30
+                    elif customDiff == "ESP32":
+                        # optimal diff for low power devices like ESP32
+                        diff = 275
+                        basereward = 0.00045
+                        randomChoice = random.randint(0, len(readyHashesESP32) - 1)
+                        rand = readyHashesESP32[randomChoice]["Result"]
+                        newBlockHash = readyHashesESP32[randomChoice]["Hash"]
+                        lastBlockHash_copy = readyHashesESP32[randomChoice]["LastBlockHash"]
+                        # Not overclocked ESP32 chips won't make more than 6-7 kH/s
+                        max_hashrate = 8000
+                        max_shares_per_sec = 30
 
-                elif customDiff == "ESP":
-                    # Optimal diff for low power devices like ESP8266
-                    diff = 125
-                    basereward = 0.00055
-                    randomChoice = random.randint(0, len(readyHashesESP)-1)
-                    rand = readyHashesESP[randomChoice]["Result"]
-                    newBlockHash = readyHashesESP[randomChoice]["Hash"]
-                    lastBlockHash_copy = readyHashesESP[randomChoice]["LastBlockHash"]
-                    # Not overclocked ESP8266 chips won't make more than 2.8 kH/s
-                    max_hashrate = 3000
-                    max_shares_per_sec = 30
+                    elif customDiff == "ESP":
+                        # Optimal diff for low power devices like ESP8266
+                        diff = 125
+                        basereward = 0.00055
+                        randomChoice = random.randint(0, len(readyHashesESP) - 1)
+                        rand = readyHashesESP[randomChoice]["Result"]
+                        newBlockHash = readyHashesESP[randomChoice]["Hash"]
+                        lastBlockHash_copy = readyHashesESP[randomChoice]["LastBlockHash"]
+                        # Not overclocked ESP8266 chips won't make more than 2.8 kH/s
+                        max_hashrate = 3000
+                        max_shares_per_sec = 30
 
-                elif customDiff == "AVR":
-                    # Optimal diff for very low power devices like Arduino
-                    diff = 4
-                    basereward = 0.00035
-                    randomChoice = random.randint(0, len(readyHashesAVR)-1)
-                    rand = readyHashesAVR[randomChoice]["Result"]
-                    newBlockHash = readyHashesAVR[randomChoice]["Hash"]
-                    lastBlockHash_copy = readyHashesAVR[randomChoice]["LastBlockHash"]
-                    # Not overclocked Arduino chips won't make more than 150 H/s
-                    max_hashrate = 150
-                    max_shares_per_sec = 3
+                    elif customDiff == "AVR":
+                        # Optimal diff for very low power devices like Arduino
+                        diff = 4
+                        basereward = 0.00035
+                        randomChoice = random.randint(0, len(readyHashesAVR) - 1)
+                        rand = readyHashesAVR[randomChoice]["Result"]
+                        newBlockHash = readyHashesAVR[randomChoice]["Hash"]
+                        lastBlockHash_copy = readyHashesAVR[randomChoice]["LastBlockHash"]
+                        # Not overclocked Arduino chips won't make more than 150 H/s
+                        max_hashrate = 150
+                        max_shares_per_sec = 3
 
                 # Check if websocket proxy isn't used for anything else than webminer
                 if customDiff != "LOW" and ip == "51.15.127.80":
@@ -961,10 +962,12 @@ def handle(c, ip):
                             new_diff = int(diff * p)
                             # Checks whether the diff is lower than 0 (sharetime was way higher than expected)
                             if new_diff < 0:
-                                # Divided by p to drastically lower the diff
-								# +1 is added to avoid dividing by -0.x
-                                # 0.9 is used to decrease it when the sharetime is 3x higher than expected
-                                new_diff = int(diff / abs(p + 2)) * 0.9
+                                # Divided by abs(p) + 2 to drastically lower the diff
+				# +2 is added to avoid dividing by +-0.x
+                                # *0.9 is used to decrease it when the sharetime is 3x higher than expected 
+				# everything is rounded down (floored) to not make the 0.9 useless
+				# +1 is added to avoid getting diffs equal to 0
+                                new_diff = math.floor(int(diff / (abs(p) + 2)) * 0.9) + 1
                             # Check if sharetime was exactly double than expected
                             elif new_diff == 0:
                                 # Thus roughly half the difficulty
@@ -1079,6 +1082,8 @@ def handle(c, ip):
                 # Kolka system V3
                 # Move miner to higher diff tier if his hashrate is too high
                 if int(hashrateCalculated) > int(max_hashrate):
+		    # Set to adjust the starting diff again (see roughly line 860)
+                    firstshare = True
                     if customDiff == "LOW":
                         overrideDiff = "MEDIUM"
                     if customDiff == "MEDIUM":
