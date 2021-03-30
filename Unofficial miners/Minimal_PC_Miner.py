@@ -71,7 +71,7 @@ while True:
                 if job[1] == ducos1:
                     hashingStopTime = time.time()
                     timeDifference = hashingStopTime - hashingStartTime
-                    hashrate = ducos1xxres / timeDifference
+                    hashrate = result / timeDifference
 
                     # Send numeric result to the server
                     soc.send(bytes(
@@ -86,7 +86,7 @@ while True:
                     # If result was good
                     if feedback == "GOOD":
                         print("Accepted share",
-                              ducos1xxres,
+                              result,
                               "Hashrate",
                               int(hashrate/1000),
                               "kH/s",
@@ -96,7 +96,7 @@ while True:
                     # If result was incorrect
                     elif feedback == "BAD":
                         print("Rejected share",
-                              ducos1xxres,
+                              result,
                               "Hashrate",
                               int(hashrate/1000),
                               "kH/s",
@@ -107,4 +107,4 @@ while True:
     except Exception as e:
         print("Error occured: " + str(e) + ", restarting in 5s.")
         time.sleep(5)
-        os.execv(sys.argv[0], sys.argv)
+        os.execl(sys.executable, sys.executable, *sys.argv)
