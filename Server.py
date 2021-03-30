@@ -59,7 +59,7 @@ max_unauthorized_connections = 28
 hashes_num = 1000
 # Rewards
 shares_per_sec_reset = 1
-max_rejected_shares = 50
+max_rejected_shares = 20
 big_block_reward = 7.77
 reward_multiplier = 0.77
 higher_diffs_basereward = 0.0002811
@@ -103,7 +103,7 @@ We hope you'll have a great time using Duino-Coin.
 If you have any difficulties there are a lot of guides on our website: https://duinocoin.com/getting-started
 You can also join our Discord server: https://discord.gg/kvBkccy to chat, take part in giveaways, trade and get help from other Duino-Coin users.
 Happy mining!
-Duino-Coin Team"""
+Sincerely, Duino-Coin Team"""
 
 # Registration email - HTML version
 html = """\
@@ -115,7 +115,28 @@ html = """\
     <p>We hope you'll have a great time using Duino-Coin.<br>If you have any difficulties there are a lot of <a href="https://duinocoin.com/getting-started">guides on our website</a>.<br>
        You can also join our <a href="https://discord.gg/kvBkccy">Discord server</a> to chat, take part in giveaways, trade and get help from other Duino-Coin users.<br><br>
        Happy mining!<br>
-       <italic>Duino-Coin Team</italic>
+       <italic>Sincerely, Duino-Coin Team</italic>
+    </p>
+  </body>
+</html>
+"""
+
+# Ban email - text version
+textBan = """\
+Hi there!
+We have noticed behavior on your account that does not comply with our terms of service.
+Your account has been permanently banned.
+Sincerely, Duino-Coin Team"""
+
+# Ban email - HTML version
+htmlBan = """\
+<html>
+  <body>
+    <img src="https://github.com/revoxhere/duino-coin/raw/master/Resources/ducobanner.png?raw=true" width="360px" height="auto"><br>
+    <h3>Hi there!</h3>
+    <h4>We have noticed behavior on your account that does not comply with our <a href="https://github.com/revoxhere/duino-coin#terms-of-service">terms of service</a>.</h4>
+    <p>Your account has been permanently banned.<br>
+       <italic>Sincerely, Duino-Coin Team</italic>
     </p>
   </body>
 </html>
@@ -407,6 +428,7 @@ def cpuUsageThread():
 
 def API():
     # Update main server info and miner API file
+    serverHashratearray = []
     while True:
         try:
             now = datetime.datetime.now()
@@ -415,7 +437,9 @@ def API():
             usernameMinerCounter = {}
             minerapipublic = {}
             usernameMinerCounter_sorted = {}
+            serverHashrate_not_smoothed = 0
             serverHashrate = 0
+            serverHashrateArray = []
             hashrate = 0
             for x in minerapi.copy():
                 try:
@@ -426,17 +450,21 @@ def API():
                     if int(timedelta.total_seconds()) > 30:
                         minerapi.pop(x)
                     # Add user hashrate to the server hashrate
-                    serverHashrate += float(minerapi[x]["Hashrate"])
+                    serverHashrate_not_smoothed += float(
+                        minerapi[x]["Hashrate"])
                 except:
                     pass
 
-            if serverHashrate >= 1000000000:
+            serverHashrateArray.append(serverHashrate_not_smoothed)
+            serverHashrate = statistics.mean(serverHashrateArray[-200:])
+
+            if serverHashrate >= 800000000:
                 prefix = " GH/s"
                 serverHashrate = serverHashrate / 1000000000
-            elif serverHashrate >= 1000000:
+            elif serverHashrate >= 800000:
                 prefix = " MH/s"
                 serverHashrate = serverHashrate / 1000000
-            elif serverHashrate >= 1000:
+            elif serverHashrate >= 800:
                 prefix = " kH/s"
                 serverHashrate = serverHashrate / 1000
             else:
@@ -517,16 +545,16 @@ def UpdateOtherAPIFiles():
         with open('balances.json', 'w') as outfile:
             # Write JSON balances to file
             json.dump(
-                getAllBalances(), 
-                outfile, 
-                indent=2, 
+                getAllBalances(),
+                outfile,
+                indent=2,
                 ensure_ascii=False)
         with open('transactions.json', 'w') as outfile:
             # Write JSON transactions to file
             json.dump(
-                getTransactions(), 
-                outfile, 
-                indent=2, 
+                getTransactions(),
+                outfile,
+                indent=2,
                 ensure_ascii=False)
         time.sleep(30)
 
@@ -600,7 +628,7 @@ def InputManagement():
                     with sqlite3.connect(database, timeout=database_timeout) as conn:
                         datab = conn.cursor()
                         datab.execute(
-                            "UPDATE Users set password = ? where username = ?", (newPassword_encrypted, username))
+                            "UPDATE Users set password = ? where username = ?", (duco_password, username))
                         conn.commit()
                     print("Step 1 - Changed password")
                 except:
@@ -611,6 +639,40 @@ def InputManagement():
                         print("Step 2 - Added username to banlist")
                 except:
                     print("Step 2 - Error adding username to banlist")
+
+                try:
+                    banlist.append(str(username))
+                    print("Step 2 - Added username to blocked usernames")
+                except:
+                    print("Step 3 - Error adding username to blocked usernames")
+
+                try:
+                    with sqlite3.connect(database, timeout=database_timeout) as conn:
+                        datab = conn.cursor()
+                        datab.execute(
+                            "SELECT * FROM Users WHERE username = ?", (username,))
+                        email = str(datab.fetchone()[2])  # Fetch email of user
+
+                    message = MIMEMultipart("alternative")
+                    message["Subject"] = "ToS violation on account " + \
+                        str(username)
+                    message["From"] = duco_email
+                    message["To"] = email
+                    # Turn email data into plain/html MIMEText objects
+                    part1 = MIMEText(textBan, "plain")
+                    part2 = MIMEText(htmlBan, "html")
+                    message.attach(part1)
+                    message.attach(part2)
+                    # Create secure connection with server and send an email
+                    context = ssl.create_default_context()
+                    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtpserver:
+                        smtpserver.login(
+                            duco_email, duco_password)
+                        smtpserver.sendmail(
+                            duco_email, email, message.as_string())
+                    print("Step 4 - Sent email to", str(email))
+                except Exception as e:
+                    print("Step 4 - Error sending email to", str(email), str(e))
             except:
                 print("Provide a username first")
 
@@ -836,7 +898,9 @@ def handle(c, ip):
                     except IndexError:
                         c.send(bytes("BAD,Not enough data", encoding='utf8'))
                         break
-
+                if username in banlist:
+                    ban(ip)
+                    break
                 if firstshare:
                     try:
                         workers[username] += 1
@@ -897,7 +961,8 @@ def handle(c, ip):
                         # optimal diff for low power devices like ESP32
                         diff = 275
                         basereward = 0.00045
-                        randomChoice = random.randint(0, len(readyHashesESP32) - 1)
+                        randomChoice = random.randint(
+                            0, len(readyHashesESP32) - 1)
                         rand = readyHashesESP32[randomChoice]["Result"]
                         newBlockHash = readyHashesESP32[randomChoice]["Hash"]
                         lastBlockHash_copy = readyHashesESP32[randomChoice]["LastBlockHash"]
@@ -909,7 +974,8 @@ def handle(c, ip):
                         # Optimal diff for low power devices like ESP8266
                         diff = 125
                         basereward = 0.00055
-                        randomChoice = random.randint(0, len(readyHashesESP) - 1)
+                        randomChoice = random.randint(
+                            0, len(readyHashesESP) - 1)
                         rand = readyHashesESP[randomChoice]["Result"]
                         newBlockHash = readyHashesESP[randomChoice]["Hash"]
                         lastBlockHash_copy = readyHashesESP[randomChoice]["LastBlockHash"]
@@ -921,7 +987,8 @@ def handle(c, ip):
                         # Optimal diff for very low power devices like Arduino
                         diff = 4
                         basereward = 0.00035
-                        randomChoice = random.randint(0, len(readyHashesAVR) - 1)
+                        randomChoice = random.randint(
+                            0, len(readyHashesAVR) - 1)
                         rand = readyHashesAVR[randomChoice]["Result"]
                         newBlockHash = readyHashesAVR[randomChoice]["Hash"]
                         lastBlockHash_copy = readyHashesAVR[randomChoice]["LastBlockHash"]
@@ -940,7 +1007,7 @@ def handle(c, ip):
                     or customDiff == "EXTREME"
                     or overrideDiff == "MEDIUM"
                     or overrideDiff == "NET"
-                    or overrideDiff == "EXTREME"):
+                        or overrideDiff == "EXTREME"):
 
                     # Copy the current block hash as it can be changed by other threads
                     lastBlockHash_copy = lastBlockHash
@@ -951,31 +1018,35 @@ def handle(c, ip):
                         basereward = 0
 
                     if not firstshare:
-                        # Part of Kolka system V3 - variable difficulty section
-                        # Calculate the diff multiplier
-                        p = 2 - sharetime / expected_sharetime
+                        try:
+                            # Part of Kolka system V3 - variable difficulty section
+                            # Calculate the diff multiplier
+                            p = 2 - sharetime / expected_sharetime
 
-                        # Checks whether sharetime was higher than expected or has exceeded the buffer of 10%
-                        # (p = 1 equals to sharetime = expected_sharetime)
-                        if p < 1 or p > 1.1:
-                            # Has met either condition thus the diff gets set
-                            new_diff = int(diff * p)
-                            # Checks whether the diff is lower than 0 (sharetime was way higher than expected)
-                            if new_diff < 0:
-                                # Divided by abs(p) + 2 to drastically lower the diff
-				# +2 is added to avoid dividing by +-0.x
-                                # *0.9 is used to decrease it when the sharetime is 3x higher than expected 
-				# everything is rounded down (floored) to not make the 0.9 useless
-				# +1 is added to avoid getting diffs equal to 0
-                                new_diff = math.floor(int(diff / (abs(p) + 2)) * 0.9) + 1
-                            # Check if sharetime was exactly double than expected
-                            elif new_diff == 0:
-                                # Thus roughly half the difficulty
-                                new_diff = int(diff * 0.5)
-                            diff = int(new_diff)
-                        else:
-                            # Hasn't met any of the conditions ( > 1 and < 1.1) thus leave diff
-                            diff = int(diff)
+                            # Checks whether sharetime was higher than expected or has exceeded the buffer of 10%
+                            # (p = 1 equals to sharetime = expected_sharetime)
+                            if p < 1 or p > 1.1:
+                                # Has met either condition thus the diff gets set
+                                new_diff = int(diff * p)
+                                # Checks whether the diff is lower than 0 (sharetime was way higher than expected)
+                                if new_diff < 0:
+                                    # Divided by abs(p) + 2 to drastically lower the diff
+                                    # +2 is added to avoid dividing by +-0.x
+                                    # *0.9 is used to decrease it when the sharetime is 3x higher than expected
+                                    # everything is rounded down (floored) to not make the 0.9 useless
+                                    # +1 is added to avoid getting diffs equal to 0
+                                    new_diff = math.floor(
+                                        int(diff / (abs(p) + 2)) * 0.9) + 1
+                                # Check if sharetime was exactly double than expected
+                                elif new_diff == 0:
+                                    # Thus roughly half the difficulty
+                                    new_diff = int(diff * 0.5)
+                                diff = int(new_diff)
+                            else:
+                                # Hasn't met any of the conditions ( > 1 and < 1.1) thus leave diff
+                                diff = int(diff)
+                        except Exception as e:
+                            print(e)
                     else:
                         time.sleep(3)
 
@@ -1019,7 +1090,7 @@ def handle(c, ip):
                 jobsent = datetime.datetime.now()
                 try:
                     # Wait until client solves hash
-                    response = c.recv(256).decode().split(",")
+                    response = c.recv(512).decode().split(",")
                     result = response[0]
                 except:
                     break
@@ -1082,8 +1153,15 @@ def handle(c, ip):
                 # Kolka system V3
                 # Move miner to higher diff tier if his hashrate is too high
                 if int(hashrateCalculated) > int(max_hashrate):
-		    # Set to adjust the starting diff again (see roughly line 860)
+                    # Set to adjust the starting diff again (see roughly line 860)
                     firstshare = True
+                    # Move the difficulty up by one tier
+                    if customDiff == "AVR":
+                        overrideDiff = "MEDIUM"
+                    if customDiff == "ESP":
+                        overrideDiff = "ESP32"
+                    if customDiff == "ESP32":
+                        overrideDiff = "LOW"
                     if customDiff == "LOW":
                         overrideDiff = "MEDIUM"
                     if customDiff == "MEDIUM":
@@ -1107,15 +1185,15 @@ def handle(c, ip):
 
                     # Calculate the reward - Kolka system V1
                     if customDiff == "EXTREME" or overrideDiff == "EXTREME":
-                        reward = (float(sharetime) 
-                            / 100000000 
-                            + workers[username] 
-                            / 100000) / workers[username]
+                        reward = (float(sharetime)
+                                  / 100000000
+                                  + workers[username]
+                                  / 100000) / workers[username]
                     else:
-                        reward = (reward_multiplier * basereward 
-                                + float(sharetime) / 10000000000 
-                                + float(diff) / 1000000000 
-                                - workers[username] / 10000000)
+                        reward = (reward_multiplier * basereward
+                                  + float(sharetime) / 10000000000
+                                  + float(diff) / 1000000000
+                                  - workers[username] / 10000000)
 
                     # Low probability to find a "big block"
                     blockfound = random.randint(1, big_block_probability)
@@ -1200,6 +1278,9 @@ def handle(c, ip):
                     except IndexError:
                         c.send(bytes("BAD,Not enough data\n", encoding='utf8'))
                         break
+                if username in banlist:
+                    ban(ip)
+                    break
 
                 if firstshare:
                     try:
@@ -1230,7 +1311,7 @@ def handle(c, ip):
                 # Copy the current block hash as it can be changed by other threads
                 lastBlockHash_copy = lastBlockHash
                 expected_sharetime = expected_sharetime_sec * 1000
-                basereward = higher_diffs_basereward / 4
+                basereward = higher_diffs_basereward / 10
 
                 if not firstshare:
                     try:
@@ -1245,7 +1326,7 @@ def handle(c, ip):
                         else:
                             new_diff = int(diff)
 
-                        # Checks whether sharetime was higher than expected 
+                        # Checks whether sharetime was higher than expected
                         # (p = 1 equals to sharetime = expected_sharetime)
                         if p < 1:
                             # If sharetime was longer than expected,
@@ -1259,13 +1340,22 @@ def handle(c, ip):
                             # If sharetime was shorter than expected,
                             # Raise the difficulty
                             diff = int(new_diff)
+
+                        # Generate result in range of the difficulty
+                        rand = fastrand.pcg32bounded(100 * diff)
+                        # Create the DUCO-S1 hash
+                        newBlockHash = hashlib.sha1(
+                            str(str(lastBlockHash_copy)
+                                + str(rand)
+                                ).encode("utf-8")).hexdigest()
                     except Exception as e:
                         print(e)
 
                 # Generate result in range of the difficulty
                 rand = fastrand.pcg32bounded(100 * diff)
                 # Create the xxhash hash
-                newBlockHash = xxhash.xxh64(str(str(lastBlockHash_copy) + str(rand)), seed=2811).hexdigest()
+                newBlockHash = xxhash.xxh64(
+                    str(str(lastBlockHash_copy) + str(rand)), seed=2811).hexdigest()
 
                 # Send lastblockhash, expectedhash and diff to the client
                 try:
@@ -1361,7 +1451,7 @@ def handle(c, ip):
 
                     reward = reward_multiplier * \
                         (basereward + float(sharetime) /
-                             100000000 + float(diff) / 100000000)
+                         100000000 + float(diff) / 100000000)
 
                     # Low probability to find a "big block"
                     blockfound = random.randint(1, big_block_probability)
@@ -1391,7 +1481,7 @@ def handle(c, ip):
                         except:
                             print("Error sending feedback", username)
                             break
-                        
+
                     try:
                         # Add username to the dict so it will be incremented in the next DB update
                         balancesToUpdate[username] += reward
@@ -1419,7 +1509,6 @@ def handle(c, ip):
                     except:
                         break
 
-
             ######################################################################
             elif str(data[0]) == "LOGI":
                 try:
@@ -1430,6 +1519,9 @@ def handle(c, ip):
                             and not username in whitelistedUsernames):
                         adminLog("bans", "Banning IP: " + ip +
                                  " in login section, account: " + username)
+                        ban(ip)
+                        break
+                    if username in banlist:
                         ban(ip)
                         break
                 except IndexError:
@@ -2201,19 +2293,32 @@ if __name__ == '__main__':
         whitelisted_ip = []
         for ip in whitelisted:
             whitelisted_ip.append(socket.gethostbyname(str(ip)))
-        try:
-            # Read whitelisted usernames
-            with open("config/whitelistedUsernames.txt", "r") as whitelistusrfile:
-                whitelistedusr = whitelistusrfile.read().splitlines()
-                adminLog("system", "Loaded whitelisted usernames file")
-                whitelistedUsernames = []
-                for username in whitelistedusr:
-                    whitelistedUsernames.append(username)
-        except Exception as e:
-            adminLog(
-                "system", "Error reading whitelisted usernames file: " + str(e))
     except Exception as e:
         adminLog("system", "Error reading whitelisted IPs file: " + str(e))
+
+    try:
+        # Read whitelisted usernames
+        with open("config/whitelistedUsernames.txt", "r") as whitelistusrfile:
+            whitelistedusr = whitelistusrfile.read().splitlines()
+            adminLog("system", "Loaded whitelisted usernames file")
+            whitelistedUsernames = []
+            for username in whitelistedusr:
+                whitelistedUsernames.append(username)
+    except Exception as e:
+        adminLog(
+            "system", "Error reading whitelisted usernames file: " + str(e))
+
+    try:
+        # Read banned usernames
+        with open("config/banned.txt", "r") as bannedusrfile:
+            bannedusr = bannedusrfile.read().splitlines()
+            adminLog("system", "Loaded banned usernames file")
+            banlist = []
+            for username in bannedusr:
+                banlist.append(username)
+    except Exception as e:
+        adminLog(
+            "system", "Error reading banned usernames file: " + str(e))
 
     # Create CPU perc measurement
     threading.Thread(target=cpuUsageThread).start()
