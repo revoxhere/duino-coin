@@ -93,7 +93,7 @@ You can also get the whole Duino-Coin bundle on the AUR - just install it with y
 
 ```BASH
 sudo pacman -S git
-sudo git clone https://aur.archlinux.org/yay-git.git
+git clone https://aur.archlinux.org/yay-git.git
 cd yay-git
 makepkg -si
 yay -S duino-coin
