@@ -142,7 +142,7 @@ namespace /* anonymous */ {
 
 void setup() {
   Serial.begin(115200); // Start serial connection
-  Serial.println("\n\nCustom ESP Miner v"+VersionInfo());
+  Serial.println("\nESP-8266 Miner "+VersionInfo());
 
   SetupWifi();
   SetupOTA();
@@ -156,33 +156,35 @@ void loop() {
 
   Serial.println("Asking for a new job for user: " + String(ducouser));
 
-  client.print("JOB," + String(ducouser) + ",ESP"); // Ask for new job
-  String       hash = client.readStringUntil(','); // Read data to the first peroid - last block hash
-  String        job = client.readStringUntil(','); // Read data to the next peroid - expected hash
+  client.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
+  String hash = client.readStringUntil(','); // Read data to the first peroid - last block hash
+  String job = client.readStringUntil(','); // Read data to the next peroid - expected hash
   unsigned int diff = client.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
-  Serial.println("Job received: " + String(hash) + " " + String(job) + " " + String(diff));
-  
-  job.toUpperCase(); // SHA1::hash() returns Upper-Case results...
+  Serial.println("Job received: " + hash + " " + job + " " + String(diff));
+
+  job.toUpperCase();
 
   float StartTime = micros(); // Start time measurement
   for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
     String result = SHA1::hash(hash + String(iJob));
 
     if (result == job) { // If result is found
-      // Replaces two assignments and two divisions with a multiplication
       unsigned long ElapsedTime = micros() - StartTime;  // Calculate elapsed time
       float ElapsedTimeSeconds = ElapsedTime * .000001f; // Convert to seconds
       float HashRate = iJob / ElapsedTimeSeconds;
 
-      client.print(String(iJob) + "," + String(HashRate) + ",Custom ESP Miner v"+VersionInfo()+"," + String(rigIdentifier)); // Send result to server
+      client.print(String(iJob) + "," + String(HashRate) + ",ESP-8266 Miner "+VersionInfo()+"," + String(rigIdentifier)); // Send result to server
 
       String feedback = client.readStringUntil('\n'); // Receive feedback
       Shares++;
-      Serial.println(String(feedback) + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
+      Serial.println(feedback + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
       blink(BLINK_SHARE_FOUND);
       break; // Stop and ask for more work
     }
-    
+
+    if ((iJob % 10000) == 0)
+      yield();
+
     ESP.wdtFeed();
   }
 }
