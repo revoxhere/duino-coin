@@ -78,7 +78,7 @@ except:
     print(
         now().strftime("%H:%M:%S ")
         + 'Pypresence is not installed. '
-        + 'Wallet will try to install it. '
+        + 'Miner will try to install it. '
         + 'If it fails, please manually install "pypresence" python3 package.'
         + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
     install("pypresence")
@@ -86,14 +86,13 @@ except:
 # Check if xxhash is installed
 try:
     import xxhash
+    xxhash_enabled = True
 except:
     print(
         now().strftime("%H:%M:%S ")
         + 'Xxhash is not installed. '
-        + 'Wallet will try to install it. '
-        + 'If it fails, please manually install "xxhash" python3 package.'
-        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
-    install("xxhash")
+        + 'Continuing without xxhash support.')
+    xxhash_enabled = False
 
 
 # Global variables
@@ -377,28 +376,29 @@ def loadConfig():
             + Fore.WHITE
             + Style.BRIGHT)
 
-
-        print(
-            Style.RESET_ALL
-            + Style.BRIGHT
-            + Fore.WHITE
-            + "1"
-            + Style.NORMAL
-            + " - DUCO-S1")
-        print(
-            Style.RESET_ALL
-            + Style.BRIGHT
-            + Fore.WHITE
-            + "2"
-            + Style.NORMAL
-            + " - XXHASH")
-
-        algorithm = input(
-            Style.RESET_ALL
-            + Fore.YELLOW
-            + getString("ask_algorithm")
-            + Fore.WHITE
-            + Style.BRIGHT)
+        if xxhash_enabled:
+            print(
+                Style.RESET_ALL
+                + Style.BRIGHT
+                + Fore.WHITE
+                + "1"
+                + Style.NORMAL
+                + " - DUCO-S1")
+            print(
+                Style.RESET_ALL
+                + Style.BRIGHT
+                + Fore.WHITE
+                + "2"
+                + Style.NORMAL
+                + " - XXHASH")
+            algorithm = input(
+                Style.RESET_ALL
+                + Fore.YELLOW
+                + getString("ask_algorithm")
+                + Fore.WHITE
+                + Style.BRIGHT)
+        else:
+            algorithm = "1"
 
         efficiency = input(
             Style.RESET_ALL
