@@ -138,6 +138,17 @@ namespace /* anonymous */ {
     Serial.println("Connected to the server. Server version: " + client.readString());
     blink(BLINK_CLIENT_CONNECT); // Blink 3 times - indicate sucessfull connection with the server
   }
+
+  bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
+    static unsigned long _start = 0;
+
+    if ((current - _start) > max_elapsed) {
+      _start = current;
+      return true;
+    }
+      
+    return false;
+  }
 } // namespace
 
 void setup() {
@@ -164,7 +175,9 @@ void loop() {
 
   job.toUpperCase();
 
-  float StartTime = micros(); // Start time measurement
+  float StartTime = micros();       // Start time measurement
+  max_micros_elapsed(StartTime, 0);
+
   for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
     String result = SHA1::hash(hash + String(iJob));
 
@@ -182,9 +195,7 @@ void loop() {
       break; // Stop and ask for more work
     }
 
-    if ((iJob % 10000) == 0)
+    if (max_micros_elapsed(micros(), 400000)) 
       yield();
-
-    ESP.wdtFeed();
   }
 }
