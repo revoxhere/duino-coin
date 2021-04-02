@@ -887,8 +887,11 @@ def handle(c, ip):
                 # Split incoming data
                 data = data.decode().rstrip("\n").split(",")
 
+            if str(data[0]) == "PING":
+                c.send(bytes("Pong!", encoding='utf8'))
+
             ######################################################################
-            if str(data[0]) == "JOB":
+            elif str(data[0]) == "JOB":
                 if username == "":
                     try:
                         username = str(data[1])
@@ -901,25 +904,30 @@ def handle(c, ip):
                 if username in banlist:
                     ban(ip)
                     break
+                    
                 if firstshare:
                     try:
                         workers[username] += 1
                     except:
                         workers[username] = 1
 
-                    # Check if there aren't too much connections per IP
-                    if (connections[ip] > max_mining_connections
-                            and not ip in whitelisted):
-                        c.send(bytes("BAD,Too many connections", encoding='utf8'))
-                        # Close this thread
-                        break
+                # Check if there aren't too much connections per IP
+                if (connections[ip] > max_mining_connections
+                        and not ip in whitelisted):
+                    rejectedShares += 1
+                    time.sleep(15)
+                    c.send(bytes("BAD,Too many connections", encoding='utf8'))
+                    # Close this thread
+                    break
 
-                    # Check if there aren't too much connections per username
-                    if (workers[username] > max_mining_connections
-                            and not username in whitelistedUsernames):
-                        c.send(bytes("BAD,Too many connections", encoding='utf8'))
-                        # Close this thread
-                        break
+                # Check if there aren't too much connections per username
+                if (workers[username] > max_mining_connections
+                        and not username in whitelistedUsernames):
+                    rejectedShares += 1
+                    time.sleep(15)
+                    c.send(bytes("BAD,Too many connections", encoding='utf8'))
+                    # Close this thread
+                    break
 
                 try:
                     customDiff = str(data[2])
@@ -961,11 +969,6 @@ def handle(c, ip):
                         # optimal diff for low power devices like ESP32
                         diff = 275
                         basereward = 0.00045
-                        randomChoice = random.randint(
-                            0, len(readyHashesESP32) - 1)
-                        rand = readyHashesESP32[randomChoice]["Result"]
-                        newBlockHash = readyHashesESP32[randomChoice]["Hash"]
-                        lastBlockHash_copy = readyHashesESP32[randomChoice]["LastBlockHash"]
                         # Not overclocked ESP32 chips won't make more than 6-7 kH/s
                         max_hashrate = 8000
                         max_shares_per_sec = 30
@@ -974,11 +977,6 @@ def handle(c, ip):
                         # Optimal diff for low power devices like ESP8266
                         diff = 125
                         basereward = 0.00055
-                        randomChoice = random.randint(
-                            0, len(readyHashesESP) - 1)
-                        rand = readyHashesESP[randomChoice]["Result"]
-                        newBlockHash = readyHashesESP[randomChoice]["Hash"]
-                        lastBlockHash_copy = readyHashesESP[randomChoice]["LastBlockHash"]
                         # Not overclocked ESP8266 chips won't make more than 2.8 kH/s
                         max_hashrate = 3000
                         max_shares_per_sec = 30
@@ -987,14 +985,28 @@ def handle(c, ip):
                         # Optimal diff for very low power devices like Arduino
                         diff = 4
                         basereward = 0.00035
-                        randomChoice = random.randint(
-                            0, len(readyHashesAVR) - 1)
-                        rand = readyHashesAVR[randomChoice]["Result"]
-                        newBlockHash = readyHashesAVR[randomChoice]["Hash"]
-                        lastBlockHash_copy = readyHashesAVR[randomChoice]["LastBlockHash"]
                         # Not overclocked Arduino chips won't make more than 150 H/s
                         max_hashrate = 150
                         max_shares_per_sec = 3
+
+                if customDiff == "AVR":
+                    randomChoice = random.randint(
+                            0, len(readyHashesAVR) - 1)
+                    rand = readyHashesAVR[randomChoice]["Result"]
+                    newBlockHash = readyHashesAVR[randomChoice]["Hash"]
+                    lastBlockHash_copy = readyHashesAVR[randomChoice]["LastBlockHash"]
+                elif customDiff == "ESP":
+                    randomChoice = random.randint(
+                            0, len(readyHashesESP) - 1)
+                    rand = readyHashesESP[randomChoice]["Result"]
+                    newBlockHash = readyHashesESP[randomChoice]["Hash"]
+                    lastBlockHash_copy = readyHashesESP[randomChoice]["LastBlockHash"]
+                elif customDiff == "ESP32":
+                    randomChoice = random.randint(
+                            0, len(readyHashesESP32) - 1)
+                    rand = readyHashesESP32[randomChoice]["Result"]
+                    newBlockHash = readyHashesESP32[randomChoice]["Hash"]
+                    lastBlockHash_copy = readyHashesESP32[randomChoice]["LastBlockHash"]
 
                 # Check if websocket proxy isn't used for anything else than webminer
                 if customDiff != "LOW" and ip == "51.15.127.80":
@@ -1007,7 +1019,7 @@ def handle(c, ip):
                     or customDiff == "EXTREME"
                     or overrideDiff == "MEDIUM"
                     or overrideDiff == "NET"
-                        or overrideDiff == "EXTREME"):
+                    or overrideDiff == "EXTREME"):
 
                     # Copy the current block hash as it can be changed by other threads
                     lastBlockHash_copy = lastBlockHash
@@ -1288,19 +1300,21 @@ def handle(c, ip):
                     except:
                         workers[username] = 1
 
-                    # Check if there aren't too much connections per IP
-                    if (connections[ip] > max_mining_connections
-                            and not ip in whitelisted):
-                        c.send(bytes("BAD,Too many connections\n", encoding='utf8'))
-                        # Close this thread
-                        break
+                # Check if there aren't too much connections per IP
+                if (connections[ip] > max_mining_connections
+                        and not ip in whitelisted):
+                    rejectedShares += 1
+                    c.send(bytes("BAD,Too many connections\n", encoding='utf8'))
+                    # Close this thread
+                    break
 
-                    # Check if there aren't too much connections per username
-                    if (workers[username] > max_mining_connections
-                            and not username in whitelistedUsernames):
-                        c.send(bytes("BAD,Too many connections\n", encoding='utf8'))
-                        # Close this thread
-                        break
+                # Check if there aren't too much connections per username
+                if (workers[username] > max_mining_connections
+                        and not username in whitelistedUsernames):
+                    rejectedShares += 1
+                    c.send(bytes("BAD,Too many connections\n", encoding='utf8'))
+                    # Close this thread
+                    break
 
                 # Network difficulty
                 diff = int(blocks / diff_incrase_per)
@@ -1311,7 +1325,7 @@ def handle(c, ip):
                 # Copy the current block hash as it can be changed by other threads
                 lastBlockHash_copy = lastBlockHash
                 expected_sharetime = expected_sharetime_sec * 1000
-                basereward = higher_diffs_basereward / 10
+                basereward = higher_diffs_basereward / 30
 
                 if not firstshare:
                     try:
@@ -1319,37 +1333,32 @@ def handle(c, ip):
                         # Calculate the diff multiplier
                         p = 2 - sharetime / expected_sharetime
 
-                        # Check if multiplier is higher than 10%
-                        if p > 1.1:
-                            # Calculate new difficulty
-                            new_diff = int(diff * p)
-                        else:
-                            new_diff = int(diff)
-
-                        # Checks whether sharetime was higher than expected
+                        # Checks whether sharetime was higher than expected or has exceeded the buffer of 10%
                         # (p = 1 equals to sharetime = expected_sharetime)
-                        if p < 1:
-                            # If sharetime was longer than expected,
-                            # Lower the difficulty
-                            # Calculate the multiplier again for lowering
+                        if p < 1 or p > 1.1:
+                            # Has met either condition thus the diff gets set
                             new_diff = int(diff * p)
-                            if new_diff <= 0:
-                                new_diff = new_diff * -1
+                            # Checks whether the diff is lower than 0 (sharetime was way higher than expected)
+                            if new_diff < 0:
+                                # Divided by abs(p) + 2 to drastically lower the diff
+                                # +2 is added to avoid dividing by +-0.x
+                                # *0.9 is used to decrease it when the sharetime is 3x higher than expected
+                                # everything is rounded down (floored) to not make the 0.9 useless
+                                # +1 is added to avoid getting diffs equal to 0
+                                new_diff = math.floor(
+                                    int(diff / (abs(p) + 2)) * 0.9) + 1
+                            # Check if sharetime was exactly double than expected
+                            elif new_diff == 0:
+                                # Thus roughly half the difficulty
+                                new_diff = int(diff * 0.5)
                             diff = int(new_diff)
                         else:
-                            # If sharetime was shorter than expected,
-                            # Raise the difficulty
-                            diff = int(new_diff)
-
-                        # Generate result in range of the difficulty
-                        rand = fastrand.pcg32bounded(100 * diff)
-                        # Create the DUCO-S1 hash
-                        newBlockHash = hashlib.sha1(
-                            str(str(lastBlockHash_copy)
-                                + str(rand)
-                                ).encode("utf-8")).hexdigest()
+                            # Hasn't met any of the conditions ( > 1 and < 1.1) thus leave diff
+                            diff = int(diff)
                     except Exception as e:
                         print(e)
+                else:
+                    time.sleep(3)
 
                 # Generate result in range of the difficulty
                 rand = fastrand.pcg32bounded(100 * diff)
