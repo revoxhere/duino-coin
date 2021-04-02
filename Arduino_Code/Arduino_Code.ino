@@ -1,32 +1,25 @@
 //////////////////////////////////////////////////////////
-//  ____        _                    ____      _       
-// |  _ \ _   _(_)_ __   ___        / ___|___ (_)_ __  
-// | | | | | | | | '_ \ / _ \ _____| |   / _ \| | '_ \ 
-// | |_| | |_| | | | | | (_) |_____| |__| (_) | | | | |
-// |____/ \__,_|_|_| |_|\___/       \____\___/|_|_| |_|
-//  Code for Arduino boards v1.9
+//  _____        _                    _____      _
+// |  __ \      (_)                  / ____|    (_)
+// | |  | |_   _ _ _ __   ___ ______| |     ___  _ _ __
+// | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
+// | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
+// |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
+//  Code for Arduino boards v2.3.5
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
-//
-//  If you don't know how to start,
-//  visit our official website (duinocoin.com)
-//  and navigate to the Getting Started page for help.
-//  Happy mining!
 //////////////////////////////////////////////////////////
+//  https://github.com/revoxhere/duino-coin - GitHub
 //  https://duinocoin.com - Official Website
-//  https://github.com/revoxhere/duino-coin - Official GitHub
-//  https://discord.gg/k48Ht5y - Official Discord server
-//  https://github.com/revoxhere - @revox (Lead Duino-Coin developer)
-//  https://github.com/daknuett - @daknuett (Thanks for help in library migration!
-//  https://github.com/JoyBed - @JoyBed (Big thanks for many optimizations!)
+//  https://discord.gg/k48Ht5y - Discord
+//  https://github.com/revoxhere - @revox
+//  https://github.com/JoyBed - @JoyBed
+//////////////////////////////////////////////////////////
+//  If you don't know what to do, visit official website
+//  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-// If uncommented, the count is reversed.
-// This allows to not repeat searching the same numbers twice if you have a second Arduino searching the "conventional" way
-// and possibly increase efficiency of multi-Arduino setup.
-//#define REVERSE_SEARCH
-
-// Include SHA1 part of cryptosuite2 library
+// Include SHA1 library
 #include "sha1.h"
 
 String result; // Create globals
@@ -49,11 +42,7 @@ void loop() {
     String job = Serial.readStringUntil('\n'); // Read job
     unsigned int diff = Serial.parseInt() * 100 + 1; // Read difficulty
     unsigned long StartTime = micros(); // Start time measurement
-    #ifdef REVERSE_SEARCH
-    for (unsigned int iJob = diff; iJob >= 0; iJob--) { // Reversed difficulty loop
-    #else
     for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
-    #endif
       Sha1.init(); // Create SHA1 hasher
       Sha1.print(String(hash) + String(iJob));
       uint8_t * hash_bytes = Sha1.result(); // Get result
