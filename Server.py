@@ -862,6 +862,11 @@ def handle(c, ip):
     # Variables for every thread
     username = ""
     firstshare = True
+    # This gets set to true if a sharetime-test is being executed
+    sharetime_test = False
+    # This will be set according to the sharetime the miner had on higher difficulties
+    # This will only be used during sharetime-exploit tests
+    expected_test_sharetime = 0
     acceptedShares = 0
     rejectedShares = 0
     connectedUsers += 1
@@ -1029,7 +1034,7 @@ def handle(c, ip):
                     if overrideDiff == "EXTREME" or customDiff == "EXTREME":
                         basereward = 0
 
-                    if not firstshare:
+                    if not firstshare and not sharetime_test:
                         try:
                             # Part of Kolka system V3 - variable difficulty section
                             # Calculate the diff multiplier
@@ -1062,8 +1067,39 @@ def handle(c, ip):
                     else:
                         time.sleep(3)
 
+                    # Kolka V4
+                    # Checks whether a sharetime-test was executed
+                    if sharetime_test:
+                        sharetime_test = False
+                        # Calculates how far apart they are (in percent)
+                        p = sharetime / expected_test_sharetime
+                        # Checks whether the sharetime took more than 50% longer than it should've
+                        if p > 1.5:
+                            rejectedShares += 1
+                            # Calculate penalty dependent on share submission time - Kolka V1 combined with V4
+                            penalty = float(int(int(sharetime) ** 2) * math.ceil(p / 10) / 1000000000) * -1
+                            try:
+                                # Add username to the dict so it will be decremented in the next DB update
+                                balancesToUpdate[username] += penalty
+                            except:
+                                balancesToUpdate[username] = penalty
+
+
                     # Generate result in range of the difficulty
                     rand = fastrand.pcg32bounded(100 * diff)
+                    
+                    # Experimental Kolka V4
+                    # There's a 16.6% to get a sharetime-exploit test
+                    # (10 options, 11 and 12 = test; ergo 2 out of 12)
+                    if fastrand.pcg32bounded(12) > 10 and not firstshare:
+                        # Drastically dropping the nonce to force a lower sharetime
+                        # TODO: Maybe make this more random
+                        rand = fastrand.pcg32bounded(10 * diff)
+                        # Set to true to avoid increasing the difficulty by magnitudes
+                        sharetime_test = True
+                        # The expected sharetime should be about 10 times lower than it was before
+                        expected_test_sharetime = sharetime / 10
+                        
                     # Create the DUCO-S1 hash
                     newBlockHash = hashlib.sha1(
                         str(str(lastBlockHash_copy)
