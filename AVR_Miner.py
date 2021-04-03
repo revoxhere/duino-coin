@@ -1,505 +1,1182 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin AVR Miner (v1.9)
+# Duino-Coin Python AVR Miner (v2.3.5)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2021
+# © Duino-Coin Community 2019-2021
 ##########################################
-import socket, threading, time, re, subprocess, configparser, sys, datetime, os # Import libraries
+# Import libraries
+import socket
+import threading
+import time
+import sys
+import os
+import re
+import subprocess
+import configparser
+import datetime
+import locale
+import json
+import platform
 from pathlib import Path
 from signal import signal, SIGINT
 
+
 def install(package):
-  subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-  os.execl(sys.executable, sys.executable, *sys.argv)
+    # Install pip package automatically
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
 
 def now():
-  return datetime.datetime.now()
+    # Return datetime object
+    return datetime.datetime.now()
 
-try: # Check if pyserial is installed
-  import serial
-  import serial.tools.list_ports
-except:
-  print(now().strftime("%H:%M:%S ") + "Pyserial is not installed. Miner will try to install it. If it fails, please manually install \"pyserial\" python3 package.\nIf you can't install it, use the Minimal-PC_Miner.")
-  install("pyserial")
 
-try: # Check if colorama is installed
-  from colorama import init, Fore, Back, Style
+try:
+    # Check if pyserial is installed
+    import serial
+    import serial.tools.list_ports
 except:
-  print(now().strftime("%H:%M:%S ") + "Colorama is not installed. Miner will try to install it. If it fails, please manually install \"colorama\" python3 package.\nIf you can't install it, use the Minimal-PC_Miner.")
-  install("colorama")
+    print(
+        now().strftime("%H:%M:%S ")
+        + 'Pyserial is not installed. '
+        + 'Miner will try to install it. '
+        + 'If it fails, please manually install "pyserial" python3 package.'
+        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
+    install("pyserial")
 
-try: # Check if requests is installed
-  import requests
+try:
+    # Check if colorama is installed
+    from colorama import init, Fore, Back, Style
 except:
-  print(now().strftime("%H:%M:%S ") + "Requests is not installed. Miner will try to install it. If it fails, please manually install \"requests\" python3 package.\nIf you can't install it, use the Minimal-PC_Miner.")
-  install("requests")
+    print(
+        now().strftime("%H:%M:%S ")
+        + 'Colorama is not installed. '
+        + 'Miner will try to install it. '
+        + 'If it fails, please manually install "colorama" python3 package.'
+        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
+    install("colorama")
+
+try:
+    # Check if requests is installed
+    import requests
+except:
+    print(
+        now().strftime("%H:%M:%S ")
+        + 'Requests is not installed. '
+        + 'Miner will try to install it. '
+        + 'If it fails, please manually install "requests" python3 package.'
+        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
+    install("requests")
+
+try:
+    # Check if pypresence is installed
+    from pypresence import Presence
+except:
+    print(
+        now().strftime("%H:%M:%S ")
+        + 'Pypresence is not installed. '
+        + 'Wallet will try to install it. '
+        + 'If it fails, please manually install "pypresence" python3 package.'
+        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
+    install("pypresence")
 
 # Global variables
-minerVersion = "1.9" # Version number
-timeout = 60 # Socket timeout
-resourcesFolder = "AVRMiner_"+str(minerVersion)+"_resources"
+minerVersion = "2.3"  # Version number
+timeout = 15  # Socket timeout
+resourcesFolder = "AVRMiner_" + str(minerVersion) + "_resources"
 shares = [0, 0]
 diff = 0
 donatorrunning = False
 job = ""
-debug = False
-serveripfile = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt" # Serverip file
+debug = "n"
+rigIdentifier = "None"
+# Serverip file
+serveripfile = ("https://raw.githubusercontent.com/"
+    + "revoxhere/"
+    + "duino-coin/gh-pages/serverip.txt")
 config = configparser.ConfigParser()
-autorestart = 0
 donationlevel = 0
+hashrate = 0
 
+# Create resources folder if it doesn't exist
 if not os.path.exists(resourcesFolder):
-    os.mkdir(resourcesFolder) # Create resources folder if it doesn't exist
+    os.mkdir(resourcesFolder)
+
+# Check if languages file exists
+if not Path(resourcesFolder + "/langs.json").is_file():
+    url = ("https://raw.githubusercontent.com/"
+        + "revoxhere/"
+        + "duino-coin/master/Resources/"
+        + "AVR_Miner_langs.json")
+    r=requests.get(url)
+    with open(resourcesFolder + "/langs.json", "wb") as f:
+        f.write(r.content)
+
+# Load language file
+with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
+    lang_file=json.load(lang_file)
+
+# OS X invalid locale hack
+if platform.system() == 'Darwin':
+    if locale.getlocale()[0] is None:
+        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+
+# Check if miner is configured, if it isn't, autodetect language
+if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
+    locale=locale.getdefaultlocale()[0]
+    if locale.startswith("es"):
+        lang="spanish"
+    elif locale.startswith("sk"):
+        lang="slovak"
+    elif locale.startswith("ru"):
+        lang="russian"
+    elif locale.startswith("pl"):
+        lang="polish"
+    elif locale.startswith("fr"):
+        lang="french"
+    else:
+        lang="english"
+# Read language from configfile
+else:
+    try:
+        config.read(resourcesFolder + "/Miner_config.cfg")
+        lang=config["arduminer"]["language"]
+    except:
+        # If it fails, fallback to english
+        lang="english"
+
+
+def getString(string_name):
+    # Get string form language file
+    if string_name in lang_file[lang]:
+        return lang_file[lang][string_name]
+    elif string_name in lang_file["english"]:
+        return lang_file["english"][string_name]
+    else:
+        return "String not found: " + string_name
+
 
 def debugOutput(text):
-  debug = False
-  if debug:
-    print(now().strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
+    # Debug output
+    if debug == "y":
+        print(now().strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
+
 
 def title(title):
-  if os.name == 'nt':
-    os.system("title "+title)
-  else:
-    print('\33]0;'+title+'\a', end='')
-    sys.stdout.flush()
-
-def handler(signal_received, frame): # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
-  print(now().strftime(Style.DIM + "\n%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-    + Back.RESET + Fore.YELLOW + " SIGINT detected - Exiting gracefully." + Style.NORMAL + Fore.WHITE + " See you soon!")
-  try:
-    soc.close()
-  except:
-    pass
-  os._exit(0)
-signal(SIGINT, handler) # Enable signal handler
-
-def Greeting(): # Greeting message depending on time
-  global greeting, autorestart
-  print(Style.RESET_ALL)
-
-  if float(autorestart) <= 0:
-    autorestart = 0
-    autorestartmessage = "disabled"
-  if float(autorestart) > 0:
-    autorestartmessage = "every " + str(autorestart) + " minutes"
-    
-  current_hour = time.strptime(time.ctime(time.time())).tm_hour
-  
-  if current_hour < 12 :
-    greeting = "Have a wonderful morning"
-  elif current_hour == 12 :
-    greeting = "Have a tasty noon"
-  elif current_hour > 12 and current_hour < 18 :
-    greeting = "Have a peaceful afternoon"
-  elif current_hour >= 18 :
-    greeting = "Have a cozy evening"
-  else:
-    greeting = "Welcome back"
-  
-  print(" > " + Fore.YELLOW + Style.BRIGHT + "Official Duino-Coin © AVR Miner"
-  + Style.RESET_ALL + Fore.WHITE + " (v" + str(minerVersion) + ") 2019-2021") # Startup message  print(" * " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
-  print(" > " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
-  print(" > " + Fore.WHITE + "AVR board on port: " + Style.BRIGHT + Fore.YELLOW + str(avrport))
-  if os.name == 'nt' or os.name == 'posix':
-    print(" > " + Fore.WHITE + "Donation level: " +  Style.BRIGHT + Fore.YELLOW + str(donationlevel))
-  print(" > " + Fore.WHITE + "Algorithm: " + Style.BRIGHT + Fore.YELLOW + "DUCO-S1A")
-  print(" > " + Fore.WHITE + "Autorestarter: " + Style.BRIGHT + Fore.YELLOW + str(autorestartmessage))
-  print(" > " + Fore.WHITE + str(greeting) + ", " + Style.BRIGHT + Fore.YELLOW + str(username) + "!\n")
-  
-  if os.name == 'nt':
-    if not Path(resourcesFolder + "/Donate_executable.exe").is_file(): # Initial miner executable section
-      debugOutput("OS is Windows, downloading developer donation executable")
-      url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/PoT_auto.exe?raw=true'
-      r = requests.get(url)
-      with open(resourcesFolder + '/Donate_executable.exe', 'wb') as f:
-        f.write(r.content)
-  elif os.name == 'posix':
-    if not Path(resourcesFolder + "/Donate_executable").is_file(): # Initial miner executable section
-      debugOutput("OS is Windows, downloading developer donation executable")
-      url = 'https://github.com/revoxhere/duino-coin/blob/useful-tools/DonateExecutableLinux?raw=true'
-      r = requests.get(url)
-      with open(resourcesFolder + '/Donate_executable', 'wb') as f:
-        f.write(r.content)
-
-def autorestarter(): # Autorestarter
-  time.sleep(float(autorestart)*60)
-  try:
-    donateExecutable.terminate() # Stop the donation process (if running)
-  except:
-    pass
-  print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-    + Back.RESET + Fore.YELLOW + " Autorestarting the miner")
-  os.execl(sys.executable, sys.executable, *sys.argv)
-
-def loadConfig(): # Config loading section
-  global pool_address, pool_port, username, autorestart, donationlevel, avrport, debug
-  
-  if not Path(str(resourcesFolder) + "/Miner_config.cfg").is_file(): # Initial configuration section
-    print(Style.BRIGHT + "\nDuino-Coin basic configuration tool\nEdit "+str(resourcesFolder) + "/Miner_config.cfg file later if you want to change it.")
-    print(Style.RESET_ALL + "Don't have an Duino-Coin account yet? Use " + Fore.YELLOW + "Wallet" + Fore.WHITE + " to register on server.\n")
-
-    username = input(Style.RESET_ALL + Fore.YELLOW + "Enter your username: " + Style.BRIGHT)
-
-    print(Style.RESET_ALL + Fore.YELLOW + "Configuration tool has found the following ports:")
-    portlist = serial.tools.list_ports.comports()
-    for port in portlist:
-      print(Style.RESET_ALL + Style.BRIGHT + Fore.YELLOW + "  " + str(port))
-    print(Style.RESET_ALL + Fore.YELLOW + "If you can't see your board here, make sure the it is properly connected and the program has access to it (admin/sudo rights).")
-
-    avrport = input(Style.RESET_ALL + Fore.YELLOW + "Enter your board serial port (e.g. COM1 or /dev/ttyUSB1): " + Style.BRIGHT)
-    autorestart = input(Style.RESET_ALL + Fore.YELLOW + "If you want, set after how many minutes miner will restart (recommended: 30): " + Style.BRIGHT)
-    donationlevel = "0"
-    if os.name == 'nt' or os.name == 'posix':
-      donationlevel = input(Style.RESET_ALL + Fore.YELLOW + "Set developer donation level (0-5) (recommended: 1), this will not reduce your earnings: " + Style.BRIGHT)
-
-    donationlevel = re.sub("\D", "", donationlevel)  # Check wheter donationlevel is correct
-    if float(donationlevel) > int(5):
-      donationlevel = 5
-    if float(donationlevel) < int(0):
-      donationlevel = 0
-
-    config['arduminer'] = { # Format data
-    "username": username,
-    "avrport": avrport,
-    "autorestart": autorestart,
-    "donate": donationlevel,
-    "debug": False}
-    
-    with open(str(resourcesFolder) + "/Miner_config.cfg", "w") as configfile: # Write data to file
-      config.write(configfile)
-    print(Style.RESET_ALL + "Config saved! Launching the miner")
-
-  else: # If config already exists, load from it
-    config.read(str(resourcesFolder) + "/Miner_config.cfg")
-    username = config["arduminer"]["username"]
-    avrport = config["arduminer"]["avrport"]
-    autorestart = config["arduminer"]["autorestart"]
-    donationlevel = config["arduminer"]["donate"]
-    debug = config["arduminer"]["debug"]
-
-def Connect(): # Connect to master server section
-  global soc, masterServer_address, masterServer_ports
-  should_retry = True
-  while should_retry:
-    try:
-      res = requests.get(serveripfile, data = None) # Use request to grab data from raw github file
-      if res.status_code == 200: # Check for response
-        content = res.content.decode().splitlines() # Read content and split into lines
-        masterServer_address = content[0] # Line 1 = pool address
-        masterServer_port = content[1] # Line 2 = pool port
-        debugOutput("Retrieved pool IP: " + masterServer_address + ":" + str(masterServer_port))
-        should_try_socket = True
-    except: # If it wasn't, display a message
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-        + Back.RESET + Fore.RED + " Error retrieving data from GitHub! Retrying in 10s.")
-      time.sleep(10)
-      should_try_socket = False
-      should_retry = True
-    if should_try_socket:
-      try: # Try to connect
-        try: # Shutdown previous connections (if any)
-          soc.shutdown(socket.SHUT_RDWR)
-          soc.close()
-        except:
-          debugOutput("No previous connections to close")
-        soc = socket.socket()
-        soc.connect((str(masterServer_address), int(masterServer_port)))
-        debugOutput("Connected to server !")
-        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-          + Back.RESET + Fore.GREEN + " Successfully connected to the server !")
-        soc.settimeout(timeout)
-        should_retry = False
-      except: # If it wasn't, display a message
-        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-          + Back.RESET + Fore.RED + " Error connecting to the server! Retrying in 10s.")
-        time.sleep(10)
-        should_retry = True
-
-def checkVersion():
-  serverVersion = soc.recv(3).decode() # Check server version
-  debugOutput("Server version: " + serverVersion)
-  if float(serverVersion) <= float(minerVersion) and len(serverVersion) == 3: # If miner is up-to-date, display a message and continue
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Back.RESET + Fore.YELLOW + " Connected" + Style.RESET_ALL + Fore.WHITE + " to master Duino-Coin server (v"+str(serverVersion)+")")
-  else:
-    cont = input(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-      + Back.RESET + Fore.RED + " Miner is outdated (v"+minerVersion+"),"
-      + Style.RESET_ALL + Fore.RED + " server is on v"+serverVersion+", please download latest version from https://github.com/revoxhere/duino-coin/releases/ or type \'continue\' if you wish to continue anyway.\n")
-    if cont != "continue":
-      os._exit(1)
-
-def ConnectToAVR():
-  global com
-  should_retry = True
-  while should_retry:
-    try: # Close previous serial connections (if any)
-      com.close()
-    except:
-      pass
-    try:
-      com = serial.Serial(avrport, 115200, timeout=30, write_timeout=30, inter_byte_timeout=1)
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr " + Style.RESET_ALL + Style.BRIGHT + Fore.GREEN + " AVR is connected :D" + Style.RESET_ALL)
-    except:
-      debugOutput("Error connecting to AVR")
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
-        + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " AVR connection error, please check wether it's plugged or not" + Style.RESET_ALL)
-      time.sleep(10)
-      should_retry = True
+    # Window title
+    if os.name == "nt":
+        os.system("title " + title)
     else:
-      should_retry = False
+        print("\33]0;" + title + "\a", end="")
+        sys.stdout.flush()
 
 
-def AVRMine(): # Mining section
-  global donationlevel, donatorrunning, donateExecutable
-  first_share = True
-  if os.name == 'nt':
-    cmd = "cd " + resourcesFolder + "& Donate_executable.exe -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
-  elif os.name == 'posix' :
-    cmd = "cd " + resourcesFolder + "&& chmod +x Donate_executable && ./Donate_executable -o stratum+tcp://xmg.minerclaim.net:3333 -u revox.donate -p x -e "
-  if int(donationlevel) <= 0:
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-      + Back.RESET + Fore.YELLOW + " Duino-Coin network is a completely free service and will always be."
-      + Style.BRIGHT + Fore.YELLOW + "\nWe don't take any fees from your mining.\nYou can really help us maintain the server and low-fee exchanges by donating.\nVisit "
-      + Style.RESET_ALL + Fore.GREEN + "https://duinocoin.com/donate" + Style.BRIGHT + Fore.YELLOW + " to learn more about how you can help :)")
-  if donatorrunning == False:
-    if int(donationlevel) == 5: cmd += "100"
-    elif int(donationlevel) == 4: cmd += "75"
-    elif int(donationlevel) == 3: cmd += "50"
-    elif int(donationlevel) == 2: cmd += "25"
-    elif int(donationlevel) == 1: cmd += "10"
-    if int(donationlevel) > 0: # Launch CMD as subprocess
-      debugOutput("Starting donation process")
-      donatorrunning = True
-      donateExecutable = subprocess.Popen(cmd, shell=True, stderr=subprocess.DEVNULL)
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-        + Back.RESET + Fore.RED + " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development")
-  
-  avr_not_initialized = True
-  while avr_not_initialized:
+def Connect():
+    # Server connection
+    global masterServer_address, masterServer_port
+    while True:
+        try:
+            try:
+                socket.close()
+            except:
+                pass
+            debugOutput("Connecting to " + str(masterServer_address) +
+                        str(":") + str(masterServer_port))
+            socId=socket.socket()
+            # Establish socket connection to the server
+            socId.connect((str(masterServer_address), int(masterServer_port)))
+            # Get server version
+            serverVersion=socId.recv(3).decode().rstrip("\n")
+            debugOutput("Server version: " + serverVersion)
+            if (float(serverVersion) <= float(minerVersion)
+                and len(serverVersion) == 3):
+                # If miner is up-to-date, display a message and continue
+                print(
+                    now().strftime(
+                        Style.RESET_ALL
+                        + Style.DIM
+                        + "%H:%M:%S ")
+                    + Style.BRIGHT
+                    + Back.BLUE
+                    + Fore.WHITE
+                    + " net0 "
+                    + Back.RESET
+                    + Fore.YELLOW
+                    + getString("connected")
+                    + Style.RESET_ALL
+                    + Fore.WHITE
+                    + getString("connected_server")
+                    + str(serverVersion)
+                    + ")")
+                break
+            else:
+                print(
+                    now().strftime(
+                        Style.RESET_ALL
+                        + Style.DIM
+                        + "%H:%M:%S ")
+                    + Style.BRIGHT
+                    + Back.GREEN
+                    + Fore.WHITE
+                    + " sys0 "
+                    + Back.RESET
+                    + Fore.RED
+                    + " Miner is outdated (v"
+                    + minerVersion
+                    + "),"
+                    + Style.RESET_ALL
+                    + Fore.RED
+                    + getString("server_is_on_version")
+                    + serverVersion
+                    + getString("update_warning"))
+                time.sleep(10)
+                break
+        except:
+            print(
+                now().strftime(
+                    Style.DIM
+                    + "%H:%M:%S ")
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Back.BLUE
+                + Fore.WHITE
+                + " net0 "
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Fore.RED
+                + getString("connecting_error")
+                + Style.RESET_ALL)
+            if debug == "y":
+                raise
+            time.sleep(5)
+    return socId
+
+
+def connectToAVR(com):
+    while True:
+        try:
+            # Close previous serial connections (if any)
+            comConnection.close()
+        except:
+            pass
+        try:
+            # Establish serial connection
+            comConnection=serial.Serial(
+                com,
+                115200,
+                timeout=5,
+                write_timeout=5,
+                inter_byte_timeout=5)
+            print(
+                now().strftime(
+                    Style.RESET_ALL
+                    + Style.DIM
+                    + "%H:%M:%S ")
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Back.MAGENTA
+                + Fore.WHITE
+                + " usb"
+                + str(''.join(filter(str.isdigit, com)))
+                + " "
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Fore.GREEN
+                + getString("board_on_port")
+                + str(com)
+                + getString("board_is_connected")
+                + Style.RESET_ALL)
+            return comConnection
+        except:
+            debugOutput("Error connecting to AVR")
+            if debug == "y":
+                raise
+            print(
+                now().strftime(
+                    Style.DIM
+                    + "%H:%M:%S ")
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Back.MAGENTA
+                + Fore.WHITE
+                + " usb"
+                + str(''.join(filter(str.isdigit, com)))
+                + " "
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Fore.RED
+                + getString("board_connection_error")
+                + str(com)
+                + getString("board_connection_error2")
+                + Style.RESET_ALL)
+            time.sleep(10)
+
+
+def handler(signal_received, frame):
+    # SIGINT handler
+    print(
+        "\n"
+        + now().strftime(
+            Style.RESET_ALL
+            + Style.DIM
+            + "%H:%M:%S ")
+        + Style.BRIGHT
+        + Back.GREEN
+        + Fore.WHITE
+        + " sys0 "
+        + Back.RESET
+        + Fore.YELLOW
+        + getString("sigint_detected")
+        + Style.NORMAL
+        + Fore.WHITE
+        + getString("goodbye"))
     try:
-      ready = com.readline().decode() # AVR will send ready signal
-      debugOutput("Received start word ("+str(ready)+")")
-      print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-        + Back.RESET + Fore.YELLOW + " AVR mining thread is starting"
-        + Style.RESET_ALL + Fore.WHITE + " using DUCO-S1A algorithm")
-      avr_not_initialized = False
+        socket.close()
     except:
-      while connection_error:
-        try:
-          ConnectToAVR()
-        except:
-          connection_error = True
-          time.sleep(10)
-          print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
-            + Back.RESET + Fore.RED + " Error connecting to the AVR! Retrying in 10s.")
+        pass
+    os._exit(0)
+
+
+# Enable signal handler
+signal(SIGINT, handler)
+
+
+def loadConfig():
+    # Config loading section
+    global pool_address
+    global pool_port
+    global username
+    global donationlevel
+    global avrport
+    global debug
+    global requestedDiff
+    global rigIdentifier
+
+    # Initial configuration section
+    if not Path(str(resourcesFolder) + "/Miner_config.cfg").is_file():
+        print(
+            Style.BRIGHT
+            + getString("basic_config_tool")
+            + resourcesFolder
+            + getString("edit_config_file_warning"))
+
+        print(
+            Style.RESET_ALL
+            + getString("dont_have_account")
+            + Fore.YELLOW
+            + getString("wallet")
+            + Fore.WHITE
+            + getString("register_warning"))
+
+        username=input(
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + getString("ask_username")
+            + Fore.WHITE
+            + Style.BRIGHT)
+
+        print(Style.RESET_ALL
+            + Fore.YELLOW
+            + getString("ports_message"))
+        portlist=serial.tools.list_ports.comports()
+        for port in portlist:
+            print(Style.RESET_ALL
+                + Style.BRIGHT
+                + Fore.WHITE
+                + "  "
+                + str(port))
+        print(Style.RESET_ALL
+            + Fore.YELLOW
+            + getString("ports_notice"))
+
+        avrport=""
+        while True:
+            avrport += input(
+                Style.RESET_ALL
+                + Fore.YELLOW
+                + getString("ask_avrport")
+                + Fore.WHITE
+                + Style.BRIGHT)
+            confirmation=input(
+                Style.RESET_ALL
+                + Fore.YELLOW
+                + getString("ask_anotherport")
+                + Fore.WHITE
+                + Style.BRIGHT)
+            if confirmation == "y" or confirmation == "Y":
+                avrport += ","
+            else:
+                break
+
+        requestedDiffSelection=input(
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + getString("ask_higherdiff")
+            + Fore.WHITE
+            + Style.BRIGHT)
+        if requestedDiffSelection == "y" or requestedDiffSelection == "Y":
+            requestedDiff="ESP32"
         else:
-          connection_error = False
-      avr_not_initialized = True
+            requestedDiff="AVR"
 
-  while True:
-    while True:
-      try:
-        job_not_received = True
-        while job_not_received:
-          soc.send(bytes("JOB,"+str(username)+",AVR",encoding="utf8")) # Send job request
-          try:
-            job = soc.recv(1024).decode() # Retrieves work from pool
-            debugOutput("Received job")
-            job_not_received = False
-          except:
-            Connect()
-            continue
-        job = job.split(",") # Split received data to job and difficulty
-        try:
-          if job[0] and job[1] and job[2]:
-            debugOutput("Job received: " +str(job))
-            diff = job[2]
-            break # If job received, continue 
-        except IndexError:
-          debugOutput("IndexError, retrying")
-      except:
-        try:
-          Connect()
-          ConnectToAVR()
-        except:
-          debugOutput("Error ! ")
-    try: # Write data to AVR board
-      try:
-        com.write(bytes("start\n", encoding="utf8")) # start word
-        debugOutput("Written start word")
-        com.write(bytes(str(job[0] + "\n" + job[1]+ "\n" + job[2] + "\n"), encoding="utf8")) # hash
-        debugOutput("Send job to arduino")
-      except:
-        ConnectToAVR()
-        continue
-      wrong_avr_result = True
-      wrong_results = 0
-      while wrong_avr_result:
-        result = com.readline().decode() # Read the result
-        debugOutput(str("received: ")+str(result))
-        if result == "":
-          wrong_avr_result = True
-          wrong_results = wrong_results + 1
-          if first_share or wrong_results > 5:
-            wrong_avr_result = False
-            print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr " + Back.RESET + Fore.RED + " Arduino is taking longer than expected, sending it a new job ")
+        rigIdentifier=input(
+            Style.RESET_ALL
+            + Fore.YELLOW
+            + getString("ask_rig_identifier")
+            + Fore.WHITE
+            + Style.BRIGHT)
+        if rigIdentifier == "y" or rigIdentifier == "Y":
+            rigIdentifier=input(
+                Style.RESET_ALL
+                + Fore.YELLOW
+                + getString("ask_rig_name")
+                + Fore.WHITE
+                + Style.BRIGHT)
         else:
-          wrong_avr_result = False
-          first_share = False
-          wrong_results = 0
-      if first_share or wrong_results > 5:
-        continue
-      result = result.split(",")
-      try:
-        debugOutput("Received result ("+str(result[0])+")")
-        debugOutput("Received time ("+str(result[1])+")")
-        computetime = round(int(result[1]) / 1000000, 3) # Convert AVR time to s
-        hashrate = round(int(result[0]) / int(result[1]) * 1000000, 2)
-        debugOutput("Calculated hashrate ("+str(hashrate)+")")
-      except:
-        Connect()
-        continue
-      try:
-        soc.send(bytes(str(result[0]) + "," + str(hashrate) + ",Official AVR Miner v" + str(minerVersion), encoding="utf8")) # Send result back to the server
-      except:
-        Connect()
-        continue
-    except:
-      Connect()
-      ConnectToAVR()
-      first_share = True
-      continue
+            rigIdentifier="None"
 
-    while True:
-      responsetimetart = now()
-      feedback_not_received = True
-      while feedback_not_received:
-        try:
-          feedback = soc.recv(64).decode() # Get feedback
-        except socket.timeout:
-          feedback_not_received = True
-          debugOutput("Timeout while getting feedback, retrying")
-        except ConnectionResetError:
-          debugOutput("Connection was reset, reconnecting")
-          Connect()
-          feedback_not_received = True
-          break
-        except ConnectionAbortedError:
-          debugOutput("Connection was aborted, reconnecting")
-          Connect()
-          feedback_not_received = True
-          break
-        else:
-          responsetimestop = now() # Measure server ping
-          ping = responsetimestop - responsetimetart # Calculate ping
-          ping = str(int(ping.microseconds / 1000)) # Convert to ms
-          feedback_not_received = False
-          debugOutput("Successfully retrieved feedback")
+        donationlevel="0"
+        if os.name == "nt" or os.name == "posix":
+            donationlevel=input(
+                Style.RESET_ALL
+                + Fore.YELLOW
+                + getString("ask_donation_level")
+                + Fore.WHITE
+                + Style.BRIGHT)
 
-      if feedback == "GOOD": # If result was good
-        shares[0] = shares[0] + 1 # Share accepted  = increment correct shares counter by 1
-        title("Duino-Coin AVR Miner (v"+str(minerVersion)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
-        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
-          + Back.RESET + Fore.GREEN + " Accepted " + Fore.WHITE + str(shares[0]) + "/" + str(shares[0] + shares[1])
-          + Back.RESET + Fore.YELLOW + " (" + str(int((shares[0] / (shares[0] + shares[1]) * 100))) + "%)"
-          + Style.NORMAL + Fore.WHITE + " ⁃ " + Style.BRIGHT + Fore.WHITE + str(computetime) + "s"
-          + Style.NORMAL + " - " + str(hashrate) + " H/s @ diff " + str(diff) + " ⁃ " + Fore.BLUE + "ping " + ping + "ms")
-        break # Repeat
+        # Check wheter donationlevel is correct
+        donationlevel=re.sub("\D", "", donationlevel)
+        if donationlevel == '':
+            donationlevel=1
+        if float(donationlevel) > int(5):
+            donationlevel=5
+        if float(donationlevel) < int(0):
+            donationlevel=0
 
-      elif feedback == "BLOCK": # If result was good
-        shares[0] = shares[0] + 1 # Share accepted  = increment correct shares counter by 1
-        title("Duino-Coin AVR Miner (v"+str(minerVersion)+") - " + str(shares[0]) + "/" + str(shares[0] + shares[1]) + " accepted shares")
-        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
-          + Back.RESET + Fore.CYAN + " Block found " + Fore.WHITE + str(shares[0]) + "/" + str(shares[0] + shares[1])
-          + Back.RESET + Fore.YELLOW + " (" + str(int((shares[0] / (shares[0] + shares[1]) * 100))) + "%)"
-          + Style.NORMAL + Fore.WHITE + " ⁃ " + Style.BRIGHT + Fore.WHITE + str(computetime) + "s"
-          + Style.NORMAL + " - " + str(hashrate) + " H/s @ diff " + str(diff) + " ⁃ " + Fore.BLUE + "ping " + ping + "ms")
-        break # Repeat
+        # Format data
+        config["arduminer"]={
+            "username": username,
+            "avrport": avrport,
+            "donate": donationlevel,
+            "language": lang,
+            "identifier": rigIdentifier,
+            "difficulty": requestedDiff,
+            "debug": "n"}
 
-      elif feedback == "INVU": # If user doesn't exist 
-        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-          + Back.RESET + Fore.RED + " User "+str(username)+" doesn't exist."
-          + Style.RESET_ALL + Fore.RED + " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s")
-        time.sleep(10)
-        Connect()
-        ConnectToAVR()
+        # Write data to file
+        with open(str(resourcesFolder)
+            + "/Miner_config.cfg", "w") as configfile:
+            config.write(configfile)
 
-      elif feedback == "ERR": # If server says that it encountered an error
-        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-          + Back.RESET + Fore.RED + " Internal server error." + Style.RESET_ALL + Fore.RED + " Retrying in 10s")
-        time.sleep(10)
-        Connect()
+        avrport=avrport.split(",")
+        print(Style.RESET_ALL + getString("config_saved"))
+
+    else:  # If config already exists, load from it
+        config.read(str(resourcesFolder) + "/Miner_config.cfg")
+        username=config["arduminer"]["username"]
+        avrport=config["arduminer"]["avrport"]
+        avrport=avrport.split(",")
+        donationlevel=config["arduminer"]["donate"]
+        debug=config["arduminer"]["debug"]
+        rigIdentifier=config["arduminer"]["identifier"]
+        requestedDiff=config["arduminer"]["difficulty"]
 
 
-      else: # If result was bad
-        shares[1] += 1 # Share rejected = increment bad shares counter by 1
-        print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.MAGENTA + Fore.WHITE + " avr "
-          + Back.RESET + Fore.RED + " Rejected " + Fore.WHITE + str(shares[0]) + "/" + str(shares[0] + shares[1])
-          + Back.RESET + Fore.YELLOW + " (" + str(int((shares[0] / (shares[0] + shares[1]) * 100))) + "%)"
-          + Style.NORMAL + Fore.WHITE + " ⁃ " + Style.BRIGHT + Fore.WHITE + str(computetime) + "s"
-          + Style.NORMAL + " - " + str(hashrate) + " H/s @ diff " + str(diff) + " ⁃ " + Fore.BLUE + "ping " + ping + "ms")
-        break # Repeat
+def Greeting():
+    # Greeting message depending on time
+    global greeting
+    print(Style.RESET_ALL)
 
+    current_hour=time.strptime(time.ctime(time.time())).tm_hour
 
-
-def Handler():
-  Connect() # Connect to pool
-  debugOutput("Connected to master server")
-  try:
-    checkVersion() # Check version
-    debugOutput("Version check complete")
-  except:
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error checking server version. Retrying in 10s" + Style.RESET_ALL)
-    time.sleep(10)
-    Handler()
-  try:
-    ConnectToAVR() # Connect to COM port
-  except:
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error connecting to the AVR board. Check your connection, permissions and the configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
-    time.sleep(10)
-    os._exit(1)
-  else:
-    debugOutput("Connected to AVR board")
-  try:
-    debugOutput("Mining started")
-    AVRMine() # Launch mining thread
-    debugOutput("Mining ended")
-  except:
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.BLUE + Fore.WHITE + " net "
-    + Style.RESET_ALL + Style.BRIGHT + Fore.MAGENTA + " Master server timeout OR AVR connection error - rescuing" + Style.RESET_ALL)
-    Handler()
-
-
-
-
-if __name__ == '__main__':
-  init(autoreset=True) # Enable colorama
-  debug = False
-  title("Duino-Coin AVR Miner (v"+str(minerVersion)+")")
-  try:
-    loadConfig() # Load configfile
-    debugOutput("Config file loaded")
-  except:
-    print(Style.RESET_ALL + Style.BRIGHT + Fore.RED + "Error loading the configfile ("+resourcesFolder+"/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s" + Style.RESET_ALL)
-    time.sleep(10)
-    os._exit(1)
-  try:
-    Greeting() # Display greeting message
-    debugOutput("Greeting displayed")
-  except:
-    pass
-  try: # Setup autorestarter
-    if float(autorestart) > 0:
-      debugOutput("Enabled autorestarter for " + str(autorestart) + " minutes")
-      threading.Thread(target=autorestarter).start()
+    if current_hour < 12:
+        greeting=getString("greeting_morning")
+    elif current_hour == 12:
+        greeting=getString("greeting_noon")
+    elif current_hour > 12 and current_hour < 18:
+        greeting=getString("greeting_afternoon")
+    elif current_hour >= 18:
+        greeting=getString("greeting_evening")
     else:
-      debugOutput("Autorestarter is disabled")
-  except:
-    print(now().strftime(Style.DIM + "%H:%M:%S ") + Style.RESET_ALL + Style.BRIGHT + Back.GREEN + Fore.WHITE + " sys "
-      + Style.RESET_ALL + Style.BRIGHT + Fore.RED + " Error in the autorestarter. Check configuration file ("+resourcesFolder+"/Miner_config.cfg). Exiting in 10s" + Style.RESET_ALL)
-    time.sleep(10)
-    os._exit(1)
-  Handler()
+        greeting=getString("greeting_back")
+
+    # Startup message
+    print(
+        " ‖ "
+        + Fore.YELLOW
+        + Style.BRIGHT
+        + getString("banner")
+        + Style.RESET_ALL
+        + Fore.WHITE
+        + " (v"
+        + str(minerVersion)
+        + ") 2019-2021")
+    print(" ‖ " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
+
+    print(
+        " ‖ "
+        + Fore.WHITE
+        + getString("avr_on_port")
+        + Style.BRIGHT
+        + Fore.YELLOW
+        + " ".join(avrport))
+
+    if os.name == "nt" or os.name == "posix":
+        print(
+            " ‖ "
+            + Fore.WHITE
+            + getString("donation_level")
+            + Style.BRIGHT
+            + Fore.YELLOW
+            + str(donationlevel))
+    print(
+        " ‖ "
+        + Fore.WHITE
+        + getString("algorithm")
+        + Style.BRIGHT
+        + Fore.YELLOW
+        + "DUCO-S1A @ "
+        + str(requestedDiff)
+        + " diff")
+
+    print(
+        Style.RESET_ALL
+        + " ‖ "
+        + Fore.WHITE
+        + getString("rig_identifier")
+        + Style.BRIGHT
+        + Fore.YELLOW
+        + rigIdentifier)
+
+    print(
+        " ‖ "
+        + Fore.WHITE
+        + str(greeting)
+        + ", "
+        + Style.BRIGHT
+        + Fore.YELLOW
+        + str(username)
+        + "!\n")
+
+    if os.name == "nt":
+        # Initial miner executable section
+        if not Path(resourcesFolder + "/Donate_executable.exe").is_file():
+            debugOutput(
+                "OS is Windows, downloading developer donation executable")
+            url=("https://github.com/"
+                + "revoxhere/"
+                + "duino-coin/blob/useful-tools/"
+                + "DonateExecutableWindows.exe?raw=true")
+            r=requests.get(url)
+            with open(resourcesFolder + "/Donate_executable.exe", "wb") as f:
+                f.write(r.content)
+    elif os.name == "posix":
+        # Initial miner executable section
+        if not Path(resourcesFolder + "/Donate_executable").is_file():
+            debugOutput(
+                "OS is Windows, downloading developer donation executable")
+            url=("https://github.com/"
+                + "revoxhere/"
+                + "duino-coin/blob/useful-tools/"
+                + "DonateExecutableLinux?raw=true")
+            r=requests.get(url)
+            with open(resourcesFolder + "/Donate_executable", "wb") as f:
+                f.write(r.content)
+
+
+def restart_miner():
+    try:
+        if donatorrunning:
+            try:
+                donateExecutable.terminate()
+            except:
+                pass
+        os.execl(sys.executable, sys.executable, *sys.argv)
+    except:
+        print("Permission error")
+
+
+def Donate():
+    global donationlevel, donatorrunning, donateExecutable
+    if os.name == "nt":
+        cmd=(
+            "cd "
+            + resourcesFolder
+            + "& Donate_executable.exe "
+            + "-o stratum+tcp://xmg.minerclaim.net:7008 "
+            + "-u revox.donate "
+            + "-p x -s 4 -e ")
+    elif os.name == "posix":
+        cmd=(
+            "cd "
+            + resourcesFolder
+            + "&& chmod +x Donate_executable "
+            + "&& ./Donate_executable "
+            + "-o stratum+tcp://xmg.minerclaim.net:7008 "
+            + "-u revox.donate "
+            + "-p x -s 4 -e ")
+    if int(donationlevel) <= 0:
+        print(
+            now().strftime(
+                Style.DIM 
+                + "%H:%M:%S ")
+            + Style.RESET_ALL
+            + Style.BRIGHT
+            + Back.GREEN
+            + Fore.WHITE
+            + " sys0 "
+            + Back.RESET
+            + Fore.YELLOW
+            + getString("free_network_warning")
+            + Style.BRIGHT
+            + Fore.YELLOW
+            + getString("donate_warning")
+            + Style.RESET_ALL
+            + Fore.GREEN
+            + "https://duinocoin.com/donate"
+            + Style.BRIGHT
+            + Fore.YELLOW
+            + getString("learn_more_donate")
+            + Style.RESET_ALL)
+        time.sleep(5)
+    elif donatorrunning == False:
+        if int(donationlevel) == 5:
+            cmd += "95"
+        elif int(donationlevel) == 4:
+            cmd += "75"
+        elif int(donationlevel) == 3:
+            cmd += "50"
+        elif int(donationlevel) == 2:
+            cmd += "20"
+        elif int(donationlevel) == 1:
+            cmd += "10"
+        if int(donationlevel) > 0:
+            debugOutput(getString("starting_donation"))
+            donatorrunning=True
+            # Launch CMD as subprocess
+            donateExecutable=subprocess.Popen(
+                cmd, shell=True, stderr=subprocess.DEVNULL)
+            print(
+                now().strftime(
+                    Style.DIM 
+                    + "%H:%M:%S ")
+                + Style.RESET_ALL
+                + Style.BRIGHT
+                + Back.GREEN
+                + Fore.WHITE
+                + " sys0 "
+                + Back.RESET
+                + Fore.RED
+                + getString("thanks_donation")
+                + Style.RESET_ALL)
+
+
+def initRichPresence():
+    # Initialize Discord rich presence
+    global RPC
+    try:
+        RPC=Presence(808056068113563701)
+        RPC.connect()
+        debugOutput("Discord rich presence initialized")
+    except:  # Discord not launched
+        pass
+
+
+def updateRichPresence():
+    # Update rich presence status
+    startTime=int(time.time())
+    while True:
+        try:
+            RPC.update(
+                details="Hashrate: " + str(hashrate) + " H/s",
+                start=startTime,
+                state="Acc. shares: "
+                + str(shares[0])
+                + "/"
+                + str(shares[0] + shares[1]),
+                large_image="ducol",
+                large_text="Duino-Coin, "
+                + "a coin that can be mined with almost everything, "
+                + "including AVR boards",
+                buttons=[
+                    {"label": "Learn more",
+                    "url": "https://duinocoin.com"},
+                    {"label": "Discord Server",
+                    "url": "https://discord.gg/k48Ht5y"}])
+        except:  # Discord not launched
+            pass
+        time.sleep(15)  # 15 seconds to respect discord's rate limit
+
+
+def AVRMine(com):
+    # Mining section
+    global hash_count, hashrate, masterServer_address, masterServer_port
+    while True:
+        # Grab server IP and port
+        while True:
+            try:
+                # Use request to grab data from raw github file
+                res=requests.get(serveripfile, data=None)
+                if res.status_code == 200:
+                    # Read content and split into lines
+                    content=(res.content.decode().splitlines())
+                    masterServer_address=content[0]  # Line 1 = pool address
+                    masterServer_port=content[1]  # Line 2 = pool port
+                    debugOutput(
+                        "Retrieved pool IP: "
+                        + masterServer_address
+                        + ":"
+                        + str(masterServer_port))
+                    break
+            except:  # If there was an error with grabbing data from GitHub
+                print(
+                    now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
+                    + Style.BRIGHT
+                    + Back.BLUE
+                    + Fore.WHITE
+                    + " net"
+                    + str(''.join(filter(str.isdigit, com)))
+                    + " "
+                    + Back.RESET
+                    + Fore.RED
+                    + getString("data_error"))
+                if debug == "y":
+                    raise
+                time.sleep(10)
+
+        while True:
+            # Connect to the server
+            socId=Connect()
+            # Connect to the serial port
+            comConnection=connectToAVR(com)
+            try:
+                # Receive ready signal from AVR
+                ready=comConnection.readline().decode()
+                debugOutput("Received start word (" + str(ready) + ")")
+                print(
+                    now().strftime(Style.DIM + "%H:%M:%S ")
+                    + Style.RESET_ALL
+                    + Style.BRIGHT
+                    + Back.GREEN
+                    + Fore.WHITE
+                    + " sys"
+                    + str(''.join(filter(str.isdigit, com)))
+                    + " "
+                    + Back.RESET
+                    + Fore.YELLOW
+                    + getString("mining_start")
+                    + Style.RESET_ALL
+                    + Fore.WHITE
+                    + getString("mining_algorithm")
+                    + str(com)
+                    + ")")
+                break
+            except:
+                print(
+                    now().strftime(Style.DIM + "%H:%M:%S ")
+                    + Style.RESET_ALL
+                    + Style.BRIGHT
+                    + Back.MAGENTA
+                    + Fore.WHITE
+                    + " usb"
+                    + str(''.join(filter(str.isdigit, com)))
+                    + " "
+                    + Back.RESET
+                    + Fore.RED
+                    + getString("mining_avr_connection_error"))
+                comConnection=connectToAVR(com)
+
+        while True:
+            while True:
+                try:
+                    # Send job request
+                    debugOutput("Requested job")
+                    socId.send(
+                        bytes(
+                            "JOB,"
+                            + str(username)
+                            + ","
+                            + str(requestedDiff),
+                            encoding="utf8"))
+                    job=socId.recv(85).decode().rstrip("\n")  # Retrieve work
+                    job=job.split(",")  # Split received data
+
+                    # Check if username is correct
+                    try:
+                        if job[1] == "This user doesn't exist":
+                            print(
+                                now().strftime(
+                                    Style.RESET_ALL
+                                    + Style.DIM
+                                    + "%H:%M:%S ")
+                                + Style.RESET_ALL
+                                + Style.BRIGHT
+                                + Back.BLUE
+                                + Fore.WHITE
+                                + " sys0 "
+                                + Back.RESET
+                                + Fore.RED
+                                + getString("mining_user")
+                                + Fore.WHITE
+                                + str(username)
+                                + Fore.RED
+                                + getString("mining_not_exist")
+                                + getString("mining_not_exist_warning"))
+                            time.sleep(10)
+
+                        # If job received, continue
+                        elif job[0] and job[1] and job[2]:
+                            diff=int(job[2])
+                            debugOutput("Job received: " + str(job))
+                            break
+                    except:
+                        restart_miner()
+                except:
+                    restart_miner()
+
+            while True:
+                # Write data to AVR board
+                while True:
+                    try:
+                        # Send start word
+                        comConnection.write(bytes("start\n", encoding="utf8"))
+                        debugOutput("Written start word")
+                        # Send job to AVR
+                        comConnection.write(
+                            bytes(
+                                str(job[0]
+                                    + "\n"
+                                    + job[1]
+                                    + "\n"
+                                    + job[2]
+                                    + "\n"),
+                                encoding="utf8"))
+                        debugOutput("Sent job to arduino")
+                        break
+                    except:
+                        try:
+                            comConnection.close()
+                        except:
+                            pass
+                        comConnection=connectToAVR(com)
+                        debugOutput("Reconnecting to avr")
+                wrong_results=0
+                while True:
+                    try:
+                        # Read the result
+                        result=comConnection.readline().decode()
+                        if result == "":
+                            wrong_results += 1
+                            if wrong_results > 5:
+                                wrong_avr_result=False
+                                print(
+                                    now().strftime(
+                                        Style.DIM
+                                        + "%H:%M:%S ")
+                                    + Style.RESET_ALL
+                                    + Style.BRIGHT
+                                    + Back.GREEN
+                                    + Fore.WHITE
+                                    + " sys0 "
+                                    + Back.RESET
+                                    + Fore.RED
+                                    + getString("mining_avr_not_responding"))
+                                try:
+                                    os.execl(sys.executable,
+                                             sys.executable, *sys.argv)
+                                except:
+                                    print("Permission error")
+                        else:
+                            break
+                    except:
+                        print(
+                            now().strftime(Style.DIM + "%H:%M:%S ")
+                            + Style.RESET_ALL
+                            + Style.BRIGHT
+                            + Back.GREEN
+                            + Fore.WHITE
+                            + " sys0 "
+                            + Back.RESET
+                            + Fore.RED
+                            + getString("mining_avr_connection_error"))
+                        time.sleep(5)
+                        try:
+                            os.execl(sys.executable, sys.executable, *sys.argv)
+                        except:
+                            print("Permission error")
+
+                try:
+                    # Receive result from AVR
+                    result=result.split(",")
+                    debugOutput("Received result (" + str(result[0]) + ")")
+                    debugOutput("Received time (" + str(result[1]) + ")")
+                    # Convert AVR time to seconds
+                    computetime=round(int(result[1]) / 1000000, 3)
+                    # Calculate hashrate
+                    hashrate=round(
+                        int(result[0]) / int(result[1]) * 1000000, 2)
+                    debugOutput("Calculated hashrate (" + str(hashrate) + ")")
+                except:
+                    break
+                try:
+                    # Send result to the server
+                    socId.send(
+                        bytes(
+                            str(result[0])
+                            + ","
+                            + str(hashrate)
+                            + ",Official AVR Miner v"
+                            + str(minerVersion)
+                            + ","
+                            + str(rigIdentifier),
+                            encoding="utf8"))
+                except:
+                    restart_miner()
+
+                while True:
+                    try:
+                        responsetimetart=now()
+                        # Get feedback
+                        feedback=socId.recv(48).decode().rstrip("\n")
+                        responsetimestop=now()
+                        # Measure server ping
+                        ping=str(
+                            int((responsetimestop - responsetimetart)
+                        ).microseconds / 1000)
+                        feedback_not_received=False
+                        debugOutput("Successfully retrieved feedback")
+                        break
+                    except:
+                        restart_miner()
+
+                if feedback == "GOOD":
+                    # If result was correct
+                    shares[0]=(shares[0] + 1)
+                    title(
+                        getString("duco_avr_miner")
+                        + str(minerVersion)
+                        + ") - "
+                        + str(shares[0])
+                        + "/"
+                        + str(shares[0] + shares[1])
+                        + getString("accepted_shares"))
+                    print(
+                        now().strftime(
+                            Style.RESET_ALL
+                            + Style.DIM
+                            + "%H:%M:%S ")
+                        + Style.BRIGHT
+                        + Back.MAGENTA
+                        + Fore.WHITE
+                        + " usb"
+                        + str(''.join(filter(str.isdigit, com)))
+                        + " "
+                        + Back.RESET
+                        + Fore.GREEN
+                        + " ✓"
+                        + getString("accepted")
+                        + Fore.WHITE
+                        + str(int(shares[0]))
+                        + "/"
+                        + str(int(shares[0] + shares[1]))
+                        + Back.RESET
+                        + Fore.YELLOW
+                        + " ("
+                        + str(int((shares[0] / (shares[0] + shares[1]) * 100)))
+                        + "%)"
+                        + Style.NORMAL
+                        + Fore.WHITE
+                        + " ∙ "
+                        + str(f"%01.3f" % float(computetime))
+                        + "s"
+                        + Style.NORMAL
+                        + " ∙ "
+                        + Fore.BLUE
+                        + Style.BRIGHT
+                        + str(int(hashrate))
+                        + " H/s"
+                        + Style.NORMAL
+                        + Fore.WHITE
+                        + " @ diff "
+                        + str(diff)
+                        + " ∙ "
+                        + Fore.CYAN
+                        + "ping "
+                        + str(f"%02.0f" % int(ping))
+                        + "ms")
+                    break  # Repeat
+
+                elif feedback == "BLOCK":
+                    # If block was found
+                    shares[0]=(shares[0] + 1)
+                    title(
+                        getString("duco_avr_miner")
+                        + str(minerVersion)
+                        + ") - "
+                        + str(shares[0])
+                        + "/"
+                        + str(shares[0] + shares[1])
+                        + getString("accepted_shares"))
+                    print(
+                        now().strftime(
+                            Style.RESET_ALL
+                            + Style.DIM
+                            + "%H:%M:%S ")
+                        + Style.RESET_ALL
+                        + Style.BRIGHT
+                        + Back.MAGENTA
+                        + Fore.WHITE
+                        + " usb"
+                        + str(''.join(filter(str.isdigit, com)))
+                        + " "
+                        + Back.RESET
+                        + Fore.CYAN
+                        + " ✓"
+                        + getString("block_found")
+                        + Fore.WHITE
+                        + str(int(shares[0]))
+                        + "/"
+                        + str(int(shares[0] + shares[1]))
+                        + Back.RESET
+                        + Fore.YELLOW
+                        + " ("
+                        + str(int((shares[0] / (shares[0] + shares[1]) * 100)))
+                        + "%)"
+                        + Style.NORMAL
+                        + Fore.WHITE
+                        + " ∙ "
+                        + str(f"%01.3f" % float(computetime))
+                        + "s"
+                        + Style.NORMAL
+                        + " ∙ "
+                        + Fore.BLUE
+                        + Style.BRIGHT
+                        + str(int(hashrate))
+                        + " H/s"
+                        + Style.NORMAL
+                        + Fore.WHITE
+                        + " @ diff "
+                        + str(diff)
+                        + " ∙ "
+                        + Fore.CYAN
+                        + "ping "
+                        + str(f"%02.0f" % int(ping))
+                        + "ms")
+                    break
+
+                else:
+                    # If result was incorrect
+                    shares[1]=(shares[1] + 1)
+                    title(
+                        getString("duco_avr_miner")
+                        + str(minerVersion)
+                        + ") - "
+                        + str(shares[0])
+                        + "/"
+                        + str(shares[0] + shares[1])
+                        + getString("accepted_shares"))
+                    print(
+                        now().strftime(
+                            Style.RESET_ALL
+                            + Style.DIM
+                            + "%H:%M:%S ")
+                        + Style.RESET_ALL
+                        + Style.BRIGHT
+                        + Back.MAGENTA
+                        + Fore.WHITE
+                        + " usb"
+                        + str(''.join(filter(str.isdigit, com)))
+                        + " "
+                        + Back.RESET
+                        + Fore.RED
+                        + " ✗"
+                        + getString("rejected")
+                        + Fore.WHITE
+                        + str(int(shares[0]))
+                        + "/"
+                        + str(int(shares[0] + shares[1]))
+                        + Back.RESET
+                        + Fore.YELLOW
+                        + " ("
+                        + str(int((shares[0] / (shares[0] + shares[1]) * 100)))
+                        + "%)"
+                        + Style.NORMAL
+                        + Fore.WHITE
+                        + " ∙ "
+                        + str(f"%01.3f" % float(computetime))
+                        + "s"
+                        + Style.NORMAL
+                        + " ∙ "
+                        + Fore.BLUE
+                        + Style.BRIGHT
+                        + str(int(hashrate))
+                        + " H/s"
+                        + Style.NORMAL
+                        + Fore.WHITE
+                        + " @ diff "
+                        + str(diff)
+                        + " ∙ "
+                        + Fore.CYAN
+                        + "ping "
+                        + str(f"%02.0f" % int(ping))
+                        + "ms")
+                    break  # Repeat
+                break
+
+
+if __name__ == "__main__":
+    init(autoreset=True)  # Colorama
+    title(getString("duco_avr_miner") + str(minerVersion) + ")")
+    try:
+        loadConfig()  # Load config file or create new one
+        debugOutput("Config file loaded")
+    except:
+        print(
+            now().strftime(Style.DIM + "%H:%M:%S ")
+            + Style.RESET_ALL
+            + Style.BRIGHT
+            + Back.GREEN
+            + Fore.WHITE
+            + " sys0 "
+            + Style.RESET_ALL
+            + Style.BRIGHT
+            + Fore.RED
+            + getString("load_config_error")
+            + resourcesFolder
+            + getString("load_config_error_warning")
+            + Style.RESET_ALL)
+        if debug == "y":
+            raise
+        time.sleep(10)
+        os._exit(1)
+    try:
+        Greeting()  # Display greeting message
+        debugOutput("Greeting displayed")
+    except:
+        if debug == "y":
+            raise
+    try:
+        Donate()  # Start donation thread
+    except:
+        if debug == "y":
+            raise
+
+    try:
+        # Launch avr duco mining threads
+        for port in avrport:
+            threading.Thread(
+                target=AVRMine,
+                args=(port,)).start()
+    except:
+        raise
+
+    # Discord rich presence threads
+    try:
+        initRichPresence()
+        threading.Thread(
+            target=updateRichPresence).start()
+    except:
+        if debug == "y":
+            raise

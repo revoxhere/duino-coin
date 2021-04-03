@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
-# Minimal version of Duino-Coin PC Miner, useful for developing own apps. Created by revox 2020-2021
+# Minimal version of Duino-Coin PC Miner
+# Using the XXHASH algorithm
+# Created by revox 2020-2021
 import socket
-import hashlib
 import urllib.request
 import time
 import os
 import sys  # Only python3 included libraries
+import xxhash  # use python3 -m pip install xxhash to install xxhash
 
 soc = socket.socket()
 soc.settimeout(10)
 
 username = "revox"  # Edit this to your username, mind the quotes
-UseLowerDiff = True  # Set it to True to mine with lower difficulty
 
 while True:
     try:
@@ -38,20 +39,12 @@ while True:
 
         # Mining section
         while True:
-            if UseLowerDiff:
-                # Send job request for lower diff
-                soc.send(bytes(
-                    "JOB,"
-                    + str(username)
-                    + ",MEDIUM",
-                    encoding="utf8"))
-            else:
-                # Send job request
-                soc.send(bytes(
-                    "JOB,"
-                    + str(username),
-                    encoding="utf8"))
-
+            # Send job request
+            soc.send(bytes(
+                "JOBXX,"
+                + str(username)
+                + ",NET",
+                encoding="utf8"))
             # Receive work
             job = soc.recv(1024).decode().rstrip("\n")
             # Split received data to job and difficulty
@@ -59,26 +52,25 @@ while True:
             difficulty = job[2]
 
             hashingStartTime = time.time()
-            for result in range(100 * int(difficulty) + 1):
+            for ducos1xxres in range(100 * int(difficulty) + 1):
                 # Calculate hash with difficulty
-                ducos1 = hashlib.sha1(
-                    str(
-                        job[0]
-                        + str(result)
-                    ).encode("utf-8")).hexdigest()
+                ducos1xx = xxhash.xxh64(
+                    str(job[0])
+                    + str(ducos1xxres),
+                    seed=2811).hexdigest()
 
                 # If hash is even with expected hash result
-                if job[1] == ducos1:
+                if job[1] == ducos1xx:
                     hashingStopTime = time.time()
                     timeDifference = hashingStopTime - hashingStartTime
-                    hashrate = result / timeDifference
+                    hashrate = ducos1xxres / timeDifference
 
                     # Send numeric result to the server
                     soc.send(bytes(
-                        str(result)
+                        str(ducos1xxres)
                         + ","
-                        + str(hashrate)
-                        + ",Minimal_PC_Miner",
+                        + str(hashrate) +
+                        ",Minimal PC Miner (XXHASH)",
                         encoding="utf8"))
 
                     # Get feedback about the result
@@ -86,7 +78,7 @@ while True:
                     # If result was good
                     if feedback == "GOOD":
                         print("Accepted share",
-                              result,
+                              ducos1xxres,
                               "Hashrate",
                               int(hashrate/1000),
                               "kH/s",
@@ -96,7 +88,7 @@ while True:
                     # If result was incorrect
                     elif feedback == "BAD":
                         print("Rejected share",
-                              result,
+                              ducos1xxres,
                               "Hashrate",
                               int(hashrate/1000),
                               "kH/s",
@@ -107,4 +99,4 @@ while True:
     except Exception as e:
         print("Error occured: " + str(e) + ", restarting in 5s.")
         time.sleep(5)
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        os.execv(sys.argv[0], sys.argv)

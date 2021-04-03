@@ -5,8 +5,8 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards v1.8
-//  © Duino-Coin Community 2019-2020
+//  Code for ESP8266 boards v2.3
+//  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
 //  https://github.com/revoxhere/duino-coin - GitHub
@@ -19,13 +19,11 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
-const char* ssid     = "Your WiFi SSID"; // Change this to your WiFi SSID
-const char* password = "Your WiFi password"; // Change this to your WiFi password
-const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-Coin username
-// TIP for revox: MAKE SURE THERE ISN'T ANY OF YOUR PASSWORDS BEFORE COMMIT
-
-#define LED_BUILTIN 2 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
+const char* ssid          = "Wifi Name";      // Change this to your WiFi SSID
+const char* password      = "Wifi Password";  // Change this to your WiFi password
+const char* ducouser      = "DUCO Username";  // Change this to your Duino-Coin username
+const char* rigIdentifier = "ESP8266";        // Change this if you want a custom miner name
+#define LED_BUILTIN         2                 // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
 #include <ESP8266WiFi.h> // Include WiFi library
 #include <ESP8266mDNS.h> // OTA libraries
@@ -36,7 +34,7 @@ const char* ducouser = "Your Duino-Coin username"; // Change this to your Duino-
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT); // Define built-in led as output
   Serial.begin(115200); // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP Miner v1.8");
+  Serial.println("\n\nDuino-Coin ESP Miner v2.3");
 
   Serial.println("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
@@ -85,8 +83,7 @@ void loop() {
   ArduinoOTA.handle(); // Enable OTA handler
   const char * host = "51.15.127.80"; // Static server IP
   const int port = 2811;
-  unsigned int acceptedShares = 0; // Shares variables
-  unsigned int rejectedShares = 0;
+  unsigned int Shares = 0; // Share variable
 
   Serial.println("\nConnecting to Duino-Coin server...");
   // Use WiFiClient class to create TCP connection
@@ -107,27 +104,27 @@ void loop() {
     ArduinoOTA.handle(); // Enable OTA handler
     Serial.println("Asking for a new job for user: " + String(ducouser));
     client.print("JOB," + String(ducouser) + ",ESP"); // Ask for new job
-
-    String hash = client.readStringUntil(','); // Read last block hash
-    String job = client.readStringUntil(','); // Read expected hash
-    unsigned int diff =  (1500) * 100 + 1; // Low power devices use the low diff job, we don't read it as no termination character causes unnecessary network lag
+    String       hash = client.readStringUntil(','); // Read data to the first peroid - last block hash
+    String        job = client.readStringUntil(','); // Read data to the next peroid - expected hash
+    unsigned int diff = client.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
     Serial.println("Job received: " + String(hash) + " " + String(job) + " " + String(diff));
-
+    
+    unsigned long StartTime = micros(); // Start time measurement
     for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
       ArduinoOTA.handle(); // Enable OTA handler
       yield(); // uncomment if ESP watchdog triggers
       String result = sha1(String(hash) + String(iJob)); // Hash previous block hash and current iJob
       if (result == job) { // If result is found
-        client.print(String(iJob) + ",2150,ESP Miner v1.8"); // Send result to server
+        unsigned long EndTime = micros(); // End time measurement
+        unsigned long ElapsedTime = EndTime - StartTime; // Calculate elapsed time
+        float ElapsedTimeMiliSeconds = ElapsedTime / 1000; // Convert to miliseconds
+        float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
+        float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
+        client.print(String(iJob) + "," + String(HashRate) + ",ESP Miner v2.3," + String(rigIdentifier)); // Send result to server
 
-        String feedback = client.readStringUntil('D'); // Receive feedback
-        if (feedback.indexOf("GOOD")) {
-          acceptedShares++;
-          Serial.println("Accepted share #" + String(acceptedShares) + " (" + String(iJob) + ")");
-        } else {
-          rejectedShares++;
-          Serial.println("Rejected share #" + String(acceptedShares) + " (" + String(iJob) + ")");
-        }
+        String feedback = client.readStringUntil('\n'); // Receive feedback
+        Shares++;
+        Serial.println(String(feedback) + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
         digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
         delay(3); // Wait shortly so LED flash isn't distracting
         digitalWrite(LED_BUILTIN, HIGH); // Turn off built-in led
