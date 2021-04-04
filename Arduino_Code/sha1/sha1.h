@@ -21,7 +21,7 @@
 #include "types.h"
 #include "hash.h"
 #include <stddef.h>
-#include <unistd.h>
+//#include <unistd.h>
 
 #ifdef __AVR__
 #define ssize_t long int
