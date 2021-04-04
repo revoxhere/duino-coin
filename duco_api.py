@@ -6,11 +6,40 @@
 # © Duino-Coin Community 2021
 ##########################################
 import ast
+from requests import get
 import requests
+import socket
+import json
+import hashlib
+import urllib.request
+from threading import Timer
+import threading
+import time, os, sys
+import queue
+
+miner_q = queue.Queue()
+
+
+#====================================# Vars #====================================#
 
 
 TRANSACTIONS_URL = "http://51.15.127.80/transactions.json"
 
+API_URL = "http://51.15.127.80/api.json"
+SERVER_URL = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+
+duco_price = 0.003
+socket.setdefaulttimeout(10)
+
+
+#====================================# common functions #====================================#
+
+
+def decode_response(rec):
+    return rec.decode().split(",")
+
+
+#====================================# Duco Transactions #====================================#
 
 class transaction_data:
 
@@ -281,3 +310,251 @@ class read_data:
 
         # Returns the total amount of ducos received
         return total
+
+
+
+#====================================# Duco Api #====================================#
+
+def get_duco_price():
+    """
+    A function for getting the current price of DUCO
+    """
+    api_response = get(API_URL)
+    if api_response.status_code == 200:
+        duco_price = round(api_response.json()["Duco price"], 6)
+    else:
+        duco_price = .003
+    return duco_price
+
+class api_actions:
+    """
+    A class that provides an interface for interacting with the DUCO server
+    """
+    def __init__(self):
+        """
+        A class constructor that initiates the connection with the server.
+        """
+        serverinfo = get(SERVER_URL).text.splitlines()
+        self.pool_address = serverinfo[0]
+        self.pool_port = int(serverinfo[1])
+        self.sock = socket.socket()
+        self.sock.connect((self.pool_address, self.pool_port))
+        self.sock.recv(3)
+        self.username = None
+        self.password = None
+
+    def register(self, username, password, email):
+        """
+        A function for registering an account
+        """
+        self.sock.send(f"REGI,{username},{password},{email}".encode())
+        register_result = decode_response(self.sock.recv(128))
+        if 'NO' in register_result:
+            raise Exception(register_result[1])
+        return register_result
+
+    def login(self, username, password):
+        """
+        A function for logging into an account
+        """
+        self.username = username
+        self.password = password
+
+        self.sock.send(f"LOGI,{username},{password}".encode())
+        login_result = decode_response(self.sock.recv(64))
+
+        if 'NO' in login_result:
+            raise Exception(login_result[1])
+
+        return login_result
+
+    def logout(self):
+        """
+        A function for disconnecting from the server
+        """
+        self.sock.close()
+
+    def balance(self):
+        """
+        A function for getting account balance
+        """
+        if not self.password or not self.username:
+            raise Exception("User not logged in")
+        self.sock.send("BALA".encode())
+        user_balance = self.sock.recv(1024).decode()
+        return user_balance
+
+    def transfer(self, recipient_username, amount):
+        """
+        A function for transfering balance between two accounts
+        """
+        if not self.password or not self.username:
+            raise Exception("User not logged in")
+        self.sock.send(f"SEND,-,{recipient_username},{amount}".encode())
+        transfer_response = self.sock.recv(128).decode()
+        return transfer_response
+
+    def getTransactions(self, amount):
+        """
+        A function for get last (amount) of transactions
+        """
+        if not self.password or not self.username:
+            raise Exception("User not logged in")
+        self.sock.send(f"GTXL,{self.username},{amount}".encode())
+        transactions = self.sock.recv(1024).decode()
+        return json.loads(json.dumps(transactions))
+
+    def reset_pass(self, old_password, new_password):
+        """
+        A function for resetting the password of an account
+        """
+        if not self.password or not self.username:
+            raise Exception("User not logged in")
+        self.sock.send(f"CHGP,{old_password},{new_password}".encode())
+        reset_password_response = self.sock.recv(128).decode()
+        return reset_password_response
+
+    def close(self):
+        """
+        A function for disconnecting from the server
+        """
+        self.sock.close()
+
+
+#====================================# Duco Miner #====================================#
+
+class miner:
+
+    def __init__(self):
+        self.username = None
+        self.UseLowerDiff = True
+        self.stopVar = False
+        self.workers = 1
+        self.last_job = {}
+
+
+
+    def start(self, username=None, workers=None):
+        if username != None:
+            self.username = username
+        elif self.username == None:
+            raise ValueError("Please provide a username")
+
+        if workers != None:
+            self.workers = int(workers)
+
+        for worker in range(self.workers):
+            x = threading.Thread(target=self.worker)
+            x.start()
+
+
+    def stop(self):
+        self.stopVar = True
+
+
+    def worker(self): # Mining section\
+        soc = socket.socket()
+        with urllib.request.urlopen(SERVER_URL) as content:
+            # Read content and split into lines
+            content = content.read().decode().splitlines()
+
+        # Line 1 = IP
+        pool_address = content[0]
+        # Line 2 = port
+        pool_port = content[1]
+
+        # This section connects and logs user to the server
+        soc.connect((str(pool_address), int(pool_port)))
+        server_version = soc.recv(3).decode()  # Get server version
+        print("Server is on version", server_version)
+
+        while True:
+            if self.stopVar == True:
+                print("Stopping Worker")
+                break
+            if self.UseLowerDiff:
+                # Send job request for lower diff
+                soc.send(bytes(
+                    "JOB,"
+                    + str(self.username)
+                    + ",MEDIUM",
+                    encoding="utf8"))
+            else:
+                # Send job request
+                soc.send(bytes(
+                    "JOB,"
+                    + str(self.username),
+                    encoding="utf8"))
+
+            # Receive work
+            job = soc.recv(1024).decode().rstrip("\n")
+            # Split received data to job and difficulty
+            job = job.split(",")
+            difficulty = job[2]
+
+            hashingStartTime = time.time()
+            for result in range(100 * int(difficulty) + 1):
+                # Calculate hash with difficulty
+                ducos1 = hashlib.sha1(
+                    str(
+                        job[0]
+                        + str(result)
+                    ).encode("utf-8")).hexdigest()
+
+                # If hash is even with expected hash result
+                if job[1] == ducos1:
+                    hashingStopTime = time.time()
+                    timeDifference = hashingStopTime - hashingStartTime
+                    hashrate = result / timeDifference
+
+                    # Send numeric result to the server
+                    soc.send(bytes(
+                        str(result)
+                        + ","
+                        + str(hashrate)
+                        + ",Minimal_PC_Miner",
+                        encoding="utf8"))
+
+                    # Get feedback about the result
+                    feedback = soc.recv(1024).decode().rstrip("\n")
+                    # If result was good
+                    if feedback == "GOOD":
+                        miner_q.put({'Status': "Accepted share",
+                                        'Result': result,
+                                        "Hashrate": int(hashrate/1000),
+                                        "Difficulty": difficulty})
+                        # print("Accepted share",
+                        #       result,
+                        #       "Hashrate",
+                        #       int(hashrate/1000),
+                        #       "kH/s",
+                        #       "Difficulty",
+                        #       difficulty)
+                        break
+                    # If result was incorrect
+                    elif feedback == "BAD":
+                        miner_q.put({'Status': "Rejected share",
+                                        'Result': result,
+                                        "Hashrate": int(hashrate/1000),
+                                        "Difficulty": difficulty})
+                        # print("Rejected share",
+                        #       result,
+                        #       "Hashrate",
+                        #       int(hashrate/1000),
+                        #       "kH/s",
+                        #       "Difficulty",
+                        #       difficulty)
+                        break
+
+
+if __name__ == '__main__':
+    miner_class = miner()
+
+    miner_class.start(username="connorhess")
+
+    for i in range(10):
+        print(miner_q.get())
+        time.sleep(1)
+
+    miner_class.stop()
+
