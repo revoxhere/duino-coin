@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Master Server Remastered (v2.3)
+# Duino-Coin Master Server Remastered (v2.4)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -63,11 +63,11 @@ max_rejected_shares = 20
 big_block_reward = 7.77
 reward_multiplier = 0.77
 higher_diffs_basereward = 0.0002811
-expected_sharetime_sec = 5
+expected_sharetime_sec = 7
 big_block_probability = 1000000
 # Database access times out after this many seconds (default: 5)
 database_timeout = 5
-socket_listen_num = 16
+socket_listen_num = 0
 # Wheter to enable wDUCO wrapper
 use_wrapper = True
 wrapper_permission = False
@@ -507,10 +507,10 @@ def API():
                 "_Duino-Coin Public master server JSON API": "https://github.com/revoxhere/duino-coin",
                 "Server version":        float(serverVersion),
                 "Active connections":    int(connectedUsers),
-                "Open threads":          int(threading.active_count()),
+                "Open threads":          threading.activeCount(),
                 "Server CPU usage":      float(round(statistics.mean(percarray[-20:]), 2)),
                 "Server RAM usage":      float(round(statistics.mean(memarray[-20:]), 2)),
-                "Last update":           str(now.strftime("%d/%m/%Y %H:%M (UTC)")),
+                "Last update":           str(now.strftime("%d/%m/%Y %H:%M:%s (UTC)")),
                 "Pool hashrate":         str(round(serverHashrate, 4))+prefix,
                 # Get price from global
                 "Duco price":            float(round(ducoPrice, 6)),
@@ -520,7 +520,6 @@ def API():
                 "All-time mined DUCO":   int(getMinedDuco()),
                 "Current difficulty":    int(diff),
                 "Mined blocks":          int(blocks),
-                "Full last block hash":  str(lastBlockHash),
                 "Last block hash":       str(lastBlockHash)[:10]+"...",
                 # Call getLeaders function
                 "Top 10 richest miners": getLeaders(),
@@ -796,7 +795,7 @@ def createHashes():
     # Generate DUCO-S1 jobs
     while True:
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 4)
+            rand = fastrand.pcg32bounded(100 * 4.5)
             readyHashesAVR[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
@@ -862,6 +861,11 @@ def handle(c, ip):
     # Variables for every thread
     username = ""
     firstshare = True
+    # This gets set to true if a sharetime-test is being executed
+    sharetime_test = False
+    # This will be set according to the sharetime the miner had on higher difficulties
+    # This will only be used during sharetime-exploit tests
+    expected_test_sharetime = 0
     acceptedShares = 0
     rejectedShares = 0
     connectedUsers += 1
@@ -983,8 +987,8 @@ def handle(c, ip):
 
                     elif customDiff == "AVR":
                         # Optimal diff for very low power devices like Arduino
-                        diff = 4
-                        basereward = 0.00035
+                        diff = 5
+                        basereward = 0.00055
                         # Not overclocked Arduino chips won't make more than 150 H/s
                         max_hashrate = 150
                         max_shares_per_sec = 3
@@ -1029,9 +1033,9 @@ def handle(c, ip):
                     if overrideDiff == "EXTREME" or customDiff == "EXTREME":
                         basereward = 0
 
-                    if not firstshare:
+                    if not firstshare and not sharetime_test:
                         try:
-                            # Part of Kolka system V3 - variable difficulty section
+                            # Part of Kolka V3 - variable difficulty section
                             # Calculate the diff multiplier
                             p = 2 - sharetime / expected_sharetime
 
@@ -1062,8 +1066,38 @@ def handle(c, ip):
                     else:
                         time.sleep(3)
 
+                    # Kolka V4
+                    # Checks whether a sharetime-test was executed
+                    if sharetime_test:
+                        sharetime_test = False
+                        # Calculates how far apart they are (in percent)
+                        p = sharetime / expected_test_sharetime
+                        # Checks whether the sharetime took more than 50% longer than it should've
+                        if p > 1.5:
+                            rejectedShares += 1
+                            # Calculate penalty dependent on share submission time - Kolka V1 combined with V4
+                            penalty = float(int(int(sharetime) ** 2) * math.ceil(p / 10) / 1000000000) * -1
+                            try:
+                                # Add username to the dict so it will be decremented in the next DB update
+                                balancesToUpdate[username] += penalty
+                            except:
+                                balancesToUpdate[username] = penalty
+
                     # Generate result in range of the difficulty
                     rand = fastrand.pcg32bounded(100 * diff)
+
+                    # Experimental Kolka V4
+                    # There's a 16.6% to get a sharetime-exploit test
+                    # (10 options, 11 and 12 = test; ergo 2 out of 12)
+                    if fastrand.pcg32bounded(12) > 10 and not firstshare:
+                        # Drastically dropping the nonce to force a lower sharetime
+                        # TODO: Maybe make this more random
+                        rand = fastrand.pcg32bounded(10 * diff)
+                        # Set to true to avoid increasing the difficulty by magnitudes
+                        sharetime_test = True
+                        # The expected sharetime should be about 10 times lower than it was before
+                        expected_test_sharetime = sharetime / 10
+
                     # Create the DUCO-S1 hash
                     newBlockHash = hashlib.sha1(
                         str(str(lastBlockHash_copy)
@@ -1162,7 +1196,7 @@ def handle(c, ip):
                 except:
                     pass
 
-                # Kolka system V3
+                # Kolka V3
                 # Move miner to higher diff tier if his hashrate is too high
                 if int(hashrateCalculated) > int(max_hashrate):
                     # Set to adjust the starting diff again (see roughly line 860)
@@ -1188,14 +1222,14 @@ def handle(c, ip):
 
                     try:
                         # Check if miner didn't exceed max sharerate per second
-                        # Kolka system V2
+                        # Kolka V2
                         if minerapi[str(threading.get_ident())]["Sharerate"] > max_shares_per_sec:
                             # If he did, throttle him
                             time.sleep(15)
                     except:
                         pass
 
-                    # Calculate the reward - Kolka system V1
+                    # Calculate the reward - Kolka V1
                     if customDiff == "EXTREME" or overrideDiff == "EXTREME":
                         reward = (float(sharetime)
                                   / 100000000
@@ -1242,7 +1276,6 @@ def handle(c, ip):
                             try:
                                 c.send(bytes("GOOD", encoding="utf8"))
                             except:
-                                print("Error sending feedback", username)
                                 break
                     try:
                         # Add username to the dict so it will be incremented in the next DB update
@@ -1257,7 +1290,7 @@ def handle(c, ip):
                 # If incorrect result was received
                 else:
                     rejectedShares += 1
-                    # Calculate penalty dependent on share submission time - "kolka system"
+                    # Calculate penalty dependent on share submission time - Kolka V1
                     penalty = float(int(int(sharetime) ** 2) / 1000000000) * -1
                     try:
                         # Add username to the dict so it will be decremented in the next DB update
@@ -1329,7 +1362,7 @@ def handle(c, ip):
 
                 if not firstshare:
                     try:
-                        # Part of Kolka system V3 - variable difficulty section
+                        # Part of Kolka V3 - variable difficulty section
                         # Calculate the diff multiplier
                         p = 2 - sharetime / expected_sharetime
 
@@ -1451,7 +1484,7 @@ def handle(c, ip):
 
                     try:
                         # Check if miner didn't exceed max sharerate per second
-                        # Kolka system V2
+                        # Kolka V2
                         if minerapi[str(threading.get_ident())]["Sharerate"] > max_shares_per_sec:
                             # If he did, throttle him
                             time.sleep(15)
@@ -1488,7 +1521,6 @@ def handle(c, ip):
                         try:
                             c.send(bytes("GOOD\n", encoding="utf8"))
                         except:
-                            print("Error sending feedback", username)
                             break
 
                     try:
@@ -1504,7 +1536,7 @@ def handle(c, ip):
                 # If incorrect result was received
                 else:
                     rejectedShares += 1
-                    # Calculate penalty dependent on share submission time - "kolka system"
+                    # Calculate penalty dependent on share submission time - Kolka V1
                     penalty = float(int(int(sharetime) ** 2) / 1000000000) * -1
                     try:
                         # Add username to the dict so it will be decremented in the next DB update
@@ -2367,12 +2399,14 @@ if __name__ == '__main__':
                 IPS[addr[0]] += 1
             except:
                 IPS[addr[0]] = 1
-            start_new_thread(handle, (c, addr[0]))  # Start a new thread
+
+            # Start a new thread
+            start_new_thread(handle, (c, addr[0]))  
 
             IPS[addr[0]] -= 1
             if IPS[addr[0]] <= 0:
                 IPS.pop(addr[0])
-    finally:
-        print("Exiting")
+    except Exception as e:
+        print("Exiting", str(e))
         s.close()
-        os._exit(1)  # error code 1 so server will autorestart with systemd
+        os._exit(1)  # Error code 1 so server will autorestart with systemd
