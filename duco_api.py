@@ -162,6 +162,20 @@ class read_data:
         # Creates a userdata-instance based on the data provided
         return user_data(data=self.data)
 
+    def all_time_transacted(self):
+        # returnes the all time transacted amount
+
+        transactions = self.all()
+
+        transactions_token = list(transactions.tokens())
+
+        total = 0
+
+        for trans_token in transactions_token:
+            total += float(transactions.token(trans_token).amount)
+
+        return total
+
 
     def user_transactions(self, username=None):
         # Checks whether a 'valid' username was specified.
@@ -548,13 +562,14 @@ class miner:
 
 
 if __name__ == '__main__':
-    miner_class = miner()
+    print(read_data().all_time_transacted())
+    # miner_class = miner()
 
-    miner_class.start(username="connorhess")
+    # miner_class.start(username="connorhess")
 
-    for i in range(10):
-        print(miner_q.get())
-        time.sleep(1)
+    # for i in range(10):
+    #     print(miner_q.get())
+    #     time.sleep(1)
 
-    miner_class.stop()
+    # miner_class.stop()
 
