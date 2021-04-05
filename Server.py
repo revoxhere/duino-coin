@@ -79,6 +79,7 @@ try:  # Read sensitive data from config file
     duco_email = config["main"]["duco_email"]
     duco_password = config["main"]["duco_password"]
     NodeS_Overide = config["main"]["NodeS_Overide"]
+    PoolPassword = config["main"]["PoolPassword"]
     wrapper_private_key = config["main"]["wrapper_private_key"]
     NodeS_Username = config["main"]["NodeS_Username"]
     emailchecker_private_key = config["main"]["emailchecker_private_key"]
@@ -90,6 +91,7 @@ except Exception:
         duco_email = ???
         duco_password = ???
         NodeS_Overide = ???
+        PoolPassword = ???
         wrapper_private_key = ???
         NodeS_Username = ???
         emailchecker_private_key = ???""")
@@ -802,7 +804,7 @@ def createHashes():
             readyHashesAVR[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
-                    str(lastBlockHash 
+                    str(lastBlockHash
                         + str(rand)).encode("utf-8")).hexdigest(),
                 "LastBlockHash": str(lastBlockHash)}
 
@@ -811,7 +813,7 @@ def createHashes():
             readyHashesESP[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
-                    str(lastBlockHash 
+                    str(lastBlockHash
                         + str(rand)).encode("utf-8")).hexdigest(),
                 "LastBlockHash": str(lastBlockHash)}
 
@@ -820,7 +822,7 @@ def createHashes():
             readyHashesESP32[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
-                    str(lastBlockHash 
+                    str(lastBlockHash
                         + str(rand)).encode("utf-8")).hexdigest(),
                 "LastBlockHash": str(lastBlockHash)}
 
@@ -829,7 +831,7 @@ def createHashes():
 
 def wraptx(duco_username, address, amount):
     # wDUCO wrapper
-    adminLog("wrapper", 
+    adminLog("wrapper",
         "TRON wrapper called by " + duco_username)
     txn = wduco.functions.wrap(
         address,
@@ -841,7 +843,7 @@ def wraptx(duco_username, address, amount):
         PrivateKey(
             bytes.fromhex(wrapper_private_key)))
     txn = txn.broadcast()
-    adminLog("wrapper", 
+    adminLog("wrapper",
         "Sent wrap tx to TRON network by " + duco_username)
     feedback = txn.result()
     return feedback
@@ -2025,7 +2027,7 @@ def handle(c, ip):
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
 
-                if password == NodeS_Overide:
+                if password == PoolPassword:
                     while True:
                         try:
                             blocks += amount
@@ -2048,7 +2050,7 @@ def handle(c, ip):
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
 
-                if password == NodeS_Overide:
+                if password == PoolPassword:
                     while True:
                         try:
                             with sqlite3.connect(database, timeout=database_timeout) as conn:
@@ -2075,7 +2077,7 @@ def handle(c, ip):
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
 
-                if password == NodeS_Overide:
+                if password == PoolPassword:
                     while True:
                         try:
                             reward += 7  # Add 7 DUCO to the reward
@@ -2093,6 +2095,44 @@ def handle(c, ip):
                             break
                         except Exception:
                             pass
+
+            ################################## Pool Sync ####################################
+            elif str(data[0]) == "POOLListUpdate":
+                try:
+                    password = str(data[1])
+                    name = str(data[2])
+                    ip = str(data[3])
+                    port = str(data[4])
+                    status = str(data[5])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                if password == PoolPassword:
+                    with sqlite3.connect(database, timeout=database_timeout) as conn:
+                        c = conn.cursor()
+                        c.execute('''CREATE TABLE IF NOT EXISTS Pools(name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+
+                        c.execute("SELECT COUNT(name) FROM Pools WHERE name = ?", (name,))
+                        if (c.fetchall()[0][0]) == 0:
+                            c.execute('''INSERT INTO Pools(name, ip, port, Status) VALUES(?, ? ,? ,?)''',(name, ip, port, status))
+                        else:
+                            c.execute("UPDATE Pools SET ip = ?, port = ?, Status = ? WHERE name = ?",(ip, port, status, name))
+
+                        conn.commit()
+
+                    c.send(bytes("YES,Successful", encoding='utf8'))
+
+            ################################## Pool Sync ####################################
+            elif str(data[0]) == "POOLList":
+                    with sqlite3.connect(database, timeout=database_timeout) as conn:
+                        c = conn.cursor()
+                        c.execute('''CREATE TABLE IF NOT EXISTS Pools(name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+
+                        c.execute("SELECT * FROM Pools")
+                        info = c.fetchall()
+
+                c.send(bytes(f"{info}", encoding='utf8'))
 
             ######################################################################
             elif str(data[0]) == "WRAP" and str(username) != "":
