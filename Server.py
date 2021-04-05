@@ -79,7 +79,6 @@ try:  # Read sensitive data from config file
     duco_email = config["main"]["duco_email"]
     duco_password = config["main"]["duco_password"]
     NodeS_Overide = config["main"]["NodeS_Overide"]
-    PoolPassword = config["main"]["PoolPassword"]
     wrapper_private_key = config["main"]["wrapper_private_key"]
     NodeS_Username = config["main"]["NodeS_Username"]
     emailchecker_private_key = config["main"]["emailchecker_private_key"]
@@ -91,7 +90,6 @@ except Exception:
         duco_email = ???
         duco_password = ???
         NodeS_Overide = ???
-        PoolPassword = ???
         wrapper_private_key = ???
         NodeS_Username = ???
         emailchecker_private_key = ???""")
@@ -512,7 +510,6 @@ def API():
                 "_Duino-Coin Public master server JSON API": "https://github.com/revoxhere/duino-coin",
                 "Server version":        float(serverVersion),
                 "Active connections":    int(connectedUsers),
-                "Open threads":          threading.activeCount(),
                 "Server CPU usage":      float(round(statistics.mean(percarray[-20:]), 2)),
                 "Server RAM usage":      float(round(statistics.mean(memarray[-20:]), 2)),
                 "Last update":           str(now.strftime("%d/%m/%Y %H:%M:%S (UTC)")),
@@ -883,7 +880,7 @@ def confirmunwraptx(duco_username, recipient, amount):
 
 
 def handle(c, ip):
-    c.settimeout(5)
+    c.settimeout(15)
     # Thread for every connection
     # These globals are used in the statistics API
     global connectedUsers, minerapi
@@ -918,7 +915,7 @@ def handle(c, ip):
             else:
                 # Split incoming data
                 data = data.decode().rstrip("\n").split(",")
-                c.settimeout(30)
+                c.settimeout(60)
 
             if str(data[0]) == "PING":
                 """Simple ping response"""
@@ -1010,6 +1007,12 @@ def handle(c, ip):
                         max_hashrate = 10000
                         max_shares_per_sec = 3
 
+                    elif customDiff == "ESP32NL":
+                        diff = 275
+                        basereward = 0.00045
+                        max_hashrate = 80000000000000000000
+                        max_shares_per_sec = 30
+
                     elif customDiff == "ESP":
                         # DEPRECATED DIFF FOR ESP8266 MINERS BELOW VERSION 2.4
                         # Optimal diff for low power devices like ESP8266
@@ -1048,7 +1051,7 @@ def handle(c, ip):
                     rand = readyHashesESP[randomChoice]["Result"]
                     newBlockHash = readyHashesESP[randomChoice]["Hash"]
                     lastBlockHash_copy = readyHashesESP[randomChoice]["LastBlockHash"]
-                elif customDiff == "ESP32" or customDiff == "ESP8266":
+                elif customDiff == "ESP32" or customDiff == "ESP32NL" or customDiff == "ESP8266":
                     randomChoice = random.randint(
                         0, len(readyHashesESP32) - 1)
                     rand = readyHashesESP32[randomChoice]["Result"]
@@ -1154,7 +1157,7 @@ def handle(c, ip):
                             + str(rand)
                             ).encode("utf-8")).hexdigest()
 
-                if customDiff == "ESP32" or customDiff == "ESP" or customDiff == "ESP8266":
+                if customDiff == "ESP32" or customDiff == "ESP" or customDiff == "ESP32NL" or customDiff == "ESP8266":
                     # ESPs expect job ending with \n
                     # TODO: this will soon be pushed also to the other miners
                     try:
@@ -2027,7 +2030,7 @@ def handle(c, ip):
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
 
-                if password == PoolPassword:
+                if password == NodeS_Overide:
                     while True:
                         try:
                             blocks += amount
@@ -2050,7 +2053,7 @@ def handle(c, ip):
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
 
-                if password == PoolPassword:
+                if password == NodeS_Overide:
                     while True:
                         try:
                             with sqlite3.connect(database, timeout=database_timeout) as conn:
@@ -2077,7 +2080,7 @@ def handle(c, ip):
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
 
-                if password == PoolPassword:
+                if password == NodeS_Overide:
                     while True:
                         try:
                             reward += 7  # Add 7 DUCO to the reward
@@ -2133,6 +2136,7 @@ def handle(c, ip):
                         info = c.fetchall()
 
                 c.send(bytes(f"{info}", encoding='utf8'))
+
 
             ######################################################################
             elif str(data[0]) == "WRAP" and str(username) != "":
