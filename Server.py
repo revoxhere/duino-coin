@@ -2130,12 +2130,12 @@ def handle(c, ip):
 
             ################################## Pool Sync ####################################
             elif str(data[0]) == "POOLList":
-                    with sqlite3.connect(database, timeout=database_timeout) as conn:
-                        c = conn.cursor()
-                        c.execute('''CREATE TABLE IF NOT EXISTS Pools(name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+                with sqlite3.connect(database, timeout=database_timeout) as conn:
+                    c = conn.cursor()
+                    c.execute('''CREATE TABLE IF NOT EXISTS Pools(name TEXT, ip TEXT, port TEXT, Status TEXT)''')
 
-                        c.execute("SELECT * FROM Pools")
-                        info = c.fetchall()
+                    c.execute("SELECT * FROM Pools")
+                    info = c.fetchall()
 
                 c.send(bytes(f"{info}", encoding='utf8'))
 
