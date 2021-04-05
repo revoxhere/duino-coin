@@ -235,7 +235,7 @@ def Connect():
                     + getString("update_warning"))
                 time.sleep(10)
                 break
-        except Exception:
+        except Exception as e:
             print(
                 now().strftime(
                     Style.DIM
@@ -250,8 +250,7 @@ def Connect():
                 + Fore.RED
                 + getString("connecting_error")
                 + Style.RESET_ALL)
-            if debug == "y":
-                raise
+            debugOutput("Connection error: " + str(e))
             time.sleep(10)
     return socId
 
@@ -736,7 +735,7 @@ def AVRMine(com):
                     # Connect to the server
                     socId = Connect()
                     break
-            except Exception:
+            except Exception as e:
                 # If there was an error with grabbing data from GitHub
                 print(
                     now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
@@ -749,8 +748,7 @@ def AVRMine(com):
                     + Back.RESET
                     + Fore.RED
                     + getString("data_error"))
-                if debug == "y":
-                    raise
+                debugOutput("GitHub error: " + str(e))
                 time.sleep(10)
 
         while True:
@@ -834,7 +832,7 @@ def AVRMine(com):
                         diff = int(job[2])
                         debugOutput("Job received: " + " ".join(job))
                         break
-                except Exception:
+                except Exception as e:
                     print(
                         now().strftime(
                             Style.DIM
@@ -849,10 +847,8 @@ def AVRMine(com):
                         + Fore.RED
                         + getString("connecting_error")
                         + Style.RESET_ALL)
-                    if debug == "y":
-                        raise
-                    # Reconnect to the server
-                    socId = Connect()
+                    debugOutput("Connection error: " + str(e))
+                    restart_miner()
 
             while True:
                 while True:
@@ -932,7 +928,7 @@ def AVRMine(com):
                             + ","
                             + str(chipID),
                             encoding="utf8"))
-                except Exception:
+                except Exception as e:
                     print(
                         now().strftime(
                             Style.DIM
@@ -947,8 +943,7 @@ def AVRMine(com):
                         + Fore.RED
                         + getString("connecting_error")
                         + Style.RESET_ALL)
-                    if debug == "y":
-                        raise
+                    debugOutput("Connection error: " + str(e))
                     time.sleep(10)
                     restart_miner()
 
