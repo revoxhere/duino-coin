@@ -182,10 +182,10 @@ def Connect():
                 socket.close()
             except Exception:
                 pass
-            debugOutput("Connecting to " 
-                + str(masterServer_address) 
-                + str(":") 
-                + str(masterServer_port))
+            debugOutput("Connecting to "
+                        + str(masterServer_address)
+                        + str(":")
+                        + str(masterServer_port))
             socId = socket.socket()
             # Establish socket connection to the server
             socId.connect((str(masterServer_address), int(masterServer_port)))
@@ -316,20 +316,20 @@ def connectToAVR(com):
 def handler(signal_received, frame):
     # SIGINT handler
     print("\n"
-        + now().strftime(
-            Style.RESET_ALL
-            + Style.DIM
-            + "%H:%M:%S ")
-        + Style.BRIGHT
-        + Back.GREEN
-        + Fore.WHITE
-        + " sys0 "
-        + Back.RESET
-        + Fore.YELLOW
-        + getString("sigint_detected")
-        + Style.NORMAL
-        + Fore.WHITE
-        + getString("goodbye"))
+          + now().strftime(
+              Style.RESET_ALL
+              + Style.DIM
+              + "%H:%M:%S ")
+          + Style.BRIGHT
+          + Back.GREEN
+          + Fore.WHITE
+          + " sys0 "
+          + Back.RESET
+          + Fore.YELLOW
+          + getString("sigint_detected")
+          + Style.NORMAL
+          + Fore.WHITE
+          + getString("goodbye"))
     try:
         socket.close()
     except Exception:
@@ -707,7 +707,7 @@ def updateRichPresence():
             # Discord not launched
             pass
         # 15 seconds to respect Discord's rate limit
-        time.sleep(15)  
+        time.sleep(15)
 
 
 def AVRMine(com):
@@ -803,7 +803,7 @@ def AVRMine(com):
                     # Retrieve work
                     job = socId.recv(85).decode()
                     # Split received data
-                    job = job.rstrip("\n").split(",")  
+                    job = job.rstrip("\n").split(",")
 
                     # Check if username is correct
                     if job[1] == "This user doesn't exist":
@@ -863,22 +863,25 @@ def AVRMine(com):
                                 + ","),
                             encoding="utf8"))
                         debugOutput("Sent job to AVR")
-                        
+
                         # Read the result
                         result = comConnection.readline().decode()
                         result = result.rstrip("\n").split(",")
 
                         if result != "" and result != " ":
-                            debugOutput("Received from AVR: " + " ".join(result))
+                            debugOutput("Received from AVR: " +
+                                        " ".join(result))
                             break
                         else:
                             raise Exception("Empty data")
 
                     except Exception as e:
-                        debugOutput("Exception when reading/writing to serial: " + str(e))
+                        debugOutput(
+                            "Exception with to serial: " + str(e))
                         errorCounter += 1
                         if errorCounter >= 5:
-                            debugOutput("Reconnecting to AVR because of too many errors")
+                            debugOutput(
+                                "Reconnecting to AVR - too many errors")
                             print(
                                 now().strftime(Style.DIM + "%H:%M:%S ")
                                 + Style.RESET_ALL
@@ -907,7 +910,8 @@ def AVRMine(com):
                     debugOutput("Calculated hashrate (" + str(hashrate) + ")")
                     try:
                         chipID = result[2]
-                        debugOutput("Received chip ID (" + str(result[2]) + ")")
+                        debugOutput(
+                            "Received chip ID (" + str(result[2]) + ")")
                     except IndexError:
                         chipID = "None"
                 except Exception as e:
@@ -957,10 +961,12 @@ def AVRMine(com):
                         timeDelta = (responsetimestop -
                                      responsetimetart).microseconds
                         ping = round(timeDelta / 1000)
-                        debugOutput("Successfully retrieved feedback: " + str(feedback) + " with ping: " + str(ping))
+                        debugOutput("Successfully retrieved feedback: " +
+                                    str(feedback) + " with ping: " + str(ping))
                         break
                     except Exception:
-                        print("Error parsing response: " + str(e) + ", restarting miner")
+                        print("Error parsing response: " +
+                              str(e) + ", restarting miner")
                         restart_miner()
 
                 if feedback == "GOOD":
@@ -996,8 +1002,8 @@ def AVRMine(com):
                         + Back.RESET
                         + Fore.YELLOW
                         + " ("
-                        + str(int((shares[0] 
-                            / (shares[0] + shares[1]) * 100)))
+                        + str(int((shares[0]
+                                   / (shares[0] + shares[1]) * 100)))
                         + "%)"
                         + Style.NORMAL
                         + Fore.WHITE
@@ -1055,8 +1061,8 @@ def AVRMine(com):
                         + Back.RESET
                         + Fore.YELLOW
                         + " ("
-                        + str(int((shares[0] 
-                            / (shares[0] + shares[1]) * 100)))
+                        + str(int((shares[0]
+                                   / (shares[0] + shares[1]) * 100)))
                         + "%)"
                         + Style.NORMAL
                         + Fore.WHITE
@@ -1114,8 +1120,8 @@ def AVRMine(com):
                         + Back.RESET
                         + Fore.YELLOW
                         + " ("
-                        + str(int((shares[0] 
-                            / (shares[0] + shares[1]) * 100)))
+                        + str(int((shares[0]
+                                   / (shares[0] + shares[1]) * 100)))
                         + "%)"
                         + Style.NORMAL
                         + Fore.WHITE
@@ -1143,13 +1149,13 @@ def AVRMine(com):
 
 if __name__ == "__main__":
     # Colorama
-    init(autoreset=True)  
+    init(autoreset=True)
     # Window title
     title(getString("duco_avr_miner") + str(minerVersion) + ")")
 
     try:
         # Load config file or create new one
-        loadConfig()  
+        loadConfig()
         debugOutput("Config file loaded")
     except Exception:
         print(
@@ -1172,14 +1178,14 @@ if __name__ == "__main__":
 
     try:
         # Display greeting message
-        Greeting()  
+        Greeting()
         debugOutput("Greeting displayed")
     except Exception as e:
         debugOutput("Error displaying greeting message: " + str(e))
 
     try:
         # Start donation thread
-        Donate()  
+        Donate()
     except Exception as e:
         debugOutput("Error launching donation thread: " + str(e))
 
@@ -1192,7 +1198,6 @@ if __name__ == "__main__":
     except Exception as e:
         debugOutput("Error launching AVR thead(s): " + str(e))
 
-    
     try:
         # Discord rich presence threads
         initRichPresence()
