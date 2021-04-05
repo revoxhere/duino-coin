@@ -177,8 +177,8 @@ Server source code, documentation for API calls and official libraries for devel
 
 <h2 align="center">Some of the officially tested devices</h2><br>
 
-*   Arduino Pro Mini / Uno / Nano (ATmega328p @ 16 MHz 5V): ~170 H/s
-*   NodeMCU (ESP8266 @ 160 MHz): ~9.3 kH/s (~4.5 kH/s at 80 MHz clock)
+*   Arduino Pro Mini / Uno / Nano (ATmega328p @ 16 MHz 5V): ~155 H/s (15-20 DUCO/day)
+*   NodeMCU (ESP8266 @ 160 MHz): ~9.3 kH/s (~4.5 kH/s at 80 MHz clock) (8-12 DUCO/day)
 *   ESP32 (dual-threaded): ~13 kH/s (6 kH/s (core1) and 7 kH/s (core2)) (WIP)
 
 Hashrate Calculators for AVR/ESP8266 platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
