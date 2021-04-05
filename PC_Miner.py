@@ -8,7 +8,6 @@
 # Import libraries
 import socket
 import threading
-import multiprocessing
 import time
 import hashlib
 import sys
@@ -24,21 +23,26 @@ import platform
 from pathlib import Path
 from signal import signal, SIGINT
 
-# Install pip package automatically
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-    os.execl(sys.executable, sys.executable, *sys.argv)
 
-# Return datetime object
+def install(package):
+    # Install pip package automatically
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    if os.name == "nt":
+        os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
+    else:
+        os.execl(sys.executable, sys.executable, *sys.argv)
+
+
 def now():
+    # Return datetime object
     return datetime.datetime.now()
 
 
-# Check if cpuinfo is installed
 try:
+    # Check if cpuinfo is installed
     import cpuinfo
     from multiprocessing import freeze_support
-except:
+except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
         + 'Cpuinfo is not installed. '
@@ -47,10 +51,11 @@ except:
         + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
     install("py-cpuinfo")
 
-# Check if colorama is installed
+
 try:
+    # Check if colorama is installed
     from colorama import init, Fore, Back, Style
-except:
+except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
         + 'Colorama is not installed. '
@@ -59,10 +64,11 @@ except:
         + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
     install("colorama")
 
-# Check if requests is installed
+
 try:
+    # Check if requests is installed
     import requests
-except:
+except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
         + 'Requests is not installed. '
@@ -71,10 +77,10 @@ except:
         + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
     install("requests")
 
-# Check if pypresence is installed
 try:
+    # Check if pypresence is installed
     from pypresence import Presence
-except:
+except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
         + 'Pypresence is not installed. '
@@ -83,11 +89,11 @@ except:
         + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
     install("pypresence")
 
-# Check if xxhash is installed
 try:
+    # Check if xxhash is installed
     import xxhash
     xxhash_enabled = True
-except:
+except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
         + 'Xxhash is not installed. '
@@ -106,9 +112,9 @@ rigIdentifier = "None"
 requestedDiff = "NET"
 algorithm = "DUCO-S1"
 serveripfile = ("https://raw.githubusercontent.com/"
-    + "revoxhere/"
-    + "duino-coin/gh-pages/"
-    + "serverip.txt")  # Serverip file
+                + "revoxhere/"
+                + "duino-coin/gh-pages/"
+                + "serverip.txt")  # Serverip file
 config = configparser.ConfigParser()
 donationlevel = 0
 thread = []
@@ -120,9 +126,9 @@ if not os.path.exists(resourcesFolder):
 # Check if languages file exists
 if not Path(resourcesFolder + "/langs.json").is_file():
     url = ("https://raw.githubusercontent.com/"
-    + "revoxhere/"
-    + "duino-coin/master/Resources/"
-    + "PC_Miner_langs.json")
+           + "revoxhere/"
+           + "duino-coin/master/Resources/"
+           + "PC_Miner_langs.json")
     r = requests.get(url)
     with open(resourcesFolder + "/langs.json", "wb") as f:
         f.write(r.content)
@@ -156,11 +162,13 @@ else:
     try:
         config.read(resourcesFolder + "/Miner_config.cfg")
         lang = config["miner"]["language"]
-    except:
+    except Exception:
         # If it fails, fallback to english
         lang = "english"
 
 # Get string form language file
+
+
 def getString(string_name):
     if string_name in lang_file[lang]:
         return lang_file[lang][string_name]
@@ -170,11 +178,15 @@ def getString(string_name):
         return "String not found: " + string_name
 
 # Debug output
+
+
 def debugOutput(text):
     if debug == "y":
         print(now().strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
 
 # Set window title
+
+
 def title(title):
     if os.name == "nt":
         os.system("title " + title)
@@ -183,6 +195,8 @@ def title(title):
         sys.stdout.flush()
 
 # SIGINT handler
+
+
 def handler(signal_received, frame):
     if multiprocessing.current_process().name == 'MainProcess':
         print(
@@ -200,7 +214,7 @@ def handler(signal_received, frame):
             + getString("goodbye"))
         try:
             soc.close()
-        except:
+        except Exception:
             pass
         os._exit(0)
     else:
@@ -262,7 +276,7 @@ def Greeting():
             + str(threadcount)
             + "x "
             + str(cpu["brand_raw"]))
-    except:
+    except Exception:
         if debug == "y":
             raise
     if os.name == "nt" or os.name == "posix":
@@ -309,9 +323,9 @@ def Greeting():
             debugOutput(
                 "OS is Windows, downloading developer donation executable")
             url = ("https://github.com/"
-            + "revoxhere/"
-            + "duino-coin/blob/useful-tools/"
-            + "DonateExecutableWindows.exe?raw=true")
+                   + "revoxhere/"
+                   + "duino-coin/blob/useful-tools/"
+                   + "DonateExecutableWindows.exe?raw=true")
             r = requests.get(url)
             with open(resourcesFolder + "/Donate_executable.exe", "wb") as f:
                 f.write(r.content)
@@ -321,9 +335,9 @@ def Greeting():
             debugOutput(
                 "OS is Windows, downloading developer donation executable")
             url = ("https://github.com/"
-            + "revoxhere/"
-            + "duino-coin/blob/useful-tools/"
-            + "DonateExecutableLinux?raw=true")
+                   + "revoxhere/"
+                   + "duino-coin/blob/useful-tools/"
+                   + "DonateExecutableLinux?raw=true")
             r = requests.get(url)
             with open(resourcesFolder + "/Donate_executable", "wb") as f:
                 f.write(r.content)
@@ -640,6 +654,8 @@ def ducos1(
             return [ducos1res, hashcount]
 
 # XXHASH algorithm
+
+
 def ducos1xxh(
         lastBlockHash,
         expectedHash,
@@ -679,15 +695,17 @@ def Thread(
                 if res.status_code == 200:
                     # Read content and split into lines
                     content = (res.content.decode().splitlines())
-                    masterServer_address = content[0]  # Line 1 = pool address
-                    masterServer_port = content[1]  # Line 2 = pool port
+                    # Line 1 = IP
+                    masterServer_address = content[0]
+                    # Line 2 = port
+                    masterServer_port = content[1]
                     debugOutput(
                         "Retrieved pool IP: "
                         + masterServer_address
                         + ":"
                         + str(masterServer_port))
                     break
-            except:  # If there was an error with grabbing data from GitHub
+            except Exception:  # If there was an error with grabbing data from GitHub
                 print(
                     now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
                     + Style.BRIGHT
@@ -710,7 +728,8 @@ def Thread(
                 # Establish socket connection to the server
                 soc.connect((str(masterServer_address),
                              int(masterServer_port)))
-                serverVersion = soc.recv(3).decode().rstrip("\n")  # Get server version
+                serverVersion = soc.recv(3).decode().rstrip(
+                    "\n")  # Get server version
                 debugOutput("Server version: " + serverVersion)
                 if (float(serverVersion) <= float(minerVersion)
                         and len(serverVersion) == 3):
@@ -760,7 +779,7 @@ def Thread(
                         + serverVersion
                         + getString("update_warning"))
                     break
-            except:
+            except Exception:
                 # Socket connection error
                 print(
                     now().strftime(Style.DIM + "%H:%M:%S ")
@@ -804,7 +823,8 @@ def Thread(
             + using_algo
             + Fore.YELLOW
             + str(int(100 - efficiency * 100))
-            + f"% {getString('efficiency')}")
+            + "% "
+            + getString('efficiency'))
 
         # Mining section
         while True:
@@ -860,7 +880,7 @@ def Thread(
                     elif job[0] and job[1] and job[2]:
                         diff = int(job[2])
                         debugOutput(str(threadid) +
-                                    "Job received: " 
+                                    "Job received: "
                                     + str(job))
                         # If job received, continue to hashing algo
                         break
@@ -900,7 +920,7 @@ def Thread(
                             + ","
                             + "Official PC Miner ("
                             + str(algorithm)
-                            + ") v" 
+                            + ") v"
                             + str(minerVersion)
                             + ","
                             + str(rigIdentifier),
@@ -1110,7 +1130,7 @@ def Thread(
                                 + "ms")
                             break  # Repeat
                     break
-            except:
+            except Exception:
                 print(
                     now().strftime(Style.DIM + "%H:%M:%S ")
                     + Style.RESET_ALL
@@ -1132,17 +1152,21 @@ def Thread(
                 break
 
 # Initialize Discord rich presence
+
+
 def initRichPresence():
     global RPC
     try:
         RPC = Presence(808045598447632384)
         RPC.connect()
         debugOutput("Discord rich presence initialized")
-    except:  # Discord not launched
+    except Exception:  # Discord not launched
         if debug == "y":
             raise
 
 # Update rich presence status
+
+
 def updateRichPresence():
     startTime = int(time.time())
     while True:
@@ -1170,27 +1194,41 @@ def updateRichPresence():
                     {"label": "Discord Server",
                      "url": "https://discord.gg/k48Ht5y"}])
             debugOutput("Rich presence updated")
-        except:  # Discord not launched
+        except Exception:  # Discord not launched
             if debug == "y":
                 raise
         time.sleep(15)  # 15 seconds to respect Discord rate limit
 
 
 if __name__ == "__main__":
-    multiprocessing.freeze_support()  # Multiprocessing fix for pyinstaller
-    cpu = cpuinfo.get_cpu_info()  # Processor info
-    init(autoreset=True)  # Colorama
+    # Processor info
+    cpu = cpuinfo.get_cpu_info()
+    # Colorama
+    init(autoreset=True)
     title(getString("duco_python_miner") + str(minerVersion) + ")")
-    # Multiprocessing globals
-    hashcount = multiprocessing.Value("i", 0)
-    khashcount = multiprocessing.Value("i", 0)
-    accepted = multiprocessing.Value("i", 0)
-    rejected = multiprocessing.Value("i", 0)
 
     try:
-        loadConfig()  # Load config file or create new one
+        import multiprocessing
+        # Multiprocessing fix for pyinstaller
+        multiprocessing.freeze_support()
+        # Multiprocessing globals
+        hashcount = multiprocessing.Value("i", 0)
+        khashcount = multiprocessing.Value("i", 0)
+        accepted = multiprocessing.Value("i", 0)
+        rejected = multiprocessing.Value("i", 0)
+    except Exception:
+        print(now().strftime("%H:%M:%S ")
+              + 'Multiprocessing is not available. '
+              + 'Please check permissions and/or your python installation. '
+              + 'Exiting in 15s.')
+        time.sleep(15)
+        os._exit(0)
+
+    try:
+        # Load config file or create new one
+        loadConfig()
         debugOutput("Config file loaded")
-    except:
+    except Exception:
         print(
             now().strftime(Style.DIM + "%H:%M:%S ")
             + Style.RESET_ALL
@@ -1210,23 +1248,27 @@ if __name__ == "__main__":
         time.sleep(10)
         os._exit(1)
     try:
-        Greeting()  # Display greeting message
+        # Display greeting message
+        Greeting()
         debugOutput("Greeting displayed")
-    except:
+    except Exception:
         if debug == "y":
             raise
     try:
-        Donate()  # Start donation thread
-    except:
+        # Start donation thread
+        Donate()
+    except Exception:
         if debug == "y":
             raise
 
+    # Start hashrate calculator thread
     threading.Thread(
         target=hashrateCalculator,
         args=(hashcount, khashcount)
-    ).start()  # Start hashrate calculator thread
+    ).start()
 
-    for x in range(int(threadcount)):  # Launch duco mining threads
+    for x in range(int(threadcount)):
+        # Launch duco mining threads
         thread.append(x)
         thread[x] = multiprocessing.Process(
             target=Thread,
@@ -1247,6 +1289,6 @@ if __name__ == "__main__":
     try:
         initRichPresence()
         threading.Thread(target=updateRichPresence).start()
-    except:
+    except Exception:
         if debug == "y":
             raise
