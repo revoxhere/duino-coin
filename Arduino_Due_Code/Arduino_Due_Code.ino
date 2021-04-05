@@ -31,8 +31,6 @@ unsigned int ducos1result = 0;
 
 // Setup stuff
 void setup() {
-  // Prepare built-in led pin as output
-  pinMode(LED_BUILTIN, OUTPUT);
   // Open serial port
   Serial.begin(115200);
   Serial.setTimeout(5000);
@@ -85,11 +83,7 @@ void loop() {
     unsigned long elapsedTime = endTime - startTime;
     // Send result back to the program with share time
     Serial.print(String(ducos1result) + "," + String(elapsedTime) + "\n");
-    // Turn on built-in led
-    PORTB = PORTB | B00100000;
     // Wait a bit
     delay(25);
-    // Turn off built-in led
-    PORTB = PORTB & B11011111;
   }
 }
