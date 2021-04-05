@@ -84,7 +84,7 @@ try:  # Read sensitive data from config file
     emailchecker_private_key = config["main"]["emailchecker_private_key"]
     client = quickemailverification.Client(
         str(emailchecker_private_key).replace("\n", ""))
-except:
+except Exception:
     print("""Please create AdminData.ini config file first:
         [main]
         duco_email = ???
@@ -171,14 +171,14 @@ if not os.path.isfile(blockchain):
             with open("config/lastblock", "r+") as lastblockfile:
                 # If old database is found, read lastBlockHash from it
                 lastBlockHash = lastblockfile.readline()
-        except:
+        except Exception:
             # First block - SHA1 of "duino-coin"
             lastBlockHash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
         try:
             with open("config/blocks", "r+") as blockfile:
                 # If old database is found, read mined blocks amount from it
                 blocks = blockfile.readline()
-        except:
+        except Exception:
             blocks = 1  # Start from 1
         blockdatab = blockconn.cursor()
         blockdatab.execute(
@@ -318,7 +318,7 @@ def getRegisteredUsers():
                 datab.execute("SELECT COUNT(username) FROM Users")
                 registeredUsers = datab.fetchone()[0]
                 break
-        except:
+        except Exception:
             pass
     return registeredUsers
 
@@ -332,7 +332,7 @@ def getMinedDuco():
                 datab.execute("SELECT SUM(balance) FROM Users")
                 allMinedDuco = datab.fetchone()[0]
                 break
-        except:
+        except Exception:
             pass
     return allMinedDuco
 
@@ -352,7 +352,7 @@ def getLeaders():
                     if i > 10:
                         break
                 break
-        except:
+        except Exception:
             pass
     return(leadersdata[:10])
 
@@ -361,18 +361,21 @@ def getAllBalances():
     # Get all balances list
     while True:
         try:
-            leadersdata = {}
+            baldata = {}
             with sqlite3.connect(database, timeout=database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Users ORDER BY balance DESC")
                 for row in datab.fetchall():
                     if float(row[3]) > 0:
-                        leadersdata[str(row[0])] = str(
-                            round((float(row[3])), 4)) + " DUCO"
+                        baldata[str(row[0])] = str(
+                            round((float(row[3])), 8)) + " DUCO"
+                    else:
+                        # Stop when rest of the balances are just 0
+                        break
                 break
-        except:
+        except Exception:
             pass
-    return(leadersdata)
+    return(baldata)
 
 
 def getTransactions():
@@ -391,7 +394,7 @@ def getTransactions():
                         "Recipient": str(row[2]),
                         "Amount": float(row[3])}
             break
-        except:
+        except Exception:
             pass
     return transactiondata
 
@@ -452,7 +455,7 @@ def API():
                     # Add user hashrate to the server hashrate
                     serverHashrate_not_smoothed += float(
                         minerapi[x]["Hashrate"])
-                except:
+                except Exception:
                     pass
 
             serverHashrateArray.append(serverHashrate_not_smoothed)
@@ -484,14 +487,14 @@ def API():
                         "Software":     str(minerapi[miner]["Software"]),
                         "Identifier":   str(minerapi[miner]["Identifier"]),
                         "Last share timestamp": str(minerapi[miner]["Last share timestamp"])}
-                except:
+                except Exception:
                     pass
 
             for thread in minerapipublic.copy():
                 try:
                     # Append miners to formattedMinerApi["Miners"][id of thread]
                     minerList.append(minerapipublic[thread]["User"])
-                except:
+                except Exception:
                     pass
 
             for i in minerList.copy():
@@ -510,7 +513,7 @@ def API():
                 "Open threads":          threading.activeCount(),
                 "Server CPU usage":      float(round(statistics.mean(percarray[-20:]), 2)),
                 "Server RAM usage":      float(round(statistics.mean(memarray[-20:]), 2)),
-                "Last update":           str(now.strftime("%d/%m/%Y %H:%M:%s (UTC)")),
+                "Last update":           str(now.strftime("%d/%m/%Y %H:%M:%S (UTC)")),
                 "Pool hashrate":         str(round(serverHashrate, 4))+prefix,
                 # Get price from global
                 "Duco price":            float(round(ducoPrice, 6)),
@@ -534,7 +537,7 @@ def API():
                     indent=2,
                     ensure_ascii=False)
             time.sleep(5)
-        except:
+        except Exception:
             pass
 
 
@@ -555,7 +558,7 @@ def UpdateOtherAPIFiles():
                 outfile,
                 indent=2,
                 ensure_ascii=False)
-        time.sleep(30)
+        time.sleep(10)
 
 
 def UpdateDatabase():
@@ -630,19 +633,19 @@ def InputManagement():
                             "UPDATE Users set password = ? where username = ?", (duco_password, username))
                         conn.commit()
                     print("Step 1 - Changed password")
-                except:
+                except Exception:
                     print("Step 1 - Error changing password")
                 try:
                     with open('config/banned.txt', 'a') as bansfile:
                         bansfile.write(str(username) + "\n")
                         print("Step 2 - Added username to banlist")
-                except:
+                except Exception:
                     print("Step 2 - Error adding username to banlist")
 
                 try:
                     banlist.append(str(username))
                     print("Step 2 - Added username to blocked usernames")
-                except:
+                except Exception:
                     print("Step 3 - Error adding username to blocked usernames")
 
                 try:
@@ -672,7 +675,7 @@ def InputManagement():
                     print("Step 4 - Sent email to", str(email))
                 except Exception as e:
                     print("Step 4 - Error sending email to", str(email), str(e))
-            except:
+            except Exception:
                 print("Provide a username first")
 
         elif userInput[0] == "exit":
@@ -703,7 +706,7 @@ def InputManagement():
                         "SELECT * FROM Users WHERE username = ?", (userInput[1],))
                     balance = str(datab.fetchone()[3])  # Fetch balance of user
                     print(userInput[1] + "'s balance: " + str(balance))
-            except:
+            except Exception:
                 print("User doesn't exist")
 
         elif userInput[0] == "set":
@@ -731,7 +734,7 @@ def InputManagement():
                     print("User balance is now " + str(balance))
                 else:
                     print("Canceled")
-            except:
+            except Exception:
                 print("User doesn't exist or you've entered wrong number")
 
         elif userInput[0] == "subtract":
@@ -759,7 +762,7 @@ def InputManagement():
                     print("User balance is now " + str(balance))
                 else:
                     print("Canceled")
-            except:
+            except Exception:
                 print("User doesn't exist or you've entered wrong number")
 
         elif userInput[0] == "add":
@@ -787,7 +790,7 @@ def InputManagement():
                     print("User balance is now " + str(balance))
                 else:
                     print("Canceled")
-            except:
+            except Exception:
                 print("User doesn't exist or you've entered wrong number")
 
 
@@ -798,21 +801,27 @@ def createHashes():
             rand = fastrand.pcg32bounded(100 * 4.5)
             readyHashesAVR[i] = {
                 "Result": rand,
-                "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
+                "Hash": hashlib.sha1(
+                    str(lastBlockHash 
+                        + str(rand)).encode("utf-8")).hexdigest(),
                 "LastBlockHash": str(lastBlockHash)}
 
         for i in range(hashes_num):
             rand = fastrand.pcg32bounded(100 * 125)
             readyHashesESP[i] = {
                 "Result": rand,
-                "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
+                "Hash": hashlib.sha1(
+                    str(lastBlockHash 
+                        + str(rand)).encode("utf-8")).hexdigest(),
                 "LastBlockHash": str(lastBlockHash)}
 
         for i in range(hashes_num):
             rand = fastrand.pcg32bounded(100 * 275)
             readyHashesESP32[i] = {
                 "Result": rand,
-                "Hash": hashlib.sha1(str(lastBlockHash + str(rand)).encode("utf-8")).hexdigest(),
+                "Hash": hashlib.sha1(
+                    str(lastBlockHash 
+                        + str(rand)).encode("utf-8")).hexdigest(),
                 "LastBlockHash": str(lastBlockHash)}
 
         time.sleep(10)  # Refresh every 10s
@@ -820,13 +829,20 @@ def createHashes():
 
 def wraptx(duco_username, address, amount):
     # wDUCO wrapper
-    adminLog("wrapper", "TRON wrapper called by " + duco_username)
+    adminLog("wrapper", 
+        "TRON wrapper called by " + duco_username)
     txn = wduco.functions.wrap(
         address,
         duco_username,
-        int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+        int(float(amount)*10**6)
+    ).with_owner(
+        wrapper_public_key
+    ).fee_limit(5_000_000).build().sign(
+        PrivateKey(
+            bytes.fromhex(wrapper_private_key)))
     txn = txn.broadcast()
-    adminLog("wrapper", "Sent wrap tx to TRON network by " + duco_username)
+    adminLog("wrapper", 
+        "Sent wrap tx to TRON network by " + duco_username)
     feedback = txn.result()
     return feedback
 
@@ -836,7 +852,13 @@ def unwraptx(duco_username, recipient, amount, private_key, public_key):
     txn = wduco.functions.initiateWithdraw(
         duco_username,
         recipient,
-        int(float(amount)*10**6)).with_owner(PublicKey(PrivateKey(bytes.fromhex(wrapper_public_key)))).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+        int(float(amount)*10**6)
+    ).with_owner(
+        PublicKey(PrivateKey(
+            bytes.fromhex(wrapper_public_key)))
+    ).fee_limit(5_000_000).build().sign(
+        PrivateKey(
+            bytes.fromhex(wrapper_private_key)))
     feedback = txn.broadcast().wait()
     return feedback
 
@@ -846,13 +868,20 @@ def confirmunwraptx(duco_username, recipient, amount):
     txn = wduco.functions.confirmWithdraw(
         duco_username,
         recipient,
-        int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+        int(float(amount)*10**6)
+    ).with_owner(
+        wrapper_public_key
+    ).fee_limit(5_000_000
+                ).build().sign(
+        PrivateKey(
+            bytes.fromhex(wrapper_private_key)))
     txn = txn.broadcast()
     adminLog("unwrapper", "Sent confirm tx to tron network by", duco_username)
     return feedback
 
 
 def handle(c, ip):
+    c.settimeout(5)
     # Thread for every connection
     # These globals are used in the statistics API
     global connectedUsers, minerapi
@@ -861,10 +890,10 @@ def handle(c, ip):
     # Variables for every thread
     username = ""
     firstshare = True
-    # This gets set to true if a sharetime-test is being executed
+    # Set to true if a sharetime-test is being executed
     sharetime_test = False
-    # This will be set according to the sharetime the miner had on higher difficulties
-    # This will only be used during sharetime-exploit tests
+    # Set according to the sharetime the miner had on higher difficulties
+    # Only used during sharetime-exploit tests
     expected_test_sharetime = 0
     acceptedShares = 0
     rejectedShares = 0
@@ -872,14 +901,11 @@ def handle(c, ip):
     overrideDiff = ""
     try:
         connections[ip] += 1
-    except:
+    except Exception:
         connections[ip] = 1
 
     # Send server version
-    try:
-        c.send(bytes(str(serverVersion), encoding="utf8"))
-    except:
-        pass
+    c.send(bytes(str(serverVersion), encoding="utf8"))
 
     while True:
         try:
@@ -890,12 +916,17 @@ def handle(c, ip):
             else:
                 # Split incoming data
                 data = data.decode().rstrip("\n").split(",")
+                c.settimeout(30)
 
             if str(data[0]) == "PING":
-                c.send(bytes("Pong!", encoding='utf8'))
+                """Simple ping response"""
+                try:
+                    c.send(bytes("Pong!", encoding='utf8'))
+                except Exception:
+                    break
 
-            ######################################################################
             elif str(data[0]) == "JOB":
+                """Mining protocol for DUCO-S1"""
                 if username == "":
                     try:
                         username = str(data[1])
@@ -908,11 +939,11 @@ def handle(c, ip):
                 if username in banlist:
                     ban(ip)
                     break
-                    
+
                 if firstshare:
                     try:
                         workers[username] += 1
-                    except:
+                    except Exception:
                         workers[username] = 1
 
                 # Check if there aren't too much connections per IP
@@ -973,41 +1004,51 @@ def handle(c, ip):
                         # optimal diff for low power devices like ESP32
                         diff = 275
                         basereward = 0.00045
-                        # Not overclocked ESP32 chips won't make more than 6-7 kH/s
-                        max_hashrate = 8000
-                        max_shares_per_sec = 30
+                        # Not overclocked ESP32 chips won't make more than ~10 kH/s
+                        max_hashrate = 10000
+                        max_shares_per_sec = 3
 
                     elif customDiff == "ESP":
+                        # DEPRECATED DIFF FOR ESP8266 MINERS BELOW VERSION 2.4
                         # Optimal diff for low power devices like ESP8266
                         diff = 125
                         basereward = 0.00055
-                        # Not overclocked ESP8266 chips won't make more than 2.8 kH/s
+                        # Not overclocked ESP8266 chips won't make more than ~3 kH/s
                         max_hashrate = 3000
-                        max_shares_per_sec = 30
+                        max_shares_per_sec = 3
+
+                    elif customDiff == "ESP8266":
+                        # DIFF FOR NEW ESP8266 MINERS
+                        # Optimal diff for low power devices like ESP8266
+                        diff = 275
+                        basereward = 0.00025
+                        # Not overclocked ESP8266 chips won't make more than ~9 kH/s
+                        max_hashrate = 10000
+                        max_shares_per_sec = 3
 
                     elif customDiff == "AVR":
                         # Optimal diff for very low power devices like Arduino
                         diff = 5
                         basereward = 0.00055
-                        # Not overclocked Arduino chips won't make more than 150 H/s
-                        max_hashrate = 150
+                        # Not overclocked Arduino chips won't make more than ~155 H/s
+                        max_hashrate = 155
                         max_shares_per_sec = 3
 
                 if customDiff == "AVR":
                     randomChoice = random.randint(
-                            0, len(readyHashesAVR) - 1)
+                        0, len(readyHashesAVR) - 1)
                     rand = readyHashesAVR[randomChoice]["Result"]
                     newBlockHash = readyHashesAVR[randomChoice]["Hash"]
                     lastBlockHash_copy = readyHashesAVR[randomChoice]["LastBlockHash"]
                 elif customDiff == "ESP":
                     randomChoice = random.randint(
-                            0, len(readyHashesESP) - 1)
+                        0, len(readyHashesESP) - 1)
                     rand = readyHashesESP[randomChoice]["Result"]
                     newBlockHash = readyHashesESP[randomChoice]["Hash"]
                     lastBlockHash_copy = readyHashesESP[randomChoice]["LastBlockHash"]
-                elif customDiff == "ESP32":
+                elif customDiff == "ESP32" or customDiff == "ESP8266":
                     randomChoice = random.randint(
-                            0, len(readyHashesESP32) - 1)
+                        0, len(readyHashesESP32) - 1)
                     rand = readyHashesESP32[randomChoice]["Result"]
                     newBlockHash = readyHashesESP32[randomChoice]["Hash"]
                     lastBlockHash_copy = readyHashesESP32[randomChoice]["LastBlockHash"]
@@ -1023,7 +1064,7 @@ def handle(c, ip):
                     or customDiff == "EXTREME"
                     or overrideDiff == "MEDIUM"
                     or overrideDiff == "NET"
-                    or overrideDiff == "EXTREME"):
+                        or overrideDiff == "EXTREME"):
 
                     # Copy the current block hash as it can be changed by other threads
                     lastBlockHash_copy = lastBlockHash
@@ -1068,20 +1109,24 @@ def handle(c, ip):
 
                     # Kolka V4
                     # Checks whether a sharetime-test was executed
-                    if sharetime_test:
-                        sharetime_test = False
-                        # Calculates how far apart they are (in percent)
-                        p = sharetime / expected_test_sharetime
-                        # Checks whether the sharetime took more than 50% longer than it should've
-                        if p > 1.5:
-                            rejectedShares += 1
-                            # Calculate penalty dependent on share submission time - Kolka V1 combined with V4
-                            penalty = float(int(int(sharetime) ** 2) * math.ceil(p / 10) / 1000000000) * -1
-                            try:
-                                # Add username to the dict so it will be decremented in the next DB update
-                                balancesToUpdate[username] += penalty
-                            except:
-                                balancesToUpdate[username] = penalty
+                    try:
+                        if sharetime_test:
+                            sharetime_test = False
+                            # Calculates how far apart they are (in percent)
+                            p = sharetime / expected_test_sharetime
+                            # Checks whether the sharetime took more than 50% longer than it should've
+                            if p > 1.5:
+                                rejectedShares += 1
+                                # Calculate penalty dependent on share submission time - Kolka V1 combined with V4
+                                penalty = float(
+                                    int(int(sharetime) ** 2) * math.ceil(p / 10) / 1000000000) * -1
+                                try:
+                                    # Add username to the dict so it will be decremented in the next DB update
+                                    balancesToUpdate[username] += penalty
+                                except Exception:
+                                    balancesToUpdate[username] = penalty
+                    except Exception as e:
+                        print(e)
 
                     # Generate result in range of the difficulty
                     rand = fastrand.pcg32bounded(100 * diff)
@@ -1089,14 +1134,17 @@ def handle(c, ip):
                     # Experimental Kolka V4
                     # There's a 16.6% to get a sharetime-exploit test
                     # (10 options, 11 and 12 = test; ergo 2 out of 12)
-                    if fastrand.pcg32bounded(12) > 10 and not firstshare:
-                        # Drastically dropping the nonce to force a lower sharetime
-                        # TODO: Maybe make this more random
-                        rand = fastrand.pcg32bounded(10 * diff)
-                        # Set to true to avoid increasing the difficulty by magnitudes
-                        sharetime_test = True
-                        # The expected sharetime should be about 10 times lower than it was before
-                        expected_test_sharetime = sharetime / 10
+                    try:
+                        if fastrand.pcg32bounded(12) > 10 and not firstshare:
+                            # Drastically dropping the nonce to force a lower sharetime
+                            # TODO: Maybe make this more random
+                            rand = fastrand.pcg32bounded(10 * diff)
+                            # Set to true to avoid increasing the difficulty by magnitudes
+                            sharetime_test = True
+                            # The expected sharetime should be about 10 times lower than it was before
+                            expected_test_sharetime = sharetime / 10
+                    except Exception as e:
+                        print(e)
 
                     # Create the DUCO-S1 hash
                     newBlockHash = hashlib.sha1(
@@ -1104,7 +1152,7 @@ def handle(c, ip):
                             + str(rand)
                             ).encode("utf-8")).hexdigest()
 
-                if customDiff == "ESP32" or customDiff == "ESP":
+                if customDiff == "ESP32" or customDiff == "ESP" or customDiff == "ESP8266":
                     # ESPs expect job ending with \n
                     # TODO: this will soon be pushed also to the other miners
                     try:
@@ -1116,7 +1164,7 @@ def handle(c, ip):
                             + str(diff)
                             + "\n",
                             encoding='utf8'))  # Send hashes and diff hash to the miner
-                    except:
+                    except Exception:
                         break
                 else:
                     # Send lastblockhash, expectedhash and diff to the client
@@ -1129,7 +1177,7 @@ def handle(c, ip):
                             + ","
                             + str(diff),
                             encoding='utf8'))
-                    except:
+                    except Exception:
                         break
 
                 # Measure starting time
@@ -1138,7 +1186,7 @@ def handle(c, ip):
                     # Wait until client solves hash
                     response = c.recv(512).decode().split(",")
                     result = response[0]
-                except:
+                except Exception:
                     break
                 # Measure ending time
                 resultreceived = datetime.datetime.now()
@@ -1150,13 +1198,13 @@ def handle(c, ip):
 
                 try:
                     hashrateCalculated = int(rand / (sharetime / 1000))
-                except:
+                except Exception:
                     hashrateCalculated = 1
                 try:
                     # If client submitted hashrate, use it for the API
                     hashrate = float(response[1])
                     hashrateEstimated = False
-                except:
+                except Exception:
                     # If not, use the calculation
                     hashrate = hashrateCalculated
                     hashrateEstimated = True
@@ -1167,16 +1215,23 @@ def handle(c, ip):
                     # Check miner software for unallowed characters
                     minerIdentifier = re.sub(
                         '[^A-Za-z0-9 .()-]+', ' ', response[3])
-                except:
+                except Exception:
                     minerUsed = "Unknown miner"
                     minerIdentifier = "None"
+
+                if customDiff == 'AVR':
+                    try:
+                        chipID = str(response[4])
+                        #print("Chip ID:", chipID)
+                    except IndexError:
+                        pass
 
                 try:
                     # Prepare miner API
                     try:
                         shares_per_sec = minerapi[str(
                             threading.get_ident())]["Sharerate"] + 1
-                    except:
+                    except Exception:
                         shares_per_sec = 0
                     now = datetime.datetime.now()
                     lastsharetimestamp = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -1193,7 +1248,7 @@ def handle(c, ip):
                         "Software":     str(minerUsed),
                         "Identifier":   str(minerIdentifier),
                         "Last share timestamp": str(lastsharetimestamp)}
-                except:
+                except Exception:
                     pass
 
                 # Kolka V3
@@ -1226,7 +1281,7 @@ def handle(c, ip):
                         if minerapi[str(threading.get_ident())]["Sharerate"] > max_shares_per_sec:
                             # If he did, throttle him
                             time.sleep(15)
-                    except:
+                    except Exception:
                         pass
 
                     # Calculate the reward - Kolka V1
@@ -1260,27 +1315,27 @@ def handle(c, ip):
                         # Send feedback that block was found
                         try:
                             c.send(bytes("BLOCK", encoding="utf8"))
-                        except:
+                        except Exception:
                             break
                     else:
-                        if str(customDiff) == "ESP32" or str(customDiff) == "ESP":
+                        if str(customDiff) == "ESP32" or str(customDiff) == "ESP" or customDiff == "ESP8266":
                             # ESPs expect newline in the feedback
                             # TODO: this will soon be added to all the miners
                             try:
                                 #print("Sending good esp feedback", username)
                                 c.send(bytes("GOOD\n", encoding="utf8"))
-                            except:
+                            except Exception:
                                 break
                         else:
                             # Send feedback that result was correct
                             try:
                                 c.send(bytes("GOOD", encoding="utf8"))
-                            except:
+                            except Exception:
                                 break
                     try:
                         # Add username to the dict so it will be incremented in the next DB update
                         balancesToUpdate[username] += reward
-                    except:
+                    except Exception:
                         balancesToUpdate[username] = reward
 
                     # Increase global amount of shares and update block hash
@@ -1295,25 +1350,25 @@ def handle(c, ip):
                     try:
                         # Add username to the dict so it will be decremented in the next DB update
                         balancesToUpdate[username] += penalty
-                    except:
+                    except Exception:
                         balancesToUpdate[username] = penalty
 
-                    if str(customDiff) == "ESP32" or str(customDiff) == "ESP":
+                    if str(customDiff) == "ESP32" or str(customDiff) == "ESP" or customDiff == "ESP8266":
                         try:
                             # ESPs expect newline in the feedback
                             # TODO: this will soon be added to all the miners
                             c.send(bytes("BAD\n", encoding="utf8"))
-                        except:
+                        except Exception:
                             break
                     else:
                         try:
                             # Send feedback that incorrect result was received
                             c.send(bytes("BAD", encoding="utf8"))
-                        except:
+                        except Exception:
                             break
 
-            ######################################################################
             elif str(data[0]) == "JOBXX":
+                """Mining protocol for XXHASH"""
                 if username == "":
                     try:
                         username = str(data[1])
@@ -1330,7 +1385,7 @@ def handle(c, ip):
                 if firstshare:
                     try:
                         workers[username] += 1
-                    except:
+                    except Exception:
                         workers[username] = 1
 
                 # Check if there aren't too much connections per IP
@@ -1410,7 +1465,7 @@ def handle(c, ip):
                         + str(diff)
                         + "\n",
                         encoding='utf8'))
-                except:
+                except Exception:
                     break
 
                 # Measure starting time
@@ -1418,7 +1473,7 @@ def handle(c, ip):
                 try:
                     # Wait until client solves hash
                     response = c.recv(128).decode().split(",")
-                except:
+                except Exception:
                     break
                 result = response[0]
                 # Measure ending time
@@ -1431,13 +1486,13 @@ def handle(c, ip):
 
                 try:
                     hashrateCalculated = int(rand / (sharetime / 1000))
-                except:
+                except Exception:
                     hashrateCalculated = 1
                 try:
                     # If client submitted hashrate, use it for the API
                     hashrate = float(response[1])
                     hashrateEstimated = False
-                except:
+                except Exception:
                     # If not, use the calculation
                     hashrate = hashrateCalculated
                     hashrateEstimated = True
@@ -1448,7 +1503,7 @@ def handle(c, ip):
                     # Check miner software for unallowed characters
                     minerIdentifier = re.sub(
                         '[^A-Za-z0-9 .()-]+', ' ', response[3])
-                except:
+                except Exception:
                     minerUsed = "Unknown miner"
                     minerIdentifier = "None"
 
@@ -1457,7 +1512,7 @@ def handle(c, ip):
                     try:
                         shares_per_sec = minerapi[str(
                             threading.get_ident())]["Sharerate"] + 1
-                    except:
+                    except Exception:
                         shares_per_sec = 0
                     now = datetime.datetime.now()
                     lastsharetimestamp = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -1474,7 +1529,7 @@ def handle(c, ip):
                         "Software":     str(minerUsed),
                         "Identifier":   str(minerIdentifier),
                         "Last share timestamp": str(lastsharetimestamp)}
-                except:
+                except Exception:
                     pass
 
                 # If the received result was correct
@@ -1488,7 +1543,7 @@ def handle(c, ip):
                         if minerapi[str(threading.get_ident())]["Sharerate"] > max_shares_per_sec:
                             # If he did, throttle him
                             time.sleep(15)
-                    except:
+                    except Exception:
                         pass
 
                     reward = reward_multiplier * \
@@ -1514,19 +1569,19 @@ def handle(c, ip):
                         # Send feedback that block was found
                         try:
                             c.send(bytes("BLOCK\n", encoding="utf8"))
-                        except:
+                        except Exception:
                             break
                     else:
                         # Send feedback that result was correct
                         try:
                             c.send(bytes("GOOD\n", encoding="utf8"))
-                        except:
+                        except Exception:
                             break
 
                     try:
                         # Add username to the dict so it will be incremented in the next DB update
                         balancesToUpdate[username] += reward
-                    except:
+                    except Exception:
                         balancesToUpdate[username] = reward
 
                     # Increase global amount of shares and update block hash
@@ -1541,17 +1596,17 @@ def handle(c, ip):
                     try:
                         # Add username to the dict so it will be decremented in the next DB update
                         balancesToUpdate[username] += penalty
-                    except:
+                    except Exception:
                         balancesToUpdate[username] = penalty
 
                     try:
                         # Send feedback that incorrect result was received
                         c.send(bytes("BAD\n", encoding="utf8"))
-                    except:
+                    except Exception:
                         break
 
-            ######################################################################
             elif str(data[0]) == "LOGI":
+                """User login protocol"""
                 try:
                     username = str(data[1])
                     password = str(data[2]).encode('utf-8')
@@ -1578,7 +1633,7 @@ def handle(c, ip):
                             datab.execute(
                                 "SELECT * FROM Users WHERE username = ?", (str(username),))
                             stored_password = datab.fetchone()[1]
-                    except:
+                    except Exception:
                         # Disconnect user which username doesn't exist, close the connection
                         c.send(bytes("NO,This user doesn't exist", encoding='utf8'))
                         break
@@ -1597,7 +1652,7 @@ def handle(c, ip):
                             c.send(
                                 bytes("NO,Password is invalid", encoding='utf8'))
                             break
-                    except:
+                    except Exception:
                         try:
                             stored_password = str(
                                 stored_password).encode('utf-8')
@@ -1610,7 +1665,7 @@ def handle(c, ip):
                                 c.send(
                                     bytes("NO,Password is invalid", encoding='utf8'))
                                 break
-                        except:
+                        except Exception:
                             c.send(
                                 bytes("NO,This user doesn't exist", encoding='utf8'))
                             break
@@ -1620,8 +1675,8 @@ def handle(c, ip):
                         bytes("NO,You have used unallowed characters", encoding='utf8'))
                     break
 
-            ######################################################################
             elif str(data[0]) == "BALA" and str(username) != "":
+                """Balance return protocol"""
                 try:
                     while True:
                         try:
@@ -1634,13 +1689,13 @@ def handle(c, ip):
                                 # Send it as 20 digit float
                                 c.send(bytes(str(f'{float(balance):.20f}'), encoding="utf8"))
                                 break
-                        except:
+                        except Exception:
                             pass
-                except:
+                except Exception:
                     break
 
-            ######################################################################
             elif str(data[0]) == "REGI":
+                """New user registration protocol"""
                 try:
                     username = str(data[1])
                     unhashed_pass = str(data[2]).encode('utf-8')
@@ -1688,10 +1743,10 @@ def handle(c, ip):
                                                 duco_email, duco_password)
                                             smtpserver.sendmail(
                                                 duco_email, email, message.as_string())
-                                    except:
+                                    except Exception:
                                         adminLog(
                                             "duco", "Error sending registration email to " + email)
-                                except:
+                                except Exception:
                                     c.send(
                                         bytes("NO,Error registering user", encoding='utf8'))
                                     break
@@ -1708,8 +1763,8 @@ def handle(c, ip):
                         "NO,You have used unallowed characters or data is too long", encoding='utf8'))
                     break
 
-            ######################################################################
             elif str(data[0]) == "CHGP" and str(username) != "":
+                """Password change protocol"""
                 try:
                     oldPassword = data[1]
                     newPassword = data[2]
@@ -1721,7 +1776,7 @@ def handle(c, ip):
                     newPassword = newPassword.encode("utf-8")
                     newPassword_encrypted = bcrypt.hashpw(
                         newPassword, bcrypt.gensalt(rounds=4))
-                except:
+                except Exception:
                     c.send(bytes("NO,Bcrypt error", encoding="utf8"))
                     adminLog(
                         "duco", "Bcrypt error when changing password of user " + username)
@@ -1733,7 +1788,7 @@ def handle(c, ip):
                             "SELECT * FROM Users WHERE username = ?", (username,))
                         old_password_database = datab.fetchone()[1]
                     adminLog("duco", "Fetched old password")
-                except:
+                except Exception:
                     c.send(bytes("NO,Incorrect username", encoding="utf8"))
                     adminLog(
                         "duco", "Incorrect username reported, most likely a DB error")
@@ -1750,7 +1805,7 @@ def handle(c, ip):
                             try:
                                 c.send(
                                     bytes("OK,Your password has been changed", encoding='utf8'))
-                            except:
+                            except Exception:
                                 break
                     else:
                         adminLog("duco", "Passwords of user " +
@@ -1758,9 +1813,9 @@ def handle(c, ip):
                         try:
                             server.send(
                                 bytes("NO,Your old password doesn't match!", encoding='utf8'))
-                        except:
+                        except Exception:
                             break
-                except:
+                except Exception:
                     if bcrypt.checkpw(oldPassword, old_password_database) or oldPassword == duco_password.encode('utf-8'):
                         with sqlite3.connect(database, timeout=database_timeout) as conn:
                             datab = conn.cursor()
@@ -1772,18 +1827,18 @@ def handle(c, ip):
                             try:
                                 c.send(
                                     bytes("OK,Your password has been changed", encoding='utf8'))
-                            except:
+                            except Exception:
                                 break
                     else:
                         print("Passwords dont match")
                         try:
                             server.send(
                                 bytes("NO,Your old password doesn't match!", encoding='utf8'))
-                        except:
+                        except Exception:
                             break
 
-            ######################################################################
-            if str(data[0]) == "SEND" and str(username) != "":
+            elif str(data[0]) == "SEND" and str(username) != "":
+                """Sending funds protcol"""
                 try:
                     recipient = str(data[2])
                     amount = float(data[3])
@@ -1802,21 +1857,21 @@ def handle(c, ip):
                             balance = float(datab.fetchone()[3])
                             #adminLog("duco", "Read senders balance: " + str(balance))
                             break
-                    except:
+                    except Exception:
                         pass
 
                 if str(recipient) == str(username):
                     try:
                         c.send(
                             bytes("NO,You're sending funds to yourself", encoding='utf8'))
-                    except:
+                    except Exception:
                         break
                 if str(amount) == "" or str(recipient) == "" or float(balance) <= float(amount) or float(amount) <= 0:
                     try:
                         c.send(bytes("NO,Incorrect amount", encoding='utf8'))
                         adminLog(
                             "duco", "Incorrect amount supplied: " + str(amount))
-                    except:
+                    except Exception:
                         break
                 try:
                     with sqlite3.connect(database, timeout=database_timeout) as conn:
@@ -1839,7 +1894,7 @@ def handle(c, ip):
                                             conn.commit()
                                             #adminLog("duco", "Updated senders balance: " + str(balance))
                                             break
-                                    except:
+                                    except Exception:
                                         pass
                             while True:
                                 with lock:
@@ -1853,7 +1908,7 @@ def handle(c, ip):
                                                 datab.fetchone()[3])
                                             #adminLog("duco", "Read recipients balance: " + str(recipientbal))
                                             break
-                                    except:
+                                    except Exception:
                                         pass
                             recipientbal += float(amount)
                             while True:
@@ -1877,23 +1932,23 @@ def handle(c, ip):
                                         adminLog("duco", "Transferred " + str(round(amount, 2)) +
                                                  " DUCO from " + str(username) + " to " + str(recipient))
                                         break
-                                    except:
+                                    except Exception:
                                         pass
-                        except:
+                        except Exception:
                             try:
                                 c.send(
                                     bytes("NO,Error occured while sending funds", encoding='utf8'))
-                            except:
+                            except Exception:
                                 break
-                except:
+                except Exception:
                     try:
                         adminLog("duco", "Invalid recipient: " + recipient)
                         c.send(bytes("NO,Recipient doesn't exist", encoding='utf8'))
-                    except:
+                    except Exception:
                         break
 
-            ######################################################################
             elif str(data[0]) == "GTXL":
+                """Transactions involving specific user protocol"""
                 try:
                     username = str(data[1])
                     num = int(data[2])
@@ -1958,7 +2013,7 @@ def handle(c, ip):
                                     "nodes", "Updated NodeS Broker balance with: " + str(amount))
                                 c.send(bytes("YES,Successful", encoding='utf8'))
                                 break
-                        except:
+                        except Exception:
                             pass
 
             ######################################################################
@@ -2036,7 +2091,7 @@ def handle(c, ip):
                                      username)
                             c.send(bytes("YES,Successful", encoding='utf8'))
                             break
-                        except:
+                        except Exception:
                             pass
 
             ######################################################################
@@ -2057,14 +2112,14 @@ def handle(c, ip):
                                 "SELECT * FROM Users WHERE username = ?", (username,))
                             # Get current balance
                             balance = float(datab.fetchone()[3])
-                    except:
+                    except Exception:
                         c.send(bytes("NO,Can't check balance", encoding='utf8'))
                         break
 
                     if float(balance) < float(amount) or float(amount) <= 0:
                         try:
                             c.send(bytes("NO,Incorrect amount", encoding='utf8'))
-                        except:
+                        except Exception:
                             break
                     elif float(balance) >= float(amount) and float(amount) > 0:
                         if float(amount) < 10:
@@ -2072,7 +2127,7 @@ def handle(c, ip):
                                 c.send(
                                     bytes("NO,minimum amount is 10 DUCO", encoding="utf8"))
                                 adminLog("wrapper", "Amount is below 10 DUCO")
-                            except:
+                            except Exception:
                                 break
                         else:
                             balancebackup = balance
@@ -2117,9 +2172,9 @@ def handle(c, ip):
                                                 tranconn.commit()
                                             c.send(
                                                 bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
-                                        except:
+                                        except Exception:
                                             pass
-                                    except:
+                                    except Exception:
                                         break
                                 else:
                                     try:
@@ -2127,9 +2182,9 @@ def handle(c, ip):
                                             "UPDATE Users set balance = ? where username = ?", (balancebackup, username))
                                         c.send(
                                             bytes("NO,Unknown error, transaction reverted", encoding="utf8"))
-                                    except:
+                                    except Exception:
                                         pass
-                            except:
+                            except Exception:
                                 pass
                     else:
                         c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
@@ -2153,7 +2208,7 @@ def handle(c, ip):
                                 # Get current balance
                                 balance = float(datab.fetchone()[3])
                                 break
-                        except:
+                        except Exception:
                             pass
                     print("Balance retrieved")
                     wbalance = float(
@@ -2174,7 +2229,7 @@ def handle(c, ip):
                                                 "UPDATE Users set balance = ? where username = ?", (balance, username))
                                             conn.commit()
                                             break
-                                    except:
+                                    except Exception:
                                         pass
                                 try:
                                     adminLog(
@@ -2200,7 +2255,7 @@ def handle(c, ip):
                                                 tranconn.commit()
                                             c.send(
                                                 bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
-                                        except:
+                                        except Exception:
                                             pass
                                     else:
                                         while True:
@@ -2211,30 +2266,30 @@ def handle(c, ip):
                                                         "UPDATE Users set balance = ? where username = ?", (balancebackup, username))
                                                     conn.commit()
                                                     break
-                                            except:
+                                            except Exception:
                                                 pass
-                                except:
+                                except Exception:
                                     adminLog(
                                         "unwrapper", "Error with Tron blockchain")
                                     try:
                                         c.send(
                                             bytes("NO,error with Tron blockchain", encoding="utf8"))
                                         break
-                                    except:
+                                    except Exception:
                                         break
                             else:
                                 try:
                                     c.send(
                                         bytes("NO,Minimum amount is 10", encoding="utf8"))
-                                except:
+                                except Exception:
                                     break
                 else:
                     adminLog("unwrapper", "Wrapper disabled")
                     try:
                         c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
-                    except:
+                    except Exception:
                         break
-        except:
+        except Exception:
             break
 
     # These things execute when user disconnects/exits the main loop
@@ -2271,7 +2326,7 @@ def unbanip(ip):
     try:
         os.system("sudo iptables -D INPUT -s "+str(ip)+" -j DROP")
         adminLog("bans", "Unbanning IP: " + ip)
-    except:
+    except Exception:
         pass
 
 
@@ -2282,7 +2337,7 @@ def ban(ip):
         # Start auto-unban thread for this IP
         threading.Timer(30.0, unbanip, [ip]).start()
         IPS.pop(ip)
-    except:
+    except Exception:
         pass
 
 
@@ -2294,7 +2349,7 @@ def countips():
                 if IPS[ip] > max_unauthorized_connections and not ip in whitelisted_ip:
                     adminLog("bans", "Banning DDoSing IP: " + ip)
                     ban(ip)
-            except:
+            except Exception:
                 pass
         time.sleep(5)
 
@@ -2313,7 +2368,7 @@ def shares_per_sec_timer():
         for miner in minerapi.copy():
             try:
                 minerapi[miner]["Sharerate"] = 0
-            except:
+            except Exception:
                 pass
         time.sleep(shares_per_sec_reset)
 
@@ -2397,11 +2452,11 @@ if __name__ == '__main__':
             c, addr = s.accept()  # Establish connection with client
             try:
                 IPS[addr[0]] += 1
-            except:
+            except Exception:
                 IPS[addr[0]] = 1
 
             # Start a new thread
-            start_new_thread(handle, (c, addr[0]))  
+            start_new_thread(handle, (c, addr[0]))
 
             IPS[addr[0]] -= 1
             if IPS[addr[0]] <= 0:
