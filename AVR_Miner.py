@@ -25,7 +25,10 @@ from signal import signal, SIGINT
 def install(package):
     # Install pip package automatically
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-    os.execl(sys.executable, sys.executable, *sys.argv)
+    if os.name == "nt":
+        os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
+    else:
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 def now():
@@ -252,6 +255,7 @@ def Connect():
                 + Style.RESET_ALL)
             debugOutput("Connection error: " + str(e))
             time.sleep(10)
+            restart_miner()
     return socId
 
 
@@ -588,9 +592,15 @@ def restart_miner():
     try:
         if donatorrunning:
             donateExecutable.terminate()
-        os.execl(sys.executable, sys.executable, *sys.argv)
-    except Exception:
-        print("Permission error when restarting miner")
+    except Exception as e:
+        print("Error closing donate executable: " + str(e))
+    try:
+        if os.name == "nt":
+            os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
+        else:
+            os.execl(sys.executable, sys.executable, *sys.argv)
+    except Exception as e:
+        print("Error when restarting miner: " + str(e))
 
 
 def Donate():
@@ -848,6 +858,7 @@ def AVRMine(com):
                         + getString("connecting_error")
                         + Style.RESET_ALL)
                     debugOutput("Connection error: " + str(e))
+                    time.sleep(10)
                     restart_miner()
 
             while True:
@@ -866,11 +877,12 @@ def AVRMine(com):
 
                         # Read the result
                         result = comConnection.readline().decode()
+                        # print(repr(result))
                         result = result.rstrip("\n").split(",")
 
                         if result != "" and result != " ":
-                            debugOutput("Received from AVR: " +
-                                        " ".join(result))
+                            debugOutput("Received from AVR: "
+                                        + " ".join(result))
                             break
                         else:
                             raise Exception("Empty data")
