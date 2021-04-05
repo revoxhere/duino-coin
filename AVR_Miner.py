@@ -37,7 +37,7 @@ try:
     # Check if pyserial is installed
     import serial
     import serial.tools.list_ports
-except:
+except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
         + 'Pyserial is not installed. '
@@ -49,7 +49,7 @@ except:
 try:
     # Check if colorama is installed
     from colorama import init, Fore, Back, Style
-except:
+except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
         + 'Colorama is not installed. '
@@ -61,7 +61,7 @@ except:
 try:
     # Check if requests is installed
     import requests
-except:
+except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
         + 'Requests is not installed. '
@@ -73,11 +73,11 @@ except:
 try:
     # Check if pypresence is installed
     from pypresence import Presence
-except:
+except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
         + 'Pypresence is not installed. '
-        + 'Wallet will try to install it. '
+        + 'Miner will try to install it. '
         + 'If it fails, please manually install "pypresence" python3 package.'
         + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
     install("pypresence")
@@ -115,7 +115,7 @@ if not Path(resourcesFolder + "/langs.json").is_file():
         f.write(r.content)
 
 # Load language file
-with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
+with open(resourcesFolder + "/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = json.load(lang_file)
 
 # OS X invalid locale hack
@@ -138,12 +138,12 @@ if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
         lang = "french"
     else:
         lang = "english"
-# Read language from configfile
 else:
     try:
+        # Read language from configfile
         config.read(resourcesFolder + "/Miner_config.cfg")
         lang = config["arduminer"]["language"]
-    except:
+    except Exception:
         # If it fails, fallback to english
         lang = "english"
 
@@ -180,10 +180,12 @@ def Connect():
         try:
             try:
                 socket.close()
-            except:
+            except Exception:
                 pass
-            debugOutput("Connecting to " + str(masterServer_address) +
-                        str(":") + str(masterServer_port))
+            debugOutput("Connecting to " 
+                + str(masterServer_address) 
+                + str(":") 
+                + str(masterServer_port))
             socId = socket.socket()
             # Establish socket connection to the server
             socId.connect((str(masterServer_address), int(masterServer_port)))
@@ -233,7 +235,7 @@ def Connect():
                     + getString("update_warning"))
                 time.sleep(10)
                 break
-        except:
+        except Exception:
             print(
                 now().strftime(
                     Style.DIM
@@ -259,16 +261,15 @@ def connectToAVR(com):
         try:
             # Close previous serial connections (if any)
             comConnection.close()
-        except:
+        except Exception:
             pass
+
         try:
             # Establish serial connection
             comConnection = serial.Serial(
                 com,
                 baudrate=115200,
-                timeout=5,
-                write_timeout=1,
-                inter_byte_timeout=1)
+                timeout=5)
             print(
                 now().strftime(
                     Style.RESET_ALL
@@ -289,10 +290,9 @@ def connectToAVR(com):
                 + getString("board_is_connected")
                 + Style.RESET_ALL)
             return comConnection
-        except:
-            debugOutput("Error connecting to AVR")
-            if debug == "y":
-                raise
+
+        except Exception as e:
+            debugOutput("Error connecting to AVR: " + str(e))
             print(
                 now().strftime(
                     Style.DIM
@@ -316,8 +316,7 @@ def connectToAVR(com):
 
 def handler(signal_received, frame):
     # SIGINT handler
-    print(
-        "\n"
+    print("\n"
         + now().strftime(
             Style.RESET_ALL
             + Style.DIM
@@ -334,7 +333,7 @@ def handler(signal_received, frame):
         + getString("goodbye"))
     try:
         socket.close()
-    except:
+    except Exception:
         pass
     os._exit(0)
 
@@ -589,17 +588,16 @@ def Greeting():
 def restart_miner():
     try:
         if donatorrunning:
-            try:
-                donateExecutable.terminate()
-            except:
-                pass
+            donateExecutable.terminate()
         os.execl(sys.executable, sys.executable, *sys.argv)
-    except:
-        print("Permission error")
+    except Exception:
+        print("Permission error when restarting miner")
 
 
 def Donate():
-    global donationlevel, donatorrunning, donateExecutable
+    global donationlevel
+    global donatorrunning
+    global donateExecutable
     if os.name == "nt":
         cmd = (
             "cd "
@@ -680,7 +678,8 @@ def initRichPresence():
         RPC = Presence(808056068113563701)
         RPC.connect()
         debugOutput("Discord rich presence initialized")
-    except:  # Discord not launched
+    except Exception:
+        # Discord not launched
         pass
 
 
@@ -705,14 +704,19 @@ def updateRichPresence():
                      "url": "https://duinocoin.com"},
                     {"label": "Discord Server",
                      "url": "https://discord.gg/k48Ht5y"}])
-        except:  # Discord not launched
+        except Exception:
+            # Discord not launched
             pass
-        time.sleep(15)  # 15 seconds to respect discord's rate limit
+        # 15 seconds to respect Discord's rate limit
+        time.sleep(15)  
 
 
 def AVRMine(com):
     # Mining section
-    global hash_count, hashrate, masterServer_address, masterServer_port
+    errorCounter = 0
+    global hashrate
+    global masterServer_address
+    global masterServer_port
     while True:
         # Grab server IP and port
         while True:
@@ -729,8 +733,11 @@ def AVRMine(com):
                         + masterServer_address
                         + ":"
                         + str(masterServer_port))
+                    # Connect to the server
+                    socId = Connect()
                     break
-            except:  # If there was an error with grabbing data from GitHub
+            except Exception:
+                # If there was an error with grabbing data from GitHub
                 print(
                     now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
                     + Style.BRIGHT
@@ -747,8 +754,6 @@ def AVRMine(com):
                 time.sleep(10)
 
         while True:
-            # Connect to the server
-            socId = Connect()
             try:
                 # Connect to the serial port
                 comConnection = connectToAVR(com)
@@ -770,7 +775,8 @@ def AVRMine(com):
                     + str(com)
                     + ")")
                 break
-            except:
+
+            except Exception:
                 print(
                     now().strftime(Style.DIM + "%H:%M:%S ")
                     + Style.RESET_ALL
@@ -788,7 +794,7 @@ def AVRMine(com):
             while True:
                 try:
                     # Send job request
-                    debugOutput("Requested job")
+                    debugOutput("Requested job from the server")
                     socId.send(
                         bytes(
                             "JOB,"
@@ -796,8 +802,10 @@ def AVRMine(com):
                             + ","
                             + str(requestedDiff),
                             encoding="utf8"))
-                    job = socId.recv(85).decode().rstrip("\n")  # Retrieve work
-                    job = job.split(",")  # Split received data
+                    # Retrieve work
+                    job = socId.recv(85).decode()
+                    # Split received data
+                    job = job.rstrip("\n").split(",")  
 
                     # Check if username is correct
                     if job[1] == "This user doesn't exist":
@@ -821,12 +829,12 @@ def AVRMine(com):
                             + getString("mining_not_exist_warning"))
                         time.sleep(10)
 
-                    # If job received, continue
+                    # If job was received, continue
                     elif job[0] and job[1] and job[2]:
                         diff = int(job[2])
-                        debugOutput("Job received: " + str(job))
+                        debugOutput("Job received: " + " ".join(job))
                         break
-                except:
+                except Exception:
                     print(
                         now().strftime(
                             Style.DIM
@@ -843,12 +851,13 @@ def AVRMine(com):
                         + Style.RESET_ALL)
                     if debug == "y":
                         raise
-                    restart_miner()
+                    # Reconnect to the server
+                    socId = Connect()
 
             while True:
-                # Write data to AVR board
                 while True:
                     try:
+                        # Write data to AVR board
                         comConnection.write(bytes(
                             str(job[0]
                                 + ","
@@ -858,57 +867,41 @@ def AVRMine(com):
                                 + ","),
                             encoding="utf8"))
                         debugOutput("Sent job to AVR")
-                        break
-                    except:
-                        try:
-                            comConnection.close()
-                        except:
-                            pass
-                        comConnection = connectToAVR(com)
-                        debugOutput("Reconnecting to avr")
-
-                wrong_results = 0
-                while True:
-                    if wrong_results > 5:
-                        wrong_avr_result = False
-                        print(
-                            now().strftime(
-                                Style.DIM
-                                + "%H:%M:%S ")
-                            + Style.RESET_ALL
-                            + Style.BRIGHT
-                            + Back.GREEN
-                            + Fore.WHITE
-                            + " sys0 "
-                            + Back.RESET
-                            + Fore.RED
-                            + getString("mining_avr_not_responding"))
-                        try:
-                            restart_miner()
-                        except:
-                            print("Permission error")
-                    try:
+                        
                         # Read the result
-                        result = comConnection.read_until('\n')
-                        debugOutput("Received from AVR: " + str(result))
-                    except:
-                        restart_miner()
-                    import traceback
-                    try:
-                        result = result.decode().rstrip("\n")
-                        if result == "":
-                            debugOutput("Retrying reading")
-                            wrong_results += 1
-                        else:
+                        result = comConnection.readline().decode()
+                        result = result.rstrip("\n").split(",")
+
+                        if result != "" and result != " ":
+                            debugOutput("Received from AVR: " + " ".join(result))
                             break
-                    except Exception:
-                        restart_miner()
+                        else:
+                            raise Exception("Empty data")
+
+                    except Exception as e:
+                        debugOutput("Exception when reading/writing to serial: " + str(e))
+                        errorCounter += 1
+                        if errorCounter >= 5:
+                            debugOutput("Reconnecting to AVR because of too many errors")
+                            print(
+                                now().strftime(Style.DIM + "%H:%M:%S ")
+                                + Style.RESET_ALL
+                                + Style.BRIGHT
+                                + Back.MAGENTA
+                                + Fore.WHITE
+                                + " usb"
+                                + str(''.join(filter(str.isdigit, com)))
+                                + " "
+                                + Back.RESET
+                                + Fore.RED
+                                + getString("mining_avr_not_responding"))
+                            comConnection = connectToAVR(com)
+                            errorCounter = 0
+                        time.sleep(1)
 
                 try:
-                    result = result.split(",")
                     debugOutput("Received result (" + str(result[0]) + ")")
                     debugOutput("Received time (" + str(result[1]) + ")")
-                    debugOutput("Received chip ID (" + str(result[2]) + ")")
                     ducos1result = result[0]
                     # Convert AVR time to seconds
                     computetime = round(int(result[1]) / 1000000, 3)
@@ -916,9 +909,15 @@ def AVRMine(com):
                     hashrate = round(
                         int(result[0]) / int(result[1]) * 1000000, 2)
                     debugOutput("Calculated hashrate (" + str(hashrate) + ")")
-                    chipID = result[2]
-                except:
+                    try:
+                        chipID = result[2]
+                        debugOutput("Received chip ID (" + str(result[2]) + ")")
+                    except IndexError:
+                        chipID = "None"
+                except Exception as e:
+                    debugOutput("Error splitting data: " + str(e))
                     break
+
                 try:
                     # Send result to the server
                     socId.send(
@@ -926,14 +925,14 @@ def AVRMine(com):
                             str(ducos1result)
                             + ","
                             + str(hashrate)
-                            + ",Official AVR Miner v"
+                            + ",Official AVR Miner (DUCO-S1A) v"
                             + str(minerVersion)
                             + ","
                             + str(rigIdentifier)
                             + ","
                             + str(chipID),
                             encoding="utf8"))
-                except:
+                except Exception:
                     print(
                         now().strftime(
                             Style.DIM
@@ -962,12 +961,11 @@ def AVRMine(com):
                         # Measure server ping
                         timeDelta = (responsetimestop -
                                      responsetimetart).microseconds
-                        ping = str(int(timeDelta / 1000))
-                        feedback_not_received = False
-                        debugOutput("Successfully retrieved feedback")
+                        ping = round(timeDelta / 1000)
+                        debugOutput("Successfully retrieved feedback: " + str(feedback) + " with ping: " + str(ping))
                         break
-                    except:
-                        raise
+                    except Exception:
+                        print("Error parsing response: " + str(e) + ", restarting miner")
                         restart_miner()
 
                 if feedback == "GOOD":
@@ -1003,7 +1001,8 @@ def AVRMine(com):
                         + Back.RESET
                         + Fore.YELLOW
                         + " ("
-                        + str(int((shares[0] / (shares[0] + shares[1]) * 100)))
+                        + str(int((shares[0] 
+                            / (shares[0] + shares[1]) * 100)))
                         + "%)"
                         + Style.NORMAL
                         + Fore.WHITE
@@ -1061,7 +1060,8 @@ def AVRMine(com):
                         + Back.RESET
                         + Fore.YELLOW
                         + " ("
-                        + str(int((shares[0] / (shares[0] + shares[1]) * 100)))
+                        + str(int((shares[0] 
+                            / (shares[0] + shares[1]) * 100)))
                         + "%)"
                         + Style.NORMAL
                         + Fore.WHITE
@@ -1119,7 +1119,8 @@ def AVRMine(com):
                         + Back.RESET
                         + Fore.YELLOW
                         + " ("
-                        + str(int((shares[0] / (shares[0] + shares[1]) * 100)))
+                        + str(int((shares[0] 
+                            / (shares[0] + shares[1]) * 100)))
                         + "%)"
                         + Style.NORMAL
                         + Fore.WHITE
@@ -1146,12 +1147,16 @@ def AVRMine(com):
 
 
 if __name__ == "__main__":
-    init(autoreset=True)  # Colorama
+    # Colorama
+    init(autoreset=True)  
+    # Window title
     title(getString("duco_avr_miner") + str(minerVersion) + ")")
+
     try:
-        loadConfig()  # Load config file or create new one
+        # Load config file or create new one
+        loadConfig()  
         debugOutput("Config file loaded")
-    except:
+    except Exception:
         print(
             now().strftime(Style.DIM + "%H:%M:%S ")
             + Style.RESET_ALL
@@ -1166,21 +1171,22 @@ if __name__ == "__main__":
             + resourcesFolder
             + getString("load_config_error_warning")
             + Style.RESET_ALL)
-        if debug == "y":
-            raise
+        debugOutput("Error reading configfile: " + str(e))
         time.sleep(10)
         os._exit(1)
+
     try:
-        Greeting()  # Display greeting message
+        # Display greeting message
+        Greeting()  
         debugOutput("Greeting displayed")
-    except:
-        if debug == "y":
-            raise
+    except Exception as e:
+        debugOutput("Error displaying greeting message: " + str(e))
+
     try:
-        Donate()  # Start donation thread
-    except:
-        if debug == "y":
-            raise
+        # Start donation thread
+        Donate()  
+    except Exception as e:
+        debugOutput("Error launching donation thread: " + str(e))
 
     try:
         # Launch avr duco mining threads
@@ -1188,14 +1194,14 @@ if __name__ == "__main__":
             threading.Thread(
                 target=AVRMine,
                 args=(port,)).start()
-    except:
-        raise
+    except Exception as e:
+        debugOutput("Error launching AVR thead(s): " + str(e))
 
-    # Discord rich presence threads
+    
     try:
+        # Discord rich presence threads
         initRichPresence()
         threading.Thread(
             target=updateRichPresence).start()
-    except:
-        if debug == "y":
-            raise
+    except Exception as e:
+        debugOutput("Error launching Discord RPC thead: " + str(e))
