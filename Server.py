@@ -79,6 +79,7 @@ try:  # Read sensitive data from config file
     duco_email = config["main"]["duco_email"]
     duco_password = config["main"]["duco_password"]
     NodeS_Overide = config["main"]["NodeS_Overide"]
+    PoolPassword = config["main"]["PoolPassword"]
     wrapper_private_key = config["main"]["wrapper_private_key"]
     NodeS_Username = config["main"]["NodeS_Username"]
     emailchecker_private_key = config["main"]["emailchecker_private_key"]
@@ -90,6 +91,7 @@ except Exception:
         duco_email = ???
         duco_password = ???
         NodeS_Overide = ???
+        PoolPassword = ???
         wrapper_private_key = ???
         NodeS_Username = ???
         emailchecker_private_key = ???""")
