@@ -78,7 +78,7 @@ You can use one of the following links to get some data from Duino-Coin Server:
          }
         ```
 
-*   User balances API refreshed every 30s
+*   User balances API refreshed every 10s
     *   HTTPS: `https://server.duinocoin.com/balances.json`
     *   HTTP: `http://51.15.127.80/balances.json`
     *   Small part of the response:
@@ -93,7 +93,7 @@ You can use one of the following links to get some data from Duino-Coin Server:
         ```
         Note: only users who have account balance greater than 0 are listed in this API.
         
-*   Transactions API refreshed every 30s
+*   Transactions API refreshed every 10s
     *   HTTPS: `https://server.duinocoin.com/transactions.json`
     *   HTTP: `http://51.15.127.80/transactions.json`
     *   Small part of the response:
