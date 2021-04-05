@@ -37,6 +37,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   // Open serial port
   Serial.begin(115200);
+  Serial.setTimeout(5000);
   // Grab Arduino chip ID
   for (size_t i = 0; i < 8; i++)
     IDstring += UniqueID[i];
