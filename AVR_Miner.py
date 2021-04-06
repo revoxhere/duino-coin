@@ -6,34 +6,35 @@
 # © Duino-Coin Community 2019-2021
 ##########################################
 # Import libraries
-import socket
-import threading
-import time
-import sys
-import os
-import re
-import subprocess
-import configparser
-import datetime
-import locale
-import json
-import platform
+from socket import socket, close
+from threading import Thread
+from time import sleep, time, ctime, strptime
+from os import execl, path, system, mkdir, _exit
+from os import name as osname
+from re import sub
+from subprocess import Popen, check_call, DEVNULL
+from configparser import ConfigParser
+from datetime import datetime
+from locale import getlocale, setlocale, getdefaultlocale, LC_ALL
+from json import load as jsonload
+from platform import system
 from pathlib import Path
 from signal import signal, SIGINT
+import sys
 
 
 def install(package):
     # Install pip package automatically
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-    if os.name == "nt":
-        os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
+    check_call([sys.executable, "-m", "pip", "install", package])
+    if osname == "nt":
+        execl(sys.executable, path.abspath(__file__), *sys.argv)
     else:
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        execl(sys.executable, sys.executable, *sys.argv)
 
 
 def now():
     # Return datetime object
-    return datetime.datetime.now()
+    return datetime.now()
 
 
 try:
@@ -99,13 +100,13 @@ rigIdentifier = "None"
 serveripfile = ("https://raw.githubusercontent.com/"
                 + "revoxhere/"
                 + "duino-coin/gh-pages/serverip.txt")
-config = configparser.ConfigParser()
+config = ConfigParser()
 donationlevel = 0
 hashrate = 0
 
 # Create resources folder if it doesn't exist
-if not os.path.exists(resourcesFolder):
-    os.mkdir(resourcesFolder)
+if not path.exists(resourcesFolder):
+    mkdir(resourcesFolder)
 
 # Check if languages file exists
 if not Path(resourcesFolder + "/langs.json").is_file():
@@ -119,16 +120,16 @@ if not Path(resourcesFolder + "/langs.json").is_file():
 
 # Load language file
 with open(resourcesFolder + "/langs.json", "r", encoding="utf8") as lang_file:
-    lang_file = json.load(lang_file)
+    lang_file = jsonload(lang_file)
 
 # OS X invalid locale hack
-if platform.system() == 'Darwin':
-    if locale.getlocale()[0] is None:
-        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+if system() == 'Darwin':
+    if getlocale()[0] is None:
+        setlocale(LC_ALL, 'en_US.UTF-8')
 
 # Check if miner is configured, if it isn't, autodetect language
 if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
-    locale = locale.getdefaultlocale()[0]
+    locale = getdefaultlocale()[0]
     if locale.startswith("es"):
         lang = "spanish"
     elif locale.startswith("sk"):
@@ -173,8 +174,8 @@ def debugOutput(text):
 
 def title(title):
     # Window title
-    if os.name == "nt":
-        os.system("title " + title)
+    if osname == "nt":
+        system("title " + title)
     else:
         print("\33]0;" + title + "\a", end="")
         sys.stdout.flush()
@@ -194,7 +195,7 @@ def Connect():
                         + str(masterServer_address)
                         + str(":")
                         + str(masterServer_port))
-            socConn = socket.socket()
+            socConn = socket()
             # Establish socket connection to the server
             socConn.connect(
                 (str(masterServer_address), int(masterServer_port)))
@@ -226,7 +227,7 @@ def Connect():
                     + Fore.RESET
                     + getString("update_warning"),
                     "warning")
-                time.sleep(10)
+                sleep(10)
                 break
         except Exception as e:
             prettyPrint(
@@ -235,9 +236,10 @@ def Connect():
                 + Style.NORMAL
                 + " ("
                 + str(e)
-                + ")")
+                + ")",
+                "error")
             debugOutput("Connection error: " + str(e))
-            time.sleep(10)
+            sleep(10)
             restart_miner()
     return socConn
 
@@ -281,7 +283,7 @@ def handler(signal_received, frame):
         socket.close()
     except Exception:
         pass
-    os._exit(0)
+    _exit(0)
 
 
 # Enable signal handler
@@ -383,7 +385,7 @@ def loadConfig():
             rigIdentifier = "None"
 
         donationlevel = "0"
-        if os.name == "nt" or os.name == "posix":
+        if osname == "nt" or osname == "posix":
             donationlevel = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
@@ -392,7 +394,7 @@ def loadConfig():
                 + Style.BRIGHT)
 
         # Check wheter donationlevel is correct
-        donationlevel = re.sub("\D", "", donationlevel)
+        donationlevel = sub("\D", "", donationlevel)
         if donationlevel == '':
             donationlevel = 1
         if float(donationlevel) > int(5):
@@ -434,7 +436,7 @@ def Greeting():
     global greeting
     print(Style.RESET_ALL)
 
-    current_hour = time.strptime(time.ctime(time.time())).tm_hour
+    current_hour = strptime(ctime(time())).tm_hour
 
     if current_hour < 12:
         greeting = getString("greeting_morning")
@@ -482,7 +484,7 @@ def Greeting():
         + Fore.YELLOW
         + " ".join(avrport))
 
-    if os.name == "nt" or os.name == "posix":
+    if osname == "nt" or osname == "posix":
         print(
             Style.DIM
             + Fore.MAGENTA
@@ -530,7 +532,7 @@ def Greeting():
         + str(username)
         + "!\n")
 
-    if os.name == "nt":
+    if osname == "nt":
         # Initial miner executable section
         if not Path(resourcesFolder + "/Donate_executable.exe").is_file():
             debugOutput(
@@ -542,7 +544,7 @@ def Greeting():
             r = requests.get(url)
             with open(resourcesFolder + "/Donate_executable.exe", "wb") as f:
                 f.write(r.content)
-    elif os.name == "posix":
+    elif osname == "posix":
         # Initial miner executable section
         if not Path(resourcesFolder + "/Donate_executable").is_file():
             debugOutput(
@@ -571,10 +573,10 @@ def restart_miner():
             + ")",
             "error")
     try:
-        if os.name == "nt":
-            os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
+        if osname == "nt":
+            execl(sys.executable, path.abspath(__file__), *sys.argv)
         else:
-            os.execl(sys.executable, sys.executable, *sys.argv)
+            execl(sys.executable, sys.executable, *sys.argv)
     except Exception as e:
         prettyPrint(
             "sys0",
@@ -590,7 +592,7 @@ def Donate():
     global donatorrunning
     global donateExecutable
 
-    if os.name == "nt":
+    if osname == "nt":
         cmd = (
             "cd "
             + resourcesFolder
@@ -599,7 +601,7 @@ def Donate():
             + "-u revox.donate "
             + "-p x -s 4 -e ")
 
-    elif os.name == "posix":
+    elif osname == "posix":
         cmd = (
             "cd "
             + resourcesFolder
@@ -620,7 +622,7 @@ def Donate():
             + Fore.YELLOW
             + getString("learn_more_donate"),
             "warning")
-        time.sleep(10)
+        sleep(10)
 
     elif donatorrunning == False:
         if int(donationlevel) == 5:
@@ -637,8 +639,8 @@ def Donate():
             debugOutput(getString("starting_donation"))
             donatorrunning = True
             # Launch CMD as subprocess
-            donateExecutable = subprocess.Popen(
-                cmd, shell=True, stderr=subprocess.DEVNULL)
+            donateExecutable = Popen(
+                cmd, shell=True, stderr=DEVNULL)
             prettyPrint(
                 "sys0",
                 getString("thanks_donation"),
@@ -659,7 +661,7 @@ def initRichPresence():
 
 def updateRichPresence():
     # Update rich presence status
-    startTime = int(time.time())
+    startTime = int(time())
     while True:
         try:
             RPC.update(
@@ -682,7 +684,7 @@ def updateRichPresence():
             # Discord not launched
             pass
         # 15 seconds to respect Discord's rate limit
-        time.sleep(15)
+        sleep(15)
 
 
 def prettyPrint(messageType, message, state):
@@ -757,7 +759,7 @@ def AVRMine(com):
                     + ")",
                     "error")
                 debugOutput("GitHub error: " + str(e))
-                time.sleep(10)
+                sleep(10)
 
         while True:
             try:
@@ -786,7 +788,7 @@ def AVRMine(com):
                     + str(e)
                     + ")",
                     "error")
-                time.sleep(10)
+                sleep(10)
 
         while True:
             while True:
@@ -817,7 +819,7 @@ def AVRMine(com):
                             + Fore.RESET
                             + getString("mining_not_exist_warning"),
                             "error")
-                        time.sleep(10)
+                        sleep(10)
 
                     # If job was received, continue
                     elif job[0] and job[1] and job[2]:
@@ -836,7 +838,7 @@ def AVRMine(com):
                         + ")",
                         "error")
                     debugOutput("Connection error: " + str(e))
-                    time.sleep(10)
+                    sleep(10)
                     restart_miner()
 
             while True:
@@ -884,7 +886,7 @@ def AVRMine(com):
                             errorCounter = 0
                         debugOutput(
                             "Exception with to serial: " + str(e))
-                        time.sleep(1)
+                        sleep(1)
 
                 try:
                     debugOutput("Received result (" + str(result[0]) + ")")
@@ -896,6 +898,9 @@ def AVRMine(com):
                     hashrate = round(
                         int(result[0]) / int(result[1]) * 1000000, 2)
                     debugOutput("Calculated hashrate (" + str(hashrate) + ")")
+                    if int(hashrate) > 1000:
+                        raise Exception(
+                            "Response too fast - possible AVR error")
                     try:
                         chipID = result[2]
                         debugOutput(
@@ -930,7 +935,7 @@ def AVRMine(com):
                         + ")",
                         "error")
                     debugOutput("Error splitting data: " + str(e))
-                    time.sleep(1)
+                    sleep(1)
                     break
 
                 try:
@@ -959,7 +964,7 @@ def AVRMine(com):
                         + ")",
                         "error")
                     debugOutput("Connection error: " + str(e))
-                    time.sleep(10)
+                    sleep(10)
                     restart_miner()
 
                 while True:
@@ -988,7 +993,7 @@ def AVRMine(com):
                             "error")
                         debugOutput("Error parsing response: " +
                                     str(e) + ", restarting miner")
-                        time.sleep(1)
+                        sleep(1)
                         restart_miner()
 
                 if feedback == "GOOD":
@@ -1184,8 +1189,8 @@ if __name__ == "__main__":
             + ")",
             "error")
         debugOutput("Error reading configfile: " + str(e))
-        time.sleep(10)
-        os._exit(1)
+        sleep(10)
+        _exit(1)
 
     try:
         # Display greeting message
@@ -1203,7 +1208,7 @@ if __name__ == "__main__":
     try:
         # Launch avr duco mining threads
         for port in avrport:
-            threading.Thread(
+            Thread(
                 target=AVRMine,
                 args=(port,)).start()
     except Exception as e:
@@ -1212,7 +1217,7 @@ if __name__ == "__main__":
     try:
         # Discord rich presence threads
         initRichPresence()
-        threading.Thread(
+        Thread(
             target=updateRichPresence).start()
     except Exception as e:
         debugOutput("Error launching Discord RPC thead: " + str(e))
