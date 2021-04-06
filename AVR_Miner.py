@@ -6,8 +6,8 @@
 # © Duino-Coin Community 2019-2021
 ##########################################
 # Import libraries
-from socket import socket, close
-from threading import Thread
+from socket import socket
+from threading import Thread as thrThread
 from time import sleep, time, ctime, strptime
 from os import execl, path, system, mkdir, _exit
 from os import name as osname
@@ -175,8 +175,10 @@ def debugOutput(text):
 def title(title):
     # Window title
     if osname == "nt":
+        # Windows systems
         system("title " + title)
     else:
+        # Most standard terminals
         print("\33]0;" + title + "\a", end="")
         sys.stdout.flush()
 
@@ -899,8 +901,7 @@ def AVRMine(com):
                         int(result[0]) / int(result[1]) * 1000000, 2)
                     debugOutput("Calculated hashrate (" + str(hashrate) + ")")
                     if int(hashrate) > 1000:
-                        raise Exception(
-                            "Response too fast - possible AVR error")
+                        raise Exception("Response too fast - possible AVR error")
                     try:
                         chipID = result[2]
                         debugOutput(
@@ -1208,7 +1209,7 @@ if __name__ == "__main__":
     try:
         # Launch avr duco mining threads
         for port in avrport:
-            Thread(
+            thrThread(
                 target=AVRMine,
                 args=(port,)).start()
     except Exception as e:
@@ -1217,7 +1218,7 @@ if __name__ == "__main__":
     try:
         # Discord rich presence threads
         initRichPresence()
-        Thread(
+        thrThread(
             target=updateRichPresence).start()
     except Exception as e:
         debugOutput("Error launching Discord RPC thead: " + str(e))
