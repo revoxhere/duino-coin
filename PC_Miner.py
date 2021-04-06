@@ -665,7 +665,6 @@ def ducos1xxh(
             return [ducos1xxres, hashrate]
 
 
-# Mining section for every thread
 def Thread(
         threadid,
         accepted,
@@ -677,6 +676,7 @@ def Thread(
         rigIdentifier,
         algorithm,
         hashrates_list):
+    # Mining section for every thread
     while True:
         # Grab server IP and port
         while True:
@@ -1042,6 +1042,7 @@ def Thread(
                                 + " cpu"
                                 + str(threadid)
                                 + " "
+                                + Style.BRIGHT
                                 + Back.RESET
                                 + Fore.RED
                                 + " ✗"
@@ -1085,7 +1086,7 @@ def Thread(
                     getString("error_while_mining")
                     + Style.NORMAL
                     + Fore.RESET
-                    + " ("
+                    + " (mining err: "
                     + str(e)
                     + ")",
                     "error")
@@ -1186,12 +1187,14 @@ if __name__ == "__main__":
     try:
         from multiprocessing import Process, Value, current_process, cpu_count
         from multiprocessing import Manager
+        manager = Manager()
         # Multiprocessing fix for pyinstaller
         freeze_support()
         # Multiprocessing globals
         khashcount = Value("i", 0)
         accepted = Value("i", 0)
         rejected = Value("i", 0)
+        hashrates_list = manager.dict()
     except Exception:
         prettyPrint(
             "sys0",
@@ -1214,7 +1217,7 @@ if __name__ == "__main__":
             + getString("load_config_error_warning")
             + Style.NORMAL
             + Fore.RESET
-            + " ("
+            + " (config load err: "
             + str(e)
             + ")",
             "error")
@@ -1234,9 +1237,6 @@ if __name__ == "__main__":
         Donate()
     except Exception as e:
         debugOutput("Error launching donation thread: " + str(e))
-
-    manager = Manager()
-    hashrates_list = manager.dict()
 
     try:
         for x in range(int(threadcount)):
