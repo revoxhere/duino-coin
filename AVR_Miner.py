@@ -182,7 +182,8 @@ def title(title):
 
 def Connect():
     # Server connection
-    global masterServer_address, masterServer_port
+    global masterServer_address
+    global masterServer_port
     while True:
         try:
             try:
@@ -467,7 +468,7 @@ def Greeting():
         + Fore.MAGENTA
         + " ‖ "
         + Style.NORMAL
-        + Fore.MAGENTA 
+        + Fore.MAGENTA
         + "https://github.com/revoxhere/duino-coin")
 
     print(
@@ -565,7 +566,7 @@ def restart_miner():
             "Error closing donate executable"
             + Style.NORMAL
             + Fore.RESET
-            + " (" 
+            + " ("
             + str(e)
             + ")",
             "error")
@@ -577,8 +578,8 @@ def restart_miner():
     except Exception as e:
         prettyPrint(
             "sys0",
-            "Error restarting miner" 
-            + " (" 
+            "Error restarting miner"
+            + " ("
             + str(e)
             + ")",
             "error")
@@ -685,13 +686,16 @@ def updateRichPresence():
 
 
 def prettyPrint(messageType, message, state):
-    if messageType.startswith("sys"):
-        background = Back.GREEN
-    elif messageType.startswith("net"):
+    # Print output messages in the DUCO "standard"
+    # Usb/net/sys background
+    if messageType.startswith("net"):
         background = Back.BLUE
     elif messageType.startswith("usb"):
         background = Back.MAGENTA
+    if messageType.startswith("sys"):
+        background = Back.GREEN
 
+    # Text color
     if state == "success":
         color = Fore.GREEN
     elif state == "warning":
@@ -782,8 +786,7 @@ def AVRMine(com):
                     + str(e)
                     + ")",
                     "error")
-
-                time.sleep(5)
+                time.sleep(10)
 
         while True:
             while True:
@@ -881,7 +884,7 @@ def AVRMine(com):
                             errorCounter = 0
                         debugOutput(
                             "Exception with to serial: " + str(e))
-                        time.sleep(0.5)
+                        time.sleep(1)
 
                 try:
                     debugOutput("Received result (" + str(result[0]) + ")")
@@ -927,7 +930,7 @@ def AVRMine(com):
                         + ")",
                         "error")
                     debugOutput("Error splitting data: " + str(e))
-                    time.sleep(0.5)
+                    time.sleep(1)
                     break
 
                 try:
@@ -984,8 +987,8 @@ def AVRMine(com):
                             + ")",
                             "error")
                         debugOutput("Error parsing response: " +
-                              str(e) + ", restarting miner")
-                        time.sleep(0.5)
+                                    str(e) + ", restarting miner")
+                        time.sleep(1)
                         restart_miner()
 
                 if feedback == "GOOD":
