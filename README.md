@@ -120,6 +120,7 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
     *   [(Old) Multithreaded Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Multithreaded_PC_Miner.py) by Bilaboz
 
 **Other tools:**
+*   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
 *   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) by LDarki
 *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) by siunus
 *   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
