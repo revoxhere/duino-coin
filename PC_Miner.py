@@ -27,11 +27,7 @@ import sys
 def install(package):
     # Install pip package automatically
     check_call([sys.executable, "-m", "pip", "install", package])
-    if osname == "nt":
-        execl(sys.executable, path.abspath(__file__), *sys.argv)
-    else:
-        execl(sys.executable, sys.executable, *sys.argv)
-
+    execl(sys.executable, sys.executable, * sys.argv)
 
 def now():
     # Return datetime object
@@ -871,7 +867,7 @@ def Thread(
                         soc.send(bytes(
                             str(ducos1res)
                             + ","
-                            + str(threadhashcount)
+                            + str(threadhashcount * 1000)
                             + ","
                             + "Official PC Miner ("
                             + str(algorithm)
@@ -920,7 +916,7 @@ def Thread(
                                 + getString("accepted_shares"))
                             print(
                                 Style.RESET_ALL
-                                + Fore.RESET
+                                + Fore.WHITE
                                 + now().strftime(Style.DIM + "%H:%M:%S ")
                                 + Style.BRIGHT
                                 + algo_back_color
@@ -977,7 +973,7 @@ def Thread(
                                 + getString("accepted_shares"))
                             print(
                                 Style.RESET_ALL
-                                + Fore.RESET
+                                + Fore.WHITE
                                 + now().strftime(Style.DIM + "%H:%M:%S ")
                                 + Style.BRIGHT
                                 + algo_back_color
@@ -1034,7 +1030,7 @@ def Thread(
                                 + getString("accepted_shares"))
                             print(
                                 Style.RESET_ALL
-                                + Fore.RESET
+                                + Fore.WHITE
                                 + now().strftime(Style.DIM + "%H:%M:%S ")
                                 + algo_back_color
                                 + Back.YELLOW
@@ -1114,7 +1110,7 @@ def prettyPrint(messageType, message, state):
         color = Fore.RED
 
     print(Style.RESET_ALL
-          + Fore.RESET
+          + Fore.WHITE
           + now().strftime(Style.DIM + "%H:%M:%S ")
           + Style.BRIGHT
           + background
@@ -1152,7 +1148,7 @@ def updateRichPresence():
             if totalhashrate > 800:
                 totalhashrate = str(round(totalhashrate / 1000, 2)) + " MH/s"
             else:
-                totalhashrate = str(int(55)) + " kH/s"
+                totalhashrate = str(totalhashrate) + " kH/s"
 
             RPC.update(
                 details="Hashrate: " + str(totalhashrate),
