@@ -840,99 +840,102 @@ def AVRMine(com):
 
             while True:
                 while True:
-                    try:
-                        # Write data to AVR board
-                        comConn.write(bytes(
-                            str(job[0]
-                                + ","
-                                + job[1]
-                                + ","
-                                + job[2]
-                                + ","),
-                            encoding="utf8"))
-                        debugOutput("Sent job to AVR")
+                    while True:
+                        try:
+                            # Write data to AVR board
+                            comConn.write(bytes(
+                                str(job[0]
+                                    + ","
+                                    + job[1]
+                                    + ","
+                                    + job[2]
+                                    + ","),
+                                encoding="utf8"))
+                            debugOutput("Sent job to AVR")
 
-                        # Read the result
-                        result = comConn.readline().decode()
-                        # print(repr(result))
-                        result = result.rstrip("\n").split(",")
+                            # Read the result
+                            result = comConn.readline().decode()
+                            # print(repr(result))
+                            result = result.rstrip("\n").split(",")
 
-                        if result != "" and result != " ":
-                            debugOutput("Received from AVR: "
-                                        + " ".join(result))
-                            break
-                        else:
-                            raise Exception("Empty data")
+                            if result != "" and result[0] and result[1]:
+                                debugOutput("Received from AVR: "
+                                            + " ".join(result))
+                                break
+                            else:
+                                raise Exception("Empty data")
 
-                    except Exception as e:
-                        errorCounter += 1
-                        if errorCounter >= 5:
+                        except Exception as e:
+                            errorCounter += 1
+                            if errorCounter >= 5:
+                                debugOutput(
+                                    "Reconnecting to AVR - too many errors")
+                                prettyPrint(
+                                    "usb"
+                                    + str(''.join(filter(str.isdigit, com))),
+                                    getString("mining_avr_not_responding")
+                                    + Style.NORMAL
+                                    + Fore.RESET
+                                    + " (errorCounter > 5: "
+                                    + str(e)
+                                    + ")",
+                                    "error")
+                                comConn = connectToAVR(com)
+                                errorCounter = 0
                             debugOutput(
-                                "Reconnecting to AVR - too many errors")
+                                "Exception with to serial: " + str(e))
+                            sleep(1)
+
+                    try:
+                        debugOutput("Received result (" + str(result[0]) + ")")
+                        debugOutput("Received time (" + str(result[1]) + ")")
+                        ducos1result = result[0]
+                        # Convert AVR time to seconds
+                        computetime = round(int(result[1]) / 1000000, 3)
+                        # Calculate hashrate
+                        hashrate = round(
+                            int(result[0]) / int(result[1]) * 1000000, 2)
+                        debugOutput(
+                            "Calculated hashrate (" + str(hashrate) + ")")
+                        if int(hashrate) > 1000:
+                            raise Exception(
+                                "Response too fast - possible AVR error")
+                        try:
+                            chipID = result[2]
+                            debugOutput(
+                                "Received chip ID (" + str(result[2]) + ")")
+                            # Check if user is using the latest Arduino code
+                            # This is not used yet anywhere, but will soon be
+                            # added as yet another a security measure in the
+                            # Kolka security system for identifying AVR boards
+                            if (not chipID.startswith("DUCOID")
+                                    or len(chipID) < 21):
+                                raise Exception("Wrong chipID string")
+                        except Exception:
                             prettyPrint(
                                 "usb"
                                 + str(''.join(filter(str.isdigit, com))),
-                                getString("mining_avr_not_responding")
+                                " Possible incorrect chipID!"
                                 + Style.NORMAL
                                 + Fore.RESET
-                                + " (errorCounter > 5: "
-                                + str(e)
-                                + ")",
-                                "error")
-                            comConn = connectToAVR(com)
-                            errorCounter = 0
-                        debugOutput(
-                            "Exception with to serial: " + str(e))
-                        sleep(1)
-
-                try:
-                    debugOutput("Received result (" + str(result[0]) + ")")
-                    debugOutput("Received time (" + str(result[1]) + ")")
-                    ducos1result = result[0]
-                    # Convert AVR time to seconds
-                    computetime = round(int(result[1]) / 1000000, 3)
-                    # Calculate hashrate
-                    hashrate = round(
-                        int(result[0]) / int(result[1]) * 1000000, 2)
-                    debugOutput("Calculated hashrate (" + str(hashrate) + ")")
-                    if int(hashrate) > 1000:
-                        raise Exception("Response too fast - possible AVR error")
-                    try:
-                        chipID = result[2]
-                        debugOutput(
-                            "Received chip ID (" + str(result[2]) + ")")
-                        # Check if user is using the latest Arduino code
-                        # This is not used yet anywhere, but will soon be added
-                        # as yet another a security measure in the Kolka V4
-                        # security system for identifying AVR boards
-                        if (not chipID.startswith("DUCOID")
-                                or len(chipID) < 21):
-                            raise Exception("Wrong chipID string")
-                    except Exception:
+                                + " This will cause problems with the future"
+                                + " release of Kolka security system",
+                                "warning")
+                            chipID = "None"
+                        break
+                    except Exception as e:
                         prettyPrint(
                             "usb"
                             + str(''.join(filter(str.isdigit, com))),
-                            " Possible incorrect chipID!"
+                            getString("mining_avr_connection_error")
                             + Style.NORMAL
                             + Fore.RESET
-                            + " This will cause problems with the future"
-                            + " release of Kolka security system",
-                            "warning")
-                        chipID = "None"
-                except Exception as e:
-                    prettyPrint(
-                        "usb"
-                        + str(''.join(filter(str.isdigit, com))),
-                        getString("mining_avr_connection_error")
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " (err splitting avr data: "
-                        + str(e)
-                        + ")",
-                        "error")
-                    debugOutput("Error splitting data: " + str(e))
-                    sleep(1)
-                    break
+                            + " (err splitting avr data: "
+                            + str(e)
+                            + ")",
+                            "error")
+                        debugOutput("Error splitting data: " + str(e))
+                        sleep(1)
 
                 try:
                     # Send result to the server
