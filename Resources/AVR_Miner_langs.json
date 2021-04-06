@@ -35,7 +35,7 @@
         "donate_warning": "\nWe don't take any fees from your mining.\nYou can really help us maintain the server and low-fee exchanges by donating.\nVisit ",
         "learn_more_donate": " to learn more about how you can help :)",
         "starting_donation": "Starting donation process",
-        "thanks_donation": " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development",
+        "thanks_donation": " Thank You for being an awesome donator ❤️ Your donation will help us maintain the server and allow further development",
 
         "data_error": " Error retrieving data from GitHub! Retrying in 10s.",
         "connected": " Connected",
@@ -87,11 +87,11 @@
         "rig_identifier": "Identyfikator koparki: ",
 
         "basic_config_tool": "\nKreator pliku konfiguracyjnego Duino-Coin\nEdytuj plik ",
-        "edit_config_file_warning": "/Miner_config.cfg jeżeli chcesz coś poźniej zmienić.",
+        "edit_config_file_warning": "/Miner_config.cfg jeżeli chcesz coś poźniej zmienić.",
         "dont_have_account": "Nie posiadasz konta Duino-Coin? Użyj ",
         "wallet": "Wallet (Portfel)",
         "register_warning": " aby zarejestrować się na sieci.\n",
-        "ask_username": "Wprowadź swoją nazwę użytkownika Duino-Coin: ",
+        "ask_username": "Wprowadź swoją nazwę użytkownika Duino-Coin: ",
         "ports_message": "Kreator konfiguracji znalazł następujące porty:",
         "ports_notice": "Jeżeli nie widzisz powyżej swojej płytki, upewnij się że jest poprawnie podłączona i program ma do niej wymagane uprawninia (np. admin lub sudo).",
         "ask_avrport": "Wprowadź nazwę portu swojej płytki (np. COM1 (Windows) lub /dev/ttyUSB1 (Unix)): ",
@@ -102,18 +102,18 @@
         "ask_donation_level": "Ustaw poziom dotacji dla deweloperów (0-5) (zalecane: 1), nie zmniejszy to Twoich zysków: ",
         "config_saved": "Konfiguracja zapisana! Uruchamianie koparki",
 
-        "free_network_warning": " Sieć Duino-Coin jest w pełni darmową usługą i zawsze taka będzie",
+        "free_network_warning": " Sieć Duino-Coin jest w pełni darmową usługą i zawsze taka będzie",
         "donate_warning": "\nNie bierzemy żadnych prowizji z Twojego kopania, a utrzymanie serwera i opłacanie wymian jest kosztowne.\nMożesz nam bardzo pomóc w utrzymaniu odwiedzając ",
         "learn_more_donate": " aby złożyć dotację :)",
         "starting_donation": "Włączanie procesu dotacji",
-        "thanks_donation": " Bardzo dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
+        "thanks_donation": " Bardzo dziękujemy za posiadanie włączonej dotacji ❤️ Pomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
 
         "data_error": " Problem pobierania danych z GitHuba! Ponowna próba za 10s.",
         "connected": " Połączono",
         "connected_server": " z głównym serwerem Duino-Coin (v",
         "outdated_miner": " Koparka jest nieaktualna (v",
         "server_is_on_version": " serwer jest na v",
-        "update_warning": ", proszę pobrać najnowszą wersję z https://github.com/revoxhere/duino-coin/releases/",
+        "update_warning": ", proszę pobrać najnowszą wersję z https://github.com/revoxhere/duino-coin/releases/",
         "connecting_error": " Problem podczas łączenia z serwerem. Ponowna próba za 10s",
 
         "duco_avr_miner": "Koparka AVR Duino-Coin (v",
@@ -136,7 +136,7 @@
         "retrying": " Ponowna próba za 10s",
         "mining_user": " Użytkownik ",
         "mining_not_exist": " nie jest zarejestrowany.",
-        "mining_not_exist_warning": " Upewnij się że poprawnie wprowadziłeś nazwę użytkownika. Sprawdź swój plik konfiguracyjny. Ponowna próba za 10s",
+        "mining_not_exist_warning": " Upewnij się że poprawnie wprowadziłeś nazwę użytkownika. Sprawdź swój plik konfiguracyjny. Ponowna próba za 10s",
 
         "load_config_error": " Problem z ładowaniem pliku konfiguracyjnego (",
         "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s"
@@ -177,7 +177,7 @@
         "donate_warning": "\nМы не берем никаких комиссий с вашего майнинга.\nВы можете очень сильно помочь нам поддерживать сервер и обменники с низкой комиссией своим пожертвованием.\nПосетите ",
         "learn_more_donate": " чтобы узнать больше о том, как вы можете помочь :)",
         "starting_donation": "Начинаем процесс пожертвования",
-        "thanks_donation": " Спасибо вам за пожертвования ❤️ \nВаше пожертвование поможет нам подерживать сервер и продолжать разработку",
+        "thanks_donation": " Спасибо вам за пожертвования ❤️ Ваше пожертвование поможет нам подерживать сервер и продолжать разработку",
 
         "data_error": " Ошибка получения данных с GitHub! Повтор через 10с.",
         "connected": " Подключено",
@@ -248,7 +248,7 @@
         "donate_warning": "\nNo obtenemos ningún tipo de comisión de tu minado.\nPuedes ayudarnos mucho a mantener el servidor y el exchange de baja comisión donando.\nVisita ",
         "learn_more_donate": " para saber más sobre como puedes ayudar :)",
         "starting_donation": "Empezando el proceso de donación",
-        "thanks_donation": " Gracías por ser un asombroso donador ❤️ \nTu donación nos ayudará a mantener el servidor y permitir el desarrollo",        "data_error": " Error extrayendo datos desde GitHub! Reintentando en 10s.",
+        "thanks_donation": " Gracías por ser un asombroso donador ❤️ Tu donación nos ayudará a mantener el servidor y permitir el desarrollo",        "data_error": " Error extrayendo datos desde GitHub! Reintentando en 10s.",
         "connected": " Conectado",
         "connected_server": " al servidor maestro de Duino-Coin (v",
         "outdated_miner": " El minero está desactualizado (v",
@@ -319,7 +319,7 @@
         "donate_warning": "\nWir nehmen keine Gebühren, wenn du schürfst.\nDu kannst uns mit der Weiterentwicklung helfen, indem du spendest.\nBesuche ",
         "learn_more_donate": " um zu lernen wie du helfen kannst :)",
         "starting_donation": "Starte Spendeminer",
-        "thanks_donation": " Danke, dass du spendest ❤️ \nDeine Spende hilft uns den Server zu verwalten und Duino-Coin weiterzuentwickeln",
+        "thanks_donation": " Danke, dass du spendest ❤️ Deine Spende hilft uns den Server zu verwalten und Duino-Coin weiterzuentwickeln",
 
         "data_error": " Fehler beim Empfangen der Daten von GitHub! Neuversuch in 10s.",
         "connected": " Verbunden",
@@ -390,7 +390,7 @@
         "donate_warning": "\nNous ne prenons aucun frais sur votre minage.\nVous pouvez réellement nous aider à maintenir le serveur et garder un exchange avec peu de frais en activant la donation.\nVisitez ",
         "learn_more_donate": " pour en apprendre plus sur comment vous pouvez nous aider :)",
         "starting_donation": "Démarrage du service de donation",
-        "thanks_donation": " Merci d'être un super donateur ❤️ \nVotre don nous aidera a maintenir le serveur et permettra un développement ultérieur",
+        "thanks_donation": " Merci d'être un super donateur ❤️ Votre don nous aidera a maintenir le serveur et permettra un développement ultérieur",
 
         "data_error": " Erreur lors de la récupération des données depuis GitHub! Nouvel essai dans 10s.",
         "connected": " Connecté",
@@ -461,7 +461,7 @@
         "donate_warning": "\nNeberieme ziadne poplatky z vasho miningu.\nNaozaj na pomozete vasim stedrym prispevkom.\nNavstivte ",
         "learn_more_donate": " aby ste yistili viac a aj ako nam mozete pomoct :)",
         "starting_donation": "Zacina sa prispevkovy program",
-        "thanks_donation": " Dakujeme za vas stedry prispevok ❤️ \nVas prispevok nam pomoze udrzat server v chode tak ako je teraz.",
+        "thanks_donation": " Dakujeme za vas stedry prispevok ❤️ Vas prispevok nam pomoze udrzat server v chode tak ako je teraz.",
 
         "data_error": " Chyba stahovania dat z GitHubu! Odznova o 10s.",
         "connected": " Pripojene",
