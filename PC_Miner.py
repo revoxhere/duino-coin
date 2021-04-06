@@ -6,36 +6,36 @@
 # © Duino-Coin Community 2019-2021
 ##########################################
 # Import libraries
-import socket
-import threading
-import time
-import hashlib
-import sys
-import os
-import statistics
-import re
-import subprocess
-import configparser
-import datetime
-import locale
-import json
-import platform
+from socket import socket
+from threading import Thread as thrThread
+from time import sleep, time, ctime, strptime
+from hashlib import sha1
+from os import execl, path, system, mkdir, _exit
+from os import name as osname
+from re import sub
+from subprocess import Popen, check_call, DEVNULL
+from configparser import ConfigParser
+from datetime import datetime
+from locale import getlocale, setlocale, getdefaultlocale, LC_ALL
+from json import load as jsonload
+from platform import system
 from pathlib import Path
 from signal import signal, SIGINT
+import sys
 
 
 def install(package):
     # Install pip package automatically
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-    if os.name == "nt":
-        os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
+    check_call([sys.executable, "-m", "pip", "install", package])
+    if osname == "nt":
+        execl(sys.executable, path.abspath(__file__), *sys.argv)
     else:
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        execl(sys.executable, sys.executable, *sys.argv)
 
 
 def now():
     # Return datetime object
-    return datetime.datetime.now()
+    return datetime.now()
 
 
 try:
@@ -45,10 +45,10 @@ try:
 except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
-        + 'Cpuinfo is not installed. '
-        + 'Miner will try to install it. '
-        + 'If it fails, please manually install "py-cpuinfo" python3 package.'
-        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
+        + "Cpuinfo is not installed. "
+        + "Miner will try to install it. "
+        + "If it fails, please manually install \"py-cpuinfo\" python3 package."
+        + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("py-cpuinfo")
 
 
@@ -58,10 +58,10 @@ try:
 except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
-        + 'Colorama is not installed. '
-        + 'Miner will try to install it. '
-        + 'If it fails, please manually install "colorama" python3 package.'
-        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
+        + "Colorama is not installed. "
+        + "Miner will try to install it. "
+        + "If it fails, please manually install \"colorama\" python3 package."
+        + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("colorama")
 
 
@@ -71,10 +71,10 @@ try:
 except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
-        + 'Requests is not installed. '
-        + 'Miner will try to install it. '
-        + 'If it fails, please manually install "requests" python3 package.'
-        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
+        + "Requests is not installed. "
+        + "Miner will try to install it. "
+        + "If it fails, please manually install \"requests\" python3 package."
+        + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("requests")
 
 try:
@@ -83,10 +83,10 @@ try:
 except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
-        + 'Pypresence is not installed. '
-        + 'Miner will try to install it. '
-        + 'If it fails, please manually install "pypresence" python3 package.'
-        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
+        + "Pypresence is not installed. "
+        + "Miner will try to install it. "
+        + "If it fails, please manually install \"pypresence\" python3 package."
+        + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("pypresence")
 
 try:
@@ -96,8 +96,8 @@ try:
 except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
-        + 'Xxhash is not installed. '
-        + 'Continuing without xxhash support.')
+        + "Xxhash is not installed. "
+        + "Continuing without xxhash support.")
     xxhash_enabled = False
 
 
@@ -115,13 +115,13 @@ serveripfile = ("https://raw.githubusercontent.com/"
                 + "revoxhere/"
                 + "duino-coin/gh-pages/"
                 + "serverip.txt")  # Serverip file
-config = configparser.ConfigParser()
+config = ConfigParser()
 donationlevel = 0
 thread = []
 
 # Create resources folder if it doesn't exist
-if not os.path.exists(resourcesFolder):
-    os.mkdir(resourcesFolder)
+if not path.exists(resourcesFolder):
+    mkdir(resourcesFolder)
 
 # Check if languages file exists
 if not Path(resourcesFolder + "/langs.json").is_file():
@@ -135,16 +135,16 @@ if not Path(resourcesFolder + "/langs.json").is_file():
 
 # Load language file
 with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
-    lang_file = json.load(lang_file)
+    lang_file = jsonload(lang_file)
 
 # OS X invalid locale hack
-if platform.system() == 'Darwin':
-    if locale.getlocale()[0] is None:
-        locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+if system() == "Darwin":
+    if getlocale()[0] is None:
+        setlocale(LC_ALL, "en_US.UTF-8")
 
 # Check if miner is configured, if it isn't, autodetect language
 if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
-    locale = locale.getdefaultlocale()[0]
+    locale = getdefaultlocale()[0]
     if locale.startswith("es"):
         lang = "spanish"
     elif locale.startswith("pl"):
@@ -166,10 +166,9 @@ else:
         # If it fails, fallback to english
         lang = "english"
 
-# Get string form language file
-
 
 def getString(string_name):
+    # Get string form language file
     if string_name in lang_file[lang]:
         return lang_file[lang][string_name]
     elif string_name in lang_file["english"]:
@@ -177,56 +176,48 @@ def getString(string_name):
     else:
         return "String not found: " + string_name
 
-# Debug output
-
 
 def debugOutput(text):
+    # Debug output
     if debug == "y":
         print(now().strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
 
-# Set window title
-
 
 def title(title):
-    if os.name == "nt":
-        os.system("title " + title)
+    # Set window title
+    if osname == "nt":
+        # Windows systems
+        system("title " + title)
     else:
+        # Most standard terminals
         print("\33]0;" + title + "\a", end="")
         sys.stdout.flush()
 
-# SIGINT handler
-
 
 def handler(signal_received, frame):
-    if multiprocessing.current_process().name == 'MainProcess':
-        print(
-            "\n"
-            + now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
-            + Style.BRIGHT
-            + Back.GREEN
-            + Fore.WHITE
-            + " sys0 "
-            + Back.RESET
-            + Fore.YELLOW
-            + getString("sigint_detected")
+    # SIGINT handler
+    if current_process().name == "MainProcess":
+        prettyPrint(
+            "sys0",
+            getString("sigint_detected")
             + Style.NORMAL
-            + Fore.WHITE
-            + getString("goodbye"))
-        try:
-            soc.close()
-        except Exception:
-            pass
-        os._exit(0)
-    else:
-        os._exit(0)
+            + Fore.RESET
+            + getString("goodbye"),
+            "warning")
+    try:
+        # Close previous socket connection (if any)
+        socket.close()
+    except Exception:
+        pass
+    _exit(0)
 
 
 # Enable signal handler
 signal(SIGINT, handler)
 
 
-# Greeting message
 def Greeting():
+    # Greeting message
     global greeting
     print(Style.RESET_ALL)
 
@@ -237,7 +228,7 @@ def Greeting():
     else:
         diffName = getString("net_diff_short")
 
-    current_hour = time.strptime(time.ctime(time.time())).tm_hour
+    current_hour = strptime(ctime(time())).tm_hour
     if current_hour < 12:
         greeting = getString("greeting_morning")
     elif current_hour == 12:
@@ -250,48 +241,61 @@ def Greeting():
         greeting = getString("greeting_back")
 
     print(
-        Style.RESET_ALL
+        Style.DIM
+        + Fore.YELLOW
         + " ‖ "
         + Fore.YELLOW
         + Style.BRIGHT
         + getString("banner")
         + Style.RESET_ALL
-        + Fore.WHITE
+        + Fore.MAGENTA
         + " (v"
         + str(minerVersion)
-        + ") 2019-2021")
+        + ") "
+        + Fore.RESET
+        + "2019-2021")
+
     print(
-        Style.RESET_ALL
+        Style.DIM
+        + Fore.YELLOW
         + " ‖ "
+        + Style.NORMAL
         + Fore.YELLOW
         + "https://github.com/revoxhere/duino-coin")
+
     try:
         print(
-            Style.RESET_ALL
+            Style.DIM
+            + Fore.YELLOW
             + " ‖ "
-            + Fore.WHITE
+            + Style.NORMAL
+            + Fore.RESET
             + "CPU: "
             + Style.BRIGHT
             + Fore.YELLOW
             + str(threadcount)
             + "x "
             + str(cpu["brand_raw"]))
-    except Exception:
-        if debug == "y":
-            raise
-    if os.name == "nt" or os.name == "posix":
+    except Exception as e:
+        debugOutput("Error displaying CPU message: " + str(e))
+
+    if osname == "nt" or osname == "posix":
         print(
-            Style.RESET_ALL
+            Style.DIM
+            + Fore.YELLOW
             + " ‖ "
-            + Fore.WHITE
+            + Style.NORMAL
+            + Fore.RESET
             + getString("donation_level")
             + Style.BRIGHT
             + Fore.YELLOW
             + str(donationlevel))
     print(
-        Style.RESET_ALL
+        Style.DIM
+        + Fore.YELLOW
         + " ‖ "
-        + Fore.WHITE
+        + Style.NORMAL
+        + Fore.RESET
         + getString("algorithm")
         + Style.BRIGHT
         + Fore.YELLOW
@@ -299,17 +303,21 @@ def Greeting():
         + " @ "
         + diffName)
     print(
-        Style.RESET_ALL
+        Style.DIM
+        + Fore.YELLOW
         + " ‖ "
-        + Fore.WHITE
+        + Style.NORMAL
+        + Fore.RESET
         + getString("rig_identifier")
         + Style.BRIGHT
         + Fore.YELLOW
         + rigIdentifier)
     print(
-        Style.RESET_ALL
+        Style.DIM
+        + Fore.YELLOW
         + " ‖ "
-        + Fore.WHITE
+        + Style.NORMAL
+        + Fore.RESET
         + str(greeting)
         + ", "
         + Style.BRIGHT
@@ -317,7 +325,7 @@ def Greeting():
         + str(username)
         + "!\n")
 
-    if os.name == "nt":
+    if osname == "nt":
         # Initial miner executable section
         if not Path(resourcesFolder + "/Donate_executable.exe").is_file():
             debugOutput(
@@ -329,7 +337,7 @@ def Greeting():
             r = requests.get(url)
             with open(resourcesFolder + "/Donate_executable.exe", "wb") as f:
                 f.write(r.content)
-    elif os.name == "posix":
+    elif osname == "posix":
         # Initial miner executable section
         if not Path(resourcesFolder + "/Donate_executable").is_file():
             debugOutput(
@@ -343,21 +351,8 @@ def Greeting():
                 f.write(r.content)
 
 
-# Hashes/sec calculation
-def hashrateCalculator(hashcount, khashcount):
-    while True:
-        # Append last hashcount in kH to the list
-        hash_mean.append(hashcount.value / 1000)
-        # Reset the counter
-        hashcount.value = 0
-        # Calculate average hashrate from last 50 hashrate measurements
-        khashcount.value = int(statistics.mean(hash_mean[-50:]))
-        # Repeat every second
-        time.sleep(1)
-
-
-# Config loading section
 def loadConfig():
+    # Config loading section
     global username
     global efficiency
     global donationlevel
@@ -380,28 +375,28 @@ def loadConfig():
             + getString("dont_have_account")
             + Fore.YELLOW
             + getString("wallet")
-            + Fore.WHITE
+            + Fore.RESET
             + getString("register_warning"))
 
         username = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_username")
-            + Fore.WHITE
+            + Fore.RESET
             + Style.BRIGHT)
 
         if xxhash_enabled:
             print(
                 Style.RESET_ALL
                 + Style.BRIGHT
-                + Fore.WHITE
+                + Fore.RESET
                 + "1"
                 + Style.NORMAL
                 + " - DUCO-S1")
             print(
                 Style.RESET_ALL
                 + Style.BRIGHT
-                + Fore.WHITE
+                + Fore.RESET
                 + "2"
                 + Style.NORMAL
                 + " - XXHASH")
@@ -409,7 +404,7 @@ def loadConfig():
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_algorithm")
-                + Fore.WHITE
+                + Fore.RESET
                 + Style.BRIGHT)
         else:
             algorithm = "1"
@@ -418,22 +413,22 @@ def loadConfig():
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_intensity")
-            + Fore.WHITE
+            + Fore.RESET
             + Style.BRIGHT)
 
         threadcount = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_threads")
-            + str(multiprocessing.cpu_count())
+            + str(cpu_count())
             + "): "
-            + Fore.WHITE
+            + Fore.RESET
             + Style.BRIGHT)
 
         print(
             Style.RESET_ALL
             + Style.BRIGHT
-            + Fore.WHITE
+            + Fore.RESET
             + "1"
             + Style.NORMAL
             + " - "
@@ -441,7 +436,7 @@ def loadConfig():
         print(
             Style.RESET_ALL
             + Style.BRIGHT
-            + Fore.WHITE
+            + Fore.RESET
             + "2"
             + Style.NORMAL
             + " - "
@@ -449,7 +444,7 @@ def loadConfig():
         print(
             Style.RESET_ALL
             + Style.BRIGHT
-            + Fore.WHITE
+            + Fore.RESET
             + "3"
             + Style.NORMAL
             + " - "
@@ -459,14 +454,14 @@ def loadConfig():
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_difficulty")
-            + Fore.WHITE
+            + Fore.RESET
             + Style.BRIGHT)
 
         rigIdentifier = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_rig_identifier")
-            + Fore.WHITE
+            + Fore.RESET
             + Style.BRIGHT)
 
         if rigIdentifier == "y" or rigIdentifier == "Y":
@@ -474,23 +469,23 @@ def loadConfig():
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_rig_name")
-                + Fore.WHITE
+                + Fore.RESET
                 + Style.BRIGHT)
         else:
             rigIdentifier = "None"
 
         donationlevel = "0"
-        if os.name == "nt" or os.name == "posix":
+        if osname == "nt" or osname == "posix":
             donationlevel = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_donation_level")
-                + Fore.WHITE
+                + Fore.RESET
                 + Style.BRIGHT)
 
         # Check wheter efficiency is correct
-        efficiency = re.sub("\D", "", efficiency)
-        if efficiency == '':
+        efficiency = sub("\D", "", efficiency)
+        if efficiency == "":
             efficiency = 95
         elif float(efficiency) > int(100):
             efficiency = 100
@@ -498,9 +493,9 @@ def loadConfig():
             efficiency = 1
 
         # Check wheter threadcount is correct
-        threadcount = re.sub("\D", "", threadcount)
-        if threadcount == '':
-            threadcount = multiprocessing.cpu_count()
+        threadcount = sub("\D", "", threadcount)
+        if threadcount == "":
+            threadcount = cpu_count()
         elif int(threadcount) > int(10):
             threadcount = 10
         elif int(threadcount) < int(1):
@@ -521,8 +516,8 @@ def loadConfig():
             requestedDiff = "NET"
 
         # Check wheter donationlevel is correct
-        donationlevel = re.sub("\D", "", donationlevel)
-        if donationlevel == '':
+        donationlevel = sub("\D", "", donationlevel)
+        if donationlevel == "":
             donationlevel = 1
         elif float(donationlevel) > int(5):
             donationlevel = 5
@@ -544,13 +539,13 @@ def loadConfig():
         with open(resourcesFolder + "/Miner_config.cfg", "w") as configfile:
             config.write(configfile)
 
-        # Calulate efficiency for use with sleep function
+        # Calulate efficiency for later use with sleep function
         efficiency = (100 - float(efficiency)) * 0.01
 
         print(Style.RESET_ALL + getString("config_saved"))
 
-    # If config already exists, load data from it
     else:
+        # If config already exists, load data from it
         config.read(resourcesFolder + "/Miner_config.cfg")
         username = config["miner"]["username"]
         efficiency = config["miner"]["efficiency"]
@@ -565,9 +560,11 @@ def loadConfig():
 
 
 def Donate():
-    global donationlevel, donatorrunning, donateExecutable
+    global donationlevel
+    global donatorrunning
+    global donateExecutable
 
-    if os.name == "nt":
+    if osname == "nt":
         cmd = (
             "cd "
             + resourcesFolder
@@ -575,7 +572,8 @@ def Donate():
             + "-o stratum+tcp://xmg.minerclaim.net:7008 "
             + "-u revox.donate "
             + "-p x -s 4 -e ")
-    elif os.name == "posix":
+
+    elif osname == "posix":
         cmd = (
             "cd "
             + resourcesFolder
@@ -584,100 +582,92 @@ def Donate():
             + "-o stratum+tcp://xmg.minerclaim.net:7008 "
             + "-u revox.donate "
             + "-p x -s 4 -e ")
+
     if int(donationlevel) <= 0:
-        print(
-            now().strftime(Style.DIM + "%H:%M:%S ")
-            + Style.RESET_ALL
-            + Style.BRIGHT
-            + Back.GREEN
-            + Fore.WHITE
-            + " sys0 "
-            + Back.RESET
-            + Fore.YELLOW
+        prettyPrint(
+            "sys0",
+            Fore.YELLOW
             + getString("free_network_warning")
-            + Style.BRIGHT
-            + Fore.YELLOW
             + getString("donate_warning")
-            + Style.RESET_ALL
             + Fore.GREEN
             + "https://duinocoin.com/donate"
-            + Style.BRIGHT
             + Fore.YELLOW
-            + getString("learn_more_donate"))
-        time.sleep(10)
+            + getString("learn_more_donate"),
+            "warning")
+        sleep(10)
 
-    if donatorrunning == False:
+    elif donatorrunning == False:
         if int(donationlevel) == 5:
-            cmd += "100"
+            cmd += "95"
         elif int(donationlevel) == 4:
-            cmd += "85"
+            cmd += "75"
         elif int(donationlevel) == 3:
-            cmd += "60"
+            cmd += "50"
         elif int(donationlevel) == 2:
-            cmd += "30"
+            cmd += "20"
         elif int(donationlevel) == 1:
-            cmd += "15"
+            cmd += "10"
         if int(donationlevel) > 0:
-            debugOutput("Starting donation process")
+            debugOutput(getString("starting_donation"))
             donatorrunning = True
             # Launch CMD as subprocess
-            donateExecutable = subprocess.Popen(
-                cmd, shell=True, stderr=subprocess.DEVNULL)
-            print(
-                now().strftime(Style.DIM + "%H:%M:%S ")
-                + Style.RESET_ALL
-                + Style.BRIGHT
-                + Back.GREEN
-                + Fore.WHITE
-                + " sys0 "
-                + Back.RESET
-                + Fore.RED
-                + getString("thanks_donation"))
+            donateExecutable = Popen(
+                cmd, shell=True, stderr=DEVNULL)
+            prettyPrint(
+                "sys0",
+                getString("thanks_donation"),
+                "warning")
 
 
-# DUCO-S1 algorithm
 def ducos1(
         lastBlockHash,
         expectedHash,
         difficulty):
-    hashcount = 0
+    # DUCO-S1 algorithm
+    # Measure starting time
+    timeStart = time()
     # Loop from 1 too 100*diff
     for ducos1res in range(100 * int(difficulty) + 1):
         # Generate hash
-        ducos1 = hashlib.sha1(
+        ducos1 = sha1(
             str(lastBlockHash + str(ducos1res)).encode("utf-8"))
         ducos1 = ducos1.hexdigest()
-        # Increment hash counter for hashrate calculator
-        hashcount += 1
         # Check if result was found
         if ducos1 == expectedHash:
-            return [ducos1res, hashcount]
-
-# XXHASH algorithm
+            # Measure finish time
+            timeStop = time()
+            # Calculate hashrate
+            timeDelta = timeStop - timeStart
+            hashrate = ducos1res / timeDelta
+            return [ducos1res, hashrate]
 
 
 def ducos1xxh(
         lastBlockHash,
         expectedHash,
         difficulty):
-    hashcount = 0
+    # XXHASH algorithm
+    # Measure starting time
+    timeStart = time()
     # Loop from 1 too 100*diff
     for ducos1xxres in range(100 * int(difficulty) + 1):
         # Generate hash
         ducos1xx = xxhash.xxh64(
             str(lastBlockHash) + str(ducos1xxres), seed=2811)
         ducos1xx = ducos1xx.hexdigest()
-        # Increment hash counter for hashrate calculator
-        hashcount += 1
         # Check if result was found
         if ducos1xx == expectedHash:
-            return [ducos1xxres, hashcount]
+            # Measure finish time
+            timeStop = time()
+            # Calculate hashrate
+            timeDelta = timeStop - timeStart
+            hashrate = ducos1xxres / timeDelta
+            return [ducos1xxres, hashrate]
 
 
 # Mining section for every thread
 def Thread(
         threadid,
-        hashcount,
         accepted,
         rejected,
         requestedDiff,
@@ -685,7 +675,8 @@ def Thread(
         username,
         efficiency,
         rigIdentifier,
-        algorithm):
+        algorithm,
+        hashrates_list):
     while True:
         # Grab server IP and port
         while True:
@@ -705,26 +696,25 @@ def Thread(
                         + ":"
                         + str(masterServer_port))
                     break
-            except Exception:  # If there was an error with grabbing data from GitHub
-                print(
-                    now().strftime(Style.RESET_ALL + Style.DIM + "%H:%M:%S ")
-                    + Style.BRIGHT
-                    + Back.BLUE
-                    + Fore.WHITE
-                    + " net"
-                    + str(threadid)
-                    + " "
-                    + Back.RESET
-                    + Fore.RED
-                    + getString("data_error"))
-                if debug == "y":
-                    raise
-                time.sleep(10)
+            except Exception as e:
+                # If there was an error with grabbing data from GitHub
+                prettyPrint(
+                    "net"
+                    + str("".join(filter(str.isdigit, com))),
+                    getString("data_error")
+                    + Style.NORMAL
+                    + Fore.RESET
+                    + " (git err: "
+                    + str(e)
+                    + ")",
+                    "error")
+                debugOutput("GitHub error: " + str(e))
+                sleep(10)
 
         # Connect to the server
         while True:
             try:
-                soc = socket.socket()
+                soc = socket()
                 # Establish socket connection to the server
                 soc.connect((str(masterServer_address),
                              int(masterServer_port)))
@@ -734,97 +724,67 @@ def Thread(
                 if (float(serverVersion) <= float(minerVersion)
                         and len(serverVersion) == 3):
                     # If miner is up-to-date, display a message and continue
-                    print(
-                        now().strftime(
-                            Style.RESET_ALL
-                            + Style.DIM
-                            + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.BLUE
-                        + Fore.WHITE
-                        + " net"
-                        + str(threadid)
-                        + " "
-                        + Back.RESET
-                        + Fore.YELLOW
-                        + getString("connected")
-                        + Style.RESET_ALL
-                        + Fore.WHITE
+                    prettyPrint(
+                        "net"
+                        + str(threadid),
+                        getString("connected")
+                        + Fore.RESET
+                        + Style.NORMAL
                         + getString("connected_server")
                         + str(serverVersion)
-                        + ")")
+                        + ")",
+                        "success")
                     break
 
                 else:
                     # Miner is outdated
-                    print(
-                        now().strftime(
-                            Style.RESET_ALL
-                            + Style.DIM
-                            + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.GREEN
-                        + Fore.WHITE
-                        + " sys"
-                        + str(threadid)
-                        + " "
-                        + Back.RESET
-                        + Fore.RED
-                        + getString("outdated_miner")
+                    prettyPrint(
+                        "sys"
+                        + str(threadid),
+                        getString("outdated_miner")
                         + minerVersion
-                        + "),"
-                        + Style.RESET_ALL
-                        + Fore.RED
+                        + ") -"
                         + getString("server_is_on_version")
                         + serverVersion
-                        + getString("update_warning"))
+                        + Style.NORMAL
+                        + Fore.RESET
+                        + getString("update_warning"),
+                        "warning")
                     break
-            except Exception:
+            except Exception as e:
                 # Socket connection error
-                print(
-                    now().strftime(Style.DIM + "%H:%M:%S ")
-                    + Style.RESET_ALL
-                    + Style.BRIGHT
-                    + Back.BLUE
-                    + Fore.WHITE
-                    + " net"
-                    + str(threadid)
-                    + " "
-                    + Style.RESET_ALL
-                    + Style.BRIGHT
-                    + Fore.RED
-                    + getString("connecting_error")
-                    + Style.RESET_ALL)
-                if debug == "y":
-                    raise
-                time.sleep(5)
+                prettyPrint(
+                    "net"
+                    + str(threadid),
+                    getString("connecting_error")
+                    + Style.NORMAL
+                    + Fore.RESET
+                    + " (net err: "
+                    + str(e)
+                    + ")",
+                    "error")
+                debugOutput("Connection error: " + str(e))
+                sleep(10)
 
         if algorithm == "XXHASH":
             using_algo = getString("using_algo_xxh")
         else:
             using_algo = getString("using_algo")
-        print(
-            # Message about mining thread starting
-            now().strftime(Style.DIM + "%H:%M:%S ")
-            + Style.RESET_ALL
-            + Style.BRIGHT
-            + Back.GREEN
-            + Fore.WHITE
-            + " sys"
-            + str(threadid)
-            + " "
-            + Back.RESET
-            + Fore.YELLOW
-            + getString("mining_thread")
+
+        prettyPrint(
+            "sys"
+            + str(threadid),
+            getString("mining_thread")
             + str(threadid)
             + getString("mining_thread_starting")
-            + Style.RESET_ALL
-            + Fore.WHITE
+            + Style.NORMAL
+            + Fore.RESET
             + using_algo
             + Fore.YELLOW
             + str(int(100 - efficiency * 100))
             + "% "
-            + getString('efficiency'))
+            + getString("efficiency"),
+            "success")
 
         # Mining section
         while True:
@@ -832,7 +792,7 @@ def Thread(
                 # If efficiency lower than 100...
                 if float(100 - efficiency * 100) < 100:
                     # ...sleep some time
-                    time.sleep(float(efficiency * 5))
+                    sleep(float(efficiency * 5))
                 while True:
                     # Ask the server for job
                     if algorithm == "XXHASH":
@@ -855,27 +815,17 @@ def Thread(
                     debugOutput("Received: " + str(job))
 
                     if job[1] == "This user doesn't exist":
-                        print(
-                            now().strftime(
-                                Style.RESET_ALL
-                                + Style.DIM
-                                + "%H:%M:%S ")
-                            + Style.RESET_ALL
-                            + Style.BRIGHT
-                            + Back.BLUE
-                            + Fore.WHITE
-                            + " cpu"
-                            + str(threadid)
-                            + " "
-                            + Back.RESET
-                            + Fore.RED
-                            + getString("mining_user")
-                            + Fore.WHITE
+                        prettyPrint(
+                            "cpu"
+                            + str(threadid),
+                            getString("mining_user")
                             + str(username)
-                            + Fore.RED
                             + getString("mining_not_exist")
-                            + getString("mining_not_exist_warning"))
-                        time.sleep(10)
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + getString("mining_not_exist_warning"),
+                            "error")
+                        sleep(10)
 
                     elif job[0] and job[1] and job[2]:
                         diff = int(job[2])
@@ -887,14 +837,14 @@ def Thread(
 
                 while True:
                     # Call DUCOS-1 hasher
-                    computetimeStart = time.time()
+                    computetimeStart = time()
                     if algorithm == "XXHASH":
                         algo_back_color = Back.CYAN
                         result = ducos1xxh(job[0], job[1], diff)
                     else:
                         algo_back_color = Back.YELLOW
                         result = ducos1(job[0], job[1], diff)
-                    computetimeStop = time.time()
+                    computetimeStop = time()
                     # Measure compute time
                     computetime = computetimeStop - computetimeStart
                     # Convert it to miliseconds
@@ -906,10 +856,15 @@ def Thread(
                                 + ": result found: "
                                 + str(ducos1res))
 
-                    threadhashcount = result[1]
+                    # Convert H/s to kH/s
+                    threadhashcount = int(result[1] / 1000)
                     # Add this thread's hash counter
                     # to the global hashrate counter
-                    hashcount.value += threadhashcount
+                    hashrates_list[threadid] = threadhashcount
+                    # Calculate total hashrate of all thrads
+                    totalhashrate = 0
+                    for thread in hashrates_list.keys():
+                        totalhashrate += hashrates_list[thread]
 
                     while True:
                         # Send result of hashing algorithm to the server
@@ -941,15 +896,15 @@ def Thread(
                                     + " Ping: "
                                     + str(ping))
 
-                        if khashcount.value > 800:
+                        if totalhashrate > 800:
                             # Format hashcount to MH/s
                             formattedhashcount = str(
-                                f"%01.2f" % round(khashcount.value / 1000, 2)
+                                f"%03.2f" % round(totalhashrate / 1000, 2)
                                 + " MH/s")
                         else:
                             # Stay with kH/s
                             formattedhashcount = str(
-                                f"%03.0f" % float(khashcount.value)
+                                f"%03.0f" % float(totalhashrate)
                                 + " kH/s")
 
                         if feedback == "GOOD":
@@ -964,13 +919,12 @@ def Thread(
                                 + str(accepted.value + rejected.value)
                                 + getString("accepted_shares"))
                             print(
-                                now().strftime(
-                                    Style.RESET_ALL
-                                    + Style.DIM
-                                    + "%H:%M:%S ")
+                                Style.RESET_ALL
+                                + Fore.RESET
+                                + now().strftime(Style.DIM + "%H:%M:%S ")
                                 + Style.BRIGHT
                                 + algo_back_color
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + " cpu"
                                 + str(threadid)
                                 + " "
@@ -978,11 +932,10 @@ def Thread(
                                 + Fore.GREEN
                                 + " ✓"
                                 + getString("accepted")
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + str(int(accepted.value))
                                 + "/"
                                 + str(int(accepted.value + rejected.value))
-                                + Back.RESET
                                 + Fore.YELLOW
                                 + " ("
                                 + str(int(
@@ -991,16 +944,16 @@ def Thread(
                                      * 100)))
                                 + "%)"
                                 + Style.NORMAL
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + " ∙ "
-                                + str(f"%01.3f" % float(computetime))
+                                + str(f"%05.2f" % float(computetime))
                                 + "s"
                                 + Style.NORMAL
                                 + " ∙ "
                                 + Fore.BLUE
                                 + Style.BRIGHT
                                 + str(formattedhashcount)
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + Style.NORMAL
                                 + " @ diff "
                                 + str(diff)
@@ -1023,13 +976,12 @@ def Thread(
                                 + str(accepted.value + rejected.value)
                                 + getString("accepted_shares"))
                             print(
-                                now().strftime(
-                                    Style.RESET_ALL
-                                    + Style.DIM
-                                    + "%H:%M:%S ")
+                                Style.RESET_ALL
+                                + Fore.RESET
+                                + now().strftime(Style.DIM + "%H:%M:%S ")
                                 + Style.BRIGHT
                                 + algo_back_color
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + " cpu"
                                 + str(threadid)
                                 + " "
@@ -1037,11 +989,10 @@ def Thread(
                                 + Fore.CYAN
                                 + " ✓"
                                 + getString("block_found")
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + str(accepted.value)
                                 + "/"
                                 + str(accepted.value + rejected.value)
-                                + Back.RESET
                                 + Fore.YELLOW
                                 + " ("
                                 + str(int(
@@ -1050,16 +1001,16 @@ def Thread(
                                      * 100)))
                                 + "%)"
                                 + Style.NORMAL
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + " ∙ "
-                                + str(f"%01.3f" % float(computetime))
+                                + str(f"%05.2f" % float(computetime))
                                 + "s"
                                 + Style.NORMAL
                                 + " ∙ "
                                 + Fore.BLUE
                                 + Style.BRIGHT
                                 + str(formattedhashcount)
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + Style.NORMAL
                                 + " @ diff "
                                 + str(diff)
@@ -1082,14 +1033,12 @@ def Thread(
                                 + str(accepted.value + rejected.value)
                                 + getString("accepted_shares"))
                             print(
-                                now().strftime(
-                                    Style.RESET_ALL
-                                    + Style.DIM
-                                    + "%H:%M:%S ")
-                                + Style.RESET_ALL
+                                Style.RESET_ALL
+                                + Fore.RESET
+                                + now().strftime(Style.DIM + "%H:%M:%S ")
                                 + algo_back_color
                                 + Back.YELLOW
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + " cpu"
                                 + str(threadid)
                                 + " "
@@ -1097,11 +1046,10 @@ def Thread(
                                 + Fore.RED
                                 + " ✗"
                                 + getString("rejected")
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + str(accepted.value)
                                 + "/"
                                 + str(accepted.value + rejected.value)
-                                + Back.RESET
                                 + Fore.YELLOW
                                 + " ("
                                 + str(int(
@@ -1110,16 +1058,16 @@ def Thread(
                                      * 100)))
                                 + "%)"
                                 + Style.NORMAL
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + " ∙ "
-                                + str(f"%01.3f" % float(computetime))
+                                + str(f"%05.2f" % float(computetime))
                                 + "s"
                                 + Style.NORMAL
                                 + " ∙ "
                                 + Fore.BLUE
                                 + Style.BRIGHT
                                 + str(formattedhashcount)
-                                + Fore.WHITE
+                                + Fore.RESET
                                 + Style.NORMAL
                                 + " @ diff "
                                 + str(diff)
@@ -1130,55 +1078,83 @@ def Thread(
                                 + "ms")
                             break  # Repeat
                     break
-            except Exception:
-                print(
-                    now().strftime(Style.DIM + "%H:%M:%S ")
-                    + Style.RESET_ALL
-                    + Style.BRIGHT
-                    + Back.BLUE
-                    + Fore.WHITE
-                    + " net"
-                    + str(threadid)
-                    + " "
-                    + Style.RESET_ALL
-                    + Style.BRIGHT
-                    + Fore.MAGENTA
-                    + getString("error_while_mining")
-                    + Style.RESET_ALL
-                )
-                if debug == "y":
-                    raise
-                time.sleep(5)
+            except Exception as e:
+                prettyPrint(
+                    "net"
+                    + str(threadid),
+                    getString("error_while_mining")
+                    + Style.NORMAL
+                    + Fore.RESET
+                    + " ("
+                    + str(e)
+                    + ")",
+                    "error")
+                debugOutput("Error while mining: " + str(e))
+                sleep(10)
                 break
 
-# Initialize Discord rich presence
+
+def prettyPrint(messageType, message, state):
+    # Print output messages in the DUCO "standard"
+    # Usb/net/sys background
+    if messageType.startswith("net"):
+        background = Back.BLUE
+    elif messageType.startswith("cpu"):
+        background = Back.YELLOW
+    if messageType.startswith("sys"):
+        background = Back.GREEN
+
+    # Text color
+    if state == "success":
+        color = Fore.GREEN
+    elif state == "warning":
+        color = Fore.YELLOW
+    else:
+        color = Fore.RED
+
+    print(Style.RESET_ALL
+          + Fore.RESET
+          + now().strftime(Style.DIM + "%H:%M:%S ")
+          + Style.BRIGHT
+          + background
+          + " "
+          + messageType
+          + " "
+          + Back.RESET
+          + color
+          + Style.BRIGHT
+          + message
+          + Style.NORMAL
+          + Fore.RESET)
 
 
 def initRichPresence():
+    # Initialize Discord rich presence
     global RPC
     try:
         RPC = Presence(808045598447632384)
         RPC.connect()
         debugOutput("Discord rich presence initialized")
-    except Exception:  # Discord not launched
-        if debug == "y":
-            raise
-
-# Update rich presence status
+    except Exception as e: 
+        # Discord not launched
+        debugOutput("Error launching Discord RPC thead: " + str(e))
 
 
 def updateRichPresence():
-    startTime = int(time.time())
+    # Update rich presence status
+    startTime = int(time())
     while True:
         try:
-            hashcount = statistics.mean(hash_mean[-50:])
-            if hashcount > 800:
-                hashcount = str(round(hashcount / 1000, 2)) + " MH/s"
+            totalhashrate = 0
+            for thread in hashrates_list.keys():
+                totalhashrate += hashrates_list[thread]
+            if totalhashrate > 800:
+                totalhashrate = str(round(totalhashrate / 1000, 2)) + " MH/s"
             else:
-                hashcount = str(int(hashcount)) + " kH/s"
+                totalhashrate = str(int(55)) + " kH/s"
 
             RPC.update(
-                details="Hashrate: " + str(hashcount),
+                details="Hashrate: " + str(totalhashrate),
                 start=startTime,
                 state="Acc. shares: "
                 + str(accepted.value)
@@ -1194,10 +1170,10 @@ def updateRichPresence():
                     {"label": "Discord Server",
                      "url": "https://discord.gg/k48Ht5y"}])
             debugOutput("Rich presence updated")
-        except Exception:  # Discord not launched
-            if debug == "y":
-                raise
-        time.sleep(15)  # 15 seconds to respect Discord rate limit
+        except Exception as e:
+            # Discord not launched
+            debugOutput("Error launching Discord RPC thead: " + str(e))
+        sleep(15)  # 15 seconds to respect Discord rate limit
 
 
 if __name__ == "__main__":
@@ -1208,87 +1184,86 @@ if __name__ == "__main__":
     title(getString("duco_python_miner") + str(minerVersion) + ")")
 
     try:
-        import multiprocessing
+        from multiprocessing import Process, Value, current_process, cpu_count
+        from multiprocessing import Manager
         # Multiprocessing fix for pyinstaller
-        multiprocessing.freeze_support()
+        freeze_support()
         # Multiprocessing globals
-        hashcount = multiprocessing.Value("i", 0)
-        khashcount = multiprocessing.Value("i", 0)
-        accepted = multiprocessing.Value("i", 0)
-        rejected = multiprocessing.Value("i", 0)
+        khashcount = Value("i", 0)
+        accepted = Value("i", 0)
+        rejected = Value("i", 0)
     except Exception:
-        print(now().strftime("%H:%M:%S ")
-              + 'Multiprocessing is not available. '
-              + 'Please check permissions and/or your python installation. '
-              + 'Exiting in 15s.')
-        time.sleep(15)
-        os._exit(0)
+        prettyPrint(
+            "sys0",
+            " Multiprocessing is not available. "
+            + "Please check permissions and/or your python installation. "
+            + "Exiting in 15s.",
+            "error")
+        sleep(15)
+        _exit(1)
 
     try:
         # Load config file or create new one
         loadConfig()
         debugOutput("Config file loaded")
-    except Exception:
-        print(
-            now().strftime(Style.DIM + "%H:%M:%S ")
-            + Style.RESET_ALL
-            + Style.BRIGHT
-            + Back.GREEN
-            + Fore.WHITE
-            + " sys0 "
-            + Style.RESET_ALL
-            + Style.BRIGHT
-            + Fore.RED
-            + getString("load_config_error")
+    except Exception as e:
+        prettyPrint(
+            "sys0",
+            getString("load_config_error")
             + resourcesFolder
             + getString("load_config_error_warning")
-            + Style.RESET_ALL)
-        if debug == "y":
-            raise
-        time.sleep(10)
-        os._exit(1)
+            + Style.NORMAL
+            + Fore.RESET
+            + " ("
+            + str(e)
+            + ")",
+            "error")
+        debugOutput("Error reading configfile: " + str(e))
+        sleep(10)
+        _exit(1)
+
     try:
         # Display greeting message
         Greeting()
         debugOutput("Greeting displayed")
-    except Exception:
-        if debug == "y":
-            raise
+    except Exception as e:
+        debugOutput("Error displaying greeting message: " + str(e))
+
     try:
         # Start donation thread
         Donate()
-    except Exception:
-        if debug == "y":
-            raise
+    except Exception as e:
+        debugOutput("Error launching donation thread: " + str(e))
 
-    # Start hashrate calculator thread
-    threading.Thread(
-        target=hashrateCalculator,
-        args=(hashcount, khashcount)
-    ).start()
-
-    for x in range(int(threadcount)):
-        # Launch duco mining threads
-        thread.append(x)
-        thread[x] = multiprocessing.Process(
-            target=Thread,
-            args=(
-                x,
-                hashcount,
-                accepted,
-                rejected,
-                requestedDiff,
-                khashcount,
-                username,
-                efficiency,
-                rigIdentifier,
-                algorithm))
-        thread[x].start()
-        time.sleep(0.1)
+    manager = Manager()
+    hashrates_list = manager.dict()
 
     try:
+        for x in range(int(threadcount)):
+            # Launch duco mining threads
+            thread.append(x)
+            thread[x] = Process(
+                target=Thread,
+                args=(
+                    x,
+                    accepted,
+                    rejected,
+                    requestedDiff,
+                    khashcount,
+                    username,
+                    efficiency,
+                    rigIdentifier,
+                    algorithm,
+                    hashrates_list))
+            thread[x].start()
+            sleep(0.05)
+    except Exception as e:
+        debugOutput("Error launching CPU thead(s): " + str(e))
+
+    try:
+        # Discord rich presence threads
         initRichPresence()
-        threading.Thread(target=updateRichPresence).start()
-    except Exception:
-        if debug == "y":
-            raise
+        thrThread(
+            target=updateRichPresence).start()
+    except Exception as e:
+        debugOutput("Error launching Discord RPC thead: " + str(e))
