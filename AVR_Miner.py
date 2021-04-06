@@ -9,8 +9,9 @@
 from socket import socket
 from threading import Thread as thrThread
 from time import sleep, time, ctime, strptime
-from os import execl, path, system, mkdir, _exit
+from os import execl, path, mkdir, _exit
 from os import name as osname
+from os import system as ossystem
 from re import sub
 from subprocess import Popen, check_call, DEVNULL
 from configparser import ConfigParser
@@ -176,7 +177,7 @@ def title(title):
     # Window title
     if osname == "nt":
         # Windows systems
-        system("title " + title)
+        ossystem("title " + title)
     else:
         # Most standard terminals
         print("\33]0;" + title + "\a", end="")
