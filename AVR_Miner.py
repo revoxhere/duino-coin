@@ -195,61 +195,42 @@ def Connect():
                         + str(masterServer_port))
             socConn = socket.socket()
             # Establish socket connection to the server
-            socConn.connect((str(masterServer_address), int(masterServer_port)))
+            socConn.connect(
+                (str(masterServer_address), int(masterServer_port)))
             # Get server version
             serverVersion = socConn.recv(3).decode().rstrip("\n")
             debugOutput("Server version: " + serverVersion)
             if (float(serverVersion) <= float(minerVersion)
                     and len(serverVersion) == 3):
                 # If miner is up-to-date, display a message and continue
-                print(
-                    Style.RESET_ALL
-                    + now().strftime(Style.DIM + "%H:%M:%S ")
-                    + Style.BRIGHT
-                    + Back.BLUE
-                    + Fore.WHITE
-                    + " net0 "
-                    + Back.RESET
-                    + Fore.YELLOW
-                    + getString("connected")
-                    + Style.RESET_ALL
-                    + Fore.WHITE
+                prettyPrint(
+                    "net0",
+                    getString("connected")
+                    + Style.NORMAL
+                    + Fore.RESET
                     + getString("connected_server")
                     + str(serverVersion)
-                    + ")")
+                    + ")",
+                    "success")
                 break
             else:
-                print(
-                    Style.RESET_ALL
-                    + now().strftime(Style.DIM + "%H:%M:%S ")
-                    + Style.BRIGHT
-                    + Back.GREEN
-                    + Fore.WHITE
-                    + " sys0 "
-                    + Back.RESET
-                    + Fore.RED
-                    + " Miner is outdated (v"
+                prettyPrint(
+                    "sys0",
+                    " Miner is outdated (v"
                     + minerVersion
-                    + "),"
-                    + Style.RESET_ALL
-                    + Fore.RED
+                    + ") -"
                     + getString("server_is_on_version")
                     + serverVersion
-                    + getString("update_warning"))
+                    + Style.NORMAL
+                    + Fore.RESET
+                    + getString("update_warning"),
+                    "warning")
                 time.sleep(10)
                 break
         except Exception as e:
-            print(
-                Style.RESET_ALL
-                + now().strftime(Style.DIM + "%H:%M:%S ")
-                + Style.BRIGHT
-                + Back.BLUE
-                + Fore.WHITE
-                + " net0 "
-                + Back.RESET
-                + Style.BRIGHT
-                + Fore.RED
-                + getString("connecting_error")
+            prettyPrint(
+                "net0",
+                getString("connecting_error")
                 + Style.NORMAL
                 + " ("
                 + str(e)
@@ -261,81 +242,39 @@ def Connect():
 
 
 def connectToAVR(com):
-    while True:
-        try:
-            # Close previous serial connections (if any)
-            comConn.close()
-        except Exception:
-            pass
+    try:
+        # Close previous serial connections (if any)
+        comConn.close()
+    except Exception:
+        pass
 
-        try:
-            # Establish serial connection
-            comConn = serial.Serial(
-                com,
-                baudrate=115200,
-                timeout=5)
-            print(
-                now().strftime(
-                    Style.RESET_ALL
-                    + Style.DIM
-                    + "%H:%M:%S ")
-                + Style.RESET_ALL
-                + Style.BRIGHT
-                + Back.MAGENTA
-                + Fore.WHITE
-                + " usb"
-                + str(''.join(filter(str.isdigit, com)))
-                + " "
-                + Style.RESET_ALL
-                + Style.BRIGHT
-                + Fore.GREEN
-                + getString("board_on_port")
-                + str(com)
-                + getString("board_is_connected")
-                + Style.RESET_ALL)
-            return comConn
-
-        except Exception as e:
-            debugOutput("Error connecting to AVR: " + str(e))
-            print(
-                Style.RESET_ALL
-                + now().strftime(Style.DIM + "%H:%M:%S ")
-                + Style.BRIGHT
-                + Back.MAGENTA
-                + Fore.WHITE
-                + " usb"
-                + str(''.join(filter(str.isdigit, com)))
-                + " "
-                + Style.RESET_ALL
-                + Style.BRIGHT
-                + Fore.RED
-                + getString("board_connection_error")
-                + str(com)
-                + getString("board_connection_error2")
-                + Style.NORMAL
-                + " ("
-                + str(e)
-                + ")")
-            time.sleep(10)
+    # Establish serial connection
+    comConn = serial.Serial(
+        com,
+        baudrate=115200,
+        timeout=5)
+    prettyPrint(
+        "usb"
+        + str(''.join(filter(str.isdigit, com))),
+        getString("board_on_port")
+        + Fore.YELLOW
+        + str(com)
+        + Style.NORMAL
+        + Fore.RESET
+        + getString("board_is_connected"),
+        "success")
+    return comConn
 
 
 def handler(signal_received, frame):
     # SIGINT handler
-    print("\n"
-          + now().strftime(
-              Style.RESET_ALL
-              + Style.DIM
-              + "%H:%M:%S ")
-          + Style.BRIGHT
-          + Back.GREEN
-          + Fore.WHITE
-          + " sys0 "
-          + Back.RESET
-          + Fore.YELLOW
-          + getString("sigint_detected")
-          + Style.NORMAL
-          + Fore.WHITE
-          + getString("goodbye"))
+    prettyPrint(
+        "sys0",
+        getString("sigint_detected")
+        + Style.NORMAL
+        + Fore.RESET
+        + getString("goodbye"),
+        "warning")
     try:
         # Close previous socket connection (if any)
         socket.close()
@@ -372,14 +311,14 @@ def loadConfig():
             + getString("dont_have_account")
             + Fore.YELLOW
             + getString("wallet")
-            + Fore.WHITE
+            + Fore.RESET
             + getString("register_warning"))
 
         username = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_username")
-            + Fore.WHITE
+            + Fore.RESET
             + Style.BRIGHT)
 
         print(Style.RESET_ALL
@@ -389,7 +328,7 @@ def loadConfig():
         for port in portlist:
             print(Style.RESET_ALL
                   + Style.BRIGHT
-                  + Fore.WHITE
+                  + Fore.RESET
                   + "  "
                   + str(port))
         print(Style.RESET_ALL
@@ -402,13 +341,13 @@ def loadConfig():
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_avrport")
-                + Fore.WHITE
+                + Fore.RESET
                 + Style.BRIGHT)
             confirmation = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_anotherport")
-                + Fore.WHITE
+                + Fore.RESET
                 + Style.BRIGHT)
             if confirmation == "y" or confirmation == "Y":
                 avrport += ","
@@ -419,7 +358,7 @@ def loadConfig():
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_higherdiff")
-            + Fore.WHITE
+            + Fore.RESET
             + Style.BRIGHT)
         if requestedDiffSelection == "y" or requestedDiffSelection == "Y":
             requestedDiff = "ESP32"
@@ -430,14 +369,14 @@ def loadConfig():
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_rig_identifier")
-            + Fore.WHITE
+            + Fore.RESET
             + Style.BRIGHT)
         if rigIdentifier == "y" or rigIdentifier == "Y":
             rigIdentifier = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_rig_name")
-                + Fore.WHITE
+                + Fore.RESET
                 + Style.BRIGHT)
         else:
             rigIdentifier = "None"
@@ -448,7 +387,7 @@ def loadConfig():
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_donation_level")
-                + Fore.WHITE
+                + Fore.RESET
                 + Style.BRIGHT)
 
         # Check wheter donationlevel is correct
@@ -509,20 +448,34 @@ def Greeting():
 
     # Startup message
     print(
-        " ‖ "
+        Style.DIM
+        + Fore.MAGENTA
+        + " ‖ "
         + Fore.YELLOW
         + Style.BRIGHT
         + getString("banner")
         + Style.RESET_ALL
-        + Fore.WHITE
+        + Fore.MAGENTA
         + " (v"
         + str(minerVersion)
-        + ") 2019-2021")
-    print(" ‖ " + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
+        + ") "
+        + Fore.RESET
+        + "2019-2021")
 
     print(
-        " ‖ "
-        + Fore.WHITE
+        Style.DIM
+        + Fore.MAGENTA
+        + " ‖ "
+        + Style.NORMAL
+        + Fore.MAGENTA 
+        + "https://github.com/revoxhere/duino-coin")
+
+    print(
+        Style.DIM
+        + Fore.MAGENTA
+        + " ‖ "
+        + Style.NORMAL
+        + Fore.RESET
         + getString("avr_on_port")
         + Style.BRIGHT
         + Fore.YELLOW
@@ -530,15 +483,21 @@ def Greeting():
 
     if os.name == "nt" or os.name == "posix":
         print(
-            " ‖ "
-            + Fore.WHITE
+            Style.DIM
+            + Fore.MAGENTA
+            + " ‖ "
+            + Style.NORMAL
+            + Fore.RESET
             + getString("donation_level")
             + Style.BRIGHT
             + Fore.YELLOW
             + str(donationlevel))
     print(
-        " ‖ "
-        + Fore.WHITE
+        Style.DIM
+        + Fore.MAGENTA
+        + " ‖ "
+        + Style.NORMAL
+        + Fore.RESET
         + getString("algorithm")
         + Style.BRIGHT
         + Fore.YELLOW
@@ -547,17 +506,22 @@ def Greeting():
         + " diff")
 
     print(
-        Style.RESET_ALL
+        Style.DIM
+        + Fore.MAGENTA
         + " ‖ "
-        + Fore.WHITE
+        + Style.NORMAL
+        + Fore.RESET
         + getString("rig_identifier")
         + Style.BRIGHT
         + Fore.YELLOW
         + rigIdentifier)
 
     print(
-        " ‖ "
-        + Fore.WHITE
+        Style.DIM
+        + Fore.MAGENTA
+        + " ‖ "
+        + Style.NORMAL
+        + Fore.RESET
         + str(greeting)
         + ", "
         + Style.BRIGHT
@@ -596,20 +560,35 @@ def restart_miner():
         if donatorrunning:
             donateExecutable.terminate()
     except Exception as e:
-        print("Error closing donate executable: " + str(e))
+        prettyPrint(
+            "sys0",
+            "Error closing donate executable"
+            + Style.NORMAL
+            + Fore.RESET
+            + " (" 
+            + str(e)
+            + ")",
+            "error")
     try:
         if os.name == "nt":
             os.execl(sys.executable, os.path.abspath(__file__), *sys.argv)
         else:
             os.execl(sys.executable, sys.executable, *sys.argv)
     except Exception as e:
-        print("Error when restarting miner: " + str(e))
+        prettyPrint(
+            "sys0",
+            "Error restarting miner" 
+            + " (" 
+            + str(e)
+            + ")",
+            "error")
 
 
 def Donate():
     global donationlevel
     global donatorrunning
     global donateExecutable
+
     if os.name == "nt":
         cmd = (
             "cd "
@@ -618,6 +597,7 @@ def Donate():
             + "-o stratum+tcp://xmg.minerclaim.net:7008 "
             + "-u revox.donate "
             + "-p x -s 4 -e ")
+
     elif os.name == "posix":
         cmd = (
             "cd "
@@ -627,30 +607,20 @@ def Donate():
             + "-o stratum+tcp://xmg.minerclaim.net:7008 "
             + "-u revox.donate "
             + "-p x -s 4 -e ")
+
     if int(donationlevel) <= 0:
-        print(
-            now().strftime(
-                Style.DIM
-                + "%H:%M:%S ")
-            + Style.RESET_ALL
-            + Style.BRIGHT
-            + Back.GREEN
-            + Fore.WHITE
-            + " sys0 "
-            + Back.RESET
-            + Fore.YELLOW
+        prettyPrint(
+            "sys0",
+            Fore.YELLOW
             + getString("free_network_warning")
-            + Style.BRIGHT
-            + Fore.YELLOW
             + getString("donate_warning")
-            + Style.RESET_ALL
             + Fore.GREEN
             + "https://duinocoin.com/donate"
-            + Style.BRIGHT
             + Fore.YELLOW
-            + getString("learn_more_donate")
-            + Style.RESET_ALL)
+            + getString("learn_more_donate"),
+            "warning")
         time.sleep(10)
+
     elif donatorrunning == False:
         if int(donationlevel) == 5:
             cmd += "95"
@@ -668,19 +638,10 @@ def Donate():
             # Launch CMD as subprocess
             donateExecutable = subprocess.Popen(
                 cmd, shell=True, stderr=subprocess.DEVNULL)
-            print(
-                now().strftime(
-                    Style.DIM
-                    + "%H:%M:%S ")
-                + Style.RESET_ALL
-                + Style.BRIGHT
-                + Back.GREEN
-                + Fore.WHITE
-                + " sys0 "
-                + Back.RESET
-                + Fore.RED
-                + getString("thanks_donation")
-                + Style.RESET_ALL)
+            prettyPrint(
+                "sys0",
+                getString("thanks_donation"),
+                "warning")
 
 
 def initRichPresence():
@@ -723,6 +684,37 @@ def updateRichPresence():
         time.sleep(15)
 
 
+def prettyPrint(messageType, message, state):
+    if messageType.startswith("sys"):
+        background = Back.GREEN
+    elif messageType.startswith("net"):
+        background = Back.BLUE
+    elif messageType.startswith("usb"):
+        background = Back.MAGENTA
+
+    if state == "success":
+        color = Fore.GREEN
+    elif state == "warning":
+        color = Fore.YELLOW
+    else:
+        color = Fore.RED
+
+    print(Style.RESET_ALL
+          + Fore.WHITE
+          + now().strftime(Style.DIM + "%H:%M:%S ")
+          + Style.BRIGHT
+          + background
+          + " "
+          + messageType
+          + " "
+          + Back.RESET
+          + color
+          + Style.BRIGHT
+          + message
+          + Style.NORMAL
+          + Fore.RESET)
+
+
 def AVRMine(com):
     # Mining section
     errorCounter = 0
@@ -750,22 +742,16 @@ def AVRMine(com):
                     break
             except Exception as e:
                 # If there was an error with grabbing data from GitHub
-                print(
-                    Style.RESET_ALL
-                    + now().strftime(Style.DIM + "%H:%M:%S ")
-                    + Style.BRIGHT
-                    + Back.BLUE
-                    + Fore.WHITE
-                    + " net"
-                    + str(''.join(filter(str.isdigit, com)))
-                    + " "
-                    + Back.RESET
-                    + Fore.RED
-                    + getString("data_error")
+                prettyPrint(
+                    "net"
+                    + str(''.join(filter(str.isdigit, com))),
+                    getString("data_error")
                     + Style.NORMAL
+                    + Fore.RESET
                     + " (git err: "
                     + str(e)
-                    + ")")
+                    + ")",
+                    "error")
                 debugOutput("GitHub error: " + str(e))
                 time.sleep(10)
 
@@ -773,42 +759,30 @@ def AVRMine(com):
             try:
                 # Connect to the serial port
                 comConn = connectToAVR(com)
-                print(
-                    Style.RESET_ALL
-                    + now().strftime(Style.DIM + "%H:%M:%S ")
-                    + Style.BRIGHT
-                    + Back.GREEN
-                    + Fore.WHITE
-                    + " sys"
-                    + str(''.join(filter(str.isdigit, com)))
-                    + " "
-                    + Back.RESET
-                    + Fore.YELLOW
-                    + getString("mining_start")
-                    + Style.RESET_ALL
-                    + Fore.WHITE
+                prettyPrint(
+                    "sys"
+                    + str(''.join(filter(str.isdigit, com))),
+                    getString("mining_start")
+                    + Style.NORMAL
+                    + Fore.RESET
                     + getString("mining_algorithm")
                     + str(com)
-                    + ")")
+                    + ")",
+                    "success")
                 break
 
             except Exception as e:
-                print(
-                    Style.RESET_ALL
-                    + now().strftime(Style.DIM + "%H:%M:%S ")
-                    + Style.BRIGHT
-                    + Back.MAGENTA
-                    + Fore.WHITE
-                    + " usb"
-                    + str(''.join(filter(str.isdigit, com)))
-                    + " "
-                    + Back.RESET
-                    + Fore.RED
-                    + getString("mining_avr_connection_error")
+                prettyPrint(
+                    "usb"
+                    + str(''.join(filter(str.isdigit, com))),
+                    getString("mining_avr_connection_error")
                     + Style.NORMAL
+                    + Fore.RESET
                     + " (avr connection err: "
                     + str(e)
-                    + ")")
+                    + ")",
+                    "error")
+
                 time.sleep(5)
 
         while True:
@@ -830,22 +804,16 @@ def AVRMine(com):
 
                     # Check if username is correct
                     if job[1] == "This user doesn't exist":
-                        print(
-                            Style.RESET_ALL
-                            + now().strftime(Style.DIM + "%H:%M:%S ")
-                            + Style.RESET_ALL
-                            + Style.BRIGHT
-                            + Back.BLUE
-                            + Fore.WHITE
-                            + " sys0 "
-                            + Back.RESET
-                            + Fore.RED
-                            + getString("mining_user")
-                            + Fore.WHITE
+                        prettyPrint(
+                            "net"
+                            + str(''.join(filter(str.isdigit, com))),
+                            getString("mining_user")
                             + str(username)
-                            + Fore.RED
                             + getString("mining_not_exist")
-                            + getString("mining_not_exist_warning"))
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + getString("mining_not_exist_warning"),
+                            "error")
                         time.sleep(10)
 
                     # If job was received, continue
@@ -854,21 +822,16 @@ def AVRMine(com):
                         debugOutput("Job received: " + " ".join(job))
                         break
                 except Exception as e:
-                    print(
-                        Style.RESET_ALL
-                        + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.BLUE
-                        + Fore.WHITE
-                        + " net0 "
-                        + Back.RESET
-                        + Style.BRIGHT
-                        + Fore.RED
-                        + getString("connecting_error")
+                    prettyPrint(
+                        "net"
+                        + str(''.join(filter(str.isdigit, com))),
+                        getString("connecting_error")
                         + Style.NORMAL
+                        + Fore.RESET
                         + " (net err: "
                         + str(e)
-                        + ")")
+                        + ")",
+                        "error")
                     debugOutput("Connection error: " + str(e))
                     time.sleep(10)
                     restart_miner()
@@ -904,24 +867,16 @@ def AVRMine(com):
                         if errorCounter >= 5:
                             debugOutput(
                                 "Reconnecting to AVR - too many errors")
-                            print(
-                                Style.RESET_ALL
-                                + now().strftime(
-                                    Style.DIM
-                                    + "%H:%M:%S ")
-                                + Style.BRIGHT
-                                + Back.MAGENTA
-                                + Fore.WHITE
-                                + " usb"
-                                + str(''.join(filter(str.isdigit, com)))
-                                + " "
-                                + Back.RESET
-                                + Fore.RED
-                                + getString("mining_avr_not_responding")
+                            prettyPrint(
+                                "usb"
+                                + str(''.join(filter(str.isdigit, com))),
+                                getString("mining_avr_not_responding")
                                 + Style.NORMAL
+                                + Fore.RESET
                                 + " (errorCounter > 5: "
                                 + str(e)
-                                + ")")
+                                + ")",
+                                "error")
                             comConn = connectToAVR(com)
                             errorCounter = 0
                         debugOutput(
@@ -948,42 +903,31 @@ def AVRMine(com):
                         # security system for identifying AVR boards
                         if (not chipID.startswith("DUCOID")
                                 or len(chipID) != 21):
-                            raise Exception("Wrong start string")
+                            raise Exception("Wrong chipID string")
                     except Exception:
-                        print(
-                            Style.RESET_ALL
-                            + now().strftime(Style.DIM + "%H:%M:%S ")
-                            + Style.BRIGHT
-                            + Back.MAGENTA
-                            + Fore.WHITE
-                            + " usb"
-                            + str(''.join(filter(str.isdigit, com)))
-                            + " "
-                            + Back.RESET
-                            + Fore.YELLOW
-                            + " Possible incorrect chipID!"
+                        prettyPrint(
+                            "usb"
+                            + str(''.join(filter(str.isdigit, com))),
+                            " Possible incorrect chipID!"
+                            + Style.NORMAL
+                            + Fore.RESET
                             + " This will cause problems with the future"
-                            + " release of Kolka security system")
+                            + " release of Kolka security system",
+                            "warning")
                         chipID = "None"
                 except Exception as e:
-                    debugOutput("Error splitting data: " + str(e))
-                    print(
-                        Style.RESET_ALL
-                        + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.MAGENTA
-                        + Fore.WHITE
-                        + " usb"
-                        + str(''.join(filter(str.isdigit, com)))
-                        + " "
-                        + Back.RESET
-                        + Fore.RED
-                        + getString("mining_avr_connection_error")
+                    prettyPrint(
+                        "usb"
+                        + str(''.join(filter(str.isdigit, com))),
+                        getString("mining_avr_connection_error")
                         + Style.NORMAL
+                        + Fore.RESET
                         + " (err splitting avr data: "
                         + str(e)
-                        + ")")
-                    time.sleep(5)
+                        + ")",
+                        "error")
+                    debugOutput("Error splitting data: " + str(e))
+                    time.sleep(0.5)
                     break
 
                 try:
@@ -1001,21 +945,16 @@ def AVRMine(com):
                             + str(chipID),
                             encoding="utf8"))
                 except Exception as e:
-                    print(
-                        Style.RESET_ALL
-                        + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.BLUE
-                        + Fore.WHITE
-                        + " net0 "
-                        + Back.RESET
-                        + Style.BRIGHT
-                        + Fore.RED
-                        + getString("connecting_error")
+                    prettyPrint(
+                        "net"
+                        + str(''.join(filter(str.isdigit, com))),
+                        getString("connecting_error")
                         + Style.NORMAL
+                        + Fore.RESET
                         + " ("
                         + str(e)
-                        + ")")
+                        + ")",
+                        "error")
                     debugOutput("Connection error: " + str(e))
                     time.sleep(10)
                     restart_miner()
@@ -1033,24 +972,20 @@ def AVRMine(com):
                         debugOutput("Successfully retrieved feedback: " +
                                     str(feedback) + " with ping: " + str(ping))
                         break
-                    except Exception:
-                        print(
-                            Style.RESET_ALL
-                            + now().strftime(Style.DIM + "%H:%M:%S ")
-                            + Style.BRIGHT
-                            + Back.BLUE
-                            + Fore.WHITE
-                            + " net0 "
-                            + Back.RESET
-                            + Style.BRIGHT
-                            + Fore.RED
-                            + getString("connecting_error")
+                    except Exception as e:
+                        prettyPrint(
+                            "net"
+                            + str(''.join(filter(str.isdigit, com))),
+                            getString("connecting_error")
                             + Style.NORMAL
-                            + " ("
+                            + Fore.RESET
+                            + " (err parsing response: "
                             + str(e)
-                            + ")")
-                        print("Error parsing response: " +
+                            + ")",
+                            "error")
+                        debugOutput("Error parsing response: " +
                               str(e) + ", restarting miner")
+                        time.sleep(0.5)
                         restart_miner()
 
                 if feedback == "GOOD":
@@ -1066,10 +1001,11 @@ def AVRMine(com):
                         + getString("accepted_shares"))
                     print(
                         Style.RESET_ALL
+                        + Fore.WHITE
                         + now().strftime(Style.DIM + "%H:%M:%S ")
                         + Style.BRIGHT
                         + Back.MAGENTA
-                        + Fore.WHITE
+                        + Fore.RESET
                         + " usb"
                         + str(''.join(filter(str.isdigit, com)))
                         + " "
@@ -1077,7 +1013,7 @@ def AVRMine(com):
                         + Fore.GREEN
                         + " ✓"
                         + getString("accepted")
-                        + Fore.WHITE
+                        + Fore.RESET
                         + str(int(shares[0]))
                         + "/"
                         + str(int(shares[0] + shares[1]))
@@ -1087,7 +1023,7 @@ def AVRMine(com):
                                    / (shares[0] + shares[1]) * 100)))
                         + "%)"
                         + Style.NORMAL
-                        + Fore.WHITE
+                        + Fore.RESET
                         + " ∙ "
                         + str(f"%01.3f" % float(computetime))
                         + "s"
@@ -1098,7 +1034,7 @@ def AVRMine(com):
                         + str(round(hashrate))
                         + " H/s"
                         + Style.NORMAL
-                        + Fore.WHITE
+                        + Fore.RESET
                         + " @ diff "
                         + str(diff)
                         + " ∙ "
@@ -1121,11 +1057,11 @@ def AVRMine(com):
                         + getString("accepted_shares"))
                     print(
                         Style.RESET_ALL
+                        + Fore.WHITE
                         + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.RESET_ALL
                         + Style.BRIGHT
                         + Back.MAGENTA
-                        + Fore.WHITE
+                        + Fore.RESET
                         + " usb"
                         + str(''.join(filter(str.isdigit, com)))
                         + " "
@@ -1133,7 +1069,7 @@ def AVRMine(com):
                         + Fore.CYAN
                         + " ✓"
                         + getString("block_found")
-                        + Fore.WHITE
+                        + Fore.RESET
                         + str(int(shares[0]))
                         + "/"
                         + str(int(shares[0] + shares[1]))
@@ -1143,7 +1079,7 @@ def AVRMine(com):
                                    / (shares[0] + shares[1]) * 100)))
                         + "%)"
                         + Style.NORMAL
-                        + Fore.WHITE
+                        + Fore.RESET
                         + " ∙ "
                         + str(f"%01.3f" % float(computetime))
                         + "s"
@@ -1154,7 +1090,7 @@ def AVRMine(com):
                         + str(int(hashrate))
                         + " H/s"
                         + Style.NORMAL
-                        + Fore.WHITE
+                        + Fore.RESET
                         + " @ diff "
                         + str(diff)
                         + " ∙ "
@@ -1177,11 +1113,11 @@ def AVRMine(com):
                         + getString("accepted_shares"))
                     print(
                         Style.RESET_ALL
+                        + Fore.WHITE
                         + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.RESET_ALL
                         + Style.BRIGHT
                         + Back.MAGENTA
-                        + Fore.WHITE
+                        + Fore.RESET
                         + " usb"
                         + str(''.join(filter(str.isdigit, com)))
                         + " "
@@ -1189,7 +1125,7 @@ def AVRMine(com):
                         + Fore.RED
                         + " ✗"
                         + getString("rejected")
-                        + Fore.WHITE
+                        + Fore.RESET
                         + str(int(shares[0]))
                         + "/"
                         + str(int(shares[0] + shares[1]))
@@ -1199,7 +1135,7 @@ def AVRMine(com):
                                    / (shares[0] + shares[1]) * 100)))
                         + "%)"
                         + Style.NORMAL
-                        + Fore.WHITE
+                        + Fore.RESET
                         + " ∙ "
                         + str(f"%01.3f" % float(computetime))
                         + "s"
@@ -1210,7 +1146,7 @@ def AVRMine(com):
                         + str(int(hashrate))
                         + " H/s"
                         + Style.NORMAL
-                        + Fore.WHITE
+                        + Fore.RESET
                         + " @ diff "
                         + str(diff)
                         + " ∙ "
@@ -1233,23 +1169,17 @@ if __name__ == "__main__":
         loadConfig()
         debugOutput("Config file loaded")
     except Exception as e:
-        print(
-            Style.RESET_ALL
-            + now().strftime(Style.DIM + "%H:%M:%S ")
-            + Style.BRIGHT
-            + Back.GREEN
-            + Fore.WHITE
-            + " sys0 "
-            + Style.RESET_ALL
-            + Style.BRIGHT
-            + Fore.RED
-            + getString("load_config_error")
+        prettyPrint(
+            "sys0",
+            getString("load_config_error")
             + resourcesFolder
             + getString("load_config_error_warning")
             + Style.NORMAL
+            + Fore.RESET
             + " ("
             + str(e)
-            + ")")
+            + ")",
+            "error")
         debugOutput("Error reading configfile: " + str(e))
         time.sleep(10)
         os._exit(1)
