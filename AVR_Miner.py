@@ -27,10 +27,7 @@ import sys
 def install(package):
     # Install pip package automatically
     check_call([sys.executable, "-m", "pip", "install", package])
-    if osname == "nt":
-        execl(sys.executable, path.abspath(__file__), *sys.argv)
-    else:
-        execl(sys.executable, sys.executable, *sys.argv)
+    execl(sys.executable, sys.executable, *sys.argv)
 
 
 def now():
@@ -576,10 +573,7 @@ def restart_miner():
             + ")",
             "error")
     try:
-        if osname == "nt":
-            execl(sys.executable, path.abspath(__file__), *sys.argv)
-        else:
-            execl(sys.executable, sys.executable, *sys.argv)
+        execl(sys.executable, sys.executable, *sys.argv)
     except Exception as e:
         prettyPrint(
             "sys0",
@@ -912,7 +906,7 @@ def AVRMine(com):
                         # as yet another a security measure in the Kolka V4
                         # security system for identifying AVR boards
                         if (not chipID.startswith("DUCOID")
-                                or len(chipID) != 21):
+                                or len(chipID) < 21):
                             raise Exception("Wrong chipID string")
                     except Exception:
                         prettyPrint(
