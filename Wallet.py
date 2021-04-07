@@ -5,55 +5,47 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
 ##########################################
-from tkinter import (
-    Tk,
-    Label,
-    Frame,
-    Entry,
-    StringVar,
-    IntVar,
-    Button,
-    PhotoImage,
-    Listbox,
-    Scrollbar,
-    Checkbutton,
-    Toplevel,
-    ttk
-)
+from tkinter import Tk, Label, Frame, Entry, Button
+from tkinter import StringVar, IntVar, PhotoImage
+from tkinter import Listbox, Scrollbar, Checkbutton
+from tkinter import Toplevel, ttk
 from tkinter.font import Font
 from tkinter import LEFT, BOTH, RIGHT, END, N, S, W, E
 from webbrowser import open_new_tab
 from urllib.request import urlopen, urlretrieve
 from pathlib import Path
-import socket
-import sys
-import sqlite3
 from threading import Timer
-import threading
+from configparser import ConfigParser
 from time import sleep, time
 from os import _exit, mkdir, execl
-import datetime
 from tkinter import messagebox
 from base64 import b64encode, b64decode
 from requests import get
 from json import loads
-from configparser import ConfigParser
+import threading
+import datetime
 import json
 import subprocess
 import os
 import locale
+import socket
+import sys
+import sqlite3
 
-
+# Version number
 version = 2.3
-config = ConfigParser()
-resources = "Wallet_" + str(version) + "_resources/"
+# Colors
 backgroundColor = "#121212"
 fontColor = "#FAFAFA"
 foregroundColor = "#f0932b"
 foregroundColorSecondary = "#ffbe76"
-min_trans_difference = 0.00000000001  # Minimum transaction amount to be saved
+# Minimum transaction amount to be saved
+min_trans_difference = 0.00000000001
 # Minimum transaction amount to show a notification
 min_trans_difference_notify = 0.5
+# Resources folder location
+resources = "Wallet_" + str(version) + "_resources/"
+config = ConfigParser()
 wrong_passphrase = False
 iterations = 100_000
 globalBalance = 0
@@ -774,6 +766,10 @@ def openDiscord(handler):
     open_new_tab("https://discord.com/invite/kvBkccy")
 
 
+def openTransaction(hashToOpen):
+    open_new_tab("https://explorer.duinocoin.com/?search="+str(hashToOpen))
+
+
 def openTransactions(handler):
     transactionsWindow = Toplevel()
     transactionsWindow.resizable(False, False)
@@ -792,7 +788,7 @@ def openTransactions(handler):
 
     Label(
         transactionsWindow,
-        text=getString("local_transactions_list"),
+        text=getString("transaction_list"),
         font=textFont3,
         background=backgroundColor,
         foreground=foregroundColor,
@@ -802,16 +798,18 @@ def openTransactions(handler):
            sticky=S + W,
            pady=(5, 0),
            padx=5)
+
     Label(
         transactionsWindow,
-        text=getString("local_transactions_list_warning"),
+        text=getString("transaction_list_notice"),
         font=textFont,
-        foreground=fontColor,
         background=backgroundColor,
+        foreground=fontColor,
     ).grid(row=1,
            column=0,
            columnspan=2,
            sticky=S + W,
+           pady=(5, 0),
            padx=5)
 
     listbox = Listbox(
@@ -834,13 +832,17 @@ def openTransactions(handler):
         padx=(0, 5),
         pady=(0, 5))
 
-    with sqlite3.connect(f"{resources}/wallet.db") as con:
-        cur = con.cursor()
-        cur.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
-        Transactions = cur.fetchall()
-    for i, row in enumerate(Transactions, start=1):
-        listbox.insert(END, f"{str(row[1])}  {row[2]} DUCO")
+    for i in gtxl:
+        listbox.insert(END, gtxl[i]["Sender"] + " to " + gtxl[i]["Recipient"] + ": " + str(gtxl[i]["Amount"]) + " DUCO")
+        
+    def getSelection(event):
+        try:
+            selection = listbox.curselection()[0]
+            openTransaction(gtxl[str(selection)]["Hash"])
+        except IndexError:
+            pass
 
+    listbox.bind("<Button-1>", getSelection)
     listbox.config(yscrollcommand=scrollbar.set, font=textFont)
     scrollbar.config(command=listbox.yview)
 
@@ -1690,7 +1692,8 @@ def openSettings(handler):
                                 + ","
                                 + str(newpasswordS),
                                 encoding="utf8"))
-                        response = soc.recv(128).decode("utf8").rstrip("\n").split(",")
+                        response = soc.recv(128).decode(
+                            "utf8").rstrip("\n").split(",")
                         soc.close()
 
                         if not "OK" in response[0]:
@@ -2032,7 +2035,11 @@ unpaid_balance = 0
 
 
 def getBalance():
-    global oldbalance, balance, unpaid_balance, globalBalance
+    global oldbalance
+    global balance
+    global unpaid_balance
+    global globalBalance
+    global gtxl
     try:
         soc = socket.socket()
         soc.connect((pool_address, int(pool_port)))
@@ -2043,64 +2050,62 @@ def getBalance():
             + ","
             + str(password), encoding="utf8"))
         _ = soc.recv(2)
-        while True:
-            try:
-                soc.send(bytes(
-                    "BALA",
-                    encoding="utf8"))
-                oldbalance = balance
-                balance = soc.recv(1024).decode().rstrip("\n")
-                try:
-                    balance = float(balance)
-                    globalBalance = round(float(balance), 8)
-                    break
-                except ValueError:
-                    pass
-            except Exception as e:
-                print("Retrying in 5s.")
-                sleep(5)
+        soc.send(bytes(
+            "BALA",
+            encoding="utf8"))
+        oldbalance = balance
+        balance = float(soc.recv(64).decode().rstrip("\n"))
+        globalBalance = round(float(balance), 8)
+
         try:
-            if oldbalance != balance:
-                difference = float(balance) - float(oldbalance)
-                dif_with_unpaid = (
-                    float(balance) - float(oldbalance)) + unpaid_balance
-                if float(balance) != float(difference):
-                    if (dif_with_unpaid >= min_trans_difference
+            gtxl = {}
+            soc.send(bytes(
+                "GTXL," + str(username) + ",7",
+                encoding="utf8"))
+            gtxl = str(soc.recv(8096).decode().rstrip("\n").replace("\'", "\""))
+            print(gtxl)
+            gtxl = json.loads(gtxl)
+        except Exception as e:
+            print("Error getting transaction list: " + str(e))
+
+        if oldbalance != balance:
+            difference = float(balance) - float(oldbalance)
+            dif_with_unpaid = (
+                float(balance) - float(oldbalance)) + unpaid_balance
+            if float(balance) != float(difference):
+                if (dif_with_unpaid >= min_trans_difference
                         or dif_with_unpaid < 0
                         ):
-                        now = datetime.datetime.now()
-                        difference = round(dif_with_unpaid, 8)
-                        if (
-                            difference >= min_trans_difference_notify
-                            or difference < 0
-                            and notificationsEnabled
-                        ):
-                            notification = Notify()
-                            notification.title = getString("duino_coin_wallet")
-                            notification.message = (
-                                getString("notification_new_transaction")
-                                + "\n"
-                                + now.strftime("%d.%m.%Y %H:%M:%S\n")
-                                + str(round(difference, 6))
-                                + " DUCO")
-                            notification.icon = f"{resources}/duco_color.png"
-                            notification.send(block=False)
-                        with sqlite3.connect(f"{resources}/wallet.db") as con:
-                            cur = con.cursor()
-                            cur.execute(
-                                """INSERT INTO Transactions(Date, amount)
-                                    VALUES(?, ?)""", (
-                                    now.strftime("%d.%m.%Y %H:%M:%S"),
-                                    round(difference, 8)))
-                            con.commit()
-                            unpaid_balance = 0
-                    else:
-                        unpaid_balance += float(balance) - float(oldbalance)
-        except Exception as e:
-            print(e)
-    except:
-        print("Retrying in 5s.")
-        sleep(5)
+                    now = datetime.datetime.now()
+                    difference = round(dif_with_unpaid, 8)
+                    if (
+                        difference >= min_trans_difference_notify
+                        or difference < 0
+                        and notificationsEnabled
+                    ):
+                        notification = Notify()
+                        notification.title = getString("duino_coin_wallet")
+                        notification.message = (
+                            getString("notification_new_transaction")
+                            + "\n"
+                            + now.strftime("%d.%m.%Y %H:%M:%S\n")
+                            + str(round(difference, 6))
+                            + " DUCO")
+                        notification.icon = f"{resources}/duco_color.png"
+                        notification.send(block=False)
+                    with sqlite3.connect(f"{resources}/wallet.db") as con:
+                        cur = con.cursor()
+                        cur.execute(
+                            """INSERT INTO Transactions(Date, amount)
+                                VALUES(?, ?)""", (
+                                now.strftime("%d.%m.%Y %H:%M:%S"),
+                                round(difference, 8)))
+                        con.commit()
+                        unpaid_balance = 0
+                else:
+                    unpaid_balance += float(balance) - float(oldbalance)
+    except Exception as e:
+        print("Retrying in 3s. (" + str(e) + ")")
     Timer(3, getBalance).start()
 
 
