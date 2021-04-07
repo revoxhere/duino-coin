@@ -912,14 +912,31 @@ def handle(c, ip):
 
     while True:
         try:
-            data = c.recv(256)  # Receive data from client
-            if not data:
+            data2 = c.recv(256).decode()  # Receive data from client
+            if not data2:
                 # Exit loop if no data received
                 break
             else:
                 # Split incoming data
-                data = data.decode().rstrip("\n").split(",")
+                data = data2.rstrip("\n").split(",")
+
+                if data[0] == "PoolSync":
+                    leng_of_base = 9
+                    new_data = (data2[leng_of_base:])
+                    data = ['PoolSync', new_data]
+
+                elif data[0] == "PoolLoginAdd":
+                    leng_of_base = 14 + len(data[1])
+                    new_data = (data2[leng_of_base:])
+                    data = ['PoolLoginAdd', data[1], new_data]
+
+                elif data[0] == "PoolLogin":
+                    leng_of_base = 10
+                    new_data = (data2[leng_of_base:])
+                    data = ['PoolLogin', new_data]
                 c.settimeout(60)
+
+            # print('new_data', data)
 
             if str(data[0]) == "PING":
                 """Simple ping response"""
@@ -2020,17 +2037,17 @@ def handle(c, ip):
                     c.send(bytes(f"NO,Error: {e}", encoding='utf8'))
                     break
 
-                if poolVersion_sent == PoolVersion:
+                if str(poolVersion_sent) == str(PoolVersion):
                     with sqlite3.connect(database, timeout=database_timeout) as conn:
-                        c = conn.cursor()
-                        c.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+                        c2 = conn.cursor()
+                        c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
 
-                        c.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
-                        if (c.fetchall()[0][0]) == 0:
+                        c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
+                        if (c2.fetchall()[0][0]) == 0:
                             c.send(bytes("NO,Identifier not found", encoding='utf8'))
                             break
 
-                        c.execute("UPDATE PoolList SET ip = ?, port = ?, Status = ? WHERE identifier = ?",(poolHost, poolPort, "True", poolID))
+                        c2.execute("UPDATE PoolList SET ip = ?, port = ?, Status = ? WHERE identifier = ?",(poolHost, poolPort, "True", poolID))
 
                         conn.commit()
 
@@ -2060,12 +2077,11 @@ def handle(c, ip):
 
                 if password == PoolPassword:
                     with sqlite3.connect(database, timeout=database_timeout) as conn:
-                        c = conn.cursor()
-                        c.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
-
-                        c.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
-                        if (c.fetchall()[0][0]) == 0:
-                            c.execute("INSERT INTO PoolList(identifier, name, ip, port, Status) VALUES(?, ?, ?, ?, ?)",(poolID, poolName, poolHost, poolPort, "True"))
+                        c2 = conn.cursor()
+                        c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+                        c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
+                        if (c2.fetchall()[0][0]) == 0:
+                            c2.execute("INSERT INTO PoolList(identifier, name, ip, port, Status) VALUES(?, ?, ?, ?, ?)",(poolID, poolName, poolHost, poolPort, "False"))
 
                             conn.commit()
                             c.send(bytes("LoginOK", encoding='utf8'))
@@ -2089,7 +2105,7 @@ def handle(c, ip):
                 try:
                     info = ast.literal_eval(info)
                     rewards = info['rewards']
-                    blocks_to_add = int(info['blockIncrease'])
+                    blocks_to_add = int(info['blocks']['blockIncrease'])
                 except Exception as e:
                     print(e)
                     c.send(bytes(f"NO,Error: {e}", encoding='utf8'))
@@ -2109,6 +2125,8 @@ def handle(c, ip):
                 data_send = {"totalBlocks": blocks,
                             "diffIncrease": diff_incrase_per}
 
+                data_send = (str(data_send)).replace("\'", "\"")
+
                 c.send(bytes(f"SyncOK,{data_send}", encoding='utf8'))
 
 
@@ -2123,15 +2141,15 @@ def handle(c, ip):
 
 
                 with sqlite3.connect(database, timeout=database_timeout) as conn:
-                    c = conn.cursor()
-                    c.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+                    c2 = conn.cursor()
+                    c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
 
-                    c.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
-                    if (c.fetchall()[0][0]) == 0:
+                    c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
+                    if (c2.fetchall()[0][0]) == 0:
                         c.send(bytes("NO,Identifier not found", encoding='utf8'))
                         break
 
-                    c.execute("UPDATE PoolList SET Status = ? WHERE identifier = ?",("False", poolID))
+                    c2.execute("UPDATE PoolList SET Status = ? WHERE identifier = ?",("False", poolID))
 
                     conn.commit()
 
@@ -2141,11 +2159,11 @@ def handle(c, ip):
             ################################## Pool List ####################################
             elif str(data[0]) == "POOLList":
                 with sqlite3.connect(database, timeout=database_timeout) as conn:
-                    c = conn.cursor()
-                    c.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+                    c2 = conn.cursor()
+                    c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
 
-                    c.execute("SELECT name, ip, port, Status FROM PoolList")
-                    info = c.fetchall()
+                    c2.execute("SELECT name, ip, port, Status FROM PoolList")
+                    info = c2.fetchall()
 
                     c.send(bytes(f"{info}", encoding='utf8'))
 
