@@ -1999,53 +1999,6 @@ def handle(c, ip):
                     print(e)
                     pass
 
-            ######################################################################
-            elif str(data[0]) == "NODES":
-                try:
-                    password = str(data[1])
-                    amount = float(data[2])
-                except IndexError:
-                    c.send(bytes("NO,Not enough data", encoding='utf8'))
-                    break
-
-                if password == NodeS_Overide:
-                    print("NodeS Usage")
-                    while True:
-                        try:
-                            with sqlite3.connect(database, timeout=database_timeout) as conn:
-                                datab = conn.cursor()
-                                datab.execute(
-                                    "UPDATE Users set balance = balance + ?  where username = ?", (amount, NodeS_Username))
-                                conn.commit()
-                                adminLog(
-                                    "nodes", "Updated NodeS Broker balance with: " + str(amount))
-                                c.send(bytes("YES,Successful", encoding='utf8'))
-                                break
-                        except Exception:
-                            pass
-
-            ######################################################################
-            elif str(data[0]) == "INCB":
-                try:
-                    password = str(data[1])
-                    amount = int(data[2])
-                except IndexError:
-                    c.send(bytes("NO,Not enough data", encoding='utf8'))
-                    break
-
-                if password == NodeS_Overide:
-                    while True:
-                        try:
-                            blocks += amount
-                            adminLog(
-                                "nodes", "Incremented block counter by NodeS: " + str(amount))
-                            c.send(bytes("YES,Successful", encoding='utf8'))
-                            break
-                        except Exception as e:
-                            c.send(
-                                bytes("NO,Something went wrong: " + e, encoding='utf8'))
-                            break
-
 
             ################################## Pool Login ####################################
             elif str(data[0]) == "PoolLogin":
@@ -2081,6 +2034,45 @@ def handle(c, ip):
                     conn.commit()
 
                     c.send(bytes("LoginOK", encoding='utf8'))
+
+            ################################## Pool add Node ####################################
+            elif str(data[0]) == "PoolLoginAdd":
+                try:
+                    password = str(data[1])
+                    info = str(data[2])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                try:
+                    info = ast.literal_eval(info)
+                    poolName = info['name']
+                    poolHost = info['host']
+                    poolPort = info['port']
+                    poolID = info['identifier']
+                except Exception as e:
+                    print(e)
+                    c.send(bytes(f"NO,Error: {e}", encoding='utf8'))
+                    break
+
+                if password == PoolPassword:
+                    with sqlite3.connect(database, timeout=database_timeout) as conn:
+                        c = conn.cursor()
+                        c.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+
+                        c.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
+                        if (c.fetchall()[0][0]) == 0:
+                            c.execute("INSERT INTO PoolList(identifier, name, ip, port, Status) VALUES(?, ?, ?, ?, ?)",(poolID, poolName, poolHost, poolPort, "True"))
+
+                            conn.commit()
+                            c.send(bytes("LoginOK", encoding='utf8'))
+
+                        else:
+                            c.send(bytes("NO,Identifier not found", encoding='utf8'))
+                            break
+                else:
+                    c.send(bytes("NO,Password Incorrect", encoding='utf8'))
+
 
 
             ################################## Pool Sync ####################################
