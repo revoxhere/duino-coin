@@ -897,7 +897,7 @@ def AVRMine(com):
                             int(result[0]) / int(result[1]) * 1000000, 2)
                         debugOutput(
                             "Calculated hashrate (" + str(hashrate) + ")")
-                        if int(hashrate) > 1000:
+                        if int(hashrate) > 30000:
                             raise Exception(
                                 "Response too fast - possible AVR error")
                         try:
