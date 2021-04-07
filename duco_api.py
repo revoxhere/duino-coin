@@ -367,6 +367,14 @@ class api_actions:
             raise Exception(register_result[1])
         return register_result
 
+    def Pools(self):
+        """
+        A function for getting a list of pools
+        """
+        self.sock.send("POOLList".encode())
+        register_result = decode_response(self.sock.recv(1024))
+        return register_result
+
     def login(self, username, password):
         """
         A function for logging into an account
