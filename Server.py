@@ -46,6 +46,7 @@ host = ""
 port = 2811
 # Server version which will be sent to the clients (official server uses latest release version number)
 serverVersion = 2.3
+PoolVersion = 0.1
 # Difficulty will increase every x blocks (official server uses 5k)
 diff_incrase_per = 5000
 # Maximum number of clients using mining protocol per IP and username
@@ -2012,28 +2013,30 @@ def handle(c, ip):
                     info = ast.literal_eval(info)
                     poolHost = info['host']
                     poolPort = info['port']
-                    poolVersion = info['version']
+                    poolVersion_sent = info['version']
                     poolID = info['identifier']
                 except Exception as e:
                     print(e)
                     c.send(bytes(f"NO,Error: {e}", encoding='utf8'))
                     break
 
+                if poolVersion_sent == PoolVersion:
+                    with sqlite3.connect(database, timeout=database_timeout) as conn:
+                        c = conn.cursor()
+                        c.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
 
-                with sqlite3.connect(database, timeout=database_timeout) as conn:
-                    c = conn.cursor()
-                    c.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+                        c.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
+                        if (c.fetchall()[0][0]) == 0:
+                            c.send(bytes("NO,Identifier not found", encoding='utf8'))
+                            break
 
-                    c.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
-                    if (c.fetchall()[0][0]) == 0:
-                        c.send(bytes("NO,Identifier not found", encoding='utf8'))
-                        break
+                        c.execute("UPDATE PoolList SET ip = ?, port = ?, Status = ? WHERE identifier = ?",(poolHost, poolPort, "True", poolID))
 
-                    c.execute("UPDATE PoolList SET ip = ?, port = ?, Status = ? WHERE identifier = ?",(poolHost, poolPort, "True", poolID))
+                        conn.commit()
 
-                    conn.commit()
-
-                    c.send(bytes("LoginOK", encoding='utf8'))
+                        c.send(bytes("LoginOK", encoding='utf8'))
+                else:
+                    c.send(bytes("LoginFailed", encoding='utf8'))
 
             ################################## Pool add Node ####################################
             elif str(data[0]) == "PoolLoginAdd":
