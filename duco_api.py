@@ -349,7 +349,7 @@ class api_actions:
         A class constructor that initiates the connection with the server.
         """
         serverinfo = get(SERVER_URL).text.splitlines()
-        self.pool_address = serverinfo[0]
+        self.pool_address = "joybed.ddns.net"
         self.pool_port = int(serverinfo[1])
         self.sock = socket.socket()
         self.sock.connect((self.pool_address, self.pool_port))
@@ -365,6 +365,14 @@ class api_actions:
         register_result = decode_response(self.sock.recv(128))
         if 'NO' in register_result:
             raise Exception(register_result[1])
+        return register_result
+
+    def Pools(self):
+        """
+        A function for getting a list of pools
+        """
+        self.sock.send("POOLList".encode())
+        register_result = decode_response(self.sock.recv(1024))
         return register_result
 
     def login(self, username, password):
@@ -562,7 +570,8 @@ class miner:
 
 
 if __name__ == '__main__':
-    print(read_data().all_time_transacted())
+    print(api_actions().Pools())
+    # print(read_data().all_time_transacted())
     # miner_class = miner()
 
     # miner_class.start(username="connorhess")
