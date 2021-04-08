@@ -124,6 +124,7 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 *   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) by LDarki
 *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) by siunus
 *   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
+*   [Duino Stats](https://github.com/Bilaboz/duino-stats) (Discord bot) by Bilaboz
 <!--*   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz (DEPRECATED) -->
 
 This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
