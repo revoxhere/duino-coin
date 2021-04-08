@@ -38,6 +38,19 @@ def decode_response(rec):
     return rec.decode().split(",")
 
 
+#====================================# Duco Balances #====================================#
+
+def User_Balance(username):
+    value = 0.0
+    jsonapi = get("https://server.duinocoin.com/balances.json", data = None)
+    if jsonapi.status_code == 200:
+        content = jsonapi.content.decode()
+        contentjson = json.loads(content)
+
+        value = float(contentjson.get(username)[:-5])
+        print(value)
+    return value
+
 #====================================# Duco Transactions #====================================#
 
 class transaction_data:
