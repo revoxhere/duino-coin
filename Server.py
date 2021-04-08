@@ -941,7 +941,7 @@ def handle(c, ip):
                     data = ['PoolLogin', new_data]
                 c.settimeout(60)
 
-            print('new_data', data)
+            # print('new_data', data)
 
             if str(data[0]) == "PING":
                 """Simple ping response"""
