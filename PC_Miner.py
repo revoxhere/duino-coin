@@ -18,9 +18,10 @@ from configparser import ConfigParser
 from datetime import datetime
 from locale import getlocale, setlocale, getdefaultlocale, LC_ALL
 from json import load as jsonload
-from platform import system
+from platform import system as plsystem
 from pathlib import Path
 from signal import signal, SIGINT
+from statistics import mean
 import sys
 
 
@@ -28,6 +29,7 @@ def install(package):
     # Install pip package automatically
     check_call([sys.executable, "-m", "pip", "install", package])
     execl(sys.executable, sys.executable, * sys.argv)
+
 
 def now():
     # Return datetime object
@@ -43,7 +45,7 @@ except ModuleNotFoundError:
         now().strftime("%H:%M:%S ")
         + "Cpuinfo is not installed. "
         + "Miner will try to install it. "
-        + "If it fails, please manually install \"py-cpuinfo\" python3 package."
+        + "If it fails, please manually install \"py-cpuinfo\"."
         + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("py-cpuinfo")
 
@@ -56,7 +58,7 @@ except ModuleNotFoundError:
         now().strftime("%H:%M:%S ")
         + "Colorama is not installed. "
         + "Miner will try to install it. "
-        + "If it fails, please manually install \"colorama\" python3 package."
+        + "If it fails, please manually install \"colorama\"."
         + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("colorama")
 
@@ -69,7 +71,7 @@ except ModuleNotFoundError:
         now().strftime("%H:%M:%S ")
         + "Requests is not installed. "
         + "Miner will try to install it. "
-        + "If it fails, please manually install \"requests\" python3 package."
+        + "If it fails, please manually install \"requests\"."
         + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("requests")
 
@@ -81,7 +83,7 @@ except ModuleNotFoundError:
         now().strftime("%H:%M:%S ")
         + "Pypresence is not installed. "
         + "Miner will try to install it. "
-        + "If it fails, please manually install \"pypresence\" python3 package."
+        + "If it fails, please manually install \"pypresence\"."
         + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("pypresence")
 
@@ -101,7 +103,6 @@ except ModuleNotFoundError:
 minerVersion = "2.4"  # Version number
 timeout = 15  # Socket timeout
 resourcesFolder = "PCMiner_" + str(minerVersion) + "_resources"
-hash_mean = []
 donatorrunning = False
 debug = "n"
 rigIdentifier = "None"
@@ -114,6 +115,7 @@ serveripfile = ("https://raw.githubusercontent.com/"
 config = ConfigParser()
 donationlevel = 0
 thread = []
+totalhashrate_mean = []
 
 # Create resources folder if it doesn't exist
 if not path.exists(resourcesFolder):
@@ -134,7 +136,7 @@ with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = jsonload(lang_file)
 
 # OS X invalid locale hack
-if system() == "Darwin":
+if plsystem() == "Darwin":
     if getlocale()[0] is None:
         setlocale(LC_ALL, "en_US.UTF-8")
 
@@ -671,7 +673,8 @@ def Thread(
         efficiency,
         rigIdentifier,
         algorithm,
-        hashrates_list):
+        hashrates_list,
+        totalhashrate_mean):
     # Mining section for every thread
     while True:
         # Grab server IP and port
@@ -858,9 +861,12 @@ def Thread(
                     # to the global hashrate counter
                     hashrates_list[threadid] = threadhashcount
                     # Calculate total hashrate of all thrads
-                    totalhashrate = 0
+                    sharehashrate = 0
                     for thread in hashrates_list.keys():
-                        totalhashrate += hashrates_list[thread]
+                        sharehashrate += hashrates_list[thread]
+                    totalhashrate_mean.append(sharehashrate)
+                    # Get average from the last 20 hashrate measurements
+                    totalhashrate = mean(totalhashrate_mean[-20:])
 
                     while True:
                         # Send result of hashing algorithm to the server
@@ -1132,7 +1138,7 @@ def initRichPresence():
         RPC = Presence(808045598447632384)
         RPC.connect()
         debugOutput("Discord rich presence initialized")
-    except Exception as e: 
+    except Exception as e:
         # Discord not launched
         debugOutput("Error launching Discord RPC thead: " + str(e))
 
@@ -1142,13 +1148,12 @@ def updateRichPresence():
     startTime = int(time())
     while True:
         try:
-            totalhashrate = 0
-            for thread in hashrates_list.keys():
-                totalhashrate += hashrates_list[thread]
+            # Calculate average total hashrate with prefix
+            totalhashrate = mean(totalhashrate_mean[-20:])
             if totalhashrate > 800:
                 totalhashrate = str(round(totalhashrate / 1000, 2)) + " MH/s"
             else:
-                totalhashrate = str(totalhashrate) + " kH/s"
+                totalhashrate = str(round(totalhashrate, 1)) + " kH/s"
 
             RPC.update(
                 details="Hashrate: " + str(totalhashrate),
@@ -1191,6 +1196,7 @@ if __name__ == "__main__":
         accepted = Value("i", 0)
         rejected = Value("i", 0)
         hashrates_list = manager.dict()
+        totalhashrate_mean = manager.list()
     except Exception:
         prettyPrint(
             "sys0",
@@ -1250,7 +1256,8 @@ if __name__ == "__main__":
                     efficiency,
                     rigIdentifier,
                     algorithm,
-                    hashrates_list))
+                    hashrates_list,
+                    totalhashrate_mean))
             thread[x].start()
             sleep(0.05)
     except Exception as e:
