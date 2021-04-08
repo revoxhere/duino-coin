@@ -930,13 +930,18 @@ def handle(c, ip):
                     new_data = (data2[leng_of_base:])
                     data = ['PoolLoginAdd', data[1], new_data]
 
+                elif data[0] == "PoolLoginRemove":
+                    leng_of_base = 17 + len(data[1])
+                    new_data = (data2[leng_of_base:])
+                    data = ['PoolLoginRemove', data[1], new_data]
+
                 elif data[0] == "PoolLogin":
                     leng_of_base = 10
                     new_data = (data2[leng_of_base:])
                     data = ['PoolLogin', new_data]
                 c.settimeout(60)
 
-            # print('new_data', data)
+            print('new_data', data)
 
             if str(data[0]) == "PING":
                 """Simple ping response"""
@@ -2040,7 +2045,7 @@ def handle(c, ip):
                 if str(poolVersion_sent) == str(PoolVersion):
                     with sqlite3.connect(database, timeout=database_timeout) as conn:
                         c2 = conn.cursor()
-                        c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+                        c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT, hidden TEXT)''')
 
                         c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
                         if (c2.fetchall()[0][0]) == 0:
@@ -2063,12 +2068,51 @@ def handle(c, ip):
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
-
+                print("Debug 1")
                 try:
                     info = ast.literal_eval(info)
                     poolName = info['name']
                     poolHost = info['host']
                     poolPort = info['port']
+                    poolID = info['identifier']
+                    poolHidden = info['hidden']
+                except Exception as e:
+                    print(e)
+                    c.send(bytes(f"NO,Error: {e}", encoding='utf8'))
+                    break
+                print("Debug 2")
+
+                if password == PoolPassword:
+                    print("Debug 3")
+                    with sqlite3.connect(database, timeout=database_timeout) as conn:
+                        c2 = conn.cursor()
+                        print("Debug 4")
+                        c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT, hidden TEXT)''')
+                        c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
+                        if (c2.fetchall()[0][0]) == 0:
+                            c2.execute("INSERT INTO PoolList(identifier, name, ip, port, Status, hidden) VALUES(?, ?, ?, ?, ?, ?)",(poolID, poolName, poolHost, poolPort, "False", poolHidden))
+
+                            conn.commit()
+                            c.send(bytes("LoginOK", encoding='utf8'))
+
+                        else:
+                            c.send(bytes("NO,Identifier not found", encoding='utf8'))
+                            break
+                else:
+                    c.send(bytes("NO,Password Incorrect", encoding='utf8'))
+
+
+            ################################## Pool remove Node ####################################
+            elif str(data[0]) == "PoolLoginRemove":
+                try:
+                    password = str(data[1])
+                    info = str(data[2])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                try:
+                    info = ast.literal_eval(info)
                     poolID = info['identifier']
                 except Exception as e:
                     print(e)
@@ -2078,13 +2122,13 @@ def handle(c, ip):
                 if password == PoolPassword:
                     with sqlite3.connect(database, timeout=database_timeout) as conn:
                         c2 = conn.cursor()
-                        c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+                        c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT, hidden TEXT)''')
                         c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
-                        if (c2.fetchall()[0][0]) == 0:
-                            c2.execute("INSERT INTO PoolList(identifier, name, ip, port, Status) VALUES(?, ?, ?, ?, ?)",(poolID, poolName, poolHost, poolPort, "False"))
+                        if (c2.fetchall()[0][0]) != 0:
+                            c2.execute('''DELETE FROM PoolList WHERE identifier=?''',(poolID,))
 
                             conn.commit()
-                            c.send(bytes("LoginOK", encoding='utf8'))
+                            c.send(bytes("DeletedOK", encoding='utf8'))
 
                         else:
                             c.send(bytes("NO,Identifier not found", encoding='utf8'))
@@ -2142,7 +2186,7 @@ def handle(c, ip):
 
                 with sqlite3.connect(database, timeout=database_timeout) as conn:
                     c2 = conn.cursor()
-                    c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+                    c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT, hidden TEXT)''')
 
                     c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
                     if (c2.fetchall()[0][0]) == 0:
@@ -2160,10 +2204,11 @@ def handle(c, ip):
             elif str(data[0]) == "POOLList":
                 with sqlite3.connect(database, timeout=database_timeout) as conn:
                     c2 = conn.cursor()
-                    c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+                    c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT, hidden TEXT)''')
 
-                    c2.execute("SELECT name, ip, port, Status FROM PoolList")
+                    c2.execute("SELECT name, ip, port, Status FROM PoolList WHERE hidden != 'ok'")
                     info = c2.fetchall()
+                    print(info)
 
                     c.send(bytes(f"{info}", encoding='utf8'))
 

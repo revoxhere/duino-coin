@@ -1,8 +1,7 @@
 ##########################################
-# Duino-Coin Transactions Module
+# Duino-Coin API Module
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# Creator: Connor2
 # © Duino-Coin Community 2021
 ##########################################
 import ast
@@ -123,7 +122,7 @@ class user_data:
 
 
 
-class read_data:
+class transactions:
 
     def __init__(self):
         # Gets response from transactions.json on the masterserver
@@ -340,6 +339,25 @@ def get_duco_price():
         duco_price = .003
     return duco_price
 
+
+def start_duco_price_timer(tkinter_label=None, interval=15):
+    """
+    A function that starts a timer with a specified interval and updates duco_price variable with the current price.
+    Arguments:
+        tkinter_label: Tkinter label that will be updated with the price (optional)
+        interval: Interval between price updates (default: 15)
+    """
+    global duco_price
+    api_response = get(API_URL)
+    if api_response.status_code == 200:
+        duco_price = round(api_response.json()["Duco price"], 6)
+    else:
+        duco_price = .003
+    if tkinter_label:
+        tkinter_label.set(f"1 Duco = ${duco_price}")
+    Timer(interval, start_duco_price_timer, args=(tkinter_label, interval)).start()
+
+
 class api_actions:
     """
     A class that provides an interface for interacting with the DUCO server
@@ -349,7 +367,7 @@ class api_actions:
         A class constructor that initiates the connection with the server.
         """
         serverinfo = get(SERVER_URL).text.splitlines()
-        self.pool_address = "joybed.ddns.net"
+        self.pool_address = serverinfo[0]
         self.pool_port = int(serverinfo[1])
         self.sock = socket.socket()
         self.sock.connect((self.pool_address, self.pool_port))
@@ -570,8 +588,7 @@ class miner:
 
 
 if __name__ == '__main__':
-    print(api_actions().Pools())
-    # print(read_data().all_time_transacted())
+    print(transactions().all_time_transacted())
     # miner_class = miner()
 
     # miner_class.start(username="connorhess")
@@ -581,4 +598,3 @@ if __name__ == '__main__':
     #     time.sleep(1)
 
     # miner_class.stop()
-
