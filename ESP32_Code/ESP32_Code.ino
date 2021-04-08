@@ -94,10 +94,9 @@ void Task1code( void * pvParameters ) {
         Shares1++;
         Serial.println("CORE1 " + String(feedback1) + " share #" + String(Shares1) + " (" + String(iJob1) + ")" + " Hashrate: " + String(HashRate1));
         if (HashRate1 < 4000) {
-          Serial.println("CORE1 Low hashrate. Restarting core 1");
+          Serial.println("CORE1 Low hashrate. Restarting");
           client1.stop();
-          xTaskCreatePinnedToCore(Task1code, "Task1", 10000, NULL, 1, &Task1, 0);
-          vTaskDelete( NULL );
+          esp_restart();
         }
         break; // Stop and ask for more work
       }
@@ -175,10 +174,9 @@ void Task2code( void * pvParameters ) {
         Shares++;
         Serial.println("CORE2 " + String(feedback) + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate));
         if (HashRate < 4000) {
-          Serial.println("CORE2 Low hashrate. Restarting core 2");
+          Serial.println("CORE2 Low hashrate. Restarting");
           client.stop();
-          xTaskCreatePinnedToCore(Task2code, "Task2", 10000, NULL, 2, &Task2, 1);
-          vTaskDelete( NULL );
+          esp_restart();
         }
         break; // Stop and ask for more work
       }
