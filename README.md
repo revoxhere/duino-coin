@@ -199,7 +199,7 @@ Some third-party included files may have different licenses - please check their
 7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
 8. Only coins earned legally are eligible for the exchange.<br/>
 9. Users spotted using a VPN (or similar) with malicious intents (e.g. bypassing limits) may be banned without prior notice.<br/>
-10. Mulitple accounts used to bypass limits may be banned without prior notice.<br/>
+10. Multiple accounts used to bypass limits may be banned without prior notice.<br/>
 11. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
 12. Multiple accounts used to evade bans will be banned without prior notice.<br/>
 13. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
