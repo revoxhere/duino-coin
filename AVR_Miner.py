@@ -292,8 +292,6 @@ signal(SIGINT, handler)
 
 def loadConfig():
     # Config loading section
-    global pool_address
-    global pool_port
     global username
     global donationlevel
     global avrport
@@ -394,7 +392,7 @@ def loadConfig():
                 + Style.BRIGHT)
 
         # Check wheter donationlevel is correct
-        donationlevel = sub("\D", "", donationlevel)
+        donationlevel = sub(r"\D", "", donationlevel)
         if donationlevel == '':
             donationlevel = 1
         if float(donationlevel) > int(5):
@@ -897,7 +895,7 @@ def AVRMine(com):
                             int(result[0]) / int(result[1]) * 1000000, 2)
                         debugOutput(
                             "Calculated hashrate (" + str(hashrate) + ")")
-                        if int(hashrate) > 30000:
+                        if int(hashrate) > 10000:
                             raise Exception(
                                 "Response too fast - possible AVR error")
                         try:
