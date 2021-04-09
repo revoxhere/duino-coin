@@ -4,7 +4,7 @@
   * [HTTP JSON API](#HTTP-JSON-API)
 - [C DUCO library](#C-DUCO-library)
 - [Python3 DUCO module](#Python3-DUCO-module)
-- [Branding colors][#Branding]
+- [Branding colors](#Branding)
 
 ## Commnicating with the master server
 
