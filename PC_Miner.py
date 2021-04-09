@@ -482,7 +482,7 @@ def loadConfig():
                 + Style.BRIGHT)
 
         # Check wheter efficiency is correct
-        efficiency = sub("\D", "", efficiency)
+        efficiency = sub(r"\D", "", efficiency)
         if efficiency == "":
             efficiency = 95
         elif float(efficiency) > int(100):
@@ -491,7 +491,7 @@ def loadConfig():
             efficiency = 1
 
         # Check wheter threadcount is correct
-        threadcount = sub("\D", "", threadcount)
+        threadcount = sub(r"\D", "", threadcount)
         if threadcount == "":
             threadcount = cpu_count()
         elif int(threadcount) > int(10):
@@ -514,7 +514,7 @@ def loadConfig():
             requestedDiff = "NET"
 
         # Check wheter donationlevel is correct
-        donationlevel = sub("\D", "", donationlevel)
+        donationlevel = sub(r"\D", "", donationlevel)
         if donationlevel == "":
             donationlevel = 1
         elif float(donationlevel) > int(5):
@@ -699,7 +699,7 @@ def Thread(
                 # If there was an error with grabbing data from GitHub
                 prettyPrint(
                     "net"
-                    + str("".join(filter(str.isdigit, com))),
+                    + str(threadid),
                     getString("data_error")
                     + Style.NORMAL
                     + Fore.RESET
