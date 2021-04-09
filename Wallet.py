@@ -1243,10 +1243,10 @@ def openStats(handler):
         sticky=N + E + S + W,
         pady=(0, 5),
         padx=5)
-    i = 0
-    for rich in statsApi["Top 10 richest miners"]:
+
+    for i in statsApi["Top 10 richest miners"]:
         Top_10_listbox.insert(i, statsApi["Top 10 richest miners"][i])
-        i += 1
+
     Top_10_listbox.select_set(32)
     Top_10_listbox.event_generate("<<ListboxSelect>>")
 
@@ -1427,12 +1427,10 @@ def openUnWrapper(handler):
 
         try:
             priv_key = str(password_decrypt(privKeyEnc, passphrase))[2:66]
-            wrong_passphrase = False
             use_wrapper = True
         except InvalidToken:
             print(getString("invalid_passphrase"))
             use_wrapper = False
-            wrong_passphrase = True
 
         amount = amountUnWrap.get()
         print("Got amount:", amount)
@@ -1481,7 +1479,7 @@ def openUnWrapper(handler):
                         soc.send(
                             bytes(
                                 "UNWRAP,"
-                                + str(amount) +
+                                + str(amount)
                                 + ","
                                 + str(pub_key),
                                 encoding="utf8"))
@@ -1492,7 +1490,7 @@ def openUnWrapper(handler):
 
     try:
         pubkeyfile = open(str(f"{resources}/DUCOPubKey.pub"), "r")
-        pub_key = pubkeyfile.read()
+        pubkeyfile.read()
         pubkeyfile.close()
     except:
         messagebox.showerror(
@@ -1574,21 +1572,20 @@ def openSettings(handler):
                     except:
                         pass
                     else:
-                        with sqlite3.connect(f"{resources}/wallet.db") as con:
-                            print("Saving data")
+                        print("Saving data")
 
-                            privkeyfile = open(
-                                str(f"{resources}/DUCOPrivKey.encrypt"), "w")
-                            privkeyfile.write(
-                                str(password_encrypt(
-                                    priv_key.encode(), passphrase
-                                ).decode()))
-                            privkeyfile.close()
+                        privkeyfile = open(
+                            str(f"{resources}/DUCOPrivKey.encrypt"), "w")
+                        privkeyfile.write(
+                            str(password_encrypt(
+                                priv_key.encode(), passphrase
+                            ).decode()))
+                        privkeyfile.close()
 
-                            pubkeyfile = open(
-                                str(f"{resources}/DUCOPubKey.pub"), "w")
-                            pubkeyfile.write(pub_key)
-                            pubkeyfile.close()
+                        pubkeyfile = open(
+                            str(f"{resources}/DUCOPubKey.pub"), "w")
+                        pubkeyfile.write(pub_key)
+                        pubkeyfile.close()
 
                         Label(wrapconfWindow, text=getString(
                             "wrapper_success")).pack()
@@ -2115,11 +2112,10 @@ def getwbalance():
             pubkeyfile = open(str(f"{resources}/DUCOPubKey.pub"), "r")
             pub_key = pubkeyfile.read()
             pubkeyfile.close()
-        except:
-            return 0.0
-        else:
             wBalance = float(wduco.functions.balanceOf(pub_key)) / (10 ** 6)
             return wBalance
+        except:
+            return 0.0
     else:
         return 0.0
 
@@ -2175,7 +2171,7 @@ def updateBalanceLabel():
         _exit(0)
     Timer(1, updateBalanceLabel).start()
 
-
+curr_bal = 0
 def calculateProfit(start_bal):
     try:  # Thanks Bilaboz for the code!
         global curr_bal, profit_array
@@ -2291,7 +2287,6 @@ class Wallet:
         global hourlyprofittext
         global dailyprofittext
         global balanceusdtext
-        global ducopricetext
         global transactionstext
         global curr_bal
         global profit_array
