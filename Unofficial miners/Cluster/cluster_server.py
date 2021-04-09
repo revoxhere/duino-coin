@@ -83,8 +83,7 @@ def loadConfig():
     requestedDiff = config["miner"]["requestedDiff"]
     algorithm = config["miner"]["algorithm"]
     rigIdentifier = config["miner"]["identifier"]
-    # Calulate efficiency for use with sleep function
-    efficiency = (100 - float(efficiency)) * 0.01
+
 
 
 time_for_device = 90
