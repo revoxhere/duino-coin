@@ -4,6 +4,7 @@
   * [HTTP JSON API](#HTTP-JSON-API)
 - [C DUCO library](#C-DUCO-library)
 - [Python3 DUCO module](#Python3-DUCO-module)
+- [Branding colors][#Branding]
 
 ## Commnicating with the master server
 
@@ -127,3 +128,21 @@ If you want to easily access the Duino-Coin API with your C apps, you can use [l
 ## Python3 DUCO module
 
 If you want to easily access the Duino-Coin API with your Python3 apps, [@connorhess](https://github.com/connorhess) made an official module for that here: [duco_api](https://github.com/revoxhere/duino-coin/tree/useful-tools/duco_api).
+
+## Branding
+
+We suggest using these colors in creating DUCO-Related apps:
+
+Branding colors:
+
+* White accent: `#0f0f0f`
+* Orange accent: `#ff4112`
+* Sun yellow accent: `#ffb412`
+* Magenta accent: `#f31291`
+* Dark accent: `#121212`
+
+Gradient variations of the colors above are a welcome touch.
+
+GUI colors:
+* Background: `#121212` (Dark) or `#fffdee` (Light)
+* Font color: `#fffdee` (Dark) or `#0f0f0f` (Light)
