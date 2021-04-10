@@ -371,7 +371,7 @@
         "rig_identifier": "Nom du mineur/rig: ",
 
         "basic_config_tool": "\nEditeur de configuration Duino-Coin\nEditez ",
-        "edit_config_file_warning": "le fichier /Miner_config.cfg si vous voulez le changer ultérieurement.",
+        "edit_config_file_warning": "le fichier /Miner_config.cfg si vous voulez changer votre configuration ultérieurement.",
         "dont_have_account": "Vous n'avez pas encore de compte Duino-Coin? Utilisez ",
         "wallet": "Wallet",
         "register_warning": " pour en créer un.\n",
@@ -387,7 +387,7 @@
         "config_saved": "Configuration sauvegardée! Lancement du mineur",
 
         "free_network_warning": " Le réseau Duino-Coin est un service complètement gratuit et le sera toujours",
-        "donate_warning": "\nNous ne prenons aucun frais sur votre minage.\nVous pouvez réellement nous aider à maintenir le serveur et garder un exchange avec peu de frais en activant la donation.\nVisitez ",
+        "donate_warning": "\nNous ne prélevons aucun frais sur votre minage.\nVous pouvez nous aider à maintenir le serveur et garder un exchange avec peu de frais en activant la donation.\nVisitez ",
         "learn_more_donate": " pour en apprendre plus sur comment vous pouvez nous aider :)",
         "starting_donation": "Démarrage du service de donation",
         "thanks_donation": " Merci d'être un super donateur ❤️ Votre don nous aidera a maintenir le serveur et permettra un développement ultérieur",
