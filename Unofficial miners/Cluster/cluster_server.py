@@ -361,6 +361,10 @@ def job_done(dispatcher,event):
                     job_to_send = start_end
                     break
 
+        if job_to_send == None:
+            device.job_stopped()
+            logger.warning('CANT FIND FREE JOB')
+            return None
 
         data = json.dumps({'t':'e',
                         'event':'start_job',
@@ -369,6 +373,7 @@ def job_done(dispatcher,event):
                         'start':job_to_send[0],
                         'end':job_to_send[1],
                         'algorithm':algorithm})
+        logger.debug('Sending job: '+data)
         device.job_started()
 
         event.callback.sendto(data.encode('ascii'),event.address)
@@ -382,7 +387,8 @@ def job_done(dispatcher,event):
         logger.debug('stopping workers')
         for addr,device in devices.items():
             device.job_stopped()
-            event.callback.sendto(data,addr)
+            if addr != event.address:
+                event.callback.sendto(data,addr)
         JOB = None
 
 
@@ -453,10 +459,11 @@ def request_job(dispatcher,event):
             job_object = Job()
             JOBS_TO_PROCESS[(start,end)] = job_object
             start = end
-            if real_difficulty<end+job_part:
+            if real_difficulty<=end+job_part:
                 end = real_difficulty+1
             else:
-                end += job_part 
+                end += job_part
+        logger.debug('JOB: '+str(JOBS_TO_PROCESS))
 
         break
 
