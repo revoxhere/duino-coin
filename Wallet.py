@@ -17,7 +17,7 @@ from pathlib import Path
 from threading import Timer, Thread
 from configparser import ConfigParser
 from time import sleep, time
-from os import _exit, mkdir, execl
+from os import _exit, mkdir, execl, path
 from tkinter import messagebox
 from base64 import b64encode, b64decode
 from requests import get
@@ -46,112 +46,15 @@ MIN_TRANSACTION_VALUE = 0.00000000001
 MIN_TRANSACTION_VALUE_NOTIFY = 0.5
 # Resources folder location
 resources = "Wallet_" + str(VERSION) + "_resources/"
+ENCRYPTION_ITERATIONS = 100_000
 config = ConfigParser()
 wrong_passphrase = False
-iterations = 100_000
 global_balance = 0
 
 
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
     execl(sys.executable, sys.executable, *sys.argv)
-
-
-try:
-    from pypresence import Presence
-except:
-    print(
-        'Pypresence is not installed.'
-        + 'Wallet will try to install it. '
-        + 'If it fails, please manually install "pypresence" python3 package.')
-    install("pypresence")
-
-try:
-    from PIL import Image, ImageTk
-except:
-    print(
-        'Pillow is not installed. '
-        + 'Wallet will try to install it. '
-        + 'If it fails, please manually install "Pillow" python3 package.')
-    install("Pillow")
-
-try:
-    import pystray
-except:
-    print("Pystray is not installed. "
-          + "Continuing without system tray support")
-    disableTray = True
-else:
-    disableTray = Falsename
-
-try:
-    from notifypy import Notify
-except:
-    print("Notify-py is not installed. "
-          + "Continuing without notification system")
-    notificationsEnabled = False
-else:
-    notificationsEnabled = True
-
-try:
-    from cryptography.fernet import Fernet, InvalidToken
-    from cryptography.hazmat.backends import default_backend
-    from cryptography.hazmat.primitives import hashes
-    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-
-    backend = default_backend()
-except ModuleNotFoundError:
-    now = datetime.now()
-    print(
-        now.strftime("%H:%M:%S ")
-        + 'Cryptography is not installed. '
-        + 'Please install it using: python3 - m pip install cryptography.'
-        + '\nExiting in 15s.')
-    sleep(15)
-    _exit(1)
-
-
-try:
-    import secrets
-except ModuleNotFoundError:
-    now = datetime.now()
-    print(
-        now.strftime("%H:%M:%S ")
-        + 'Secrets is not installed. '
-        + 'Please install it using: python3 - m pip install secrets.'
-        + '\nExiting in 15s.')
-    sleep(15)
-    _exit(1)
-
-try:
-    from base64 import urlsafe_b64encode as b64e, urlsafe_b64decode as b64d
-except:
-    now = datetime.now()
-    print(
-        now.strftime("%H:%M:%S ")
-        + 'Base64 is not installed. '
-        + 'Please install it using: python3 -m pip install base64.'
-        + '\nExiting in 15s.')
-    sleep(15)
-    _exit(1)
-
-try:
-    import tronpy
-    from tronpy.keys import PrivateKey
-
-    tronpy_installed = True
-except ModuleNotFoundError:
-    tronpy_installed = False
-    now = datetime.now()
-    print(
-        now.strftime("%H:%M:%S ")
-        + 'Tronpy is not installed. '
-        + 'Please install it using: python3 -m pip install tronpy.'
-        + '\nwDUCO Wrapper was disabled because Tronpy is missing')
-else:
-    tron = tronpy.Tron()
-    tron = tronpy.Tron()
-    wduco = tron.get_contract("TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U")
 
 
 def get_duco_price():
@@ -167,11 +70,11 @@ def get_duco_price():
             content = jsonapi.content.decode()
             contentjson = loads(content)
             duco_fiat_value = round(float(contentjson["Duco price"]), 4)
-        except:
+        except Exception:
             duco_fiat_value = 0.003
     else:
         duco_fiat_value = 0.003
-    Timer(30, GetDucoPrice).start()
+    Timer(30, get_duco_price).start()
 
 
 def title(title):
@@ -185,13 +88,12 @@ def title(title):
 def _derive_key(
         password: bytes,
         salt: bytes,
-        iterations: int = iterations) -> bytes:
-
+        iterations: int = ENCRYPTION_ITERATIONS) -> bytes:
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
         salt=salt,
-        iterations=iterations,
+        iterations=ENCRYPTION_ITERATIONS,
         backend=backend)
     return b64e(kdf.derive(password))
 
@@ -199,16 +101,16 @@ def _derive_key(
 def password_encrypt(
         message: bytes,
         password: str,
-        iterations: int = iterations) -> bytes:
+        iterations: int = ENCRYPTION_ITERATIONS) -> bytes:
     salt = secrets.token_bytes(16)
     key = _derive_key(
         password.encode(),
         salt,
-        iterations)
+        ENCRYPTION_ITERATIONS)
     return b64e(
         b"%b%b%b" % (
             salt,
-            iterations.to_bytes(4, "big"),
+            ENCRYPTION_ITERATIONS.to_bytes(4, "big"),
             b64d(Fernet(key).encrypt(message))))
 
 
@@ -216,13 +118,47 @@ def password_decrypt(
         token: bytes,
         password: str) -> bytes:
     decoded = b64d(token)
-    salt, iterations, token = decoded[:16], decoded[16:20], b64e(decoded[20:])
-    iterations = int.from_bytes(iterations, "big")
+    salt, ENCRYPTION_ITERATIONS, token = decoded[:16], decoded[16:20], b64e(
+        decoded[20:])
+    ENCRYPTION_ITERATIONS = int.from_bytes(ENCRYPTION_ITERATIONS, "big")
     key = _derive_key(
         password.encode(),
         salt,
-        iterations)
+        ENCRYPTION_ITERATIONS)
     return Fernet(key).decrypt(token)
+
+
+def get_string(string_name):
+    if string_name in lang_file[lang]:
+        return lang_file[lang][string_name]
+    elif string_name in lang_file["english"]:
+        return lang_file["english"][string_name]
+    else:
+        return "String not found: " + string_name
+
+
+def openTos(handler):
+    open_new_tab("https://github.com/revoxhere/duino-coin#terms-of-usage")
+
+
+def openGitHub(handler):
+    open_new_tab("https://github.com/revoxhere/duino-coin")
+
+
+def openWebsite(handler):
+    open_new_tab("https://duinocoin.com")
+
+
+def openExchange(handler):
+    open_new_tab("https://revoxhere.github.io/duco-exchange/")
+
+
+def openDiscord(handler):
+    open_new_tab("https://discord.com/invite/kvBkccy")
+
+
+def openTransaction(hashToOpen):
+    open_new_tab("https://explorer.duinocoin.com/?search="+str(hashToOpen))
 
 
 class LoginFrame(Frame):
@@ -370,7 +306,7 @@ class LoginFrame(Frame):
             if response[0] == "OK":
                 if keeplogedin >= 1:
                     passwordEnc = b64encode(bytes(password, encoding="utf8"))
-                    with sqlconn(f"{resources}/wallet.db") as con:
+                    with sqlconn(resources + "wallet.db") as con:
                         cur = con.cursor()
                         cur.execute(
                             """INSERT INTO
@@ -449,7 +385,7 @@ class LoginFrame(Frame):
         tos_warning = get_string("register_tos_warning")
         import textwrap
         tos_warning = textwrap.dedent(tos_warning)
-        tos_warning = '\n'.join(l for line in tos_warning.splitlines()
+        tos_warning = "\n".join(l for line in tos_warning.splitlines()
                                 for l in textwrap.wrap(line, width=20))
 
         duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
@@ -590,7 +526,7 @@ class LoginFrame(Frame):
         register.configure(background=BACKGROUND_COLOR)
 
 
-def LoadingWindow():
+def loading_window():
     global loading, status
     loading = Tk()
     loading.resizable(False, False)
@@ -599,14 +535,14 @@ def LoadingWindow():
     try:
         loading.iconphoto(True,
                           PhotoImage(file=resources + "duco_color.png"))
-    except:
+    except Exception:
         pass
     TEXT_FONT = Font(loading,
-                    size=10,
-                    weight="bold")
-    TEXT_FONT_BOLD = Font(loading,
-                     size=14,
+                     size=10,
                      weight="bold")
+    TEXT_FONT_BOLD = Font(loading,
+                          size=14,
+                          weight="bold")
 
     original = Image.open(resources + "duco_color.png")
     resized = original.resize((128, 128), Image.ANTIALIAS)
@@ -651,127 +587,7 @@ def LoadingWindow():
     loading.update()
 
 
-def get_string(string_name):
-    if string_name in lang_file[lang]:
-        return lang_file[lang][string_name]
-    elif string_name in lang_file["english"]:
-        return lang_file["english"][string_name]
-    else:
-        return "String not found: " + string_name
-
-
-with urlopen(
-    "https://raw.githubusercontent.com/"
-    + "revoxhere/"
-    + "duino-coin/gh-pages/"
-        + "serverip.txt") as content:
-    content = content.read().decode().splitlines()
-    pool_address = content[0]
-    pool_port = content[1]
-
-try:
-    mkdir(resources)
-except FileExistsError:
-    pass
-
-with sqlconn(f"{resources}/wallet.db") as con:
-    cur = con.cursor()
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS
-        Transactions(Date TEXT, amount REAL)""")
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS
-        UserData(username TEXT, password TEXT, useWrapper TEXT)""")
-    con.commit()
-
-if not Path(resources + "duco.png").is_file():
-    urlretrieve("https://i.imgur.com/9JzxR0B.png", resources + "duco.png")
-if not Path(resources + "duco_color.png").is_file():
-    urlretrieve(
-        "https://github.com/"
-        + "revoxhere/"
-        + "duino-coin/blob/master/"
-        + "Resources/duco.png?raw=true",
-        resources + "duco_color.png")
-if not Path(resources + "calculator.png").is_file():
-    urlretrieve("https://i.imgur.com/iqE28Ej.png",
-                resources + "calculator.png")
-if not Path(resources + "exchange.png").is_file():
-    urlretrieve("https://i.imgur.com/0qMtoZ7.png",
-                resources + "exchange.png")
-if not Path(resources + "discord.png").is_file():
-    urlretrieve("https://i.imgur.com/LoctALa.png",
-                resources + "discord.png")
-if not Path(resources + "github.png").is_file():
-    urlretrieve("https://i.imgur.com/PHEfWbl.png",
-                resources + "github.png")
-if not Path(resources + "settings.png").is_file():
-    urlretrieve("https://i.imgur.com/NNEI4WL.png",
-                resources + "settings.png")
-if not Path(resources + "transactions.png").is_file():
-    urlretrieve("https://i.imgur.com/nbVPlKk.png",
-                resources + "transactions.png")
-if not Path(resources + "stats.png").is_file():
-    urlretrieve("https://i.imgur.com/KRfHZUM.png",
-                resources + "stats.png")
-if not Path(resources + "langs.json").is_file():
-    urlretrieve(
-        "https://raw.githubusercontent.com/"
-        + "revoxhere/"
-        + "duino-coin/master/Resources/"
-        + "Wallet_langs.json",
-        resources + "langs.json")
-
-# Load language strings depending on system locale
-with open(f"{resources}langs.json", "r", encoding="utf-8") as lang_file:
-    lang_file = jsonload(lang_file)
-
-locale = getdefaultlocale()[0]
-if locale.startswith("es"):
-    lang = "spanish"
-elif locale.startswith("pl"):
-    lang = "polish"
-elif locale.startswith("fr"):
-    lang = "french"
-elif locale.startswith("bg"):
-    lang = "bulgarian"
-elif locale.startswith("nl"):
-    lang = "dutch"
-elif locale.startswith("ru"):
-    lang = "russian"
-elif locale.startswith("de"):
-    lang = "german"
-elif locale.startswith("tr"):
-    lang = "turkish"
-else:
-    lang = "english"
-
-
-def openTos(handler):
-    open_new_tab("https://github.com/revoxhere/duino-coin#terms-of-usage")
-
-
-def openGitHub(handler):
-    open_new_tab("https://github.com/revoxhere/duino-coin")
-
-
-def openWebsite(handler):
-    open_new_tab("https://duinocoin.com")
-
-
-def openExchange(handler):
-    open_new_tab("https://revoxhere.github.io/duco-exchange/")
-
-
-def openDiscord(handler):
-    open_new_tab("https://discord.com/invite/kvBkccy")
-
-
-def openTransaction(hashToOpen):
-    open_new_tab("https://explorer.duinocoin.com/?search="+str(hashToOpen))
-
-
-def openTransactions(handler):
+def transactions_window(handler):
     transactionsWindow = Toplevel()
     transactionsWindow.resizable(False, False)
     transactionsWindow.title(get_string("wallet_transactions"))
@@ -834,105 +650,47 @@ def openTransactions(handler):
         pady=(0, 5))
 
     for i in gtxl:
-        listbox.insert(END, gtxl[i]["Sender"] + " to " + gtxl[i]["Recipient"] + ": " + str(gtxl[i]["Amount"]) + " DUCO")
-        
-    def getSelection(event):
+        listbox.insert(END, gtxl[i]["Sender"] + " to " + gtxl[i]
+                       ["Recipient"] + ": " + str(gtxl[i]["Amount"]) + " DUCO")
+
+    def get_selection(event):
         try:
             selection = listbox.curselection()[0]
             openTransaction(gtxl[str(selection)]["Hash"])
         except IndexError:
             pass
 
-    listbox.bind("<Button-1>", getSelection)
+    listbox.bind("<Button-1>", get_selection)
     listbox.config(yscrollcommand=scrollbar.set, font=TEXT_FONT)
     scrollbar.config(command=listbox.yview)
 
 
-def currencyConvert():
+def currency_converter_calc():
     fromcurrency = fromCurrencyInput.get(fromCurrencyInput.curselection())
     tocurrency = toCurrencyInput.get(toCurrencyInput.curselection())
     amount = amountInput.get()
-    try:
-        if fromcurrency != "DUCO":
-            currencyapi = get(
-                "https://api.exchangeratesapi.io/latest?base=" +
-                str(fromcurrency),
-                data=None)
-            exchangerates = loads(currencyapi.content.decode())
-        else:
-            currencyapi = get(
-                "https://api.exchangeratesapi.io/latest?base=USD",
-                data=None)
-            exchangerates = loads(currencyapi.content.decode())
 
-        if currencyapi.status_code == 200:  # Check for reponse
-            if fromcurrency == "DUCO" and tocurrency != "DUCO":
-                exchangerates = loads(currencyapi.content.decode())
-                result = (
-                    str(
-                        round(
-                            float(amount)
-                            * float(duco_fiat_value)
-                            * float(exchangerates["rates"][tocurrency]),
-                            6))
-                    + " "
-                    + str(tocurrency))
-            else:
-                if tocurrency == "DUCO":
-                    currencyapisss = get(
-                        "https://api.exchangeratesapi.io/latest?symbols="
-                        + str(fromcurrency)
-                        + ",USD",
-                        data=None)
-                    if currencyapi.status_code == 200:  # Check for reponse
-                        ratesjson = loads(
-                            currencyapisss.content.decode())
-                        result = str(
-                            str(round(
-                                float(amount)
-                                * float(1 / duco_fiat_value)
-                                / float(ratesjson["rates"][fromcurrency]),
-                                6))
-                            + " "
-                            + str(tocurrency))
-                else:
-                    result = (
-                        str(
-                            round(
-                                float(amount)
-                                * float(exchangerates["rates"][tocurrency]),
-                                6,
-                            )
-                        )
-                        + " "
-                        + str(tocurrency))
-    except:
-        result = get_string("calculate_error")
+    # TODO
+    value = duco_fiat_value * float(amount)
 
-    result = get_string("result") + ": " + result
+    result = get_string("result") + ": " + str(round(value, 6))
     conversionresulttext.set(str(result))
     calculatorWindow.update()
 
 
-def openCalculator(handler):
+def currency_converter_window(handler):
     global conversionresulttext
     global fromCurrencyInput
     global toCurrencyInput
     global amountInput
     global calculatorWindow
 
-    currencyapi = get(
-        "https://api.exchangeratesapi.io/latest",
-        data=None)
-    if currencyapi.status_code == 200:  # Check for reponse
-        exchangerates = loads(currencyapi.content.decode())
-        exchangerates["rates"]["DUCO"] = float(duco_fiat_value)
-
     calculatorWindow = Toplevel()
     calculatorWindow.resizable(False, False)
     calculatorWindow.title(get_string("wallet_calculator"))
     calculatorWindow.transient([root])
     calculatorWindow.configure(background=BACKGROUND_COLOR)
+
 
     TEXT_FONT_BOLD = Font(
         calculatorWindow,
@@ -985,10 +743,8 @@ def openCalculator(handler):
                            column=0,
                            sticky=S + W,
                            padx=(5, 0))
-    i = 0
-    for currency in exchangerates["rates"]:
-        fromCurrencyInput.insert(i, currency)
-        i = i + 1
+    fromCurrencyInput.insert(0, "DUCO")
+
     vsb = Scrollbar(
         calculatorWindow,
         orient="vertical",
@@ -1001,7 +757,7 @@ def openCalculator(handler):
              padx=(0, 5))
     fromCurrencyInput.configure(yscrollcommand=vsb.set)
 
-    fromCurrencyInput.select_set(32)
+    fromCurrencyInput.select_set(0)
     fromCurrencyInput.event_generate("<<ListboxSelect>>")
 
     Label(
@@ -1030,10 +786,8 @@ def openCalculator(handler):
         column=3,
         sticky=S + W,
         padx=(5, 0))
-    i = 0
-    for currency in exchangerates["rates"]:
-        toCurrencyInput.insert(i, currency)
-        i = i + 1
+    toCurrencyInput.insert(0, "USD")
+
     vsb2 = Scrollbar(
         calculatorWindow,
         orient="vertical",
@@ -1087,7 +841,7 @@ def openCalculator(handler):
         foreground=FOREGROUND_COLOR,
         activebackground=BACKGROUND_COLOR,
         background=BACKGROUND_COLOR,
-        command=currencyConvert,
+        command=currency_converter_calc,
     ).grid(row=3,
            columnspan=2,
            column=2,
@@ -1096,7 +850,7 @@ def openCalculator(handler):
            padx=5)
 
     conversionresulttext = StringVar(calculatorWindow)
-    conversionresulttext.set(f'{get_string("result")}: 0.0')
+    conversionresulttext.set(get_string("result") + ": 0.0")
     conversionresultLabel = Label(
         calculatorWindow,
         textvariable=conversionresulttext,
@@ -1112,7 +866,7 @@ def openCalculator(handler):
     calculatorWindow.mainloop()
 
 
-def openStats(handler):
+def statistics_window(handler):
     statsApi = get(
         "https://raw.githubusercontent.com/"
         + "revoxhere/"
@@ -1187,7 +941,8 @@ def openStats(handler):
                 + shares)
             i += 1
     if i == 0:
-        Active_workers_listbox.insert(i, get_string("statistics_miner_warning"))
+        Active_workers_listbox.insert(
+            i, get_string("statistics_miner_warning"))
 
     totalHashrateString = str(int(totalHashrate)) + " H/s"
     if totalHashrate > 1000000000:
@@ -1204,7 +959,7 @@ def openStats(handler):
 
     Label(
         statsWindow,
-        text=f'{get_string("your_miners")} - ' + totalHashrateString,
+        text=get_string("your_miners") + " - " + totalHashrateString,
         font=TEXT_FONT_BOLD_LARGE,
         foreground=FOREGROUND_COLOR,
         background=BACKGROUND_COLOR,
@@ -1264,7 +1019,8 @@ def openStats(handler):
            pady=5)
     Label(
         statsWindow,
-        text=f'{get_string("difficulty")}: '
+        text=get_string("difficulty") 
+        + ": "
         + str(statsApi["Current difficulty"]),
         font=TEXT_FONT,
         background=BACKGROUND_COLOR,
@@ -1275,7 +1031,8 @@ def openStats(handler):
            padx=5)
     Label(
         statsWindow,
-        text=f'{get_string("mined_blocks")}: '
+        text=get_string("mined_blocks") 
+        + ": "
         + str(statsApi["Mined blocks"]),
         font=TEXT_FONT,
         background=BACKGROUND_COLOR,
@@ -1286,7 +1043,8 @@ def openStats(handler):
            padx=5)
     Label(
         statsWindow,
-        text=f'{get_string("network_hashrate")}: '
+        text=get_string("network_hashrate")
+        + ": "
         + str(statsApi["Pool hashrate"]),
         font=TEXT_FONT,
         background=BACKGROUND_COLOR,
@@ -1297,7 +1055,8 @@ def openStats(handler):
            padx=5)
     Label(
         statsWindow,
-        text=f'{get_string("active_miners")}: '
+        text=get_string("active_miners") 
+        + ": "
         + str(len(statsApi["Miners"])),
         font=TEXT_FONT,
         background=BACKGROUND_COLOR,
@@ -1308,7 +1067,9 @@ def openStats(handler):
            padx=5)
     Label(
         statsWindow,
-        text=f'1 DUCO {get_string("estimated_price")}: $'
+        text="1 DUCO "
+        + get_string("estimated_price") 
+        + ": $"
         + str(statsApi["Duco price"]),
         font=TEXT_FONT,
         background=BACKGROUND_COLOR,
@@ -1319,7 +1080,8 @@ def openStats(handler):
            padx=5)
     Label(
         statsWindow,
-        text=f'{get_string("registered_users")}: '
+        text=get_string("registered_users") 
+        + ": "
         + str(statsApi["Registered users"]),
         font=TEXT_FONT,
         background=BACKGROUND_COLOR,
@@ -1330,7 +1092,8 @@ def openStats(handler):
            padx=5)
     Label(
         statsWindow,
-        text=f'{get_string("mined_duco")}: '
+        text=get_string("mined_duco")
+        + ": "
         + str(statsApi["All-time mined DUCO"])
         + " ᕲ",
         font=TEXT_FONT,
@@ -1344,7 +1107,7 @@ def openStats(handler):
     statsWindow.mainloop()
 
 
-def openWrapper(handler):
+def wrapper_window(handler):
     def Wrap():
         amount = amountWrap.get()
         print("Got amount: ", amount)
@@ -1353,7 +1116,7 @@ def openWrapper(handler):
         soc.recv(3)
         try:
             float(amount)
-        except:
+        except Exception:
             pass
         else:
             soc.send(bytes(
@@ -1375,13 +1138,13 @@ def openWrapper(handler):
             wrapperWindow.quit()
 
     try:
-        pubkeyfile = open(str(f"{resources}/DUCOPubKey.pub"), "r")
-    except:
+        pubkeyfile = open(str(resources + "DUCOPubKey.pub"), "r")
+    except Exception:
         messagebox.showerror(
             title=get_string("wrapper_error_title"),
             message=get_string("wrapper_error"))
     else:
-        if tronpy_installed:
+        if TRONPY_ENABLED:
             pub_key = pubkeyfile.read()
             pubkeyfile.close()
 
@@ -1415,14 +1178,14 @@ def openWrapper(handler):
                 message=get_string("wrapper_error_tronpy"))
 
 
-def openUnWrapper(handler):
+def unwrapper_window(handler):
     def UnWrap():
-        pubkeyfile = open(str(f"{resources}/DUCOPubKey.pub"), "r")
+        pubkeyfile = open(str(resources + "DUCOPubKey.pub"), "r")
         pub_key = pubkeyfile.read()
         pubkeyfile.close()
 
         passphrase = passphraseEntry.get()
-        privkeyfile = open(str(f"{resources}/DUCOPrivKey.encrypt"), "r")
+        privkeyfile = open(str(resources + "DUCOPrivKey.encrypt"), "r")
         privKeyEnc = privkeyfile.read()
         privkeyfile.close()
 
@@ -1440,7 +1203,7 @@ def openUnWrapper(handler):
         soc.recv(3)
         try:
             float(amount)
-        except:
+        except Exception:
             pass
         else:
             soc.send(bytes(
@@ -1490,15 +1253,15 @@ def openUnWrapper(handler):
                 unWrapperWindow.quit()
 
     try:
-        pubkeyfile = open(str(f"{resources}/DUCOPubKey.pub"), "r")
+        pubkeyfile = open(str(resources + "DUCOPubKey.pub"), "r")
         pubkeyfile.read()
         pubkeyfile.close()
-    except:
+    except Exception:
         messagebox.showerror(
             title=get_string("wrapper_error_title"),
             message=get_string("wrapper_error"))
     else:
-        if tronpy_installed:
+        if TRONPY_ENABLED:
             unWrapperWindow = Toplevel()
             unWrapperWindow.resizable(False, False)
             unWrapperWindow.title(get_string("unwrapper_title"))
@@ -1549,9 +1312,9 @@ def openUnWrapper(handler):
                 message=get_string("wrapper_error_tronpy"))
 
 
-def openSettings(handler):
+def settings_window(handler):
     def _wrapperconf():
-        if tronpy_installed:
+        if TRONPY_ENABLED:
             privkey_input = StringVar()
             passphrase_input = StringVar()
             wrapconfWindow = Toplevel()
@@ -1570,13 +1333,13 @@ def openSettings(handler):
                         pub_key = PrivateKey(
                             bytes.fromhex(priv_key)
                         ).public_key.to_base58check_address()
-                    except:
+                    except Exception:
                         pass
                     else:
                         print("Saving data")
 
                         privkeyfile = open(
-                            str(f"{resources}/DUCOPrivKey.encrypt"), "w")
+                            str(resources + "DUCOPrivKey.encrypt"), "w")
                         privkeyfile.write(
                             str(password_encrypt(
                                 priv_key.encode(), passphrase
@@ -1584,7 +1347,7 @@ def openSettings(handler):
                         privkeyfile.close()
 
                         pubkeyfile = open(
-                            str(f"{resources}/DUCOPubKey.pub"), "w")
+                            str(resources + "DUCOPubKey.pub"), "w")
                         pubkeyfile.write(pub_key)
                         pubkeyfile.close()
 
@@ -1647,7 +1410,7 @@ def openSettings(handler):
 
     def _logout():
         try:
-            with sqlconn(f"{resources}/wallet.db") as con:
+            with sqlconn(resources + "wallet.db") as con:
                 cur = con.cursor()
                 cur.execute("DELETE FROM UserData")
                 con.commit()
@@ -1659,7 +1422,7 @@ def openSettings(handler):
             print(e)
 
     def _cleartrs():
-        with sqlconn(f"{resources}/wallet.db") as con:
+        with sqlconn(resources + "wallet.db") as con:
             cur = con.cursor()
             cur.execute("DELETE FROM transactions")
             con.commit()
@@ -1705,7 +1468,7 @@ def openSettings(handler):
                             try:
                                 try:
                                     with sqlconn(
-                                        f"{resources}/wallet.db"
+                                        resources + "wallet.db"
                                     ) as con:
                                         cur = con.cursor()
                                         cur.execute("DELETE FROM UserData")
@@ -1902,7 +1665,9 @@ def openSettings(handler):
 
     Label(
         settingsWindow,
-        text=f'{get_string("logged_in_as")}: ' + str(username),
+        text=get_string("logged_in_as") 
+        + ": " 
+        + str(username),
         font=TEXT_FONT,
         background=BACKGROUND_COLOR,
         foreground=FONT_COLOR,
@@ -1914,7 +1679,9 @@ def openSettings(handler):
         sticky=S + W)
     Label(
         settingsWindow,
-        text=f'{get_string("wallet_version")}: ' + str(VERSION),
+        text=get_string("wallet_version")
+        + ": " 
+        + str(VERSION),
         font=TEXT_FONT,
         background=BACKGROUND_COLOR,
         foreground=FONT_COLOR,
@@ -2032,7 +1799,7 @@ balance = 0
 unpaid_balance = 0
 
 
-def getBalance():
+def get_balance():
     global oldbalance
     global balance
     global unpaid_balance
@@ -2060,8 +1827,8 @@ def getBalance():
             soc.send(bytes(
                 "GTXL," + str(username) + ",7",
                 encoding="utf8"))
-            gtxl = str(soc.recv(8096).decode().rstrip("\n").replace("\'", "\""))
-            print(gtxl)
+            gtxl = str(soc.recv(8096).decode().rstrip(
+                "\n").replace("\'", "\""))
             gtxl = jsonloads(gtxl)
         except Exception as e:
             print("Error getting transaction list: " + str(e))
@@ -2073,7 +1840,7 @@ def getBalance():
             if float(balance) != float(difference):
                 if (dif_with_unpaid >= MIN_TRANSACTION_VALUE
                         or dif_with_unpaid < 0
-                        ):
+                    ):
                     now = datetime.now()
                     difference = round(dif_with_unpaid, 8)
                     if (
@@ -2089,9 +1856,9 @@ def getBalance():
                             + now.strftime("%d.%m.%Y %H:%M:%S\n")
                             + str(round(difference, 6))
                             + " DUCO")
-                        notification.icon = f"{resources}/duco_color.png"
+                        notification.icon = resources + "duco_color.png"
                         notification.send(block=False)
-                    with sqlconn(f"{resources}/wallet.db") as con:
+                    with sqlconn(resources + "wallet.db") as con:
                         cur = con.cursor()
                         cur.execute(
                             """INSERT INTO Transactions(Date, amount)
@@ -2104,18 +1871,18 @@ def getBalance():
                     unpaid_balance += float(balance) - float(oldbalance)
     except Exception as e:
         print("Retrying in 3s. (" + str(e) + ")")
-    Timer(3, getBalance).start()
+    Timer(3, get_balance).start()
 
 
-def getwbalance():
-    if tronpy_installed:
+def get_wbalance():
+    if TRONPY_ENABLED:
         try:
-            pubkeyfile = open(str(f"{resources}/DUCOPubKey.pub"), "r")
+            pubkeyfile = open(str(resources + "DUCOPubKey.pub"), "r")
             pub_key = pubkeyfile.read()
             pubkeyfile.close()
             wBalance = float(wduco.functions.balanceOf(pub_key)) / (10 ** 6)
             return wBalance
-        except:
+        except Exception:
             return 0.0
     else:
         return 0.0
@@ -2124,14 +1891,15 @@ def getwbalance():
 profitCheck = 0
 
 
-def updateBalanceLabel():
+def update_balance_labels():
     global profit_array, profitCheck
     try:
         balancetext.set(str(round(global_balance, 7)) + " ᕲ")
-        wbalancetext.set(str(getwbalance()) + " wᕲ")
-        balanceusdtext.set("$" + str(round(global_balance * duco_fiat_value, 4)))
+        wbalancetext.set(str(get_wbalance()) + " wᕲ")
+        balanceusdtext.set(
+            "$" + str(round(global_balance * duco_fiat_value, 4)))
 
-        with sqlconn(f"{resources}/wallet.db") as con:
+        with sqlconn(resources + "wallet.db") as con:
             cur = con.cursor()
             cur.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
             Transactions = cur.fetchall()
@@ -2168,12 +1936,15 @@ def updateBalanceLabel():
                 hourlyprofittext.set("")
                 dailyprofittext.set("")
             profitCheck += 1
-    except:
+    except Exception:
         _exit(0)
-    Timer(1, updateBalanceLabel).start()
+    Timer(1, update_balance_labels).start()
+
 
 curr_bal = 0
-def calculateProfit(start_bal):
+
+
+def profit_calculator(start_bal):
     try:  # Thanks Bilaboz for the code!
         global curr_bal, profit_array
 
@@ -2191,12 +1962,12 @@ def calculateProfit(start_bal):
                 round(minute, 6),
                 round(hourly, 4),
                 round(daily, 2)]
-    except:
+    except Exception:
         _exit(0)
-    Timer(10, calculateProfit, [start_bal]).start()
+    Timer(10, profit_calculator, [start_bal]).start()
 
 
-def sendFunds(handler):
+def send_funds_protocol(handler):
     recipientStr = recipient.get()
     amountStr = amount.get()
 
@@ -2243,16 +2014,16 @@ def sendFunds(handler):
     root.update()
 
 
-def initRichPresence():
+def init_rich_presence():
     global RPC
     try:
         RPC = Presence(806985845320056884)
         RPC.connect()
-    except:  # Discord not launched
+    except Exception:  # Discord not launched
         pass
 
 
-def updateRichPresence():
+def update_rich_presence():
     startTime = int(time())
     while True:
         try:
@@ -2272,7 +2043,7 @@ def updateRichPresence():
                      "url": "https://duinocoin.com"},
                     {"label": "Discord Server",
                      "url": "https://discord.gg/k48Ht5y"}])
-        except:  # Discord not launched
+        except Exception:  # Discord not launched
             pass
         sleep(15)
 
@@ -2293,7 +2064,7 @@ class Wallet:
         global profit_array
         try:
             loading.destroy()
-        except:
+        except Exception:
             pass
 
         textFont4 = Font(
@@ -2316,7 +2087,8 @@ class Wallet:
 
         Label(
             master,
-            text=f'{get_string("uppercase_duino_coin_wallet")}: '
+            text=get_string("uppercase_duino_coin_wallet") 
+            + ": "
             + str(username),
             font=TEXT_FONT_BOLD_LARGE,
             foreground=FOREGROUND_COLOR,
@@ -2332,7 +2104,7 @@ class Wallet:
         balancetext = StringVar()
         wbalancetext = StringVar()
         balancetext.set(get_string("please_wait"))
-        if tronpy_installed:
+        if TRONPY_ENABLED:
             wbalancetext.set(get_string("please_wait"))
         else:
             wbalancetext.set("0.00")
@@ -2454,7 +2226,7 @@ class Wallet:
             columnspan=4,
             padx=(5),
             pady=(1, 2))
-        sendLabel.bind("<Button-1>", sendFunds)
+        sendLabel.bind("<Button-1>", send_funds_protocol)
 
         wrapLabel = Button(
             master,
@@ -2470,7 +2242,7 @@ class Wallet:
             columnspan=2,
             padx=(5, 1),
             pady=(1, 5))
-        wrapLabel.bind("<Button-1>", openWrapper)
+        wrapLabel.bind("<Button-1>", wrapper_window)
 
         wrapLabel = Button(
             master,
@@ -2486,7 +2258,7 @@ class Wallet:
             columnspan=2,
             padx=(1, 5),
             pady=(1, 5))
-        wrapLabel.bind("<Button-1>", openUnWrapper)
+        wrapLabel.bind("<Button-1>", unwrapper_window)
 
         separator = ttk.Separator(master, orient="horizontal")
         separator.grid(
@@ -2629,7 +2401,7 @@ class Wallet:
             column=0,
             sticky=N + S + W + E,
             pady=(0, 5))
-        transactionsLabel.bind("<Button>", openTransactions)
+        transactionsLabel.bind("<Button>", transactions_window)
 
         original = Image.open(resources + "calculator.png")
         resized = original.resize((58, 58), Image.ANTIALIAS)
@@ -2646,7 +2418,7 @@ class Wallet:
             sticky=N + S + W + E,
             padx=(0, 5),
             pady=(0, 5))
-        calculatorLabel.bind("<Button>", openCalculator)
+        calculatorLabel.bind("<Button>", currency_converter_window)
 
         original = Image.open(resources + "stats.png")
         resized = original.resize((58, 58), Image.ANTIALIAS)
@@ -2663,7 +2435,7 @@ class Wallet:
             sticky=N + S + W + E,
             padx=(0, 5),
             pady=(0, 5))
-        statsLabel.bind("<Button>", openStats)
+        statsLabel.bind("<Button>", statistics_window)
 
         original = Image.open(resources + "settings.png")
         resized = original.resize((58, 58), Image.ANTIALIAS)
@@ -2680,15 +2452,15 @@ class Wallet:
             sticky=N + S + W + E,
             padx=(0, 10),
             pady=(0, 5))
-        settingsLabel.bind("<Button>", openSettings)
+        settingsLabel.bind("<Button>", settings_window)
 
         root.iconphoto(True, PhotoImage(file=resources + "duco_color.png"))
         start_balance = global_balance
         curr_bal = start_balance
-        calculateProfit(start_balance)
-        updateBalanceLabel()
+        profit_calculator(start_balance)
+        update_balance_labels()
 
-        if not disableTray:
+        if not DISABLE_TRAY:
             try:
                 def quit_window(icon, item):
                     master.destroy()
@@ -2711,48 +2483,224 @@ class Wallet:
                 t = Thread(target=withdraw_window)
                 t.setDaemon(True)
                 t.start()
-            except:
+            except Exception:
                 pass
 
         root.mainloop()
 
 
-with sqlconn(f"{resources}/wallet.db") as con:
+try:
+    from pypresence import Presence
+except ModuleNotFoundError:
+    print("Pypresence is not installed."
+          + "Wallet will try to install it. "
+          + "If it fails, please manually install \"pypresence\".")
+    install("pypresence")
+
+try:
+    from PIL import Image, ImageTk
+except ModuleNotFoundError:
+    print("Pillow is not installed. "
+          + "Wallet will try to install it. "
+          + "If it fails, please manually install \"Pillow\".")
+    install("Pillow")
+
+try:
+    import pystray
+except ModuleNotFoundError:
+    print("Pystray is not installed. "
+          + "Continuing without system tray support.")
+    DISABLE_TRAY = True
+else:
+    DISABLE_TRAY = False
+
+try:
+    from notifypy import Notify
+except ModuleNotFoundError:
+    print("Notify-py is not installed. "
+          + "Continuing without notification system.")
+    notificationsEnabled = False
+else:
+    notificationsEnabled = True
+
+try:
+    from cryptography.fernet import Fernet, InvalidToken
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
+    backend = default_backend()
+except ModuleNotFoundError:
+    print("Cryptography is not installed. "
+          + "Please manually install \"cryptography\"."
+          + "\nExiting in 15s.")
+    sleep(15)
+    _exit(1)
+
+try:
+    import secrets
+except ModuleNotFoundError:
+    print("Secrets is not installed. "
+          + "Please manually install \"secrets\"."
+          + "\nExiting in 15s.")
+    sleep(15)
+    _exit(1)
+
+try:
+    from base64 import urlsafe_b64encode as b64e, urlsafe_b64decode as b64d
+except ModuleNotFoundError:
+    print("Base64 is not installed. "
+          + "Please manually install \"base64\""
+          + "\nExiting in 15s.")
+    sleep(15)
+    _exit(1)
+
+try:
+    import tronpy
+    from tronpy.keys import PrivateKey
+    TRONPY_ENABLED = True
+except ModuleNotFoundError:
+    TRONPY_ENABLED = False
+    print("Tronpy is not installed. "
+          + "Please manually install \"tronpy\" "
+          + "if you intend on using wDUCO wrapper.")
+else:
+    tron = tronpy.Tron()
+    tron = tronpy.Tron()
+    wduco = tron.get_contract("TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U")
+
+with urlopen(
+    "https://raw.githubusercontent.com/"
+    + "revoxhere/"
+    + "duino-coin/gh-pages/"
+        + "serverip.txt") as content:
+    content = content.read().decode().splitlines()
+    pool_address = content[0]
+    pool_port = content[1]
+
+if not path.exists(resources):
+    mkdir(resources)
+
+with sqlconn(resources + "/wallet.db") as con:
     cur = con.cursor()
-    cur.execute("SELECT COUNT(username) FROM UserData")
-    userdata_count = cur.fetchall()[0][0]
-    if userdata_count < 1:
-        root = Tk()
-        lf = LoginFrame(root)
-        root.mainloop()
+    cur.execute(
+        """CREATE TABLE IF NOT EXISTS
+        Transactions(Date TEXT, amount REAL)""")
+    cur.execute(
+        """CREATE TABLE IF NOT EXISTS
+        UserData(username TEXT, password TEXT, useWrapper TEXT)""")
+    con.commit()
+
+if not Path(resources + "duco.png").is_file():
+    urlretrieve("https://i.imgur.com/9JzxR0B.png", resources + "duco.png")
+
+if not Path(resources + "duco_color.png").is_file():
+    urlretrieve(
+        "https://github.com/"
+        + "revoxhere/"
+        + "duino-coin/blob/master/"
+        + "Resources/duco.png?raw=true",
+        resources + "duco_color.png")
+
+if not Path(resources + "calculator.png").is_file():
+    urlretrieve("https://i.imgur.com/iqE28Ej.png",
+                resources + "calculator.png")
+
+if not Path(resources + "exchange.png").is_file():
+    urlretrieve("https://i.imgur.com/0qMtoZ7.png",
+                resources + "exchange.png")
+
+if not Path(resources + "discord.png").is_file():
+    urlretrieve("https://i.imgur.com/LoctALa.png",
+                resources + "discord.png")
+
+if not Path(resources + "github.png").is_file():
+    urlretrieve("https://i.imgur.com/PHEfWbl.png",
+                resources + "github.png")
+
+if not Path(resources + "settings.png").is_file():
+    urlretrieve("https://i.imgur.com/NNEI4WL.png",
+                resources + "settings.png")
+
+if not Path(resources + "transactions.png").is_file():
+    urlretrieve("https://i.imgur.com/nbVPlKk.png",
+                resources + "transactions.png")
+
+if not Path(resources + "stats.png").is_file():
+    urlretrieve("https://i.imgur.com/KRfHZUM.png",
+                resources + "stats.png")
+
+if not Path(resources + "langs.json").is_file():
+    urlretrieve(
+        "https://raw.githubusercontent.com/"
+        + "revoxhere/"
+        + "duino-coin/master/Resources/"
+        + "Wallet_langs.json",
+        resources + "langs.json")
+
+# Load language strings depending on system locale
+with open(resources + "langs.json", "r", encoding="utf-8") as lang_file:
+    lang_file = jsonloads(lang_file.read())
+try:
+    locale = getdefaultlocale()[0]
+    if locale.startswith("es"):
+        lang = "spanish"
+    elif locale.startswith("pl"):
+        lang = "polish"
+    elif locale.startswith("fr"):
+        lang = "french"
+    elif locale.startswith("bg"):
+        lang = "bulgarian"
+    elif locale.startswith("nl"):
+        lang = "dutch"
+    elif locale.startswith("ru"):
+        lang = "russian"
+    elif locale.startswith("de"):
+        lang = "german"
+    elif locale.startswith("tr"):
+        lang = "turkish"
+    else:
+        lang = "english"
+except IndexError:
+    lang = "english"
+
+
+if __name__ == "__main__":
+    with sqlconn(resources + "wallet.db") as con:
         cur = con.cursor()
         cur.execute("SELECT COUNT(username) FROM UserData")
         userdata_count = cur.fetchall()[0][0]
-    if userdata_count >= 1:
-        LoadingWindow()
-        with sqlconn(f"{resources}/wallet.db") as con:
-            cur = con.cursor()
-            cur.execute("SELECT * FROM UserData")
-            userdata_query = cur.fetchone()
-            username = userdata_query[0]
-            passwordEnc = (userdata_query[1]).decode("utf-8")
-            password = b64decode(passwordEnc).decode("utf8")
-        status.config(text=get_string("preparing_wallet_window"))
-        loading.update()
-        try:
-            # Start duco price updater
-            get_duco_price()
-            getBalance()
-            initRichPresence()
-            Thread(target=updateRichPresence).start()
-            try:
-                # Destroy loading dialog and start the main wallet window
-                loading.destroy()
-            except:
-                pass
+        if userdata_count < 1:
             root = Tk()
-            my_gui = Wallet(root)
-        except ValueError:
-            print("ValueError")
-            _exit(0)
-_exit(0)
+            lf = LoginFrame(root)
+            root.mainloop()
+            cur = con.cursor()
+            cur.execute("SELECT COUNT(username) FROM UserData")
+            userdata_count = cur.fetchall()[0][0]
+        if userdata_count >= 1:
+            loading_window()
+            with sqlconn(resources + "wallet.db") as con:
+                cur = con.cursor()
+                cur.execute("SELECT * FROM UserData")
+                userdata_query = cur.fetchone()
+                username = userdata_query[0]
+                passwordEnc = (userdata_query[1]).decode("utf-8")
+                password = b64decode(passwordEnc).decode("utf8")
+            status.config(text=get_string("preparing_wallet_window"))
+            loading.update()
+            try:
+                # Start duco price updater
+                get_duco_price()
+                get_balance()
+                init_rich_presence()
+                Thread(target=update_rich_presence).start()
+                try:
+                    # Destroy loading dialog and start the main wallet window
+                    loading.destroy()
+                except Exception:
+                    pass
+                root = Tk()
+                my_gui = Wallet(root)
+            except ValueError:
+                print("ValueError")
+                _exit(0)
