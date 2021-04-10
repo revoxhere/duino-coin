@@ -104,7 +104,8 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
-*   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner)
+*   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) by DoctorEenot
+*   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) by fabiopolancoe
 *   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) by PhereloHD & HGEpro
 *   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) by Alicia426
 *   [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch
@@ -116,7 +117,7 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
     *   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) by revox
     *   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) by revox
     *   [Minimal Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) by revox
-    *   [(Old) Multithreaded Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Multithreaded_PC_Miner.py) by Bilaboz
+<!--*   [Multithreaded Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Multithreaded_PC_Miner.py) by Bilaboz (DEPRECATED) -->
 
 **Other tools:**
 *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
