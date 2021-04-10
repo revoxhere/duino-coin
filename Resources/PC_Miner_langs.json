@@ -365,7 +365,7 @@
     },    
     "german": {
         "translation_autor": "BastelPichi, EinWildesPanda",
-        "sigint_detected": " SIGINT erkannt - Schliesse Miner.",
+        "sigint_detected": " SIGINT erkannt - Schließe Miner.",
         "goodbye": " Bis Bald!",
         "greeting_morning": "Guten Morgen!",
         "greeting_noon": "Schönen Mittag",
@@ -389,7 +389,7 @@
 
         "basic_config_tool": "\nDuino-Coin simples Konfigurationstool\nBearbeite ",
         "edit_config_file_warning": "/Miner_config.cfg wenn du später Einstellungen verändern möchtest.",
-        "dont_have_account": "Du hast noch kein Duino-Coin-Account? Benutze ",
+        "dont_have_account": "Du hast noch keinen Duino-Coin Account? Benutze ",
         "wallet": "Wallet",
         "register_warning": " um dich zu registrieren.\n",
         "ask_username": "Gib deinen Duino-Coin Nutzernamen ein: ",
@@ -433,6 +433,6 @@
 
         "mining_user": " Benutzer ",
         "mining_not_exist": " existiert nicht.",
-        "mining_not_exist_warning": " Stelle sicher, dass du den Nuternamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s"
+        "mining_not_exist_warning": " Stelle sicher, dass du den Nutzernamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s"
     }	
 }
