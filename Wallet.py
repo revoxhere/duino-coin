@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Tkinter GUI Wallet (v2.3)
+# Duino-Coin Tkinter GUI Wallet (v2.4)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -14,7 +14,7 @@ from tkinter import LEFT, BOTH, RIGHT, END, N, S, W, E
 from webbrowser import open_new_tab
 from urllib.request import urlopen, urlretrieve
 from pathlib import Path
-from threading import Timer
+from threading import Timer, Thread
 from configparser import ConfigParser
 from time import sleep, time
 from os import _exit, mkdir, execl
@@ -22,38 +22,39 @@ from tkinter import messagebox
 from base64 import b64encode, b64decode
 from requests import get
 from json import loads
-import threading
-import datetime
-import json
-import subprocess
-import os
-import locale
-import socket
+from datetime import datetime
+from json import loads as jsonloads
+from subprocess import check_call
+from os import execl, system, _exit
+from os import name as osname
+from locale import getdefaultlocale
+from socket import socket
+from sqlite3 import connect as sqlconn
 import sys
-import sqlite3
 
-# Version number
-version = 2.3
+
+# VERSION number
+VERSION = 2.4
 # Colors
-backgroundColor = "#121212"
-fontColor = "#FAFAFA"
-foregroundColor = "#f0932b"
-foregroundColorSecondary = "#ffbe76"
+BACKGROUND_COLOR = "#121212"
+FONT_COLOR = "#FAFAFA"
+FOREGROUND_COLOR = "#f0932b"
+FOREGROUND_COLOR_SECONDARY = "#ffbe76"
 # Minimum transaction amount to be saved
-min_trans_difference = 0.00000000001
+MIN_TRANSACTION_VALUE = 0.00000000001
 # Minimum transaction amount to show a notification
-min_trans_difference_notify = 0.5
+MIN_TRANSACTION_VALUE_NOTIFY = 0.5
 # Resources folder location
-resources = "Wallet_" + str(version) + "_resources/"
+resources = "Wallet_" + str(VERSION) + "_resources/"
 config = ConfigParser()
 wrong_passphrase = False
 iterations = 100_000
-globalBalance = 0
+global_balance = 0
 
 
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-    os.execl(sys.executable, sys.executable, *sys.argv)
+    execl(sys.executable, sys.executable, *sys.argv)
 
 
 try:
@@ -81,7 +82,7 @@ except:
           + "Continuing without system tray support")
     disableTray = True
 else:
-    disableTray = False
+    disableTray = Falsename
 
 try:
     from notifypy import Notify
@@ -100,39 +101,39 @@ try:
 
     backend = default_backend()
 except ModuleNotFoundError:
-    now = datetime.datetime.now()
+    now = datetime.now()
     print(
         now.strftime("%H:%M:%S ")
         + 'Cryptography is not installed. '
         + 'Please install it using: python3 - m pip install cryptography.'
         + '\nExiting in 15s.')
     sleep(15)
-    os._exit(1)
+    _exit(1)
 
 
 try:
     import secrets
 except ModuleNotFoundError:
-    now = datetime.datetime.now()
+    now = datetime.now()
     print(
         now.strftime("%H:%M:%S ")
         + 'Secrets is not installed. '
         + 'Please install it using: python3 - m pip install secrets.'
         + '\nExiting in 15s.')
     sleep(15)
-    os._exit(1)
+    _exit(1)
 
 try:
     from base64 import urlsafe_b64encode as b64e, urlsafe_b64decode as b64d
 except:
-    now = datetime.datetime.now()
+    now = datetime.now()
     print(
         now.strftime("%H:%M:%S ")
         + 'Base64 is not installed. '
         + 'Please install it using: python3 -m pip install base64.'
         + '\nExiting in 15s.')
     sleep(15)
-    os._exit(1)
+    _exit(1)
 
 try:
     import tronpy
@@ -141,7 +142,7 @@ try:
     tronpy_installed = True
 except ModuleNotFoundError:
     tronpy_installed = False
-    now = datetime.datetime.now()
+    now = datetime.now()
     print(
         now.strftime("%H:%M:%S ")
         + 'Tronpy is not installed. '
@@ -153,8 +154,8 @@ else:
     wduco = tron.get_contract("TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U")
 
 
-def GetDucoPrice():
-    global ducofiat
+def get_duco_price():
+    global duco_fiat_value
     jsonapi = get(
         "https://raw.githubusercontent.com/"
         + "revoxhere/"
@@ -165,17 +166,17 @@ def GetDucoPrice():
         try:
             content = jsonapi.content.decode()
             contentjson = loads(content)
-            ducofiat = round(float(contentjson["Duco price"]), 4)
+            duco_fiat_value = round(float(contentjson["Duco price"]), 4)
         except:
-            ducofiat = 0.003
+            duco_fiat_value = 0.003
     else:
-        ducofiat = 0.003
+        duco_fiat_value = 0.003
     Timer(30, GetDucoPrice).start()
 
 
 def title(title):
-    if os.name == "nt":
-        os.system("title " + title)
+    if osname == "nt":
+        system("title " + title)
     else:
         print("\33]0;" + title + "\a", end="")
         sys.stdout.flush()
@@ -230,48 +231,48 @@ class LoginFrame(Frame):
         master.title("Login")
         master.resizable(False, False)
 
-        textFont2 = Font(size=12, weight="bold")
-        textFont = Font(size=12, weight="normal")
+        TEXT_FONT_BOLD = Font(size=12, weight="bold")
+        TEXT_FONT = Font(size=12, weight="normal")
 
         self.duco = ImageTk.PhotoImage(Image.open(resources + "duco.png"))
         self.duco.image = self.duco
         self.ducoLabel = Label(
-            self, background=foregroundColor,
-            foreground=fontColor,
+            self, background=FOREGROUND_COLOR,
+            foreground=FONT_COLOR,
             image=self.duco)
         self.ducoLabel2 = Label(
             self,
-            background=foregroundColor,
-            foreground=fontColor,
-            text=getString("welcome_message"),
-            font=textFont2)
+            background=FOREGROUND_COLOR,
+            foreground=FONT_COLOR,
+            text=get_string("welcome_message"),
+            font=TEXT_FONT_BOLD)
         self.spacer = Label(self)
 
         self.label_username = Label(
             self,
-            text=getString("username"),
-            font=textFont2,
-            background=backgroundColor,
-            foreground=fontColor,
+            text=get_string("username"),
+            font=TEXT_FONT_BOLD,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
             padx=5)
         self.label_password = Label(
             self,
-            text=getString("passwd"),
-            font=textFont2,
-            background=backgroundColor,
-            foreground=fontColor,
+            text=get_string("passwd"),
+            font=TEXT_FONT_BOLD,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
             padx=5)
         self.entry_username = Entry(
             self,
-            font=textFont,
-            background=backgroundColor,
-            foreground=foregroundColorSecondary)
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FOREGROUND_COLOR_SECONDARY)
         self.entry_password = Entry(
             self,
             show="*",
-            font=textFont,
-            background=backgroundColor,
-            foreground=foregroundColorSecondary)
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FOREGROUND_COLOR_SECONDARY)
 
         self.ducoLabel.grid(
             row=0,
@@ -300,14 +301,14 @@ class LoginFrame(Frame):
         self.var = IntVar()
         self.checkbox = Checkbutton(
             self,
-            text=getString("keep_me_logged_in"),
-            background=backgroundColor,
-            activebackground=backgroundColor,
-            selectcolor=backgroundColor,
-            activeforeground=foregroundColor,
-            foreground=fontColor,
+            text=get_string("keep_me_logged_in"),
+            background=BACKGROUND_COLOR,
+            activebackground=BACKGROUND_COLOR,
+            selectcolor=BACKGROUND_COLOR,
+            activeforeground=FOREGROUND_COLOR,
+            foreground=FONT_COLOR,
             variable=self.var,
-            font=textFont,
+            font=TEXT_FONT,
             borderwidth="0",
             highlightthickness="0")
         self.checkbox.grid(
@@ -318,12 +319,12 @@ class LoginFrame(Frame):
 
         self.logbtn = Button(
             self,
-            text=getString("login"),
-            foreground=foregroundColor,
-            background=backgroundColor,
-            activebackground=backgroundColor,
+            text=get_string("login"),
+            foreground=FOREGROUND_COLOR,
+            background=BACKGROUND_COLOR,
+            activebackground=BACKGROUND_COLOR,
             command=self._login_btn_clicked,
-            font=textFont2)
+            font=TEXT_FONT_BOLD)
         self.logbtn.grid(
             columnspan=2,
             sticky="nswe",
@@ -332,19 +333,19 @@ class LoginFrame(Frame):
 
         self.regbtn = Button(
             self,
-            text=getString("register"),
-            foreground=foregroundColor,
-            background=backgroundColor,
-            activebackground=backgroundColor,
+            text=get_string("register"),
+            foreground=FOREGROUND_COLOR,
+            background=BACKGROUND_COLOR,
+            activebackground=BACKGROUND_COLOR,
             command=self._register_btn_clicked,
-            font=textFont2)
+            font=TEXT_FONT_BOLD)
         self.regbtn.grid(
             columnspan=2,
             sticky="nswe",
             padx=(5),
             pady=(0, 5))
 
-        self.configure(background=backgroundColor)
+        self.configure(background=BACKGROUND_COLOR)
         self.pack()
 
     def _login_btn_clicked(self):
@@ -354,7 +355,7 @@ class LoginFrame(Frame):
         keeplogedin = self.var.get()
 
         if username and password:
-            soc = socket.socket()
+            soc = socket()
             soc.connect((pool_address, int(pool_port)))
             soc.recv(3)
             soc.send(bytes(
@@ -369,7 +370,7 @@ class LoginFrame(Frame):
             if response[0] == "OK":
                 if keeplogedin >= 1:
                     passwordEnc = b64encode(bytes(password, encoding="utf8"))
-                    with sqlite3.connect(f"{resources}/wallet.db") as con:
+                    with sqlconn(f"{resources}/wallet.db") as con:
                         cur = con.cursor()
                         cur.execute(
                             """INSERT INTO
@@ -380,12 +381,12 @@ class LoginFrame(Frame):
                 root.destroy()
             else:
                 messagebox.showerror(
-                    title=getString("login_error"),
+                    title=get_string("login_error"),
                     message=response[1])
         else:
             messagebox.showerror(
-                title=getString("login_error"),
-                message=getString("fill_the_blanks_warning"))
+                title=get_string("login_error"),
+                message=get_string("fill_the_blanks_warning"))
 
     def _registerprotocol(self):
         emailS = email.get()
@@ -395,7 +396,7 @@ class LoginFrame(Frame):
 
         if emailS and usernameS and passwordS and confpasswordS:
             if passwordS == confpasswordS:
-                soc = socket.socket()
+                soc = socket()
                 soc.connect((pool_address, int(pool_port)))
                 soc.recv(3)
                 soc.send(
@@ -412,40 +413,40 @@ class LoginFrame(Frame):
 
                 if response[0] == "OK":
                     messagebox.showinfo(
-                        title=getString("registration_success"),
-                        message=getString("registration_success_msg"))
+                        title=get_string("registration_success"),
+                        message=get_string("registration_success_msg"))
                     register.destroy()
                     execl(sys.executable, sys.executable, *sys.argv)
                 else:
                     messagebox.showerror(
-                        title=getString("register_error"),
+                        title=get_string("register_error"),
                         message=response[1])
             else:
                 messagebox.showerror(
-                    title=getString("register_error"),
-                    message=getString("error_passwd_dont_match"))
+                    title=get_string("register_error"),
+                    message=get_string("error_passwd_dont_match"))
         else:
             messagebox.showerror(
-                title=getString("register_error"),
-                message=getString("fill_the_blanks_warning"))
+                title=get_string("register_error"),
+                message=get_string("fill_the_blanks_warning"))
 
     def _register_btn_clicked(self):
         global username, password, confpassword, email, register
         root.destroy()
         register = Tk()
-        register.title(getString("register"))
+        register.title(get_string("register"))
         register.resizable(False, False)
 
-        textFont2 = Font(
+        TEXT_FONT_BOLD = Font(
             register,
             size=12,
             weight="bold")
-        textFont = Font(
+        TEXT_FONT = Font(
             register,
             size=12,
             weight="normal")
 
-        tos_warning = getString("register_tos_warning")
+        tos_warning = get_string("register_tos_warning")
         import textwrap
         tos_warning = textwrap.dedent(tos_warning)
         tos_warning = '\n'.join(l for line in tos_warning.splitlines()
@@ -455,8 +456,8 @@ class LoginFrame(Frame):
         duco.image = duco
         ducoLabel = Label(
             register,
-            background=foregroundColor,
-            foreground=fontColor,
+            background=FOREGROUND_COLOR,
+            foreground=FONT_COLOR,
             image=duco)
         ducoLabel.grid(
             row=0,
@@ -466,10 +467,10 @@ class LoginFrame(Frame):
 
         ducoLabel2 = Label(
             register,
-            background=foregroundColor,
-            foreground=fontColor,
-            text=getString("register_on_network"),
-            font=textFont2)
+            background=FOREGROUND_COLOR,
+            foreground=FONT_COLOR,
+            text=get_string("register_on_network"),
+            font=TEXT_FONT_BOLD)
         ducoLabel2.grid(row=1,
                         padx=5,
                         sticky="nswe")
@@ -478,14 +479,14 @@ class LoginFrame(Frame):
             ducoLabel3.configure(foreground="#6c5ce7")
 
         def colorLabelNormal(handler):
-            ducoLabel3.configure(foreground=fontColor)
+            ducoLabel3.configure(foreground=FONT_COLOR)
 
         ducoLabel3 = Label(
             register,
-            background=foregroundColor,
-            foreground=fontColor,
+            background=FOREGROUND_COLOR,
+            foreground=FONT_COLOR,
             text=tos_warning,
-            font=textFont)
+            font=TEXT_FONT)
         ducoLabel3.grid(
             row=2,
             padx=5,
@@ -496,10 +497,10 @@ class LoginFrame(Frame):
 
         Label(
             register,
-            text=getString("username").upper(),
-            background=backgroundColor,
-            foreground=fontColor,
-            font=textFont2,
+            text=get_string("username").upper(),
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
+            font=TEXT_FONT_BOLD,
         ).grid(
             row=3,
             sticky=W,
@@ -507,19 +508,19 @@ class LoginFrame(Frame):
             pady=(5, 0))
         username = Entry(
             register,
-            font=textFont,
-            background=backgroundColor,
-            foreground=foregroundColorSecondary)
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FOREGROUND_COLOR_SECONDARY)
         username.grid(
             row=4,
             padx=5)
 
         Label(
             register,
-            text=getString("passwd").upper(),
-            background=backgroundColor,
-            foreground=fontColor,
-            font=textFont2,
+            text=get_string("passwd").upper(),
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
+            font=TEXT_FONT_BOLD,
         ).grid(
             row=5,
             sticky=W,
@@ -527,19 +528,19 @@ class LoginFrame(Frame):
         password = Entry(
             register,
             show="*",
-            font=textFont,
-            background=backgroundColor,
-            foreground=foregroundColorSecondary)
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FOREGROUND_COLOR_SECONDARY)
         password.grid(
             row=6,
             padx=5)
 
         Label(
             register,
-            text=getString("confirm_passwd").upper(),
-            background=backgroundColor,
-            foreground=fontColor,
-            font=textFont2,
+            text=get_string("confirm_passwd").upper(),
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
+            font=TEXT_FONT_BOLD,
         ).grid(
             row=7,
             sticky=W,
@@ -547,63 +548,63 @@ class LoginFrame(Frame):
         confpassword = Entry(
             register,
             show="*",
-            font=textFont,
-            background=backgroundColor,
-            foreground=foregroundColorSecondary)
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FOREGROUND_COLOR_SECONDARY)
         confpassword.grid(
             row=8,
             padx=5)
 
         Label(
             register,
-            text=getString("email").upper(),
-            background=backgroundColor,
-            foreground=fontColor,
-            font=textFont2,
+            text=get_string("email").upper(),
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
+            font=TEXT_FONT_BOLD,
         ).grid(
             row=9,
             sticky=W,
             padx=5)
         email = Entry(
             register,
-            font=textFont,
-            background=backgroundColor,
-            foreground=foregroundColorSecondary)
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FOREGROUND_COLOR_SECONDARY)
         email.grid(
             row=10,
             padx=5)
 
         self.logbtn = Button(
             register,
-            text=getString("register"),
-            activebackground=backgroundColor,
-            foreground=foregroundColor,
-            background=backgroundColor,
+            text=get_string("register"),
+            activebackground=BACKGROUND_COLOR,
+            foreground=FOREGROUND_COLOR,
+            background=BACKGROUND_COLOR,
             command=self._registerprotocol,
-            font=textFont2)
+            font=TEXT_FONT_BOLD)
         self.logbtn.grid(
             columnspan=2,
             sticky="nswe",
             padx=(5, 5),
             pady=(5, 5))
-        register.configure(background=backgroundColor)
+        register.configure(background=BACKGROUND_COLOR)
 
 
 def LoadingWindow():
     global loading, status
     loading = Tk()
     loading.resizable(False, False)
-    loading.configure(background=backgroundColor)
-    loading.title(getString("loading"))
+    loading.configure(background=BACKGROUND_COLOR)
+    loading.title(get_string("loading"))
     try:
         loading.iconphoto(True,
                           PhotoImage(file=resources + "duco_color.png"))
     except:
         pass
-    textFont = Font(loading,
+    TEXT_FONT = Font(loading,
                     size=10,
                     weight="bold")
-    textFont2 = Font(loading,
+    TEXT_FONT_BOLD = Font(loading,
                      size=14,
                      weight="bold")
 
@@ -613,8 +614,8 @@ def LoadingWindow():
     github.image = github
     githubLabel = Label(loading,
                         image=github,
-                        background=backgroundColor,
-                        foreground=fontColor)
+                        background=BACKGROUND_COLOR,
+                        foreground=FONT_COLOR)
     githubLabel.grid(row=0,
                      column=0,
                      sticky=N + S + E + W,
@@ -623,10 +624,10 @@ def LoadingWindow():
 
     Label(
         loading,
-        text=getString("duino_coin_wallet"),
-        font=textFont2,
-        foreground=foregroundColor,
-        background=backgroundColor,
+        text=get_string("duino_coin_wallet"),
+        font=TEXT_FONT_BOLD,
+        foreground=FOREGROUND_COLOR,
+        background=BACKGROUND_COLOR,
     ).grid(
         row=1,
         column=0,
@@ -637,10 +638,10 @@ def LoadingWindow():
 
     status = Label(
         loading,
-        background=backgroundColor,
-        foreground=fontColor,
-        text=getString("loading_database"),
-        font=textFont)
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
+        text=get_string("loading_database"),
+        font=TEXT_FONT)
     status.grid(
         row=2,
         column=0,
@@ -650,7 +651,7 @@ def LoadingWindow():
     loading.update()
 
 
-def getString(string_name):
+def get_string(string_name):
     if string_name in lang_file[lang]:
         return lang_file[lang][string_name]
     elif string_name in lang_file["english"]:
@@ -673,7 +674,7 @@ try:
 except FileExistsError:
     pass
 
-with sqlite3.connect(f"{resources}/wallet.db") as con:
+with sqlconn(f"{resources}/wallet.db") as con:
     cur = con.cursor()
     cur.execute(
         """CREATE TABLE IF NOT EXISTS
@@ -723,9 +724,9 @@ if not Path(resources + "langs.json").is_file():
 
 # Load language strings depending on system locale
 with open(f"{resources}langs.json", "r", encoding="utf-8") as lang_file:
-    lang_file = json.load(lang_file)
+    lang_file = jsonload(lang_file)
 
-locale = locale.getdefaultlocale()[0]
+locale = getdefaultlocale()[0]
 if locale.startswith("es"):
     lang = "spanish"
 elif locale.startswith("pl"):
@@ -773,25 +774,25 @@ def openTransaction(hashToOpen):
 def openTransactions(handler):
     transactionsWindow = Toplevel()
     transactionsWindow.resizable(False, False)
-    transactionsWindow.title(getString("wallet_transactions"))
+    transactionsWindow.title(get_string("wallet_transactions"))
     transactionsWindow.transient([root])
-    transactionsWindow.configure(background=backgroundColor)
+    transactionsWindow.configure(background=BACKGROUND_COLOR)
 
-    textFont3 = Font(
+    TEXT_FONT_BOLD_LARGE = Font(
         transactionsWindow,
         size=14,
         weight="bold")
-    textFont = Font(
+    TEXT_FONT = Font(
         transactionsWindow,
         size=12,
         weight="normal")
 
     Label(
         transactionsWindow,
-        text=getString("transaction_list"),
-        font=textFont3,
-        background=backgroundColor,
-        foreground=foregroundColor,
+        text=get_string("transaction_list"),
+        font=TEXT_FONT_BOLD_LARGE,
+        background=BACKGROUND_COLOR,
+        foreground=FOREGROUND_COLOR,
     ).grid(row=0,
            column=0,
            columnspan=2,
@@ -801,10 +802,10 @@ def openTransactions(handler):
 
     Label(
         transactionsWindow,
-        text=getString("transaction_list_notice"),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        text=get_string("transaction_list_notice"),
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(row=1,
            column=0,
            columnspan=2,
@@ -815,8 +816,8 @@ def openTransactions(handler):
     listbox = Listbox(
         transactionsWindow,
         width="35",
-        background=backgroundColor,
-        foreground=fontColor)
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR)
     listbox.grid(
         row=2,
         column=0,
@@ -824,7 +825,7 @@ def openTransactions(handler):
         padx=(5, 0),
         pady=(0, 5))
     scrollbar = Scrollbar(transactionsWindow,
-                          background=backgroundColor)
+                          background=BACKGROUND_COLOR)
     scrollbar.grid(
         row=2,
         column=1,
@@ -843,7 +844,7 @@ def openTransactions(handler):
             pass
 
     listbox.bind("<Button-1>", getSelection)
-    listbox.config(yscrollcommand=scrollbar.set, font=textFont)
+    listbox.config(yscrollcommand=scrollbar.set, font=TEXT_FONT)
     scrollbar.config(command=listbox.yview)
 
 
@@ -871,7 +872,7 @@ def currencyConvert():
                     str(
                         round(
                             float(amount)
-                            * float(ducofiat)
+                            * float(duco_fiat_value)
                             * float(exchangerates["rates"][tocurrency]),
                             6))
                     + " "
@@ -889,7 +890,7 @@ def currencyConvert():
                         result = str(
                             str(round(
                                 float(amount)
-                                * float(1 / ducofiat)
+                                * float(1 / duco_fiat_value)
                                 / float(ratesjson["rates"][fromcurrency]),
                                 6))
                             + " "
@@ -906,9 +907,9 @@ def currencyConvert():
                         + " "
                         + str(tocurrency))
     except:
-        result = getString("calculate_error")
+        result = get_string("calculate_error")
 
-    result = getString("result") + ": " + result
+    result = get_string("result") + ": " + result
     conversionresulttext.set(str(result))
     calculatorWindow.update()
 
@@ -925,33 +926,33 @@ def openCalculator(handler):
         data=None)
     if currencyapi.status_code == 200:  # Check for reponse
         exchangerates = loads(currencyapi.content.decode())
-        exchangerates["rates"]["DUCO"] = float(ducofiat)
+        exchangerates["rates"]["DUCO"] = float(duco_fiat_value)
 
     calculatorWindow = Toplevel()
     calculatorWindow.resizable(False, False)
-    calculatorWindow.title(getString("wallet_calculator"))
+    calculatorWindow.title(get_string("wallet_calculator"))
     calculatorWindow.transient([root])
-    calculatorWindow.configure(background=backgroundColor)
+    calculatorWindow.configure(background=BACKGROUND_COLOR)
 
-    textFont2 = Font(
+    TEXT_FONT_BOLD = Font(
         calculatorWindow,
         size=12,
         weight="bold")
-    textFont3 = Font(
+    TEXT_FONT_BOLD_LARGE = Font(
         calculatorWindow,
         size=14,
         weight="bold")
-    textFont = Font(
+    TEXT_FONT = Font(
         calculatorWindow,
         size=12,
         weight="normal")
 
     Label(
         calculatorWindow,
-        text=getString("currency_converter"),
-        font=textFont3,
-        foreground=foregroundColor,
-        background=backgroundColor,
+        text=get_string("currency_converter"),
+        font=TEXT_FONT_BOLD_LARGE,
+        foreground=FOREGROUND_COLOR,
+        background=BACKGROUND_COLOR,
     ).grid(row=0,
            columnspan=2,
            column=0,
@@ -961,10 +962,10 @@ def openCalculator(handler):
 
     Label(
         calculatorWindow,
-        text=getString("from"),
-        font=textFont2,
-        foreground=foregroundColor,
-        background=backgroundColor,
+        text=get_string("from"),
+        font=TEXT_FONT_BOLD,
+        foreground=FOREGROUND_COLOR,
+        background=BACKGROUND_COLOR,
     ).grid(row=1,
            column=0,
            sticky=S + W,
@@ -972,11 +973,11 @@ def openCalculator(handler):
     fromCurrencyInput = Listbox(
         calculatorWindow,
         exportselection=False,
-        background=backgroundColor,
-        selectbackground=foregroundColor,
+        background=BACKGROUND_COLOR,
+        selectbackground=FOREGROUND_COLOR,
         border="0",
-        font=textFont,
-        foreground=fontColor,
+        font=TEXT_FONT,
+        foreground=FONT_COLOR,
         width="20",
         height="13",
     )
@@ -992,7 +993,7 @@ def openCalculator(handler):
         calculatorWindow,
         orient="vertical",
         command=fromCurrencyInput.yview,
-        background=backgroundColor,
+        background=BACKGROUND_COLOR,
     )
     vsb.grid(row=2,
              column=1,
@@ -1005,10 +1006,10 @@ def openCalculator(handler):
 
     Label(
         calculatorWindow,
-        text=getString("to"),
-        font=textFont2,
-        foreground=foregroundColor,
-        background=backgroundColor,
+        text=get_string("to"),
+        font=TEXT_FONT_BOLD,
+        foreground=FOREGROUND_COLOR,
+        background=BACKGROUND_COLOR,
     ).grid(row=1,
            column=3,
            columnspan=2,
@@ -1017,11 +1018,11 @@ def openCalculator(handler):
     toCurrencyInput = Listbox(
         calculatorWindow,
         exportselection=False,
-        background=backgroundColor,
-        selectbackground=foregroundColor,
+        background=BACKGROUND_COLOR,
+        selectbackground=FOREGROUND_COLOR,
         border="0",
-        foreground=fontColor,
-        font=textFont,
+        foreground=FONT_COLOR,
+        font=TEXT_FONT,
         width="20",
         height="13")
     toCurrencyInput.grid(
@@ -1037,7 +1038,7 @@ def openCalculator(handler):
         calculatorWindow,
         orient="vertical",
         command=toCurrencyInput.yview,
-        background=backgroundColor,)
+        background=BACKGROUND_COLOR,)
     vsb2.grid(
         row=2,
         column=4,
@@ -1050,10 +1051,10 @@ def openCalculator(handler):
 
     Label(
         calculatorWindow,
-        text=getString("input_amount"),
-        font=textFont2,
-        foreground=foregroundColor,
-        background=backgroundColor,
+        text=get_string("input_amount"),
+        font=TEXT_FONT_BOLD,
+        foreground=FOREGROUND_COLOR,
+        background=BACKGROUND_COLOR,
     ).grid(row=3,
            columnspan=2,
            column=0,
@@ -1065,10 +1066,10 @@ def openCalculator(handler):
 
     amountInput = Entry(
         calculatorWindow,
-        foreground=foregroundColorSecondary,
+        foreground=FOREGROUND_COLOR_SECONDARY,
         border="0",
-        font=textFont,
-        background=backgroundColor,)
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,)
     amountInput.grid(
         row=4,
         column=0,
@@ -1076,16 +1077,16 @@ def openCalculator(handler):
         padx=5,
         columnspan=2,
         pady=(0, 5))
-    amountInput.insert("0", str(globalBalance))
+    amountInput.insert("0", str(global_balance))
     amountInput.bind("<FocusIn>", clear_ccamount_placeholder)
 
     Button(
         calculatorWindow,
-        text=getString("calculate"),
-        font=textFont2,
-        foreground=foregroundColor,
-        activebackground=backgroundColor,
-        background=backgroundColor,
+        text=get_string("calculate"),
+        font=TEXT_FONT_BOLD,
+        foreground=FOREGROUND_COLOR,
+        activebackground=BACKGROUND_COLOR,
+        background=BACKGROUND_COLOR,
         command=currencyConvert,
     ).grid(row=3,
            columnspan=2,
@@ -1095,13 +1096,13 @@ def openCalculator(handler):
            padx=5)
 
     conversionresulttext = StringVar(calculatorWindow)
-    conversionresulttext.set(f'{getString("result")}: 0.0')
+    conversionresulttext.set(f'{get_string("result")}: 0.0')
     conversionresultLabel = Label(
         calculatorWindow,
         textvariable=conversionresulttext,
-        font=textFont2,
-        background=backgroundColor,
-        foreground=fontColor,)
+        font=TEXT_FONT_BOLD,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,)
     conversionresultLabel.grid(
         row=4,
         columnspan=2,
@@ -1123,15 +1124,15 @@ def openStats(handler):
 
     statsWindow = Toplevel()
     statsWindow.resizable(False, False)
-    statsWindow.title(getString("statistics_title"))
+    statsWindow.title(get_string("statistics_title"))
     statsWindow.transient([root])
-    statsWindow.configure(background=backgroundColor)
+    statsWindow.configure(background=BACKGROUND_COLOR)
 
-    textFont3 = Font(
+    TEXT_FONT_BOLD_LARGE = Font(
         statsWindow,
         size=14,
         weight="bold")
-    textFont = Font(
+    TEXT_FONT = Font(
         statsWindow,
         size=12,
         weight="normal")
@@ -1139,10 +1140,10 @@ def openStats(handler):
     Active_workers_listbox = Listbox(
         statsWindow,
         exportselection=False,
-        background=backgroundColor,
-        foreground=fontColor,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
         border="0",
-        font=textFont,
+        font=TEXT_FONT,
         width="65",
         height="8",)
     Active_workers_listbox.grid(
@@ -1186,7 +1187,7 @@ def openStats(handler):
                 + shares)
             i += 1
     if i == 0:
-        Active_workers_listbox.insert(i, getString("statistics_miner_warning"))
+        Active_workers_listbox.insert(i, get_string("statistics_miner_warning"))
 
     totalHashrateString = str(int(totalHashrate)) + " H/s"
     if totalHashrate > 1000000000:
@@ -1203,10 +1204,10 @@ def openStats(handler):
 
     Label(
         statsWindow,
-        text=f'{getString("your_miners")} - ' + totalHashrateString,
-        font=textFont3,
-        foreground=foregroundColor,
-        background=backgroundColor,
+        text=f'{get_string("your_miners")} - ' + totalHashrateString,
+        font=TEXT_FONT_BOLD_LARGE,
+        foreground=FOREGROUND_COLOR,
+        background=BACKGROUND_COLOR,
     ).grid(
         row=0,
         column=0,
@@ -1217,10 +1218,10 @@ def openStats(handler):
 
     Label(
         statsWindow,
-        text=getString("richlist"),
-        font=textFont3,
-        foreground=foregroundColor,
-        background=backgroundColor,
+        text=get_string("richlist"),
+        font=TEXT_FONT_BOLD_LARGE,
+        foreground=FOREGROUND_COLOR,
+        background=BACKGROUND_COLOR,
     ).grid(
         row=2,
         column=0,
@@ -1231,11 +1232,11 @@ def openStats(handler):
         statsWindow,
         exportselection=False,
         border="0",
-        font=textFont,
+        font=TEXT_FONT,
         width="30",
         height="10",
-        background=backgroundColor,
-        foreground=fontColor)
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR)
     Top_10_listbox.grid(
         row=3,
         column=0,
@@ -1252,10 +1253,10 @@ def openStats(handler):
 
     Label(
         statsWindow,
-        text=getString("network_info"),
-        font=textFont3,
-        foreground=foregroundColor,
-        background=backgroundColor,
+        text=get_string("network_info"),
+        font=TEXT_FONT_BOLD_LARGE,
+        foreground=FOREGROUND_COLOR,
+        background=BACKGROUND_COLOR,
     ).grid(row=2,
            column=1,
            sticky=S + W,
@@ -1263,78 +1264,78 @@ def openStats(handler):
            pady=5)
     Label(
         statsWindow,
-        text=f'{getString("difficulty")}: '
+        text=f'{get_string("difficulty")}: '
         + str(statsApi["Current difficulty"]),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(row=3,
            column=1,
            sticky=S + W,
            padx=5)
     Label(
         statsWindow,
-        text=f'{getString("mined_blocks")}: '
+        text=f'{get_string("mined_blocks")}: '
         + str(statsApi["Mined blocks"]),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(row=4,
            column=1,
            sticky=S + W,
            padx=5)
     Label(
         statsWindow,
-        text=f'{getString("network_hashrate")}: '
+        text=f'{get_string("network_hashrate")}: '
         + str(statsApi["Pool hashrate"]),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(row=5,
            column=1,
            sticky=S + W,
            padx=5)
     Label(
         statsWindow,
-        text=f'{getString("active_miners")}: '
+        text=f'{get_string("active_miners")}: '
         + str(len(statsApi["Miners"])),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(row=6,
            column=1,
            sticky=S + W,
            padx=5)
     Label(
         statsWindow,
-        text=f'1 DUCO {getString("estimated_price")}: $'
+        text=f'1 DUCO {get_string("estimated_price")}: $'
         + str(statsApi["Duco price"]),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(row=7,
            column=1,
            sticky=S + W,
            padx=5)
     Label(
         statsWindow,
-        text=f'{getString("registered_users")}: '
+        text=f'{get_string("registered_users")}: '
         + str(statsApi["Registered users"]),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(row=8,
            column=1,
            sticky=S + W,
            padx=5)
     Label(
         statsWindow,
-        text=f'{getString("mined_duco")}: '
+        text=f'{get_string("mined_duco")}: '
         + str(statsApi["All-time mined DUCO"])
         + " ᕲ",
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(row=9,
            column=1,
            sticky=S + W,
@@ -1347,7 +1348,7 @@ def openWrapper(handler):
     def Wrap():
         amount = amountWrap.get()
         print("Got amount: ", amount)
-        soc = socket.socket()
+        soc = socket()
         soc.connect((pool_address, int(pool_port)))
         soc.recv(3)
         try:
@@ -1377,8 +1378,8 @@ def openWrapper(handler):
         pubkeyfile = open(str(f"{resources}/DUCOPubKey.pub"), "r")
     except:
         messagebox.showerror(
-            title=getString("wrapper_error_title"),
-            message=getString("wrapper_error"))
+            title=get_string("wrapper_error_title"),
+            message=get_string("wrapper_error"))
     else:
         if tronpy_installed:
             pub_key = pubkeyfile.read()
@@ -1386,13 +1387,13 @@ def openWrapper(handler):
 
             wrapperWindow = Toplevel()
             wrapperWindow.resizable(False, False)
-            wrapperWindow.title(getString("wrapper_title"))
+            wrapperWindow.title(get_string("wrapper_title"))
             wrapperWindow.transient([root])
             wrapperWindow.configure()
 
             askWrapAmount = Label(
                 wrapperWindow,
-                text=getString("wrapper_amount_to_wrap") + ":")
+                text=get_string("wrapper_amount_to_wrap") + ":")
             askWrapAmount.grid(row=0,
                                column=0,
                                sticky=N + W)
@@ -1410,8 +1411,8 @@ def openWrapper(handler):
                             sticky=N + W)
         else:
             messagebox.showerror(
-                title=getString("wrapper_error_title"),
-                message=getString("wrapper_error_tronpy"))
+                title=get_string("wrapper_error_title"),
+                message=get_string("wrapper_error_tronpy"))
 
 
 def openUnWrapper(handler):
@@ -1429,12 +1430,12 @@ def openUnWrapper(handler):
             priv_key = str(password_decrypt(privKeyEnc, passphrase))[2:66]
             use_wrapper = True
         except InvalidToken:
-            print(getString("invalid_passphrase"))
+            print(get_string("invalid_passphrase"))
             use_wrapper = False
 
         amount = amountUnWrap.get()
         print("Got amount:", amount)
-        soc = socket.socket()
+        soc = socket()
         soc.connect((pool_address, int(pool_port)))
         soc.recv(3)
         try:
@@ -1494,18 +1495,18 @@ def openUnWrapper(handler):
         pubkeyfile.close()
     except:
         messagebox.showerror(
-            title=getString("wrapper_error_title"),
-            message=getString("wrapper_error"))
+            title=get_string("wrapper_error_title"),
+            message=get_string("wrapper_error"))
     else:
         if tronpy_installed:
             unWrapperWindow = Toplevel()
             unWrapperWindow.resizable(False, False)
-            unWrapperWindow.title(getString("unwrapper_title"))
+            unWrapperWindow.title(get_string("unwrapper_title"))
             unWrapperWindow.transient([root])
             unWrapperWindow.configure()
             askAmount = Label(
                 unWrapperWindow,
-                text=getString("unwrap_amount"))
+                text=get_string("unwrap_amount"))
             askAmount.grid(row=1,
                            column=0,
                            sticky=N + W)
@@ -1520,7 +1521,7 @@ def openUnWrapper(handler):
 
             askPassphrase = Label(
                 unWrapperWindow,
-                text=getString("ask_passphrase"))
+                text=get_string("ask_passphrase"))
             askPassphrase.grid(row=4,
                                column=0,
                                sticky=N + W)
@@ -1536,7 +1537,7 @@ def openUnWrapper(handler):
 
             wrapButton = Button(
                 unWrapperWindow,
-                text=getString("unwrap_duco"),
+                text=get_string("unwrap_duco"),
                 command=UnWrap)
             wrapButton.grid(
                 row=7,
@@ -1544,8 +1545,8 @@ def openUnWrapper(handler):
                 sticky=N + W)
         else:
             messagebox.showerror(
-                title=getString("wrapper_error"),
-                message=getString("wrapper_error_tronpy"))
+                title=get_string("wrapper_error"),
+                message=get_string("wrapper_error_tronpy"))
 
 
 def openSettings(handler):
@@ -1555,7 +1556,7 @@ def openSettings(handler):
             passphrase_input = StringVar()
             wrapconfWindow = Toplevel()
             wrapconfWindow.resizable(False, False)
-            wrapconfWindow.title(getString("wrapper_title"))
+            wrapconfWindow.title(get_string("wrapper_title"))
             wrapconfWindow.transient([root])
             wrapconfWindow.configure()
 
@@ -1587,13 +1588,13 @@ def openSettings(handler):
                         pubkeyfile.write(pub_key)
                         pubkeyfile.close()
 
-                        Label(wrapconfWindow, text=getString(
+                        Label(wrapconfWindow, text=get_string(
                             "wrapper_success")).pack()
                         wrapconfWindow.quit()
 
             title = Label(
                 wrapconfWindow,
-                text=getString("wrapper_config_title"),
+                text=get_string("wrapper_config_title"),
                 font=Font(size=20))
             title.grid(row=0,
                        column=0,
@@ -1602,28 +1603,28 @@ def openSettings(handler):
 
             askprivkey = Label(
                 wrapconfWindow,
-                text=getString("ask_private_key"))
+                text=get_string("ask_private_key"))
             askprivkey.grid(row=1,
                             column=0,
                             sticky=N + W)
 
             privkey_entry = Entry(
                 wrapconfWindow,
-                font=textFont,
+                font=TEXT_FONT,
                 textvariable=privkey_input)
             privkey_entry.grid(row=2,
                                column=0,
                                sticky=N + W)
 
             askpassphrase = Label(wrapconfWindow,
-                                  text=getString("passphrase"))
+                                  text=get_string("passphrase"))
             askpassphrase.grid(row=3,
                                column=0,
                                sticky=N + W)
 
             passphrase_entry = Entry(
                 wrapconfWindow,
-                font=textFont,
+                font=TEXT_FONT,
                 textvariable=passphrase_input)
             passphrase_entry.grid(row=4,
                                   column=0,
@@ -1631,7 +1632,7 @@ def openSettings(handler):
 
             wrapConfigButton = Button(
                 wrapconfWindow,
-                text=getString("configure_wrapper_lowercase"),
+                text=get_string("configure_wrapper_lowercase"),
                 command=setwrapper)
             wrapConfigButton.grid(row=5,
                                   column=0,
@@ -1641,12 +1642,12 @@ def openSettings(handler):
 
         else:
             messagebox.showerror(
-                title=getString("wrapper_error"),
-                message=getString("wrapper_error_tronpy"))
+                title=get_string("wrapper_error"),
+                message=get_string("wrapper_error_tronpy"))
 
     def _logout():
         try:
-            with sqlite3.connect(f"{resources}/wallet.db") as con:
+            with sqlconn(f"{resources}/wallet.db") as con:
                 cur = con.cursor()
                 cur.execute("DELETE FROM UserData")
                 con.commit()
@@ -1658,7 +1659,7 @@ def openSettings(handler):
             print(e)
 
     def _cleartrs():
-        with sqlite3.connect(f"{resources}/wallet.db") as con:
+        with sqlconn(f"{resources}/wallet.db") as con:
             cur = con.cursor()
             cur.execute("DELETE FROM transactions")
             con.commit()
@@ -1672,7 +1673,7 @@ def openSettings(handler):
             if oldpasswordS != newpasswordS:
                 if oldpasswordS and newpasswordS and confpasswordS:
                     if newpasswordS == confpasswordS:
-                        soc = socket.socket()
+                        soc = socket()
                         soc.connect((pool_address, int(pool_port)))
                         soc.recv(3)
                         soc.send(
@@ -1695,15 +1696,15 @@ def openSettings(handler):
 
                         if not "OK" in response[0]:
                             messagebox.showerror(
-                                title=getString("change_passwd_error"),
+                                title=get_string("change_passwd_error"),
                                 message=response[1])
                         else:
                             messagebox.showinfo(
-                                title=getString("change_passwd_ok"),
+                                title=get_string("change_passwd_ok"),
                                 message=response[1])
                             try:
                                 try:
-                                    with sqlite3.connect(
+                                    with sqlconn(
                                         f"{resources}/wallet.db"
                                     ) as con:
                                         cur = con.cursor()
@@ -1716,92 +1717,92 @@ def openSettings(handler):
                             execl(sys.executable, sys.executable, *sys.argv)
                     else:
                         messagebox.showerror(
-                            title=getString("change_passwd_error"),
-                            message=getString("error_passwd_dont_match"))
+                            title=get_string("change_passwd_error"),
+                            message=get_string("error_passwd_dont_match"))
                 else:
                     messagebox.showerror(
-                        title=getString("change_passwd_error"),
-                        message=getString("fill_the_blanks_warning"))
+                        title=get_string("change_passwd_error"),
+                        message=get_string("fill_the_blanks_warning"))
             else:
                 messagebox.showerror(
-                    title=getString("change_passwd_error"),
-                    message=getString("same_passwd_error"))
+                    title=get_string("change_passwd_error"),
+                    message=get_string("same_passwd_error"))
 
         settingsWindow.destroy()
         changepassWindow = Toplevel()
-        changepassWindow.title(getString("change_passwd_lowercase"))
+        changepassWindow.title(get_string("change_passwd_lowercase"))
         changepassWindow.resizable(False, False)
         changepassWindow.transient([root])
-        changepassWindow.configure(background=backgroundColor)
+        changepassWindow.configure(background=BACKGROUND_COLOR)
 
-        textFont2 = Font(changepassWindow, size=12, weight="bold")
-        textFont = Font(changepassWindow, size=12, weight="normal")
+        TEXT_FONT_BOLD = Font(changepassWindow, size=12, weight="bold")
+        TEXT_FONT = Font(changepassWindow, size=12, weight="normal")
 
         Label(
             changepassWindow,
-            text=getString("old_passwd"),
-            font=textFont2,
-            background=backgroundColor,
-            foreground=fontColor,
+            text=get_string("old_passwd"),
+            font=TEXT_FONT_BOLD,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
         ).grid(row=0,
                sticky=W,
                padx=5)
         oldpassword = Entry(
             changepassWindow,
             show="*",
-            font=textFont,
-            foreground=foregroundColorSecondary,
-            background=backgroundColor)
+            font=TEXT_FONT,
+            foreground=FOREGROUND_COLOR_SECONDARY,
+            background=BACKGROUND_COLOR)
         oldpassword.grid(row=1,
                          sticky="nswe",
                          padx=5)
 
         Label(
             changepassWindow,
-            text=getString("new_passwd"),
-            font=textFont2,
-            background=backgroundColor,
-            foreground=fontColor,
+            text=get_string("new_passwd"),
+            font=TEXT_FONT_BOLD,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
         ).grid(row=2,
                sticky=W,
                padx=5)
         newpassword = Entry(
             changepassWindow,
             show="*",
-            font=textFont,
-            foreground=foregroundColorSecondary,
-            background=backgroundColor)
+            font=TEXT_FONT,
+            foreground=FOREGROUND_COLOR_SECONDARY,
+            background=BACKGROUND_COLOR)
         newpassword.grid(row=3,
                          sticky="nswe",
                          padx=5)
 
         Label(
             changepassWindow,
-            text=getString("confirm_new_passwd"),
-            font=textFont2,
-            background=backgroundColor,
-            foreground=fontColor,
+            text=get_string("confirm_new_passwd"),
+            font=TEXT_FONT_BOLD,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
         ).grid(row=4,
                sticky=W,
                padx=5)
         confpassword = Entry(
             changepassWindow,
             show="*",
-            font=textFont,
-            foreground=foregroundColorSecondary,
-            background=backgroundColor)
+            font=TEXT_FONT,
+            foreground=FOREGROUND_COLOR_SECONDARY,
+            background=BACKGROUND_COLOR)
         confpassword.grid(row=5,
                           sticky="nswe",
                           padx=5)
 
         chgpbtn = Button(
             changepassWindow,
-            text=getString("change_passwd"),
+            text=get_string("change_passwd"),
             command=_changepassprotocol,
-            foreground=foregroundColor,
-            font=textFont2,
-            background=backgroundColor,
-            activebackground=backgroundColor)
+            foreground=FOREGROUND_COLOR,
+            font=TEXT_FONT_BOLD,
+            background=BACKGROUND_COLOR,
+            activebackground=BACKGROUND_COLOR)
         chgpbtn.grid(columnspan=2,
                      sticky="nswe",
                      pady=5,
@@ -1809,24 +1810,24 @@ def openSettings(handler):
 
     settingsWindow = Toplevel()
     settingsWindow.resizable(False, False)
-    settingsWindow.title(getString("settings_title"))
+    settingsWindow.title(get_string("settings_title"))
     settingsWindow.transient([root])
-    settingsWindow.configure(background=backgroundColor)
-    textFont = Font(
+    settingsWindow.configure(background=BACKGROUND_COLOR)
+    TEXT_FONT = Font(
         settingsWindow,
         size=12,
         weight="normal")
-    textFont3 = Font(
+    TEXT_FONT_BOLD_LARGE = Font(
         settingsWindow,
         size=12,
         weight="bold")
 
     Label(
         settingsWindow,
-        text=getString("uppercase_settings"),
-        font=textFont3,
-        foreground=foregroundColor,
-        background=backgroundColor,
+        text=get_string("uppercase_settings"),
+        font=TEXT_FONT_BOLD_LARGE,
+        foreground=FOREGROUND_COLOR,
+        background=BACKGROUND_COLOR,
     ).grid(row=0,
            column=0,
            columnspan=4,
@@ -1836,12 +1837,12 @@ def openSettings(handler):
 
     logoutbtn = Button(
         settingsWindow,
-        text=getString("logout"),
+        text=get_string("logout"),
         command=_logout,
-        font=textFont,
-        background=backgroundColor,
-        activebackground=backgroundColor,
-        foreground=fontColor)
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        activebackground=BACKGROUND_COLOR,
+        foreground=FONT_COLOR)
     logoutbtn.grid(row=1,
                    column=0,
                    columnspan=4,
@@ -1850,12 +1851,12 @@ def openSettings(handler):
 
     chgpassbtn = Button(
         settingsWindow,
-        text=getString("change_passwd"),
+        text=get_string("change_passwd"),
         command=_chgpass,
-        font=textFont,
-        background=backgroundColor,
-        activebackground=backgroundColor,
-        foreground=fontColor)
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        activebackground=BACKGROUND_COLOR,
+        foreground=FONT_COLOR)
     chgpassbtn.grid(row=2,
                     column=0,
                     columnspan=4,
@@ -1864,12 +1865,12 @@ def openSettings(handler):
 
     wrapperconfbtn = Button(
         settingsWindow,
-        text=getString("configure_wrapper"),
+        text=get_string("configure_wrapper"),
         command=_wrapperconf,
-        font=textFont,
-        background=backgroundColor,
-        activebackground=backgroundColor,
-        foreground=fontColor)
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        activebackground=BACKGROUND_COLOR,
+        foreground=FONT_COLOR)
     wrapperconfbtn.grid(row=3,
                         column=0,
                         columnspan=4,
@@ -1878,12 +1879,12 @@ def openSettings(handler):
 
     cleartransbtn = Button(
         settingsWindow,
-        text=getString("clear_transactions"),
+        text=get_string("clear_transactions"),
         command=_cleartrs,
-        font=textFont,
-        background=backgroundColor,
-        activebackground=backgroundColor,
-        foreground=fontColor)
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        activebackground=BACKGROUND_COLOR,
+        foreground=FONT_COLOR)
     cleartransbtn.grid(row=4,
                        column=0,
                        columnspan=4,
@@ -1901,10 +1902,10 @@ def openSettings(handler):
 
     Label(
         settingsWindow,
-        text=f'{getString("logged_in_as")}: ' + str(username),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        text=f'{get_string("logged_in_as")}: ' + str(username),
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(
         row=6,
         column=0,
@@ -1913,10 +1914,10 @@ def openSettings(handler):
         sticky=S + W)
     Label(
         settingsWindow,
-        text=f'{getString("wallet_version")}: ' + str(version),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        text=f'{get_string("wallet_version")}: ' + str(VERSION),
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(
         row=7,
         column=0,
@@ -1925,12 +1926,12 @@ def openSettings(handler):
         sticky=S + W)
     Label(
         settingsWindow,
-        text=getString("translation_author_message")
+        text=get_string("translation_author_message")
         + " "
-        + getString("translation_author"),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        + get_string("translation_author"),
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(
         row=8,
         column=0,
@@ -1939,10 +1940,10 @@ def openSettings(handler):
         sticky=S + W)
     Label(
         settingsWindow,
-        text=getString("config_dev_warning"),
-        font=textFont,
-        background=backgroundColor,
-        foreground=fontColor,
+        text=get_string("config_dev_warning"),
+        font=TEXT_FONT,
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR,
     ).grid(
         row=9,
         column=0,
@@ -1966,8 +1967,8 @@ def openSettings(handler):
     websiteLabel = Label(
         settingsWindow,
         image=website,
-        background=backgroundColor,
-        foreground=fontColor)
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR)
     websiteLabel.grid(
         row=11,
         column=0,
@@ -1983,8 +1984,8 @@ def openSettings(handler):
     githubLabel = Label(
         settingsWindow,
         image=github,
-        background=backgroundColor,
-        foreground=fontColor)
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR)
     githubLabel.grid(
         row=11,
         column=1,
@@ -1999,8 +2000,8 @@ def openSettings(handler):
     exchangeLabel = Label(
         settingsWindow,
         image=exchange,
-        background=backgroundColor,
-        foreground=fontColor)
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR)
     exchangeLabel.grid(
         row=11,
         column=2,
@@ -2015,8 +2016,8 @@ def openSettings(handler):
     discordLabel = Label(
         settingsWindow,
         image=discord,
-        background=backgroundColor,
-        foreground=fontColor)
+        background=BACKGROUND_COLOR,
+        foreground=FONT_COLOR)
     discordLabel.grid(
         row=11,
         column=3,
@@ -2035,10 +2036,10 @@ def getBalance():
     global oldbalance
     global balance
     global unpaid_balance
-    global globalBalance
+    global global_balance
     global gtxl
     try:
-        soc = socket.socket()
+        soc = socket()
         soc.connect((pool_address, int(pool_port)))
         soc.recv(3)
         soc.send(bytes(
@@ -2052,7 +2053,7 @@ def getBalance():
             encoding="utf8"))
         oldbalance = balance
         balance = float(soc.recv(64).decode().rstrip("\n"))
-        globalBalance = round(float(balance), 8)
+        global_balance = round(float(balance), 8)
 
         try:
             gtxl = {}
@@ -2061,7 +2062,7 @@ def getBalance():
                 encoding="utf8"))
             gtxl = str(soc.recv(8096).decode().rstrip("\n").replace("\'", "\""))
             print(gtxl)
-            gtxl = json.loads(gtxl)
+            gtxl = jsonloads(gtxl)
         except Exception as e:
             print("Error getting transaction list: " + str(e))
 
@@ -2070,27 +2071,27 @@ def getBalance():
             dif_with_unpaid = (
                 float(balance) - float(oldbalance)) + unpaid_balance
             if float(balance) != float(difference):
-                if (dif_with_unpaid >= min_trans_difference
+                if (dif_with_unpaid >= MIN_TRANSACTION_VALUE
                         or dif_with_unpaid < 0
                         ):
-                    now = datetime.datetime.now()
+                    now = datetime.now()
                     difference = round(dif_with_unpaid, 8)
                     if (
-                        difference >= min_trans_difference_notify
+                        difference >= MIN_TRANSACTION_VALUE_NOTIFY
                         or difference < 0
                         and notificationsEnabled
                     ):
                         notification = Notify()
-                        notification.title = getString("duino_coin_wallet")
+                        notification.title = get_string("duino_coin_wallet")
                         notification.message = (
-                            getString("notification_new_transaction")
+                            get_string("notification_new_transaction")
                             + "\n"
                             + now.strftime("%d.%m.%Y %H:%M:%S\n")
                             + str(round(difference, 6))
                             + " DUCO")
                         notification.icon = f"{resources}/duco_color.png"
                         notification.send(block=False)
-                    with sqlite3.connect(f"{resources}/wallet.db") as con:
+                    with sqlconn(f"{resources}/wallet.db") as con:
                         cur = con.cursor()
                         cur.execute(
                             """INSERT INTO Transactions(Date, amount)
@@ -2126,11 +2127,11 @@ profitCheck = 0
 def updateBalanceLabel():
     global profit_array, profitCheck
     try:
-        balancetext.set(str(round(globalBalance, 7)) + " ᕲ")
+        balancetext.set(str(round(global_balance, 7)) + " ᕲ")
         wbalancetext.set(str(getwbalance()) + " wᕲ")
-        balanceusdtext.set("$" + str(round(globalBalance * ducofiat, 4)))
+        balanceusdtext.set("$" + str(round(global_balance * duco_fiat_value, 4)))
 
-        with sqlite3.connect(f"{resources}/wallet.db") as con:
+        with sqlconn(f"{resources}/wallet.db") as con:
             cur = con.cursor()
             cur.execute("SELECT rowid,* FROM Transactions ORDER BY rowid DESC")
             Transactions = cur.fetchall()
@@ -2144,26 +2145,26 @@ def updateBalanceLabel():
 
         if profit_array[2] != 0:
             sessionprofittext.set(
-                getString("session") + ": "
+                get_string("session") + ": "
                 + str(profit_array[0]) + " ᕲ")
             minuteprofittext.set(
                 "≈" + str(profit_array[1]) + " ᕲ/"
-                + getString("minute"))
+                + get_string("minute"))
             hourlyprofittext.set(
                 "≈" + str(profit_array[2]) + " ᕲ/"
-                + getString("hour"))
+                + get_string("hour"))
             dailyprofittext.set(
                 "≈"
                 + str(profit_array[3])
                 + " ᕲ/"
-                + getString("day")
+                + get_string("day")
                 + " ($"
-                + str(round(profit_array[3] * ducofiat, 4))
+                + str(round(profit_array[3] * duco_fiat_value, 4))
                 + ")")
         else:
             if profitCheck > 10:
-                sessionprofittext.set(getString("sessionprofit_unavailable1"))
-                minuteprofittext.set(getString("sessionprofit_unavailable2"))
+                sessionprofittext.set(get_string("sessionprofit_unavailable1"))
+                minuteprofittext.set(get_string("sessionprofit_unavailable2"))
                 hourlyprofittext.set("")
                 dailyprofittext.set("")
             profitCheck += 1
@@ -2177,7 +2178,7 @@ def calculateProfit(start_bal):
         global curr_bal, profit_array
 
         prev_bal = curr_bal
-        curr_bal = globalBalance
+        curr_bal = global_balance
         session = curr_bal - start_bal
         tensec = curr_bal - prev_bal
         minute = tensec * 6
@@ -2200,16 +2201,16 @@ def sendFunds(handler):
     amountStr = amount.get()
 
     MsgBox = messagebox.askquestion(
-        getString("warning"),
-        getString("send_funds_warning")
+        get_string("warning"),
+        get_string("send_funds_warning")
         + str(amountStr)
         + " DUCO "
-        + getString("send_funds_to")
+        + get_string("send_funds_to")
         + " "
         + str(recipientStr),
         icon="warning",)
     if MsgBox == "yes":
-        soc = socket.socket()
+        soc = socket()
         soc.connect((pool_address, int(pool_port)))
         soc.recv(3)
 
@@ -2255,11 +2256,11 @@ def updateRichPresence():
     startTime = int(time())
     while True:
         try:
-            balance = round(globalBalance, 4)
+            balance = round(global_balance, 4)
             RPC.update(
                 details=str(balance)
                 + " ᕲ ($"
-                + str(round(ducofiat * balance, 2))
+                + str(round(duco_fiat_value * balance, 2))
                 + ")",
                 start=startTime,
                 large_image="duco",
@@ -2298,28 +2299,28 @@ class Wallet:
         textFont4 = Font(
             size=14,
             weight="bold")
-        textFont3 = Font(
+        TEXT_FONT_BOLD_LARGE = Font(
             size=12,
             weight="bold")
-        textFont2 = Font(
+        TEXT_FONT_BOLD = Font(
             size=18,
             weight="bold")
-        textFont = Font(
+        TEXT_FONT = Font(
             size=12,
             weight="normal")
 
         self.master = master
         master.resizable(False, False)
-        master.configure(background=backgroundColor)
-        master.title(getString("duino_coin_wallet"))
+        master.configure(background=BACKGROUND_COLOR)
+        master.title(get_string("duino_coin_wallet"))
 
         Label(
             master,
-            text=f'{getString("uppercase_duino_coin_wallet")}: '
+            text=f'{get_string("uppercase_duino_coin_wallet")}: '
             + str(username),
-            font=textFont3,
-            foreground=foregroundColor,
-            background=backgroundColor,
+            font=TEXT_FONT_BOLD_LARGE,
+            foreground=FOREGROUND_COLOR,
+            background=BACKGROUND_COLOR,
         ).grid(
             row=0,
             column=0,
@@ -2330,17 +2331,17 @@ class Wallet:
 
         balancetext = StringVar()
         wbalancetext = StringVar()
-        balancetext.set(getString("please_wait"))
+        balancetext.set(get_string("please_wait"))
         if tronpy_installed:
-            wbalancetext.set(getString("please_wait"))
+            wbalancetext.set(get_string("please_wait"))
         else:
             wbalancetext.set("0.00")
         balanceLabel = Label(
             master,
             textvariable=balancetext,
-            font=textFont2,
-            foreground=foregroundColorSecondary,
-            background=backgroundColor)
+            font=TEXT_FONT_BOLD,
+            foreground=FOREGROUND_COLOR_SECONDARY,
+            background=BACKGROUND_COLOR)
         balanceLabel.grid(row=1,
                           column=0,
                           columnspan=3,
@@ -2351,8 +2352,8 @@ class Wallet:
             master,
             textvariable=wbalancetext,
             font=textFont4,
-            foreground=foregroundColorSecondary,
-            background=backgroundColor)
+            foreground=FOREGROUND_COLOR_SECONDARY,
+            background=BACKGROUND_COLOR)
         wbalanceLabel.grid(row=2,
                            column=0,
                            columnspan=3,
@@ -2360,14 +2361,14 @@ class Wallet:
                            padx=(5, 0))
 
         balanceusdtext = StringVar()
-        balanceusdtext.set(getString("please_wait"))
+        balanceusdtext.set(get_string("please_wait"))
 
         Label(
             master,
             textvariable=balanceusdtext,
-            font=textFont,
-            background=backgroundColor,
-            foreground=fontColor,
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
         ).grid(row=1,
                column=3,
                sticky=S + E,
@@ -2391,10 +2392,10 @@ class Wallet:
 
         Label(
             master,
-            text=getString("recipient"),
-            font=textFont,
-            background=backgroundColor,
-            foreground=fontColor,
+            text=get_string("recipient"),
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
         ).grid(row=5,
                column=0,
                sticky=W + S,
@@ -2403,9 +2404,9 @@ class Wallet:
         recipient = Entry(
             master,
             border="0",
-            font=textFont,
-            foreground=foregroundColorSecondary,
-            background=backgroundColor)
+            font=TEXT_FONT,
+            foreground=FOREGROUND_COLOR_SECONDARY,
+            background=BACKGROUND_COLOR)
         recipient.grid(row=5,
                        column=1,
                        sticky=N + W + S + E,
@@ -2416,10 +2417,10 @@ class Wallet:
 
         Label(
             master,
-            text=getString("amount"),
-            font=textFont,
-            background=backgroundColor,
-            foreground=fontColor,
+            text=get_string("amount"),
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR,
         ).grid(row=6,
                column=0,
                sticky=W + S,
@@ -2428,24 +2429,24 @@ class Wallet:
         amount = Entry(
             master,
             border="0",
-            font=textFont,
-            foreground=foregroundColorSecondary,
-            background=backgroundColor)
+            font=TEXT_FONT,
+            foreground=FOREGROUND_COLOR_SECONDARY,
+            background=BACKGROUND_COLOR)
         amount.grid(row=6,
                     column=1,
                     sticky=N + W + S + E,
                     columnspan=3,
                     padx=(0, 5))
-        amount.insert("0", "2.3")
+        amount.insert("0", str(VERSION))
         amount.bind("<FocusIn>", clear_amount_placeholder)
 
         sendLabel = Button(
             master,
-            text=getString("send_funds"),
-            font=textFont3,
-            foreground=foregroundColor,
-            background=backgroundColor,
-            activebackground=backgroundColor)
+            text=get_string("send_funds"),
+            font=TEXT_FONT_BOLD_LARGE,
+            foreground=FOREGROUND_COLOR,
+            background=BACKGROUND_COLOR,
+            activebackground=BACKGROUND_COLOR)
         sendLabel.grid(
             row=8,
             column=0,
@@ -2457,11 +2458,11 @@ class Wallet:
 
         wrapLabel = Button(
             master,
-            text=getString("wrap_duco"),
-            font=textFont3,
-            foreground=foregroundColor,
-            background=backgroundColor,
-            activebackground=backgroundColor)
+            text=get_string("wrap_duco"),
+            font=TEXT_FONT_BOLD_LARGE,
+            foreground=FOREGROUND_COLOR,
+            background=BACKGROUND_COLOR,
+            activebackground=BACKGROUND_COLOR)
         wrapLabel.grid(
             row=9,
             column=0,
@@ -2473,11 +2474,11 @@ class Wallet:
 
         wrapLabel = Button(
             master,
-            text=getString("unwrap_duco"),
-            font=textFont3,
-            foreground=foregroundColor,
-            background=backgroundColor,
-            activebackground=backgroundColor)
+            text=get_string("unwrap_duco"),
+            font=TEXT_FONT_BOLD_LARGE,
+            foreground=FOREGROUND_COLOR,
+            background=BACKGROUND_COLOR,
+            activebackground=BACKGROUND_COLOR)
         wrapLabel.grid(
             row=9,
             column=2,
@@ -2497,10 +2498,10 @@ class Wallet:
 
         Label(
             master,
-            text=getString("estimated_profit"),
-            font=textFont3,
-            foreground=foregroundColor,
-            background=backgroundColor,
+            text=get_string("estimated_profit"),
+            font=TEXT_FONT_BOLD_LARGE,
+            foreground=FOREGROUND_COLOR,
+            background=BACKGROUND_COLOR,
         ).grid(row=11,
                column=0,
                sticky=S + W,
@@ -2509,13 +2510,13 @@ class Wallet:
                padx=(5, 0))
 
         sessionprofittext = StringVar()
-        sessionprofittext.set(getString("please_wait_calculating"))
+        sessionprofittext.set(get_string("please_wait_calculating"))
         sessionProfitLabel = Label(
             master,
             textvariable=sessionprofittext,
-            font=textFont,
-            background=backgroundColor,
-            foreground=fontColor)
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR)
         sessionProfitLabel.grid(
             row=12,
             column=0,
@@ -2527,9 +2528,9 @@ class Wallet:
         minuteProfitLabel = Label(
             master,
             textvariable=minuteprofittext,
-            font=textFont,
-            background=backgroundColor,
-            foreground=fontColor)
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR)
         minuteProfitLabel.grid(
             row=13,
             column=0,
@@ -2541,9 +2542,9 @@ class Wallet:
         hourlyProfitLabel = Label(
             master,
             textvariable=hourlyprofittext,
-            font=textFont,
-            background=backgroundColor,
-            foreground=fontColor)
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR)
         hourlyProfitLabel.grid(
             row=14,
             column=0,
@@ -2556,9 +2557,9 @@ class Wallet:
         dailyProfitLabel = Label(
             master,
             textvariable=dailyprofittext,
-            font=textFont,
-            background=backgroundColor,
-            foreground=fontColor)
+            font=TEXT_FONT,
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR)
         dailyProfitLabel.grid(
             row=15,
             column=0,
@@ -2576,10 +2577,10 @@ class Wallet:
 
         Label(
             master,
-            text=getString("local_transactions"),
-            font=textFont3,
-            foreground=foregroundColor,
-            background=backgroundColor,
+            text=get_string("local_transactions"),
+            font=TEXT_FONT_BOLD_LARGE,
+            foreground=FOREGROUND_COLOR,
+            background=BACKGROUND_COLOR,
         ).grid(row=17,
                column=0,
                sticky=S + W,
@@ -2592,10 +2593,10 @@ class Wallet:
         transactionstextLabel = Label(
             master,
             textvariable=transactionstext,
-            font=textFont,
+            font=TEXT_FONT,
             justify=LEFT,
-            background=backgroundColor,
-            foreground=fontColor)
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR)
         transactionstextLabel.grid(
             row=18,
             column=0,
@@ -2621,8 +2622,8 @@ class Wallet:
         transactionsLabel = Label(
             master,
             image=transactions,
-            background=backgroundColor,
-            foreground=fontColor)
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR)
         transactionsLabel.grid(
             row=20,
             column=0,
@@ -2637,8 +2638,8 @@ class Wallet:
         calculatorLabel = Label(
             master,
             image=calculator,
-            background=backgroundColor,
-            foreground=fontColor)
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR)
         calculatorLabel.grid(
             row=20,
             column=1,
@@ -2654,8 +2655,8 @@ class Wallet:
         statsLabel = Label(
             master,
             image=stats,
-            background=backgroundColor,
-            foreground=fontColor)
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR)
         statsLabel.grid(
             row=20,
             column=2,
@@ -2671,8 +2672,8 @@ class Wallet:
         settingsLabel = Label(
             master,
             image=settings,
-            background=backgroundColor,
-            foreground=fontColor)
+            background=BACKGROUND_COLOR,
+            foreground=FONT_COLOR)
         settingsLabel.grid(
             row=20,
             column=3,
@@ -2682,7 +2683,7 @@ class Wallet:
         settingsLabel.bind("<Button>", openSettings)
 
         root.iconphoto(True, PhotoImage(file=resources + "duco_color.png"))
-        start_balance = globalBalance
+        start_balance = global_balance
         curr_bal = start_balance
         calculateProfit(start_balance)
         updateBalanceLabel()
@@ -2698,16 +2699,16 @@ class Wallet:
                 def withdraw_window():
                     image = Image.open(resources + "duco.png")
                     menu = (
-                        pystray.MenuItem(getString("tray_show"), show_window),
-                        pystray.MenuItem(getString("tray_exit"), quit_window))
+                        pystray.MenuItem(get_string("tray_show"), show_window),
+                        pystray.MenuItem(get_string("tray_exit"), quit_window))
                     icon = pystray.Icon(
-                        getString("duino_coin_wallet"),
+                        get_string("duino_coin_wallet"),
                         image,
-                        getString("duino_coin_wallet"),
+                        get_string("duino_coin_wallet"),
                         menu)
                     icon.run()
 
-                t = threading.Thread(target=withdraw_window)
+                t = Thread(target=withdraw_window)
                 t.setDaemon(True)
                 t.start()
             except:
@@ -2716,7 +2717,7 @@ class Wallet:
         root.mainloop()
 
 
-with sqlite3.connect(f"{resources}/wallet.db") as con:
+with sqlconn(f"{resources}/wallet.db") as con:
     cur = con.cursor()
     cur.execute("SELECT COUNT(username) FROM UserData")
     userdata_count = cur.fetchall()[0][0]
@@ -2729,21 +2730,21 @@ with sqlite3.connect(f"{resources}/wallet.db") as con:
         userdata_count = cur.fetchall()[0][0]
     if userdata_count >= 1:
         LoadingWindow()
-        with sqlite3.connect(f"{resources}/wallet.db") as con:
+        with sqlconn(f"{resources}/wallet.db") as con:
             cur = con.cursor()
             cur.execute("SELECT * FROM UserData")
             userdata_query = cur.fetchone()
             username = userdata_query[0]
             passwordEnc = (userdata_query[1]).decode("utf-8")
             password = b64decode(passwordEnc).decode("utf8")
-        status.config(text=getString("preparing_wallet_window"))
+        status.config(text=get_string("preparing_wallet_window"))
         loading.update()
         try:
             # Start duco price updater
-            GetDucoPrice()
+            get_duco_price()
             getBalance()
             initRichPresence()
-            threading.Thread(target=updateRichPresence).start()
+            Thread(target=updateRichPresence).start()
             try:
                 # Destroy loading dialog and start the main wallet window
                 loading.destroy()
