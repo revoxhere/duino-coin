@@ -33,13 +33,13 @@ from sqlite3 import connect as sqlconn
 import sys
 
 
-# VERSION number
+# Version number
 VERSION = 2.4
 # Colors
 BACKGROUND_COLOR = "#121212"
-FONT_COLOR = "#FAFAFA"
-FOREGROUND_COLOR = "#f0932b"
-FOREGROUND_COLOR_SECONDARY = "#ffbe76"
+FONT_COLOR = "#fffdee"
+FOREGROUND_COLOR = "#ff9f43"
+FOREGROUND_COLOR_SECONDARY = "#fdcb6e"
 # Minimum transaction amount to be saved
 MIN_TRANSACTION_VALUE = 0.00000000001
 # Minimum transaction amount to show a notification
@@ -1152,7 +1152,6 @@ def wrapper_window(handler):
             wrapperWindow.resizable(False, False)
             wrapperWindow.title(get_string("wrapper_title"))
             wrapperWindow.transient([root])
-            wrapperWindow.configure()
 
             askWrapAmount = Label(
                 wrapperWindow,
@@ -2460,32 +2459,6 @@ class Wallet:
         profit_calculator(start_balance)
         update_balance_labels()
 
-        if not DISABLE_TRAY:
-            try:
-                def quit_window(icon, item):
-                    master.destroy()
-
-                def show_window(icon, item):
-                    master.after(0, root.deiconify)
-
-                def withdraw_window():
-                    image = Image.open(resources + "duco.png")
-                    menu = (
-                        pystray.MenuItem(get_string("tray_show"), show_window),
-                        pystray.MenuItem(get_string("tray_exit"), quit_window))
-                    icon = pystray.Icon(
-                        get_string("duino_coin_wallet"),
-                        image,
-                        get_string("duino_coin_wallet"),
-                        menu)
-                    icon.run()
-
-                t = Thread(target=withdraw_window)
-                t.setDaemon(True)
-                t.start()
-            except Exception:
-                pass
-
         root.mainloop()
 
 
@@ -2504,15 +2477,6 @@ except ModuleNotFoundError:
           + "Wallet will try to install it. "
           + "If it fails, please manually install \"Pillow\".")
     install("Pillow")
-
-try:
-    import pystray
-except ModuleNotFoundError:
-    print("Pystray is not installed. "
-          + "Continuing without system tray support.")
-    DISABLE_TRAY = True
-else:
-    DISABLE_TRAY = False
 
 try:
     from notifypy import Notify
@@ -2565,7 +2529,6 @@ except ModuleNotFoundError:
           + "Please manually install \"tronpy\" "
           + "if you intend on using wDUCO wrapper.")
 else:
-    tron = tronpy.Tron()
     tron = tronpy.Tron()
     wduco = tron.get_contract("TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U")
 
@@ -2664,43 +2627,42 @@ try:
 except IndexError:
     lang = "english"
 
-
-if __name__ == "__main__":
-    with sqlconn(resources + "wallet.db") as con:
+with sqlconn(resources + "wallet.db") as con:
+    cur = con.cursor()
+    cur.execute("SELECT COUNT(username) FROM UserData")
+    userdata_count = cur.fetchall()[0][0]
+    if userdata_count < 1:
+        root = Tk()
+        lf = LoginFrame(root)
+        root.mainloop()
         cur = con.cursor()
         cur.execute("SELECT COUNT(username) FROM UserData")
         userdata_count = cur.fetchall()[0][0]
-        if userdata_count < 1:
-            root = Tk()
-            lf = LoginFrame(root)
-            root.mainloop()
+    if userdata_count >= 1:
+        loading_window()
+        with sqlconn(resources + "wallet.db") as con:
             cur = con.cursor()
-            cur.execute("SELECT COUNT(username) FROM UserData")
-            userdata_count = cur.fetchall()[0][0]
-        if userdata_count >= 1:
-            loading_window()
-            with sqlconn(resources + "wallet.db") as con:
-                cur = con.cursor()
-                cur.execute("SELECT * FROM UserData")
-                userdata_query = cur.fetchone()
-                username = userdata_query[0]
-                passwordEnc = (userdata_query[1]).decode("utf-8")
-                password = b64decode(passwordEnc).decode("utf8")
-            status.config(text=get_string("preparing_wallet_window"))
-            loading.update()
+            cur.execute("SELECT * FROM UserData")
+            userdata_query = cur.fetchone()
+            username = userdata_query[0]
+            passwordEnc = (userdata_query[1]).decode("utf-8")
+            password = b64decode(passwordEnc).decode("utf8")
+        status.config(text=get_string("preparing_wallet_window"))
+        loading.update()
+        try:
+            # Start duco price updater
+            get_duco_price()
+            get_balance()
+            init_rich_presence()
+            Thread(target=update_rich_presence).start()
             try:
-                # Start duco price updater
-                get_duco_price()
-                get_balance()
-                init_rich_presence()
-                Thread(target=update_rich_presence).start()
-                try:
-                    # Destroy loading dialog and start the main wallet window
-                    loading.destroy()
-                except Exception:
-                    pass
-                root = Tk()
-                my_gui = Wallet(root)
-            except ValueError:
-                print("ValueError")
-                _exit(0)
+                # Destroy loading dialog and start the main wallet window
+                loading.destroy()
+            except Exception:
+                pass
+            root = Tk()
+            my_gui = Wallet(root)
+            print("exiting")
+        except Exception as e:
+            print(e)
+            _exit(0)
