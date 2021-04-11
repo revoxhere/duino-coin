@@ -2209,6 +2209,7 @@ def handle(c, ip):
                     c2.execute("SELECT name, ip, port, Status FROM PoolList WHERE hidden != 'ok'")
                     info = c2.fetchall()
                     print(info)
+                    info = (str(info)).replace('\n', '')
 
                     c.send(bytes(f"{info}", encoding='utf8'))
 
