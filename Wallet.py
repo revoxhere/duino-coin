@@ -50,6 +50,11 @@ ENCRYPTION_ITERATIONS = 100_000
 config = ConfigParser()
 wrong_passphrase = False
 global_balance = 0
+oldbalance = 0
+balance = 0
+unpaid_balance = 0
+profitCheck = 0
+curr_bal = 0
 
 
 def install(package):
@@ -234,25 +239,6 @@ class LoginFrame(Frame):
             row=7,
             sticky=N)
 
-        self.var = IntVar()
-        self.checkbox = Checkbutton(
-            self,
-            text=get_string("keep_me_logged_in"),
-            background=BACKGROUND_COLOR,
-            activebackground=BACKGROUND_COLOR,
-            selectcolor=BACKGROUND_COLOR,
-            activeforeground=FOREGROUND_COLOR,
-            foreground=FONT_COLOR,
-            variable=self.var,
-            font=TEXT_FONT,
-            borderwidth="0",
-            highlightthickness="0")
-        self.checkbox.grid(
-            columnspan=2,
-            sticky=W,
-            pady=(5),
-            padx=5)
-
         self.logbtn = Button(
             self,
             text=get_string("login"),
@@ -265,7 +251,7 @@ class LoginFrame(Frame):
             columnspan=2,
             sticky="nswe",
             padx=(5),
-            pady=(0, 1))
+            pady=(5, 1))
 
         self.regbtn = Button(
             self,
@@ -282,13 +268,18 @@ class LoginFrame(Frame):
             pady=(0, 5))
 
         self.configure(background=BACKGROUND_COLOR)
+        self.master.bind(
+            "<Return>", 
+            self._login_btn_clicked_bind)
         self.pack()
+
+    def _login_btn_clicked_bind(self, event):
+        self._login_btn_clicked()
 
     def _login_btn_clicked(self):
         global username, password
         username = self.entry_username.get()
         password = self.entry_password.get()
-        keeplogedin = self.var.get()
 
         if username and password:
             soc = socket()
@@ -304,16 +295,15 @@ class LoginFrame(Frame):
             response = response.split(",")
 
             if response[0] == "OK":
-                if keeplogedin >= 1:
-                    passwordEnc = b64encode(bytes(password, encoding="utf8"))
-                    with sqlconn(resources + "wallet.db") as con:
-                        cur = con.cursor()
-                        cur.execute(
-                            """INSERT INTO
-                            UserData(username, password, useWrapper)
-                            VALUES(?, ?, ?)""",
-                            (username, passwordEnc, "False"))
-                        con.commit()
+                passwordEnc = b64encode(bytes(password, encoding="utf8"))
+                with sqlconn(resources + "wallet.db") as con:
+                    cur = con.cursor()
+                    cur.execute(
+                        """INSERT INTO
+                        UserData(username, password, useWrapper)
+                        VALUES(?, ?, ?)""",
+                        (username, passwordEnc, "False"))
+                    con.commit()
                 root.destroy()
             else:
                 messagebox.showerror(
@@ -1793,10 +1783,6 @@ def settings_window(handler):
     discordLabel.bind("<Button-1>", openDiscord)
 
 
-oldbalance = 0
-balance = 0
-unpaid_balance = 0
-
 
 def get_balance():
     global oldbalance
@@ -1887,8 +1873,6 @@ def get_wbalance():
         return 0.0
 
 
-profitCheck = 0
-
 
 def update_balance_labels():
     global profit_array, profitCheck
@@ -1939,8 +1923,6 @@ def update_balance_labels():
         _exit(0)
     Timer(1, update_balance_labels).start()
 
-
-curr_bal = 0
 
 
 def profit_calculator(start_bal):
@@ -2627,42 +2609,42 @@ try:
 except IndexError:
     lang = "english"
 
-with sqlconn(resources + "wallet.db") as con:
-    cur = con.cursor()
-    cur.execute("SELECT COUNT(username) FROM UserData")
-    userdata_count = cur.fetchall()[0][0]
-    if userdata_count < 1:
-        root = Tk()
-        lf = LoginFrame(root)
-        root.mainloop()
+if __name__ == "__main__":
+    with sqlconn(resources + "wallet.db") as con:
         cur = con.cursor()
         cur.execute("SELECT COUNT(username) FROM UserData")
         userdata_count = cur.fetchall()[0][0]
-    if userdata_count >= 1:
-        loading_window()
-        with sqlconn(resources + "wallet.db") as con:
+        if userdata_count < 1:
+            root = Tk()
+            lf = LoginFrame(root)
+            root.mainloop()
+            cur = con.cursor()
+            cur.execute("SELECT COUNT(username) FROM UserData")
+            userdata_count = cur.fetchall()[0][0]
+
+        if userdata_count >= 1:
+            loading_window()
             cur = con.cursor()
             cur.execute("SELECT * FROM UserData")
             userdata_query = cur.fetchone()
             username = userdata_query[0]
             passwordEnc = (userdata_query[1]).decode("utf-8")
             password = b64decode(passwordEnc).decode("utf8")
-        status.config(text=get_string("preparing_wallet_window"))
-        loading.update()
-        try:
-            # Start duco price updater
-            get_duco_price()
-            get_balance()
-            init_rich_presence()
-            Thread(target=update_rich_presence).start()
+            status.config(text=get_string("preparing_wallet_window"))
+            loading.update()
             try:
-                # Destroy loading dialog and start the main wallet window
-                loading.destroy()
-            except Exception:
-                pass
-            root = Tk()
-            my_gui = Wallet(root)
-            print("exiting")
-        except Exception as e:
-            print(e)
-            _exit(0)
+                # Start duco price updater
+                get_duco_price()
+                get_balance()
+                init_rich_presence()
+                Thread(target=update_rich_presence).start()
+                try:
+                    # Destroy loading dialog and start the main wallet window
+                    loading.destroy()
+                except Exception:
+                    pass
+                root = Tk()
+                my_gui = Wallet(root)
+            except Exception as e:
+                print(e)
+                _exit(0)
