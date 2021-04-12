@@ -93,9 +93,9 @@ py -m pip install -r requirements.txt
 
 <hr>
 
-You can also get the whole Duino-Coin bundle on the AUR - just install it with your favourite AUR Helper:
+您还可以在AUR上获得整个Duino-Coin捆绑包-只需使用您最喜欢的AUR Helper进行安装即可：
 
-```BASH
+```bash
 sudo pacman -S git
 git clone https://aur.archlinux.org/yay-git.git
 cd yay-git
@@ -103,7 +103,7 @@ makepkg -si
 yay -S duino-coin
 ```
 
-Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD).
+Duino-Coin AUR 由 [PhereloHD](https://github.com/PhereloHD)进行维护.
 
 <h3 align="center">社区贡献者开发的软件</h3><br>
 
@@ -135,36 +135,39 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 
 <h3 align="center">wDUCO 教程</h3><br>
 
-wDUCO is DUCO wrapped on the Tron network. Currently there aren't many uses for it, other than just storing funds in external wallet or exchanging wDUCO to another token on JustSwap. Before doing anything, make sure you have `tronpy` (tron lib) and `cryptography` (for encrypting private key) modules for python3 installed.
+wDUCO 是 DUCO 在 Tron 网络上的一种包装. 目前，除了将资金存储在外部钱包中或将wDUCO交换为JustSwap上的另一个令牌外，它没有太多用途。
+
+在做任何事情之前，请确保已经安装了用于python3的 `tronpy`模块和`cryptography`模块（用于加密私钥）。
 
 ### 配置 wDUCO 包装器
 
-1. Open your DUCO GUI (desktop) or CLI (console) Wallet
-2. If you're using the GUI Wallet:
-    1. Open the settings tab
-    2. Click the **Configure Wrapper** button
-3. If you're using the CLI Wallet:
-    1. Start wrapper configuration tool by typing `wrapperconf`
-4. Input your private key (for example your tronlink key) and set a passphrase used for encrypting it
+1. 打开您的DUCO GUI（桌面）或CLI（控制台）钱包
+2. 如果您使用的是GUI版的电子钱包:
+    1. 打开设置选项卡;
+    2. 点击 **配置包装器** 按钮;
+3. 如果您使用的是CLU版的电子钱包:
+    1. 通过输入 `wrapperconf`启动包装器配置工具。
+4. 输入您的私钥（例如您的tronlink密钥）并设置用于加密它的密码;
 
 ### 在命令行钱包中配置 wDUCO 包装器
 
 ### 打包 DUCO
 
-After setting up the wrapper in one of the two wallets, you can wrap DUCOs (convert them to wDUCO).
+在两个钱包之一中设置包装器后，您可以包装DUCO（将其转换为wDUCO）。
 
-1. Open your Wallet
-2. Type `wrap` to start the wrapping process OR click **Wrap DUCO** button
-3. Follow the instructions displayed by the wallet
+1. 打开钱包
+2. 输入 `wrap` 开始包装过程，或者点击 **包装 DUCO** 按钮;
+3. 请遵循钱包显示的说明;
 
 ### 解包 DUCO
 
-After setting up the wrapper in one of the two wallets, you can unwrap wDUCOs (convert them to DUCO).
-**Note: make sure you have some TRX in your wallet for the fees!** Unwraping will use ~5 TRX (~0.5 USD) as fees.
+在两个钱包之一中设置包装器后，您可以解开wDUCO（将它们转换为DUCO）。
 
-1. Open your Wallet
-2. Type `unwrap` to start the wrapping process OR click **Unwrap DUCO** button
-3. Follow the instructions displayed by the wallet
+**注意：请确保您的钱包里有TRX来支付费用！**取消包装将使用~5 TRX（~0.5 USD）作为费用。
+
+1. 打开您的钱包;
+2. 输入 `unwrap`  开始解包过程,或点击 **解包 DUCO** 按钮;
+3. 请遵循钱包显示的说明;
 
 <h2 align="center">开发</h2><br>
 
@@ -195,28 +198,29 @@ Duino-Coin 主要根据MIT许可证进行分发。有关更多信息，请参见
 某些第三方随附的文件可能具有不同的许可证-请检查其`LICENSE`（通常在源代码文件的顶部）。
 
 <h2 align="center">服务协议</h2><br>
-1. Duino-Coins ("DUCOs") are earned by miners with a process called mining.<br/>
-2. Mining is described as using DUCO-S1 algorithm (explained in the <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
-3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README).<br/>
-4. Mining on GPUs, FPGAs and other high-efficiency hardware is allowed, but using only the `EXTREME` mining difficulty.<br/>
-5. Any users using miners on difficulty not suited for their hardware (see the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">difficulty list</a>) will be automatically throttled and/or blocked.<br/>
-6. Any users spotted using inappropriate and/or overpowered hardware will be banned manually or automatically from the network without prior notice.<br/>
-7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
-8. Only coins earned legally are eligible for the exchange.<br/>
-9. Users spotted using a VPN (or similar) with malicious intents (e.g. bypassing limits) may be banned without prior notice.<br/>
-10. Multiple accounts used to bypass limits may be banned without prior notice.<br/>
-11. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
-12. Multiple accounts used to evade bans will be banned without prior notice.<br/>
-13. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
-14. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
-15. A user's DUCOs may be burnt if a violation can be proven.<br/>
-16. These terms of service can change at any time without prior notice.<br/>
-17. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+1. Duino-Coins ("DUCOs")是由矿工挖矿挖出来的。<br/>
+2. 挖矿被描述为使用DUCO-S1算法（在<a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf"> Duino-Coin白皮书</a>中进行了解释），在其中找到正确的数学问题结果会给矿工以奖励。<br/>
+3.可以使用CPU、AVR板（例如Arduino板）、单板计算机（例如Raspberry Pi板）、ESP32 / 8266板（使用官方矿工）来正式进行挖矿（自述文件的上部描述了其他官方允许的矿工） ）。<br/>
+4.允许在GPU，FPGA和其他高效硬件上进行挖掘，但仅使用`EXTREME`挖掘难度。<br/>
+5. 任何因困难而使用矿工的用户都不适合其硬件（请参见<a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">困难列表</a> ）将被自动节流和/或阻塞。<br/>
+6. 任何发现使用不适当和/或过载的硬件的用户都将被手动或自动从网络禁止，恕不另行通知。<br/>
+7. 禁止包括阻止用户访问他的硬币以及删除帐户。<br/>
+8. 只有合法赚取的币才有资格兑换。<br/>
+9. 可能禁止使用具有恶意（例如绕过限制）的VPN（或类似网络）发现的用户，恕不另行通知。<br/>
+10.  可能会禁止使用多个绕过限额的帐户，恕不另行通知。<br/>
+11. 帐户可能会暂时被暂停以调查（`调查`）ToS违规行为（`违规`或`滥用`）。<br/>
+12. 多个用于逃避禁令的帐户将被禁止，恕不另行通知。<br/>
+13.在调查过程中，向官方DUCO-Exchange提出的交换请求（`官方交换`）可能会被延迟和/或拒绝。 <br/>
+14. 由于违反服务条款和/或资金不足，向正式交易所提出的交易所请求可能会被拒绝。<br/>
+15. 如果可以证明违规，则可能会烧毁用户的DUCO。<br/>
+16. 这些服务条款可以随时更改，恕不另行通知。<br/>
+17. 每个使用Duino-Coin的用户均同意遵守上述规则。
+<br/>
 <h4 align="center">隐私政策</h2><br>
-1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
-2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
-3. Balances, transactions and mining-related data is publicly available in the public <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
-4. The privacy policy may be changed in the future with a prior notification.
+1.在主服务器上，我们仅存储用户名，哈希密码（在bcrypt的帮助下）和用户的电子邮件作为其帐户数据。<br/>
+2. 电子邮件不是公开可用的，仅在需要时用于联系用户,在<a href="https://revoxhere.github.io/duco-exchange/"> DUCO-Exchange </a>上确认交流，并偶尔收到通讯（计划在将来进行）。<br/>
+3.余额，交易和与采矿相关的数据可以在公共<a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api"> JSON APIs </ strong>中公开获得</a>.<br/>
+4. 将来可能会在事先通知的情况下更改隐私政策。
 
 <h2 align="center">开发者</h2><br>
 
