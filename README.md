@@ -5,7 +5,18 @@
 
 <p align = "center">
   <a href="https://github.com/revoxhere/duino-coin">
-    <img width="80%" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" /></a><br /><br />
+    <img width="80%" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" />
+  </a>
+  <br />
+  <a href="https://github.com/revoxhere/duino-coin/blob/master/README.md">
+    <img src="https://img.shields.io/badge/English-fb6404.svg?style=for-the-badge" />
+  </a>
+  <a href="https://github.com/revoxhere/duino-coin/blob/master/README_zh_CN.md">
+    <img src="https://img.shields.io/badge/简体中文-fb6404.svg?style=for-the-badge" />
+  </a>
+</p>
+<br />
+<p align = "center">
   <a href="https://duinocoin.com">
     <img src="https://img.shields.io/badge/duinocoin.com-555555.svg?style=for-the-badge&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAmklEQVQ4T7WUQQ6AIAwEIcaX%2BALj0fdz9gM%2BxMRESQ8ktSllrciZTneX0hg6n8h5Z5pvhD%2Bu26OO17iABaCBPwEJLKFV6ZZ1GQ2HwgqlEg51ATV7GhSyXFPjBpK6UsztdQdqjSDLNYVu4JGWaQjXLh%2BmaRn5eq8ybAGRWfx3sJFNo7lw%2FxStobkcWhlKYJf1ZS1XaggPNpIv3cls33EVXWotfwAAAABJRU5ErkJggg%3D%3D" /></a>
   <a href="https://wallet.duinocoin.com">
@@ -234,6 +245,7 @@ Some third-party included files may have different licenses - please check their
     *   [@httsmvkcom](https://github.com/httsmvkcom)
     *   [@Nosh-Ware](https://github.com/Nosh-Ware)
     *   [@BastelPichi](https://github.com/BastelPichi)
+    *   [@suifengtec](https://github.com/suifengtec)
     *   Thanks to [@Furim](https://github.com/Furim) for help in the early development stage
     *   Thanks to [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg) for designing early logos
     *   Thanks to [@Tech1k](https://github.com/Tech1k) for [Beyondcoin](https://beyondcoin.io) partnership and providing [duinocoin.com](https://duinocoin.com) domain
