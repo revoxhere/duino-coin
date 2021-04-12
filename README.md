@@ -25,67 +25,71 @@
     <img src="https://img.shields.io/badge/release-2.3-fb6404.svg?style=for-the-badge" /></a>
 </p>
 
-<h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards and many more.</h2><br />
+<h2 align="center">Duino-Coin 是一种可以在电脑、树莓派、Arduino(及其变种板)、ESP 板子等设备上挖的币。</h2><br />
 
 <table align="center">
   <tr>
-    <th>Key features</th>
-    <th>Technical specifications</th>
+    <th>关键特性</th>
+    <th>技术指标</th>
   </tr>
   <tr>
     <td>
-      💻 Supported by a large number of platforms<br>
-      👥 A friendly & growing community<br>
-      💱 Easy to use & exchange<br>
-      🌎 Available everywhere<br>
-      :new: Fully original project<br>
-      :blush: Beginner-friendly<br>
-      💰 Cost-effective<br>
-      ⛏️ Easy to mine<br>
-      📚 Open-source<br>
+      💻 支持多种平台<br>
+      👥 一个友好且成长中的社区<br>
+      💱 易于使用和交换<br>
+      🌎 随处可用<br>
+      :new: 完全原创的项目<br>
+      :blush: 对新手友好<br>
+      💰 高性价比<br>
+      ⛏️ 容易开采<br>
+      📚 开源<br>
     </td>
     <td>
-      ♾️ Coin supply: Infinite (before December 2020: 350k coins)<br>
-      😎 Premine: <5k blocks (<500 coins)<br>
-      ⚡ Transaction time: Instant<br>
-      🔢 Decimals: up to 20<br>
-      🔤 Ticker: DUCO (ᕲ)<br>
-      ⚒️ Algorithms: DUCO-S1, DUCO-S1A, XXHASH +more planned<br>
-      ♐ Rewards: supported by "Kolka system" helping to reward miners fairly<br>
+      ♾️ 硬币供应量：无限（2020年12月之前：350k个）<br>
+      😎 预挖: <5k 个区块 (<500 个币)<br>
+      ⚡ 交易时间：即时<br>
+      🔢 小数：最多20个<br>
+      🔤 代号: DUCO (ᕲ)<br>
+      ⚒️ 算法: DUCO-S1, DUCO-S1A, XXHASH ,未来会有更多<br>
+      ♐ 奖励：由"Kolka系统"支持，有助于公平地奖励矿工<br>
     </td>
   </tr>
 </table>
 
-<h2 align="center">Get started</h2><br>
+<h2 align="center">开始吧</h2><br>
 
-| Official Wallet | Official Miners |
+| 官方版钱包 | 官方版矿工端 |
 :----------------:|:----------------:
 [<img src="https://i.imgur.com/OEh0JxK.png">](https://duinocoin.com/getting-started#register)  |  [<img src="https://i.imgur.com/QNWkoee.png">](https://duinocoin.com/getting-started#pc)
 
-#### Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a>.
+#### 可在<a href="https://revoxhere.github.io/duino-coin/getting-started">官方网站</a>查看含有如何创建账户以及如何安装矿工客户端的官方版的开始指南
 
-<h3 align="center">Installing Duino-Coin</h2><br>
+<h3 align="center">安装 Duino-Coin</h2><br>
 
-The easiest way to get started with Duino-Coin is to download [the latest release](https://github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
-After downloading, unzip it and launch the desired program.<br>
-There are no dependencies required.
+下载与您的操作系统匹配的[最新版本的](https://github.com/revoxhere/duino-coin/releases/latest) Duino-Coin。<br>
+下载之后,解压并运行想运行的程序。<br>
+完全没有依赖。
 
 <hr>
 
-If you want to run the programs from source, you may need to install some dependencies. Here's how to do it on debian-based distros(e.g. Ubuntu, Debian, raspian):
-```BASH
+如果要从源代码运行程序，则可能需要安装一些依赖项。这是在基于Debian的发行版（例如Ubuntu，Debian，raspian）上执行此操作的方法：
+
+```bash
 sudo apt install python3 python3-pip git
 git clone https://github.com/revoxhere/duino-coin
 cd duino-coin
 python3 -m pip install -r requirements.txt
 ```
-If you are on Windows, download [Python 3](https://www.python.org/downloads/), then [our repository](https://github.com/revoxhere/duino-coin/archive/master.zip), extract it and open the folder in command prompt. In CMD, type:
-```BASH
+
+如果您在使用 Windows, 下载 [Python 3](https://www.python.org/downloads/), then [our repository](https://github.com/revoxhere/duino-coin/archive/master.zip), 解压缩并在命令提示符下打开文件夹。在CMD中，键入：
+
+```bash
 py -m pip install -r requirements.txt
 ```
-Note: Make sure python and pip are added to your PATH
 
-After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py` OR `py PC_Miner.py`). 
+注意：确保将python和pip添加到您的`PATH`中.
+
+完成此操作后，您就可以启动该软件了(例如`python3 PC_Miner.py` 或者 `py PC_Miner.py`).
 
 <hr>
 
@@ -101,9 +105,9 @@ yay -S duino-coin
 
 Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD).
 
-<h3 align="center">Community-made software</h3><br>
+<h3 align="center">社区贡献者开发的软件</h3><br>
 
-**Other miners known to work with Duino-Coin:**
+**其它已知的可以挖掘 Duino-Coin 的矿工端:**
 *   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) by DoctorEenot
 *   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) by fabiopolancoe
 *   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) by PhereloHD & HGEpro
@@ -119,7 +123,7 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
     *   [Minimal Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) by revox
 <!--*   [Multithreaded Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Multithreaded_PC_Miner.py) by Bilaboz (DEPRECATED) -->
 
-**Other tools:**
+**其它工具:**
 *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
 *   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) by LDarki
 *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) by siunus
@@ -127,13 +131,13 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 *   [Duino Stats](https://github.com/Bilaboz/duino-stats) (Discord bot) by Bilaboz
 <!--*   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz (DEPRECATED) -->
 
-This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
+此列表将被积极更新。如想将软件添加到此列表中，请提交PR或联系其中一位开发人员。
 
-<h3 align="center">wDUCO tutorial</h3><br>
+<h3 align="center">wDUCO 教程</h3><br>
 
 wDUCO is DUCO wrapped on the Tron network. Currently there aren't many uses for it, other than just storing funds in external wallet or exchanging wDUCO to another token on JustSwap. Before doing anything, make sure you have `tronpy` (tron lib) and `cryptography` (for encrypting private key) modules for python3 installed.
 
-### Configuring wDUCO Wrapper
+### 配置 wDUCO 包装器
 
 1. Open your DUCO GUI (desktop) or CLI (console) Wallet
 2. If you're using the GUI Wallet:
@@ -143,9 +147,9 @@ wDUCO is DUCO wrapped on the Tron network. Currently there aren't many uses for 
     1. Start wrapper configuration tool by typing `wrapperconf`
 4. Input your private key (for example your tronlink key) and set a passphrase used for encrypting it
 
-### Configuring wDUCO Wrapper in the CLI Wallet
+### 在命令行钱包中配置 wDUCO 包装器
 
-### Wrapping DUCO
+### 打包 DUCO
 
 After setting up the wrapper in one of the two wallets, you can wrap DUCOs (convert them to wDUCO).
 
@@ -153,7 +157,7 @@ After setting up the wrapper in one of the two wallets, you can wrap DUCOs (conv
 2. Type `wrap` to start the wrapping process OR click **Wrap DUCO** button
 3. Follow the instructions displayed by the wallet
 
-### Unwrapping DUCO
+### 解包 DUCO
 
 After setting up the wrapper in one of the two wallets, you can unwrap wDUCOs (convert them to DUCO).
 **Note: make sure you have some TRX in your wallet for the fees!** Unwraping will use ~5 TRX (~0.5 USD) as fees.
@@ -162,35 +166,35 @@ After setting up the wrapper in one of the two wallets, you can unwrap wDUCOs (c
 2. Type `unwrap` to start the wrapping process OR click **Unwrap DUCO** button
 3. Follow the instructions displayed by the wallet
 
-<h2 align="center">Development</h2><br>
+<h2 align="center">开发</h2><br>
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create.
-Any contributions you make to the Duino-Coin project are greatly appreciated.
+贡献使开源社区成为了一个令人赞叹的学习，启发和创造场所。
+感谢您为Duino-Coin项目所做的任何贡献。
 
-How to help?
+怎么帮助?
 
-*   Fork the Project
-*   Create your feature branch
-*   Commit your changes
-*   Make sure everything works as intended
-*   Open a pull request
+* Fork 这个项目
+* 创建你的特性分支
+* 提交你的更改
+* 确保一切正常
+* 提交PR
 
-Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch. 
+[有用的工具](https://github.com/revoxhere/duino-coin/tree/useful-tools)中提供了服务器源代码，API调用文档以及用于开发自己的Duino-Coin应用程序的官方库。
 
-<h2 align="center">Some of the officially tested devices</h2><br>
+<h2 align="center">一些经过官方测试的设备</h2><br>
 
-*   Arduino Pro Mini / Uno / Nano (ATmega328p @ 16 MHz 5V): ~155 H/s (15-20 DUCO/day)
-*   NodeMCU (ESP8266 @ 160 MHz): ~9.3 kH/s (~4.5 kH/s at 80 MHz clock) (8-12 DUCO/day)
-*   ESP32 (dual-threaded): ~13 kH/s (6 kH/s (core1) and 7 kH/s (core2)) (WIP)
+* Arduino Pro Mini / Uno / Nano (ATmega328p @ 16 MHz 5V): ~155 H/s (15-20 DUCO/day)
+* NodeMCU (ESP8266 @ 160 MHz): ~9.3 kH/s (~4.5 kH/s at 80 MHz clock) (8-12 DUCO/day)
+* ESP32 (dual-threaded): ~13 kH/s (6 kH/s (core1) and 7 kH/s (core2)) (WIP)
 
-Hashrate Calculators for AVR/ESP8266 platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
+在[有用的工具分支](https://github.com/revoxhere/duino-coin/tree/useful-tools)提供有用于AVR/ESP8266平台的哈希计算器.
 
 <h2 align="center">License</h2><br>
 
-Duino-Coin is mostly distributed under the MIT License. See `LICENSE` file for more information.
-Some third-party included files may have different licenses - please check their `LICENSE` statements (usually at the top of the source code files).
+Duino-Coin 主要根据MIT许可证进行分发。有关更多信息，请参见`LICENSE`文件。
+某些第三方随附的文件可能具有不同的许可证-请检查其`LICENSE`（通常在源代码文件的顶部）。
 
-<h2 align="center">Terms of service</h2><br>
+<h2 align="center">服务协议</h2><br>
 1. Duino-Coins ("DUCOs") are earned by miners with a process called mining.<br/>
 2. Mining is described as using DUCO-S1 algorithm (explained in the <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
 3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README).<br/>
@@ -204,19 +208,19 @@ Some third-party included files may have different licenses - please check their
 11. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
 12. Multiple accounts used to evade bans will be banned without prior notice.<br/>
 13. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
-14. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/> 
+14. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
 15. A user's DUCOs may be burnt if a violation can be proven.<br/>
 16. These terms of service can change at any time without prior notice.<br/>
 17. Every user using Duino-Coin agrees to comply with the above rules.<br/>
-<h4 align="center">Privacy policy</h2><br>
+<h4 align="center">隐私政策</h2><br>
 1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
 2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
 3. Balances, transactions and mining-related data is publicly available in the public <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
 4. The privacy policy may be changed in the future with a prior notification.
 
-<h2 align="center">Developers</h2><br>
+<h2 align="center">开发者</h2><br>
 
-*   **Developers:**
+*  **开发者:**
     *   [@revox](https://github.com/revoxhere/) (Founder/lead dev) - robik123.345@gmail.com
     *   [@Bilaboz](https://github.com/bilaboz/) (Lead dev)
     *   [@connorhess](https://github.com/connorhess) (Lead dev)
@@ -228,7 +232,7 @@ Some third-party included files may have different licenses - please check their
     *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
     *   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
 
-*   **Contributors:**
+*   **贡献者:**
     *   [@5Q](https://github.com/its5Q)
     *   [@kyngs](https://github.com/kyngs)
     *   [@httsmvkcom](https://github.com/httsmvkcom)
@@ -242,4 +246,4 @@ Some third-party included files may have different licenses - please check their
 
 <hr>
 
-Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
+项目链接: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
