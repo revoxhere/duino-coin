@@ -85,7 +85,7 @@ py -m pip install -r requirements.txt
 ```
 Note: Make sure python and pip are added to your PATH
 
-After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py` OR `py PC_Miner.py`). 
+After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py` OR `py PC_Miner.py`).
 
 <hr>
 
@@ -159,7 +159,7 @@ After setting up the wrapper in one of the two wallets, you can unwrap wDUCOs (c
 **Note: make sure you have some TRX in your wallet for the fees!** Unwraping will use ~5 TRX (~0.5 USD) as fees.
 
 1. Open your Wallet
-2. Type `unwrap` to start the wrapping process OR click **Unwrap DUCO** button
+2. Type `unwrap` to start the unwrapping process OR click **Unwrap DUCO** button
 3. Follow the instructions displayed by the wallet
 
 <h2 align="center">Development</h2><br>
@@ -175,7 +175,7 @@ How to help?
 *   Make sure everything works as intended
 *   Open a pull request
 
-Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch. 
+Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch.
 
 <h2 align="center">Some of the officially tested devices</h2><br>
 
@@ -204,7 +204,7 @@ Some third-party included files may have different licenses - please check their
 11. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
 12. Multiple accounts used to evade bans will be banned without prior notice.<br/>
 13. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
-14. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/> 
+14. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
 15. A user's DUCOs may be burnt if a violation can be proven.<br/>
 16. These terms of service can change at any time without prior notice.<br/>
 17. Every user using Duino-Coin agrees to comply with the above rules.<br/>

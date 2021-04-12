@@ -72,6 +72,7 @@
         "mining_not_exist": " doesn't exist.",
         "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s"
     },
+
     "polish": {
         "translation_autor": "revox",
         "sigint_detected": " SIGINT wykryty - Wyłączam koparkę.",
@@ -119,7 +120,7 @@
         "thanks_donation": " Bardzo dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
 
         "data_error": " Problem pobierania danych z GitHuba! Ponowna próba za 10s.",
-        
+
         "connected": " Połączono",
         "connected_server": " z głównym serwerem Duino-Coin (v",
         "outdated_miner": " Koparka jest nieaktualna (v",
@@ -165,7 +166,7 @@
 
         "low_diff_short": "Umbral bajo",
         "medium_diff_short": "Peso medio",
-        "net_diff_short": "Umbral controlado por la red", 
+        "net_diff_short": "Umbral controlado por la red",
         "algorithm": "Algoritmo: ",
         "rig_identifier": "Identificador del rig: ",
 
@@ -362,7 +363,7 @@
         "mining_user": " Пользователь ",
         "mining_not_exist": " не существует.",
         "mining_not_exist_warning": " Убедитесь в том, что вы правильно ввели имя пользователя. Пожалуйста, проверьте ваш файл настроек. Пробуем еще раз через 10с"
-    },    
+    },
     "german": {
         "translation_autor": "BastelPichi, EinWildesPanda",
         "sigint_detected": " SIGINT erkannt - Schließe Miner.",
@@ -434,5 +435,70 @@
         "mining_user": " Benutzer ",
         "mining_not_exist": " existiert nicht.",
         "mining_not_exist_warning": " Stelle sicher, dass du den Nutzernamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s"
-    }	
+    },
+    "chinese_simplified": {
+        "translation_autor": "suifengtec",
+        "sigint_detected": "检测到 SIGINT - 优雅退出.",
+        "goodbye": " 待会儿见!",
+        "greeting_morning": "早上好啊!",
+        "greeting_noon": "中午好",
+        "greeting_afternoon": "下午好",
+        "greeting_evening": "祝您有个舒适的夜晚",
+        "greeting_back": "欢迎回来",
+        "banner": "官方版 Duino-Coin © Python 矿工",
+        "donation_level": "开发者贡献等级: ",
+        "ask_algorithm": "选择您要使用的挖矿算法 (1-2): ",
+        "ask_difficulty": "选择您要使用的挖矿难度 (1-3): ",
+        "low_diff": "低难度（适用于树莓派以及较旧的计算机）",
+        "medium_diff": "中等难度(适用于一般的电脑)",
+        "net_diff": "网络难度(适用于强劲的电脑)",
+        "low_diff_short": "低难度",
+        "medium_diff_short": "中等难度",
+        "net_diff_short": "网络难度",
+        "algorithm": "算法: ",
+        "rig_identifier": "矿机标识符: ",
+        "basic_config_tool": "\nDuino-Coin 基础配置工具\n编辑 ",
+        "edit_config_file_warning": "/如果要更改 Miner_config.cfg 文件，请稍后。",
+        "dont_have_account": "还没有Duino-Coin帐户吗？ 使用 ",
+        "wallet": "钱包",
+        "register_warning": " 在服务器上注册个。\n",
+        "ask_username": "输入您的 Duino-Coin 用户名: ",
+        "ask_intensity": "设定挖矿强度（1-100）％（建议:95）: ",
+        "ask_threads": "设置挖矿线程（推荐用于您的系统: ",
+        "ask_lower_difficulty": "您是否想使用较低的难度进行挖掘（对于较慢的系统）？ (y/N): ",
+        "ask_rig_identifier": "您是否要向该矿机添加个标识符（名称）? (y/N): ",
+        "ask_rig_name": "输入想要的矿机名称(可含有英文字母,数字和下划线): ",
+        "ask_donation_level": "将开发者捐赠级别设置为（0-5）（建议：1），这不会减少您的收入: ",
+        "config_saved": "配置已保存！可以挖矿了",
+        "load_config_error": "载入配置文件时出错了 (",
+        "load_config_error_warning": "/Miner_config.cfg)。请尝试删除它,再次配置。将在10秒内退出",
+        "free_network_warning": " Duino-Coin网络是一项完全免费的服务，并将永远是",
+        "donate_warning": "\n我们不会从您的采矿中收取任何费用。\n您可以通过捐赠来真正帮助我们维护服务器和低价交易。\n访问 ",
+        "learn_more_donate": " 以进一步了解如何提供帮助 :)",
+        "starting_donation": "开始捐赠过程",
+        "thanks_donation": " 感谢您成为帅气或美丽的捐赠者 ❤️ \n您的捐款将帮助我们维护服务器并以及进一步开发该项目",
+        "data_error": " 从GitHub检索数据时出错！ 10秒后重试。",
+        "connected": " 已连接",
+        "connected_server": " 到 Duino-Coin 主服务器 (v",
+        "outdated_miner": " 挖矿软件已经过期了 (v",
+        "server_is_on_version": " 服务器上的版本是 v",
+        "update_warning": ", 请从 https://github.com/revoxhere/duino-coin/releases/ 下载最新的版本",
+        "connecting_error": " 连接服务器时出错。 10s重试。",
+        "mining_thread": " 挖矿线程 #",
+        "mining_thread_starting": " 正在开启",
+        "using_algo": " 使用 DUCO-S1 算法与 ",
+        "using_algo_xxh": " 使用 XXHASH 算法与 ",
+        "efficiency": "效率",
+        "duco_python_miner": "Duino-Coin Python 版矿工 (v",
+        "accepted_shares": "已接受的份额",
+        "accepted": " 已接受 ",
+        "block_found": " 找到块 ",
+        "internal_server_error": " 内部服务器错误.",
+        "retrying": " 10s重试",
+        "rejected": " 已拒绝 ",
+        "error_while_mining": " 挖矿时出错-最有可能是连接错误-将在5秒钟内重新启动。",
+        "mining_user": " 用户 ",
+        "mining_not_exist": " 不存在。",
+        "mining_not_exist_warning": " 确保您正确输入了用户名。请检查您的配置文件。 将在10秒内重试"
+    }
 }
