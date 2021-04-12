@@ -216,10 +216,12 @@ Duino-Coin 主要根据MIT许可证进行分发。有关更多信息，请参见
 16. 这些服务条款可以随时更改，恕不另行通知。<br/>
 17. 每个使用Duino-Coin的用户均同意遵守上述规则。
 <br/>
+
 <h4 align="center">隐私政策</h2><br>
-1.在主服务器上，我们仅存储用户名，哈希密码（在bcrypt的帮助下）和用户的电子邮件作为其帐户数据。<br/>
+
+1. 在主服务器上，我们仅存储用户名，哈希密码（在bcrypt的帮助下）和用户的电子邮件作为其帐户数据。<br/>
 2. 电子邮件不是公开可用的，仅在需要时用于联系用户,在<a href="https://revoxhere.github.io/duco-exchange/"> DUCO-Exchange </a>上确认交流，并偶尔收到通讯（计划在将来进行）。<br/>
-3.余额，交易和与采矿相关的数据可以在公共<a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api"> JSON APIs </ strong>中公开获得</a>.<br/>
+3. 余额，交易和与采矿相关的数据可以在公共<a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api"> JSON APIs </ strong>中公开获得</a>.<br/>
 4. 将来可能会在事先通知的情况下更改隐私政策。
 
 <h2 align="center">开发者</h2><br>
