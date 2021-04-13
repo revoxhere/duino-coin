@@ -2512,6 +2512,10 @@ IPS = {}
 workers = {}
 bannedIPS = {}
 whitelisted = []
+whitelisted_ip = []
+whitelistedUsernames = []
+banlist = []
+
 if __name__ == '__main__':
     print("Duino-Coin Master Server", serverVersion, "is starting")
     print("wDUCO address:", wrapper_public_key)
@@ -2521,7 +2525,6 @@ if __name__ == '__main__':
         with open(config_whitelisted, "r") as whitelistfile:
             whitelisted = whitelistfile.read().splitlines()
         adminLog("system", "Loaded whitelisted IPs file")
-        whitelisted_ip = []
         for ip in whitelisted:
             whitelisted_ip.append(socket.gethostbyname(str(ip)))
     except Exception as e:
@@ -2532,7 +2535,6 @@ if __name__ == '__main__':
         with open(config_whitelistedUsernames, "r") as whitelistusrfile:
             whitelistedusr = whitelistusrfile.read().splitlines()
             adminLog("system", "Loaded whitelisted usernames file")
-            whitelistedUsernames = []
             for username in whitelistedusr:
                 whitelistedUsernames.append(username)
     except Exception as e:
@@ -2544,7 +2546,6 @@ if __name__ == '__main__':
         with open(config_banned, "r") as bannedusrfile:
             bannedusr = bannedusrfile.read().splitlines()
             adminLog("system", "Loaded banned usernames file")
-            banlist = []
             for username in bannedusr:
                 banlist.append(username)
     except Exception as e:
