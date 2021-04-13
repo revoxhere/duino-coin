@@ -84,7 +84,7 @@ git clone https://github.com/revoxhere/duino-coin
 cd duino-coin
 python3 -m pip install -r requirements.txt
 ```
-Jeżeli używasz Windowsa, pobierz [Python 3](https://www.python.org/downloads/), potem [nasze repozitorium](https://github.com/revoxhere/duino-coin/archive/master.zip), wypakuj je i otwórz folder w konsoli. W niej wpisz:
+Jeżeli używasz Windowsa, pobierz [Python 3](https://www.python.org/downloads/), potem [nasze repozytorium](https://github.com/revoxhere/duino-coin/archive/master.zip), wypakuj je i otwórz folder w konsoli. W niej wpisz:
 ```BASH
 py -m pip install -r requirements.txt
 ```
@@ -210,7 +210,7 @@ Niektóre pliki niepochodzące od nas mogą mieć inne licencje - sprawdź ich k
 16. Niniejszy regulamin może ulec zmianie w dowolnym momencie bez wcześniejszego powiadomienia.<br/>
 17. Każdy użytkownik korzystający z Duino-Coin zobowiązuje się do przestrzegania powyższych zasad.<br/>
 
-<h4 align="center">Polityka prywatności</h2><br>1.
+<h4 align="center">Polityka prywatności</h2><br>
 1. Na serwerze głównym przechowujemy tylko nazwy użytkowników, zaszyfrowane hasła (za pomocą bcrypt) i e-maile użytkowników jako ich dane konta.<br/>
 2. E-maile nie są publicznie dostępne i są wykorzystywane wyłącznie do kontaktowania się z użytkownikiem w razie potrzeby, potwierdzania wymian na <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> i otrzymywania okazjonalnego newslettera (planowanego na przyszłość).<br/>
 3. Salda, transakcje i dane związane z wydobyciem jest publicznie dostępne w publicznych <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON API</a>.<br/>
