@@ -97,6 +97,7 @@ try:  # Read sensitive data from config file
     emailchecker_private_key = config["main"]["emailchecker_private_key"]
     client = quickemailverification.Client(
         str(emailchecker_private_key).replace("\n", ""))
+    connection_timeout = config["main"]["connection_timeout"]
 except Exception:
     print("""Please create AdminData.ini config file first:
         [main]
@@ -106,7 +107,8 @@ except Exception:
         PoolPassword = ???
         wrapper_private_key = ???
         NodeS_Username = ???
-        emailchecker_private_key = ???""")
+        emailchecker_private_key = ???
+        connection_timeout = ???""")
     exit()
 
 # Registration email - text version
@@ -897,8 +899,40 @@ def confirmunwraptx(duco_username, recipient, amount):
     return feedback
 
 
+def connectionCleanup(ip, username, thread_id):
+    global minerapi, connectedUsers, connections, workers
+
+    # # These things execute when user disconnects/exits the main loop
+    connectedUsers -= 1
+
+    # Decrement connection counter
+    try:
+        connections[ip] -= 1
+        if connections[ip] <= 0:
+            connections.pop(ip)
+    except KeyError:
+        pass
+
+    # Decrement worker counter
+    try:
+        workers[username] -= 1
+        if workers[username] <= 0:
+            workers.pop(username)
+    except KeyError:
+        pass
+
+    # Delete worker from minerapi
+    try:
+        del minerapi[thread_id]
+    except KeyError:
+        pass
+
+    # print("=> cleanup done!")
+    # print("connections[%s] = %d" %(ip, connections[ip]))
+    # print("workers[%s] = %d" %(username, workers[username]))
+
+
 def handle(c, ip):
-    c.settimeout(15)
     # Thread for every connection
     # These globals are used in the statistics API
     global connectedUsers, minerapi
@@ -922,6 +956,9 @@ def handle(c, ip):
         connections[ip] += 1
     except Exception:
         connections[ip] = 1
+
+    # Set timeout on the connection not the parent socket itself.
+    c.settimeout(connection_timeout)
 
     # Send server version
     c.send(bytes(str(serverVersion), encoding="utf8"))
@@ -1233,6 +1270,13 @@ def handle(c, ip):
                     # Wait until client solves hash
                     response = c.recv(512).decode().split(",")
                     result = response[0]
+                # Handle socket or timeout errors explictly
+                # except socket.timeout as ex:
+                #     print("socket.timeout", ex)
+                #     break
+                # except socket.error as ex:
+                #     print("socket.error", ex)
+                #     break
                 except Exception:
                     break
                 # Measure ending time
@@ -2424,33 +2468,12 @@ def handle(c, ip):
                         c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
                     except Exception:
                         break
-        except Exception:
+        except Exception as ex:
+            print("[handle] Exception thrown:\n", ex)
+            connectionCleanup(ip, username, thread_id)
             break
 
-    # These things execute when user disconnects/exits the main loop
-    connectedUsers -= 1
-
-    # Decrement connection counter
-    try:
-        connections[ip] -= 1
-        if connections[ip] <= 0:
-            connections.pop(ip)
-    except KeyError:
-        pass
-
-    # Decrement worker counter
-    try:
-        workers[username] -= 1
-        if workers[username] <= 0:
-            workers.pop(username)
-    except KeyError:
-        pass
-
-    # Delete worker from minerapi
-    try:
-        del minerapi[str(threading.get_ident())]
-    except KeyError:
-        pass
+    connectionCleanup(ip, username, thread_id)
 
     # Close thread
     sys.exit()
