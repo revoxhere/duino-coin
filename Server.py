@@ -75,6 +75,17 @@ wrapper_permission = False
 config = configparser.ConfigParser()
 lock = threading.Lock()
 
+# DB files
+config_base_dir = "config"
+config_db_transactions = config_base_dir + "/transactions.db"
+config_db_foundBlocks = config_base_dir + "/foundBlocks.db"
+config_lastblock = config_base_dir + "/lastblock"
+config_blocks = config_base_dir + "/blocks"
+config_banned = config_base_dir + "/banned.txt"
+config_whitelisted = config_base_dir + "/whitelisted.txt"
+config_whitelistedUsernames = config_base_dir + "/whitelistedUsernames.txt"
+
+
 try:  # Read sensitive data from config file
     config.read('AdminData.ini')
     duco_email = config["main"]["duco_email"]
@@ -86,6 +97,7 @@ try:  # Read sensitive data from config file
     emailchecker_private_key = config["main"]["emailchecker_private_key"]
     client = quickemailverification.Client(
         str(emailchecker_private_key).replace("\n", ""))
+    connection_timeout = config["main"]["connection_timeout"]
 except Exception:
     print("""Please create AdminData.ini config file first:
         [main]
@@ -95,7 +107,8 @@ except Exception:
         PoolPassword = ???
         wrapper_private_key = ???
         NodeS_Username = ???
-        emailchecker_private_key = ???""")
+        emailchecker_private_key = ???
+        connection_timeout = ???""")
     exit()
 
 # Registration email - text version
@@ -171,14 +184,14 @@ if not os.path.isfile(blockchain):
     # Create it if it doesn't exist
     with sqlite3.connect(blockchain, timeout=database_timeout) as blockconn:
         try:
-            with open("config/lastblock", "r+") as lastblockfile:
+            with open(config_lastblock, "r+") as lastblockfile:
                 # If old database is found, read lastBlockHash from it
                 lastBlockHash = lastblockfile.readline()
         except Exception:
             # First block - SHA1 of "duino-coin"
             lastBlockHash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
         try:
-            with open("config/blocks", "r+") as blockfile:
+            with open(config_blocks, "r+") as blockfile:
                 # If old database is found, read mined blocks amount from it
                 blocks = blockfile.readline()
         except Exception:
@@ -199,17 +212,21 @@ else:
         # Read lastblock's hash
         lastBlockHash = str(blockdatab.fetchone()[0])
 
-if not os.path.isfile("config/transactions.db"):
+# Create config dir first if it does not exist
+if not os.path.isdir(config_base_dir):
+    os.mkdir(config_base_dir)
+
+if not os.path.isfile(config_db_transactions):
     # Create transactions database if it doesn't exist
-    with sqlite3.connect("config/transactions.db", timeout=database_timeout) as conn:
+    with sqlite3.connect(config_db_transactions, timeout=database_timeout) as conn:
         datab = conn.cursor()
         datab.execute(
             '''CREATE TABLE IF NOT EXISTS Transactions(timestamp TEXT, username TEXT, recipient TEXT, amount REAL, hash TEXT)''')
         conn.commit()
 
-if not os.path.isfile("config/foundBlocks.db"):
+if not os.path.isfile(config_db_foundBlocks):
     # Create transactions database if it doesn't exist
-    with sqlite3.connect("config/foundBlocks.db", timeout=database_timeout) as conn:
+    with sqlite3.connect(config_db_foundBlocks, timeout=database_timeout) as conn:
         datab = conn.cursor()
         datab.execute(
             '''CREATE TABLE IF NOT EXISTS Blocks(timestamp TEXT, finder TEXT, amount REAL, hash TEXT)''')
@@ -386,7 +403,7 @@ def getTransactions():
     while True:
         try:
             transactiondata = {}
-            with sqlite3.connect("config/transactions.db", timeout=database_timeout) as conn:
+            with sqlite3.connect(config_db_transactions, timeout=database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Transactions")
                 for row in datab.fetchall():
@@ -407,7 +424,7 @@ def getBlocks():
     while True:
         try:
             transactiondata = {}
-            with sqlite3.connect("config/foundBlocks.db", timeout=database_timeout) as conn:
+            with sqlite3.connect(config_db_foundBlocks, timeout=database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Blocks")
                 for row in datab.fetchall():
@@ -638,7 +655,7 @@ def InputManagement():
                 except Exception:
                     print("Step 1 - Error changing password")
                 try:
-                    with open('config/banned.txt', 'a') as bansfile:
+                    with open(config_banned, 'a') as bansfile:
                         bansfile.write(str(username) + "\n")
                         print("Step 2 - Added username to banlist")
                 except Exception:
@@ -800,7 +817,7 @@ def createHashes():
     # Generate DUCO-S1 jobs
     while True:
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 4.5)
+            rand = fastrand.pcg32bounded(int(100 * 4.5))
             readyHashesAVR[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
@@ -809,7 +826,7 @@ def createHashes():
                 "LastBlockHash": str(lastBlockHash)}
 
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 125)
+            rand = fastrand.pcg32bounded(int(100 * 125))
             readyHashesESP[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
@@ -818,7 +835,7 @@ def createHashes():
                 "LastBlockHash": str(lastBlockHash)}
 
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 275)
+            rand = fastrand.pcg32bounded(int(100 * 275))
             readyHashesESP32[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
@@ -882,8 +899,40 @@ def confirmunwraptx(duco_username, recipient, amount):
     return feedback
 
 
+def connectionCleanup(ip, username, thread_id):
+    global minerapi, connectedUsers, connections, workers
+
+    # # These things execute when user disconnects/exits the main loop
+    connectedUsers -= 1
+
+    # Decrement connection counter
+    try:
+        connections[ip] -= 1
+        if connections[ip] <= 0:
+            connections.pop(ip)
+    except KeyError:
+        pass
+
+    # Decrement worker counter
+    try:
+        workers[username] -= 1
+        if workers[username] <= 0:
+            workers.pop(username)
+    except KeyError:
+        pass
+
+    # Delete worker from minerapi
+    try:
+        del minerapi[thread_id]
+    except KeyError:
+        pass
+
+    # print("=> cleanup done!")
+    # print("connections[%s] = %d" %(ip, connections[ip]))
+    # print("workers[%s] = %d" %(username, workers[username]))
+
+
 def handle(c, ip):
-    c.settimeout(15)
     # Thread for every connection
     # These globals are used in the statistics API
     global connectedUsers, minerapi
@@ -892,6 +941,7 @@ def handle(c, ip):
     # Variables for every thread
     username = ""
     poolID = ""
+    thread_id = str(threading.get_ident())
     firstshare = True
     # Set to true if a sharetime-test is being executed
     sharetime_test = False
@@ -906,6 +956,9 @@ def handle(c, ip):
         connections[ip] += 1
     except Exception:
         connections[ip] = 1
+
+    # Set timeout on the connection not the parent socket itself.
+    c.settimeout(connection_timeout)
 
     # Send server version
     c.send(bytes(str(serverVersion), encoding="utf8"))
@@ -1217,6 +1270,13 @@ def handle(c, ip):
                     # Wait until client solves hash
                     response = c.recv(512).decode().split(",")
                     result = response[0]
+                # Handle socket or timeout errors explictly
+                # except socket.timeout as ex:
+                #     print("socket.timeout", ex)
+                #     break
+                # except socket.error as ex:
+                #     print("socket.error", ex)
+                #     break
                 except Exception:
                     break
                 # Measure ending time
@@ -1260,13 +1320,12 @@ def handle(c, ip):
                 try:
                     # Prepare miner API
                     try:
-                        shares_per_sec = minerapi[str(
-                            threading.get_ident())]["Sharerate"] + 1
+                        shares_per_sec = minerapi[thread_id]["Sharerate"] + 1
                     except Exception:
                         shares_per_sec = 0
                     now = datetime.datetime.now()
                     lastsharetimestamp = now.strftime("%d/%m/%Y %H:%M:%S")
-                    minerapi[str(threading.get_ident())] = {
+                    minerapi[thread_id] = {
                         "User":         str(username),
                         "Hashrate":     hashrate,
                         "Is estimated": str(hashrateEstimated),
@@ -1309,7 +1368,7 @@ def handle(c, ip):
                     try:
                         # Check if miner didn't exceed max sharerate per second
                         # Kolka V2
-                        if minerapi[str(threading.get_ident())]["Sharerate"] > max_shares_per_sec:
+                        if minerapi[thread_id]["Sharerate"] > max_shares_per_sec:
                             # If he did, throttle him
                             time.sleep(15)
                     except Exception:
@@ -1333,7 +1392,7 @@ def handle(c, ip):
                         # Add some DUCO to the reward
                         reward += big_block_reward
                         # Write to the big block database
-                        with sqlite3.connect("config/foundBlocks.db", timeout=database_timeout) as bigblockconn:
+                        with sqlite3.connect(config_db_foundBlocks, timeout=database_timeout) as bigblockconn:
                             datab = bigblockconn.cursor()
                             now = datetime.datetime.now()
                             formatteddatetime = now.strftime(
@@ -1547,7 +1606,7 @@ def handle(c, ip):
                         shares_per_sec = 0
                     now = datetime.datetime.now()
                     lastsharetimestamp = now.strftime("%d/%m/%Y %H:%M:%S")
-                    minerapi[str(threading.get_ident())] = {
+                    minerapi[thread_id] = {
                         "User":         str(username),
                         "Hashrate":     hashrate,
                         "Is estimated": str(hashrateEstimated),
@@ -1571,7 +1630,7 @@ def handle(c, ip):
                     try:
                         # Check if miner didn't exceed max sharerate per second
                         # Kolka V2
-                        if minerapi[str(threading.get_ident())]["Sharerate"] > max_shares_per_sec:
+                        if minerapi[thread_id]["Sharerate"] > max_shares_per_sec:
                             # If he did, throttle him
                             time.sleep(15)
                     except Exception:
@@ -1587,7 +1646,7 @@ def handle(c, ip):
                         # Add some DUCO to the reward
                         reward += big_block_reward
                         # Write to the big block database
-                        with sqlite3.connect("config/foundBlocks.db", timeout=database_timeout) as bigblockconn:
+                        with sqlite3.connect(config_db_foundBlocks, timeout=database_timeout) as bigblockconn:
                             datab = bigblockconn.cursor()
                             now = datetime.datetime.now()
                             formatteddatetime = now.strftime(
@@ -1950,7 +2009,7 @@ def handle(c, ip):
                                             datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
                                             conn.commit()
                                             #adminLog("duco", "Updated recipients balance: " + str(recipientbal))
-                                        with sqlite3.connect("config/transactions.db", timeout=database_timeout) as tranconn:
+                                        with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
                                             datab = tranconn.cursor()
                                             now = datetime.datetime.now()
                                             formatteddatetime = now.strftime(
@@ -1989,7 +2048,7 @@ def handle(c, ip):
                 while True:
                     try:
                         transactiondata = {}
-                        with sqlite3.connect("config/transactions.db", timeout=database_timeout) as conn:
+                        with sqlite3.connect(config_db_transactions, timeout=database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Transactions")
                             for row in datab.fetchall():
@@ -2282,7 +2341,7 @@ def handle(c, ip):
                                         adminLog(
                                             "wrapper", "Successful wrapping")
                                         try:
-                                            with sqlite3.connect("config/transactions.db", timeout=database_timeout) as tranconn:
+                                            with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
                                                 datab = tranconn.cursor()
                                                 now = datetime.datetime.now()
                                                 formatteddatetime = now.strftime(
@@ -2365,7 +2424,7 @@ def handle(c, ip):
                                         adminLog(
                                             "unwrapper", "Successful unwrapping")
                                         try:
-                                            with sqlite3.connect("config/transactions.db", timeout=database_timeout) as tranconn:
+                                            with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
                                                 datab = tranconn.cursor()
                                                 now = datetime.datetime.now()
                                                 formatteddatetime = now.strftime(
@@ -2409,33 +2468,12 @@ def handle(c, ip):
                         c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
                     except Exception:
                         break
-        except Exception:
+        except Exception as ex:
+            print("[handle] Exception thrown:\n", ex)
+            connectionCleanup(ip, username, thread_id)
             break
 
-    # These things execute when user disconnects/exits the main loop
-    connectedUsers -= 1
-
-    # Decrement connection counter
-    try:
-        connections[ip] -= 1
-        if connections[ip] <= 0:
-            connections.pop(ip)
-    except KeyError:
-        pass
-
-    # Decrement worker counter
-    try:
-        workers[username] -= 1
-        if workers[username] <= 0:
-            workers.pop(username)
-    except KeyError:
-        pass
-
-    # Delete worker from minerapi
-    try:
-        del minerapi[str(threading.get_ident())]
-    except KeyError:
-        pass
+    connectionCleanup(ip, username, thread_id)
 
     # Close thread
     sys.exit()
@@ -2497,16 +2535,19 @@ IPS = {}
 workers = {}
 bannedIPS = {}
 whitelisted = []
+whitelisted_ip = []
+whitelistedUsernames = []
+banlist = []
+
 if __name__ == '__main__':
     print("Duino-Coin Master Server", serverVersion, "is starting")
     print("wDUCO address:", wrapper_public_key)
 
     try:
         # Read whitelisted IPs
-        with open("config/whitelisted.txt", "r") as whitelistfile:
+        with open(config_whitelisted, "r") as whitelistfile:
             whitelisted = whitelistfile.read().splitlines()
         adminLog("system", "Loaded whitelisted IPs file")
-        whitelisted_ip = []
         for ip in whitelisted:
             whitelisted_ip.append(socket.gethostbyname(str(ip)))
     except Exception as e:
@@ -2514,10 +2555,9 @@ if __name__ == '__main__':
 
     try:
         # Read whitelisted usernames
-        with open("config/whitelistedUsernames.txt", "r") as whitelistusrfile:
+        with open(config_whitelistedUsernames, "r") as whitelistusrfile:
             whitelistedusr = whitelistusrfile.read().splitlines()
             adminLog("system", "Loaded whitelisted usernames file")
-            whitelistedUsernames = []
             for username in whitelistedusr:
                 whitelistedUsernames.append(username)
     except Exception as e:
@@ -2526,10 +2566,9 @@ if __name__ == '__main__':
 
     try:
         # Read banned usernames
-        with open("config/banned.txt", "r") as bannedusrfile:
+        with open(config_banned, "r") as bannedusrfile:
             bannedusr = bannedusrfile.read().splitlines()
             adminLog("system", "Loaded banned usernames file")
-            banlist = []
             for username in bannedusr:
                 banlist.append(username)
     except Exception as e:
@@ -2560,7 +2599,8 @@ if __name__ == '__main__':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    s.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
+    if hasattr(socket,"TCP_QUICKACK"):
+        s.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
     s.bind((host, port))
     # Put the socket into listening mode; reuse connection after one is closed
     s.listen(socket_listen_num)
