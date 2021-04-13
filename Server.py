@@ -815,7 +815,7 @@ def createHashes():
     # Generate DUCO-S1 jobs
     while True:
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 4.5)
+            rand = fastrand.pcg32bounded(int(100 * 4.5))
             readyHashesAVR[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
@@ -824,7 +824,7 @@ def createHashes():
                 "LastBlockHash": str(lastBlockHash)}
 
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 125)
+            rand = fastrand.pcg32bounded(int(100 * 125))
             readyHashesESP[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
@@ -833,7 +833,7 @@ def createHashes():
                 "LastBlockHash": str(lastBlockHash)}
 
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(100 * 275)
+            rand = fastrand.pcg32bounded(int(100 * 275))
             readyHashesESP32[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
