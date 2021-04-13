@@ -46,27 +46,28 @@ host = ""
 port = 2811
 # Server version which will be sent to the clients (official server uses latest release version number)
 serverVersion = 2.3
-PoolVersion = 0.1
 # Difficulty will increase every x blocks (official server uses 5k)
 diff_incrase_per = 5000
 # Maximum number of clients using mining protocol per IP and username
 max_mining_connections = 24
 # Maximum number of logged-in clients per IP
-max_login_connections = 28
+max_login_connections = 32
 # Maximum number of connections that haven't sent any data yet
-max_unauthorized_connections = 28
+max_unauthorized_connections = 32
 # Number of pregenerated jobs for AVR, ESP and ESP32 diffs in mining section;
 # used to massively reduce load on the server (official server uses 1000)
 hashes_num = 1000
 # Rewards
 shares_per_sec_reset = 1
-max_rejected_shares = 20
+max_rejected_shares = 28
 big_block_reward = 7.77
-reward_multiplier = 0.77
+reward_multiplier = 0.67
 higher_diffs_basereward = 0.0002811
-expected_sharetime_sec = 7
+expected_sharetime_sec = 10
 big_block_probability = 1000000
+diff_multiplier = 1.1
 # Database access times out after this many seconds (default: 5)
+database_save_time = 2.5
 database_timeout = 5
 socket_listen_num = 0
 # Wheter to enable wDUCO wrapper
@@ -74,6 +75,7 @@ use_wrapper = True
 wrapper_permission = False
 config = configparser.ConfigParser()
 lock = threading.Lock()
+regi_pass = False
 
 # DB files
 config_base_dir = "config"
@@ -85,7 +87,6 @@ config_banned = config_base_dir + "/banned.txt"
 config_whitelisted = config_base_dir + "/whitelisted.txt"
 config_whitelistedUsernames = config_base_dir + "/whitelistedUsernames.txt"
 
-
 try:  # Read sensitive data from config file
     config.read('AdminData.ini')
     duco_email = config["main"]["duco_email"]
@@ -94,11 +95,26 @@ try:  # Read sensitive data from config file
     PoolPassword = config["main"]["PoolPassword"]
     wrapper_private_key = config["main"]["wrapper_private_key"]
     NodeS_Username = config["main"]["NodeS_Username"]
-    emailchecker_private_key = config["main"]["emailchecker_private_key"]
-    client = quickemailverification.Client(
-        str(emailchecker_private_key).replace("\n", ""))
     connection_timeout = config["main"]["connection_timeout"]
-except Exception:
+
+    emailchecker_private_key = str(
+        config["main"]["emailchecker_private_key"]).replace("\n", "").split(",")
+    client = quickemailverification.Client(
+        str(emailchecker_private_key[0].strip()))
+    quick = client.quickemailverification()
+    response = quick.verify("duino.coin@gmail.com")
+    resp = response.body
+    if resp["success"] == "false":
+        client = quickemailverification.Client(
+            str(emailchecker_private_key[1].strip()))
+        quick = client.quickemailverification()
+        response = quick.verify("duino.coin@gmail.com")
+        resp = response.body
+        if resp["success"] == "false":
+            regi_pass = True
+
+except Exception as e:
+    print(e)
     print("""Please create AdminData.ini config file first:
         [main]
         duco_email = ???
@@ -164,13 +180,15 @@ balancesToUpdate = {}
 connectedUsers = 0
 globalCpuUsage = 0
 ducoPrice = 0.01
-percarray = []
-memarray = []
+ducousdjustswap = 0.002
+percarray = [0]
+memarray = [0]
 readyHashesAVR = {}
 readyHashesESP = {}
 readyHashesESP32 = {}
 
-database = 'crypto_database.db'  # User data database location
+# User data database location
+database = 'crypto_database.db'
 if not os.path.isfile(database):
     # Create it if it doesn't exist
     with sqlite3.connect(database, timeout=database_timeout) as conn:
@@ -179,7 +197,8 @@ if not os.path.isfile(database):
             '''CREATE TABLE IF NOT EXISTS Users(username TEXT, password TEXT, email TEXT, balance REAL)''')
         conn.commit()
 
-blockchain = 'duino_blockchain.db'  # Blockchain database location
+# Blockchain database location
+blockchain = 'duino_blockchain.db'
 if not os.path.isfile(blockchain):
     # Create it if it doesn't exist
     with sqlite3.connect(blockchain, timeout=database_timeout) as blockconn:
@@ -270,7 +289,7 @@ def createBackup():
                     "," + str(getDucoPriceNodeS()).rstrip("\n"))
             with open("pricesJustSwap.txt", "a") as pricesJustSwapfile:
                 pricesJustSwapfile.write(
-                    "," + str(getDucoPriceJustSwap()).rstrip("\n"))
+                    "," + str(ducousdjustswap).rstrip("\n"))
         # Run every 6h
         time.sleep(3600*6)
         adminLog("system", "Backup finished")
@@ -289,7 +308,7 @@ def getDucoPrice():
         else:
             xmgusd = .03
         # 1:10 (XMG:DUCO) exchange rate
-        ducoPrice = round(float(xmgusd) / 10, 8)
+        ducoPrice = round(float(xmgusd) / 100, 8)
         time.sleep(120)
 
 
@@ -307,26 +326,29 @@ def getDucoPriceNodeS():
 
 
 def getDucoPriceJustSwap():
-    # Get DUCO price from JustSwap exchange
-    justswap = requests.get(
-        "https://api.justswap.io/v2/allpairs?page_size=9000&page_num=2", data=None)
-    if justswap.status_code == 200:
-        justswapcontent = justswap.content.decode()
-        justswapcontentjson = json.loads(justswapcontent)
-        ducotrx = float(
-            justswapcontentjson["data"]["0_TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U"]["price"])
-    else:
-        ducotrx = .25
-    coingecko = requests.get(
-        "https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usd", data=None)
-    if coingecko.status_code == 200:
-        geckocontent = coingecko.content.decode()
-        geckocontentjson = json.loads(geckocontent)
-        trxusd = float(geckocontentjson["tron"]["usd"])
-    else:
-        trxusd = .05
-    ducousd = round(ducotrx * trxusd, 8)
-    return ducousd
+    global ducousdjustswap
+    ducousdjustswap = 0
+    while True:
+        try:
+            # Get DUCO price from JustSwap exchange
+            import json
+            import requests
+            # Get values from contract
+            resp = requests.get(
+                "https://apilist.tronscan.org/api/account?address=TRAoFeB7n8Tt4nZGTRB8La4UP4i84bsoMh").json()
+            # Convert values back to floats
+            trxBal = int(resp["tokens"][0]["balance"]) / 1000000
+            wducoBal = int(resp["tokens"][2]["balance"]) / 100000
+            # JustSwap pool exchange rate is trx bal divided by second token bal
+            exchangeRate = trxBal / wducoBal
+            resp = requests.get(
+                "https://apilist.tronscan.org/api/token/price?token=trx").json()
+            trxprice = resp["price_in_usd"]
+            ducousdjustswap = round(float(exchangeRate) * float(trxprice), 8)
+        except Exception as e:
+            print(e)
+            ducousdjustswap = 0.002
+        time.sleep(120)
 
 
 def getRegisteredUsers():
@@ -443,55 +465,72 @@ def getBlocks():
 
 def cpuUsageThread():
     # CPU and RAM usage %
+    time.sleep(5)
     while True:
-        percarray.append(round(psutil.cpu_percent(interval=1)))
+        percarray.append(round(psutil.cpu_percent()))
         memarray.append(psutil.virtual_memory()[2])
-        time.sleep(3)
+        time.sleep(1)
+
+def floatmap(x, in_min, in_max, out_min, out_max):
+    # Yes, this is Arduino's built in map function remade in python haha
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 
 def API():
     # Update main server info and miner API file
-    serverHashratearray = []
+    serverHashrateArray = [0]
     while True:
         try:
             now = datetime.datetime.now()
-            diff = int(blocks / diff_incrase_per)
+            diff = int(int(blocks / diff_incrase_per) * diff_multiplier)
             minerList = []
             usernameMinerCounter = {}
             minerapipublic = {}
             usernameMinerCounter_sorted = {}
-            serverHashrate_not_smoothed = 0
+            serverHashrate_unsmoothed = 0
             serverHashrate = 0
-            serverHashrateArray = []
+            
             hashrate = 0
+            ducos1hashrate = 0
+            xxhashhashrate = 0
             for x in minerapi.copy():
                 try:
+                    # Convert string back to datetime format
                     lastsharetimestamp = datetime.datetime.strptime(
-                        minerapi[x]["Last share timestamp"], "%d/%m/%Y %H:%M:%S")  # Convert string back to datetime format
+                        minerapi[x]["Last share timestamp"], "%d/%m/%Y %H:%M:%S")  
                     timedelta = now - lastsharetimestamp  # Get time delta
-                    # Remove workers inactive for more than 30 seconds from the API
-                    if int(timedelta.total_seconds()) > 30:
+                    # Remove workers inactive for more than 60 seconds from the API
+                    if int(timedelta.total_seconds()) > 60:
                         minerapi.pop(x)
                     # Add user hashrate to the server hashrate
-                    serverHashrate_not_smoothed += float(
+                    if minerapi[x]["Algorithm"] == "DUCO-S1":
+                        ducos1hashrate += float(minerapi[x]["Hashrate"])
+                    elif minerapi[x]["Algorithm"] == "XXHASH":
+                        xxhashhashrate += float(minerapi[x]["Hashrate"])
+                    serverHashrate_unsmoothed += float(
                         minerapi[x]["Hashrate"])
                 except Exception:
                     pass
 
-            serverHashrateArray.append(serverHashrate_not_smoothed)
-            serverHashrate = statistics.mean(serverHashrateArray[-200:])
+            def _hashrate_prefix(hashrate):
+                if hashrate >= 800000000:
+                    prefix = " GH/s"
+                    hashrate = hashrate / 1000000000
+                elif hashrate >= 800000:
+                    prefix = " MH/s"
+                    hashrate = hashrate / 1000000
+                elif hashrate >= 800:
+                    prefix = " kH/s"
+                    hashrate = hashrate / 1000
+                else:
+                    prefix = " H/s"
+                return str(round(hashrate, 4)) + str(prefix)
 
-            if serverHashrate >= 800000000:
-                prefix = " GH/s"
-                serverHashrate = serverHashrate / 1000000000
-            elif serverHashrate >= 800000:
-                prefix = " MH/s"
-                serverHashrate = serverHashrate / 1000000
-            elif serverHashrate >= 800:
-                prefix = " kH/s"
-                serverHashrate = serverHashrate / 1000
-            else:
-                prefix = " H/s"
+            serverHashrateArray.append(serverHashrate_unsmoothed)
+            serverHashrate = _hashrate_prefix(statistics.mean(serverHashrateArray[-5:]))
+
+            ducos1hashrate = _hashrate_prefix(ducos1hashrate)
+            xxhashhashrate = _hashrate_prefix(xxhashhashrate)
 
             for miner in minerapi.copy():
                 try:
@@ -530,12 +569,16 @@ def API():
                 "_Duino-Coin Public master server JSON API": "https://github.com/revoxhere/duino-coin",
                 "Server version":        float(serverVersion),
                 "Active connections":    int(connectedUsers),
-                "Server CPU usage":      float(round(statistics.mean(percarray[-20:]), 2)),
-                "Server RAM usage":      float(round(statistics.mean(memarray[-20:]), 2)),
+                "Open threads":          threading.activeCount(),
+                "Server CPU usage":      float(round(statistics.mean(percarray[-60:]), 2)),
+                "Server RAM usage":      float(round(statistics.mean(memarray[-60:]), 2)),
                 "Last update":           str(now.strftime("%d/%m/%Y %H:%M:%S (UTC)")),
-                "Pool hashrate":         str(round(serverHashrate, 4))+prefix,
+                "Pool hashrate":         str(serverHashrate),
+                "DUCO-S1 hashrate":      str(ducos1hashrate),
+                "XXHASH hashrate":       str(xxhashhashrate),
                 # Get price from global
                 "Duco price":            float(round(ducoPrice, 6)),
+                "Duco JustSwap price":   float(round(ducousdjustswap, 6)),
                 # Call getRegisteredUsers function
                 "Registered users":      int(getRegisteredUsers()),
                 # Call getMinedDuco function
@@ -555,7 +598,8 @@ def API():
                     outfile,
                     indent=2,
                     ensure_ascii=False)
-            time.sleep(5)
+
+            time.sleep(floatmap(round(statistics.mean(percarray[-60:]), 2), 0, 100, 0.5, 5))
         except Exception:
             pass
 
@@ -577,11 +621,11 @@ def UpdateOtherAPIFiles():
                 outfile,
                 indent=2,
                 ensure_ascii=False)
-        time.sleep(10)
+        time.sleep(floatmap(round(statistics.mean(percarray[-60:]), 2), 0, 100, 5, 15))
 
 
 def UpdateDatabase():
-    # Update database files every 5 seconds
+    # Update database files every n seconds
     error_counter = 0
     while True:
         while True:
@@ -617,7 +661,7 @@ def UpdateDatabase():
         if error_counter > 5:
             print("Restarting because of database errors")
             os.execl(sys.executable, sys.executable, *sys.argv)
-        time.sleep(5)
+        time.sleep(database_save_time)
 
 
 def InputManagement():
@@ -817,7 +861,7 @@ def createHashes():
     # Generate DUCO-S1 jobs
     while True:
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(int(100 * 4.5))
+            rand = fastrand.pcg32bounded(int(100 * 6))
             readyHashesAVR[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
@@ -835,7 +879,7 @@ def createHashes():
                 "LastBlockHash": str(lastBlockHash)}
 
         for i in range(hashes_num):
-            rand = fastrand.pcg32bounded(int(100 * 275))
+            rand = fastrand.pcg32bounded(int(100 * 350))
             readyHashesESP32[i] = {
                 "Result": rand,
                 "Hash": hashlib.sha1(
@@ -843,13 +887,47 @@ def createHashes():
                         + str(rand)).encode("utf-8")).hexdigest(),
                 "LastBlockHash": str(lastBlockHash)}
 
-        time.sleep(10)  # Refresh every 10s
+        # Sleep some time before creating new jobs
+        time.sleep(floatmap(round(statistics.mean(percarray[-60:]), 2), 0, 100, 5, 15))
+
+
+def connectionCleanup(ip, username, thread_id):
+    global minerapi, connectedUsers, connections, workers
+
+    # # These things execute when user disconnects/exits the main loop
+    connectedUsers -= 1
+
+    # Decrement connection counter
+    try:
+        connections[ip] -= 1
+        if connections[ip] <= 0:
+            connections.pop(ip)
+    except KeyError:
+        pass
+
+    # Decrement worker counter
+    try:
+        workers[username] -= 1
+        if workers[username] <= 0:
+            workers.pop(username)
+    except KeyError:
+        pass
+
+    # Delete worker from minerapi
+    try:
+        del minerapi[thread_id]
+    except KeyError:
+        pass
+
+    # print("=> cleanup done!")
+    # print("connections[%s] = %d" %(ip, connections[ip]))
+    # print("workers[%s] = %d" %(username, workers[username]))
 
 
 def wraptx(duco_username, address, amount):
     # wDUCO wrapper
     adminLog("wrapper",
-        "TRON wrapper called by " + duco_username)
+             "TRON wrapper called by " + duco_username)
     txn = wduco.functions.wrap(
         address,
         duco_username,
@@ -861,7 +939,7 @@ def wraptx(duco_username, address, amount):
             bytes.fromhex(wrapper_private_key)))
     txn = txn.broadcast()
     adminLog("wrapper",
-        "Sent wrap tx to TRON network by " + duco_username)
+             "Sent wrap tx to TRON network by " + duco_username)
     feedback = txn.result()
     return feedback
 
@@ -899,49 +977,17 @@ def confirmunwraptx(duco_username, recipient, amount):
     return feedback
 
 
-def connectionCleanup(ip, username, thread_id):
-    global minerapi, connectedUsers, connections, workers
-
-    # # These things execute when user disconnects/exits the main loop
-    connectedUsers -= 1
-
-    # Decrement connection counter
-    try:
-        connections[ip] -= 1
-        if connections[ip] <= 0:
-            connections.pop(ip)
-    except KeyError:
-        pass
-
-    # Decrement worker counter
-    try:
-        workers[username] -= 1
-        if workers[username] <= 0:
-            workers.pop(username)
-    except KeyError:
-        pass
-
-    # Delete worker from minerapi
-    try:
-        del minerapi[thread_id]
-    except KeyError:
-        pass
-
-    # print("=> cleanup done!")
-    # print("connections[%s] = %d" %(ip, connections[ip]))
-    # print("workers[%s] = %d" %(username, workers[username]))
-
-
 def handle(c, ip):
+    # Set timeout on the connection not the parent socket itself.
+    c.settimeout(connection_timeout)
     # Thread for every connection
     # These globals are used in the statistics API
     global connectedUsers, minerapi
     # These globals hold the current block count and last accepted hash
     global blocks, lastBlockHash
     # Variables for every thread
-    username = ""
-    poolID = ""
     thread_id = str(threading.get_ident())
+    username = ""
     firstshare = True
     # Set to true if a sharetime-test is being executed
     sharetime_test = False
@@ -953,48 +999,29 @@ def handle(c, ip):
     connectedUsers += 1
     overrideDiff = ""
     try:
-        connections[ip] += 1
+        # Send server version
+        c.send(bytes(str(serverVersion), encoding="utf8"))
     except Exception:
+        pass
+    try:
+        connections[ip] += 1
+    except:
         connections[ip] = 1
-
-    # Set timeout on the connection not the parent socket itself.
-    c.settimeout(connection_timeout)
-
-    # Send server version
-    c.send(bytes(str(serverVersion), encoding="utf8"))
 
     while True:
         try:
-            data2 = c.recv(256).decode()  # Receive data from client
-            if not data2:
+            # Receive data from client
+            data = c.recv(256)
+            if not data:
                 # Exit loop if no data received
                 break
             else:
                 # Split incoming data
-                data = data2.rstrip("\n").split(",")
-
-                if data[0] == "PoolSync":
-                    leng_of_base = 9
-                    new_data = (data2[leng_of_base:])
-                    data = ['PoolSync', new_data]
-
-                elif data[0] == "PoolLoginAdd":
-                    leng_of_base = 14 + len(data[1])
-                    new_data = (data2[leng_of_base:])
-                    data = ['PoolLoginAdd', data[1], new_data]
-
-                elif data[0] == "PoolLoginRemove":
-                    leng_of_base = 17 + len(data[1])
-                    new_data = (data2[leng_of_base:])
-                    data = ['PoolLoginRemove', data[1], new_data]
-
-                elif data[0] == "PoolLogin":
-                    leng_of_base = 10
-                    new_data = (data2[leng_of_base:])
-                    data = ['PoolLogin', new_data]
-                c.settimeout(60)
-
-            # print('new_data', data)
+                data = data.decode().rstrip("\n").split(",")
+                if ip == "51.15.127.80" or ip == "wallet.duinocoin.com" or ip == "34.233.38.119":
+                    c.settimeout(60*10)
+                else:
+                    c.settimeout(60)
 
             if str(data[0]) == "PING":
                 """Simple ping response"""
@@ -1015,7 +1042,7 @@ def handle(c, ip):
                         c.send(bytes("BAD,Not enough data", encoding='utf8'))
                         break
                 if username in banlist:
-                    ban(ip)
+                    full_ban(ip)
                     break
 
                 if firstshare:
@@ -1028,8 +1055,8 @@ def handle(c, ip):
                 if (connections[ip] > max_mining_connections
                         and not ip in whitelisted):
                     rejectedShares += 1
-                    time.sleep(15)
-                    c.send(bytes("BAD,Too many connections", encoding='utf8'))
+                    c.send(bytes("BAD,Too many connections - youre over the limit (" +
+                                 str(max_mining_connections) + ")\n", encoding='utf8'))
                     # Close this thread
                     break
 
@@ -1037,8 +1064,8 @@ def handle(c, ip):
                 if (workers[username] > max_mining_connections
                         and not username in whitelistedUsernames):
                     rejectedShares += 1
-                    time.sleep(15)
-                    c.send(bytes("BAD,Too many connections", encoding='utf8'))
+                    c.send(bytes("BAD,Too many connections - youre over the limit (" +
+                                 str(max_mining_connections) + ")\n", encoding='utf8'))
                     # Close this thread
                     break
 
@@ -1052,71 +1079,65 @@ def handle(c, ip):
                 if firstshare:
                     if overrideDiff == "EXTREME" or customDiff == "EXTREME":
                         # Custom difficulty 950k
-                        diff = 950000
+                        diff = int(950000 * diff_multiplier)
                         # Practically no limits
                         max_hashrate = 999999999
                         max_shares_per_sec = 10
 
                     elif overrideDiff == "NET" or customDiff == "NET":
                         # Network difficulty
-                        diff = int(blocks / diff_incrase_per)
+                        diff = int(int(blocks / diff_incrase_per) * diff_multiplier)
                         # Max 2 MH/s
                         max_hashrate = 2000000
                         max_shares_per_sec = 1
 
                     elif overrideDiff == "MEDIUM" or customDiff == "MEDIUM":
                         # Diff for medium computers 30k
-                        diff = 30000
+                        diff = int(30000 * diff_multiplier)
                         # Max 1 MH/s
                         max_hashrate = 1000000
                         max_shares_per_sec = 2
 
                     elif customDiff == "LOW":
                         # Diff for webminers or slow computers 3k
-                        diff = 3000
+                        diff = int(3000 * diff_multiplier)
                         # Max 200 kH/s
                         max_hashrate = 200000
                         max_shares_per_sec = 2
 
                     elif customDiff == "ESP32":
                         # optimal diff for low power devices like ESP32
-                        diff = 275
+                        diff = 350
                         basereward = 0.00045
                         # Not overclocked ESP32 chips won't make more than ~10 kH/s
                         max_hashrate = 10000
-                        max_shares_per_sec = 3
-
-                    elif customDiff == "ESP32NL":
-                        diff = 275
-                        basereward = 0.00045
-                        max_hashrate = 80000000000000000000
-                        max_shares_per_sec = 30
+                        max_shares_per_sec = 2
 
                     elif customDiff == "ESP":
                         # DEPRECATED DIFF FOR ESP8266 MINERS BELOW VERSION 2.4
                         # Optimal diff for low power devices like ESP8266
                         diff = 125
                         basereward = 0.00055
-                        # Not overclocked ESP8266 chips won't make more than ~3 kH/s
+                        # Not overclocked ESP8266 chips won't make more than ~3 kH/s (OLD CODE)
                         max_hashrate = 3000
-                        max_shares_per_sec = 3
+                        max_shares_per_sec = 2
 
                     elif customDiff == "ESP8266":
                         # DIFF FOR NEW ESP8266 MINERS
                         # Optimal diff for low power devices like ESP8266
-                        diff = 275
+                        diff = 350
                         basereward = 0.00025
                         # Not overclocked ESP8266 chips won't make more than ~9 kH/s
                         max_hashrate = 10000
-                        max_shares_per_sec = 3
+                        max_shares_per_sec = 2
 
                     elif customDiff == "AVR":
                         # Optimal diff for very low power devices like Arduino
-                        diff = 5
+                        diff = 6
                         basereward = 0.00055
-                        # Not overclocked Arduino chips won't make more than ~155 H/s
-                        max_hashrate = 155
-                        max_shares_per_sec = 3
+                        # Not overclocked Arduino chips won't make more than ~170 H/s
+                        max_hashrate = 175
+                        max_shares_per_sec = 2
 
                 if customDiff == "AVR":
                     randomChoice = random.randint(
@@ -1130,16 +1151,12 @@ def handle(c, ip):
                     rand = readyHashesESP[randomChoice]["Result"]
                     newBlockHash = readyHashesESP[randomChoice]["Hash"]
                     lastBlockHash_copy = readyHashesESP[randomChoice]["LastBlockHash"]
-                elif customDiff == "ESP32" or customDiff == "ESP32NL" or customDiff == "ESP8266":
+                elif customDiff == "ESP32" or customDiff == "ESP8266":
                     randomChoice = random.randint(
                         0, len(readyHashesESP32) - 1)
                     rand = readyHashesESP32[randomChoice]["Result"]
                     newBlockHash = readyHashesESP32[randomChoice]["Hash"]
                     lastBlockHash_copy = readyHashesESP32[randomChoice]["LastBlockHash"]
-
-                # Check if websocket proxy isn't used for anything else than webminer
-                if customDiff != "LOW" and ip == "51.15.127.80":
-                    break
 
                 # Check if diffs that don't use pregenerated shares are used
                 if (customDiff == "LOW"
@@ -1236,7 +1253,7 @@ def handle(c, ip):
                             + str(rand)
                             ).encode("utf-8")).hexdigest()
 
-                if customDiff == "ESP32" or customDiff == "ESP" or customDiff == "ESP32NL" or customDiff == "ESP8266":
+                if customDiff == "ESP32" or customDiff == "ESP" or customDiff == "ESP8266":
                     # ESPs expect job ending with \n
                     # TODO: this will soon be pushed also to the other miners
                     try:
@@ -1248,6 +1265,7 @@ def handle(c, ip):
                             + str(diff)
                             + "\n",
                             encoding='utf8'))  # Send hashes and diff hash to the miner
+                        c.settimeout(120)
                     except Exception:
                         break
                 else:
@@ -1261,6 +1279,7 @@ def handle(c, ip):
                             + ","
                             + str(diff),
                             encoding='utf8'))
+                        c.settimeout(120)
                     except Exception:
                         break
 
@@ -1269,6 +1288,7 @@ def handle(c, ip):
                 try:
                     # Wait until client solves hash
                     response = c.recv(512).decode().split(",")
+                    c.settimeout(60)
                     result = response[0]
                 # Handle socket or timeout errors explictly
                 # except socket.timeout as ex:
@@ -1364,13 +1384,17 @@ def handle(c, ip):
                 if str(result) == str(rand) and int(hashrateCalculated) <= int(max_hashrate):
                     firstshare = False
                     acceptedShares += 1
+                    if acceptedShares % 10 == 0:
+                        # Decrement rejects every 10 accepted shares
+                        if rejectedShares > 0:
+                            rejectedShares -= 1
 
                     try:
                         # Check if miner didn't exceed max sharerate per second
                         # Kolka V2
                         if minerapi[thread_id]["Sharerate"] > max_shares_per_sec:
                             # If he did, throttle him
-                            time.sleep(15)
+                            time.sleep(expected_sharetime)
                     except Exception:
                         pass
 
@@ -1469,10 +1493,11 @@ def handle(c, ip):
                         c.send(bytes("BAD,Not enough data\n", encoding='utf8'))
                         break
                 if username in banlist:
-                    ban(ip)
+                    full_ban(ip)
                     break
 
                 if firstshare:
+                    c.settimeout(30)
                     try:
                         workers[username] += 1
                     except Exception:
@@ -1482,7 +1507,8 @@ def handle(c, ip):
                 if (connections[ip] > max_mining_connections
                         and not ip in whitelisted):
                     rejectedShares += 1
-                    c.send(bytes("BAD,Too many connections\n", encoding='utf8'))
+                    c.send(bytes("BAD,Too many connections - youre over the limit (" +
+                                 str(max_mining_connections) + ")\n", encoding='utf8'))
                     # Close this thread
                     break
 
@@ -1490,15 +1516,16 @@ def handle(c, ip):
                 if (workers[username] > max_mining_connections
                         and not username in whitelistedUsernames):
                     rejectedShares += 1
-                    c.send(bytes("BAD,Too many connections\n", encoding='utf8'))
+                    c.send(bytes("BAD,Too many connections - youre over the limit (" +
+                                 str(max_mining_connections) + ")\n", encoding='utf8'))
                     # Close this thread
                     break
 
                 # Network difficulty
                 diff = int(blocks / diff_incrase_per)
                 max_shares_per_sec = 1
-                # Max 3 MH/s
-                max_hashrate = 3000000
+                # Max 30 MH/s
+                max_hashrate = 30000000
 
                 # Copy the current block hash as it can be changed by other threads
                 lastBlockHash_copy = lastBlockHash
@@ -1536,7 +1563,7 @@ def handle(c, ip):
                     except Exception as e:
                         print(e)
                 else:
-                    time.sleep(3)
+                    time.sleep(5)
 
                 # Generate result in range of the difficulty
                 rand = fastrand.pcg32bounded(100 * diff)
@@ -1600,8 +1627,7 @@ def handle(c, ip):
                 try:
                     # Prepare miner API
                     try:
-                        shares_per_sec = minerapi[str(
-                            threading.get_ident())]["Sharerate"] + 1
+                        shares_per_sec = minerapi[thread_id]["Sharerate"] + 1
                     except Exception:
                         shares_per_sec = 0
                     now = datetime.datetime.now()
@@ -1626,19 +1652,23 @@ def handle(c, ip):
                 if str(result) == str(rand) and int(hashrateCalculated) <= int(max_hashrate):
                     firstshare = False
                     acceptedShares += 1
+                    if acceptedShares % 10 == 0:
+                        # Decrement rejects every 10 accepted shares
+                        if rejectedShares > 0:
+                            rejectedShares -= 1
 
                     try:
                         # Check if miner didn't exceed max sharerate per second
                         # Kolka V2
                         if minerapi[thread_id]["Sharerate"] > max_shares_per_sec:
                             # If he did, throttle him
-                            time.sleep(15)
+                            time.sleep(expected_sharetime)
                     except Exception:
                         pass
 
-                    reward = reward_multiplier * \
+                    reward = 0.3 * \
                         (basereward + float(sharetime) /
-                         100000000 + float(diff) / 100000000)
+                         10000000000 + float(diff) / 10000000000)
 
                     # Low probability to find a "big block"
                     blockfound = random.randint(1, big_block_probability)
@@ -1708,7 +1738,7 @@ def handle(c, ip):
                         ban(ip)
                         break
                     if username in banlist:
-                        ban(ip)
+                        full_ban(ip)
                         break
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
@@ -1793,7 +1823,7 @@ def handle(c, ip):
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
-                if re.match("^[A-Za-z0-9_-]*$", username) and len(username) < 64 and len(unhashed_pass) < 64 and len(email) < 128:
+                if not " " in username and re.match("^[A-Za-z0-9_-]*$", username) and len(username) < 64 and len(unhashed_pass) < 64 and len(email) < 128:
                     password = bcrypt.hashpw(
                         unhashed_pass, bcrypt.gensalt(rounds=4))  # Encrypt password
                     with sqlite3.connect(database, timeout=database_timeout) as conn:
@@ -1801,17 +1831,58 @@ def handle(c, ip):
                         datab.execute(
                             "SELECT COUNT(username) FROM Users WHERE username = ?", (username,))
                         if int(datab.fetchone()[0]) == 0:
-                            quickemailverification = client.quickemailverification()
-                            # Email address which need to be verified
-                            response = quickemailverification.verify(email)
-                            resp = response.body
-                            if resp["result"] == "valid" and resp["disposable"] == "false" and resp["safe_to_send"] == "true":
-                                message = MIMEMultipart("alternative")
-                                message["Subject"] = "Welcome on Duino-Coin network, " + \
-                                    str(username)+"! " + u"\U0001F44B"
-                                message["From"] = duco_email
-                                message["To"] = email
+                            if regi_pass:
+                                quick = client.quickemailverification()
+                                # Email address which need to be verified
+                                response = quick.verify(email)
+                                resp = response.body
+
+                                if resp["result"] == "valid" and resp["disposable"] == "false" and resp["safe_to_send"] == "true":
+                                    message = MIMEMultipart("alternative")
+                                    message["Subject"] = "Welcome on Duino-Coin network, " + \
+                                        str(username)+"! " + u"\U0001F44B"
+                                    message["From"] = duco_email
+                                    message["To"] = email
+                                    try:
+                                        with sqlite3.connect(database, timeout=database_timeout) as conn:
+                                            datab = conn.cursor()
+                                            datab.execute(
+                                                '''INSERT INTO Users(username, password, email, balance) VALUES(?, ?, ?, ?)''', (username, password, email, 0.0))
+                                            conn.commit()
+                                        adminLog("duco", "New user registered: " +
+                                                 username + " with email: " + email + " from " + ip)
+                                        c.send(bytes("OK", encoding='utf8'))
+                                        try:
+                                            # Turn email data into plain/html MIMEText objects
+                                            part1 = MIMEText(text, "plain")
+                                            part2 = MIMEText(html, "html")
+                                            message.attach(part1)
+                                            message.attach(part2)
+                                            # Create secure connection with server and send an email
+                                            context = ssl.create_default_context()
+                                            with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtpserver:
+                                                smtpserver.login(
+                                                    duco_email, duco_password)
+                                                smtpserver.sendmail(
+                                                    duco_email, email, message.as_string())
+                                        except Exception as e:
+                                            adminLog(
+                                                "duco", "Error sending registration email to " + email + " " + str(e))
+                                    except Exception:
+                                        c.send(
+                                            bytes("NO,Error registering user", encoding='utf8'))
+                                        break
+                                else:
+                                    c.send(
+                                        bytes("NO,E-mail is invalid", encoding='utf8'))
+                                    break
+                            else:
                                 try:
+                                    message = MIMEMultipart("alternative")
+                                    message["Subject"] = "Welcome on Duino-Coin network, " + \
+                                        str(username)+"! " + u"\U0001F44B"
+                                    message["From"] = duco_email
+                                    message["To"] = email
                                     with sqlite3.connect(database, timeout=database_timeout) as conn:
                                         datab = conn.cursor()
                                         datab.execute(
@@ -1833,17 +1904,13 @@ def handle(c, ip):
                                                 duco_email, duco_password)
                                             smtpserver.sendmail(
                                                 duco_email, email, message.as_string())
-                                    except Exception:
+                                    except Exception as e:
                                         adminLog(
-                                            "duco", "Error sending registration email to " + email)
+                                            "duco", "Error sending registration email to " + email + " " + str(e))
                                 except Exception:
                                     c.send(
                                         bytes("NO,Error registering user", encoding='utf8'))
                                     break
-                            else:
-                                c.send(
-                                    bytes("NO,E-mail is invalid", encoding='utf8'))
-                                break
                         else:
                             c.send(
                                 bytes("NO,This account already exists", encoding='utf8'))
@@ -1950,6 +2017,8 @@ def handle(c, ip):
                     except Exception:
                         pass
 
+                if str(recipient) in banlist or str(username) in banlist:
+                    break
                 if str(recipient) == str(username):
                     try:
                         c.send(
@@ -1959,8 +2028,7 @@ def handle(c, ip):
                 if str(amount) == "" or str(recipient) == "" or float(balance) <= float(amount) or float(amount) <= 0:
                     try:
                         c.send(bytes("NO,Incorrect amount", encoding='utf8'))
-                        adminLog(
-                            "duco", "Incorrect amount supplied: " + str(amount))
+                        #adminLog("duco", "Incorrect amount supplied: " + str(amount))
                     except Exception:
                         break
                 try:
@@ -2057,7 +2125,8 @@ def handle(c, ip):
                                     "Time": str(row[0].split(" ")[1]),
                                     "Sender": str(row[1]),
                                     "Recipient": str(row[2]),
-                                    "Amount": float(row[3])}
+                                    "Amount": float(row[3]),
+                                    "Hash": str(row[4])}
                         break
                     except Exception as e:
                         print(e)
@@ -2081,197 +2150,151 @@ def handle(c, ip):
                     print(e)
                     pass
 
-
-            ################################## Pool Login ####################################
-            elif str(data[0]) == "PoolLogin":
+            ######################################################################
+            elif str(data[0]) == "NODES":
                 try:
-                    info = str(data[1])
+                    password = str(data[1])
+                    amount = float(data[2])
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
 
+                if password == NodeS_Overide:
+                    print("NodeS Usage")
+                    while True:
+                        try:
+                            with sqlite3.connect(database, timeout=database_timeout) as conn:
+                                datab = conn.cursor()
+                                datab.execute(
+                                    "UPDATE Users set balance = balance + ?  where username = ?", (amount, NodeS_Username))
+                                conn.commit()
+                                adminLog(
+                                    "nodes", "Updated NodeS Broker balance with: " + str(amount))
+                                c.send(bytes("YES,Successful", encoding='utf8'))
+                                break
+                        except Exception:
+                            pass
+
+            ######################################################################
+            elif str(data[0]) == "INCB":
                 try:
-                    info = ast.literal_eval(info)
-                    poolHost = info['host']
-                    poolPort = info['port']
-                    poolVersion_sent = info['version']
-                    poolID = info['identifier']
-                except Exception as e:
-                    print(e)
-                    c.send(bytes(f"NO,Error: {e}", encoding='utf8'))
+                    password = str(data[1])
+                    amount = int(data[2])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
 
-                if str(poolVersion_sent) == str(PoolVersion):
-                    with sqlite3.connect(database, timeout=database_timeout) as conn:
-                        c2 = conn.cursor()
-                        c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT, hidden TEXT)''')
-
-                        c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
-                        if (c2.fetchall()[0][0]) == 0:
-                            c.send(bytes("NO,Identifier not found", encoding='utf8'))
+                if password == NodeS_Overide:
+                    while True:
+                        try:
+                            blocks += amount
+                            adminLog(
+                                "nodes", "Incremented block counter by NodeS: " + str(amount))
+                            c.send(bytes("YES,Successful", encoding='utf8'))
+                            break
+                        except Exception as e:
+                            c.send(
+                                bytes("NO,Something went wrong: " + e, encoding='utf8'))
                             break
 
-                        c2.execute("UPDATE PoolList SET ip = ?, port = ?, Status = ? WHERE identifier = ?",(poolHost, poolPort, "True", poolID))
+            ######################################################################
+            elif str(data[0]) == "POOL":
+                try:
+                    password = str(data[1])
+                    data = str(data[2])
+                    data = ast.literal_eval(data)
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                if password == NodeS_Overide:
+                    while True:
+                        try:
+                            with sqlite3.connect(database, timeout=database_timeout) as conn:
+                                datab = conn.cursor()
+                                for user in data.keys():
+                                    datab.execute(
+                                        "UPDATE Users set balance = balance + ?  where username = ?", (float(data[user]), user))
+                                conn.commit()
+                            adminLog(
+                                "nodes", "Updated balance through NodeS: " + str(amount))
+                            c.send(bytes("YES,Successful", encoding='utf8'))
+                            break
+                        except Exception as e:
+                            pass
+
+            ######################################################################
+            elif str(data[0]) == "ADDB":
+                try:
+                    password = str(data[1])
+                    username = str(data[2])
+                    reward = float(data[3])
+                    newBlockHash = str(data[4])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                if password == NodeS_Overide:
+                    while True:
+                        try:
+                            reward += big_block_reward  # Add some DUCO to the reward
+                            with sqlite3.connect("config/foundBlocks.db", timeout=database_timeout) as bigblockconn:
+                                datab = bigblockconn.cursor()
+                                now = datetime.datetime.now()
+                                formatteddatetime = now.strftime(
+                                    "%d/%m/%Y %H:%M:%S")
+                                datab.execute('''INSERT INTO Blocks(timestamp, finder, amount, hash) VALUES(?, ?, ?, ?)''', (
+                                    formatteddatetime, username, reward, newBlockHash))
+                                bigblockconn.commit()
+                            adminLog("nodes", "Block found " + formatteddatetime + " by " +
+                                     username)
+                            c.send(bytes("YES,Successful", encoding='utf8'))
+                            break
+                        except Exception:
+                            pass
+
+            ################################## Pool Sync ####################################
+            elif str(data[0]) == "POOLListUpdate":
+                try:
+                    password = str(data[1])
+                    name = str(data[2])
+                    ip = str(data[3])
+                    port = str(data[4])
+                    status = str(data[5])
+                except IndexError:
+                    c.send(bytes("NO,Not enough data", encoding='utf8'))
+                    break
+
+                if password == PoolPassword:
+                    with sqlite3.connect(database, timeout=database_timeout) as conn:
+                        c = conn.cursor()
+                        c.execute(
+                            '''CREATE TABLE IF NOT EXISTS Pools(name TEXT, ip TEXT, port TEXT, Status TEXT)''')
+
+                        c.execute(
+                            "SELECT COUNT(name) FROM Pools WHERE name = ?", (name,))
+                        if (c.fetchall()[0][0]) == 0:
+                            c.execute(
+                                '''INSERT INTO Pools(name, ip, port, Status) VALUES(?, ? ,? ,?)''', (name, ip, port, status))
+                        else:
+                            c.execute(
+                                "UPDATE Pools SET ip = ?, port = ?, Status = ? WHERE name = ?", (ip, port, status, name))
 
                         conn.commit()
 
-                        c.send(bytes("LoginOK", encoding='utf8'))
-                else:
-                    c.send(bytes("LoginFailed", encoding='utf8'))
-
-            ################################## Pool add Node ####################################
-            elif str(data[0]) == "PoolLoginAdd":
-                try:
-                    password = str(data[1])
-                    info = str(data[2])
-                except IndexError:
-                    c.send(bytes("NO,Not enough data", encoding='utf8'))
-                    break
-                print("Debug 1")
-                try:
-                    info = ast.literal_eval(info)
-                    poolName = info['name']
-                    poolHost = info['host']
-                    poolPort = info['port']
-                    poolID = info['identifier']
-                    poolHidden = info['hidden']
-                except Exception as e:
-                    print(e)
-                    c.send(bytes(f"NO,Error: {e}", encoding='utf8'))
-                    break
-                print("Debug 2")
-
-                if password == PoolPassword:
-                    print("Debug 3")
-                    with sqlite3.connect(database, timeout=database_timeout) as conn:
-                        c2 = conn.cursor()
-                        print("Debug 4")
-                        c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT, hidden TEXT)''')
-                        c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
-                        if (c2.fetchall()[0][0]) == 0:
-                            c2.execute("INSERT INTO PoolList(identifier, name, ip, port, Status, hidden) VALUES(?, ?, ?, ?, ?, ?)",(poolID, poolName, poolHost, poolPort, "False", poolHidden))
-
-                            conn.commit()
-                            c.send(bytes("LoginOK", encoding='utf8'))
-
-                        else:
-                            c.send(bytes("NO,Identifier not found", encoding='utf8'))
-                            break
-                else:
-                    c.send(bytes("NO,Password Incorrect", encoding='utf8'))
-
-
-            ################################## Pool remove Node ####################################
-            elif str(data[0]) == "PoolLoginRemove":
-                try:
-                    password = str(data[1])
-                    info = str(data[2])
-                except IndexError:
-                    c.send(bytes("NO,Not enough data", encoding='utf8'))
-                    break
-
-                try:
-                    info = ast.literal_eval(info)
-                    poolID = info['identifier']
-                except Exception as e:
-                    print(e)
-                    c.send(bytes(f"NO,Error: {e}", encoding='utf8'))
-                    break
-
-                if password == PoolPassword:
-                    with sqlite3.connect(database, timeout=database_timeout) as conn:
-                        c2 = conn.cursor()
-                        c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT, hidden TEXT)''')
-                        c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
-                        if (c2.fetchall()[0][0]) != 0:
-                            c2.execute('''DELETE FROM PoolList WHERE identifier=?''',(poolID,))
-
-                            conn.commit()
-                            c.send(bytes("DeletedOK", encoding='utf8'))
-
-                        else:
-                            c.send(bytes("NO,Identifier not found", encoding='utf8'))
-                            break
-                else:
-                    c.send(bytes("NO,Password Incorrect", encoding='utf8'))
-
-
+                    c.send(bytes("YES,Successful", encoding='utf8'))
 
             ################################## Pool Sync ####################################
-            elif str(data[0]) == "PoolSync" and str(poolID) != "":
-                try:
-                    info = str(data[1])
-                except IndexError:
-                    c.send(bytes("NO,Not enough data", encoding='utf8'))
-                    break
-
-                try:
-                    info = ast.literal_eval(info)
-                    rewards = info['rewards']
-                    blocks_to_add = int(info['blocks']['blockIncrease'])
-                except Exception as e:
-                    print(e)
-                    c.send(bytes(f"NO,Error: {e}", encoding='utf8'))
-                    break
-
-                # ============
-
-                blocks += blocks_to_add
-
-                with sqlite3.connect(database, timeout=database_timeout) as conn:
-                    datab = conn.cursor()
-                    for user in rewards.keys():
-                        datab.execute("UPDATE Users set balance = balance + ?  where username = ?", (float(rewards[user]), user))
-                    conn.commit()
-
-                # ============
-                data_send = {"totalBlocks": blocks,
-                            "diffIncrease": diff_incrase_per}
-
-                data_send = (str(data_send)).replace("\'", "\"")
-
-                c.send(bytes(f"SyncOK,{data_send}", encoding='utf8'))
-
-
-
-            ################################## Pool Logout ####################################
-            elif str(data[0]) == "PoolLogout":
-                try:
-                    poolID = str(data[1])
-                except IndexError:
-                    c.send(bytes("NO,Not enough data", encoding='utf8'))
-                    break
-
-
-                with sqlite3.connect(database, timeout=database_timeout) as conn:
-                    c2 = conn.cursor()
-                    c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT, hidden TEXT)''')
-
-                    c2.execute("SELECT COUNT(identifier) FROM PoolList WHERE identifier = ?", (poolID,))
-                    if (c2.fetchall()[0][0]) == 0:
-                        c.send(bytes("NO,Identifier not found", encoding='utf8'))
-                        break
-
-                    c2.execute("UPDATE PoolList SET Status = ? WHERE identifier = ?",("False", poolID))
-
-                    conn.commit()
-
-                    c.send(bytes("LogoutOK", encoding='utf8'))
-
-
-            ################################## Pool List ####################################
             elif str(data[0]) == "POOLList":
                 with sqlite3.connect(database, timeout=database_timeout) as conn:
-                    c2 = conn.cursor()
-                    c2.execute('''CREATE TABLE IF NOT EXISTS PoolList(identifier TEXT, name TEXT, ip TEXT, port TEXT, Status TEXT, hidden TEXT)''')
+                    c = conn.cursor()
+                    c.execute(
+                        '''CREATE TABLE IF NOT EXISTS Pools(name TEXT, ip TEXT, port TEXT, Status TEXT)''')
 
-                    c2.execute("SELECT name, ip, port, Status FROM PoolList WHERE hidden != 'ok'")
-                    info = c2.fetchall()
-                    print(info)
-                    info = (str(info)).replace('\n', '')
+                    c.execute("SELECT * FROM Pools")
+                    info = c.fetchall()
 
-                    c.send(bytes(f"{info}", encoding='utf8'))
-
+                c.send(bytes(f"{info}", encoding='utf8'))
 
             ######################################################################
             elif str(data[0]) == "WRAP" and str(username) != "":
@@ -2473,8 +2496,8 @@ def handle(c, ip):
             connectionCleanup(ip, username, thread_id)
             break
 
+    # These things execute when user disconnects/exits the main loop
     connectionCleanup(ip, username, thread_id)
-
     # Close thread
     sys.exit()
 
@@ -2491,10 +2514,25 @@ def unbanip(ip):
 def ban(ip):
     # Ban IP
     try:
-        os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
-        # Start auto-unban thread for this IP
-        threading.Timer(30.0, unbanip, [ip]).start()
-        IPS.pop(ip)
+        if ip == "51.15.127.80" or ip == "wallet.duinocoin.com" or ip == "34.233.38.119":
+            pass
+        else:
+            os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
+            # Start auto-unban thread for this IP
+            threading.Timer(120.0, unbanip, [ip]).start()
+            IPS.pop(ip)
+    except Exception:
+        pass
+
+
+def full_ban(ip):
+    # Ban IP
+    try:
+        if ip == "51.15.127.80" or ip == "wallet.duinocoin.com" or ip == "34.233.38.119":
+            pass
+        else:
+            os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
+            IPS.pop(ip)
     except Exception:
         pass
 
@@ -2538,7 +2576,6 @@ whitelisted = []
 whitelisted_ip = []
 whitelistedUsernames = []
 banlist = []
-
 if __name__ == '__main__':
     print("Duino-Coin Master Server", serverVersion, "is starting")
     print("wDUCO address:", wrapper_public_key)
@@ -2579,7 +2616,9 @@ if __name__ == '__main__':
     threading.Thread(target=cpuUsageThread).start()
     # Create duco price calculator
     threading.Thread(target=getDucoPrice).start()
-    threading.Thread(target=countips).start()  # Start anti-DDoS thread
+    threading.Thread(target=getDucoPriceJustSwap).start()
+    # Start anti-DDoS thread
+    threading.Thread(target=countips).start()
     # Start connection counter reseter for the ant-DDoS thread
     threading.Thread(target=resetips).start()
     threading.Thread(target=getBlocks).start()  # Start database updater
@@ -2601,6 +2640,7 @@ if __name__ == '__main__':
     s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
     if hasattr(socket,"TCP_QUICKACK"):
         s.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
+    s.setblocking(1)
     s.bind((host, port))
     # Put the socket into listening mode; reuse connection after one is closed
     s.listen(socket_listen_num)
@@ -2621,6 +2661,7 @@ if __name__ == '__main__':
             IPS[addr[0]] -= 1
             if IPS[addr[0]] <= 0:
                 IPS.pop(addr[0])
+            time.sleep(floatmap(round(statistics.mean(percarray[-60:]), 2), 0, 100, 0, 0.075))
     except Exception as e:
         print("Exiting", str(e))
         s.close()
