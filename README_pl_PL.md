@@ -30,7 +30,7 @@
     <img src="https://img.shields.io/badge/release-2.3-fb6404.svg?style=for-the-badge" /></a>
 </p>
 
-<h2 align="center">Duino-Coin to moneta która można wydobywać używając komputerów, płytek Raspberry Pi, Arduino, ESP i nie tylko.</h2><br />
+<h2 align="center">Duino-Coin to moneta którę można wydobywać używając komputerów, płytek Raspberry Pi, Arduino, ESP i nie tylko.</h2><br />
 
 <table align="center">
   <tr>
@@ -56,7 +56,7 @@
       🔢 Cyfry po przecinku: maks. 20<br>
       🔤 Symbol: DUCO (ᕲ)<br>
       ⚒️ Algorytmy: DUCO-S1, DUCO-S1A, XXHASH +więcej planowanych<br>
-      ♐ Dystrybucja: wspierana przez "Kolka system" pomagający sprawiedliwie nagradzać górników<br>
+      ♐ Dystrybucja nagród: wspierana przez "Kolka system" pomagający sprawiedliwie nagradzać górników<br>
     </td>
   </tr>
 </table>
@@ -196,24 +196,24 @@ Niektóre pliki niepochodzące od nas mogą mieć inne licencje - sprawdź ich k
 2. Górnictwo to wykorzystanie algorytmu DUCO-S1 (wyjaśnionego w <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), w którym znalezienie poprawnego wyniku do problemu matematycznego daje górnikowi nagrodę.<br/>
 3. Mining może być oficjalnie wykonywany przy użyciu procesorów, płytek AVR (np. Arduino), komputerów jednopłytkowych (np. Raspberry Pi) lub płytek ESP32/8266 z wykorzystaniem oficjalnych minerów (inne oficjalnie dozwolone górniki są opisane w górnej części README).<br/>
 4. Mining przu użyciu GPU, FPGA i innego sprzętu o wysokiej wydajności jest dozwolone, ale przy użyciu tylko trudności `EXTREME`.<br/>
-5. Każdy użytkownik korzystający z górników na trudności niezgodnej dla ich wydajności (patrz <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">lista trudności</a>) będzie automatycznie przeniesiony (Kolka system) do odpowiedniej i / lub zablokowany.<br/>.
-6. Każdy użytkownik zauważony przy użyciu niewłaściwego sprzętu zostanie zbanowany ręcznie lub automatycznie z sieci bez uprzedzenia.<br/>.
+5. Każdy użytkownik korzystający z górników na trudności niezgodnej dla ich wydajności (patrz <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">lista trudności</a>) będzie automatycznie przeniesiony (Kolka system) do odpowiedniej i / lub zablokowany.<br/>
+6. Każdy użytkownik zauważony przy użyciu niewłaściwego sprzętu zostanie zbanowany ręcznie lub automatycznie z sieci bez uprzedzenia.<br/>
 7. Banowanie polega na zablokowaniu użytkownikowi dostępu do jego monet wraz z usunięciem konta.<br/>
 8. Do wymiany kwalifikują się tylko monety zdobyte legalnie.<br/>
 9. Użytkownicy zauważeni przy użyciu VPN (lub podobnych) w złych zamiarach (np. omijanie limitów) mogą zostać zbanowani bez uprzedzenia.<br/>
-10. Wiele kont używanych do ominięcia limitów mogą być zbanowane bez uprzedzenia.<br/>.
+10. Wiele kont używanych do ominięcia limitów mogą być zbanowane bez uprzedzenia.<br/>
 11. Konta mogą zostać tymczasowo zawieszone w celu zbadania ("dochodzenia") naruszeń ToS ("naruszenie" lub "nadużycie").<br/>
 12. Wielokrotne konta używane do unikania zakazów zostaną zbanowane bez uprzedzenia.<br/>
-13. Żądanie wymiany dokonane na oficjalnej giełdzie DUCO-Exchange ("oficjalna giełda") może być opóźnione i/lub odrzucone podczas dochodzenia. <br/>.
+13. Żądanie wymiany dokonane na oficjalnej giełdzie DUCO-Exchange ("oficjalna giełda") może być opóźnione i/lub odrzucone podczas dochodzenia. <br/>
 14. Żądania wymiany dokonane na oficjalnej giełdzie mogą zostać odrzucone z powodu naruszenia ToS i/lub niskich funduszy.<br/>
 15. DUCO użytkownika mogą zostać usunięte, jeśli naruszenie zostanie udowodnione.<br/>
-16. Niniejszy regulamin może ulec zmianie w dowolnym momencie bez wcześniejszego powiadomienia.<br/>.
+16. Niniejszy regulamin może ulec zmianie w dowolnym momencie bez wcześniejszego powiadomienia.<br/>
 17. Każdy użytkownik korzystający z Duino-Coin zobowiązuje się do przestrzegania powyższych zasad.<br/>
 
 <h4 align="center">Polityka prywatności</h2><br>1.
 1. Na serwerze głównym przechowujemy tylko nazwy użytkowników, zaszyfrowane hasła (za pomocą bcrypt) i e-maile użytkowników jako ich dane konta.<br/>
 2. E-maile nie są publicznie dostępne i są wykorzystywane wyłącznie do kontaktowania się z użytkownikiem w razie potrzeby, potwierdzania wymian na <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> i otrzymywania okazjonalnego newslettera (planowanego na przyszłość).<br/>
-3. Salda, transakcje i dane związane z wydobyciem jest publicznie dostępne w publicznych <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON API</a>.<br/>.
+3. Salda, transakcje i dane związane z wydobyciem jest publicznie dostępne w publicznych <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON API</a>.<br/>
 4. Polityka prywatności może ulec zmianie w przyszłości z uprzednim powiadomieniem.
 
 <h2 align="center">Deweloperzy</h2><br>
