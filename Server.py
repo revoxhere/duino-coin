@@ -75,6 +75,17 @@ wrapper_permission = False
 config = configparser.ConfigParser()
 lock = threading.Lock()
 
+# DB files
+config_base_dir = "config"
+config_db_transactions = config_base_dir + "/transactions.db"
+config_db_foundBlocks = config_base_dir + "/foundBlocks.db"
+config_lastblock = config_base_dir + "/lastblock"
+config_blocks = config_base_dir + "/blocks"
+config_banned = config_base_dir + "/banned.txt"
+config_whitelisted = config_base_dir + "/whitelisted.txt"
+config_whitelistedUsernames = config_base_dir + "/whitelistedUsernames.txt"
+
+
 try:  # Read sensitive data from config file
     config.read('AdminData.ini')
     duco_email = config["main"]["duco_email"]
@@ -171,14 +182,14 @@ if not os.path.isfile(blockchain):
     # Create it if it doesn't exist
     with sqlite3.connect(blockchain, timeout=database_timeout) as blockconn:
         try:
-            with open("config/lastblock", "r+") as lastblockfile:
+            with open(config_lastblock, "r+") as lastblockfile:
                 # If old database is found, read lastBlockHash from it
                 lastBlockHash = lastblockfile.readline()
         except Exception:
             # First block - SHA1 of "duino-coin"
             lastBlockHash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
         try:
-            with open("config/blocks", "r+") as blockfile:
+            with open(config_blocks, "r+") as blockfile:
                 # If old database is found, read mined blocks amount from it
                 blocks = blockfile.readline()
         except Exception:
@@ -199,17 +210,21 @@ else:
         # Read lastblock's hash
         lastBlockHash = str(blockdatab.fetchone()[0])
 
-if not os.path.isfile("config/transactions.db"):
+# Create config dir first if it does not exist
+if not os.path.isdir(config_base_dir):
+    os.mkdir(config_base_dir)
+
+if not os.path.isfile(config_db_transactions):
     # Create transactions database if it doesn't exist
-    with sqlite3.connect("config/transactions.db", timeout=database_timeout) as conn:
+    with sqlite3.connect(config_db_transactions, timeout=database_timeout) as conn:
         datab = conn.cursor()
         datab.execute(
             '''CREATE TABLE IF NOT EXISTS Transactions(timestamp TEXT, username TEXT, recipient TEXT, amount REAL, hash TEXT)''')
         conn.commit()
 
-if not os.path.isfile("config/foundBlocks.db"):
+if not os.path.isfile(config_db_foundBlocks):
     # Create transactions database if it doesn't exist
-    with sqlite3.connect("config/foundBlocks.db", timeout=database_timeout) as conn:
+    with sqlite3.connect(config_db_foundBlocks, timeout=database_timeout) as conn:
         datab = conn.cursor()
         datab.execute(
             '''CREATE TABLE IF NOT EXISTS Blocks(timestamp TEXT, finder TEXT, amount REAL, hash TEXT)''')
@@ -386,7 +401,7 @@ def getTransactions():
     while True:
         try:
             transactiondata = {}
-            with sqlite3.connect("config/transactions.db", timeout=database_timeout) as conn:
+            with sqlite3.connect(config_db_transactions, timeout=database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Transactions")
                 for row in datab.fetchall():
@@ -407,7 +422,7 @@ def getBlocks():
     while True:
         try:
             transactiondata = {}
-            with sqlite3.connect("config/foundBlocks.db", timeout=database_timeout) as conn:
+            with sqlite3.connect(config_db_foundBlocks, timeout=database_timeout) as conn:
                 datab = conn.cursor()
                 datab.execute("SELECT * FROM Blocks")
                 for row in datab.fetchall():
@@ -638,7 +653,7 @@ def InputManagement():
                 except Exception:
                     print("Step 1 - Error changing password")
                 try:
-                    with open('config/banned.txt', 'a') as bansfile:
+                    with open(config_banned, 'a') as bansfile:
                         bansfile.write(str(username) + "\n")
                         print("Step 2 - Added username to banlist")
                 except Exception:
@@ -1333,7 +1348,7 @@ def handle(c, ip):
                         # Add some DUCO to the reward
                         reward += big_block_reward
                         # Write to the big block database
-                        with sqlite3.connect("config/foundBlocks.db", timeout=database_timeout) as bigblockconn:
+                        with sqlite3.connect(config_db_foundBlocks, timeout=database_timeout) as bigblockconn:
                             datab = bigblockconn.cursor()
                             now = datetime.datetime.now()
                             formatteddatetime = now.strftime(
@@ -1587,7 +1602,7 @@ def handle(c, ip):
                         # Add some DUCO to the reward
                         reward += big_block_reward
                         # Write to the big block database
-                        with sqlite3.connect("config/foundBlocks.db", timeout=database_timeout) as bigblockconn:
+                        with sqlite3.connect(config_db_foundBlocks, timeout=database_timeout) as bigblockconn:
                             datab = bigblockconn.cursor()
                             now = datetime.datetime.now()
                             formatteddatetime = now.strftime(
@@ -1950,7 +1965,7 @@ def handle(c, ip):
                                             datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
                                             conn.commit()
                                             #adminLog("duco", "Updated recipients balance: " + str(recipientbal))
-                                        with sqlite3.connect("config/transactions.db", timeout=database_timeout) as tranconn:
+                                        with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
                                             datab = tranconn.cursor()
                                             now = datetime.datetime.now()
                                             formatteddatetime = now.strftime(
@@ -1989,7 +2004,7 @@ def handle(c, ip):
                 while True:
                     try:
                         transactiondata = {}
-                        with sqlite3.connect("config/transactions.db", timeout=database_timeout) as conn:
+                        with sqlite3.connect(config_db_transactions, timeout=database_timeout) as conn:
                             datab = conn.cursor()
                             datab.execute("SELECT * FROM Transactions")
                             for row in datab.fetchall():
@@ -2282,7 +2297,7 @@ def handle(c, ip):
                                         adminLog(
                                             "wrapper", "Successful wrapping")
                                         try:
-                                            with sqlite3.connect("config/transactions.db", timeout=database_timeout) as tranconn:
+                                            with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
                                                 datab = tranconn.cursor()
                                                 now = datetime.datetime.now()
                                                 formatteddatetime = now.strftime(
@@ -2365,7 +2380,7 @@ def handle(c, ip):
                                         adminLog(
                                             "unwrapper", "Successful unwrapping")
                                         try:
-                                            with sqlite3.connect("config/transactions.db", timeout=database_timeout) as tranconn:
+                                            with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
                                                 datab = tranconn.cursor()
                                                 now = datetime.datetime.now()
                                                 formatteddatetime = now.strftime(
@@ -2503,7 +2518,7 @@ if __name__ == '__main__':
 
     try:
         # Read whitelisted IPs
-        with open("config/whitelisted.txt", "r") as whitelistfile:
+        with open(config_whitelisted, "r") as whitelistfile:
             whitelisted = whitelistfile.read().splitlines()
         adminLog("system", "Loaded whitelisted IPs file")
         whitelisted_ip = []
@@ -2514,7 +2529,7 @@ if __name__ == '__main__':
 
     try:
         # Read whitelisted usernames
-        with open("config/whitelistedUsernames.txt", "r") as whitelistusrfile:
+        with open(config_whitelistedUsernames, "r") as whitelistusrfile:
             whitelistedusr = whitelistusrfile.read().splitlines()
             adminLog("system", "Loaded whitelisted usernames file")
             whitelistedUsernames = []
@@ -2526,7 +2541,7 @@ if __name__ == '__main__':
 
     try:
         # Read banned usernames
-        with open("config/banned.txt", "r") as bannedusrfile:
+        with open(config_banned, "r") as bannedusrfile:
             bannedusr = bannedusrfile.read().splitlines()
             adminLog("system", "Loaded banned usernames file")
             banlist = []
