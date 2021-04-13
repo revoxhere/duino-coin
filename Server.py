@@ -907,6 +907,7 @@ def handle(c, ip):
     # Variables for every thread
     username = ""
     poolID = ""
+    thread_id = str(threading.get_ident())
     firstshare = True
     # Set to true if a sharetime-test is being executed
     sharetime_test = False
@@ -1275,13 +1276,12 @@ def handle(c, ip):
                 try:
                     # Prepare miner API
                     try:
-                        shares_per_sec = minerapi[str(
-                            threading.get_ident())]["Sharerate"] + 1
+                        shares_per_sec = minerapi[thread_id]["Sharerate"] + 1
                     except Exception:
                         shares_per_sec = 0
                     now = datetime.datetime.now()
                     lastsharetimestamp = now.strftime("%d/%m/%Y %H:%M:%S")
-                    minerapi[str(threading.get_ident())] = {
+                    minerapi[thread_id] = {
                         "User":         str(username),
                         "Hashrate":     hashrate,
                         "Is estimated": str(hashrateEstimated),
@@ -1324,7 +1324,7 @@ def handle(c, ip):
                     try:
                         # Check if miner didn't exceed max sharerate per second
                         # Kolka V2
-                        if minerapi[str(threading.get_ident())]["Sharerate"] > max_shares_per_sec:
+                        if minerapi[thread_id]["Sharerate"] > max_shares_per_sec:
                             # If he did, throttle him
                             time.sleep(15)
                     except Exception:
@@ -1562,7 +1562,7 @@ def handle(c, ip):
                         shares_per_sec = 0
                     now = datetime.datetime.now()
                     lastsharetimestamp = now.strftime("%d/%m/%Y %H:%M:%S")
-                    minerapi[str(threading.get_ident())] = {
+                    minerapi[thread_id] = {
                         "User":         str(username),
                         "Hashrate":     hashrate,
                         "Is estimated": str(hashrateEstimated),
@@ -1586,7 +1586,7 @@ def handle(c, ip):
                     try:
                         # Check if miner didn't exceed max sharerate per second
                         # Kolka V2
-                        if minerapi[str(threading.get_ident())]["Sharerate"] > max_shares_per_sec:
+                        if minerapi[thread_id]["Sharerate"] > max_shares_per_sec:
                             # If he did, throttle him
                             time.sleep(15)
                     except Exception:
