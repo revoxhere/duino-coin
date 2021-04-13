@@ -2575,7 +2575,8 @@ if __name__ == '__main__':
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    s.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
+    if hasattr(socket,"TCP_QUICKACK"):
+        s.setsockopt(socket.IPPROTO_TCP, socket.TCP_QUICKACK, 1)
     s.bind((host, port))
     # Put the socket into listening mode; reuse connection after one is closed
     s.listen(socket_listen_num)
