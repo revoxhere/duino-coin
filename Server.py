@@ -23,7 +23,6 @@ import ssl
 import sqlite3
 import bcrypt
 import time
-import os.path
 import json
 import logging
 import threading
@@ -32,13 +31,14 @@ import fastrand
 import os
 import psutil
 import statistics
+from os import path as ospath
 from _thread import *
 from shutil import copyfile
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from collections import OrderedDict
 from operator import itemgetter
-import quickemailverification
+from verify_email import verify_email
 
 # Server will use this as hostname to bind to (localhost on Windows, 0.0.0.0 on Linux in most cases)
 host = ""
@@ -96,23 +96,6 @@ try:  # Read sensitive data from config file
     wrapper_private_key = config["main"]["wrapper_private_key"]
     NodeS_Username = config["main"]["NodeS_Username"]
     connection_timeout = config["main"]["connection_timeout"]
-
-    emailchecker_private_key = str(
-        config["main"]["emailchecker_private_key"]).replace("\n", "").split(",")
-    client = quickemailverification.Client(
-        str(emailchecker_private_key[0].strip()))
-    quick = client.quickemailverification()
-    response = quick.verify("duino.coin@gmail.com")
-    resp = response.body
-    if resp["success"] == "false":
-        client = quickemailverification.Client(
-            str(emailchecker_private_key[1].strip()))
-        quick = client.quickemailverification()
-        response = quick.verify("duino.coin@gmail.com")
-        resp = response.body
-        if resp["success"] == "false":
-            regi_pass = True
-
 except Exception as e:
     print(e)
     print("""Please create AdminData.ini config file first:
@@ -123,7 +106,6 @@ except Exception as e:
         PoolPassword = ???
         wrapper_private_key = ???
         NodeS_Username = ???
-        emailchecker_private_key = ???
         connection_timeout = ???""")
     exit()
 
@@ -189,7 +171,7 @@ readyHashesESP32 = {}
 
 # User data database location
 database = 'crypto_database.db'
-if not os.path.isfile(database):
+if not ospath.isfile(database):
     # Create it if it doesn't exist
     with sqlite3.connect(database, timeout=database_timeout) as conn:
         datab = conn.cursor()
@@ -199,7 +181,7 @@ if not os.path.isfile(database):
 
 # Blockchain database location
 blockchain = 'duino_blockchain.db'
-if not os.path.isfile(blockchain):
+if not ospath.isfile(blockchain):
     # Create it if it doesn't exist
     with sqlite3.connect(blockchain, timeout=database_timeout) as blockconn:
         try:
@@ -232,10 +214,10 @@ else:
         lastBlockHash = str(blockdatab.fetchone()[0])
 
 # Create config dir first if it does not exist
-if not os.path.isdir(config_base_dir):
+if not ospath.isdir(config_base_dir):
     os.mkdir(config_base_dir)
 
-if not os.path.isfile(config_db_transactions):
+if not ospath.isfile(config_db_transactions):
     # Create transactions database if it doesn't exist
     with sqlite3.connect(config_db_transactions, timeout=database_timeout) as conn:
         datab = conn.cursor()
@@ -243,7 +225,7 @@ if not os.path.isfile(config_db_transactions):
             '''CREATE TABLE IF NOT EXISTS Transactions(timestamp TEXT, username TEXT, recipient TEXT, amount REAL, hash TEXT)''')
         conn.commit()
 
-if not os.path.isfile(config_db_foundBlocks):
+if not ospath.isfile(config_db_foundBlocks):
     # Create transactions database if it doesn't exist
     with sqlite3.connect(config_db_foundBlocks, timeout=database_timeout) as conn:
         datab = conn.cursor()
@@ -272,12 +254,12 @@ def adminLog(messagetype, message):
 
 def createBackup():
     # Create backups folder if it doesn't exist
-    if not os.path.isdir('backups/'):
+    if not ospath.isdir('backups/'):
         os.mkdir('backups/')
 
     while True:
         today = datetime.date.today()
-        if not os.path.isdir('backups/'+str(today)+'/'):
+        if not ospath.isdir('backups/'+str(today)+'/'):
             os.mkdir('backups/'+str(today))
             copyfile(blockchain, "backups/"+str(today)+"/"+blockchain)
             copyfile(database, "backups/"+str(today)+"/"+database)
@@ -894,9 +876,6 @@ def createHashes():
 def connectionCleanup(ip, username, thread_id):
     global minerapi, connectedUsers, connections, workers
 
-    # # These things execute when user disconnects/exits the main loop
-    connectedUsers -= 1
-
     # Decrement connection counter
     try:
         connections[ip] -= 1
@@ -978,8 +957,7 @@ def confirmunwraptx(duco_username, recipient, amount):
 
 
 def handle(c, ip):
-    # Set timeout on the connection not the parent socket itself.
-    c.settimeout(connection_timeout)
+    c.settimeout(10)
     # Thread for every connection
     # These globals are used in the statistics API
     global connectedUsers, minerapi
@@ -1287,21 +1265,12 @@ def handle(c, ip):
                 jobsent = datetime.datetime.now()
                 try:
                     c.settimeout(60)
-
                     # Wait until client solves hash
                     response = c.recv(512).decode().split(",")
                     result = response[0]
-                # Handle socket or timeout errors explictly
-                # except socket.timeout as ex:
-                #     print("socket.timeout", ex)
-                #     break
-                # except socket.error as ex:
-                #     print("socket.error", ex)
-                #     break
                 except Exception:
                     connectionCleanup(ip, username, thread_id)
                     break
-
                 # Measure ending time
                 resultreceived = datetime.datetime.now()
 
@@ -1591,16 +1560,16 @@ def handle(c, ip):
                 # Measure starting time
                 jobsent = datetime.datetime.now()
                 try:
+                    c.settimeout(60)
                     # Wait until client solves hash
                     response = c.recv(128).decode().split(",")
                     result = response[0]
-                except Exception:
                     connectionCleanup(ip, username, thread_id)
+                except Exception:
                     break
-
+                
                 # Measure ending time
                 resultreceived = datetime.datetime.now()
-
                 # Time from start of hash computing to finding the result
                 sharetime = resultreceived - jobsent
                 # Get total ms
@@ -1828,7 +1797,8 @@ def handle(c, ip):
                 except IndexError:
                     c.send(bytes("NO,Not enough data", encoding='utf8'))
                     break
-                if not " " in username and re.match("^[A-Za-z0-9_-]*$", username) and len(username) < 64 and len(unhashed_pass) < 64 and len(email) < 128:
+
+                if registrations[ip] < 2 and not " " in username and re.match("^[A-Za-z0-9_-]*$", username) and len(username) < 64 and len(unhashed_pass) < 64 and len(email) < 128:
                     password = bcrypt.hashpw(
                         unhashed_pass, bcrypt.gensalt(rounds=4))  # Encrypt password
                     with sqlite3.connect(database, timeout=database_timeout) as conn:
@@ -1836,66 +1806,18 @@ def handle(c, ip):
                         datab.execute(
                             "SELECT COUNT(username) FROM Users WHERE username = ?", (username,))
                         if int(datab.fetchone()[0]) == 0:
-                            if regi_pass:
-                                quick = client.quickemailverification()
-                                # Email address which need to be verified
-                                response = quick.verify(email)
-                                resp = response.body
-
-                                if resp["result"] == "valid" and resp["disposable"] == "false" and resp["safe_to_send"] == "true":
-                                    message = MIMEMultipart("alternative")
-                                    message["Subject"] = "Welcome on Duino-Coin network, " + \
-                                        str(username)+"! " + u"\U0001F44B"
-                                    message["From"] = duco_email
-                                    message["To"] = email
-                                    try:
-                                        with sqlite3.connect(database, timeout=database_timeout) as conn:
-                                            datab = conn.cursor()
-                                            datab.execute(
-                                                '''INSERT INTO Users(username, password, email, balance) VALUES(?, ?, ?, ?)''', (username, password, email, 0.0))
-                                            conn.commit()
-                                        adminLog("duco", "New user registered: " +
-                                                 username + " with email: " + email + " from " + ip)
-                                        c.send(bytes("OK", encoding='utf8'))
-                                        try:
-                                            # Turn email data into plain/html MIMEText objects
-                                            part1 = MIMEText(text, "plain")
-                                            part2 = MIMEText(html, "html")
-                                            message.attach(part1)
-                                            message.attach(part2)
-                                            # Create secure connection with server and send an email
-                                            context = ssl.create_default_context()
-                                            with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtpserver:
-                                                smtpserver.login(
-                                                    duco_email, duco_password)
-                                                smtpserver.sendmail(
-                                                    duco_email, email, message.as_string())
-                                        except Exception as e:
-                                            adminLog(
-                                                "duco", "Error sending registration email to " + email + " " + str(e))
-                                    except Exception:
-                                        c.send(
-                                            bytes("NO,Error registering user", encoding='utf8'))
-                                        break
-                                else:
-                                    c.send(
-                                        bytes("NO,E-mail is invalid", encoding='utf8'))
-                                    break
-                            else:
+                            if verify_email(email):
+                                message = MIMEMultipart("alternative")
+                                message["Subject"] = "Welcome on Duino-Coin network, " + \
+                                    str(username)+"! " + u"\U0001F44B"
+                                message["From"] = duco_email
+                                message["To"] = email
                                 try:
-                                    message = MIMEMultipart("alternative")
-                                    message["Subject"] = "Welcome on Duino-Coin network, " + \
-                                        str(username)+"! " + u"\U0001F44B"
-                                    message["From"] = duco_email
-                                    message["To"] = email
                                     with sqlite3.connect(database, timeout=database_timeout) as conn:
                                         datab = conn.cursor()
                                         datab.execute(
                                             '''INSERT INTO Users(username, password, email, balance) VALUES(?, ?, ?, ?)''', (username, password, email, 0.0))
                                         conn.commit()
-                                    adminLog("duco", "New user registered: " +
-                                             username + " with email: " + email)
-                                    c.send(bytes("OK", encoding='utf8'))
                                     try:
                                         # Turn email data into plain/html MIMEText objects
                                         part1 = MIMEText(text, "plain")
@@ -1909,13 +1831,24 @@ def handle(c, ip):
                                                 duco_email, duco_password)
                                             smtpserver.sendmail(
                                                 duco_email, email, message.as_string())
+                                        adminLog("duco", "New user registered: " +
+                                             username + " with email: " + email + " from " + ip)
+                                        try:
+                                            registrations[ip] += 1
+                                        except:
+                                            registrations[ip] = 1
+                                        c.send(bytes("OK", encoding='utf8'))
                                     except Exception as e:
-                                        adminLog(
-                                            "duco", "Error sending registration email to " + email + " " + str(e))
+                                        c.send(bytes("NO,E-mail is invalid", encoding='utf8'))
+                                        break
                                 except Exception:
                                     c.send(
                                         bytes("NO,Error registering user", encoding='utf8'))
                                     break
+                            else:
+                                c.send(
+                                    bytes("NO,E-mail is invalid", encoding='utf8'))
+                                break
                         else:
                             c.send(
                                 bytes("NO,This account already exists", encoding='utf8'))
@@ -2053,7 +1986,10 @@ def handle(c, ip):
                                         with sqlite3.connect(database, timeout=database_timeout) as conn:
                                             datab = conn.cursor()
                                             datab.execute(
-                                                "UPDATE Users set balance = ? where username = ?", (balance, username))
+                                                """UPDATE Users 
+                                                set balance = ? 
+                                                where username = ?""", 
+                                                (balance, username))
                                             conn.commit()
                                             #adminLog("duco", "Updated senders balance: " + str(balance))
                                             break
@@ -2079,7 +2015,10 @@ def handle(c, ip):
                                     try:
                                         with sqlite3.connect(database, timeout=database_timeout) as conn:
                                             datab = conn.cursor()  # Update receipents' balance
-                                            datab.execute("UPDATE Users set balance = ? where username = ?", (f'{float(recipientbal):.20f}', recipient))
+                                            datab.execute("""UPDATE Users 
+                                                set balance = ? 
+                                                where username = ?""", 
+                                                (f'{float(recipientbal):.20f}', recipient))
                                             conn.commit()
                                             #adminLog("duco", "Updated recipients balance: " + str(recipientbal))
                                         with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
@@ -2497,11 +2436,12 @@ def handle(c, ip):
                     except Exception:
                         break
         except Exception as ex:
-            print("[handle] Exception thrown:\n", ex)
+            #print("[handle] Exception thrown:\n", ex)
             connectionCleanup(ip, username, thread_id)
             break
 
     # These things execute when user disconnects/exits the main loop
+    connectedUsers -= 1
     connectionCleanup(ip, username, thread_id)
     # Close thread
     sys.exit()
@@ -2577,6 +2517,7 @@ def shares_per_sec_timer():
 IPS = {}
 workers = {}
 bannedIPS = {}
+registrations = {}
 whitelisted = []
 whitelisted_ip = []
 whitelistedUsernames = []
