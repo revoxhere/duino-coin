@@ -1554,6 +1554,7 @@ def handle(c, ip):
                         + str(diff)
                         + "\n",
                         encoding='utf8'))
+                    c.settimeout(120)
                 except Exception:
                     break
 
@@ -1562,10 +1563,10 @@ def handle(c, ip):
                 try:
                     c.settimeout(60)
                     # Wait until client solves hash
-                    response = c.recv(128).decode().split(",")
+                    response = c.recv(512).decode().split(",")
                     result = response[0]
-                    connectionCleanup(ip, username, thread_id)
                 except Exception:
+                    connectionCleanup(ip, username, thread_id)
                     break
                 
                 # Measure ending time
