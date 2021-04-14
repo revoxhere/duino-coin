@@ -1885,7 +1885,7 @@ def update_balance_labels():
             Transactions = cur.fetchall()
         transactionstext_format = ""
         for i, row in enumerate(Transactions, start=1):
-            transactionstext_format += f"{str(row[1])}  {row[2]} DUCO\n"
+            transactionstext_format += str(row[1]) + " " + str(row[2]) + " DUCO\n"
             if i == 6:
                 transactionstext_format = transactionstext_format.rstrip("\n")
                 break

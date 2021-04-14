@@ -1033,7 +1033,7 @@ def AVRMine(com):
                         + Style.NORMAL
                         + Fore.RESET
                         + " ∙ "
-                        + str(f"%01.3f" % float(computetime))
+                        + str("%01.3f" % float(computetime))
                         + "s"
                         + Style.NORMAL
                         + " ∙ "
@@ -1048,7 +1048,7 @@ def AVRMine(com):
                         + " ∙ "
                         + Fore.CYAN
                         + "ping "
-                        + str(f"%02.0f" % int(ping))
+                        + str("%02.0f" % int(ping))
                         + "ms")
                     break  # Repeat
 
@@ -1089,7 +1089,7 @@ def AVRMine(com):
                         + Style.NORMAL
                         + Fore.RESET
                         + " ∙ "
-                        + str(f"%01.3f" % float(computetime))
+                        + str("%01.3f" % float(computetime))
                         + "s"
                         + Style.NORMAL
                         + " ∙ "
@@ -1104,7 +1104,7 @@ def AVRMine(com):
                         + " ∙ "
                         + Fore.CYAN
                         + "ping "
-                        + str(f"%02.0f" % int(ping))
+                        + str("%02.0f" % int(ping))
                         + "ms")
                     break
 
@@ -1145,7 +1145,7 @@ def AVRMine(com):
                         + Style.NORMAL
                         + Fore.RESET
                         + " ∙ "
-                        + str(f"%01.3f" % float(computetime))
+                        + str("%01.3f" % float(computetime))
                         + "s"
                         + Style.NORMAL
                         + " ∙ "
@@ -1160,7 +1160,7 @@ def AVRMine(com):
                         + " ∙ "
                         + Fore.CYAN
                         + "ping "
-                        + str(f"%02.0f" % int(ping))
+                        + str("%02.0f" % int(ping))
                         + "ms")
                     break  # Repeat
                 break
