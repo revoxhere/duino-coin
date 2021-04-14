@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # Minimal version of Duino-Coin PC Miner, useful for developing own apps. Created by revox 2020-2021
-import socket
 import hashlib
-import urllib.request
-import time
 import os
+import socket
 import sys  # Only python3 included libraries
+import time
+import urllib.request
 
 soc = socket.socket()
 soc.settimeout(10)

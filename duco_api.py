@@ -5,16 +5,19 @@
 # © Duino-Coin Community 2021
 ##########################################
 import ast
-from requests import get
-import requests
-import socket
-import json
 import hashlib
+import json
+import os
+import queue
+import socket
+import sys
+import threading
+import time
 import urllib.request
 from threading import Timer
-import threading
-import time, os, sys
-import queue
+
+import requests
+from requests import get
 
 miner_q = queue.Queue()
 

@@ -6,22 +6,23 @@
 # © Duino-Coin Community 2019-2021
 ##########################################
 # Import libraries
-from socket import socket
-from threading import Thread as thrThread
-from time import sleep, time, ctime, strptime
-from os import execl, path, mkdir, _exit
-from os import name as osname
-from os import system as ossystem
-from re import sub
-from subprocess import Popen, check_call, DEVNULL
+import sys
 from configparser import ConfigParser
 from datetime import datetime
-from locale import getlocale, setlocale, getdefaultlocale, LC_ALL
 from json import load as jsonload
-from platform import system
+from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
+from os import _exit, execl, mkdir
+from os import name as osname
+from os import path
+from os import system as ossystem
 from pathlib import Path
-from signal import signal, SIGINT
-import sys
+from platform import system
+from re import sub
+from signal import SIGINT, signal
+from socket import socket
+from subprocess import DEVNULL, Popen, check_call
+from threading import Thread as thrThread
+from time import ctime, sleep, strptime, time
 
 
 def install(package):
@@ -50,7 +51,7 @@ except ModuleNotFoundError:
 
 try:
     # Check if colorama is installed
-    from colorama import init, Fore, Back, Style
+    from colorama import Back, Fore, Style, init
 except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
