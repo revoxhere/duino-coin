@@ -1286,9 +1286,10 @@ def handle(c, ip):
                 # Measure starting time
                 jobsent = datetime.datetime.now()
                 try:
+                    c.settimeout(60)
+
                     # Wait until client solves hash
                     response = c.recv(512).decode().split(",")
-                    c.settimeout(60)
                     result = response[0]
                 # Handle socket or timeout errors explictly
                 # except socket.timeout as ex:
@@ -1298,7 +1299,9 @@ def handle(c, ip):
                 #     print("socket.error", ex)
                 #     break
                 except Exception:
+                    connectionCleanup(ip, username, thread_id)
                     break
+
                 # Measure ending time
                 resultreceived = datetime.datetime.now()
 
@@ -1590,9 +1593,11 @@ def handle(c, ip):
                 try:
                     # Wait until client solves hash
                     response = c.recv(128).decode().split(",")
+                    result = response[0]
                 except Exception:
+                    connectionCleanup(ip, username, thread_id)
                     break
-                result = response[0]
+
                 # Measure ending time
                 resultreceived = datetime.datetime.now()
 
