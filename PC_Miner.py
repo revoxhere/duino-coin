@@ -134,7 +134,7 @@ if not Path(resourcesFolder + "/langs.json").is_file():
         f.write(r.content)
 
 # Load language file
-with open(f"{resourcesFolder}/langs.json", "r", encoding="utf8") as lang_file:
+with open(resourcesFolder + "/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = jsonload(lang_file)
 
 # OS X invalid locale hack
@@ -905,12 +905,12 @@ def Thread(
                         if totalhashrate > 800:
                             # Format hashcount to MH/s
                             formattedhashcount = str(
-                                f"%03.2f" % round(totalhashrate / 1000, 2)
+                                "%03.2f" % round(totalhashrate / 1000, 2)
                                 + " MH/s")
                         else:
                             # Stay with kH/s
                             formattedhashcount = str(
-                                f"%03.0f" % float(totalhashrate)
+                                "%03.0f" % float(totalhashrate)
                                 + " kH/s")
 
                         if feedback == "GOOD":
@@ -952,7 +952,7 @@ def Thread(
                                 + Style.NORMAL
                                 + Fore.RESET
                                 + " ∙ "
-                                + str(f"%05.2f" % float(computetime))
+                                + str("%05.2f" % float(computetime))
                                 + "s"
                                 + Style.NORMAL
                                 + " ∙ "
@@ -966,7 +966,7 @@ def Thread(
                                 + " ∙ "
                                 + Fore.CYAN
                                 + "ping "
-                                + str(f"%02.0f" % int(ping))
+                                + str("%02.0f" % int(ping))
                                 + "ms")
                             break  # Repeat
 
@@ -1009,7 +1009,7 @@ def Thread(
                                 + Style.NORMAL
                                 + Fore.RESET
                                 + " ∙ "
-                                + str(f"%05.2f" % float(computetime))
+                                + str("%05.2f" % float(computetime))
                                 + "s"
                                 + Style.NORMAL
                                 + " ∙ "
@@ -1023,7 +1023,7 @@ def Thread(
                                 + " ∙ "
                                 + Fore.CYAN
                                 + "ping "
-                                + str(f"%02.0f" % int(ping))
+                                + str("%02.0f" % int(ping))
                                 + "ms")
                             break  # Repeat
 
@@ -1067,7 +1067,7 @@ def Thread(
                                 + Style.NORMAL
                                 + Fore.RESET
                                 + " ∙ "
-                                + str(f"%05.2f" % float(computetime))
+                                + str("%05.2f" % float(computetime))
                                 + "s"
                                 + Style.NORMAL
                                 + " ∙ "
@@ -1081,7 +1081,7 @@ def Thread(
                                 + " ∙ "
                                 + Fore.CYAN
                                 + "ping "
-                                + str(f"%02.0f" % int(ping))
+                                + str("%02.0f" % int(ping))
                                 + "ms")
                             break  # Repeat
                     break
