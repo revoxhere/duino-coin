@@ -106,10 +106,7 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 You can also get the whole Duino-Coin bundle on the AUR - just install it with your favourite AUR Helper:
 
 ```BASH
-sudo pacman -S git
-git clone https://aur.archlinux.org/yay-git.git
-cd yay-git
-makepkg -si
+sudo pacman -S yay
 yay -S duino-coin
 ```
 
