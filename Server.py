@@ -1286,6 +1286,8 @@ def handle(c, ip):
                 # Measure starting time
                 jobsent = datetime.datetime.now()
                 try:
+                    c.settimeout(60)
+
                     # Wait until client solves hash
                     response = c.recv(512).decode().split(",")
                     result = response[0]
