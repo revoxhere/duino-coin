@@ -6,23 +6,24 @@
 # © Duino-Coin Community 2019-2021
 ##########################################
 # Import libraries
-from socket import socket
-from threading import Thread as thrThread
-from time import sleep, time, ctime, strptime
-from hashlib import sha1
-from os import execl, path, system, mkdir, _exit
-from os import name as osname
-from re import sub
-from subprocess import Popen, check_call, DEVNULL
+import sys
 from configparser import ConfigParser
 from datetime import datetime
-from locale import getlocale, setlocale, getdefaultlocale, LC_ALL
+from hashlib import sha1
 from json import load as jsonload
-from platform import system as plsystem
+from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
+from os import _exit, execl, mkdir
+from os import name as osname
+from os import path, system
 from pathlib import Path
-from signal import signal, SIGINT
+from platform import system as plsystem
+from re import sub
+from signal import SIGINT, signal
+from socket import socket
 from statistics import mean
-import sys
+from subprocess import DEVNULL, Popen, check_call
+from threading import Thread as thrThread
+from time import ctime, sleep, strptime, time
 
 
 def install(package):
@@ -38,8 +39,9 @@ def now():
 
 try:
     # Check if cpuinfo is installed
-    import cpuinfo
     from multiprocessing import freeze_support
+
+    import cpuinfo
 except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
@@ -52,7 +54,7 @@ except ModuleNotFoundError:
 
 try:
     # Check if colorama is installed
-    from colorama import init, Fore, Back, Style
+    from colorama import Back, Fore, Style, init
 except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
@@ -1188,8 +1190,8 @@ if __name__ == "__main__":
     title(getString("duco_python_miner") + str(minerVersion) + ")")
 
     try:
-        from multiprocessing import Process, Value, current_process, cpu_count
-        from multiprocessing import Manager
+        from multiprocessing import (Manager, Process, Value, cpu_count,
+                                     current_process)
         manager = Manager()
         # Multiprocessing fix for pyinstaller
         freeze_support()

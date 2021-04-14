@@ -5,17 +5,17 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2020
 ##########################################
-import socket
 import configparser
+import datetime
 import getpass
+import json
 import os
 import platform
+import socket
 import sys
 import time
-import json
-import datetime
-from signal import signal, SIGINT
 from pathlib import Path
+from signal import SIGINT, signal
 
 try:
     from cryptography.fernet import Fernet, InvalidToken
@@ -43,7 +43,8 @@ except:
     os._exit(1)
 
 try:
-    from base64 import urlsafe_b64encode as b64e, urlsafe_b64decode as b64d
+    from base64 import urlsafe_b64decode as b64d
+    from base64 import urlsafe_b64encode as b64e
 except:
     now = datetime.datetime.now()
     print(now.strftime("%H:%M:%S ")
@@ -65,7 +66,7 @@ except:
     os._exit(1)
 
 try:  # Check if colorama is installed
-    from colorama import init, Fore, Back, Style
+    from colorama import Back, Fore, Style, init
 except:
     now = datetime.datetime.now()
     print(now.strftime("%H:%M:%S ")

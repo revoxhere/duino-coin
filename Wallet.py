@@ -5,33 +5,30 @@
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
 ##########################################
-from tkinter import Tk, Label, Frame, Entry, Button
-from tkinter import StringVar, IntVar, PhotoImage
-from tkinter import Listbox, Scrollbar, Checkbutton
-from tkinter import Toplevel, ttk
-from tkinter.font import Font
-from tkinter import LEFT, BOTH, RIGHT, END, N, S, W, E
-from webbrowser import open_new_tab
-from urllib.request import urlopen, urlretrieve
-from pathlib import Path
-from threading import Timer, Thread
+import sys
+from base64 import b64decode, b64encode
 from configparser import ConfigParser
-from time import sleep, time
-from os import _exit, mkdir, execl, path
-from tkinter import messagebox
-from base64 import b64encode, b64decode
-from requests import get
-from json import loads
 from datetime import datetime
+from json import loads
 from json import loads as jsonloads
-from subprocess import check_call
-from os import execl, system, _exit
-from os import name as osname
 from locale import getdefaultlocale
+from os import _exit, execl, mkdir
+from os import name as osname
+from os import path, system
+from pathlib import Path
 from socket import socket
 from sqlite3 import connect as sqlconn
-import sys
+from subprocess import check_call
+from threading import Thread, Timer
+from time import sleep, time
+from tkinter import (BOTH, END, LEFT, RIGHT, Button, Checkbutton, E, Entry,
+                     Frame, IntVar, Label, Listbox, N, PhotoImage, S,
+                     Scrollbar, StringVar, Tk, Toplevel, W, messagebox, ttk)
+from tkinter.font import Font
+from urllib.request import urlopen, urlretrieve
+from webbrowser import open_new_tab
 
+from requests import get
 
 # Version number
 VERSION = 2.4
@@ -2493,7 +2490,8 @@ except ModuleNotFoundError:
     _exit(1)
 
 try:
-    from base64 import urlsafe_b64encode as b64e, urlsafe_b64decode as b64d
+    from base64 import urlsafe_b64decode as b64d
+    from base64 import urlsafe_b64encode as b64e
 except ModuleNotFoundError:
     print("Base64 is not installed. "
           + "Please manually install \"base64\""

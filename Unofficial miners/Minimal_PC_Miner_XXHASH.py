@@ -2,11 +2,12 @@
 # Minimal version of Duino-Coin PC Miner
 # Using the XXHASH algorithm
 # Created by revox 2020-2021
-import socket
-import urllib.request
-import time
 import os
+import socket
 import sys  # Only python3 included libraries
+import time
+import urllib.request
+
 import xxhash  # use python3 -m pip install xxhash to install xxhash
 
 soc = socket.socket()

@@ -12,12 +12,20 @@ discord_key = "" # coming soon
 
 # --------------------------------------------------------------- #
 
-import multiprocessing, threading, socket, hashlib, os, urllib.request, statistics, random, sys, time
-
+import hashlib
+import multiprocessing
+import os
+import random
+import socket
+import statistics
+import sys
+import threading
+import time
+import urllib.request
 
 if sys.platform == "win32":
     try:
-        from colorama import init, Fore, Back, Style
+        from colorama import Back, Fore, Style, init
         init()
     except:
         print("You don't have colorama installed. Try to install it now?")
