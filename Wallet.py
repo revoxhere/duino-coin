@@ -2509,8 +2509,12 @@ except ModuleNotFoundError:
           + "Please manually install \"tronpy\" "
           + "if you intend on using wDUCO wrapper.")
 else:
-    tron = tronpy.Tron()
-    wduco = tron.get_contract("TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U")
+    try:
+        tron = tronpy.Tron()
+        wduco = tron.get_contract("TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U")
+    except:
+        TRONPY_ENABLED = False
+        print("Tron-side error, disabling wrapper for this session")
 
 with urlopen(
     "https://raw.githubusercontent.com/"
