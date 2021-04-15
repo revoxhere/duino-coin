@@ -115,13 +115,13 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
-*   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) by DoctorEenot
-*   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) by fabiopolancoe
-*   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) by PhereloHD & HGEpro
-*   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) by Alicia426
-*   [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch
-*   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) by DarkThinking
-*   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) by phantom32
+*   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - mine with less connections on multiple devices by DoctorEenot
+*   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - MicroPython miner or ESP boards by fabiopolancoe
+*   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Python miner for Nintendo 3DS by PhereloHD & HGEpro
+*   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Miner in Docker by Alicia426
+*   [nonceMiner](https://github.com/colonelwatch/nonceMiner) - Fastest Duino-Coin miner available by colonelwatch
+*   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) - simple NodeJS miner by DarkThinking
+*   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - pure C miner by phantom32
 *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
 *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
 *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
@@ -132,10 +132,10 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 
 **Other tools:**
 *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
-*   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) by LDarki
-*   [DUCO Monitor](https://siunus.github.io/duco-monitor/) by siunus
-*   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
-*   [Duino Stats](https://github.com/Bilaboz/duino-stats) (Discord bot) by Bilaboz
+*   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) for Chrome and derivatives by LDarki
+*   [DUCO Monitor](https://siunus.github.io/duco-monitor/) account statistics website by siunus
+*   [duino-tools](https://github.com/kyngs/duino-tools) written in Java by kyngs
+*   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
 <!--*   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz (DEPRECATED) -->
 
 This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
