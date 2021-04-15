@@ -723,6 +723,7 @@ def Thread(
                 # Establish socket connection to the server
                 soc.connect((str(masterServer_address),
                              int(masterServer_port)))
+                soc.settimeout(timeout)
                 serverVersion = soc.recv(3).decode().rstrip(
                     "\n")  # Get server version
                 debugOutput("Server version: " + serverVersion)
@@ -1271,7 +1272,7 @@ if __name__ == "__main__":
                     hashrates_list,
                     totalhashrate_mean))
             thread[x].start()
-            sleep(0.05)
+            sleep(0.1)
     except Exception as e:
         prettyPrint(
             "sys0",
