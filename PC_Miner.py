@@ -39,8 +39,6 @@ def now():
 
 try:
     # Check if cpuinfo is installed
-    from multiprocessing import freeze_support
-
     import cpuinfo
 except ModuleNotFoundError:
     print(
@@ -1183,6 +1181,8 @@ def updateRichPresence():
 
 
 if __name__ == "__main__":
+    from multiprocessing import freeze_support
+    freeze_support()
     # Processor info
     cpu = cpuinfo.get_cpu_info()
     # Colorama
@@ -1190,18 +1190,17 @@ if __name__ == "__main__":
     title(getString("duco_python_miner") + str(minerVersion) + ")")
 
     try:
-        from multiprocessing import (Manager, Process, Value, cpu_count,
-                                     current_process)
+        from multiprocessing import Manager, Process, Value, cpu_count, current_process
         manager = Manager()
         # Multiprocessing fix for pyinstaller
-        freeze_support()
         # Multiprocessing globals
         khashcount = Value("i", 0)
         accepted = Value("i", 0)
         rejected = Value("i", 0)
         hashrates_list = manager.dict()
         totalhashrate_mean = manager.list()
-    except Exception:
+    except Exception as e:
+        print(e)
         prettyPrint(
             "sys0",
             " Multiprocessing is not available. "
