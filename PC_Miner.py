@@ -628,12 +628,14 @@ def ducos1(
     # DUCO-S1 algorithm
     # Measure starting time
     timeStart = time()
+    base_hash = sha1(str(lastBlockHash).encode('ascii'))
+    temp_hash = None
     # Loop from 1 too 100*diff
     for ducos1res in range(100 * int(difficulty) + 1):
         # Generate hash
-        ducos1 = sha1(
-            str(lastBlockHash + str(ducos1res)).encode("utf-8"))
-        ducos1 = ducos1.hexdigest()
+        temp_hash =  base_hash.copy()
+        temp_hash.update(str(ducos1res).encode('ascii'))
+        ducos1 = temp_hash.hexdigest()
         # Check if result was found
         if ducos1 == expectedHash:
             # Measure finish time
