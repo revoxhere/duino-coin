@@ -968,7 +968,6 @@ def Thread(
                                 + "ping "
                                 + str("%02.0f" % int(ping))
                                 + "ms")
-                            break  # Repeat
 
                         elif feedback == "BLOCK":
                             # If block was found
@@ -1025,7 +1024,6 @@ def Thread(
                                 + "ping "
                                 + str("%02.0f" % int(ping))
                                 + "ms")
-                            break  # Repeat
 
                         else:
                             # If result was incorrect
@@ -1083,7 +1081,7 @@ def Thread(
                                 + "ping "
                                 + str("%02.0f" % int(ping))
                                 + "ms")
-                            break  # Repeat
+                        break
                     break
             except Exception as e:
                 prettyPrint(
@@ -1097,9 +1095,8 @@ def Thread(
                     + ")",
                     "error")
                 debugOutput("Error while mining: " + str(e))
-                sleep(10)
+                sleep(5)
                 break
-
 
 def prettyPrint(messageType, message, state):
     # Print output messages in the DUCO "standard"
@@ -1236,6 +1233,15 @@ if __name__ == "__main__":
         Greeting()
         debugOutput("Greeting displayed")
     except Exception as e:
+        prettyPrint(
+            "sys0",
+            "Error displaying greeting message"
+            + Style.NORMAL
+            + Fore.RESET
+            + " (greeting err: "
+            + str(e)
+            + ")",
+            "error")
         debugOutput("Error displaying greeting message: " + str(e))
 
     try:
@@ -1265,6 +1271,15 @@ if __name__ == "__main__":
             thread[x].start()
             sleep(0.05)
     except Exception as e:
+        prettyPrint(
+            "sys0",
+            "Error launching CPU thread(s)"
+            + Style.NORMAL
+            + Fore.RESET
+            + " (cpu launch err: "
+            + str(e)
+            + ")",
+            "error")
         debugOutput("Error launching CPU thead(s): " + str(e))
 
     try:
