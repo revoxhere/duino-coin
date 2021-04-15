@@ -57,15 +57,16 @@ while True:
             # Split received data to job and difficulty
             job = job.split(",")
             difficulty = job[2]
-
+            
             hashingStartTime = time.time()
+            base_hash = hashlib.sha1(str(job[0]).encode('ascii'))
+            temp_hash = None
+            
             for result in range(100 * int(difficulty) + 1):
                 # Calculate hash with difficulty
-                ducos1 = hashlib.sha1(
-                    str(
-                        job[0]
-                        + str(result)
-                    ).encode("utf-8")).hexdigest()
+                temp_hash =  base_hash.copy()
+                temp_hash.update(str(result).encode('ascii'))
+                ducos1 = temp_hash.hexdigest()
 
                 # If hash is even with expected hash result
                 if job[1] == ducos1:
