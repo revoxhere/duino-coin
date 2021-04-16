@@ -28,8 +28,8 @@
 using namespace experimental::crypto;
 
 namespace {
-const char* ssid          = "Wifi SSID";   // Change this to your WiFi SSID
-const char* password      = "Wifi PASS";    // Change this to your WiFi password
+const char* ssid          = "WiFi SSID";   // Change this to your WiFi SSID
+const char* password      = "WiFi Pass";    // Change this to your WiFi password
 const char* ducouser      = "DUCO Username";     // Change this to your Duino-Coin username
 const char* rigIdentifier = "None";       // Change this if you want a custom miner name
 
@@ -39,7 +39,7 @@ unsigned int Shares = 0; // Share variable
 
 WiFiClient client;
 
-#define LED_BUILTIN 1
+#define LED_BUILTIN 2
 
 #define BLINK_SHARE_FOUND    1
 #define BLINK_SETUP_COMPLETE 2
@@ -47,6 +47,7 @@ WiFiClient client;
 #define BLINK_RESET_DEVICE   5
 
 void SetupWifi() {
+  pinMode(LED_BUILTIN, OUTPUT);
   Serial.println("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
   WiFi.begin(ssid, password); // Connect to wifi
@@ -81,19 +82,14 @@ void SetupOTA() {
   ArduinoOTA.begin();
 }
 
-void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
-  uint8_t state = HIGH;
-
-  pinMode(pin, FUNCTION_3); // Set to GPIO / OUTPUT mode
-  for (int x = 0; x < (count << 1); ++x) {
-    digitalWrite(pin, state ^= HIGH);
+void blink(uint8_t count) {
+  for (int x = 0; x < count; ++x) {
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(50);
+    digitalWrite(LED_BUILTIN, HIGH);
     delay(50);
   }
-
-  digitalWrite(pin, state); // NOTE: Is this really needed...?
-  pinMode(pin, FUNCTION_0); // Reset back to TX/RX Serial mode
   yield();  // register updates can take several cpu cycles;
-  // lets give them a chance to change
 }
 
 void RestartESP(String msg) {
