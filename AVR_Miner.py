@@ -199,6 +199,7 @@ def Connect():
                         + str(":")
                         + str(masterServer_port))
             socConn = socket()
+            socConn.settimeout(timeout)
             # Establish socket connection to the server
             socConn.connect(
                 (str(masterServer_address), int(masterServer_port)))
@@ -243,7 +244,6 @@ def Connect():
                 "error")
             debugOutput("Connection error: " + str(e))
             sleep(10)
-            restart_miner()
     return socConn
 
 
@@ -938,6 +938,7 @@ def AVRMine(com):
                         debugOutput("Error splitting data: " + str(e))
                         sleep(1)
 
+
                 try:
                     # Send result to the server
                     socConn.send(
@@ -1050,7 +1051,6 @@ def AVRMine(com):
                         + "ping "
                         + str("%02.0f" % int(ping))
                         + "ms")
-                    break  # Repeat
 
                 elif feedback == "BLOCK":
                     # If block was found
@@ -1106,7 +1106,6 @@ def AVRMine(com):
                         + "ping "
                         + str("%02.0f" % int(ping))
                         + "ms")
-                    break
 
                 else:
                     # If result was incorrect
@@ -1162,8 +1161,8 @@ def AVRMine(com):
                         + "ping "
                         + str("%02.0f" % int(ping))
                         + "ms")
-                    break  # Repeat
                 break
+
 
 
 if __name__ == "__main__":

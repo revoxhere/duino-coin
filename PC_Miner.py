@@ -39,8 +39,6 @@ def now():
 
 try:
     # Check if cpuinfo is installed
-    from multiprocessing import freeze_support
-
     import cpuinfo
 except ModuleNotFoundError:
     print(
@@ -628,12 +626,14 @@ def ducos1(
     # DUCO-S1 algorithm
     # Measure starting time
     timeStart = time()
+    base_hash = sha1(str(lastBlockHash).encode('ascii'))
+    temp_hash = None
     # Loop from 1 too 100*diff
     for ducos1res in range(100 * int(difficulty) + 1):
         # Generate hash
-        ducos1 = sha1(
-            str(lastBlockHash + str(ducos1res)).encode("utf-8"))
-        ducos1 = ducos1.hexdigest()
+        temp_hash =  base_hash.copy()
+        temp_hash.update(str(ducos1res).encode('ascii'))
+        ducos1 = temp_hash.hexdigest()
         # Check if result was found
         if ducos1 == expectedHash:
             # Measure finish time
@@ -721,6 +721,7 @@ def Thread(
                 # Establish socket connection to the server
                 soc.connect((str(masterServer_address),
                              int(masterServer_port)))
+                soc.settimeout(timeout)
                 serverVersion = soc.recv(3).decode().rstrip(
                     "\n")  # Get server version
                 debugOutput("Server version: " + serverVersion)
@@ -968,7 +969,6 @@ def Thread(
                                 + "ping "
                                 + str("%02.0f" % int(ping))
                                 + "ms")
-                            break  # Repeat
 
                         elif feedback == "BLOCK":
                             # If block was found
@@ -1025,7 +1025,6 @@ def Thread(
                                 + "ping "
                                 + str("%02.0f" % int(ping))
                                 + "ms")
-                            break  # Repeat
 
                         else:
                             # If result was incorrect
@@ -1083,7 +1082,7 @@ def Thread(
                                 + "ping "
                                 + str("%02.0f" % int(ping))
                                 + "ms")
-                            break  # Repeat
+                        break
                     break
             except Exception as e:
                 prettyPrint(
@@ -1097,9 +1096,8 @@ def Thread(
                     + ")",
                     "error")
                 debugOutput("Error while mining: " + str(e))
-                sleep(10)
+                sleep(5)
                 break
-
 
 def prettyPrint(messageType, message, state):
     # Print output messages in the DUCO "standard"
@@ -1183,6 +1181,8 @@ def updateRichPresence():
 
 
 if __name__ == "__main__":
+    from multiprocessing import freeze_support
+    freeze_support()
     # Processor info
     cpu = cpuinfo.get_cpu_info()
     # Colorama
@@ -1190,18 +1190,17 @@ if __name__ == "__main__":
     title(getString("duco_python_miner") + str(minerVersion) + ")")
 
     try:
-        from multiprocessing import (Manager, Process, Value, cpu_count,
-                                     current_process)
+        from multiprocessing import Manager, Process, Value, cpu_count, current_process
         manager = Manager()
         # Multiprocessing fix for pyinstaller
-        freeze_support()
         # Multiprocessing globals
         khashcount = Value("i", 0)
         accepted = Value("i", 0)
         rejected = Value("i", 0)
         hashrates_list = manager.dict()
         totalhashrate_mean = manager.list()
-    except Exception:
+    except Exception as e:
+        print(e)
         prettyPrint(
             "sys0",
             " Multiprocessing is not available. "
@@ -1236,6 +1235,15 @@ if __name__ == "__main__":
         Greeting()
         debugOutput("Greeting displayed")
     except Exception as e:
+        prettyPrint(
+            "sys0",
+            "Error displaying greeting message"
+            + Style.NORMAL
+            + Fore.RESET
+            + " (greeting err: "
+            + str(e)
+            + ")",
+            "error")
         debugOutput("Error displaying greeting message: " + str(e))
 
     try:
@@ -1263,8 +1271,17 @@ if __name__ == "__main__":
                     hashrates_list,
                     totalhashrate_mean))
             thread[x].start()
-            sleep(0.05)
+            sleep(0.1)
     except Exception as e:
+        prettyPrint(
+            "sys0",
+            "Error launching CPU thread(s)"
+            + Style.NORMAL
+            + Fore.RESET
+            + " (cpu launch err: "
+            + str(e)
+            + ")",
+            "error")
         debugOutput("Error launching CPU thead(s): " + str(e))
 
     try:

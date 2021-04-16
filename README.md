@@ -4,7 +4,7 @@
 -->
 
 <p align = "center">
-  <a href="https://github.com/revoxhere/duino-coin">
+  <a href="https://duinocoin.com">
     <img width="80%" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" />
   </a>
   <br />
@@ -20,10 +20,10 @@
 </p>
 <br />
 <p align = "center">
-  <a href="https://duinocoin.com">
-    <img src="https://img.shields.io/badge/duinocoin.com-555555.svg?style=for-the-badge&logo=data%3Aimage%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAAmklEQVQ4T7WUQQ6AIAwEIcaX%2BALj0fdz9gM%2BxMRESQ8ktSllrciZTneX0hg6n8h5Z5pvhD%2Bu26OO17iABaCBPwEJLKFV6ZZ1GQ2HwgqlEg51ATV7GhSyXFPjBpK6UsztdQdqjSDLNYVu4JGWaQjXLh%2BmaRn5eq8ybAGRWfx3sJFNo7lw%2FxStobkcWhlKYJf1ZS1XaggPNpIv3cls33EVXWotfwAAAABJRU5ErkJggg%3D%3D" /></a>
   <a href="https://wallet.duinocoin.com">
     <img src="https://img.shields.io/badge/Online Wallet-555555.svg?style=for-the-badge" /></a>
+  <a href="https://play.google.com/store/apps/details?id=com.pripun.duinocoin">
+    <img src="https://img.shields.io/badge/Android App-555555.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
     <img src="https://img.shields.io/badge/whitepaper-555555.svg?style=for-the-badge&logo=Academia" /></a>
   <a href="https://app.codacy.com/manual/revoxhere/duino-coin?utm_source=github.com&utm_medium=referral&utm_content=revoxhere/duino-coin">
@@ -35,11 +35,11 @@
     <img src="https://img.shields.io/codacy/grade/a995acf7cd4c4211af6da874fe549ee5?color=f68e09&style=for-the-badge" /></a>
   <a href="https://opensource.org/licenses/MIT">
     <img src="https://img.shields.io/badge/License-MIT-f97606.svg?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/releases/tag/2.3">
-    <img src="https://img.shields.io/badge/release-2.3-fb6404.svg?style=for-the-badge" /></a>
+  <a href="https://github.com/revoxhere/duino-coin/releases/tag/2.4">
+    <img src="https://img.shields.io/badge/release-2.4-fb6404.svg?style=for-the-badge" /></a>
 </p>
 
-<h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards and many more.</h2><br />
+<h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards, even Wifi routers and many more.</h2><br />
 
 <table align="center">
   <tr>
@@ -115,13 +115,13 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
-*   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) by DoctorEenot
-*   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) by fabiopolancoe
-*   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) by PhereloHD & HGEpro
-*   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) by Alicia426
-*   [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch
-*   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) by DarkThinking
-*   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) by phantom32
+*   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - mine with less connections on multiple devices by DoctorEenot
+*   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - MicroPython miner or ESP boards by fabiopolancoe
+*   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Python miner for Nintendo 3DS by PhereloHD & HGEpro
+*   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Miner in Docker by Alicia426
+*   [nonceMiner](https://github.com/colonelwatch/nonceMiner) - Fastest Duino-Coin miner available by colonelwatch
+*   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) - simple NodeJS miner by DarkThinking
+*   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - pure C miner by phantom32
 *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
 *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
 *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
@@ -132,10 +132,10 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 
 **Other tools:**
 *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
-*   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) by LDarki
-*   [DUCO Monitor](https://siunus.github.io/duco-monitor/) by siunus
-*   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
-*   [Duino Stats](https://github.com/Bilaboz/duino-stats) (Discord bot) by Bilaboz
+*   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) for Chrome and derivatives by LDarki
+*   [DUCO Monitor](https://siunus.github.io/duco-monitor/) account statistics website by siunus
+*   [duino-tools](https://github.com/kyngs/duino-tools) written in Java by kyngs
+*   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
 <!--*   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz (DEPRECATED) -->
 
 This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
