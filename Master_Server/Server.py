@@ -1555,7 +1555,6 @@ def handle(connection, address, minerapi, balances_to_update):
                 POOLCLASS = PF.Pool_Function_class(connection=connection)
                 POOLCLASS.login(data=data)
 
-
             elif data[0] == "PoolSync":
                 global_blocks = POOLCLASS.sync(data=data, global_blocks=global_blocks)
 
