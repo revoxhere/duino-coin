@@ -141,7 +141,7 @@ def update_job_tiers():
             "XXHASH": {
                 "difficulty": 10000,
                 "reward": .001,
-                "max_sharerate_per_sec": 1,
+                "max_sharerate_per_sec": 2,
                 "max_hashrate": 4500000
             },
             "NET": {
@@ -156,7 +156,7 @@ def update_job_tiers():
                 "difficulty": int(45000 * DIFF_MULTIPLIER),
                 "reward": .0012811,
                 "max_sharerate_per_sec": 2,
-                "max_hashrate": 200000
+                "max_hashrate": 1500000
             },
             "LOW": {
                 "difficulty": int(4000 * DIFF_MULTIPLIER),
@@ -189,9 +189,9 @@ def update_job_tiers():
                 "max_hashrate": 50000
             },
             "AVR": {
-                "difficulty": 7,
+                "difficulty": 6,
                 "reward": .0055,
-                "max_sharerate_per_sec": 2,
+                "max_sharerate_per_sec": 3,
                 "max_hashrate": 175
             }
         }
@@ -403,16 +403,16 @@ def input_management():
                 with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
-                            """UPDATE Users
+                        """UPDATE Users
                             set password = ?
                             where username = ?""",
-                            (duco_password, username))
+                        (duco_password, username))
                     conn.commit()
                 admin_print("Changed password")
             except Exception:
                 admin_print("Error changing password")
 
-            #with open(config_banned, 'a') as bansfile:
+            # with open(config_banned, 'a') as bansfile:
                 #bansfile.write(str(username) + "\n")
                 #admin_print("Added username to banlist")
 
@@ -436,7 +436,6 @@ def input_management():
             if confirm == "Y" or confirm == "y" or confirm == "":
                 os.system("sudo iptables -F INPUT")
                 os.system('clear')
-                s.close()
                 os.execl(sys.executable, sys.executable, *sys.argv)
             else:
                 admin_print("Canceled")
@@ -467,11 +466,11 @@ def input_management():
                     balance = str(datab.fetchone()[3])
 
                 admin_print(command[1]
-                    + "'s balance is "
-                    + str(balance)
-                    + ", set it to "
-                    + str(float(command[2]))
-                    + "?")
+                            + "'s balance is "
+                            + str(balance)
+                            + ", set it to "
+                            + str(float(command[2]))
+                            + "?")
 
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
@@ -496,7 +495,8 @@ def input_management():
                 else:
                     admin_print("Canceled")
             except Exception:
-                admin_print("User doesn't exist or you've entered wrong number")
+                admin_print(
+                    "User doesn't exist or you've entered wrong number")
 
         elif command[0] == "subtract":
             try:
@@ -510,11 +510,11 @@ def input_management():
                     balance = str(datab.fetchone()[3])
 
                 admin_print(command[1]
-                    + "'s balance is "
-                    + str(balance)
-                    + ", subtract "
-                    + str(float(command[2]))
-                    + "?")
+                            + "'s balance is "
+                            + str(balance)
+                            + ", subtract "
+                            + str(float(command[2]))
+                            + "?")
 
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
@@ -539,7 +539,8 @@ def input_management():
                 else:
                     admin_print("Canceled")
             except Exception:
-                admin_print("User doesn't exist or you've entered wrong number")
+                admin_print(
+                    "User doesn't exist or you've entered wrong number")
 
         elif command[0] == "add":
             try:
@@ -553,11 +554,11 @@ def input_management():
                     balance = str(datab.fetchone()[3])
 
                 admin_print(command[1]
-                    + "'s balance is "
-                    + str(balance)
-                    + ", add "
-                    + str(float(command[2]))
-                    + "?")
+                            + "'s balance is "
+                            + str(balance)
+                            + ", add "
+                            + str(float(command[2]))
+                            + "?")
 
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
@@ -582,7 +583,8 @@ def input_management():
                 else:
                     admin_print("Canceled")
             except Exception:
-                admin_print("User doesn't exist or you've entered wrong number")
+                admin_print(
+                    "User doesn't exist or you've entered wrong number")
 
 
 def user_exists(username):
@@ -626,9 +628,9 @@ def protocol_ducos1(data, connection, minerapi):
     global_last_block_hash_cp = global_last_block_hash
     is_first_share = True
     is_sharetime_test = False
+    diff_override = False
     accepted_shares = 0
     rejected_shares = 0
-    shares_per_sec = 0
     connection.settimeout(90)
     thread_id = threading.get_ident()
     while True:
@@ -743,24 +745,33 @@ def protocol_ducos1(data, connection, minerapi):
             except IndexError:
                 chipID = "None"
 
-        shares_per_sec += 1
-        minerapi[thread_id] = {
-            "User":                 str(username),
-            "Hashrate":             hashrate,
-            "Is estimated":         str(hashrate_is_estimated),
-            "Sharetime":            sharetime,
-            "Sharerate":            shares_per_sec,
-            "Accepted":             accepted_shares,
-            "Rejected":             rejected_shares,
-            "Algorithm":            "DUCO-S1",
-            "Diff":                 difficulty,
-            "Software":             str(miner_name),
-            "Identifier":           str(rig_identifier),
-            "Last share timestamp": now().strftime("%d/%m/%Y %H:%M:%S")}
+        try:
+            if thread_id in minerapi:
+                shares_per_sec = minerapi[thread_id]["Sharerate"] + 1
+            else:
+                shares_per_sec = 0
+            minerapi[thread_id] = {
+                "User":                 str(username),
+                "Hashrate":             hashrate,
+                "Is estimated":         str(hashrate_is_estimated),
+                "Sharetime":            sharetime,
+                "Sharerate":            shares_per_sec,
+                "Accepted":             accepted_shares,
+                "Rejected":             rejected_shares,
+                "Algorithm":            "DUCO-S1",
+                "Diff":                 difficulty,
+                "Software":             str(miner_name),
+                "Identifier":           str(rig_identifier),
+                "Last share timestamp": now().strftime("%d/%m/%Y %H:%M:%S")}
+        except Exception as e:
+            print(e)
+
+        if int(shares_per_sec) > int(job_tiers[req_difficulty]["max_sharerate_per_sec"]):
+            sleep(5)
 
         if int(calculated_hashrate) > int(max_hashrate):
+            difficulty = difficulty * 100
             send_data("BAD\n", connection)
-            rejected_shares += 1
 
         elif int(result[0]) == int(job[2]):
             if req_difficulty == "ESP32" or req_difficulty == "ESP8266":
@@ -791,6 +802,12 @@ def protocol_ducos1(data, connection, minerapi):
                 balances_to_update[username] += penalty
             else:
                 balances_to_update[username] = penalty
+
+
+def reset_shares_per_sec():
+    for miner in minerapi:
+        minerapi[miner]["Sharerate"] = 0
+    sleep(1)
 
 
 def protocol_xxhash(data, connection, minerapi):
@@ -941,13 +958,18 @@ def protocol_xxhash(data, connection, minerapi):
             else:
                 balances_to_update[username] = penalty
 
+
 def admin_print(*message):
     print(now().strftime("%H:%M:%S.%f:"), *message)
+
 
 def now():
     return datetime.now()
 
+
 global_cpu_usage = 0
+
+
 def get_cpu_usage():
     global global_cpu_usage
     global_cpu_usage = psutil.cpu_percent()
@@ -1183,14 +1205,24 @@ def protocol_login(data, connection):
                           or password == NodeS_Overide.encode('utf-8')):
                         send_data("OK", connection)
                         return False
-                    elif checkpw(password, stored_password):
-                        send_data("OK", connection)
-                        return True
-                    else:
-                        send_data("NO,Invalid password",
-                                  connection)
-                        return False
+                    try:
+                        if checkpw(password, stored_password):
+                            send_data("OK", connection)
+                            return True
+                        else:
+                            send_data("NO,Invalid password",
+                                      connection)
+                            return False
+                    except:
+                        if checkpw(password, stored_password.encode('utf-8')):
+                            send_data("OK", connection)
+                            return True
+                        else:
+                            send_data("NO,Invalid password",
+                                      connection)
+                            return False
             except Exception as e:
+                print(e)
                 send_data("NO,Error looking up account: " + str(e),
                           connection)
                 return False
@@ -1370,6 +1402,7 @@ def protocol_send_funds(data, connection, username):
             connection)
         return
 
+
 def protocol_get_balance(data, connection, username):
     """ Sends balance of user to the client
         raises an exception on error """
@@ -1490,7 +1523,7 @@ def handle(connection, address, minerapi, balances_to_update):
     logged_in = False
     global_connections += 1
     try:
-        connection.settimeout(20)
+        connection.settimeout(10)
         """ Send server version """
         send_data(SERVER_VER, connection)
 
@@ -1557,18 +1590,19 @@ def handle(connection, address, minerapi, balances_to_update):
                 POOLCLASS.login(data=data)
 
             elif data[0] == "PoolSync":
-                global_blocks = POOLCLASS.sync(data=data, global_blocks=global_blocks)
+                global_blocks = POOLCLASS.sync(
+                    data=data, global_blocks=global_blocks)
 
             elif data[0] == "PoolLogout":
                 POOLCLASS.logout(data=data)
 
             elif data[0] == "PoolLoginAdd":
-                PF.PoolLoginAdd(connection=connection, data=data, PoolPassword=PoolPassword)
+                PF.PoolLoginAdd(connection=connection,
+                                data=data, PoolPassword=PoolPassword)
 
             elif data[0] == "PoolLoginRemove":
-                PF.PoolLoginRemove(connection=connection, data=data, PoolPassword=PoolPassword)
-
-
+                PF.PoolLoginRemove(connection=connection,
+                                   data=data, PoolPassword=PoolPassword)
 
     except Exception as e:
         pass
@@ -1606,6 +1640,7 @@ class Server(object):
             process = start_new_thread(
                 handle, (conn, address, minerapi, balances_to_update))
 
+
 if __name__ == "__main__":
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
@@ -1616,6 +1651,7 @@ if __name__ == "__main__":
     threading.Thread(target=create_secondary_api_files).start()
     threading.Thread(target=remove_inactive_miners).start()
     threading.Thread(target=input_management).start()
+    threading.Thread(target=reset_shares_per_sec).start()
     server = Server(HOSTNAME, PORT)
     try:
         admin_print("Master Server is listening on port", PORT)
