@@ -2406,7 +2406,7 @@ def handle(c, ip):
                         if wrapfeedback != None:
                             soc.send(bytes(wrapfeedback, encoding="utf8"))
                         else:
-                            soc.send(bytes("None was returned", encodinn="utf8"))
+                            soc.send(bytes("OK, None was returned", encodinn="utf8"))
 
             ######################################################################
             elif str(data[0]) == "UNWRAP" and str(username) != "":
@@ -2419,7 +2419,7 @@ def handle(c, ip):
                     if unwrapfeedback != None:
                         soc.send(bytes(unwrapfeedback, encoding="utf8"))
                     else:
-                        soc.send(bytes("None was returned", encodinn="utf8"))
+                        soc.send(bytes("OK, None was returned", encodinn="utf8"))
                 else:
                     adminLog("unwrapper", "Wrapper disabled")
                     try:
