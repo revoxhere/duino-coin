@@ -923,156 +923,6 @@ def wraptx(duco_username, address, amount):
     return feedback
 
 
-
-def wrap(username, tron_address, amount):
-    try:
-        with sqlite3.connect(database) as conn:
-            datab = conn.cursor()
-            datab.execute(
-                "SELECT * FROM Users WHERE username = ?", (username,))
-            # Get current balance
-            balance = float(datab.fetchone()[3])
-    except Exception:
-        return "NO,Can't check balance"
-
-    if float(balance) < float(amount) or float(amount) <= 0:
-        return "NO,Incorrect amount"
-    elif float(balance) >= float(amount) and float(amount) > 0:
-        balancebackup = balance
-        adminLog(
-            "wrapper", "Backed up balance: " + str(balancebackup))
-        try:
-            adminLog(
-                "wrapper", "All checks done, initiating wrapping routine")
-            # Remove amount from senders' balance
-            balance -= float(amount)
-            adminLog(
-                "wrapper", "DUCO removed from pending balance")
-            with sqlite3.connect(database) as conn:
-                datab = conn.cursor()
-                datab.execute(
-                    "UPDATE Users set balance = ? where username = ?", (balance, username))
-                conn.commit()
-            adminLog(
-                "wrapper", "DUCO balance sent to DB, sending tron transaction")
-            adminLog("wrapper", "Tron wrapper called")
-            txn = wduco.functions.wrap(tron_address, int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(20_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
-            adminLog("wrapper", "Txid: " + txn.txid)
-            txn = txn.broadcast()
-            adminLog(
-                "wrapper", "Sent wrap tx to TRON network")
-            trontxfeedback = txn.result()
-
-            if trontxfeedback:
-                adminLog(
-                    "wrapper", "Successful wrapping")
-                try:
-                    with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
-                        datab = tranconn.cursor()
-                        now = datetime.datetime.now()
-                        formatteddatetime = now.strftime(
-                            "%d/%m/%Y %H:%M:%S")
-                        datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (
-                            formatteddatetime, username, str("wrapper - ")+str(tron_address), amount, lastBlockHash))
-                        tranconn.commit()
-                        return "OK,check your balances,"+str(lastBlockHash)
-                except Exception:
-                    pass
-            else:
-                try:
-                    datab.execute(
-                        "UPDATE Users set balance = ? where username = ?", (balancebackup, username))
-                    return "NO,Unknown error, transaction reverted"
-                except Exception:
-                    pass
-        except Exception:
-            pass
-    else:
-        return "NO,Wrapper disabled"
-        adminLog("wrapper", "Wrapper is disabled")
-
-
-
-def unwrap(username, tron_address, amount):
-        while True:
-            try:
-                with sqlite3.connect(database) as conn:
-                    adminLog(
-                        "unwrapper", "Retrieving user balance")
-                    datab = conn.cursor()
-                    datab.execute(
-                        "SELECT * FROM Users WHERE username = ?", (username,))
-                    # Get current balance
-                    balance = float(datab.fetchone()[3])
-                    break
-            except Exception:
-                pass
-        print("Balance retrieved")
-        wbalance = float(
-            int(wduco.functions.pendingWithdrawals(tron_address, username)))/10**6
-        if float(amount) <= float(wbalance) and float(amount) > 0:
-            if float(amount) >= 10:
-                if float(amount) <= float(wbalance):
-                    adminLog("unwrapper", "Correct amount")
-                    balancebackup = balance
-                    adminLog("unwrapper", "Updating DUCO Balance")
-                    balancebackup = balance
-                    balance = str(float(balance)+float(amount))
-                    while True:
-                        try:
-                            with sqlite3.connect(database) as conn:
-                                datab = conn.cursor()
-                                datab.execute(
-                                    "UPDATE Users set balance = ? where username = ?", (balance, username))
-                                conn.commit()
-                                break
-                        except Exception:
-                            pass
-                    try:
-                        adminLog(
-                            "unwrapper", "Sending tron transaction")
-                        txn = wduco.functions.confirmWithdraw(username, tron_address, int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(20_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
-                        adminLog("unwrapper", "Txid: " + txn.txid)
-                        txn = txn.broadcast()
-                        adminLog(
-                            "unwrapper", "Sent confirm tx to tron network")
-                        onchaintx = txn.result()
-
-                        if onchaintx:
-                            adminLog(
-                                "unwrapper", "Successful unwrapping")
-                            try:
-                                with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
-                                    datab = tranconn.cursor()
-                                    now = datetime.datetime.now()
-                                    formatteddatetime = now.strftime(
-                                        "%d/%m/%Y %H:%M:%S")
-                                    datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (
-                                        formatteddatetime, str("Wrapper - ")+str(tron_address), username, amount, lastBlockHash))
-                                    tranconn.commit()
-                                return "OK,Success, check your balances,"+str(lastBlockHash)
-                            except Exception:
-                                pass
-                        else:
-                            while True:
-                                try:
-                                    with sqlite3.connect(database) as conn:
-                                        datab = conn.cursor()
-                                        datab.execute(
-                                            "UPDATE Users set balance = ? where username = ?", (balancebackup, username))
-                                        conn.commit()
-                                        break
-                                except Exception:
-                                    pass
-                    except Exception:
-                        adminLog(
-                            "unwrapper", "Error with Tron blockchain")
-                        return "NO,error with Tron blockchain"
-                else:
-                    return "NO,Minimum amount is 10"
-
-
-
 def unwraptx(duco_username, recipient, amount, private_key, public_key):
     # wDUCO unwrapper
     txn = wduco.functions.initiateWithdraw(
@@ -2401,12 +2251,90 @@ def handle(c, ip):
                     except IndexError:
                         c.send(bytes("NO,Not enough data", encoding="utf8"))
                         break
-                    else:
-                        wrapfeedback = wrap(username, tron_address, amount)
-                        if wrapfeedback != None:
-                            soc.send(bytes(wrapfeedback, encoding="utf8"))
+                    try:
+                        with sqlite3.connect(database) as conn:
+                            datab = conn.cursor()
+                            datab.execute(
+                                "SELECT * FROM Users WHERE username = ?", (username,))
+                            # Get current balance
+                            balance = float(datab.fetchone()[3])
+                    except Exception:
+                        c.send(bytes("NO,Can't check balance", encoding='utf8'))
+                        break
+
+                    if float(balance) < float(amount) or float(amount) <= 0:
+                        try:
+                            c.send(bytes("NO,Incorrect amount", encoding='utf8'))
+                        except Exception:
+                            break
+                    elif float(balance) >= float(amount) and float(amount) > 0:
+                        if float(amount) < 10:
+                            try:
+                                c.send(
+                                    bytes("NO,minimum amount is 10 DUCO", encoding="utf8"))
+                                adminLog("wrapper", "Amount is below 10 DUCO")
+                            except Exception:
+                                break
                         else:
-                            soc.send(bytes("OK, None was returned", encodinn="utf8"))
+                            balancebackup = balance
+                            adminLog(
+                                "wrapper", "Backed up balance: " + str(balancebackup))
+                            try:
+                                adminLog(
+                                    "wrapper", "All checks done, initiating wrapping routine")
+                                # Remove amount from senders' balance
+                                balance -= float(amount)
+                                adminLog(
+                                    "wrapper", "DUCO removed from pending balance")
+                                with sqlite3.connect(database) as conn:
+                                    datab = conn.cursor()
+                                    datab.execute(
+                                        "UPDATE Users set balance = ? where username = ?", (balance, username))
+                                    conn.commit()
+                                adminLog(
+                                    "wrapper", "DUCO balance sent to DB, sending tron transaction")
+                                adminLog("wrapper", "Tron wrapper called")
+                                txn = wduco.functions.wrap(tron_address, int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+                                adminLog("wrapper", "Txid: " + txn.txid)
+                                txn = txn.broadcast()
+                                adminLog(
+                                    "wrapper", "Sent wrap tx to TRON network")
+                                trontxfeedback = txn.result()
+
+                                if trontxfeedback:
+                                    try:
+                                        c.send(
+                                            bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
+                                        adminLog(
+                                            "wrapper", "Successful wrapping")
+                                        try:
+                                            with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
+                                                datab = tranconn.cursor()
+                                                now = datetime.datetime.now()
+                                                formatteddatetime = now.strftime(
+                                                    "%d/%m/%Y %H:%M:%S")
+                                                datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (
+                                                    formatteddatetime, username, str("wrapper - ")+str(tron_address), amount, lastBlockHash))
+                                                tranconn.commit()
+                                            c.send(
+                                                bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
+                                        except Exception:
+                                            pass
+                                    except Exception:
+                                        break
+                                else:
+                                    try:
+                                        datab.execute(
+                                            "UPDATE Users set balance = ? where username = ?", (balancebackup, username))
+                                        c.send(
+                                            bytes("NO,Unknown error, transaction reverted", encoding="utf8"))
+                                    except Exception:
+                                        pass
+                            except Exception:
+                                pass
+                    else:
+                        c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
+                        adminLog("wrapper", "Wrapper is disabled")
 
             ######################################################################
             elif str(data[0]) == "UNWRAP" and str(username) != "":
@@ -2415,20 +2343,98 @@ def handle(c, ip):
                         "unwrapper", "Starting unwraping protocol by " + username)
                     amount = str(data[1])
                     tron_address = str(data[2])
-                    unwrapfeedback = unwrap(username, tron_address, amount)
-                    if unwrapfeedback != None:
-                        soc.send(bytes(unwrapfeedback, encoding="utf8"))
-                    else:
-                        soc.send(bytes("OK, None was returned", encodinn="utf8"))
+                    while True:
+                        try:
+                            with sqlite3.connect(database) as conn:
+                                adminLog(
+                                    "unwrapper", "Retrieving user balance")
+                                datab = conn.cursor()
+                                datab.execute(
+                                    "SELECT * FROM Users WHERE username = ?", (username,))
+                                # Get current balance
+                                balance = float(datab.fetchone()[3])
+                                break
+                        except Exception:
+                            pass
+                    print("Balance retrieved")
+                    wbalance = float(
+                        int(wduco.functions.pendingWithdrawals(tron_address, username)))/10**6
+                    if float(amount) <= float(wbalance) and float(amount) > 0:
+                        if float(amount) >= 10:
+                            if float(amount) <= float(wbalance):
+                                adminLog("unwrapper", "Correct amount")
+                                balancebackup = balance
+                                adminLog("unwrapper", "Updating DUCO Balance")
+                                balancebackup = balance
+                                balance = str(float(balance)+float(amount))
+                                while True:
+                                    try:
+                                        with sqlite3.connect(database) as conn:
+                                            datab = conn.cursor()
+                                            datab.execute(
+                                                "UPDATE Users set balance = ? where username = ?", (balance, username))
+                                            conn.commit()
+                                            break
+                                    except Exception:
+                                        pass
+                                try:
+                                    adminLog(
+                                        "unwrapper", "Sending tron transaction")
+                                    txn = wduco.functions.confirmWithdraw(username, tron_address, int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+                                    adminLog("unwrapper", "Txid: " + txn.txid)
+                                    txn = txn.broadcast()
+                                    adminLog(
+                                        "unwrapper", "Sent confirm tx to tron network")
+                                    onchaintx = txn.result()
+
+                                    if onchaintx:
+                                        adminLog(
+                                            "unwrapper", "Successful unwrapping")
+                                        try:
+                                            with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
+                                                datab = tranconn.cursor()
+                                                now = datetime.datetime.now()
+                                                formatteddatetime = now.strftime(
+                                                    "%d/%m/%Y %H:%M:%S")
+                                                datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (
+                                                    formatteddatetime, str("Wrapper - ")+str(tron_address), username, amount, lastBlockHash))
+                                                tranconn.commit()
+                                            c.send(
+                                                bytes("OK,Success, check your balances,"+str(lastBlockHash), encoding='utf8'))
+                                        except Exception:
+                                            pass
+                                    else:
+                                        while True:
+                                            try:
+                                                with sqlite3.connect(database) as conn:
+                                                    datab = conn.cursor()
+                                                    datab.execute(
+                                                        "UPDATE Users set balance = ? where username = ?", (balancebackup, username))
+                                                    conn.commit()
+                                                    break
+                                            except Exception:
+                                                pass
+                                except Exception:
+                                    adminLog(
+                                        "unwrapper", "Error with Tron blockchain")
+                                    try:
+                                        c.send(
+                                            bytes("NO,error with Tron blockchain", encoding="utf8"))
+                                        break
+                                    except Exception:
+                                        break
+                            else:
+                                try:
+                                    c.send(
+                                        bytes("NO,Minimum amount is 10", encoding="utf8"))
+                                except Exception:
+                                    break
                 else:
                     adminLog("unwrapper", "Wrapper disabled")
                     try:
                         c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
                     except Exception:
                         break
-
-
-
         except Exception as ex:
             #print("[handle] Exception thrown:\n", ex)
             connectionCleanup(ip, username, thread_id)
