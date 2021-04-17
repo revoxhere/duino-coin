@@ -1549,10 +1549,26 @@ def handle(connection, address, minerapi, balances_to_update):
                     send_data("NO,Not logged in", connection)
 
             elif data[0] == "POOLList":
-                PF.PoolList()
-
-            elif data[0] == "POOLList":
                 PF.PoolList(connection=connection)
+
+            elif data[0] == "PoolLogin":
+                POOLCLASS = PF.Pool_Function_class(connection=connection)
+                POOLCLASS.login(data=data)
+
+
+            elif data[0] == "PoolSync":
+                global_blocks = POOLCLASS.sync(data=data, global_blocks=global_blocks)
+
+            elif data[0] == "PoolLogout":
+                POOLCLASS.logout(data=data)
+
+            elif data[0] == "PoolLoginAdd":
+                PF.PoolLoginAdd(connection=connection, data=data, PoolPassword=PoolPassword)
+
+            elif data[0] == "PoolLoginRemove":
+                PF.PoolLoginRemove(connection=connection, data=data, PoolPassword=PoolPassword)
+
+
 
     except Exception as e:
         pass
