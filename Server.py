@@ -956,7 +956,7 @@ def wrap(username, tron_address, amount):
             adminLog(
                 "wrapper", "DUCO balance sent to DB, sending tron transaction")
             adminLog("wrapper", "Tron wrapper called")
-            txn = wduco.functions.wrap(tron_address, int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+            txn = wduco.functions.wrap(tron_address, int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(20_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
             adminLog("wrapper", "Txid: " + txn.txid)
             txn = txn.broadcast()
             adminLog(
@@ -1031,7 +1031,7 @@ def unwrap(username, tron_address, amount):
                     try:
                         adminLog(
                             "unwrapper", "Sending tron transaction")
-                        txn = wduco.functions.confirmWithdraw(username, tron_address, int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+                        txn = wduco.functions.confirmWithdraw(username, tron_address, int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(20_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
                         adminLog("unwrapper", "Txid: " + txn.txid)
                         txn = txn.broadcast()
                         adminLog(
@@ -2405,6 +2405,8 @@ def handle(c, ip):
                         wrapfeedback = wrap(username, tron_address, amount)
                         if wrapfeedback != None:
                             soc.send(bytes(wrapfeedback, encoding="utf8"))
+                        else:
+                            soc.send(bytes("None was returned", encodinn="utf8"))
 
             ######################################################################
             elif str(data[0]) == "UNWRAP" and str(username) != "":
@@ -2416,6 +2418,8 @@ def handle(c, ip):
                     unwrapfeedback = unwrap(username, tron_address, amount)
                     if unwrapfeedback != None:
                         soc.send(bytes(unwrapfeedback, encoding="utf8"))
+                    else:
+                        soc.send(bytes("None was returned", encodinn="utf8"))
                 else:
                     adminLog("unwrapper", "Wrapper disabled")
                     try:
