@@ -32,6 +32,8 @@ import psutil
 import ssl
 import sys
 import smtplib
+import pool_functions as PF
+from server_functions import receive_data, send_data
 
 # Global variables
 HOSTNAME = ""
@@ -378,7 +380,7 @@ def input_management():
     while True:
         command = input("DUCO Console $ ")
         command = command.split(" ")
-        
+
         if command[0] == "help":
             admin_print("""Available commands:
             - help - shows this help menu
@@ -400,9 +402,9 @@ def input_management():
                 with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
-                            """UPDATE Users 
-                            set password = ? 
-                            where username = ?""", 
+                            """UPDATE Users
+                            set password = ?
+                            where username = ?""",
                             (duco_password, username))
                     conn.commit()
                 admin_print("Changed password")
@@ -443,9 +445,9 @@ def input_management():
                 with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
-                        """SELECT * 
-                        FROM Users 
-                        WHERE username = ?""", 
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
                         (command[1],))
                     balance = str(datab.fetchone()[3])
                     admin_print(command[1] + "'s balance: " + str(balance))
@@ -457,17 +459,17 @@ def input_management():
                 with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
-                        """SELECT * 
-                        FROM Users 
-                        WHERE username = ?""", 
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
                         (command[1],))
                     balance = str(datab.fetchone()[3])
 
-                admin_print(command[1] 
-                    + "'s balance is " 
-                    + str(balance) 
-                    + ", set it to " 
-                    + str(float(command[2])) 
+                admin_print(command[1]
+                    + "'s balance is "
+                    + str(balance)
+                    + ", set it to "
+                    + str(float(command[2]))
                     + "?")
 
                 confirm = input("  Y/n")
@@ -475,18 +477,18 @@ def input_management():
                     with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
-                            """UPDATE Users 
-                            set balance = ? 
-                            where username = ?""", 
+                            """UPDATE Users
+                            set balance = ?
+                            where username = ?""",
                             (float(command[2]), command[1]))
                         conn.commit()
 
                     with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
-                            """SELECT * 
-                            FROM Users 
-                            WHERE username = ?""", 
+                            """SELECT *
+                            FROM Users
+                            WHERE username = ?""",
                             (command[1],))
                         balance = str(datab.fetchone()[3])
                         admin_print("User balance is now " + str(balance))
@@ -500,17 +502,17 @@ def input_management():
                 with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
-                        """SELECT * 
-                        FROM Users 
-                        WHERE username = ?""", 
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
                         (command[1],))
                     balance = str(datab.fetchone()[3])
 
-                admin_print(command[1] 
-                    + "'s balance is " 
-                    + str(balance) 
-                    + ", subtract " 
-                    + str(float(command[2])) 
+                admin_print(command[1]
+                    + "'s balance is "
+                    + str(balance)
+                    + ", subtract "
+                    + str(float(command[2]))
                     + "?")
 
                 confirm = input("  Y/n")
@@ -518,18 +520,18 @@ def input_management():
                     with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
-                            """UPDATE Users 
-                            set balance = ? 
-                            where username = ?""", 
+                            """UPDATE Users
+                            set balance = ?
+                            where username = ?""",
                             (float(balance)-float(command[2]), command[1]))
                         conn.commit()
 
                     with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
-                            """SELECT * 
-                            FROM Users 
-                            WHERE username = ?""", 
+                            """SELECT *
+                            FROM Users
+                            WHERE username = ?""",
                             (command[1],))
                         balance = str(datab.fetchone()[3])
                     admin_print("User balance is now " + str(balance))
@@ -543,17 +545,17 @@ def input_management():
                 with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
-                        """SELECT * 
-                        FROM Users 
-                        WHERE username = ?""", 
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
                         (command[1],))
                     balance = str(datab.fetchone()[3])
 
-                admin_print(command[1] 
-                    + "'s balance is " 
-                    + str(balance) 
-                    + ", add " 
-                    + str(float(command[2])) 
+                admin_print(command[1]
+                    + "'s balance is "
+                    + str(balance)
+                    + ", add "
+                    + str(float(command[2]))
                     + "?")
 
                 confirm = input("  Y/n")
@@ -561,18 +563,18 @@ def input_management():
                     with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
-                            """UPDATE Users 
-                            set balance = ? 
-                            where username = ?""", 
+                            """UPDATE Users
+                            set balance = ?
+                            where username = ?""",
                             (float(balance)+float(command[2]), command[1]))
                         conn.commit()
 
                     with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
-                            """SELECT * 
-                            FROM Users 
-                            WHERE username = ?""", 
+                            """SELECT *
+                            FROM Users
+                            WHERE username = ?""",
                             (command[1],))
                         balance = str(datab.fetchone()[3])
                     admin_print("User balance is now " + str(balance))
@@ -827,14 +829,14 @@ def protocol_xxhash(data, connection, minerapi):
                 "BAD,No username specified\n",
                 connection)
             return
-        
+
         if is_first_share:
             req_difficulty = "XXHASH"
             difficulty = job_tiers[req_difficulty]["difficulty"]
 
         elif not is_first_share and not is_sharetime_test:
             difficulty = kolka_v3(sharetime, expected_sharetime, difficulty)
-            
+
         if not is_first_share and fastrandint(12) > 10:
             """ There's a 16.6% to get a sharetime-exploit test
                 (10 options, 11 and 12 = test; ergo 2 out of 12)
@@ -1012,8 +1014,8 @@ def get_balance_list():
     with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute(
-            """SELECT * 
-            FROM Users 
+            """SELECT *
+            FROM Users
             ORDER BY balance DESC""")
         for row in datab.fetchall():
             if float(row[3]) > 0:
@@ -1262,7 +1264,7 @@ def protocol_register(data, connection):
         return
 
     if send_registration_email(username, email):
-        """ Register a new account if  the registration 
+        """ Register a new account if  the registration
             e-mail was sent sucessfully """
         try:
             with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
@@ -1303,8 +1305,8 @@ def protocol_send_funds(data, connection, username):
         with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
             datab.execute(
-                """SELECT * 
-                FROM Users 
+                """SELECT *
+                FROM Users
                 WHERE username = ?""",
                 (username,))
             balance = float(datab.fetchone()[3])
@@ -1327,8 +1329,8 @@ def protocol_send_funds(data, connection, username):
                     (balance, username))
 
                 datab.execute(
-                    """SELECT * 
-                    FROM Users 
+                    """SELECT *
+                    FROM Users
                     WHERE username = ?""",
                     (recipient,))
                 recipientbal = float(datab.fetchone()[3])
@@ -1346,7 +1348,7 @@ def protocol_send_funds(data, connection, username):
                 formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
                 datab.execute(
                     """INSERT INTO Transactions
-                    (timestamp, username, recipient, amount, hash) 
+                    (timestamp, username, recipient, amount, hash)
                     VALUES(?, ?, ?, ?, ?)""",
                     (formatteddatetime,
                         username,
@@ -1367,38 +1369,14 @@ def protocol_send_funds(data, connection, username):
             connection)
         return
 
-
-def receive_data(connection):
-    """ Returns received data from the connection,
-        raises an exception on error """
-    data = connection.recv(1024)
-    if not data:
-        raise Exception("Connection closed unexpectedly")
-        connection.close()
-        return None
-    else:
-        data = data.decode("utf8").replace("\n", "").split(",")
-        return data
-
-
-def send_data(data, connection):
-    """ Sends data to the connection,
-        raises an exception on error """
-    try:
-        connection.send(bytes(str(data), encoding="utf8"))
-    except Exception:
-        raise Exception("Connection closed unexpectedly")
-        connection.close()
-
-
 def protocol_get_balance(data, connection, username):
-    """ Sends balance of user to the client 
+    """ Sends balance of user to the client
         raises an exception on error """
     try:
         with sqlconnection(database, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
-            datab.execute("""SELECT * 
-                FROM Users 
+            datab.execute("""SELECT *
+                FROM Users
                 WHERE username = ?""",
                           (username,))
             balance = str(datab.fetchone()[3])
@@ -1569,6 +1547,12 @@ def handle(connection, address, minerapi, balances_to_update):
                     protocol_send_funds(data, connection, username)
                 else:
                     send_data("NO,Not logged in", connection)
+
+            elif data[0] == "POOLList":
+                PF.PoolList()
+
+            elif data[0] == "POOLList":
+                PF.PoolList(connection=connection)
 
     except Exception as e:
         pass
