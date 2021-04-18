@@ -68,6 +68,7 @@ int ducos1a(String lastblockhash, String newblockhash, int difficulty) {
       return ducos1res;
     }
   }
+  return 0;
 }
 
 // Infinite loop
