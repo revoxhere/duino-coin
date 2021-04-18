@@ -15,7 +15,7 @@ from hashlib import sha1
 from time import time, sleep
 from sys import exit
 from re import sub, match
-from datetime import datetime
+from datetime import datetime, date
 from sqlite3 import connect as sqlconnection
 from os import path as ospath
 from kolka_module import *
@@ -25,6 +25,7 @@ from email.mime.multipart import MIMEMultipart
 from collections import OrderedDict
 from operator import itemgetter
 from xxhash import xxh64
+from shutil import copyfile
 import configparser
 import requests
 import json
@@ -68,15 +69,21 @@ except Exception as e:
         NodeS_Username = ???""")
     exit()
 
+
+
 # DB files
-blockchain = 'duino_blockchain.db'
 database = 'crypto_database.db'
+blockchain = 'duino_blockchain.db'
 config_base_dir = "config"
 config_db_transactions = config_base_dir + "/transactions.db"
 config_db_foundBlocks = config_base_dir + "/foundBlocks.db"
-
+config_lastblock = config_base_dir + "/lastblock"
+config_blocks = config_base_dir + "/blocks"
+config_banned = config_base_dir + "/banned.txt"
+config_whitelisted = config_base_dir + "/whitelisted.txt"
+config_whitelistedUsernames = config_base_dir + "/whitelistedUsernames.txt"
 global_blocks = 1
-expected_sharetime = 10
+expected_sharetime = 7
 global_connections = 0
 duco_price, duco_price_justswap, duco_price_nodes = 0, 0, 0
 
@@ -87,7 +94,40 @@ pregenerated_jobs_avr = {}
 pregenerated_jobs_oldesp = {}
 pregenerated_jobs_esp32 = {}
 pregenerated_jobs_esp8266 = {}
+
 banlist = []
+whitelisted_usernames = []
+whitelisted_ips = []
+try:
+    # Read banned usernames
+    with open(config_banned, "r") as bannedusrfile:
+        bannedusr = bannedusrfile.read().splitlines()
+        print("Loaded banned usernames file")
+        for username in bannedusr:
+            banlist.append(username)
+except Exception as e:
+    print("Error reading banned usernames file: " + str(e))
+
+try:
+    # Read whitelisted IPs
+    with open(config_whitelisted, "r") as whitelistfile:
+        whitelisted = whitelistfile.read().splitlines()
+    print("Loaded whitelisted IPs file")
+    for ip in whitelisted:
+        whitelisted_ips.append(socket.gethostbyname(str(ip)))
+except Exception as e:
+    print("Error reading whitelisted IPs file: " + str(e))
+
+try:
+    # Read whitelisted usernames
+    with open(config_whitelistedUsernames, "r") as whitelistusrfile:
+        whitelistedusr = whitelistusrfile.read().splitlines()
+        print("Loaded whitelisted usernames file")
+        for username in whitelistedusr:
+            whitelisted_usernames.append(username)
+except Exception as e:
+    print("Error reading whitelisted usernames file: " + str(e))
+
 
 # Registration email - text version
 text = """\
@@ -126,6 +166,81 @@ html = """\
   </body>
 </html>
 """
+
+
+def create_backup():
+    """ Creates a backup folder every day """
+    if not ospath.isdir('backups/'):
+        os.mkdir('backups/')
+
+    while True:
+        today = date.today()
+        if not ospath.isdir('backups/'+str(today)+'/'):
+            os.mkdir('backups/'+str(today))
+            copyfile(blockchain, "backups/"+str(today)+"/"+blockchain)
+            copyfile(database, "backups/"+str(today)+"/"+database)
+            sleep(5)
+            with open("prices.txt", "a") as pricesfile:
+                pricesfile.write("," + str(duco_price).rstrip("\n"))
+            with open("pricesNodeS.txt", "a") as pricesNodeSfile:
+                pricesNodeSfile.write(
+                    "," + str(duco_price_nodes).rstrip("\n"))
+            with open("pricesJustSwap.txt", "a") as pricesJustSwapfile:
+                pricesJustSwapfile.write(
+                    "," + str(duco_price_justswap).rstrip("\n"))
+            admin_print("Backup finished")
+        # Run every 6h
+        sleep(3600*6)
+
+
+def unbanip(ip):
+    """ Unbans an IP """
+    os.system("sudo iptables -D INPUT -s "+str(ip)+" -j DROP")
+
+
+def permanent_ban(ip):
+    """ Bans as IP """
+    if (ip == "51.15.127.80" 
+        or ip == "wallet.duinocoin.com" 
+        or ip == "34.233.38.119"):
+        pass
+    else:
+        os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
+        ip_list.pop(ip)
+
+
+def temporary_ban(ip):
+    """ Temporarily bans IP """
+    if ip == "51.15.127.80" or ip == "wallet.duinocoin.com" or ip == "34.233.38.119":
+        pass
+    else:
+        os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
+        # Start auto-unban thread for this IP
+        threading.Timer(120.0, unbanip, [ip]).start()
+        ip_list.pop(ip)
+
+
+def countips():
+    """ Counts connections per IP """
+    while True:
+        for ip in ip_list.copy():
+            try:
+                if ip_list[ip] > MAX_MININIG_CONNECTIONS:
+                    if not ip in whitelisted_ips:
+                        temporary_ban(ip)
+            except Exception as e:
+                print(e)
+        sleep(5)
+
+
+def resetips():
+    """ Reset connections counter """
+    while True:
+        sleep(30)
+        ip_list.clear()
+
+ip_list = {}
+whitelisted_ips = []
 
 
 def update_job_tiers():
@@ -167,19 +282,19 @@ def update_job_tiers():
             "ESP32": {
                 "difficulty": 300,
                 "reward": .0045,
-                "max_sharerate_per_sec": 2,
-                "max_hashrate": 10000
+                "max_sharerate_per_sec": 6,
+                "max_hashrate": 13000
             },
             "ESP8266": {
                 "difficulty": 450,
                 "reward": .0025,
-                "max_sharerate_per_sec": 2,
+                "max_sharerate_per_sec": 3,
                 "max_hashrate": 11000
             },
             "ESP": {
                 "difficulty": 125,
                 "reward": .003,
-                "max_sharerate_per_sec": 2,
+                "max_sharerate_per_sec": 3,
                 "max_hashrate": 3000
             },
             "DUE": {
@@ -190,7 +305,7 @@ def update_job_tiers():
             },
             "AVR": {
                 "difficulty": 6,
-                "reward": .0055,
+                "reward": .0035,
                 "max_sharerate_per_sec": 3,
                 "max_hashrate": 175
             }
@@ -351,6 +466,8 @@ def database_updater():
                 datab = conn.cursor()
                 for user in balances_to_update.copy():
                     amount_to_update = balances_to_update[user]
+                    if amount_to_update > 0.0009:
+                        amount_to_update = 0.0009
                     # print("Updating", user, amount_to_update)
                     datab.execute(
                         """UPDATE Users
@@ -406,15 +523,15 @@ def input_management():
                         """UPDATE Users
                             set password = ?
                             where username = ?""",
-                        (duco_password, username))
+                        (DUCO_PASS, username))
                     conn.commit()
                 admin_print("Changed password")
-            except Exception:
-                admin_print("Error changing password")
+            except Exception as e:
+                admin_print("Error changing password: "+str(e))
 
-            # with open(config_banned, 'a') as bansfile:
-                #bansfile.write(str(username) + "\n")
-                #admin_print("Added username to banlist")
+            with open(config_banned, 'a') as bansfile:
+                bansfile.write(str(username) + "\n")
+                admin_print("Added username to banlist")
 
             try:
                 banlist.append(str(username))
@@ -617,7 +734,7 @@ def email_exists(email):
             return True
 
 
-def protocol_ducos1(data, connection, minerapi):
+def protocol_ducos1(data, connection, minerapi, address):
     """ DUCO-S1 (and DUCO-S1A) Mining protocol handler
         Takes:  data (JOB,username,requested_difficulty),
                 connection object, minerapi access
@@ -634,7 +751,6 @@ def protocol_ducos1(data, connection, minerapi):
     connection.settimeout(90)
     thread_id = threading.get_ident()
     while True:
-        sleep(.25)
         # Check if client still asks for JOB
         if not is_first_share:
             new_request = receive_data(connection)
@@ -643,6 +759,8 @@ def protocol_ducos1(data, connection, minerapi):
 
         if data[1]:
             username = str(data[1])
+            if username in banlist:
+                temporary_ban(address[0])
             if is_first_share:
                 if not user_exists(username):
                     send_data(
@@ -664,12 +782,13 @@ def protocol_ducos1(data, connection, minerapi):
         else:
             req_difficulty = "NET"
 
-        if username == "DEADBEEF":
+        if username in banlist:
+            permanent_ban(ip)
             break
 
         if username in miners_per_user:
             if miners_per_user[username] > MAX_MININIG_CONNECTIONS:
-                break
+                temporary_ban(address[0])
 
         if job_tiers[req_difficulty]["difficulty"] < 2500:
             job = get_pregenerated_job(req_difficulty)
@@ -766,11 +885,14 @@ def protocol_ducos1(data, connection, minerapi):
         except Exception as e:
             print(e)
 
-        if int(shares_per_sec) > int(job_tiers[req_difficulty]["max_sharerate_per_sec"]):
-            sleep(5)
+        if int(job_tiers[req_difficulty]["max_sharerate_per_sec"]) < int(minerapi[thread_id]["Sharerate"]):
+            sleep(3)
 
         if int(calculated_hashrate) > int(max_hashrate):
-            difficulty = difficulty * 100
+            rejected_shares += 1
+            if username == "revox":
+                print("wring hashrate revox")
+            sleep(7)
             send_data("BAD\n", connection)
 
         elif int(result[0]) == int(job[2]):
@@ -805,6 +927,7 @@ def protocol_ducos1(data, connection, minerapi):
 
 
 def reset_shares_per_sec():
+    global minerapi
     for miner in minerapi:
         minerapi[miner]["Sharerate"] = 0
     sleep(1)
@@ -836,6 +959,8 @@ def protocol_xxhash(data, connection, minerapi):
 
         if data[1]:
             username = str(data[1])
+            if username in banlist:
+                temporary_ban(address[0])
             if is_first_share:
                 if not user_exists(username):
                     send_data(
@@ -1523,7 +1648,12 @@ def handle(connection, address, minerapi, balances_to_update):
     logged_in = False
     global_connections += 1
     try:
-        connection.settimeout(10)
+        if (address[0] == "51.15.127.80"
+            or address[0] == "wallet.duinocoin.com"
+                or address[0] == "34.233.38.119"):
+            connection.settimeout(60*10)
+        else:
+            connection.settimeout(10)
         """ Send server version """
         send_data(SERVER_VER, connection)
 
@@ -1545,12 +1675,12 @@ def handle(connection, address, minerapi, balances_to_update):
                 """ Client requested the DUCO-S1 mining protocol,
                     it's not our job so we pass him to the
                     DUCO-S1 job handler """
-                protocol_ducos1(data, connection, minerapi)
+                protocol_ducos1(data, connection, minerapi, address)
 
             elif data[0] == "JOBXX":
                 """ Pass the client to the
                     XXHASH job handler """
-                protocol_xxhash(data, connection, minerapi)
+                protocol_xxhash(data, connection, minerapi, address)
 
             elif data[0] == "LOGI":
                 """ Client requested authentication """
@@ -1558,7 +1688,7 @@ def handle(connection, address, minerapi, balances_to_update):
                 if logged_in:
                     username = data[1]
                     if username in banlist:
-                        break
+                        temporary_ban(address[0])
 
             elif data[0] == "GTXL":
                 """ Client requested transaction list """
@@ -1644,14 +1774,21 @@ class Server(object):
 if __name__ == "__main__":
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
+    threading.Thread(target=countips).start()
+    threading.Thread(target=resetips).start()
+    threading.Thread(target=reset_shares_per_sec).start()
+
     threading.Thread(target=get_duco_prices).start()
     threading.Thread(target=update_job_tiers).start()
+    threading.Thread(target=remove_inactive_miners).start()
+
     threading.Thread(target=database_updater).start()
+    threading.Thread(target=create_backup).start()
+
     threading.Thread(target=create_main_api_file).start()
     threading.Thread(target=create_secondary_api_files).start()
-    threading.Thread(target=remove_inactive_miners).start()
+
     threading.Thread(target=input_management).start()
-    threading.Thread(target=reset_shares_per_sec).start()
     server = Server(HOSTNAME, PORT)
     try:
         admin_print("Master Server is listening on port", PORT)
@@ -1660,3 +1797,4 @@ if __name__ == "__main__":
         admin_print("Unexpected exception: ", e)
     finally:
         admin_print("Master Server is exiting")
+        os._exit(1)
