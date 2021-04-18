@@ -252,7 +252,7 @@ def update_job_tiers():
             },
             "XXHASH": {
                 "difficulty": 100000,
-                "reward": .001,
+                "reward": .0007,
                 "max_sharerate_per_sec": 2,
                 "max_hashrate": 4500000
             },
@@ -261,13 +261,13 @@ def update_job_tiers():
                                   / DIFF_INCREASES_PER
                                   * DIFF_MULTIPLIER) + 1,
                 "reward": .0012811,
-                "max_sharerate_per_sec": 1,
+                "max_sharerate_per_sec": 3,
                 "max_hashrate": 4500000
             },
             "MEDIUM": {
                 "difficulty": int(45000 * DIFF_MULTIPLIER),
                 "reward": .0012811,
-                "max_sharerate_per_sec": 2,
+                "max_sharerate_per_sec": 3,
                 "max_hashrate": 1500000
             },
             "LOW": {
@@ -277,7 +277,7 @@ def update_job_tiers():
                 "max_hashrate": 500000
             },
             "ESP32": {
-                "difficulty": 300,
+                "difficulty": 250,
                 "reward": .0045,
                 "max_sharerate_per_sec": 6,
                 "max_hashrate": 13000
@@ -938,8 +938,6 @@ def protocol_ducos1(data, connection, minerapi, address):
 
         if (job_tiers[req_difficulty]["max_sharerate_per_sec"]
                 < minerapi[thread_id]["Sharerate"]):
-            if username == "revox":
-                print("throttling revox")
             sleep(3)
 
         if int(calculated_hashrate) > int(max_hashrate):
@@ -1765,10 +1763,7 @@ def handle(connection, address, minerapi, balances_to_update):
             elif data[0] == "JOBXX":
                 """ Pass the client to the
                     XXHASH job handler """
-                try:
-                    protocol_xxhash(data, connection, minerapi, address)
-                except Exception as e:
-                    print(e)
+                protocol_xxhash(data, connection, minerapi, address)
 
             elif data[0] == "JOB":
                 """ Client requested the DUCO-S1 mining protocol,
