@@ -30,7 +30,7 @@
     <img src="https://img.shields.io/badge/release-2.3-fb6404.svg?style=for-the-badge" /></a>
 </p>
 
-<h2 align="center">Duino-Coin to moneta którę można wydobywać używając komputerów, płytek Raspberry Pi, Arduino, ESP i nie tylko.</h2><br />
+<h2 align="center">Duino-Coin to moneta którą można wydobywać używając komputerów, płytek Raspberry Pi, Arduino, ESP i nie tylko.</h2><br />
 
 <table align="center">
   <tr>
@@ -40,7 +40,7 @@
   <tr>
     <td>
       💻 Wspierana przez ogromną ilość platform<br>
-      👥 Przyjazna i rozwijająca się społeczność<br>
+      👥 Posiada przyjazną społeczność<br>
       💱 Łatwa w użyciu i wymianie<br>
       🌎 Dostępna wszędzie<br>
       :new: W pełni oryginalna<br>
