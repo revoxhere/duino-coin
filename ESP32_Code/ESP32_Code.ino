@@ -57,7 +57,23 @@ void Task1code( void * pvParameters ) {
   while (client1.connected()) {
     Serial.println("CORE1 Asking for a new job for user: " + String(ducouser));
     client1.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
-
+    while(!client1.available()){
+      if (!client1.connected())
+        break;
+      delay(10);
+    }
+    yield();
+    if (!client1.connected())
+      break;
+    delay(100);
+    yield();
+    int buff1size = client1.available();
+    Serial.print("CORE1 Buffer size is ");
+    Serial.println(buff1size);
+    if (buff1size<=10) {
+      Serial.println("CORE1 Buffer size is too small. Requesting another job.");
+      continue;
+    }
     String       hash1 = client1.readStringUntil(','); // Read data to the first peroid - last block hash
     String        job1 = client1.readStringUntil(','); // Read data to the next peroid - expected hash
     unsigned int diff1 = client1.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
@@ -89,7 +105,26 @@ void Task1code( void * pvParameters ) {
         float ElapsedTimeMiliSeconds1 = ElapsedTime1 / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds1 = ElapsedTimeMiliSeconds1 / 1000; // Convert to seconds
         float HashRate1 = iJob1 / ElapsedTimeSeconds1; // Calculate hashrate
+        if (!client1.connected()) {
+          Serial.println("CORE1 Lost connection. Trying to reconnect");
+          if (!client1.connect(host, port)) {
+            Serial.println("CORE1 connection failed");
+            break;
+          }
+          Serial.println("CORE1 Reconnection successful.");
+        }
         client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.3," + String(rigname)); // Send result to server
+        Serial.println("CORE1 Posting result and waiting for feedback.");
+        while(!client1.available()){
+          if (!client1.connected()) {
+            Serial.println("CORE1 Lost connection. Didn't receive feedback.");
+            break;
+          }
+          delay(10);
+          yield();
+        }
+        delay(100);
+        yield();
         String feedback1 = client1.readStringUntil('\n'); // Receive feedback
         Shares1++;
         Serial.println("CORE1 " + String(feedback1) + " share #" + String(Shares1) + " (" + String(iJob1) + ")" + " Hashrate: " + String(HashRate1));
@@ -130,7 +165,23 @@ void Task2code( void * pvParameters ) {
   while (client.connected()) {
     Serial.println("CORE2 Asking for a new job for user: " + String(ducouser));
     client.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
-
+    while(!client.available()){
+      if (!client.connected())
+        break;
+      delay(10);
+    }
+    yield();
+    if (!client.connected())
+      break;
+    delay(100);
+    yield();
+    int buff1size = client.available();
+    Serial.print("CORE1 Buffer size is ");
+    Serial.println(buff1size);
+    if (buff1size<=10) {
+      Serial.println("CORE1 Buffer size is too small. Requesting another job.");
+      continue;
+    }
     String       hash = client.readStringUntil(','); // Read data to the first peroid - last block hash
     String        job = client.readStringUntil(','); // Read data to the next peroid - expected hash
     unsigned int diff = client.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
@@ -169,7 +220,26 @@ void Task2code( void * pvParameters ) {
         float ElapsedTimeMiliSeconds = ElapsedTime / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
         float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
+        if (!client.connected()) {
+          Serial.println("CORE1 Lost connection. Trying to reconnect");
+          if (!client.connect(host, port)) {
+            Serial.println("CORE1 connection failed");
+            break;
+          }
+          Serial.println("CORE1 Reconnection successful.");
+        }
         client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.3," + String(rigname)); // Send result to server
+        Serial.println("CORE1 Posting result and waiting for feedback.");
+        while(!client.available()){
+          if (!client.connected()) {
+            Serial.println("CORE1 Lost connection. Didn't receive feedback.");
+            break;
+          }
+          delay(10);
+          yield();
+        }
+        delay(100);
+        yield();
         String feedback = client.readStringUntil('\n'); // Receive feedback
         Shares++;
         Serial.println("CORE2 " + String(feedback) + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate));
