@@ -153,7 +153,7 @@ if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
         lang = "russian"
     elif locale.startswith("de"):
         lang = "german"
-    elif locae.startswith("tr"):
+    elif locale.startswith("tr"):
         lang = "turkish"
     elif locale.startswith("zh"):
         lang = "chinese_simplified"
