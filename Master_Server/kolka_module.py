@@ -10,10 +10,27 @@ def kolka_v1(basereward, sharetime, difficulty, workers, penalty=False):
     else:
         rand = floatmap(fastrandint(100), 0, 100, 0.85, 1.15)
         output = (DIFF_MULTIPLIER * basereward
-                  + float(sharetime) / 10000000000
-                  + float(difficulty) / 100000000) * rand
-       	output = output - (workers / 10000000)
-    return float(output)
+                  + float(sharetime) / 10000
+                  + float(difficulty) / 1000000000) * rand
+       	output = output / 2
+        kolka = output + output * (0.75 ** (workers-1))
+    return float(kolka)
+
+
+def kolka_v2(current_difficulty, difficulty_list):
+    """ Kolka V2 system - move miner to the next diff tier """
+    if current_difficulty == "AVR":
+        return difficulty_list["ESP8266"]["difficulty"]
+    if current_difficulty == "ESP8266":
+        return difficulty_list["ESP32"]["difficulty"]
+    if current_difficulty == "ESP32":
+        return difficulty_list["LOW"]["difficulty"]
+    if current_difficulty == "LOW":
+        return difficulty_list["MEDIUM"]["difficulty"]
+    if current_difficulty == "MEDIUM":
+        return difficulty_list["NET"]["difficulty"]
+    if current_difficulty == "NET":
+        return difficulty_list["EXTREME"]["difficulty"]
 
 
 def kolka_v3(sharetime, expected_sharetime, difficulty):
