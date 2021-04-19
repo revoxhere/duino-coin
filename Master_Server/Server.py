@@ -48,6 +48,7 @@ SERVER_VER = 2.4
 READY_HASHES_NUM = 1000
 MOTD = """Kolka is superior"""
 MAX_MININIG_CONNECTIONS = 24
+MAX_CONNECTIONS = 34
 BLOCK_PROBABILITY = 1000000
 BLOCK_REWARD = 7.7
 
@@ -302,7 +303,7 @@ def update_job_tiers():
             },
             "AVR": {
                 "difficulty": 6,
-                "reward": .0035,
+                "reward": .005,
                 "max_sharerate_per_sec": 4,
                 "max_hashrate": 175
             }
@@ -1849,8 +1850,21 @@ class Server(object):
         self.socket.listen(0)
         while True:
             conn, address = self.socket.accept()
+            if address[0] in ip_list:
+                ip_list[address[0]] += 1
+            else:
+                ip_list[address[0]] = 1
+
+            if ip_list[address[0]] > MAX_CONNECTIONS:
+            	temporary_ban(address[0])
+
             process = start_new_thread(
                 handle, (conn, address, minerapi, balances_to_update))
+
+            if address[0] in ip_list:
+                ip_list[address[0]] -= 1
+            if ip_list[address[0]] <= 0:
+                del ip_list[address[0]]
 
 
 if __name__ == "__main__":
