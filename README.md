@@ -194,6 +194,7 @@ Server source code, documentation for API calls and official libraries for devel
 *   Arduino Pro Mini / Uno / Nano (ATmega328p @ 16 MHz 5V): ~155 H/s (15-20 DUCO/day)
 *   NodeMCU (ESP8266 @ 160 MHz): ~9.3 kH/s (~4.5 kH/s at 80 MHz clock) (8-12 DUCO/day)
 *   ESP32 (dual-threaded): ~13 kH/s (6 kH/s (core1) and 7 kH/s (core2)) (WIP)
+*   Raspberry Pi Zero: ~17 kH/s
 *   Raspberry Pi 3 (4 threads): ~440 kH/s
 *   Raspberry Pi 4 (4 threads): ~1.3 MH/s
 *   Intel Core i5 3230M (4 threads): ~2.2 MH/s
