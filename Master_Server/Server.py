@@ -203,7 +203,7 @@ def permanent_ban(ip):
         or ip == "wallet.duinocoin.com"
             or ip == "34.233.38.119"):
         pass
-    else:
+    elif not ip in whitelisted_ips:
         os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
         ip_list.pop(ip)
 
@@ -214,10 +214,10 @@ def temporary_ban(ip):
         or ip == "wallet.duinocoin.com"
             or ip == "34.233.38.119"):
         pass
-    else:
+    elif not ip in whitelisted_ips:
         os.system("sudo iptables -I INPUT -s "+str(ip)+" -j DROP")
         # Start auto-unban thread for this IP
-        threading.Timer(120.0, unbanip, [ip]).start()
+        threading.Timer(60.0, unbanip, [ip]).start()
         ip_list.pop(ip)
 
 
@@ -226,7 +226,7 @@ def countips():
     while True:
         for ip in ip_list.copy():
             try:
-                if ip_list[ip] > MAX_MININIG_CONNECTIONS:
+                if ip_list[ip] > MAX_CONNECTIONS:
                     if not ip in whitelisted_ips:
                         temporary_ban(ip)
             except Exception as e:
@@ -801,32 +801,17 @@ def protocol_ducos1(data, connection, minerapi, address):
     rejected_shares = 0
     connection.settimeout(90)
     thread_id = threading.get_ident()
-    #while True:
-        
-    # all data from main loop
-    #if not is_first_share:
-    #    new_request = receive_data(connection)
-    #    if new_request[0] != "JOB":
-    #        return
 
     if data[1]:
         username = str(data[1])
         if username in banlist:
             temporary_ban(address[0])
-        # very strange optimisation decision to check only first hash
-        # that leads to problems, with changing name on second hash
         if is_first_share:
             if not user_exists(username):
                 send_data(
                         "BAD,This user doesn't exist\n",
                         connection)
                 return
-        # client hash only 90 seconds to submit hash
-        # every sleep reduces that time
-        # better use nonblocking sockets with 'select'
-        # or having sleeping in the main loop
-        #else:
-            #sleep(3)
     else:
         send_data(
                 "BAD,No username specified\n",
@@ -919,7 +904,7 @@ def protocol_ducos1(data, connection, minerapi, address):
     if req_difficulty == "AVR":
         try:
             chipID = str(result[4])
-                # print("Chip ID:", chipID)
+            # print("Chip ID:", chipID)
         except IndexError:
             chipID = "None"
 
@@ -948,12 +933,7 @@ def protocol_ducos1(data, connection, minerapi, address):
                 < minerapi[thread_id]["Sharerate"]):
         sleep(3)
 
-    # calculated hash is already int
     if calculated_hashrate > int(max_hashrate):
-        #sleep(3)
-        # we don't need to sleep 
-        # senging data  on blocking socket will interupt thread anyway
-        # giving time to other threads
         send_data("BAD\n", connection)
         rejected_shares += 1
 
@@ -1021,18 +1001,6 @@ def protocol_xxhash(data, connection, minerapi, address, is_first_share):
     connection.settimeout(90)
     thread_id = threading.get_ident()
 
-    # There is already main loop
-    # no need for having loop for 1 job
-    #while True:
-        #sleep(.25)
-      
-    # we get only data from main loop
-    #if not is_first_share:
-    #    new_request = receive_data(connection)
-        # if there is 1 loop, we can rid of that statement
-        #if new_request[0] != "JOBXX":
-        #    return
-
     if data[1]:
         username = str(data[1])
         if username in banlist:
@@ -1048,6 +1016,10 @@ def protocol_xxhash(data, connection, minerapi, address, is_first_share):
                 "BAD,No username specified\n",
                 connection)
         return
+
+    if username in miners_per_user:
+        if miners_per_user[username] > MAX_MININIG_CONNECTIONS:
+            temporary_ban(address[0])
 
     if is_first_share:
         req_difficulty = "XXHASH"
@@ -1835,7 +1807,7 @@ def handle(connection, address, minerapi, balances_to_update):
             elif data[0] == "PoolLoginRemove":
                 PF.PoolLoginRemove(connection=connection,
                                    data=data, PoolPassword=PoolPassword)
-            #time.sleep(1)
+            sleep(0.5)
 
     except Exception as e:
         pass
@@ -1875,7 +1847,7 @@ class Server(object):
                 ip_list[address[0]] = 1
 
             if ip_list[address[0]] > MAX_CONNECTIONS:
-            	temporary_ban(address[0])
+                temporary_ban(address[0])
 
             process = start_new_thread(
                 handle, (conn, address, minerapi, balances_to_update))
