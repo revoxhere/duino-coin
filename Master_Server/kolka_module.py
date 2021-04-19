@@ -2,18 +2,38 @@
 # 2019-2021 Duino-Coin community
 from fastrand import pcg32bounded as fastrandint
 from math import floor
-DIFF_MULTIPLIER = 1
+MULTIPLIER = 1
+
 
 def kolka_v1(basereward, sharetime, difficulty, workers, penalty=False):
+    """ Kolka V1 reward system - to be extended in the future
+        Authors: revox """
     if penalty:
         output = float(int(int(sharetime) ** 2) / 1000000000) * -1
     else:
         rand = floatmap(fastrandint(100), 0, 100, 0.85, 1.15)
-        output = (DIFF_MULTIPLIER * basereward
-                  + float(sharetime) / 10000000000
-                  + float(difficulty) / 100000000) * rand
-       	output = output - (workers / 10000000)
-    return float(output)
+        output = ((MULTIPLIER * basereward
+                   + float(sharetime) / 10000
+                   + float(difficulty) / 1000000000) * rand) / 2
+        kolka = output + (output * (0.75 ** (workers-1)))
+    return float(kolka)
+
+
+def kolka_v2(current_difficulty, difficulty_list):
+    """ Kolka V2 system - move miner to the next diff tier
+        Authors: revox """
+    if current_difficulty == "AVR":
+        return difficulty_list["ESP8266"]["difficulty"]
+    if current_difficulty == "ESP8266":
+        return difficulty_list["ESP32"]["difficulty"]
+    if current_difficulty == "ESP32":
+        return difficulty_list["LOW"]["difficulty"]
+    if current_difficulty == "LOW":
+        return difficulty_list["MEDIUM"]["difficulty"]
+    if current_difficulty == "MEDIUM":
+        return difficulty_list["NET"]["difficulty"]
+    if current_difficulty == "NET":
+        return difficulty_list["EXTREME"]["difficulty"]
 
 
 def kolka_v3(sharetime, expected_sharetime, difficulty):
@@ -69,6 +89,7 @@ def kolka_v4(sharetime, expected_test_sharetime):
         except Exception:
             balancesToUpdate[username] = penalty
 
+
 def floatmap(x, in_min, in_max, out_min, out_max):
-    # Yes, this is Arduino's built in map function remade in python
+    # Arduino's built in map function remade in python
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
