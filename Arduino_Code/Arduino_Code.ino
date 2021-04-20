@@ -48,22 +48,19 @@ int ducos1a(String lastblockhash, String newblockhash, int difficulty) {
   // DUCO-S1 algorithm implementation for AVR boards (DUCO-S1A)
   // Difficulty loop
   int ducos1res = 0;
+  //Conversion
+  const char * c = newblockhash.c_str();
+  size_t len = strlen(c);
+  size_t final_len = len / 2;
+  unsigned char* newblockhash1 = (unsigned char*)malloc((final_len + 1) * sizeof(unsigned char));
+  for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
+    newblockhash1[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
   for (int ducos1res = 0; ducos1res < difficulty * 100 + 1; ducos1res++) {
     Sha1.init();
     Sha1.print(lastblockhash + ducos1res);
     // Get SHA1 result
     uint8_t * hash_bytes = Sha1.result();
-    // Cast result to array
-    for (int i = 0; i < 10; i++) {
-      for (int i = 0; i < 20; i++) {
-        // MSB to LSB (Depending on the address in hash_bytes)
-        buffer[2 * i] = "0123456789abcdef"[hash_bytes[i] >> 4];
-        // Choose that from the given array of characters
-        // and retreve the value from address next spot over
-        buffer[2 * i + 1] = "0123456789abcdef"[hash_bytes[i] & 0xf];
-      }
-    }
-    if (String(buffer) == String(newblockhash)) {
+    if (memcmp(hash_bytes, newblockhash1, sizeof(hash_bytes)) == 0) {
       // If expected hash is equal to the found hash, return the result
       return ducos1res;
     }
@@ -81,6 +78,7 @@ void loop() {
     newblockhash = Serial.readStringUntil(',');
     // Read difficulty
     difficulty = Serial.readStringUntil(',').toInt();
+    newblockhash.toUpperCase();
     // Start time measurement
     unsigned long startTime = micros();
     // Call DUCO-S1A hasher
