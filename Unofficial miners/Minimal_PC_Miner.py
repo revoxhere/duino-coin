@@ -17,10 +17,12 @@ while True:
     try:
         # This sections grabs pool adress and port from Duino-Coin GitHub file
         # Serverip file URL
-        serverip = ("https://raw.githubusercontent.com/"
-                    + "revoxhere/"
-                    + "duino-coin/gh-pages/"
-                    + "serverip.txt")
+        serverip = (
+            "https://raw.githubusercontent.com/"
+            + "revoxhere/"
+            + "duino-coin/gh-pages/"
+            + "serverip.txt"
+        )
 
         with urllib.request.urlopen(serverip) as content:
             # Read content and split into lines
@@ -40,32 +42,25 @@ while True:
         while True:
             if UseLowerDiff:
                 # Send job request for lower diff
-                soc.send(bytes(
-                    "JOB,"
-                    + str(username)
-                    + ",MEDIUM",
-                    encoding="utf8"))
+                soc.send(bytes("JOB," + str(username) + ",MEDIUM", encoding="utf8"))
             else:
                 # Send job request
-                soc.send(bytes(
-                    "JOB,"
-                    + str(username),
-                    encoding="utf8"))
+                soc.send(bytes("JOB," + str(username), encoding="utf8"))
 
             # Receive work
             job = soc.recv(1024).decode().rstrip("\n")
             # Split received data to job and difficulty
             job = job.split(",")
             difficulty = job[2]
-            
+
             hashingStartTime = time.time()
-            base_hash = hashlib.sha1(str(job[0]).encode('ascii'))
+            base_hash = hashlib.sha1(str(job[0]).encode("ascii"))
             temp_hash = None
-            
+
             for result in range(100 * int(difficulty) + 1):
                 # Calculate hash with difficulty
-                temp_hash =  base_hash.copy()
-                temp_hash.update(str(result).encode('ascii'))
+                temp_hash = base_hash.copy()
+                temp_hash.update(str(result).encode("ascii"))
                 ducos1 = temp_hash.hexdigest()
 
                 # If hash is even with expected hash result
@@ -75,34 +70,38 @@ while True:
                     hashrate = result / timeDifference
 
                     # Send numeric result to the server
-                    soc.send(bytes(
-                        str(result)
-                        + ","
-                        + str(hashrate)
-                        + ",Minimal_PC_Miner",
-                        encoding="utf8"))
+                    soc.send(
+                        bytes(
+                            str(result) + "," + str(hashrate) + ",Minimal_PC_Miner",
+                            encoding="utf8",
+                        )
+                    )
 
                     # Get feedback about the result
                     feedback = soc.recv(1024).decode().rstrip("\n")
                     # If result was good
                     if feedback == "GOOD":
-                        print("Accepted share",
-                              result,
-                              "Hashrate",
-                              int(hashrate/1000),
-                              "kH/s",
-                              "Difficulty",
-                              difficulty)
+                        print(
+                            "Accepted share",
+                            result,
+                            "Hashrate",
+                            int(hashrate / 1000),
+                            "kH/s",
+                            "Difficulty",
+                            difficulty,
+                        )
                         break
                     # If result was incorrect
                     elif feedback == "BAD":
-                        print("Rejected share",
-                              result,
-                              "Hashrate",
-                              int(hashrate/1000),
-                              "kH/s",
-                              "Difficulty",
-                              difficulty)
+                        print(
+                            "Rejected share",
+                            result,
+                            "Hashrate",
+                            int(hashrate / 1000),
+                            "kH/s",
+                            "Difficulty",
+                            difficulty,
+                        )
                         break
 
     except Exception as e:

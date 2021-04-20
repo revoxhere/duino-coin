@@ -22,29 +22,31 @@ from requests import get
 miner_q = queue.Queue()
 
 
-#====================================# Vars #====================================#
+# ====================================# Vars #====================================#
 
 
 TRANSACTIONS_URL = "http://51.15.127.80/transactions.json"
 
 API_URL = "http://51.15.127.80/api.json"
-SERVER_URL = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+SERVER_URL = (
+    "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+)
 
 duco_price = 0.003
 socket.setdefaulttimeout(10)
 
 
-#====================================# common functions #====================================#
+# ====================================# common functions #====================================#
 
 
 def decode_response(rec):
     return rec.decode().split(",")
 
 
-#====================================# Duco Transactions #====================================#
+# ====================================# Duco Transactions #====================================#
+
 
 class transaction_data:
-
     def __init__(self, data, token):
         self.data = data
         self.token = token
@@ -59,20 +61,16 @@ class transaction_data:
 
 
 class user_data:
-
     def __init__(self, data):
         self.data = data
-
 
     def diction(self):
         """Returns all transactions"""
         return self.data
 
-
     def tokens(self):
         """Returns all tokens"""
         return self.data.keys()
-
 
     def token(self, token):
         """Searches by token"""
@@ -83,57 +81,51 @@ class user_data:
                 # It is, so return the transaction data of it
                 return transaction_data(info, item)
 
-
     def time(self, time):
         """Searches by time"""
         for item in self.data.keys():
             info = self.data[item]
             # Checks whether the 'Time' is equal to the one searched
-            if info['Time'] == str(time):
+            if info["Time"] == str(time):
                 # It is, so return the transaction data of it
                 return transaction_data(info, item)
-
 
     def sender(self, sender):
         """Searches by sender"""
         for item in self.data.keys():
             info = self.data[item]
             # Checks whether the sender's the one being searched
-            if info['Sender'] == str(sender):
+            if info["Sender"] == str(sender):
                 # It is, so return the transaction data of it
                 return transaction_data(info, item)
-
 
     def recipient(self, recipient):
         """Searches by recipient"""
         for item in self.data.keys():
             info = self.data[item]
             # Checks whether the recipient's the one being searched
-            if info['Recipient'] == str(recipient):
+            if info["Recipient"] == str(recipient):
                 # It is, so return the transaction data of it
                 return transaction_data(info, item)
-
 
     def amount(self, amount):
         """Searches by amount"""
         for item in self.data.keys():
             info = self.data[item]
             # Checks whether the amount is the one being searched
-            if info['Amount'] == str(amount):
+            if info["Amount"] == str(amount):
                 # It is, so return the transaction data of it
                 return transaction_data(info, item)
 
 
-
 class transactions:
-
     def __init__(self):
         # Gets response from transactions.json on the masterserver
         response = requests.get(TRANSACTIONS_URL, data=None)
         # Checks whether data has been sent (http-code = ok)
         if response.status_code == 200:
             # The response was "ok" so get data from response body (content)
-            data1 = (response.content.decode())
+            data1 = response.content.decode()
         else:
             # The response was anything als than "ok", so report the error
             raise ConnectionError("Could not connect to server")
@@ -147,18 +139,15 @@ class transactions:
         # No username has been specified up until this point, so set it to "None"
         self.username = None
 
-
     def total_transactions(self):
         # Returns the amount of transactions
         return len(self.data)
-
 
     def print(self):
         # Iterates through every transactions
         for trans in self.data.keys():
             # and prints it
             print(self.data[trans])
-
 
     def all(self):
         # Creates a userdata-instance based on the data provided
@@ -178,7 +167,6 @@ class transactions:
 
         return total
 
-
     def user_transactions(self, username=None):
         # Checks whether a 'valid' username was specified.
         if username != None:
@@ -192,16 +180,14 @@ class transactions:
         # Iterates through every transaction available
         for trans in self.data.keys():
             # Stores the details of a transaction
-            info = (self.data[trans])
+            info = self.data[trans]
             # And checks whether the 'Sender' was the specified user
-            if info['Sender'] == self.username:
+            if info["Sender"] == self.username:
                 # It was, so the info gets pushed to the 'sent' variable
                 sent.update({trans: info})
 
-
         # return sent
         return user_data(data=sent)
-
 
     def user_transaction_qty(self, username=None):
         """Gets total amount of user sends"""
@@ -218,14 +204,13 @@ class transactions:
         # Iterates through every transaction available
         for trans in self.data.keys():
             # Stores the details in this variable
-            info = (self.data[trans])
+            info = self.data[trans]
             # And then checks whether the 'Sender' is the user specified
-            if info['Sender'] == self.username:
+            if info["Sender"] == self.username:
                 # It is the user specified, so add 1 to the transaction-counter
                 count += 1
 
         return count
-
 
     def user_reciepts(self, username=None):
         # Checks whether there's a valid username provided
@@ -241,15 +226,14 @@ class transactions:
         # Iterates through every transaction available
         for trans in self.data.keys():
             # Stores their details in this variable
-            info = (self.data[trans])
+            info = self.data[trans]
             # Checks whether the 'Recipient' is the user specified
-            if info['Recipient'] == self.username:
+            if info["Recipient"] == self.username:
                 # It is the user, so push the info to the variable
                 sent.update({trans: info})
 
         # Returns userdata based on received transactions
         return user_data(data=sent)
-
 
     def user_reciept_qty(self, username=None):
         """Gets total amount of user reciepts"""
@@ -266,15 +250,14 @@ class transactions:
         # Iterates through every transaction available
         for trans in self.data.keys():
             # Stores their details in this variable
-            info = (self.data[trans])
+            info = self.data[trans]
             # Checks whether the 'Recipient' is the user specified
-            if info['Recipient'] == self.username:
+            if info["Recipient"] == self.username:
                 # It is the user, so add 1 to the receive-counter
                 count += 1
 
         # Return the amount of received transactions.
         return count
-
 
     def total_duco_sent(self, username=None):
         """Gets total amount of duco sent by user"""
@@ -300,7 +283,6 @@ class transactions:
 
         # Returns the total duco sent
         return total
-
 
     def total_duco_received(self, username=None):
         """Gets total amount of duco recieved by user"""
@@ -328,8 +310,8 @@ class transactions:
         return total
 
 
+# ====================================# Duco Api #====================================#
 
-#====================================# Duco Api #====================================#
 
 def get_duco_price():
     """
@@ -339,7 +321,7 @@ def get_duco_price():
     if api_response.status_code == 200:
         duco_price = round(api_response.json()["Duco price"], 6)
     else:
-        duco_price = .003
+        duco_price = 0.003
     return duco_price
 
 
@@ -355,7 +337,7 @@ def start_duco_price_timer(tkinter_label=None, interval=15):
     if api_response.status_code == 200:
         duco_price = round(api_response.json()["Duco price"], 6)
     else:
-        duco_price = .003
+        duco_price = 0.003
     if tkinter_label:
         tkinter_label.set(f"1 Duco = ${duco_price}")
     Timer(interval, start_duco_price_timer, args=(tkinter_label, interval)).start()
@@ -365,6 +347,7 @@ class api_actions:
     """
     A class that provides an interface for interacting with the DUCO server
     """
+
     def __init__(self):
         """
         A class constructor that initiates the connection with the server.
@@ -384,7 +367,7 @@ class api_actions:
         """
         self.sock.send(f"REGI,{username},{password},{email}".encode())
         register_result = decode_response(self.sock.recv(128))
-        if 'NO' in register_result:
+        if "NO" in register_result:
             raise Exception(register_result[1])
         return register_result
 
@@ -406,7 +389,7 @@ class api_actions:
         self.sock.send(f"LOGI,{username},{password}".encode())
         login_result = decode_response(self.sock.recv(64))
 
-        if 'NO' in login_result:
+        if "NO" in login_result:
             raise Exception(login_result[1])
 
         return login_result
@@ -464,18 +447,16 @@ class api_actions:
         self.sock.close()
 
 
-#====================================# Duco Miner #====================================#
+# ====================================# Duco Miner #====================================#
+
 
 class miner:
-
     def __init__(self):
         self.username = None
         self.UseLowerDiff = True
         self.stopVar = False
         self.workers = 1
         self.last_job = {}
-
-
 
     def start(self, username=None, workers=None):
         if username != None:
@@ -490,12 +471,10 @@ class miner:
             x = threading.Thread(target=self.worker)
             x.start()
 
-
     def stop(self):
         self.stopVar = True
 
-
-    def worker(self): # Mining section\
+    def worker(self):  # Mining section\
         soc = socket.socket()
         with urllib.request.urlopen(SERVER_URL) as content:
             # Read content and split into lines
@@ -517,17 +496,12 @@ class miner:
                 break
             if self.UseLowerDiff:
                 # Send job request for lower diff
-                soc.send(bytes(
-                    "JOB,"
-                    + str(self.username)
-                    + ",MEDIUM",
-                    encoding="utf8"))
+                soc.send(
+                    bytes("JOB," + str(self.username) + ",MEDIUM", encoding="utf8")
+                )
             else:
                 # Send job request
-                soc.send(bytes(
-                    "JOB,"
-                    + str(self.username),
-                    encoding="utf8"))
+                soc.send(bytes("JOB," + str(self.username), encoding="utf8"))
 
             # Receive work
             job = soc.recv(1024).decode().rstrip("\n")
@@ -539,10 +513,8 @@ class miner:
             for result in range(100 * int(difficulty) + 1):
                 # Calculate hash with difficulty
                 ducos1 = hashlib.sha1(
-                    str(
-                        job[0]
-                        + str(result)
-                    ).encode("utf-8")).hexdigest()
+                    str(job[0] + str(result)).encode("utf-8")
+                ).hexdigest()
 
                 # If hash is even with expected hash result
                 if job[1] == ducos1:
@@ -551,21 +523,25 @@ class miner:
                     hashrate = result / timeDifference
 
                     # Send numeric result to the server
-                    soc.send(bytes(
-                        str(result)
-                        + ","
-                        + str(hashrate)
-                        + ",Minimal_PC_Miner",
-                        encoding="utf8"))
+                    soc.send(
+                        bytes(
+                            str(result) + "," + str(hashrate) + ",Minimal_PC_Miner",
+                            encoding="utf8",
+                        )
+                    )
 
                     # Get feedback about the result
                     feedback = soc.recv(1024).decode().rstrip("\n")
                     # If result was good
                     if feedback == "GOOD":
-                        miner_q.put({'Status': "Accepted share",
-                                        'Result': result,
-                                        "Hashrate": int(hashrate/1000),
-                                        "Difficulty": difficulty})
+                        miner_q.put(
+                            {
+                                "Status": "Accepted share",
+                                "Result": result,
+                                "Hashrate": int(hashrate / 1000),
+                                "Difficulty": difficulty,
+                            }
+                        )
                         # print("Accepted share",
                         #       result,
                         #       "Hashrate",
@@ -576,10 +552,14 @@ class miner:
                         break
                     # If result was incorrect
                     elif feedback == "BAD":
-                        miner_q.put({'Status': "Rejected share",
-                                        'Result': result,
-                                        "Hashrate": int(hashrate/1000),
-                                        "Difficulty": difficulty})
+                        miner_q.put(
+                            {
+                                "Status": "Rejected share",
+                                "Result": result,
+                                "Hashrate": int(hashrate / 1000),
+                                "Difficulty": difficulty,
+                            }
+                        )
                         # print("Rejected share",
                         #       result,
                         #       "Hashrate",
@@ -590,7 +570,7 @@ class miner:
                         break
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(transactions().all_time_transacted())
     # miner_class = miner()
 

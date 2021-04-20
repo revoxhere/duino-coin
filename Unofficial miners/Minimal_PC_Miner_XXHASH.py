@@ -19,10 +19,12 @@ while True:
     try:
         # This sections grabs pool adress and port from Duino-Coin GitHub file
         # Serverip file URL
-        serverip = ("https://raw.githubusercontent.com/"
-                    + "revoxhere/"
-                    + "duino-coin/gh-pages/"
-                    + "serverip.txt")
+        serverip = (
+            "https://raw.githubusercontent.com/"
+            + "revoxhere/"
+            + "duino-coin/gh-pages/"
+            + "serverip.txt"
+        )
 
         with urllib.request.urlopen(serverip) as content:
             # Read content and split into lines
@@ -41,11 +43,7 @@ while True:
         # Mining section
         while True:
             # Send job request
-            soc.send(bytes(
-                "JOBXX,"
-                + str(username)
-                + ",NET",
-                encoding="utf8"))
+            soc.send(bytes("JOBXX," + str(username) + ",NET", encoding="utf8"))
             # Receive work
             job = soc.recv(1024).decode().rstrip("\n")
             # Split received data to job and difficulty
@@ -56,9 +54,8 @@ while True:
             for ducos1xxres in range(100 * int(difficulty) + 1):
                 # Calculate hash with difficulty
                 ducos1xx = xxhash.xxh64(
-                    str(job[0])
-                    + str(ducos1xxres),
-                    seed=2811).hexdigest()
+                    str(job[0]) + str(ducos1xxres), seed=2811
+                ).hexdigest()
 
                 # If hash is even with expected hash result
                 if job[1] == ducos1xx:
@@ -67,34 +64,41 @@ while True:
                     hashrate = ducos1xxres / timeDifference
 
                     # Send numeric result to the server
-                    soc.send(bytes(
-                        str(ducos1xxres)
-                        + ","
-                        + str(hashrate) +
-                        ",Minimal PC Miner (XXHASH)",
-                        encoding="utf8"))
+                    soc.send(
+                        bytes(
+                            str(ducos1xxres)
+                            + ","
+                            + str(hashrate)
+                            + ",Minimal PC Miner (XXHASH)",
+                            encoding="utf8",
+                        )
+                    )
 
                     # Get feedback about the result
                     feedback = soc.recv(1024).decode().rstrip("\n")
                     # If result was good
                     if feedback == "GOOD":
-                        print("Accepted share",
-                              ducos1xxres,
-                              "Hashrate",
-                              int(hashrate/1000),
-                              "kH/s",
-                              "Difficulty",
-                              difficulty)
+                        print(
+                            "Accepted share",
+                            ducos1xxres,
+                            "Hashrate",
+                            int(hashrate / 1000),
+                            "kH/s",
+                            "Difficulty",
+                            difficulty,
+                        )
                         break
                     # If result was incorrect
                     elif feedback == "BAD":
-                        print("Rejected share",
-                              ducos1xxres,
-                              "Hashrate",
-                              int(hashrate/1000),
-                              "kH/s",
-                              "Difficulty",
-                              difficulty)
+                        print(
+                            "Rejected share",
+                            ducos1xxres,
+                            "Hashrate",
+                            int(hashrate / 1000),
+                            "kH/s",
+                            "Difficulty",
+                            difficulty,
+                        )
                         break
 
     except Exception as e:

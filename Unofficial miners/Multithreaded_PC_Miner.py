@@ -5,10 +5,10 @@
 # © Duino-Coin Community 2020
 # --------------------------------------------------------------- #
 
-refresh_time = 3.5 # refresh time in seconds for the output (recommended: 3.5)
-autorestart_time = 360 # autorestart time in seconds. 0 = disabled
+refresh_time = 3.5  # refresh time in seconds for the output (recommended: 3.5)
+autorestart_time = 360  # autorestart time in seconds. 0 = disabled
 
-discord_key = "" # coming soon
+discord_key = ""  # coming soon
 
 # --------------------------------------------------------------- #
 
@@ -26,6 +26,7 @@ import urllib.request
 if sys.platform == "win32":
     try:
         from colorama import Back, Fore, Style, init
+
         init()
     except:
         print("You don't have colorama installed. Try to install it now?")
@@ -39,43 +40,48 @@ if sys.platform == "win32":
 else:
     colorama_choice = False
 
+
 class bcolors:
-    blue = '\033[36m'
-    yellow = '\033[93m'
-    endc = '\033[0m'
-    back_cyan = '\033[46m'
-    red = '\033[31m'
-    back_yellow = '\033[43m'
-    black = '\033[30m'
-    back_red = '\033[41m'
+    blue = "\033[36m"
+    yellow = "\033[93m"
+    endc = "\033[0m"
+    back_cyan = "\033[46m"
+    red = "\033[31m"
+    back_yellow = "\033[43m"
+    black = "\033[30m"
+    back_red = "\033[41m"
+
 
 last_hash_count = 0
 khash_count = 0
 hash_count = 0
 hash_mean = []
 
+
 def hashrateCalculator():
     global last_hash_count, hash_count, khash_count, hash_mean
-    
+
     last_hash_count = hash_count
     khash_count = last_hash_count / 1000
     if khash_count == 0:
         khash_count = random.uniform(0, 1)
-    
+
     hash_mean.append(khash_count)
     khash_count = statistics.mean(hash_mean)
     khash_count = round(khash_count, 2)
-  
+
     hash_count = 0
-  
+
     threading.Timer(1.0, hashrateCalculator).start()
 
-    
+
 def start_thread(arr, i, username, accepted_shares, bad_shares, thread_number):
     global hash_count, khash_count
     soc = socket.socket()
 
-    serverip = "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+    serverip = (
+        "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+    )
     with urllib.request.urlopen(serverip) as content:
         content = content.read().decode().splitlines()
     pool_address = content[0]
@@ -87,7 +93,7 @@ def start_thread(arr, i, username, accepted_shares, bad_shares, thread_number):
     hashrateCalculator()
     while True:
         try:
-            soc.send(bytes("JOB,"+str(username), encoding="utf8"))
+            soc.send(bytes("JOB," + str(username), encoding="utf8"))
             job = soc.recv(1024).decode()
             job = job.split(",")
             try:
@@ -101,9 +107,19 @@ def start_thread(arr, i, username, accepted_shares, bad_shares, thread_number):
 
             for result in range(100 * int(difficulty) + 1):
                 hash_count = hash_count + 1
-                ducos1 = hashlib.sha1(str(job[0] + str(result)).encode("utf-8")).hexdigest()
+                ducos1 = hashlib.sha1(
+                    str(job[0] + str(result)).encode("utf-8")
+                ).hexdigest()
                 if job[1] == ducos1:
-                    soc.send(bytes(str(result) + "," + str(last_hash_count) + ",Multithreaded Miner v1.7", encoding="utf8"))
+                    soc.send(
+                        bytes(
+                            str(result)
+                            + ","
+                            + str(last_hash_count)
+                            + ",Multithreaded Miner v1.7",
+                            encoding="utf8",
+                        )
+                    )
                     feedback = soc.recv(1024).decode()
                     arr[i] = khash_count
                     if feedback == "GOOD" or feedback == "BLOCK":
@@ -121,7 +137,7 @@ def start_thread(arr, i, username, accepted_shares, bad_shares, thread_number):
 
 def autorestarter():
     time.sleep(autorestart_time)
-    
+
     for p in multiprocessing.active_children():
         p.terminate()
     time.sleep(1)
@@ -136,22 +152,22 @@ def getBalance():
     soc.recv(3).decode()
 
     soc.send(bytes("LOGI," + username + "," + password, encoding="utf8"))
-    response = soc.recv(2).decode()           
+    response = soc.recv(2).decode()
     if response != "OK":
         print("Error logging in - check account credentials!")
         soc.close()
         os._exit(1)
-        
+
     soc.send(bytes("BALA", encoding="utf8"))
     balance = soc.recv(1024).decode()
     soc.close()
-    
+
     return float(balance)
 
 
 def calculateProfit(start_bal):
     global curr_bal, profit_array
-    
+
     prev_bal = curr_bal
 
     curr_bal = getBalance()
@@ -167,41 +183,120 @@ def showOutput():
     clear()
 
     if colorama_choice:
-        print(Back.CYAN + Fore.YELLOW + "Duino-Coin Multithreaded PC Miner" + Style.RESET_ALL + "\n")
+        print(
+            Back.CYAN
+            + Fore.YELLOW
+            + "Duino-Coin Multithreaded PC Miner"
+            + Style.RESET_ALL
+            + "\n"
+        )
     else:
-        print(bcolors.back_cyan + bcolors.yellow + "Duino-Coin Multithreaded PC Miner" + bcolors.endc + "\n")
-    
-    
-    if colorama_choice:
-        print(Back.YELLOW + Fore.BLACK + "Profit: " + str(profit_array[1]) + "/min   " + str(profit_array[2]) + "/h" + "\nTotal session: " + str(profit_array[0]) + Style.RESET_ALL + "\n")
-    else:
-        print(bcolors.back_yellow + bcolors.black + "Profit: " + str(profit_array[1]) + "/min   " + str(profit_array[2]) + "/h" + "\nTotal session: " + str(profit_array[0]) + bcolors.endc + "\n")
-    
-    d = {}
-    for thread in range(thread_number):
-        d[f"#{thread + 1}"] = [f"{hashrate_array[thread]} kH/s", accepted_shares[thread], bad_shares[thread]]
+        print(
+            bcolors.back_cyan
+            + bcolors.yellow
+            + "Duino-Coin Multithreaded PC Miner"
+            + bcolors.endc
+            + "\n"
+        )
 
     if colorama_choice:
-        print(Fore.YELLOW + Back.CYAN + "{:<9} {:<13} {:<10} {:<10}".format('Thread','Hashrate','Accepted','Rejected') + Style.RESET_ALL)
+        print(
+            Back.YELLOW
+            + Fore.BLACK
+            + "Profit: "
+            + str(profit_array[1])
+            + "/min   "
+            + str(profit_array[2])
+            + "/h"
+            + "\nTotal session: "
+            + str(profit_array[0])
+            + Style.RESET_ALL
+            + "\n"
+        )
     else:
-        print(bcolors.yellow + bcolors.back_cyan + "{:<9} {:<13} {:<10} {:<10}".format('Thread','Hashrate','Accepted','Rejected') + bcolors.endc)
+        print(
+            bcolors.back_yellow
+            + bcolors.black
+            + "Profit: "
+            + str(profit_array[1])
+            + "/min   "
+            + str(profit_array[2])
+            + "/h"
+            + "\nTotal session: "
+            + str(profit_array[0])
+            + bcolors.endc
+            + "\n"
+        )
+
+    d = {}
+    for thread in range(thread_number):
+        d[f"#{thread + 1}"] = [
+            f"{hashrate_array[thread]} kH/s",
+            accepted_shares[thread],
+            bad_shares[thread],
+        ]
+
+    if colorama_choice:
+        print(
+            Fore.YELLOW
+            + Back.CYAN
+            + "{:<9} {:<13} {:<10} {:<10}".format(
+                "Thread", "Hashrate", "Accepted", "Rejected"
+            )
+            + Style.RESET_ALL
+        )
+    else:
+        print(
+            bcolors.yellow
+            + bcolors.back_cyan
+            + "{:<9} {:<13} {:<10} {:<10}".format(
+                "Thread", "Hashrate", "Accepted", "Rejected"
+            )
+            + bcolors.endc
+        )
     for k, v in d.items():
         hashrate, good, bad = v
         if colorama_choice:
-            print(Fore.CYAN + "{:<9} {:<13} {:<10} {:<10}".format(k, hashrate, good, bad) + Style.RESET_ALL)
+            print(
+                Fore.CYAN
+                + "{:<9} {:<13} {:<10} {:<10}".format(k, hashrate, good, bad)
+                + Style.RESET_ALL
+            )
         else:
-            print(bcolors.blue + "{:<9} {:<13} {:<10} {:<10}".format(k, hashrate, good, bad) + bcolors.endc)
-    
+            print(
+                bcolors.blue
+                + "{:<9} {:<13} {:<10} {:<10}".format(k, hashrate, good, bad)
+                + bcolors.endc
+            )
+
     if colorama_choice:
-        print(Back.RED + "{:<9} {:<13} {:<10} {:<10}".format("TOTAL", totalHashrate(sum(hashrate_array)), sum(accepted_shares), sum(bad_shares)) + Style.RESET_ALL)
+        print(
+            Back.RED
+            + "{:<9} {:<13} {:<10} {:<10}".format(
+                "TOTAL",
+                totalHashrate(sum(hashrate_array)),
+                sum(accepted_shares),
+                sum(bad_shares),
+            )
+            + Style.RESET_ALL
+        )
     else:
-        print(bcolors.back_red + "{:<9} {:<13} {:<10} {:<10}".format("TOTAL", totalHashrate(sum(hashrate_array)), sum(accepted_shares), sum(bad_shares)) + bcolors.endc)
+        print(
+            bcolors.back_red
+            + "{:<9} {:<13} {:<10} {:<10}".format(
+                "TOTAL",
+                totalHashrate(sum(hashrate_array)),
+                sum(accepted_shares),
+                sum(bad_shares),
+            )
+            + bcolors.endc
+        )
 
     threading.Timer(float(refresh_time), showOutput).start()
-        
+
 
 def clear():
-    os.system('cls' if os.name=='nt' else 'clear')
+    os.system("cls" if os.name == "nt" else "clear")
 
 
 def totalHashrate(khash):
@@ -211,37 +306,57 @@ def totalHashrate(khash):
         return str(round(khash, 2)) + " kH/s"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     global thread_number, curr_bal
 
-    if os.name == 'nt':
+    if os.name == "nt":
         os.system("title " + "Duino-Coin multithreaded miner")
     else:
-        print('\33]0;' + "Duino-Coin multithreaded miner"+'\a', end='')
+        print("\33]0;" + "Duino-Coin multithreaded miner" + "\a", end="")
     clear()
 
     if colorama_choice:
         print(Fore.RED + "The profit is refreshed every 60 seconds" + Style.RESET_ALL)
     else:
         print(bcolors.red + "The profit is refreshed every 60 seconds" + bcolors.endc)
-    
+
     if (autorestart_time) > 0:
         threading.Thread(target=autorestarter).start()
 
-    with urllib.request.urlopen("https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt") as content:
-        content = content.read().decode().splitlines() # doing this here because can't access pool_address and pool_port in the threads
+    with urllib.request.urlopen(
+        "https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt"
+    ) as content:
+        content = (
+            content.read().decode().splitlines()
+        )  # doing this here because can't access pool_address and pool_port in the threads
     pool_address = content[0]
     pool_port = content[1]
-    
+
     arguments = len(sys.argv)
     if arguments <= 3:
         if colorama_choice:
-            print(Fore.RED + "Provide username, password and thread count!" + Style.RESET_ALL)
-            print(Fore.YELLOW + "Example: python3 Multithreaded_PC_Miner.py username password 4" + Style.RESET_ALL)
+            print(
+                Fore.RED
+                + "Provide username, password and thread count!"
+                + Style.RESET_ALL
+            )
+            print(
+                Fore.YELLOW
+                + "Example: python3 Multithreaded_PC_Miner.py username password 4"
+                + Style.RESET_ALL
+            )
             print(Fore.RED + "Exiting in 15s." + Style.RESET_ALL)
         else:
-            print(bcolors.red + "Provide username, password and thread count!" + bcolors.endc)
-            print(bcolors.yellow + "Example: python3 Multithreaded_PC_Miner.py username password 4" + bcolors.endc)
+            print(
+                bcolors.red
+                + "Provide username, password and thread count!"
+                + bcolors.endc
+            )
+            print(
+                bcolors.yellow
+                + "Example: python3 Multithreaded_PC_Miner.py username password 4"
+                + bcolors.endc
+            )
             print(bcolors.red + "Exiting in 15s." + bcolors.endc)
         time.sleep(15)
         os._exit(0)
@@ -250,7 +365,9 @@ if __name__ == '__main__':
     password = str(sys.argv[2])
     thread_number = int(sys.argv[3])
     if thread_number > 8:
-        print("Notice: you're launching a miner with 8+ threads, values this high may not add anything to your efficiency but are spamming our small server.\nIf you don't want to contribute in making server go offline then please set this number a bit lower.\nThanks in advance")
+        print(
+            "Notice: you're launching a miner with 8+ threads, values this high may not add anything to your efficiency but are spamming our small server.\nIf you don't want to contribute in making server go offline then please set this number a bit lower.\nThanks in advance"
+        )
     print(f"Miner for user {username} started with {thread_number} threads")
 
     hashrate_array = multiprocessing.Array("d", thread_number)
@@ -263,8 +380,17 @@ if __name__ == '__main__':
     showOutput()
 
     for i in range(thread_number):
-        p = multiprocessing.Process(target=start_thread, args=(hashrate_array, i, username, accepted_shares, bad_shares, thread_number))
+        p = multiprocessing.Process(
+            target=start_thread,
+            args=(
+                hashrate_array,
+                i,
+                username,
+                accepted_shares,
+                bad_shares,
+                thread_number,
+            ),
+        )
         p.start()
         time.sleep(0.5)
     time.sleep(1)
-    
