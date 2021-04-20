@@ -91,6 +91,7 @@ If you want to run the programs from source, you may need to install some depend
 sudo apt install python3 python3-pip git
 git clone https://github.com/revoxhere/duino-coin
 cd duino-coin
+export PATH="${PATH}:/home/my_user/.local/bin"  ---->(change "my_user" to your own pc username )
 python3 -m pip install -r requirements.txt
 ```
 If you are on Windows, download [Python 3](https://www.python.org/downloads/), then [our repository](https://github.com/revoxhere/duino-coin/archive/master.zip), extract it and open the folder in command prompt. In CMD, type:
