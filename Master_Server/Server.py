@@ -6,12 +6,14 @@
 # © Duino-Coin Community 2019-2021
 #############################################
 # Import libraries
+import traceback
 from _thread import *
 import threading
 import socket
 # python3 -m pip install fastrand
 from random import randint as fastrandint
 from random import randint
+import random
 from hashlib import sha1
 from time import time, sleep
 from sys import exit
@@ -24,12 +26,13 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from collections import OrderedDict
 from operator import itemgetter
+import traceback
 # python3 -m pip install xxhash
-from xxhash import xxh64  
+from xxhash import xxh64
 # python3 -m pip install shutil
 from shutil import copyfile
 # python3 -m pip install udatetime
-import udatetime as utime  
+import udatetime as utime
 import datetime
 import configparser
 import requests
@@ -256,7 +259,7 @@ def update_job_tiers():
                 "max_hashrate": 999999999
             },
             "XXHASH": {
-                "difficulty": 100000,
+                "difficulty": 125000,
                 "reward": .0003,
                 "max_sharerate_per_sec": 2,
                 "max_hashrate": 4500000
@@ -514,6 +517,7 @@ def input_management():
             - clear - clears the console
             - exit - exits DUCO server
             - restart - restarts DUCO server
+            - changeusername <user> <newuser> - changes username
             - ban <username> - bans username""")
 
         elif command[0] == "clear":
@@ -616,9 +620,41 @@ def input_management():
                         admin_print("User balance is now " + str(balance))
                 else:
                     admin_print("Canceled")
-            except Exception:
-                admin_print(
-                    "User doesn't exist or you've entered wrong number")
+            except Exception as e:
+                admin_print("Error setting balance: " + str(e))
+
+        elif command[0] == "changeusername":
+            try:
+                with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+                    datab.execute(
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
+                        (command[1],))
+                    old_username = str(datab.fetchone()[0])
+
+                admin_print("Change "
+                            + command[1]
+                            + "'s username to "
+                            + str(command[2])
+                            + "?")
+
+                confirm = input("  Y/n")
+                if confirm == "Y" or confirm == "y" or confirm == "":
+                    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                        datab = conn.cursor()
+                        datab.execute(
+                            """UPDATE Users
+                            set username = ?
+                            where username = ?""",
+                            (str(command[2]), command[1]))
+                        conn.commit()
+                        admin_print("Changed username to " + str(command[2]))
+                else:
+                    admin_print("Canceled")
+            except Exception as e:
+                admin_print("Error: " + str(e))
 
         elif command[0] == "subtract":
             try:
@@ -781,7 +817,21 @@ def create_share_ducos1(last_block_hash, difficulty):
         job = [last_block_hash, expected_hash.hexdigest(), numeric_result]
         return job
     except Exception as e:
-        print(e)
+        print("DUCOS1 ERR:", e)
+
+
+def create_share_xxhash(last_block_hash, difficulty):
+    """ Creates and returns a job for XXHASH algo """
+    try:
+        numeric_result = random.randint(0, 100 * difficulty)
+        expected_hash_str = bytes(
+            last_block_hash
+            + str(numeric_result), encoding="utf8")
+        expected_hash = xxh64(expected_hash_str, seed=2811)
+        job = [last_block_hash, expected_hash.hexdigest(), numeric_result]
+        return job
+    except Exception as e:
+        print("XXHASH ERR:", e)
 
 
 def protocol_ducos1(data, connection, address):
@@ -789,6 +839,8 @@ def protocol_ducos1(data, connection, address):
         Takes:  data (JOB,username,requested_difficulty),
                 connection object, minerapi access
         Returns to main thread if non-mining data is submitted """
+    global global_last_block_hash
+    global global_blocks
     is_first_share = True
     is_sharetime_test = False
     override_difficulty = False
@@ -797,6 +849,7 @@ def protocol_ducos1(data, connection, address):
     connection.settimeout(90)
     thread_id = threading.get_ident()
     thread_miner_api = {}
+    global_last_block_hash_cp = global_last_block_hash
     while True:
         try:
             if not is_first_share:
@@ -807,9 +860,9 @@ def protocol_ducos1(data, connection, address):
             if data[1]:
                 username = str(data[1])
 
-                #if username in banlist:
-                    #permanent_ban(ip)
-                    #break
+                # if username in banlist:
+                # permanent_ban(ip)
+                # break
 
                 if is_first_share:
                     if not user_exists(username):
@@ -836,10 +889,11 @@ def protocol_ducos1(data, connection, address):
                 else:
                     req_difficulty = override_difficulty
 
-            #if username in miners_per_user:
-                #if miners_per_user[username] > MAX_MININIG_CONNECTIONS:
-                    #send_data("BAD\n", connection)
-                    #break
+            if username in miners_per_user:
+                if miners_per_user[username] > MAX_MININIG_CONNECTIONS:
+                    if not username in whitelisted_usernames:
+                        send_data("BAD\n", connection)
+                        return
 
             if job_tiers[req_difficulty]["difficulty"] < 2500:
                 job = get_pregenerated_job(req_difficulty)
@@ -849,10 +903,11 @@ def protocol_ducos1(data, connection, address):
                 difficulty = job_tiers[req_difficulty]["difficulty"]
 
             elif not is_first_share and not is_sharetime_test:
-                difficulty = kolka_v3(sharetime, expected_sharetime, difficulty)
+                difficulty = kolka_v3(
+                    sharetime, expected_sharetime, difficulty)
 
-            #if not is_first_share:
-                #""" There's a 16.6% to get a sharetime-exploit test
+            # if not is_first_share:
+                # """ There's a 16.6% to get a sharetime-exploit test
                 #    (10 options, 11 and 12 = test; ergo 2 out of 12)
                 #    TODO: Maybe make this more random """
                 # Drop the nonce to force a lower sharetime
@@ -862,7 +917,7 @@ def protocol_ducos1(data, connection, address):
                 # The expected sharetime should be about 10 times lower than before
                 #expected_test_sharetime = sharetime / 10
 
-            job = create_share_ducos1(global_last_block_hash, difficulty)
+            job = create_share_ducos1(global_last_block_hash_cp, difficulty)
             numeric_result = job[2]
             send_data(job[0] + "," + job[1] + "," + str(difficulty) + "\n",
                       connection)
@@ -908,25 +963,26 @@ def protocol_ducos1(data, connection, address):
                 shares_per_sec = 0
 
             thread_miner_api = {
-                 "User":                 str(username),
-                 "Hashrate":             hashrate,
-                 "Is estimated":         str(hashrate_is_estimated),
-                 "Sharetime":            sharetime,
-                 "Sharerate":            shares_per_sec,
-                 "Accepted":             accepted_shares,
-                 "Rejected":             rejected_shares,
-                 "Algorithm":            "DUCO-S1",
-                 "Diff":                 difficulty,
-                 "Software":             str(miner_name),
-                 "Identifier":           str(rig_identifier)}
+                "User":                 str(username),
+                "Hashrate":             hashrate,
+                "Is estimated":         str(hashrate_is_estimated),
+                "Sharetime":            sharetime,
+                "Sharerate":            shares_per_sec,
+                "Accepted":             accepted_shares,
+                "Rejected":             rejected_shares,
+                "Algorithm":            "DUCO-S1",
+                "Diff":                 difficulty,
+                "Software":             str(miner_name),
+                "Identifier":           str(rig_identifier)}
 
             #max_sharerate = job_tiers[req_difficulty]["max_sharerate_per_sec"]
-            #miner_sharerate = minerapi[thread_id]["Sharerate"]
-            #if miner_sharerate > max_sharerate:
-                #sleep(3)
+            #miner_sharerate = minerapi["Sharerate"]
+            # if miner_sharerate > max_sharerate:
+            # sleep(3)
             if accepted_shares % 5 == 0:
                 minerapi[thread_id] = thread_miner_api
-                #global_blocks += 5
+                global_blocks += 5
+                global_last_block_hash = job[1]
 
             if int(calculated_hashrate) > int(max_hashrate):
                 send_data("BAD\n", connection)
@@ -948,10 +1004,11 @@ def protocol_ducos1(data, connection, address):
 
                 reward = kolka_v1(basereward, sharetime, difficulty, workers)
 
-                #if fastrandint(BLOCK_PROBABILITY) == 1:
-                    #reward = generate_block(username, reward, job[1], connection)
-                #else:
-                send_data("GOOD\n", connection)
+                if random.randint(0, BLOCK_PROBABILITY) == 1:
+                    reward = generate_block(
+                        username, reward, job[1], connection)
+                else:
+                    send_data("GOOD\n", connection)
 
                 accepted_shares += 1
 
@@ -969,191 +1026,191 @@ def protocol_ducos1(data, connection, address):
                     balances_to_update[username] += penalty
                 else:
                     balances_to_update[username] = penalty
-            #sleep(.25)
-        except Exception:
+            sleep(.25)
+        except Exception :
             exit()
+
             #print(traceback.format_exc())
-import traceback
+
+
 def reset_shares_per_sec():
     #global minerapi
     while True:
-        #for miner in minerapi.copy():
-            #try:
-                #minerapi[miner]["Sharerate"] = 0
-            #except:
-                #pass
+        # for miner in minerapi.copy():
+        # try:
+        #minerapi[miner]["Sharerate"] = 0
+        # except:
+        # pass
         sleep(1)
 
 
-def protocol_xxhash(data, connection, minerapi, address):
+def protocol_xxhash(data, connection, address):
     """ XXHASH mining protocol handler
         Takes:  data (JOB,username,requested_difficulty),
                 connection object, minerapi access
         Returns to main thread if non-mining data is submitted """
     global global_last_block_hash
     global global_blocks
-    #global minerapi
-    global miners_per_user
-    global_last_block_hash_cp = global_last_block_hash
     is_first_share = True
     is_sharetime_test = False
     accepted_shares = 0
     rejected_shares = 0
     shares_per_sec = 0
+    thread_miner_api = {}
     connection.settimeout(90)
     thread_id = threading.get_ident()
-
+    global_last_block_hash_cp = global_last_block_hash
     while True:
-        if not is_first_share:
-            data = receive_data(connection)
-            if data[0] != "JOB":
+        try:
+            if not is_first_share:
+                data = receive_data(connection)
+                if data[0] != "JOB":
+                    return
+
+            if data[1]:
+                username = str(data[1])
+
+                if username in banlist:
+                    permanent_ban(ip)
+                    break
+
+                if is_first_share:
+                    if not user_exists(username):
+                        send_data(
+                            "BAD,This user doesn't exist\n",
+                            connection)
+                        return
+            else:
+                send_data(
+                    "BAD,No username specified\n",
+                    connection)
                 return
 
-        if data[1]:
-            username = str(data[1])
-
-            if username in banlist:
-                permanent_ban(ip)
-                break
+            if username in miners_per_user:
+                if miners_per_user[username] > MAX_MININIG_CONNECTIONS:
+                    if not username in whitelisted_usernames:
+                        send_data("BAD\n", connection)
+                        return
 
             if is_first_share:
-                if not user_exists(username):
-                    send_data(
-                        "BAD,This user doesn't exist\n",
-                        connection)
-                    return
-        else:
-            send_data(
-                "BAD,No username specified\n",
-                connection)
-            return
+                req_difficulty = "XXHASH"
+                difficulty = job_tiers[req_difficulty]["difficulty"]
 
+            elif not is_first_share and not is_sharetime_test:
+                difficulty = kolka_v3(sharetime, expected_sharetime, difficulty)
 
-        #if username in miners_per_user:
-            #if miners_per_user[username] > MAX_MININIG_CONNECTIONS:
-                #send_data("BAD\n", connection)
-                #break
+            # if not is_first_share and fastrandint(12) > 10:
+                """ There's a 16.6% to get a sharetime-exploit test
+                    (10 options, 11 and 12 = test; ergo 2 out of 12)
+                    TODO: Maybe make this more random """
+                # Drop the nonce to force a lower sharetime
+                #rand = fastrandint(10 * difficulty)
+                # Set to true to avoid increasing the difficulty by magnitudes
+                #is_sharetime_test = True
+                # The expected sharetime should be about 10 times lower than before
+                #expected_test_sharetime = sharetime / 10
 
-        if is_first_share:
-            req_difficulty = "XXHASH"
-            difficulty = job_tiers[req_difficulty]["difficulty"]
+            job = create_share_xxhash(global_last_block_hash_cp, difficulty)
+            numeric_result = job[2]
+            send_data(job[0] + "," + job[1] + "," + str(difficulty) + "\n",
+                      connection)
 
-        elif not is_first_share and not is_sharetime_test:
-            difficulty = kolka_v3(sharetime, expected_sharetime, difficulty)
+            job_sent_timestamp = utime.now()
+            result = receive_data(connection)
+            if is_first_share:
+                is_first_share = False
+            sharetime = (utime.now() - job_sent_timestamp).total_seconds()
+            calculated_hashrate = int(numeric_result / sharetime)
+            max_hashrate = job_tiers[req_difficulty]["max_hashrate"]
 
-        #if not is_first_share and fastrandint(12) > 10:
-            """ There's a 16.6% to get a sharetime-exploit test
-                (10 options, 11 and 12 = test; ergo 2 out of 12)
-                TODO: Maybe make this more random """
-            # Drop the nonce to force a lower sharetime
-            #rand = fastrandint(10 * difficulty)
-            # Set to true to avoid increasing the difficulty by magnitudes
-            #is_sharetime_test = True
-            # The expected sharetime should be about 10 times lower than before
-            #expected_test_sharetime = sharetime / 10
+            try:
+                # If client submitted own hashrate, use it for the API
+                hashrate = round(float(result[1]))
+                hashrate_is_estimated = False
+            except IndexError:
+                hashrate = calculated_hashrate
+                hashrate_is_estimated = True
 
-        last_block_hash = global_last_block_hash_cp
-        numeric_result = fastrandint(100 * difficulty)
-        expected_hash_str = bytes(
-            last_block_hash
-            + str(numeric_result), encoding="utf8")
-        expected_hash = xxh64(expected_hash_str, seed=2811)
+            try:
+                # Check miner software for unallowed characters
+                miner_name = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[2])
+            except IndexError:
+                miner_name = "Unknown miner"
 
-        job = [last_block_hash, expected_hash.hexdigest(), numeric_result]
+            try:
+                # Check miner software for unallowed characters
+                rig_identifier = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[3])
+            except IndexError:
+                rig_identifier = "None"
 
-        send_data(
-            job[0]
-            + ","
-            + job[1]
-            + ","
-            + str(difficulty)
-            + "\n",
-            connection)
-
-        job_sent_timestamp = utime.now()
-        result = receive_data(connection)
-        if is_first_share:
-            is_first_share = False
-        sharetime = (utime.now() - job_sent_timestamp).total_seconds()
-        calculated_hashrate = int(numeric_result / sharetime)
-        max_hashrate = job_tiers[req_difficulty]["max_hashrate"]
-
-        try:
-            # If client submitted own hashrate, use it for the API
-            hashrate = round(float(result[1]))
-            hashrate_is_estimated = False
-        except IndexError:
-            hashrate = calculated_hashrate
-            hashrate_is_estimated = True
-
-        try:
-            # Check miner software for unallowed characters
-            miner_name = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[2])
-        except IndexError:
-            miner_name = "Unknown miner"
-
-        try:
-            # Check miner software for unallowed characters
-            rig_identifier = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[3])
-        except IndexError:
-            rig_identifier = "None"
-
-        # shares_per_sec += 1
-        # minerapi[thread_id] = {
-        #     "User":                 str(username),
-        #     "Hashrate":             hashrate,
-        #     "Is estimated":         str(hashrate_is_estimated),
-        #     "Sharetime":            sharetime,
-        #     "Sharerate":            shares_per_sec,
-        #     "Accepted":             accepted_shares,
-        #     "Rejected":             rejected_shares,
-        #     "Algorithm":            "XXHASH",
-        #     "Diff":                 difficulty,
-        #     "Software":             str(miner_name),
-        #     "Identifier":           str(rig_identifier)}
-
-        # max_sharerate = job_tiers[req_difficulty]["max_sharerate_per_sec"]
-        # miner_sharerate = minerapi[thread_id]["Sharerate"]
-        # if miner_sharerate > max_sharerate:
-        #     sleep(10)
-
-        if int(calculated_hashrate) > int(max_hashrate):
-            send_data("BAD\n", connection)
-            rejected_shares += 1
-
-        elif int(result[0]) == int(job[2]):
-            basereward = job_tiers[req_difficulty]["reward"]
-            #if username in miners_per_user:
-                #workers = miners_per_user[username]
-            #else:
-            workers = 10
-
-            reward = kolka_v1(basereward, sharetime, difficulty, workers)
-
-            if fastrandint(BLOCK_PROBABILITY) == 1:
-                reward = generate_block(
-                    username, reward, job[1], connection, xxhash=True)
+            if thread_id in thread_miner_api:
+                shares_per_sec = thread_miner_api["Sharerate"] + 1
             else:
-                send_data("GOOD\n", connection)
+                shares_per_sec = 0
 
-            accepted_shares += 1
-            global_last_block_hash = job[1]
-            global_blocks += 1
+            thread_miner_api = {
+                "User":                 str(username),
+                "Hashrate":             hashrate,
+                "Is estimated":         str(hashrate_is_estimated),
+                "Sharetime":            sharetime,
+                "Sharerate":            shares_per_sec,
+                "Accepted":             accepted_shares,
+                "Rejected":             rejected_shares,
+                "Algorithm":            "XXHASH",
+                "Diff":                 difficulty,
+                "Software":             str(miner_name),
+                "Identifier":           str(rig_identifier)}
 
-            if username in balances_to_update:
-                balances_to_update[username] += reward
+            # max_sharerate = job_tiers[req_difficulty]["max_sharerate_per_sec"]
+            # miner_sharerate = minerapi[thread_id]["Sharerate"]
+            # if miner_sharerate > max_sharerate:
+            #     sleep(10)
+
+            if accepted_shares % 5 == 0:
+                minerapi[thread_id] = thread_miner_api
+                global_blocks += 5
+                global_last_block_hash = job[1]
+
+            if int(calculated_hashrate) > int(max_hashrate):
+                send_data("BAD\n", connection)
+                rejected_shares += 1
+
+            elif int(result[0]) == int(job[2]):
+                basereward = job_tiers[req_difficulty]["reward"]
+                if username in miners_per_user:
+                    workers = miners_per_user[username]
+                else:
+                    workers = 1
+
+                reward = kolka_v1(basereward, sharetime, difficulty, workers)
+
+                if random.randint(0, BLOCK_PROBABILITY) == 1:
+                    reward = generate_block(
+                        username, reward, job[1], connection, xxhash=True)
+                else:
+                    send_data("GOOD\n", connection)
+
+                accepted_shares += 1
+
+                if username in balances_to_update:
+                    balances_to_update[username] += reward
+                else:
+                    balances_to_update[username] = reward
+
             else:
-                balances_to_update[username] = reward
+                send_data("BAD\n", connection)
+                rejected_shares += 1
 
-        else:
-            send_data("BAD\n", connection)
-            rejected_shares += 1
+                penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
+                if username in balances_to_update:
+                    balances_to_update[username] += penalty
+                else:
+                    balances_to_update[username] = penalty
+        except Exception as e:
+            exit()
 
-            penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-            if username in balances_to_update:
-                balances_to_update[username] += penalty
-            else:
-                balances_to_update[username] = penalty
+            #print(traceback.format_exc())
+        sleep(.25)
 
 
 def admin_print(*message):
@@ -1365,6 +1422,7 @@ def create_main_api_file():
 
         sleep(5)
 
+
 def create_minerapi():
     while True:
         # minerapi_public = {}
@@ -1389,6 +1447,7 @@ def create_minerapi():
                 indent=2,
                 ensure_ascii=False)
         sleep(7)
+
 
 def protocol_login(data, connection):
     """ Check if user password matches to the one stored
@@ -1742,7 +1801,6 @@ def protocol_get_transactions(data, connection):
 def handle(connection, address):
     """ Handler for every client """
     global global_connections
-    global global_last_block_hash
     thread_id = threading.get_ident()
     logged_in = False
     global_connections += 1
@@ -1762,16 +1820,16 @@ def handle(connection, address):
             if not data:
                 break
 
-            elif data[0] == "JOBXX":
-                """ Pass the client to the
-                    XXHASH job handler """
-                protocol_xxhash(data, connection, minerapi, address)
-
             elif data[0] == "JOB":
                 """ Client requested the DUCO-S1 mining protocol,
                     it's not our job so we pass him to the
                     DUCO-S1 job handler """
                 protocol_ducos1(data, connection, address)
+
+            elif data[0] == "JOBXX":
+                """ Pass the client to the
+                    XXHASH job handler """
+                protocol_xxhash(data, connection, address)
 
             elif data[0] == "PING":
                 """ Client requested a ping response """
@@ -1850,7 +1908,6 @@ def handle(connection, address):
         exit()
 
 
-
 if __name__ == "__main__":
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
@@ -1888,4 +1945,8 @@ if __name__ == "__main__":
         admin_print("Unexpected exception: ", e)
     finally:
         admin_print("Master Server is exiting")
-        os._exit(1)
+        sleep(1)
+        os.execl(sys.executable, sys.executable, *sys.argv)
+        #os._exit(1)
+
+
