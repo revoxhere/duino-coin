@@ -4,6 +4,7 @@ from server_functions import receive_data, send_data
 database = 'crypto_database.db'
 database_timeout = 10
 PoolVersion = 0.1
+DIFF_INCREASES_PER = 5000
 
 
 def PoolList_NO_SEND():
@@ -152,7 +153,7 @@ class Pool_Function_class:
 
         # ============
         data_send = {"totalBlocks": global_blocks,
-                    "diffIncrease": diff_incrase_per}
+                    "diffIncrease": DIFF_INCREASES_PER}
 
         data_send = (str(data_send)).replace("\'", "\"")
 
