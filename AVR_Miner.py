@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.4)
+# Duino-Coin Python AVR Miner (v2.5)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -86,7 +86,7 @@ except ModuleNotFoundError:
     install("pypresence")
 
 # Global variables
-minerVersion = "2.4"  # Version number
+minerVersion = "2.5"  # Version number
 timeout = 15  # Socket timeout
 resourcesFolder = "AVRMiner_" + str(minerVersion) + "_resources"
 shares = [0, 0]
@@ -881,8 +881,7 @@ def AVRMine(com):
                                     + str(e)
                                     + ")",
                                     "error")
-                                comConn = connectToAVR(com)
-                                errorCounter = 0
+                                restart_miner()
                             debugOutput(
                                 "Exception with to serial: " + str(e))
                             sleep(1)
@@ -937,7 +936,6 @@ def AVRMine(com):
                             "error")
                         debugOutput("Error splitting data: " + str(e))
                         sleep(1)
-
 
                 try:
                     # Send result to the server
@@ -1162,7 +1160,6 @@ def AVRMine(com):
                         + str("%02.0f" % int(ping))
                         + "ms")
                 break
-
 
 
 if __name__ == "__main__":
