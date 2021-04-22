@@ -15,18 +15,26 @@ UseLowerDiff = True  # Set it to True to mine with lower difficulty
 
 
 def retrieve_server_ip():
-    serverip = ("https://raw.githubusercontent.com/"
-                    + "revoxhere/"
-                    + "duino-coin/gh-pages/"
-                    + "serverip.txt")
-    with urllib.request.urlopen(serverip) as content:
-        # Read content and split into lines
-        content = content.read().decode().splitlines()
-    global pool_address, pool_port
-    # Line 1 = IP
-    pool_address = content[0]
-    # Line 2 = port
-    pool_port = content[1]
+    print("> Retrieving Pool Address And Port")
+    pool_obtained = False
+    while not pool_obtained:
+        try:
+            serverip = ("https://raw.githubusercontent.com/"
+                            + "revoxhere/"
+                            + "duino-coin/gh-pages/"
+                            + "serverip.txt")
+            with urllib.request.urlopen(serverip) as content:
+                # Read content and split into lines
+                content = content.read().decode().splitlines()
+            global pool_address, pool_port
+            # Line 1 = IP
+            pool_address = content[0]
+            # Line 2 = port
+            pool_port = content[1]
+            pool_obtained =  True
+        except:
+            print("> Failed to retrieve Pool Address and Port, Retrying.")
+            continue
 
 retrieve_server_ip()
 while True:
