@@ -1,7 +1,7 @@
 # Duino-Coin Kolka algorithms and formulas
 # 2019-2021 Duino-Coin community
 from fastrand import pcg32bounded as fastrandint
-from math import floor
+from math import floor, ceil
 MULTIPLIER = 1
 
 
@@ -65,7 +65,7 @@ def kolka_v3(sharetime, expected_sharetime, difficulty):
         # Checks if sharetime was exactly double than expected
         elif new_difficulty == 0:
             # Thus roughly half the difficulty
-            new_difficulty = int(diff * 0.5)
+            new_difficulty = int(ceil(difficulty * 0.5))
     return int(new_difficulty)
 
 
