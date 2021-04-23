@@ -1260,16 +1260,16 @@ def get_ram_usage():
     return psutil.virtual_memory()[2]
 
 
-def hashrate_prefix(hashrate, accuracy):
+def hashrate_prefix(hashrate:int, accuracy:int):
     """ Input: hashrate as int
         Output rounded hashrate with scientific prefix as string """
-    if int(hashrate) >= 800000000:
+    if hashrate >= 800000000:
         prefix = " GH/s"
         hashrate = hashrate / 1000000000
-    elif int(hashrate) >= 800000:
+    elif hashrate >= 800000:
         prefix = " MH/s"
         hashrate = hashrate / 1000000
-    elif int(hashrate) >= 800:
+    elif hashrate >= 800:
         prefix = " kH/s"
         hashrate = hashrate / 1000
     else:
@@ -1407,9 +1407,9 @@ def create_main_api_file():
             except KeyError:
                 pass
 
-        total_hashrate = hashrate_prefix(xxhash_hashrate + ducos1_hashrate, 4)
-        xxhash_hashrate = hashrate_prefix(xxhash_hashrate, 1)
-        ducos1_hashrate = hashrate_prefix(ducos1_hashrate, 1)
+        total_hashrate = hashrate_prefix(int(xxhash_hashrate + ducos1_hashrate), 4)
+        xxhash_hashrate = hashrate_prefix(int(xxhash_hashrate), 1)
+        ducos1_hashrate = hashrate_prefix(int(ducos1_hashrate), 1)
 
         for user in miner_list:
             miners_per_user[user] = miner_list.count(user)
