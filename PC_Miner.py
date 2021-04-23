@@ -805,14 +805,14 @@ def Thread(
                 while True:
                     # Ask the server for job
                     if algorithm == "XXHASH":
-                        soc.send(bytes(
+                        soc.sendall(bytes(
                             "JOBXX,"
                             + str(username)
                             + ","
                             + str(requestedDiff),
                             encoding="utf8"))
                     else:
-                        soc.send(bytes(
+                        soc.sendall(bytes(
                             "JOB,"
                             + str(username)
                             + ","
@@ -880,7 +880,7 @@ def Thread(
 
                     while True:
                         # Send result of hashing algorithm to the server
-                        soc.send(bytes(
+                        soc.sendall(bytes(
                             str(ducos1res)
                             + ","
                             + str(threadhashcount * 1000)
