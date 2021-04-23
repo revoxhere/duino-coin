@@ -1087,11 +1087,11 @@ def protocol_xxhash(data, connection, address):
                 send_data(
                     "BAD,Not enough data\n",
                     connection)
-                    raise Exception("Incorrect username")
+                raise Exception("Incorrect username")
 
             if username in banlist:
                 permanent_ban(ip)
-                    raise Exception("User banned")
+                raise Exception("User banned")
 
             req_difficulty = "NET"
         else:
