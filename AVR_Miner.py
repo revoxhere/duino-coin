@@ -89,37 +89,37 @@ except ModuleNotFoundError:
 MINER_VER = "2.5"  # Version number
 SOCKET_TIMEOUT = 15 
 AVR_TIMEOUT = 7
-resourcesFolder = "AVRMiner_" + str(MINER_VER) + "_resources"
+RESOURCES_DIR = "AVRMiner_" + str(MINER_VER) + "_resources"
 shares = [0, 0]
 diff = 0
-donatorrunning = False
+donator_running = False
 job = ""
 debug = "n"
-rigIdentifier = "None"
+rig_identifier = "None"
 # Serverip file
-serveripfile = ("https://raw.githubusercontent.com/"
+server_ip_file = ("https://raw.githubusercontent.com/"
                 + "revoxhere/"
                 + "duino-coin/gh-pages/serverip.txt")
 config = ConfigParser()
-donationlevel = 0
+donation_level = 0
 hashrate = 0
 
 # Create resources folder if it doesn't exist
-if not path.exists(resourcesFolder):
-    mkdir(resourcesFolder)
+if not path.exists(RESOURCES_DIR):
+    mkdir(RESOURCES_DIR)
 
 # Check if languages file exists
-if not Path(resourcesFolder + "/langs.json").is_file():
+if not Path(RESOURCES_DIR + "/langs.json").is_file():
     url = ("https://raw.githubusercontent.com/"
            + "revoxhere/"
            + "duino-coin/master/Resources/"
            + "AVR_Miner_langs.json")
     r = requests.get(url)
-    with open(resourcesFolder + "/langs.json", "wb") as f:
+    with open(RESOURCES_DIR + "/langs.json", "wb") as f:
         f.write(r.content)
 
 # Load language file
-with open(resourcesFolder + "/langs.json", "r", encoding="utf8") as lang_file:
+with open(RESOURCES_DIR + "/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = jsonload(lang_file)
 
 # OS X invalid locale hack
@@ -129,7 +129,7 @@ if system() == 'Darwin':
 
 # Check if miner is configured, if it isn't, autodetect language
 try:
-    if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
+    if not Path(RESOURCES_DIR + "/Miner_config.cfg").is_file():
         locale = getdefaultlocale()[0]
         if locale.startswith("es"):
             lang = "spanish"
@@ -148,7 +148,7 @@ try:
     else:
         try:
             # Read language from configfile
-            config.read(resourcesFolder + "/Miner_config.cfg")
+            config.read(RESOURCES_DIR + "/Miner_config.cfg")
             lang = config["arduminer"]["language"]
         except Exception:
             # If it fails, fallback to english
@@ -300,18 +300,18 @@ signal(SIGINT, handler)
 def loadConfig():
     # Config loading section
     global username
-    global donationlevel
+    global donation_level
     global avrport
     global debug
     global requestedDiff
-    global rigIdentifier
+    global rig_identifier
 
     # Initial configuration section
-    if not Path(str(resourcesFolder) + "/Miner_config.cfg").is_file():
+    if not Path(str(RESOURCES_DIR) + "/Miner_config.cfg").is_file():
         print(
             Style.BRIGHT
             + getString("basic_config_tool")
-            + resourcesFolder
+            + RESOURCES_DIR
             + getString("edit_config_file_warning"))
 
         print(
@@ -373,52 +373,52 @@ def loadConfig():
         else:
             requestedDiff = "AVR"
 
-        rigIdentifier = input(
+        rig_identifier = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_rig_identifier")
             + Fore.RESET
             + Style.BRIGHT)
-        if rigIdentifier == "y" or rigIdentifier == "Y":
-            rigIdentifier = input(
+        if rig_identifier == "y" or rig_identifier == "Y":
+            rig_identifier = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_rig_name")
                 + Fore.RESET
                 + Style.BRIGHT)
         else:
-            rigIdentifier = "None"
+            rig_identifier = "None"
 
-        donationlevel = "0"
+        donation_level = "0"
         if osname == "nt" or osname == "posix":
-            donationlevel = input(
+            donation_level = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_donation_level")
                 + Fore.RESET
                 + Style.BRIGHT)
 
-        # Check wheter donationlevel is correct
-        donationlevel = sub(r"\D", "", donationlevel)
-        if donationlevel == '':
-            donationlevel = 1
-        if float(donationlevel) > int(5):
-            donationlevel = 5
-        if float(donationlevel) < int(0):
-            donationlevel = 0
+        # Check wheter donation_level is correct
+        donation_level = sub(r"\D", "", donation_level)
+        if donation_level == '':
+            donation_level = 1
+        if float(donation_level) > int(5):
+            donation_level = 5
+        if float(donation_level) < int(0):
+            donation_level = 0
 
         # Format data
         config["arduminer"] = {
             "username": username,
             "avrport": avrport,
-            "donate": donationlevel,
+            "donate": donation_level,
             "language": lang,
-            "identifier": rigIdentifier,
+            "identifier": rig_identifier,
             "difficulty": requestedDiff,
             "debug": "n"}
 
         # Write data to file
-        with open(str(resourcesFolder)
+        with open(str(RESOURCES_DIR)
                   + "/Miner_config.cfg", "w") as configfile:
             config.write(configfile)
 
@@ -426,13 +426,13 @@ def loadConfig():
         print(Style.RESET_ALL + getString("config_saved"))
 
     else:  # If config already exists, load from it
-        config.read(str(resourcesFolder) + "/Miner_config.cfg")
+        config.read(str(RESOURCES_DIR) + "/Miner_config.cfg")
         username = config["arduminer"]["username"]
         avrport = config["arduminer"]["avrport"]
         avrport = avrport.split(",")
-        donationlevel = config["arduminer"]["donate"]
+        donation_level = config["arduminer"]["donate"]
         debug = config["arduminer"]["debug"]
-        rigIdentifier = config["arduminer"]["identifier"]
+        rig_identifier = config["arduminer"]["identifier"]
         requestedDiff = config["arduminer"]["difficulty"]
 
 
@@ -499,7 +499,7 @@ def Greeting():
             + getString("donation_level")
             + Style.BRIGHT
             + Fore.YELLOW
-            + str(donationlevel))
+            + str(donation_level))
     print(
         Style.DIM
         + Fore.MAGENTA
@@ -522,7 +522,7 @@ def Greeting():
         + getString("rig_identifier")
         + Style.BRIGHT
         + Fore.YELLOW
-        + rigIdentifier)
+        + rig_identifier)
 
     print(
         Style.DIM
@@ -539,7 +539,7 @@ def Greeting():
 
     if osname == "nt":
         # Initial miner executable section
-        if not Path(resourcesFolder + "/Donate_executable.exe").is_file():
+        if not Path(RESOURCES_DIR + "/Donate_executable.exe").is_file():
             debugOutput(
                 "OS is Windows, downloading developer donation executable")
             url = ("https://github.com/"
@@ -547,11 +547,11 @@ def Greeting():
                    + "duino-coin/blob/useful-tools/"
                    + "DonateExecutableWindows.exe?raw=true")
             r = requests.get(url)
-            with open(resourcesFolder + "/Donate_executable.exe", "wb") as f:
+            with open(RESOURCES_DIR + "/Donate_executable.exe", "wb") as f:
                 f.write(r.content)
     elif osname == "posix":
         # Initial miner executable section
-        if not Path(resourcesFolder + "/Donate_executable").is_file():
+        if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
             debugOutput(
                 "OS is *nix, downloading developer donation executable")
             url = ("https://github.com/"
@@ -559,13 +559,13 @@ def Greeting():
                    + "duino-coin/blob/useful-tools/"
                    + "DonateExecutableLinux?raw=true")
             r = requests.get(url)
-            with open(resourcesFolder + "/Donate_executable", "wb") as f:
+            with open(RESOURCES_DIR + "/Donate_executable", "wb") as f:
                 f.write(r.content)
 
 
 def restart_miner():
     try:
-        if donatorrunning:
+        if donator_running:
             donateExecutable.terminate()
     except Exception as e:
         prettyPrint(
@@ -590,14 +590,14 @@ def restart_miner():
 
 
 def Donate():
-    global donationlevel
-    global donatorrunning
+    global donation_level
+    global donator_running
     global donateExecutable
 
     if osname == "nt":
         cmd = (
             "cd "
-            + resourcesFolder
+            + RESOURCES_DIR
             + "& Donate_executable.exe "
             + "-o stratum+tcp://xmg.minerclaim.net:7008 "
             + "-u revox.donate "
@@ -606,14 +606,14 @@ def Donate():
     elif osname == "posix":
         cmd = (
             "cd "
-            + resourcesFolder
+            + RESOURCES_DIR
             + "&& chmod +x Donate_executable "
             + "&& ./Donate_executable "
             + "-o stratum+tcp://xmg.minerclaim.net:7008 "
             + "-u revox.donate "
             + "-p x -s 4 -e ")
 
-    if int(donationlevel) <= 0:
+    if int(donation_level) <= 0:
         prettyPrint(
             "sys0",
             Fore.YELLOW
@@ -626,20 +626,20 @@ def Donate():
             "warning")
         sleep(5)
 
-    elif donatorrunning == False:
-        if int(donationlevel) == 5:
+    elif donator_running == False:
+        if int(donation_level) == 5:
             cmd += "50"
-        elif int(donationlevel) == 4:
+        elif int(donation_level) == 4:
             cmd += "40"
-        elif int(donationlevel) == 3:
+        elif int(donation_level) == 3:
             cmd += "30"
-        elif int(donationlevel) == 2:
+        elif int(donation_level) == 2:
             cmd += "20"
-        elif int(donationlevel) == 1:
+        elif int(donation_level) == 1:
             cmd += "10"
-        if int(donationlevel) > 0:
+        if int(donation_level) > 0:
             debugOutput(getString("starting_donation"))
-            donatorrunning = True
+            donator_running = True
             # Launch CMD as subprocess
             donateExecutable = Popen(
                 cmd, shell=True, stderr=DEVNULL)
@@ -734,7 +734,7 @@ def AVRMine(com):
         while True:
             try:
                 # Use request to grab data from raw github file
-                res = requests.get(serveripfile, data=None)
+                res = requests.get(server_ip_file, data=None)
                 if res.status_code == 200:
                     # Read content and split into lines
                     content = (res.content.decode().splitlines())
@@ -951,7 +951,7 @@ def AVRMine(com):
                             + ",Official AVR Miner (DUCO-S1A) v"
                             + str(MINER_VER)
                             + ","
-                            + str(rigIdentifier)
+                            + str(rig_identifier)
                             + ","
                             + str(chipID),
                             encoding="utf8"))
@@ -1180,7 +1180,7 @@ if __name__ == "__main__":
         prettyPrint(
             "sys0",
             getString("load_config_error")
-            + resourcesFolder
+            + RESOURCES_DIR
             + getString("load_config_error_warning")
             + Style.NORMAL
             + Fore.RESET
