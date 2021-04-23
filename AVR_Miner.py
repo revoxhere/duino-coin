@@ -128,30 +128,33 @@ if system() == 'Darwin':
         setlocale(LC_ALL, 'en_US.UTF-8')
 
 # Check if miner is configured, if it isn't, autodetect language
-if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
-    locale = getdefaultlocale()[0]
-    if locale.startswith("es"):
-        lang = "spanish"
-    elif locale.startswith("sk"):
-        lang = "slovak"
-    elif locale.startswith("ru"):
-        lang = "russian"
-    elif locale.startswith("pl"):
-        lang = "polish"
-    elif locale.startswith("fr"):
-        lang = "french"
-    elif locale.startswith("zh"):
-        lang = "chinese_simplified"
+try:
+    if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
+        locale = getdefaultlocale()[0]
+        if locale.startswith("es"):
+            lang = "spanish"
+        elif locale.startswith("sk"):
+            lang = "slovak"
+        elif locale.startswith("ru"):
+            lang = "russian"
+        elif locale.startswith("pl"):
+            lang = "polish"
+        elif locale.startswith("fr"):
+            lang = "french"
+        elif locale.startswith("zh"):
+            lang = "chinese_simplified"
+        else:
+            lang = "english"
     else:
-        lang = "english"
-else:
-    try:
-        # Read language from configfile
-        config.read(resourcesFolder + "/Miner_config.cfg")
-        lang = config["arduminer"]["language"]
-    except Exception:
-        # If it fails, fallback to english
-        lang = "english"
+        try:
+            # Read language from configfile
+            config.read(resourcesFolder + "/Miner_config.cfg")
+            lang = config["arduminer"]["language"]
+        except Exception:
+            # If it fails, fallback to english
+            lang = "english"
+except:
+    lang = "english"
 
 
 def getString(string_name):
