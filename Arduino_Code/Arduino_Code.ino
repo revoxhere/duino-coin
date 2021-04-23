@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for Arduino boards v2.4
+//  Code for Arduino boards v2.5
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -19,6 +19,7 @@
 
 // Include SHA1 library
 // Authors: https://github.com/daknuett, https://github.com/JoyBed, https://github.com/revox
+// Improvements: https://github.com/joaquinbvw
 #include "sha1.h"
 // Include Arduino identifier library
 // Author: https://github.com/ricaun
