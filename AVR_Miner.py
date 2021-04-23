@@ -624,15 +624,15 @@ def Donate():
             + Fore.YELLOW
             + getString("learn_more_donate"),
             "warning")
-        sleep(10)
+        sleep(5)
 
     elif donatorrunning == False:
         if int(donationlevel) == 5:
-            cmd += "95"
-        elif int(donationlevel) == 4:
-            cmd += "75"
-        elif int(donationlevel) == 3:
             cmd += "50"
+        elif int(donationlevel) == 4:
+            cmd += "40"
+        elif int(donationlevel) == 3:
+            cmd += "30"
         elif int(donationlevel) == 2:
             cmd += "20"
         elif int(donationlevel) == 1:
