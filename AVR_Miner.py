@@ -86,9 +86,10 @@ except ModuleNotFoundError:
     install("pypresence")
 
 # Global variables
-minerVersion = "2.5"  # Version number
-timeout = 15  # Socket timeout
-resourcesFolder = "AVRMiner_" + str(minerVersion) + "_resources"
+MINER_VER = "2.5"  # Version number
+SOCKET_TIMEOUT = 15 
+AVR_TIMEOUT = 7
+resourcesFolder = "AVRMiner_" + str(MINER_VER) + "_resources"
 shares = [0, 0]
 diff = 0
 donatorrunning = False
@@ -199,14 +200,14 @@ def Connect():
                         + str(":")
                         + str(masterServer_port))
             socConn = socket()
-            socConn.settimeout(timeout)
+            socConn.settimeout(SOCKET_TIMEOUT)
             # Establish socket connection to the server
             socConn.connect(
                 (str(masterServer_address), int(masterServer_port)))
             # Get server version
             serverVersion = socConn.recv(3).decode().rstrip("\n")
             debugOutput("Server version: " + serverVersion)
-            if (float(serverVersion) <= float(minerVersion)
+            if (float(serverVersion) <= float(MINER_VER)
                     and len(serverVersion) == 3):
                 # If miner is up-to-date, display a message and continue
                 prettyPrint(
@@ -223,7 +224,7 @@ def Connect():
                 prettyPrint(
                     "sys0",
                     " Miner is outdated (v"
-                    + minerVersion
+                    + MINER_VER
                     + ") -"
                     + getString("server_is_on_version")
                     + serverVersion
@@ -258,7 +259,7 @@ def connectToAVR(com):
     comConn = serial.Serial(
         com,
         baudrate=115200,
-        timeout=5)
+        timeout=AVR_TIMEOUT)
     prettyPrint(
         "usb"
         + str(''.join(filter(str.isdigit, com))),
@@ -461,7 +462,7 @@ def Greeting():
         + Style.RESET_ALL
         + Fore.MAGENTA
         + " (v"
-        + str(minerVersion)
+        + str(MINER_VER)
         + ") "
         + Fore.RESET
         + "2019-2021")
@@ -549,7 +550,7 @@ def Greeting():
         # Initial miner executable section
         if not Path(resourcesFolder + "/Donate_executable").is_file():
             debugOutput(
-                "OS is Windows, downloading developer donation executable")
+                "OS is *nix, downloading developer donation executable")
             url = ("https://github.com/"
                    + "revoxhere/"
                    + "duino-coin/blob/useful-tools/"
@@ -945,7 +946,7 @@ def AVRMine(com):
                             + ","
                             + str(hashrate)
                             + ",Official AVR Miner (DUCO-S1A) v"
-                            + str(minerVersion)
+                            + str(MINER_VER)
                             + ","
                             + str(rigIdentifier)
                             + ","
@@ -1000,7 +1001,7 @@ def AVRMine(com):
                     shares[0] += 1
                     title(
                         getString("duco_avr_miner")
-                        + str(minerVersion)
+                        + str(MINER_VER)
                         + ") - "
                         + str(shares[0])
                         + "/"
@@ -1055,7 +1056,7 @@ def AVRMine(com):
                     shares[0] += 1
                     title(
                         getString("duco_avr_miner")
-                        + str(minerVersion)
+                        + str(MINER_VER)
                         + ") - "
                         + str(shares[0])
                         + "/"
@@ -1110,7 +1111,7 @@ def AVRMine(com):
                     shares[1] += 1
                     title(
                         getString("duco_avr_miner")
-                        + str(minerVersion)
+                        + str(MINER_VER)
                         + ") - "
                         + str(shares[0])
                         + "/"
@@ -1166,7 +1167,7 @@ if __name__ == "__main__":
     # Colorama
     init(autoreset=True)
     # Window title
-    title(getString("duco_avr_miner") + str(minerVersion) + ")")
+    title(getString("duco_avr_miner") + str(MINER_VER) + ")")
 
     try:
         # Load config file or create new one
