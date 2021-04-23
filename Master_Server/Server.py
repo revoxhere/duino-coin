@@ -377,44 +377,46 @@ else:
 def create_jobs():
     """ Generate DUCO-S1A jobs for low-power devices """
     global_last_block_hash_cp = global_last_block_hash
+    base_hash = sha1(global_last_block_hash_cp.encode('ascii'))
+    temp_hash = None
     for i in range(READY_HASHES_NUM):
+        temp_hash = base_hash.copy()
         avr_diff = job_tiers["AVR"]["difficulty"]
         rand = randint(0, 100 * avr_diff)
+        temp_hash.update(str(rand).encode('ascii'))
         pregenerated_jobs_avr[i] = {
             "numeric_result": rand,
-            "expected_hash": sha1(
-                str(global_last_block_hash_cp
-                    + str(rand)).encode("utf-8")).hexdigest(),
+            "expected_hash": temp_hash.hexdigest(),
             "last_block_hash": str(global_last_block_hash_cp)}
 
     for i in range(READY_HASHES_NUM):
+        temp_hash = base_hash.copy()
         due_diff = job_tiers["DUE"]["difficulty"]
         rand = randint(0, 100 * avr_diff)
+        temp_hash.update(str(rand).encode('ascii'))
         pregenerated_jobs_due[i] = {
             "numeric_result": rand,
-            "expected_hash": sha1(
-                str(global_last_block_hash_cp
-                    + str(rand)).encode("utf-8")).hexdigest(),
+            "expected_hash": temp_hash.hexdigest(),
             "last_block_hash": str(global_last_block_hash_cp)}
 
     for i in range(READY_HASHES_NUM):
+        temp_hash = base_hash.copy()
         esp32_diff = job_tiers["ESP32"]["difficulty"]
         rand = randint(0, 100 * esp32_diff)
+        temp_hash.update(str(rand).encode('ascii'))
         pregenerated_jobs_esp32[i] = {
             "numeric_result": rand,
-            "expected_hash": sha1(
-                str(global_last_block_hash_cp
-                    + str(rand)).encode("utf-8")).hexdigest(),
+            "expected_hash": temp_hash.hexdigest(),
             "last_block_hash": str(global_last_block_hash_cp)}
 
     for i in range(READY_HASHES_NUM):
+        temp_hash = base_hash.copy()
         esp8266_diff = job_tiers["ESP8266"]["difficulty"]
         rand = randint(0, 100 * esp8266_diff)
+        temp_hash.update(str(rand).encode('ascii'))
         pregenerated_jobs_esp8266[i] = {
             "numeric_result": rand,
-            "expected_hash": sha1(
-                str(global_last_block_hash_cp
-                    + str(rand)).encode("utf-8")).hexdigest(),
+            "expected_hash": temp_hash.hexdigest(),
             "last_block_hash": str(global_last_block_hash_cp)}
 
 
