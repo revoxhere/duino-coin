@@ -101,7 +101,7 @@ except ModuleNotFoundError:
 
 # Global variables
 minerVersion = "2.4"  # Version number
-timeout = 15  # Socket timeout
+timeout = 30  # Socket timeout
 resourcesFolder = "PCMiner_" + str(minerVersion) + "_resources"
 donatorrunning = False
 debug = "n"
@@ -141,32 +141,35 @@ if plsystem() == "Darwin":
         setlocale(LC_ALL, "en_US.UTF-8")
 
 # Check if miner is configured, if it isn't, autodetect language
-if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
-    locale = getdefaultlocale()[0]
-    if locale.startswith("es"):
-        lang = "spanish"
-    elif locale.startswith("pl"):
-        lang = "polish"
-    elif locale.startswith("fr"):
-        lang = "french"
-    elif locale.startswith("ru"):
-        lang = "russian"
-    elif locale.startswith("de"):
-        lang = "german"
-    elif locale.startswith("tr"):
-        lang = "turkish"
-    elif locale.startswith("zh"):
-        lang = "chinese_simplified"
+try:
+    if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
+        locale = getdefaultlocale()[0]
+        if locale.startswith("es"):
+            lang = "spanish"
+        elif locale.startswith("pl"):
+            lang = "polish"
+        elif locale.startswith("fr"):
+            lang = "french"
+        elif locale.startswith("ru"):
+            lang = "russian"
+        elif locale.startswith("de"):
+            lang = "german"
+        elif locale.startswith("tr"):
+            lang = "turkish"
+        elif locale.startswith("zh"):
+            lang = "chinese_simplified"
+        else:
+            lang = "english"
     else:
-        lang = "english"
-else:
-    # Read language variable from configfile
-    try:
-        config.read(resourcesFolder + "/Miner_config.cfg")
-        lang = config["miner"]["language"]
-    except Exception:
-        # If it fails, fallback to english
-        lang = "english"
+        # Read language variable from configfile
+        try:
+            config.read(resourcesFolder + "/Miner_config.cfg")
+            lang = config["miner"]["language"]
+        except Exception:
+            # If it fails, fallback to english
+            lang = "english"
+except:
+    lang = "english"
 
 
 def getString(string_name):
@@ -633,7 +636,7 @@ def ducos1(
     # Loop from 1 too 100*diff
     for ducos1res in range(100 * int(difficulty) + 1):
         # Generate hash
-        temp_hash =  base_hash.copy()
+        temp_hash = base_hash.copy()
         temp_hash.update(str(ducos1res).encode('ascii'))
         ducos1 = temp_hash.hexdigest()
         # Check if result was found
@@ -1100,6 +1103,7 @@ def Thread(
                 debugOutput("Error while mining: " + str(e))
                 sleep(5)
                 break
+
 
 def prettyPrint(messageType, message, state):
     # Print output messages in the DUCO "standard"
