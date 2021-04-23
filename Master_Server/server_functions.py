@@ -1,3 +1,4 @@
+
 def Comma_Seperator_filter(data, data2):
     if data[0] == "PoolSync":
         leng_of_base = 9
@@ -25,15 +26,14 @@ def Comma_Seperator_filter(data, data2):
 def receive_data(connection):
     """ Returns received data from the connection,
         raises an exception on error """
-    data = connection.recv(1024)
+    data = connection.recv(128)
     if not data:
-        raise Exception("Connection closed unexpectedly")
         connection.close()
+        raise Exception("Connection closed unexpectedly")
         return None
     else:
         data_pre_split = data
         data = data.decode("utf8").replace("\n", "").split(",")
-
         data = Comma_Seperator_filter(data, data_pre_split)
 
         return data
@@ -43,7 +43,7 @@ def send_data(data, connection):
     """ Sends data to the connection,
         raises an exception on error """
     try:
-        connection.send(bytes(str(data), encoding="utf8"))
+        connection.sendall(bytes(str(data), encoding="utf8"))
     except Exception:
         raise Exception("Connection closed unexpectedly")
         connection.close()
