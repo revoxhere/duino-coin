@@ -797,7 +797,7 @@ def AVRMine(com):
                 try:
                     # Send job request
                     debugOutput("Requested job from the server")
-                    socConn.send(
+                    socConn.sendall(
                         bytes(
                             "JOB,"
                             + str(username)
@@ -943,7 +943,7 @@ def AVRMine(com):
 
                 try:
                     # Send result to the server
-                    socConn.send(
+                    socConn.sendall(
                         bytes(
                             str(ducos1result)
                             + ","
