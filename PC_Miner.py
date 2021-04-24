@@ -926,8 +926,8 @@ def Thread(
                                 "%03.0f" % float(totalhashrate)
                                 + " kH/s")
 
-                        if (totalhashrate > 1000
-                                and accepted.value % 5 == 0):
+                        if (totalhashrate > 2000
+                                and accepted.value % 10 == 0):
                             prettyPrint("sys0",
                                         " " + getString("max_hashrate_notice"),
                                         "warning")
