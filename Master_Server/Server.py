@@ -15,8 +15,8 @@ import requests
 import os
 import psutil
 import ssl
-import json
 import sys
+import json
 import smtplib
 import traceback
 from random import randint
@@ -54,14 +54,14 @@ PORT = 2811
 DIFF_INCREASES_PER = 5000
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 5
-DB_TIMEOUT = 5
+DB_TIMEOUT = 15
 SERVER_VER = 2.4
 READY_HASHES_NUM = 1000
 MOTD = """Kolka is superior"""
 BLOCK_PROBABILITY = 1000000
 BLOCK_REWARD = 7.7
 UPDATE_MINERAPI_EVERY = 5
-EXPECTED_SHARETIME = 7
+EXPECTED_SHARETIME = 12
 BCRYPT_ROUNDS = 8
 # DB files
 DATABASE = 'crypto_database.db'
@@ -111,7 +111,7 @@ whitelisted_ips = []
 ip_list = {}
 miners_per_user = {}
 chip_ids = []
-
+workers = {}
 
 # Read banned usernames
 with open(CONFIG_BANS, "r") as bannedusrfile:
@@ -173,6 +173,7 @@ html = """\
 </html>
 """
 
+
 def create_backup():
     """ Creates a backup folder every day """
     if not ospath.isdir('backups/'):
@@ -205,7 +206,7 @@ def permanent_ban(ip):
         os.system("sudo iptables -I INPUT -s "
                   + str(ip)
                   + " -j DROP")
-        
+
 
 def update_job_tiers():
     global job_tiers
@@ -251,7 +252,7 @@ def update_job_tiers():
             "DUE": {
                 "difficulty": 150,
                 "reward": .0025,
-                "max_hashrate": 50000
+                "max_hashrate": 1
             },
             "AVR": {
                 "difficulty": 4,
@@ -347,7 +348,7 @@ def create_jobs():
         for i in range(READY_HASHES_NUM):
             temp_hash = base_hash.copy()
             due_diff = job_tiers["DUE"]["difficulty"]
-            rand = randint(0, 100 * avr_diff)
+            rand = randint(0, 100 * due_diff)
             temp_hash.update(str(rand).encode('ascii'))
             pregenerated_jobs_due[i] = {
                 "numeric_result": rand,
@@ -426,15 +427,15 @@ def database_updater():
             with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
                 for user in balances_to_update.copy():
-                    amount_to_update = balances_to_update[user]
-                    if amount_to_update > 0.0009:
-                        amount_to_update = 0.0009
+                    amount_to_update = balances_to_update[user] / 30
+                    if amount_to_update > 0.003:
+                        amount_to_update = 0.003
                     # print("Updating", user, amount_to_update)
                     datab.execute(
                         """UPDATE Users
                         SET balance = balance + ?
                         WHERE username = ?""",
-                        (balances_to_update[user] / 50, user))
+                        (amount_to_update, user))
                     balances_to_update.pop(user)
                 conn.commit()
 
@@ -829,7 +830,7 @@ def protocol_ducos1(data, connection, address):
         Returns to main thread if non-mining data is submitted """
     global global_last_block_hash
     global global_blocks
-    global miners_per_user
+    global workers
 
     accepted_shares, rejected_shares = 0, 0
     global_last_block_hash_cp = global_last_block_hash
@@ -837,7 +838,6 @@ def protocol_ducos1(data, connection, address):
     is_first_share = True
     thread_id = id(gevent.getcurrent())
     override_difficulty = ""
-    workers = 1
 
     connection.settimeout(60)
     while True:
@@ -858,6 +858,11 @@ def protocol_ducos1(data, connection, address):
             if username in banlist:
                 permanent_ban(ip)
                 raise Exception("User banned")
+
+            try:
+                workers[address[0]] += 1
+            except:
+                workers[address[0]] = 0
 
             try:
                 # Parse starting difficulty from the client
@@ -908,28 +913,13 @@ def protocol_ducos1(data, connection, address):
 
         job_sent_timestamp = utime.now()
         result = receive_data(connection)
-        sharetime = (utime.now() - job_sent_timestamp).total_seconds()
-        hashrate = numeric_result / sharetime
+        difference = utime.now() - job_sent_timestamp
+
+        sharetime = difference.total_seconds()
+        hashrate = int(numeric_result / sharetime)
         hashrate_is_estimated = False
 
         is_first_share = False
-        #try:
-            # If client submitted own hashrate, use it for the API
-            #hashrate = float(result[1])
-            #hashrate_is_estimated = False
-        #except:
-
-        try:
-            # Check miner software for unallowed characters
-            miner_name = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[2])
-        except:
-            miner_name = "Unknown miner"
-
-        try:
-            # Check rig identifier for unallowed characters
-            rig_identifier = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[3])
-        except:
-            rig_identifier = "None"
 
         # if req_difficulty == "AVR":
         #     try:
@@ -939,15 +929,23 @@ def protocol_ducos1(data, connection, address):
         #     except IndexError:
         #         chipID = "None"
 
-        if accepted_shares % UPDATE_MINERAPI_EVERY == 0:
+        if accepted_shares > 0 and accepted_shares % UPDATE_MINERAPI_EVERY == 0:
             try:
-                workers = miners_per_user[username]
+                # Check miner software for unallowed characters
+                miner_name = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[2])
             except:
-                workers = 1
+                miner_name = "Unknown miner"
+
+            try:
+                # Check rig identifier for unallowed characters
+                rig_identifier = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[3])
+            except:
+                rig_identifier = "None"
+
             thread_miner_api = {
                 "User":         str(username),
                 "Hashrate":     hashrate,
-                "Is estimated": hashrate_is_estimated,
+                "Is estimated": str(hashrate_is_estimated),
                 "Sharetime":    sharetime,
                 "Accepted":     accepted_shares,
                 "Rejected":     rejected_shares,
@@ -958,7 +956,7 @@ def protocol_ducos1(data, connection, address):
             }
             minerapi[thread_id] = thread_miner_api
 
-        if accepted_shares % UPDATE_MINERAPI_EVERY*2 == 0:
+        if accepted_shares > 0 and accepted_shares % UPDATE_MINERAPI_EVERY*2 == 0:
             global_blocks += UPDATE_MINERAPI_EVERY*2
             global_last_block_hash = job[1]
 
@@ -979,7 +977,8 @@ def protocol_ducos1(data, connection, address):
             accepted_shares += 1
 
             basereward = job_tiers[req_difficulty]["reward"]
-            reward = kolka_v1(basereward, sharetime, difficulty, workers)
+            reward = kolka_v1(basereward, sharetime,
+                              difficulty, workers[address[0]])
 
             try:
                 balances_to_update[username] += reward
@@ -1012,6 +1011,7 @@ def protocol_xxhash(data, connection, address):
         Returns to main thread if non-mining data is submitted """
     global global_last_block_hash
     global global_blocks
+    global workers
 
     accepted_shares, rejected_shares = 0, 0
     global_last_block_hash_cp = global_last_block_hash
@@ -1039,6 +1039,11 @@ def protocol_xxhash(data, connection, address):
             if username in banlist:
                 permanent_ban(ip)
                 raise Exception("User banned")
+
+            try:
+                workers[address[0]] += 1
+            except:
+                workers[address[0]] = 0
 
             req_difficulty = "NET"
         else:
@@ -1119,13 +1124,9 @@ def protocol_xxhash(data, connection, address):
         elif int(result[0]) == job[2]:
             accepted_shares += 1
 
-            try:
-                workers = miners_per_user[username]
-            except:
-                workers = 1
-
             basereward = job_tiers[req_difficulty]["reward"]
-            reward = kolka_v1(basereward, sharetime, difficulty, workers)
+            reward = kolka_v1(basereward, sharetime,
+                              difficulty, workers[address[0]])
 
             try:
                 balances_to_update[username] += reward
@@ -1168,7 +1169,7 @@ def get_sys_usage():
         sleep(5)
 
 
-def hashrate_prefix(hashrate:int, accuracy:int):
+def hashrate_prefix(hashrate: int, accuracy: int):
     """ Input: hashrate as int
         Output rounded hashrate with scientific prefix as string """
     if hashrate >= 800000000:
@@ -1305,6 +1306,7 @@ def create_main_api_file():
         this will sooner or later be replaced with a RESTful api """
     global miners_per_user
     while True:
+        total_hashrate = 0
         ducos1_hashrate, xxhash_hashrate = 0, 0
         minerapi_public, miners_per_user = {}, {}
         miner_list = []
@@ -1312,14 +1314,15 @@ def create_main_api_file():
             try:
                 # Add miner hashrate to the server hashrate
                 if minerapi[miner]["Algorithm"] == "DUCO-S1":
-                    ducos1_hashrate += float(minerapi[miner]["Hashrate"])
-                elif minerapi[miner]["Algorithm"] == "XXHASH":
-                    xxhash_hashrate += float(minerapi[miner]["Hashrate"])
+                    ducos1_hashrate += minerapi[miner]["Hashrate"]
+                else:
+                    xxhash_hashrate += minerapi[miner]["Hashrate"]
                 miner_list.append(minerapi[miner]["User"])
-            except KeyError:
+            except:
                 pass
 
-        total_hashrate = hashrate_prefix(int(xxhash_hashrate + ducos1_hashrate), 4)
+        total_hashrate = hashrate_prefix(
+            int(xxhash_hashrate + ducos1_hashrate), 4)
         xxhash_hashrate = hashrate_prefix(int(xxhash_hashrate), 1)
         ducos1_hashrate = hashrate_prefix(int(ducos1_hashrate), 1)
 
@@ -1375,7 +1378,9 @@ def create_minerapi():
         with open('miners.json', 'w') as outfile:
             json.dump(
                 minerapi.copy(),
-                outfile)
+                outfile,
+                indent=2,
+                ensure_ascii=False)
         sleep(10)
 
 
@@ -1629,7 +1634,7 @@ def protocol_get_balance(data, connection, username):
     except Exception as e:
         print(e)
         send_data("NO,Internal server error: "+str(e))
-        return
+        raise Exception(e)
 
 
 def get_duco_prices():
@@ -1730,8 +1735,9 @@ def protocol_get_transactions(data, connection):
         transactionsToReturnStr = str(transactionsToReturn)
         send_data(transactionsToReturnStr, connection)
     except Exception as e:
-        admin_print("Error getting transactions: " + str(e))
+        #admin_print("Error getting transactions: " + str(e))
         send_data("NO,Internal server error: "+str(e), connection)
+        raise Exception("Error getting transactions")
 
 
 def handle(connection, address):
@@ -1756,6 +1762,13 @@ def handle(connection, address):
             if not data:
                 break
 
+            elif data[0] == "BALA":
+                """ Client requested balance check """
+                if logged_in:
+                    protocol_get_balance(data, connection, username)
+                else:
+                    send_data("NO,Not logged in", connection)
+
             elif data[0] == "JOB":
                 """ Client requested the DUCO-S1 mining protocol,
                     it's not our job so we pass him to the
@@ -1773,7 +1786,8 @@ def handle(connection, address):
                 if logged_in:
                     username = data[1]
                     if username in banlist:
-                        temporary_ban(address[0])
+                        permanent_ban(address[0])
+                        raise Exception("User banned")
                 else:
                     break
 
@@ -1781,12 +1795,6 @@ def handle(connection, address):
                 """ Client requested registation """
                 protocol_register(data, connection)
 
-            elif data[0] == "BALA":
-                """ Client requested balance check """
-                if logged_in:
-                    protocol_get_balance(data, connection, username)
-                else:
-                    send_data("NO,Not logged in", connection)
 
             elif data[0] == "GTXL":
                 """ Client requested transaction list """
@@ -1824,12 +1832,12 @@ def handle(connection, address):
 
             elif data[0] == "PoolLoginAdd":
                 PF.PoolLoginAdd(connection=connection,
-                                data=data, 
+                                data=data,
                                 PoolPassword=PoolPassword)
 
             elif data[0] == "PoolLoginRemove":
                 PF.PoolLoginRemove(connection=connection,
-                                   data=data, 
+                                   data=data,
                                    PoolPassword=PoolPassword)
     except Exception as e:
         pass
@@ -1841,9 +1849,21 @@ def handle(connection, address):
         except:
             pass
 
+        try:
+            workers[address[0]] -= 1
+            if workers[address[0]] <= 0:
+                workers.pop(address[0])
+        except:
+            pass
+
         global_connections -= 1
         connection.close()
         return
+
+def autorestart():
+    sleep(1800)
+    print("Autorestarting")
+    os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 if __name__ == "__main__":
@@ -1852,18 +1872,23 @@ if __name__ == "__main__":
     create_backup()
     threading.Thread(target=get_duco_prices).start()
     threading.Thread(target=input_management).start()
-    threading.Thread(target=create_main_api_file).start()
-    threading.Thread(target=create_minerapi).start()
-    threading.Thread(target=create_secondary_api_files).start()
+
     threading.Thread(target=update_job_tiers).start()
     threading.Thread(target=create_jobs).start()
     threading.Thread(target=get_sys_usage).start()
+
+    threading.Thread(target=create_main_api_file).start()
+    threading.Thread(target=create_minerapi).start()
+    threading.Thread(target=create_secondary_api_files).start()
+
     threading.Thread(target=database_updater).start()
+    threading.Thread(target=autorestart).start()
     try:
         admin_print("Master Server is listening on port", PORT)
         StreamServer((HOSTNAME, PORT), handle).serve_forever()
     except Exception as e:
         admin_print("Unexpected exception: ", e)
     finally:
-        admin_print("Master Server is exiting, connections:", global_connections)
+        admin_print("Master Server is exiting, connections:",
+                    global_connections)
         os.execl(sys.executable, sys.executable, *sys.argv)
