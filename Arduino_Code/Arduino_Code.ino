@@ -40,7 +40,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   // Open serial port
   Serial.begin(115200);
-  Serial.setTimeout(5000);
+  Serial.setTimeout(7000);
   // Allocating memory for the hash calculation
   newblockhash1 = (unsigned char*)malloc(sizeofhash * sizeof(unsigned char));
   // Grab Arduino chip ID
