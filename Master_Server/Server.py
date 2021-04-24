@@ -12,10 +12,10 @@ import socket
 import datetime
 import configparser
 import requests
-import json
 import os
 import psutil
 import ssl
+import json
 import sys
 import smtplib
 import traceback
@@ -52,17 +52,16 @@ import udatetime as utime
 HOSTNAME = ""
 PORT = 2811
 DIFF_INCREASES_PER = 5000
-DIFF_MULTIPLIER = 1.1
+DIFF_MULTIPLIER = 1
 SAVE_TIME = 5
 DB_TIMEOUT = 5
 SERVER_VER = 2.4
 READY_HASHES_NUM = 1000
 MOTD = """Kolka is superior"""
-MAX_MININIG_CONNECTIONS = 16
 BLOCK_PROBABILITY = 1000000
 BLOCK_REWARD = 7.7
 UPDATE_MINERAPI_EVERY = 5
-EXPECTED_SHARETIME = 10
+EXPECTED_SHARETIME = 7
 BCRYPT_ROUNDS = 8
 # DB files
 DATABASE = 'crypto_database.db'
@@ -98,7 +97,7 @@ except Exception as e:
 global_blocks = 1
 global_connections = 0
 duco_price, duco_price_justswap, duco_price_nodes = 0, 0, 0
-global_cpu_usage = 100
+global_cpu_usage, global_ram_usage = 100, 100
 minerapi = {}
 job_tiers = {}
 balances_to_update = {}
@@ -174,40 +173,26 @@ html = """\
 </html>
 """
 
-
 def create_backup():
     """ Creates a backup folder every day """
     if not ospath.isdir('backups/'):
         os.mkdir('backups/')
 
-    while True:
-        today = datetime.date.today()
-        if not ospath.isdir('backups/'+str(today)+'/'):
-            os.mkdir('backups/'+str(today))
-            copyfile(BLOCKCHAIN, "backups/"+str(today)+"/"+BLOCKCHAIN)
-            copyfile(DATABASE, "backups/"+str(today)+"/"+DATABASE)
-            sleep(5)
-            with open("prices.txt", "a") as pricesfile:
-                pricesfile.write("," + str(duco_price).rstrip("\n"))
-            with open("pricesNodeS.txt", "a") as pricesNodeSfile:
-                pricesNodeSfile.write(
-                    "," + str(duco_price_nodes).rstrip("\n"))
-            with open("pricesJustSwap.txt", "a") as pricesJustSwapfile:
-                pricesJustSwapfile.write(
-                    "," + str(duco_price_justswap).rstrip("\n"))
-            admin_print("Backup finished")
-        # Run every 6h
-        sleep(3600*6)
-
-
-def unbanip(ip):
-    """ Unbans an IP """
-    try:
-        os.system("sudo iptables -D INPUT -s "
-                  + str(ip)
-                  + " -j DROP > /dev/null 2>&1")
-    except Exception:
-        pass
+    today = datetime.date.today()
+    if not ospath.isdir('backups/'+str(today)+'/'):
+        os.mkdir('backups/'+str(today))
+        copyfile(BLOCKCHAIN, "backups/"+str(today)+"/"+BLOCKCHAIN)
+        copyfile(DATABASE, "backups/"+str(today)+"/"+DATABASE)
+        sleep(5)
+        with open("prices.txt", "a") as pricesfile:
+            pricesfile.write("," + str(duco_price).rstrip("\n"))
+        with open("pricesNodeS.txt", "a") as pricesNodeSfile:
+            pricesNodeSfile.write(
+                "," + str(duco_price_nodes).rstrip("\n"))
+        with open("pricesJustSwap.txt", "a") as pricesJustSwapfile:
+            pricesJustSwapfile.write(
+                "," + str(duco_price_justswap).rstrip("\n"))
+        admin_print("Backup finished")
 
 
 def permanent_ban(ip):
@@ -220,43 +205,7 @@ def permanent_ban(ip):
         os.system("sudo iptables -I INPUT -s "
                   + str(ip)
                   + " -j DROP")
-        #ip_list.pop(ip)
-
-
-def temporary_ban(ip):
-    """ Temporarily bans IP """
-    if (ip == "51.15.127.80"
-        or ip == "wallet.duinocoin.com"
-            or ip == "34.233.38.119"):
-        pass
-    else:
-        os.system("sudo iptables -I INPUT -s "
-                  + str(ip)
-                  + " -j DROP")
-        # Start auto-unban thread for this IP
-        threading.Timer(120.0, unbanip, [ip]).start()
-        #ip_list.pop(ip)
-
-
-def countips():
-    """ Counts connections per IP """
-    while True:
-        for ip in ip_list.copy():
-            try:
-                if ip_list[ip] > MAX_MININIG_CONNECTIONS*2:
-                    if not ip in whitelisted_ips:
-                        temporary_ban(ip)
-            except Exception as e:
-                print(e)
-        sleep(7)
-
-
-def resetips():
-    """ Reset connections counter """
-    while True:
-        sleep(30)
-        ip_list.clear()
-
+        
 
 def update_job_tiers():
     global job_tiers
@@ -310,8 +259,7 @@ def update_job_tiers():
                 "max_hashrate": 180
             }
         }
-        create_jobs()
-        sleep(30)
+        sleep(60)
 
 
 if not os.path.isfile(CONFIG_TRANSACTIONS):
@@ -382,48 +330,50 @@ else:
 
 def create_jobs():
     """ Generate DUCO-S1A jobs for low-power devices """
-    global_last_block_hash_cp = global_last_block_hash
-    base_hash = sha1(global_last_block_hash_cp.encode('ascii'))
-    temp_hash = None
-    for i in range(READY_HASHES_NUM):
-        temp_hash = base_hash.copy()
-        avr_diff = job_tiers["AVR"]["difficulty"]
-        rand = randint(0, 100 * avr_diff)
-        temp_hash.update(str(rand).encode('ascii'))
-        pregenerated_jobs_avr[i] = {
-            "numeric_result": rand,
-            "expected_hash": temp_hash.hexdigest(),
-            "last_block_hash": str(global_last_block_hash_cp)}
+    while True:
+        global_last_block_hash_cp = global_last_block_hash
+        base_hash = sha1(global_last_block_hash_cp.encode('ascii'))
+        temp_hash = None
+        for i in range(READY_HASHES_NUM):
+            temp_hash = base_hash.copy()
+            avr_diff = job_tiers["AVR"]["difficulty"]
+            rand = randint(0, 100 * avr_diff)
+            temp_hash.update(str(rand).encode('ascii'))
+            pregenerated_jobs_avr[i] = {
+                "numeric_result": rand,
+                "expected_hash": temp_hash.hexdigest(),
+                "last_block_hash": str(global_last_block_hash_cp)}
 
-    for i in range(READY_HASHES_NUM):
-        temp_hash = base_hash.copy()
-        due_diff = job_tiers["DUE"]["difficulty"]
-        rand = randint(0, 100 * avr_diff)
-        temp_hash.update(str(rand).encode('ascii'))
-        pregenerated_jobs_due[i] = {
-            "numeric_result": rand,
-            "expected_hash": temp_hash.hexdigest(),
-            "last_block_hash": str(global_last_block_hash_cp)}
+        for i in range(READY_HASHES_NUM):
+            temp_hash = base_hash.copy()
+            due_diff = job_tiers["DUE"]["difficulty"]
+            rand = randint(0, 100 * avr_diff)
+            temp_hash.update(str(rand).encode('ascii'))
+            pregenerated_jobs_due[i] = {
+                "numeric_result": rand,
+                "expected_hash": temp_hash.hexdigest(),
+                "last_block_hash": str(global_last_block_hash_cp)}
 
-    for i in range(READY_HASHES_NUM):
-        temp_hash = base_hash.copy()
-        esp32_diff = job_tiers["ESP32"]["difficulty"]
-        rand = randint(0, 100 * esp32_diff)
-        temp_hash.update(str(rand).encode('ascii'))
-        pregenerated_jobs_esp32[i] = {
-            "numeric_result": rand,
-            "expected_hash": temp_hash.hexdigest(),
-            "last_block_hash": str(global_last_block_hash_cp)}
+        for i in range(READY_HASHES_NUM):
+            temp_hash = base_hash.copy()
+            esp32_diff = job_tiers["ESP32"]["difficulty"]
+            rand = randint(0, 100 * esp32_diff)
+            temp_hash.update(str(rand).encode('ascii'))
+            pregenerated_jobs_esp32[i] = {
+                "numeric_result": rand,
+                "expected_hash": temp_hash.hexdigest(),
+                "last_block_hash": str(global_last_block_hash_cp)}
 
-    for i in range(READY_HASHES_NUM):
-        temp_hash = base_hash.copy()
-        esp8266_diff = job_tiers["ESP8266"]["difficulty"]
-        rand = randint(0, 100 * esp8266_diff)
-        temp_hash.update(str(rand).encode('ascii'))
-        pregenerated_jobs_esp8266[i] = {
-            "numeric_result": rand,
-            "expected_hash": temp_hash.hexdigest(),
-            "last_block_hash": str(global_last_block_hash_cp)}
+        for i in range(READY_HASHES_NUM):
+            temp_hash = base_hash.copy()
+            esp8266_diff = job_tiers["ESP8266"]["difficulty"]
+            rand = randint(0, 100 * esp8266_diff)
+            temp_hash.update(str(rand).encode('ascii'))
+            pregenerated_jobs_esp8266[i] = {
+                "numeric_result": rand,
+                "expected_hash": temp_hash.hexdigest(),
+                "last_block_hash": str(global_last_block_hash_cp)}
+        sleep(60)
 
 
 def get_pregenerated_job(req_difficulty):
@@ -485,7 +435,7 @@ def database_updater():
                         SET balance = balance + ?
                         WHERE username = ?""",
                         (balances_to_update[user] / 50, user))
-                    del balances_to_update[user]
+                    balances_to_update.pop(user)
                 conn.commit()
 
             with sqlconnection(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
@@ -505,7 +455,6 @@ def database_updater():
 
 
 def input_management():
-    sleep(.2)
     while True:
         command = input("DUCO Console $ ")
         command = command.split(" ")
@@ -888,6 +837,7 @@ def protocol_ducos1(data, connection, address):
     is_first_share = True
     thread_id = id(gevent.getcurrent())
     override_difficulty = ""
+    workers = 1
 
     connection.settimeout(60)
     while True:
@@ -959,7 +909,8 @@ def protocol_ducos1(data, connection, address):
         job_sent_timestamp = utime.now()
         result = receive_data(connection)
         sharetime = (utime.now() - job_sent_timestamp).total_seconds()
-        calculated_hashrate = int(numeric_result // sharetime)
+        hashrate = numeric_result / sharetime
+        hashrate_is_estimated = False
 
         is_first_share = False
         #try:
@@ -967,8 +918,6 @@ def protocol_ducos1(data, connection, address):
             #hashrate = float(result[1])
             #hashrate_is_estimated = False
         #except:
-        hashrate = calculated_hashrate
-        hashrate_is_estimated = False
 
         try:
             # Check miner software for unallowed characters
@@ -991,6 +940,10 @@ def protocol_ducos1(data, connection, address):
         #         chipID = "None"
 
         if accepted_shares % UPDATE_MINERAPI_EVERY == 0:
+            try:
+                workers = miners_per_user[username]
+            except:
+                workers = 1
             thread_miner_api = {
                 "User":         str(username),
                 "Hashrate":     hashrate,
@@ -1009,7 +962,7 @@ def protocol_ducos1(data, connection, address):
             global_blocks += UPDATE_MINERAPI_EVERY*2
             global_last_block_hash = job[1]
 
-        if calculated_hashrate > max_hashrate:
+        if hashrate > max_hashrate:
             rejected_shares += 1
 
             penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
@@ -1024,11 +977,6 @@ def protocol_ducos1(data, connection, address):
 
         elif int(result[0]) == job[2]:
             accepted_shares += 1
-
-            try:
-                workers = miners_per_user[username]
-            except:
-                workers = 1
 
             basereward = job_tiers[req_difficulty]["reward"]
             reward = kolka_v1(basereward, sharetime, difficulty, workers)
@@ -1083,7 +1031,6 @@ def protocol_xxhash(data, connection, address):
                         connection)
                     raise Exception("Incorrect username")
             except Exception as e:
-                print("Incorrect username:", e)
                 send_data(
                     "BAD,Not enough data\n",
                     connection)
@@ -1119,10 +1066,10 @@ def protocol_xxhash(data, connection, address):
         job_sent_timestamp = utime.now()
         result = receive_data(connection)
         sharetime = (utime.now() - job_sent_timestamp).total_seconds()
-        calculated_hashrate = int(numeric_result / sharetime)
+        hashrate = int(numeric_result / sharetime)
 
         is_first_share = False
-        hashrate = calculated_hashrate
+
         hashrate_is_estimated = False
 
         try:
@@ -1156,7 +1103,7 @@ def protocol_xxhash(data, connection, address):
             global_blocks += UPDATE_MINERAPI_EVERY*2
             global_last_block_hash = job[1]
 
-        if calculated_hashrate > max_hashrate:
+        if hashrate > max_hashrate:
             rejected_shares += 1
 
             penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
@@ -1212,15 +1159,13 @@ def now():
     return utime.now()
 
 
-def get_cpu_usage():
+def get_sys_usage():
     global global_cpu_usage
+    global global_ram_usage
     while True:
         global_cpu_usage = psutil.cpu_percent()
-        sleep(1)
-
-
-def get_ram_usage():
-    return psutil.virtual_memory()[2]
+        global_ram_usage = psutil.virtual_memory()[2]
+        sleep(5)
 
 
 def hashrate_prefix(hashrate:int, accuracy:int):
@@ -1274,7 +1219,7 @@ def get_richest_users(num):
             i += 1
             if i > num:
                 break
-    return(leaders[:num])
+    return(leaders)
 
 
 def get_balance_list():
@@ -1309,7 +1254,8 @@ def get_transaction_list():
                 "Recipient": str(row[2]),
                 "Amount":    float(row[3]),
                 "Hash":      str(row[4]),
-                "Memo":      str(row[5])}
+                "Memo":      str(row[5])
+            }
     return transactions
 
 
@@ -1324,7 +1270,8 @@ def get_blocks_list():
                 "Date": str(row[0].split(" ")[0]),
                 "Time": str(row[0].split(" ")[1]),
                 "Finder": str(row[1]),
-                "Amount generated": float(row[2])}
+                "Amount generated": float(row[2])
+            }
     return blocks
 
 
@@ -1336,32 +1283,34 @@ def create_secondary_api_files():
                 outfile,
                 indent=2,
                 ensure_ascii=False)
+        sleep(5)
         with open('foundBlocks.json', 'w') as outfile:
             json.dump(
                 get_blocks_list(),
                 outfile,
                 indent=2,
                 ensure_ascii=False)
+        sleep(5)
         with open('balances.json', 'w') as outfile:
             json.dump(
                 get_balance_list(),
                 outfile,
                 indent=2,
                 ensure_ascii=False)
-        sleep(15)
+        sleep(5)
 
 
 def create_main_api_file():
     """ Creates api.json file
-        this will sooner or later be replaced with a RESTful flask api """
+        this will sooner or later be replaced with a RESTful api """
+    global miners_per_user
     while True:
-        global miners_per_user
         ducos1_hashrate, xxhash_hashrate = 0, 0
         minerapi_public, miners_per_user = {}, {}
         miner_list = []
         for miner in minerapi.copy():
             try:
-                # Add user hashrate to the server hashrate
+                # Add miner hashrate to the server hashrate
                 if minerapi[miner]["Algorithm"] == "DUCO-S1":
                     ducos1_hashrate += float(minerapi[miner]["Hashrate"])
                 elif minerapi[miner]["Algorithm"] == "XXHASH":
@@ -1377,19 +1326,22 @@ def create_main_api_file():
         for user in miner_list:
             miners_per_user[user] = miner_list.count(user)
 
-        miners_per_user = OrderedDict(sorted(
-            miners_per_user.items(),
-            key=itemgetter(1),
-            reverse=True))
+        miners_per_user = OrderedDict(
+            sorted(
+                miners_per_user.items(),
+                key=itemgetter(1),
+                reverse=True
+            )
+        )
 
         server_api = {
-            "_Duino-Coin JSON API":  "https://github.com/revoxhere/duino-coin",
+            "Duino-Coin Server API": "github.com/revoxhere/duino-coin",
             "Server version":        SERVER_VER,
             "Active connections":    global_connections,
             "Open threads":          threading.activeCount(),
             "Server CPU usage":      global_cpu_usage,
-            "Server RAM usage":      get_ram_usage(),
-            "Last update":           str(now().strftime("%d/%m/%Y %H:%M:%S (UTC)")),
+            "Server RAM usage":      global_ram_usage,
+            "Last update":           now().strftime("%d/%m/%Y %H:%M:%S (UTC)"),
             "Pool hashrate":         total_hashrate,
             "DUCO-S1 hashrate":      ducos1_hashrate,
             "XXHASH hashrate":       xxhash_hashrate,
@@ -1403,7 +1355,8 @@ def create_main_api_file():
             "Last block hash":       global_last_block_hash[:10]+"...",
             "Top 10 richest miners": get_richest_users(10),
             "Active workers":        miners_per_user,
-            "Miners":                "server.duinocoin.com/miners.json"}
+            "Miners":                "server.duinocoin.com/miners.json"
+        }
 
         with open('api.json', 'w') as outfile:
             # Write JSON to file
@@ -1412,17 +1365,17 @@ def create_main_api_file():
                 outfile,
                 indent=2,
                 ensure_ascii=False)
-        sleep(5)
+
+        sleep(SAVE_TIME)
 
 
 def create_minerapi():
+    """ Creates miners.json file """
     while True:
         with open('miners.json', 'w') as outfile:
             json.dump(
                 minerapi.copy(),
-                outfile,
-                indent=2,
-                ensure_ascii=False)
+                outfile)
         sleep(10)
 
 
@@ -1573,7 +1526,6 @@ def protocol_register(data, connection):
 
 def protocol_send_funds(data, connection, username):
     """ Transfer funds from one account to another """
-
     try:
         global_last_block_hash_cp = global_last_block_hash
         memo = sub(r'[^A-Za-z0-9 .()-]+', ' ', str(data[1]))
@@ -1685,7 +1637,7 @@ def get_duco_prices():
     global duco_price_nodes
     global duco_price_justswap
     while True:
-        """ Gets DUCO price price from Coingecko """
+        """ Gets XMG price price from Coingecko """
         coingecko_api = requests.get(
             "https://api.coingecko.com/"
             + "api/v3/simple/"
@@ -1724,17 +1676,24 @@ def get_duco_prices():
             wducoBal = int(justswap_content["tokens"][2]["balance"]) / 100000
             # JustSwap pool exchange rate is TRC bal divided by wDUCO bal
             exchange_rate = trxBal / wducoBal
+
             # Get current TRX price
             tronscan_api = requests.get(
                 "https://apilist.tronscan.org/"
-                + "api/token/price?token=trx").json()
-            trx_price = tronscan_api["price_in_usd"]
+                + "api/token/price?token=trx",
+                data=None)
+            if tronscan_api.status_code == 200:
+                tronscan_content = json.loads(tronscan_api.content.decode())
+                trx_price = tronscan_content["price_in_usd"]
+            else:
+                trx_price = 0.03
 
             duco_price_justswap = round(
-                float(exchange_rate) * float(trx_price), 8)
+                float(exchange_rate) * float(trx_price), 8
+            )
         else:
             duco_price_justswap = 0
-        sleep(60*10)
+        sleep(360)
 
 
 def protocol_get_transactions(data, connection):
@@ -1755,7 +1714,8 @@ def protocol_get_transactions(data, connection):
                     "Recipient": str(row[2]),
                     "Amount":    float(row[3]),
                     "Hash":      str(row[4]),
-                    "Memo":      str(row[5])}
+                    "Memo":      str(row[5])
+                }
 
         transactionsToReturn = {}
         i = 0
@@ -1864,19 +1824,22 @@ def handle(connection, address):
 
             elif data[0] == "PoolLoginAdd":
                 PF.PoolLoginAdd(connection=connection,
-                                data=data, PoolPassword=PoolPassword)
+                                data=data, 
+                                PoolPassword=PoolPassword)
 
             elif data[0] == "PoolLoginRemove":
                 PF.PoolLoginRemove(connection=connection,
-                                   data=data, PoolPassword=PoolPassword)
-
+                                   data=data, 
+                                   PoolPassword=PoolPassword)
     except Exception as e:
         pass
         #print("Problem handling request: ", e)
     finally:
         #print("Closing socket")
-        if thread_id in minerapi:
-            del minerapi[thread_id]
+        try:
+            minerapi.pop(thread_id)
+        except:
+            pass
 
         global_connections -= 1
         connection.close()
@@ -1886,25 +1849,19 @@ def handle(connection, address):
 if __name__ == "__main__":
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
-    threading.Thread(target=countips).start()
-    threading.Thread(target=resetips).start()
-
+    create_backup()
     threading.Thread(target=get_duco_prices).start()
-    threading.Thread(target=update_job_tiers).start()
-
-    threading.Thread(target=database_updater).start()
-    threading.Thread(target=create_backup).start()
-    threading.Thread(target=get_cpu_usage).start()
-
-    threading.Thread(target=create_main_api_file).start()
-    threading.Thread(target=create_secondary_api_files).start()
-    threading.Thread(target=create_minerapi).start()
-
     threading.Thread(target=input_management).start()
+    threading.Thread(target=create_main_api_file).start()
+    threading.Thread(target=create_minerapi).start()
+    threading.Thread(target=create_secondary_api_files).start()
+    threading.Thread(target=update_job_tiers).start()
+    threading.Thread(target=create_jobs).start()
+    threading.Thread(target=get_sys_usage).start()
+    threading.Thread(target=database_updater).start()
     try:
         admin_print("Master Server is listening on port", PORT)
-        server = StreamServer((HOSTNAME, PORT), handle)
-        server.serve_forever()
+        StreamServer((HOSTNAME, PORT), handle).serve_forever()
     except Exception as e:
         admin_print("Unexpected exception: ", e)
     finally:
