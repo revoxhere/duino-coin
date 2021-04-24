@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.4)
+# Duino-Coin Python PC Miner (v2.5)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -100,7 +100,7 @@ except ModuleNotFoundError:
 
 
 # Global variables
-MINER_VER = "2.4"  # Version number
+MINER_VER = "2.5"  # Version number
 SOC_TIMEOUT = 30  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
@@ -109,9 +109,9 @@ rig_identiier = "None"
 requested_diff = "NET"
 algorithm = "DUCO-S1"
 server_ip_file = ("https://raw.githubusercontent.com/"
-                + "revoxhere/"
-                + "duino-coin/gh-pages/"
-                + "serverip.txt")  # Serverip file
+                  + "revoxhere/"
+                  + "duino-coin/gh-pages/"
+                  + "serverip.txt")  # Serverip file
 config = ConfigParser()
 donation_level = 0
 thread = []
@@ -397,7 +397,9 @@ def loadConfig():
                 + Fore.RESET
                 + "1"
                 + Style.NORMAL
-                + " - DUCO-S1")
+                + " - DUCO-S1 ("
+                + getString("recommended")
+                + ")")
             print(
                 Style.RESET_ALL
                 + Style.BRIGHT
@@ -501,8 +503,12 @@ def loadConfig():
         threadcount = sub(r"\D", "", threadcount)
         if threadcount == "":
             threadcount = cpu_count()
-        elif int(threadcount) > int(10):
-            threadcount = 10
+        elif int(threadcount) > int(8):
+            threadcount = 8
+            print(
+                Style.RESET_ALL
+                + Style.BRIGHT
+                + getString("max_threads_notice"))
         elif int(threadcount) < int(1):
             threadcount = 1
 
@@ -539,7 +545,8 @@ def loadConfig():
             "identifier": rig_identiier,
             "algorithm": algorithm,
             "language": lang,
-            "debug": "n"}
+            "debug": "n"
+        }
         # Write data to configfile
         with open(RESOURCES_DIR + "/Miner_config.cfg", "w") as configfile:
             config.write(configfile)
@@ -919,6 +926,12 @@ def Thread(
                                 "%03.0f" % float(totalhashrate)
                                 + " kH/s")
 
+                        if (totalhashrate > 1000
+                                and accepted.value % 5 == 0):
+                            prettyPrint("sys0",
+                                        " " + getString("max_hashrate_notice"),
+                                        "warning")
+
                         if feedback == "GOOD":
                             # If result was correct
                             accepted.value += 1
@@ -1196,7 +1209,9 @@ if __name__ == "__main__":
     title(getString("duco_python_miner") + str(MINER_VER) + ")")
 
     try:
-        from multiprocessing import Manager, Process, Value, cpu_count, current_process
+        from multiprocessing import (
+            Manager, Process, Value, cpu_count, current_process
+        )
         manager = Manager()
         # Multiprocessing fix for pyinstaller
         # Multiprocessing globals
