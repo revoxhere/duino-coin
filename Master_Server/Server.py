@@ -108,7 +108,7 @@ pregenerated_jobs_esp8266 = {}
 banlist = []
 whitelisted_usernames = []
 whitelisted_ips = []
-ip_list = {}
+connections_per_ip = {}
 miners_per_user = {}
 chip_ids = []
 workers = {}
@@ -1775,9 +1775,9 @@ def handle(connection, address):
     global_connections += 1
 
     try:
-        connctions_per_ip[ip_addr] += 1
+        connections_per_ip[ip_addr] += 1
     except Exception:
-        connctions_per_ip[ip_addr] = 1
+        connections_per_ip[ip_addr] = 1
 
     try:
         if (ip_addr == "51.15.127.80"
@@ -1882,9 +1882,9 @@ def handle(connection, address):
             pass
 
         try:
-            connctions_per_ip[ip_addr] -= 1
-            if connctions_per_ip[ip_addr] <= 0:
-                connctions_per_ip.pop(ip_addr)
+            connections_per_ip[ip_addr] -= 1
+            if connections_per_ip[ip_addr] <= 0:
+                connections_per_ip.pop(ip_addr)
         except:
             pass
 
@@ -1905,9 +1905,9 @@ def countips():
         n connections in a peroid of n seconds,
         if so - ban the IP - easy anti-ddos system """
     while True:
-        for ip in connctions_per_ip.copy():
+        for ip in connections_per_ip.copy():
             try:
-                if connctions_per_ip[ip] > 50 and not ip in whitelisted_ips:
+                if connections_per_ip[ip] > 50 and not ip in whitelisted_ips:
                     print("Banning DDoSing IP: " + ip)
                     permanent_ban(ip)
             except:
@@ -1919,7 +1919,7 @@ def resetips():
     """ Reset connections per IP values every n sec """
     while True:
         sleep(30)
-        connctions_per_ip.clear()
+        connections_per_ip.clear()
 
 
 def flush_iptables():
