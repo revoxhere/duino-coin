@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.5)
+# Duino-Coin Python AVR Miner (v2.45)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -88,8 +88,8 @@ except ModuleNotFoundError:
     install("pypresence")
 
 # Global variables
-MINER_VER = "2.5"  # Version number
-SOCKET_TIMEOUT = 15
+MINER_VER = "2.45"  # Version number
+SOCKET_TIMEOUT = 30
 AVR_TIMEOUT = 7
 RESOURCES_DIR = "AVRMiner_" + str(MINER_VER) + "_resources"
 shares = [0, 0]
@@ -144,6 +144,8 @@ try:
             lang = "polish"
         elif locale.startswith("fr"):
             lang = "french"
+        elif locale.startswith("tr"):
+            lang = "turkish"
         elif locale.startswith("zh"):
             lang = "chinese_simplified"
         else:
