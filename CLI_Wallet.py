@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v2.3)
+# Duino-Coin CLI Wallet (v2.45)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -92,7 +92,7 @@ wrong_passphrase = False
 backend = default_backend()
 iterations = 100_000
 timeout = 30  # Socket timeout
-VER = 2.3
+VER = 2.45
 use_wrapper = False
 # Serverip file
 ipfile = ("https://raw.githubusercontent.com/"
