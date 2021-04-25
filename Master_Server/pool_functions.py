@@ -1,5 +1,6 @@
 import sqlite3
 from server_functions import receive_data, send_data
+import ast
 
 database = 'crypto_database.db'
 database_timeout = 10
