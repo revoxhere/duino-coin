@@ -24,6 +24,9 @@ from statistics import mean
 from subprocess import DEVNULL, Popen, check_call
 from threading import Thread as thrThread
 from time import ctime, sleep, strptime, time
+from multiprocessing import Lock
+
+thread_lock = Lock()
 
 
 def install(package):
@@ -1218,12 +1221,9 @@ if __name__ == "__main__":
             Process, 
             Value, 
             cpu_count, 
-            current_process,
-            Lock
+            current_process
         )
-        thread_lock = Lock()
         manager = Manager()
-        # Multiprocessing fix for pyinstaller
         # Multiprocessing globals
         khashcount = Value("i", 0)
         accepted = Value("i", 0)
