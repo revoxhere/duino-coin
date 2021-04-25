@@ -24,7 +24,7 @@ from hashlib import sha1
 from time import time, sleep
 from sys import exit
 from re import sub, match
-from sqlite3 import connect as sqlconnection
+from sqlite3 import connect as sqlconn
 from os import path as ospath
 from kolka_module import *
 from email.mime.text import MIMEText
@@ -241,7 +241,7 @@ def update_job_tiers():
             },
             "ESP32": {
                 "difficulty": 500,
-                "reward": .005,
+                "reward": .0035,
                 "max_hashrate": 13000
             },
             "ESP8266": {
@@ -251,12 +251,12 @@ def update_job_tiers():
             },
             "DUE": {
                 "difficulty": 150,
-                "reward": .0025,
-                "max_hashrate": 1
+                "reward": .003,
+                "max_hashrate": 10000
             },
             "AVR": {
-                "difficulty": 4,
-                "reward": .0045,
+                "difficulty": 5,
+                "reward": .005,
                 "max_hashrate": 180
             }
         }
@@ -264,7 +264,7 @@ def update_job_tiers():
 
 
 if not os.path.isfile(CONFIG_TRANSACTIONS):
-    with sqlconnection(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute(
             """CREATE TABLE 
@@ -279,7 +279,7 @@ if not os.path.isfile(CONFIG_TRANSACTIONS):
         conn.commit()
 
 if not os.path.isfile(CONFIG_BLOCKS):
-    with sqlconnection(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute(
             """CREATE TABLE 
@@ -292,7 +292,7 @@ if not os.path.isfile(CONFIG_BLOCKS):
         conn.commit()
 
 if not ospath.isfile(DATABASE):
-    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute(
             """CREATE TABLE
@@ -307,7 +307,7 @@ if not ospath.isfile(BLOCKCHAIN):
     # SHA1 of duino-coin
     global_last_block_hash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
     global_blocks = 1
-    with sqlconnection(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute(
             """CREATE TABLE
@@ -321,7 +321,7 @@ if not ospath.isfile(BLOCKCHAIN):
             (global_blocks, global_last_block_hash))
         conn.commit()
 else:
-    with sqlconnection(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute("SELECT blocks FROM Server")
         global_blocks = int(datab.fetchone()[0])
@@ -338,7 +338,7 @@ def create_jobs():
         for i in range(READY_HASHES_NUM):
             temp_hash = base_hash.copy()
             avr_diff = job_tiers["AVR"]["difficulty"]
-            rand = randint(0, 100 * avr_diff)
+            rand = fastrandint(100 * avr_diff)
             temp_hash.update(str(rand).encode('ascii'))
             pregenerated_jobs_avr[i] = {
                 "numeric_result": rand,
@@ -348,7 +348,7 @@ def create_jobs():
         for i in range(READY_HASHES_NUM):
             temp_hash = base_hash.copy()
             due_diff = job_tiers["DUE"]["difficulty"]
-            rand = randint(0, 100 * due_diff)
+            rand = fastrandint(100 * due_diff)
             temp_hash.update(str(rand).encode('ascii'))
             pregenerated_jobs_due[i] = {
                 "numeric_result": rand,
@@ -358,7 +358,7 @@ def create_jobs():
         for i in range(READY_HASHES_NUM):
             temp_hash = base_hash.copy()
             esp32_diff = job_tiers["ESP32"]["difficulty"]
-            rand = randint(0, 100 * esp32_diff)
+            rand = fastrandint(100 * esp32_diff)
             temp_hash.update(str(rand).encode('ascii'))
             pregenerated_jobs_esp32[i] = {
                 "numeric_result": rand,
@@ -368,7 +368,7 @@ def create_jobs():
         for i in range(READY_HASHES_NUM):
             temp_hash = base_hash.copy()
             esp8266_diff = job_tiers["ESP8266"]["difficulty"]
-            rand = randint(0, 100 * esp8266_diff)
+            rand = fastrandint(100 * esp8266_diff)
             temp_hash.update(str(rand).encode('ascii'))
             pregenerated_jobs_esp8266[i] = {
                 "numeric_result": rand,
@@ -385,7 +385,7 @@ def get_pregenerated_job(req_difficulty):
     if req_difficulty == "DUE":
         # Arduino Due
         difficulty = job_tiers["DUE"]["difficulty"]
-        rand = randint(0, len(pregenerated_jobs_due) - 1)
+        rand = fastrandint(len(pregenerated_jobs_due) - 1)
         numeric_result = pregenerated_jobs_due[rand]["numeric_result"]
         expected_hash = pregenerated_jobs_due[rand]["expected_hash"]
         last_block_hash = pregenerated_jobs_due[rand]["last_block_hash"]
@@ -393,7 +393,7 @@ def get_pregenerated_job(req_difficulty):
     elif req_difficulty == "ESP32":
         # ESP32
         difficulty = job_tiers["ESP32"]["difficulty"]
-        rand = randint(0, len(pregenerated_jobs_esp32) - 1)
+        rand = fastrandint(len(pregenerated_jobs_esp32) - 1)
         numeric_result = pregenerated_jobs_esp32[rand]["numeric_result"]
         expected_hash = pregenerated_jobs_esp32[rand]["expected_hash"]
         last_block_hash = pregenerated_jobs_esp32[rand]["last_block_hash"]
@@ -401,7 +401,7 @@ def get_pregenerated_job(req_difficulty):
     elif req_difficulty == "ESP8266":
         # New ESP8266
         difficulty = job_tiers["ESP8266"]["difficulty"]
-        rand = randint(0, len(pregenerated_jobs_esp32) - 1)
+        rand = fastrandint(len(pregenerated_jobs_esp32) - 1)
         numeric_result = pregenerated_jobs_esp8266[rand]["numeric_result"]
         expected_hash = pregenerated_jobs_esp8266[rand]["expected_hash"]
         last_block_hash = pregenerated_jobs_esp8266[rand]["last_block_hash"]
@@ -409,7 +409,7 @@ def get_pregenerated_job(req_difficulty):
     else:
         # Arduino
         difficulty = job_tiers["AVR"]["difficulty"]
-        rand = randint(0, len(pregenerated_jobs_avr) - 1)
+        rand = fastrandint(len(pregenerated_jobs_avr) - 1)
         numeric_result = pregenerated_jobs_avr[rand]["numeric_result"]
         expected_hash = pregenerated_jobs_avr[rand]["expected_hash"]
         last_block_hash = pregenerated_jobs_avr[rand]["last_block_hash"]
@@ -424,7 +424,7 @@ def floatmap(x, in_min, in_max, out_min, out_max):
 def database_updater():
     while True:
         try:
-            with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
                 for user in balances_to_update.copy():
                     amount_to_update = balances_to_update[user] / 30
@@ -439,7 +439,7 @@ def database_updater():
                     balances_to_update.pop(user)
                 conn.commit()
 
-            with sqlconnection(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
+            with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
                 datab.execute(
                     """UPDATE Server
@@ -480,7 +480,7 @@ def input_management():
         elif command[0] == "ban":
             try:
                 username = command[1]
-                with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
                         """UPDATE Users
@@ -522,7 +522,7 @@ def input_management():
 
         elif command[0] == "balance":
             try:
-                with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
                         """SELECT *
@@ -536,7 +536,7 @@ def input_management():
 
         elif command[0] == "set":
             try:
-                with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
                         """SELECT *
@@ -554,7 +554,7 @@ def input_management():
 
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
-                    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
                             """UPDATE Users
@@ -563,7 +563,7 @@ def input_management():
                             (float(command[2]), command[1]))
                         conn.commit()
 
-                    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
                             """SELECT *
@@ -579,7 +579,7 @@ def input_management():
 
         elif command[0] == "changeusername":
             try:
-                with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
                         """SELECT *
@@ -596,7 +596,7 @@ def input_management():
 
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
-                    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
                             """UPDATE Users
@@ -612,7 +612,7 @@ def input_management():
 
         elif command[0] == "changepass":
             try:
-                with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
                         """SELECT *
@@ -631,7 +631,7 @@ def input_management():
                 if confirm == "Y" or confirm == "y" or confirm == "":
                     hashed_pass = hashpw(
                         command[2], gensalt(rounds=BCRYPT_ROUNDS))
-                    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
                             """UPDATE Users
@@ -648,7 +648,7 @@ def input_management():
 
         elif command[0] == "subtract":
             try:
-                with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
                         """SELECT *
@@ -666,7 +666,7 @@ def input_management():
 
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
-                    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
                             """UPDATE Users
@@ -675,7 +675,7 @@ def input_management():
                             (float(balance)-float(command[2]), command[1]))
                         conn.commit()
 
-                    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
                             """SELECT *
@@ -692,7 +692,7 @@ def input_management():
 
         elif command[0] == "add":
             try:
-                with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                     datab = conn.cursor()
                     datab.execute(
                         """SELECT *
@@ -710,7 +710,7 @@ def input_management():
 
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
-                    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
                             """UPDATE Users
@@ -719,7 +719,7 @@ def input_management():
                             (float(balance)+float(command[2]), command[1]))
                         conn.commit()
 
-                    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
                             """SELECT *
@@ -736,7 +736,7 @@ def input_management():
 
 
 def user_exists(username):
-    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute("""SELECT username
             FROM Users
@@ -750,7 +750,7 @@ def user_exists(username):
 
 
 def email_exists(email):
-    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute("""SELECT email
             FROM Users
@@ -770,7 +770,7 @@ def generate_block(username, reward, new_block_hash, connection, xxhash=False):
     else:
         algo = "DUCO-S1"
     reward += BLOCK_REWARD
-    with sqlconnection(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         timestamp = now().strftime("%d/%m/%Y %H:%M:%S")
         datab.execute(
@@ -798,7 +798,9 @@ def sleep_by_cpu_usage(upper_limit):
 def create_share_ducos1(last_block_hash, difficulty):
     """ Creates and returns a job for DUCO-S1 algo """
     try:
-        numeric_result = randint(0, 100 * difficulty)
+        if difficulty <= 0:
+            difficulty = 1
+        numeric_result = fastrandint(100 * difficulty)
         expected_hash_str = bytes(
             str(last_block_hash)
             + str(numeric_result), encoding="utf8")
@@ -812,7 +814,9 @@ def create_share_ducos1(last_block_hash, difficulty):
 def create_share_xxhash(last_block_hash, difficulty):
     """ Creates and returns a job for XXHASH algo """
     try:
-        numeric_result = randint(0, 100 * difficulty)
+        if difficulty <= 0:
+            difficulty = 1
+        numeric_result = fastrandint(100 * difficulty)
         expected_hash_str = bytes(
             str(last_block_hash)
             + str(numeric_result), encoding="utf8")
@@ -832,6 +836,8 @@ def protocol_ducos1(data, connection, address):
     global global_blocks
     global workers
 
+    ip_addr = address[0].replace("::ffff:", "")
+
     accepted_shares, rejected_shares = 0, 0
     global_last_block_hash_cp = global_last_block_hash
     thread_miner_api = {}
@@ -839,7 +845,7 @@ def protocol_ducos1(data, connection, address):
     thread_id = id(gevent.getcurrent())
     override_difficulty = ""
 
-    connection.settimeout(60)
+    connection.settimeout(90)
     while True:
         if is_first_share:
             try:
@@ -856,13 +862,13 @@ def protocol_ducos1(data, connection, address):
                 raise Exception("Incorrect username")
 
             if username in banlist:
-                permanent_ban(ip)
+                permanent_ban(ip_addr)
                 raise Exception("User banned")
 
             try:
-                workers[address[0]] += 1
+                workers[ip_addr] += 1
             except:
-                workers[address[0]] = 0
+                workers[ip_addr] = 0
 
             try:
                 # Parse starting difficulty from the client
@@ -929,7 +935,8 @@ def protocol_ducos1(data, connection, address):
         #     except IndexError:
         #         chipID = "None"
 
-        if accepted_shares > 0 and accepted_shares % UPDATE_MINERAPI_EVERY == 0:
+        if (accepted_shares > 0
+                and accepted_shares % UPDATE_MINERAPI_EVERY == 0):
             try:
                 # Check miner software for unallowed characters
                 miner_name = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[2])
@@ -956,7 +963,8 @@ def protocol_ducos1(data, connection, address):
             }
             minerapi[thread_id] = thread_miner_api
 
-        if accepted_shares > 0 and accepted_shares % UPDATE_MINERAPI_EVERY*2 == 0:
+        if (accepted_shares > 0
+                and accepted_shares % UPDATE_MINERAPI_EVERY*2 == 0):
             global_blocks += UPDATE_MINERAPI_EVERY*2
             global_last_block_hash = job[1]
 
@@ -978,19 +986,19 @@ def protocol_ducos1(data, connection, address):
 
             basereward = job_tiers[req_difficulty]["reward"]
             reward = kolka_v1(basereward, sharetime,
-                              difficulty, workers[address[0]])
+                              difficulty, workers[ip_addr])
 
             try:
                 balances_to_update[username] += reward
             except:
                 balances_to_update[username] = reward
 
-            if randint(0, BLOCK_PROBABILITY) == 1:
-                reward = generate_block(
-                    username, reward, job[1], connection)
-                send_data("BLOCK\n", connection)
-            else:
-                send_data("GOOD\n", connection)
+            #if fastrandint(BLOCK_PROBABILITY) == 1:
+                #reward = generate_block(
+                    #username, reward, job[1], connection)
+                #send_data("BLOCK\n", connection)
+            #else:
+            send_data("GOOD\n", connection)
 
         else:
             rejected_shares += 1
@@ -1013,13 +1021,15 @@ def protocol_xxhash(data, connection, address):
     global global_blocks
     global workers
 
+    ip_addr = address[0].replace("::ffff:", "")
+
     accepted_shares, rejected_shares = 0, 0
     global_last_block_hash_cp = global_last_block_hash
     thread_miner_api = {}
     is_first_share = True
     thread_id = id(gevent.getcurrent())
     override_difficulty = ""
-    connection.settimeout(60)
+    connection.settimeout(90)
 
     while True:
         if is_first_share:
@@ -1041,9 +1051,9 @@ def protocol_xxhash(data, connection, address):
                 raise Exception("User banned")
 
             try:
-                workers[address[0]] += 1
+                workers[ip_addr] += 1
             except:
-                workers[address[0]] = 0
+                workers[ip_addr] = 0
 
             req_difficulty = "NET"
         else:
@@ -1062,7 +1072,9 @@ def protocol_xxhash(data, connection, address):
                 sharetime, EXPECTED_SHARETIME, difficulty)
 
         job = create_share_xxhash(global_last_block_hash_cp, difficulty)
-        send_data(str(job[0]) + "," + str(job[1]) + "," + str(difficulty) + "\n",
+        send_data(str(job[0]) + ","
+                  + str(job[1]) + ","
+                  + str(difficulty) + "\n",
                   connection)
 
         max_hashrate = job_tiers[req_difficulty]["max_hashrate"]
@@ -1108,6 +1120,18 @@ def protocol_xxhash(data, connection, address):
             global_blocks += UPDATE_MINERAPI_EVERY*2
             global_last_block_hash = job[1]
 
+        if req_difficulty == "AVR":
+            if hashrate < max_hashrate*0.75:
+                rejected_shares += 1
+
+                penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
+                try:
+                    balances_to_update[username] += penalty
+                except:
+                    balances_to_update[username] = penalty
+
+                send_data("BAD\n", connection)
+
         if hashrate > max_hashrate:
             rejected_shares += 1
 
@@ -1126,19 +1150,14 @@ def protocol_xxhash(data, connection, address):
 
             basereward = job_tiers[req_difficulty]["reward"]
             reward = kolka_v1(basereward, sharetime,
-                              difficulty, workers[address[0]])
+                              difficulty, workers[ip_addr])
 
             try:
                 balances_to_update[username] += reward
             except:
                 balances_to_update[username] = reward
 
-            if randint(0, BLOCK_PROBABILITY) == 1:
-                reward = generate_block(
-                    username, reward, job[1], connection)
-                send_data("BLOCK\n", connection)
-            else:
-                send_data("GOOD\n", connection)
+            send_data("GOOD\n", connection)
 
         else:
             rejected_shares += 1
@@ -1188,7 +1207,7 @@ def hashrate_prefix(hashrate: int, accuracy: int):
 
 def count_registered_users():
     """ Count all registered users and returns an int """
-    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute("SELECT COUNT(username) FROM Users")
         registeredUsers = datab.fetchone()[0]
@@ -1198,7 +1217,7 @@ def count_registered_users():
 def count_total_duco():
     """ Count all DUCO in accounts and return a float """
     try:
-        with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
             datab.execute("SELECT SUM(balance) FROM Users")
             total_duco = datab.fetchone()[0]
@@ -1210,7 +1229,7 @@ def count_total_duco():
 def get_richest_users(num):
     """ Return a list of num richest users """
     leaders = []
-    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute("SELECT * FROM Users ORDER BY balance DESC")
         i = 0
@@ -1226,7 +1245,7 @@ def get_richest_users(num):
 def get_balance_list():
     """ Returns a dictionary of balances of all users """
     balances = {}
-    with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute(
             """SELECT *
@@ -1244,7 +1263,7 @@ def get_balance_list():
 def get_transaction_list():
     """ Returns a dictionary of all transactions """
     transactions = {}
-    with sqlconnection(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute("SELECT * FROM Transactions")
         for row in datab.fetchall():
@@ -1263,7 +1282,7 @@ def get_transaction_list():
 def get_blocks_list():
     """ Returns a dictionary of all mined blocks """
     blocks = {}
-    with sqlconnection(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
+    with sqlconn(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute("SELECT * FROM Blocks")
         for row in datab.fetchall():
@@ -1392,7 +1411,7 @@ def protocol_login(data, connection):
     if user_exists(username):
         if match(r"^[A-Za-z0-9_-]*$", username):
             try:
-                with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                     # User exists, read his password
                     datab = conn.cursor()
                     datab.execute(
@@ -1408,9 +1427,8 @@ def protocol_login(data, connection):
                 return False
 
             if len(stored_password) == 0:
-                send_data(
-                    "NO,This user doesn\'t exist",
-                    connection)
+                send_data("NO,This user doesn\'t exist",
+                          connection)
                 return False
 
             elif (password == stored_password
@@ -1511,7 +1529,7 @@ def protocol_register(data, connection):
         """ Register a new account if  the registration
             e-mail was sent sucessfully """
         try:
-            with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
                 datab.execute(
                     """INSERT INTO Users
@@ -1548,7 +1566,7 @@ def protocol_send_funds(data, connection, username):
             send_data("NO,Recipient doesn\'t exist", connection)
             return
 
-        with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
             datab.execute(
                 """SELECT *
@@ -1564,7 +1582,7 @@ def protocol_send_funds(data, connection, username):
             return
 
         if float(balance) >= float(amount):
-            with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
 
                 balance -= float(amount)
@@ -1589,7 +1607,7 @@ def protocol_send_funds(data, connection, username):
                     (f'{float(recipientbal):.20f}', recipient))
                 conn.commit()
 
-            with sqlconnection(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
+            with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
                 formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
                 datab.execute(
@@ -1622,7 +1640,7 @@ def protocol_get_balance(data, connection, username):
     """ Sends balance of user to the client
         raises an exception on error """
     try:
-        with sqlconnection(DATABASE, timeout=DB_TIMEOUT) as conn:
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
             datab.execute("""SELECT *
                 FROM Users
@@ -1708,7 +1726,9 @@ def protocol_get_transactions(data, connection):
         username = data[1]
         transaction_count = int(data[2])
         transactiondata = {}
-        with sqlconnection(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
+        if transaction_count > 15:
+            transaction_count = 15
+        with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
             datab.execute("SELECT * FROM Transactions")
             for row in datab.fetchall():
@@ -1721,10 +1741,15 @@ def protocol_get_transactions(data, connection):
                     "Hash":      str(row[4]),
                     "Memo":      str(row[5])
                 }
+        transactiondata = OrderedDict(
+            reversed(
+                list(transactiondata.items())
+            )
+        )
 
         transactionsToReturn = {}
         i = 0
-        for transaction in OrderedDict(reversed(list(transactiondata.items()))):
+        for transaction in transactiondata:
             if (transactiondata[transaction]["Recipient"] == username
                     or transactiondata[transaction]["Sender"] == username):
                 transactionsToReturn[str(i)] = transactiondata[transaction]
@@ -1743,13 +1768,21 @@ def protocol_get_transactions(data, connection):
 def handle(connection, address):
     """ Handler for every client """
     global global_connections
+
+    ip_addr = address[0].replace("::ffff:", "")
     thread_id = id(gevent.getcurrent())
     logged_in = False
     global_connections += 1
+
     try:
-        if (address[0] == "51.15.127.80"
-            or address[0] == "wallet.duinocoin.com"
-                or address[0] == "34.233.38.119"):
+        connctions_per_ip[ip_addr] += 1
+    except Exception:
+        connctions_per_ip[ip_addr] = 1
+
+    try:
+        if (ip_addr == "51.15.127.80"
+            or ip_addr == "wallet.duinocoin.com"
+                or ip_addr == "34.233.38.119"):
             connection.settimeout(60*20)
         else:
             connection.settimeout(20)
@@ -1786,7 +1819,7 @@ def handle(connection, address):
                 if logged_in:
                     username = data[1]
                     if username in banlist:
-                        permanent_ban(address[0])
+                        permanent_ban(ip_addr)
                         raise Exception("User banned")
                 else:
                     break
@@ -1794,7 +1827,6 @@ def handle(connection, address):
             elif data[0] == "REGI":
                 """ Client requested registation """
                 protocol_register(data, connection)
-
 
             elif data[0] == "GTXL":
                 """ Client requested transaction list """
@@ -1850,9 +1882,16 @@ def handle(connection, address):
             pass
 
         try:
-            workers[address[0]] -= 1
-            if workers[address[0]] <= 0:
-                workers.pop(address[0])
+            connctions_per_ip[ip_addr] -= 1
+            if connctions_per_ip[ip_addr] <= 0:
+                connctions_per_ip.pop(ip_addr)
+        except:
+            pass
+
+        try:
+            workers[ip_addr] -= 1
+            if workers[ip_addr] <= 0:
+                workers.pop(ip_addr)
         except:
             pass
 
@@ -1860,29 +1899,60 @@ def handle(connection, address):
         connection.close()
         return
 
-def autorestart():
-    sleep(1800)
-    print("Autorestarting")
-    os.execl(sys.executable, sys.executable, *sys.argv)
+
+def countips():
+    """ Check if someone is making more than 
+        n connections in a peroid of n seconds,
+        if so - ban the IP - easy anti-ddos system """
+    while True:
+        for ip in connctions_per_ip.copy():
+            try:
+                if connctions_per_ip[ip] > 50 and not ip in whitelisted_ips:
+                    print("Banning DDoSing IP: " + ip)
+                    permanent_ban(ip)
+            except:
+                pass
+        sleep(5)
+
+
+def resetips():
+    """ Reset connections per IP values every n sec """
+    while True:
+        sleep(30)
+        connctions_per_ip.clear()
+
+
+def flush_iptables():
+    """ For some reason the vps is cursed and flushing
+        iptables brings back the cpu usage back to
+        low levels. Why? No idea """
+    while True:
+        os.system("sudo iptables -F INPUT")
+        admin_print("Flushed iptables")
+        sleep(60*10)
 
 
 if __name__ == "__main__":
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
     create_backup()
-    threading.Thread(target=get_duco_prices).start()
-    threading.Thread(target=input_management).start()
 
+    threading.Thread(target=countips).start()
+    threading.Thread(target=resetips).start()
+    threading.Thread(target=flush_iptables).start()
+
+    threading.Thread(target=get_duco_prices).start()
+    threading.Thread(target=get_sys_usage).start()
+    
     threading.Thread(target=update_job_tiers).start()
     threading.Thread(target=create_jobs).start()
-    threading.Thread(target=get_sys_usage).start()
-
+    threading.Thread(target=database_updater).start()
+    
     threading.Thread(target=create_main_api_file).start()
     threading.Thread(target=create_minerapi).start()
     threading.Thread(target=create_secondary_api_files).start()
 
-    threading.Thread(target=database_updater).start()
-    threading.Thread(target=autorestart).start()
+    threading.Thread(target=input_management).start()
     try:
         admin_print("Master Server is listening on port", PORT)
         StreamServer((HOSTNAME, PORT), handle).serve_forever()
