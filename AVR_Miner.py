@@ -23,6 +23,7 @@ from socket import socket
 from subprocess import DEVNULL, Popen, check_call
 from threading import Thread as thrThread
 from time import ctime, sleep, strptime, time
+import select
 
 
 def install(package):
@@ -192,6 +193,7 @@ def Connect():
     # Server connection
     global masterServer_address
     global masterServer_port
+    global SOCKET_TIMEOUT
     while True:
         try:
             try:
@@ -208,7 +210,9 @@ def Connect():
             socConn.connect(
                 (str(masterServer_address), int(masterServer_port)))
             # Get server version
-            serverVersion = socConn.recv(3).decode().rstrip("\n")
+            ready = select.select([socConn], [], [], SOCKET_TIMEOUT)
+            if ready[0]:
+                serverVersion = socConn.recv(10).decode().rstrip("\n")
             debugOutput("Server version: " + serverVersion)
             if (float(serverVersion) <= float(MINER_VER)
                     and len(serverVersion) == 3):
@@ -252,6 +256,7 @@ def Connect():
 
 
 def connectToAVR(com):
+    global AVR_TIMEOUT
     try:
         # Close previous serial connections (if any)
         comConn.close()
@@ -729,6 +734,8 @@ def AVRMine(com):
     global hashrate
     global masterServer_address
     global masterServer_port
+    global MINER_VER
+    global SOCKET_TIMEOUT
     while True:
         # Grab server IP and port
         while True:
@@ -805,7 +812,9 @@ def AVRMine(com):
                             + str(requestedDiff),
                             encoding="utf8"))
                     # Retrieve work
-                    job = socConn.recv(85).decode()
+                    ready = select.select([socConn], [], [], SOCKET_TIMEOUT)
+                    if ready[0]:
+                        job = socConn.recv(100).decode()
                     # Split received data
                     job = job.rstrip("\n").split(",")
 
@@ -974,7 +983,9 @@ def AVRMine(com):
                     try:
                         responsetimetart = now()
                         # Get feedback
-                        feedback = socConn.recv(48).decode().rstrip("\n")
+                        ready = select.select([socConn], [], [], SOCKET_TIMEOUT)
+                        if ready[0]:
+                            feedback = socConn.recv(48).decode().rstrip("\n")
                         responsetimestop = now()
                         # Measure server ping
                         timeDelta = (responsetimestop -
