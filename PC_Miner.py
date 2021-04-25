@@ -943,50 +943,51 @@ def Thread(
                                 + "/"
                                 + str(accepted.value + rejected.value)
                                 + getString("accepted_shares"))
-                            print(
-                                Style.RESET_ALL
-                                + Fore.WHITE
-                                + now().strftime(Style.DIM + "%H:%M:%S ")
-                                + Style.BRIGHT
-                                + algo_back_color
-                                + Fore.RESET
-                                + " cpu"
-                                + str(threadid)
-                                + " "
-                                + Back.RESET
-                                + Fore.GREEN
-                                + " ✓"
-                                + getString("accepted")
-                                + Fore.RESET
-                                + str(int(accepted.value))
-                                + "/"
-                                + str(int(accepted.value + rejected.value))
-                                + Fore.YELLOW
-                                + " ("
-                                + str(int(
-                                    (accepted.value
-                                        / (accepted.value + rejected.value)
-                                     * 100)))
-                                + "%)"
-                                + Style.NORMAL
-                                + Fore.RESET
-                                + " ∙ "
-                                + str("%05.2f" % float(computetime))
-                                + "s"
-                                + Style.NORMAL
-                                + " ∙ "
-                                + Fore.BLUE
-                                + Style.BRIGHT
-                                + str(formattedhashcount)
-                                + Fore.RESET
-                                + Style.NORMAL
-                                + " @ diff "
-                                + str(diff)
-                                + " ∙ "
-                                + Fore.CYAN
-                                + "ping "
-                                + str("%02.0f" % int(ping))
-                                + "ms")
+                            with thread_lock:
+                                print(
+                                    Style.RESET_ALL
+                                    + Fore.WHITE
+                                    + now().strftime(Style.DIM + "%H:%M:%S ")
+                                    + Style.BRIGHT
+                                    + algo_back_color
+                                    + Fore.RESET
+                                    + " cpu"
+                                    + str(threadid)
+                                    + " "
+                                    + Back.RESET
+                                    + Fore.GREEN
+                                    + " ✓"
+                                    + getString("accepted")
+                                    + Fore.RESET
+                                    + str(int(accepted.value))
+                                    + "/"
+                                    + str(int(accepted.value + rejected.value))
+                                    + Fore.YELLOW
+                                    + " ("
+                                    + str(int(
+                                        (accepted.value
+                                            / (accepted.value + rejected.value)
+                                         * 100)))
+                                    + "%)"
+                                    + Style.NORMAL
+                                    + Fore.RESET
+                                    + " ∙ "
+                                    + str("%05.2f" % float(computetime))
+                                    + "s"
+                                    + Style.NORMAL
+                                    + " ∙ "
+                                    + Fore.BLUE
+                                    + Style.BRIGHT
+                                    + str(formattedhashcount)
+                                    + Fore.RESET
+                                    + Style.NORMAL
+                                    + " @ diff "
+                                    + str(diff)
+                                    + " ∙ "
+                                    + Fore.CYAN
+                                    + "ping "
+                                    + str("%02.0f" % int(ping))
+                                    + "ms")
 
                         elif feedback == "BLOCK":
                             # If block was found
@@ -999,50 +1000,51 @@ def Thread(
                                 + "/"
                                 + str(accepted.value + rejected.value)
                                 + getString("accepted_shares"))
-                            print(
-                                Style.RESET_ALL
-                                + Fore.WHITE
-                                + now().strftime(Style.DIM + "%H:%M:%S ")
-                                + Style.BRIGHT
-                                + algo_back_color
-                                + Fore.RESET
-                                + " cpu"
-                                + str(threadid)
-                                + " "
-                                + Back.RESET
-                                + Fore.CYAN
-                                + " ✓"
-                                + getString("block_found")
-                                + Fore.RESET
-                                + str(accepted.value)
-                                + "/"
-                                + str(accepted.value + rejected.value)
-                                + Fore.YELLOW
-                                + " ("
-                                + str(int(
-                                    (accepted.value
-                                        / (accepted.value + rejected.value)
-                                     * 100)))
-                                + "%)"
-                                + Style.NORMAL
-                                + Fore.RESET
-                                + " ∙ "
-                                + str("%05.2f" % float(computetime))
-                                + "s"
-                                + Style.NORMAL
-                                + " ∙ "
-                                + Fore.BLUE
-                                + Style.BRIGHT
-                                + str(formattedhashcount)
-                                + Fore.RESET
-                                + Style.NORMAL
-                                + " @ diff "
-                                + str(diff)
-                                + " ∙ "
-                                + Fore.CYAN
-                                + "ping "
-                                + str("%02.0f" % int(ping))
-                                + "ms")
+                            with thread_lock:
+                                print(
+                                    Style.RESET_ALL
+                                    + Fore.WHITE
+                                    + now().strftime(Style.DIM + "%H:%M:%S ")
+                                    + Style.BRIGHT
+                                    + algo_back_color
+                                    + Fore.RESET
+                                    + " cpu"
+                                    + str(threadid)
+                                    + " "
+                                    + Back.RESET
+                                    + Fore.CYAN
+                                    + " ✓"
+                                    + getString("block_found")
+                                    + Fore.RESET
+                                    + str(accepted.value)
+                                    + "/"
+                                    + str(accepted.value + rejected.value)
+                                    + Fore.YELLOW
+                                    + " ("
+                                    + str(int(
+                                        (accepted.value
+                                            / (accepted.value + rejected.value)
+                                         * 100)))
+                                    + "%)"
+                                    + Style.NORMAL
+                                    + Fore.RESET
+                                    + " ∙ "
+                                    + str("%05.2f" % float(computetime))
+                                    + "s"
+                                    + Style.NORMAL
+                                    + " ∙ "
+                                    + Fore.BLUE
+                                    + Style.BRIGHT
+                                    + str(formattedhashcount)
+                                    + Fore.RESET
+                                    + Style.NORMAL
+                                    + " @ diff "
+                                    + str(diff)
+                                    + " ∙ "
+                                    + Fore.CYAN
+                                    + "ping "
+                                    + str("%02.0f" % int(ping))
+                                    + "ms")
 
                         else:
                             # If result was incorrect
@@ -1055,51 +1057,52 @@ def Thread(
                                 + "/"
                                 + str(accepted.value + rejected.value)
                                 + getString("accepted_shares"))
-                            print(
-                                Style.RESET_ALL
-                                + Fore.WHITE
-                                + now().strftime(Style.DIM + "%H:%M:%S ")
-                                + algo_back_color
-                                + Back.YELLOW
-                                + Fore.RESET
-                                + " cpu"
-                                + str(threadid)
-                                + " "
-                                + Style.BRIGHT
-                                + Back.RESET
-                                + Fore.RED
-                                + " ✗"
-                                + getString("rejected")
-                                + Fore.RESET
-                                + str(accepted.value)
-                                + "/"
-                                + str(accepted.value + rejected.value)
-                                + Fore.YELLOW
-                                + " ("
-                                + str(int(
-                                    (accepted.value
-                                        / (accepted.value + rejected.value)
-                                     * 100)))
-                                + "%)"
-                                + Style.NORMAL
-                                + Fore.RESET
-                                + " ∙ "
-                                + str("%05.2f" % float(computetime))
-                                + "s"
-                                + Style.NORMAL
-                                + " ∙ "
-                                + Fore.BLUE
-                                + Style.BRIGHT
-                                + str(formattedhashcount)
-                                + Fore.RESET
-                                + Style.NORMAL
-                                + " @ diff "
-                                + str(diff)
-                                + " ∙ "
-                                + Fore.CYAN
-                                + "ping "
-                                + str("%02.0f" % int(ping))
-                                + "ms")
+                            with thread_lock:
+                                print(
+                                    Style.RESET_ALL
+                                    + Fore.WHITE
+                                    + now().strftime(Style.DIM + "%H:%M:%S ")
+                                    + algo_back_color
+                                    + Back.YELLOW
+                                    + Fore.RESET
+                                    + " cpu"
+                                    + str(threadid)
+                                    + " "
+                                    + Style.BRIGHT
+                                    + Back.RESET
+                                    + Fore.RED
+                                    + " ✗"
+                                    + getString("rejected")
+                                    + Fore.RESET
+                                    + str(accepted.value)
+                                    + "/"
+                                    + str(accepted.value + rejected.value)
+                                    + Fore.YELLOW
+                                    + " ("
+                                    + str(int(
+                                        (accepted.value
+                                            / (accepted.value + rejected.value)
+                                         * 100)))
+                                    + "%)"
+                                    + Style.NORMAL
+                                    + Fore.RESET
+                                    + " ∙ "
+                                    + str("%05.2f" % float(computetime))
+                                    + "s"
+                                    + Style.NORMAL
+                                    + " ∙ "
+                                    + Fore.BLUE
+                                    + Style.BRIGHT
+                                    + str(formattedhashcount)
+                                    + Fore.RESET
+                                    + Style.NORMAL
+                                    + " @ diff "
+                                    + str(diff)
+                                    + " ∙ "
+                                    + Fore.CYAN
+                                    + "ping "
+                                    + str("%02.0f" % int(ping))
+                                    + "ms")
                         break
                     break
             except Exception as e:
@@ -1136,20 +1139,21 @@ def prettyPrint(messageType, message, state):
     else:
         color = Fore.RED
 
-    print(Style.RESET_ALL
-          + Fore.WHITE
-          + now().strftime(Style.DIM + "%H:%M:%S ")
-          + Style.BRIGHT
-          + background
-          + " "
-          + messageType
-          + " "
-          + Back.RESET
-          + color
-          + Style.BRIGHT
-          + message
-          + Style.NORMAL
-          + Fore.RESET)
+    with thread_lock:
+        print(Style.RESET_ALL
+              + Fore.WHITE
+              + now().strftime(Style.DIM + "%H:%M:%S ")
+              + Style.BRIGHT
+              + background
+              + " "
+              + messageType
+              + " "
+              + Back.RESET
+              + color
+              + Style.BRIGHT
+              + message
+              + Style.NORMAL
+              + Fore.RESET)
 
 
 def initRichPresence():
@@ -1210,8 +1214,14 @@ if __name__ == "__main__":
 
     try:
         from multiprocessing import (
-            Manager, Process, Value, cpu_count, current_process
+            Manager, 
+            Process, 
+            Value, 
+            cpu_count, 
+            current_process,
+            Lock
         )
+        thread_lock = Lock()
         manager = Manager()
         # Multiprocessing fix for pyinstaller
         # Multiprocessing globals
