@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.5)
+# Duino-Coin Python PC Miner (v2.45)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -100,7 +100,7 @@ except ModuleNotFoundError:
 
 
 # Global variables
-MINER_VER = "2.5"  # Version number
+MINER_VER = "2.45"  # Version number
 SOC_TIMEOUT = 30  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
