@@ -22,6 +22,7 @@ from signal import SIGINT, signal
 from socket import socket
 from subprocess import DEVNULL, Popen, check_call
 from threading import Thread as thrThread
+from threading import Lock
 from time import ctime, sleep, strptime, time
 import select
 
@@ -88,7 +89,7 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = "2.5"  # Version number
-SOCKET_TIMEOUT = 15 
+SOCKET_TIMEOUT = 15
 AVR_TIMEOUT = 7
 RESOURCES_DIR = "AVRMiner_" + str(MINER_VER) + "_resources"
 shares = [0, 0]
@@ -99,11 +100,12 @@ debug = "n"
 rig_identifier = "None"
 # Serverip file
 server_ip_file = ("https://raw.githubusercontent.com/"
-                + "revoxhere/"
-                + "duino-coin/gh-pages/serverip.txt")
-config = ConfigParser()
+                  + "revoxhere/"
+                  + "duino-coin/gh-pages/serverip.txt")
 donation_level = 0
 hashrate = 0
+config = ConfigParser()
+thread_lock = Lock()
 
 # Create resources folder if it doesn't exist
 if not path.exists(RESOURCES_DIR):
@@ -712,20 +714,21 @@ def prettyPrint(messageType, message, state):
     else:
         color = Fore.RED
 
-    print(Style.RESET_ALL
-          + Fore.WHITE
-          + now().strftime(Style.DIM + "%H:%M:%S ")
-          + Style.BRIGHT
-          + background
-          + " "
-          + messageType
-          + " "
-          + Back.RESET
-          + color
-          + Style.BRIGHT
-          + message
-          + Style.NORMAL
-          + Fore.RESET)
+    with thread_lock:
+        print(Style.RESET_ALL
+              + Fore.WHITE
+              + now().strftime(Style.DIM + "%H:%M:%S ")
+              + Style.BRIGHT
+              + background
+              + " "
+              + messageType
+              + " "
+              + Back.RESET
+              + color
+              + Style.BRIGHT
+              + message
+              + Style.NORMAL
+              + Fore.RESET)
 
 
 def AVRMine(com):
@@ -983,7 +986,8 @@ def AVRMine(com):
                     try:
                         responsetimetart = now()
                         # Get feedback
-                        ready = select.select([socConn], [], [], SOCKET_TIMEOUT)
+                        ready = select.select(
+                            [socConn], [], [], SOCKET_TIMEOUT)
                         if ready[0]:
                             feedback = socConn.recv(48).decode().rstrip("\n")
                         responsetimestop = now()
@@ -1021,49 +1025,50 @@ def AVRMine(com):
                         + "/"
                         + str(shares[0] + shares[1])
                         + getString("accepted_shares"))
-                    print(
-                        Style.RESET_ALL
-                        + Fore.WHITE
-                        + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.MAGENTA
-                        + Fore.RESET
-                        + " usb"
-                        + str(''.join(filter(str.isdigit, com)))
-                        + " "
-                        + Back.RESET
-                        + Fore.GREEN
-                        + " ✓"
-                        + getString("accepted")
-                        + Fore.RESET
-                        + str(int(shares[0]))
-                        + "/"
-                        + str(int(shares[0] + shares[1]))
-                        + Fore.YELLOW
-                        + " ("
-                        + str(int((shares[0]
-                                   / (shares[0] + shares[1]) * 100)))
-                        + "%)"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " ∙ "
-                        + str("%01.3f" % float(computetime))
-                        + "s"
-                        + Style.NORMAL
-                        + " ∙ "
-                        + Fore.BLUE
-                        + Style.BRIGHT
-                        + str(round(hashrate))
-                        + " H/s"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " @ diff "
-                        + str(diff)
-                        + " ∙ "
-                        + Fore.CYAN
-                        + "ping "
-                        + str("%02.0f" % int(ping))
-                        + "ms")
+                    with thread_lock:
+                        print(
+                            Style.RESET_ALL
+                            + Fore.WHITE
+                            + now().strftime(Style.DIM + "%H:%M:%S ")
+                            + Style.BRIGHT
+                            + Back.MAGENTA
+                            + Fore.RESET
+                            + " usb"
+                            + str(''.join(filter(str.isdigit, com)))
+                            + " "
+                            + Back.RESET
+                            + Fore.GREEN
+                            + " ✓"
+                            + getString("accepted")
+                            + Fore.RESET
+                            + str(int(shares[0]))
+                            + "/"
+                            + str(int(shares[0] + shares[1]))
+                            + Fore.YELLOW
+                            + " ("
+                            + str(int((shares[0]
+                                       / (shares[0] + shares[1]) * 100)))
+                            + "%)"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " ∙ "
+                            + str("%01.3f" % float(computetime))
+                            + "s"
+                            + Style.NORMAL
+                            + " ∙ "
+                            + Fore.BLUE
+                            + Style.BRIGHT
+                            + str(round(hashrate))
+                            + " H/s"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " @ diff "
+                            + str(diff)
+                            + " ∙ "
+                            + Fore.CYAN
+                            + "ping "
+                            + str("%02.0f" % int(ping))
+                            + "ms")
 
                 elif feedback == "BLOCK":
                     # If block was found
@@ -1076,49 +1081,50 @@ def AVRMine(com):
                         + "/"
                         + str(shares[0] + shares[1])
                         + getString("accepted_shares"))
-                    print(
-                        Style.RESET_ALL
-                        + Fore.WHITE
-                        + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.MAGENTA
-                        + Fore.RESET
-                        + " usb"
-                        + str(''.join(filter(str.isdigit, com)))
-                        + " "
-                        + Back.RESET
-                        + Fore.CYAN
-                        + " ✓"
-                        + getString("block_found")
-                        + Fore.RESET
-                        + str(int(shares[0]))
-                        + "/"
-                        + str(int(shares[0] + shares[1]))
-                        + Fore.YELLOW
-                        + " ("
-                        + str(int((shares[0]
-                                   / (shares[0] + shares[1]) * 100)))
-                        + "%)"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " ∙ "
-                        + str("%01.3f" % float(computetime))
-                        + "s"
-                        + Style.NORMAL
-                        + " ∙ "
-                        + Fore.BLUE
-                        + Style.BRIGHT
-                        + str(int(hashrate))
-                        + " H/s"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " @ diff "
-                        + str(diff)
-                        + " ∙ "
-                        + Fore.CYAN
-                        + "ping "
-                        + str("%02.0f" % int(ping))
-                        + "ms")
+                    with thread_lock:
+                        print(
+                            Style.RESET_ALL
+                            + Fore.WHITE
+                            + now().strftime(Style.DIM + "%H:%M:%S ")
+                            + Style.BRIGHT
+                            + Back.MAGENTA
+                            + Fore.RESET
+                            + " usb"
+                            + str(''.join(filter(str.isdigit, com)))
+                            + " "
+                            + Back.RESET
+                            + Fore.CYAN
+                            + " ✓"
+                            + getString("block_found")
+                            + Fore.RESET
+                            + str(int(shares[0]))
+                            + "/"
+                            + str(int(shares[0] + shares[1]))
+                            + Fore.YELLOW
+                            + " ("
+                            + str(int((shares[0]
+                                       / (shares[0] + shares[1]) * 100)))
+                            + "%)"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " ∙ "
+                            + str("%01.3f" % float(computetime))
+                            + "s"
+                            + Style.NORMAL
+                            + " ∙ "
+                            + Fore.BLUE
+                            + Style.BRIGHT
+                            + str(int(hashrate))
+                            + " H/s"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " @ diff "
+                            + str(diff)
+                            + " ∙ "
+                            + Fore.CYAN
+                            + "ping "
+                            + str("%02.0f" % int(ping))
+                            + "ms")
 
                 else:
                     # If result was incorrect
@@ -1131,49 +1137,50 @@ def AVRMine(com):
                         + "/"
                         + str(shares[0] + shares[1])
                         + getString("accepted_shares"))
-                    print(
-                        Style.RESET_ALL
-                        + Fore.WHITE
-                        + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.MAGENTA
-                        + Fore.RESET
-                        + " usb"
-                        + str(''.join(filter(str.isdigit, com)))
-                        + " "
-                        + Back.RESET
-                        + Fore.RED
-                        + " ✗"
-                        + getString("rejected")
-                        + Fore.RESET
-                        + str(int(shares[0]))
-                        + "/"
-                        + str(int(shares[0] + shares[1]))
-                        + Fore.YELLOW
-                        + " ("
-                        + str(int((shares[0]
-                                   / (shares[0] + shares[1]) * 100)))
-                        + "%)"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " ∙ "
-                        + str("%01.3f" % float(computetime))
-                        + "s"
-                        + Style.NORMAL
-                        + " ∙ "
-                        + Fore.BLUE
-                        + Style.BRIGHT
-                        + str(int(hashrate))
-                        + " H/s"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " @ diff "
-                        + str(diff)
-                        + " ∙ "
-                        + Fore.CYAN
-                        + "ping "
-                        + str("%02.0f" % int(ping))
-                        + "ms")
+                    with thread_lock:
+                        print(
+                            Style.RESET_ALL
+                            + Fore.WHITE
+                            + now().strftime(Style.DIM + "%H:%M:%S ")
+                            + Style.BRIGHT
+                            + Back.MAGENTA
+                            + Fore.RESET
+                            + " usb"
+                            + str(''.join(filter(str.isdigit, com)))
+                            + " "
+                            + Back.RESET
+                            + Fore.RED
+                            + " ✗"
+                            + getString("rejected")
+                            + Fore.RESET
+                            + str(int(shares[0]))
+                            + "/"
+                            + str(int(shares[0] + shares[1]))
+                            + Fore.YELLOW
+                            + " ("
+                            + str(int((shares[0]
+                                       / (shares[0] + shares[1]) * 100)))
+                            + "%)"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " ∙ "
+                            + str("%01.3f" % float(computetime))
+                            + "s"
+                            + Style.NORMAL
+                            + " ∙ "
+                            + Fore.BLUE
+                            + Style.BRIGHT
+                            + str(int(hashrate))
+                            + " H/s"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " @ diff "
+                            + str(diff)
+                            + " ∙ "
+                            + Fore.CYAN
+                            + "ping "
+                            + str("%02.0f" % int(ping))
+                            + "ms")
                 break
 
 
