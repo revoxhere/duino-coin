@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Tkinter GUI Wallet (v2.4)
+# Duino-Coin Tkinter GUI Wallet (v2.45)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -31,7 +31,7 @@ from webbrowser import open_new_tab
 from requests import get
 
 # Version number
-VERSION = 2.4
+VERSION = 2.45
 # Colors
 BACKGROUND_COLOR = "#121212"
 FONT_COLOR = "#fffdee"
@@ -855,13 +855,18 @@ def currency_converter_window(handler):
 
 def statistics_window(handler):
     statsApi = get(
-        "https://raw.githubusercontent.com/"
-        + "revoxhere/"
-        + "duco-statistics/master/"
-        + "api.json",
+        "https://server.duinocoin.com"
+        + "/api.json",
         data=None)
     if statsApi.status_code == 200:  # Check for reponse
         statsApi = statsApi.json()
+
+    miner_api = get(
+        "https://server.duinocoin.com"
+        + "/miners.json",
+        data=None)
+    if miner_api.status_code == 200:  # Check for reponse
+        miner_api = miner_api.json()
 
     statsWindow = Toplevel()
     statsWindow.resizable(False, False)
@@ -895,23 +900,24 @@ def statistics_window(handler):
         padx=5)
     i = 0
     totalHashrate = 0
-    for threadid in statsApi["Miners"]:
-        if username in statsApi["Miners"][threadid]["User"]:
-            rigId = statsApi["Miners"][threadid]["Identifier"]
+
+    for threadid in miner_api:
+        if username in miner_api[threadid]["User"]:
+            rigId = miner_api[threadid]["Identifier"]
             if rigId == "None":
                 rigId = ""
             else:
                 rigId += ": "
-            software = statsApi["Miners"][threadid]["Software"]
-            hashrate = str(round(statsApi["Miners"][threadid]["Hashrate"], 2))
+            software = miner_api[threadid]["Software"]
+            hashrate = str(round(miner_api[threadid]["Hashrate"], 2))
             totalHashrate += float(hashrate)
-            difficulty = str(statsApi["Miners"][threadid]["Diff"])
+            difficulty = str(miner_api[threadid]["Diff"])
             shares = (
-                str(statsApi["Miners"][threadid]["Accepted"])
+                str(miner_api[threadid]["Accepted"])
                 + "/"
                 + str(
-                    statsApi["Miners"][threadid]["Accepted"]
-                    + statsApi["Miners"][threadid]["Rejected"]))
+                    miner_api[threadid]["Accepted"]
+                    + miner_api[threadid]["Rejected"]))
 
             Active_workers_listbox.insert(
                 i,
@@ -987,8 +993,10 @@ def statistics_window(handler):
         pady=(0, 5),
         padx=5)
 
+    num = 0
     for i in statsApi["Top 10 richest miners"]:
-        Top_10_listbox.insert(i, statsApi["Top 10 richest miners"][i])
+        Top_10_listbox.insert(num, i)
+        num += 1
 
     Top_10_listbox.select_set(32)
     Top_10_listbox.event_generate("<<ListboxSelect>>")
