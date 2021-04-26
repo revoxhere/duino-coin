@@ -12,15 +12,14 @@
 
 To build your own Duino-Coin apps, here's a list of of commands the master server accepts.
 To start communication however, firstly you need to connect to the server. For now you have two options:
-*   TCP connection (recommended) - server IP and port are static: `tcp://51.15.127.80:2811`
-*   Websocket sonnection (through proxy - may not be available 100% of the time) - server IP and port are static: `ws://51.15.127.80:14808`
-*   Secure Websocket connection (TLS/WSS) (through proxy - may not be available 100% of the time) - server IP and port are static: `wss://51.15.127.80:15808`
+*   TCP connection (recommended) - `tcp://51.15.127.80:2811`
+*   Websocket sonnection (through proxy) - `ws://51.15.127.80:14808`
+*   Secure Websocket connection (TLS/WSS) (through proxy) - `wss://51.15.127.80:15808`
 
-**Make sure you don't create more than 24 connections per IP address and don't make more than 24 connections in time shorter than 30 seconds.**
+**Make sure you don't create more more than 50 connections in time shorter than 30 seconds.**
 If you do that, the server may ban your IP for creating too much traffic and being a potential DDoS attacker.
-If you happen to get banned, wait about 315 seconds to get unbanned automatically.
 
-After connecting, the server will send its version number it's currently on (2.2).
+After connecting, the server will send its version number it's currently on (2.4).
 At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
 To login, send `LOGI,username,password` - replace username and password with credentials. After sucessfull login server will send `OK`.
 If login fails, server will send `NO,Reason of failed login`.
@@ -35,14 +34,14 @@ After loging-in you have access to the following commands:
 *   `JOB` - Server will return job for mining using DUCO-S1 (-S1A)
     *   You can also use `JOB,username` (or `JOBXX,username` for XXHASH) to mine without loging-in
 
-    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (**if you don't ask for a specific difficulty, you'll get the network diff**) where diff is one of the below:
+    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, you'll get the network diff) where diff is one of the below:
         * `AVR`     - diff      5 - used for official AVR boards mining
         * `ESP`     - diff    125 - used for official ESP8266 boards mining **(BEING DEPRECATED)**
-        * `ESP8266` - diff    275 - used for official ESP8266 boards mining **(FOR NEW 2.4 CODE)**
-        * `ESP32`   - diff    275 - used for official ESP32 boards mining
-        * `LOW`     - diff     3k - used for official Web Miner
-        * `MEDIUM`  - diff    30k - used for lower-diff PC mining
-        * `NET`     - diff   ~70k - used for PC mining - network difficulty
+        * `ESP8266` - diff    500 - used for official ESP8266 boards mining **(FOR NEW 2.4 CODE)**
+        * `ESP32`   - diff    500 - used for official ESP32 boards mining
+        * `LOW`     - diff     4k - used for official Web Miner
+        * `MEDIUM`  - diff    40k - used for lower-diff PC mining
+        * `NET`     - diff  ~100k - used for PC mining - network difficulty
         * `EXTREME` - diff   950k - not used anywhere officially
     
     *   When sending the mining result, you can pass the hashrate count and the name of the miner along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s) and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner"
