@@ -27,9 +27,11 @@ def PoolList(connection):
 def PoolLoginAdd(connection, data, PoolPassword):
     try:
         password = str(data[1])
+        
         info = str(data[2])
-
         info = ast.literal_eval(info)
+        info = json.loads(info)
+        
         poolName = info['name']
         poolHost = info['host']
         poolPort = info['port']
@@ -62,10 +64,7 @@ def PoolLoginAdd(connection, data, PoolPassword):
 def PoolLoginRemove(connection, data, PoolPassword):
     try:
         password = str(data[1])
-        info = str(data[2])
-
-        info = ast.literal_eval(info)
-        poolID = info['identifier']
+        poolID = str(data[2])
     except Exception as e:
         print(e)
         send_data(data=f"NO,Error: {e}", connection=connection)
