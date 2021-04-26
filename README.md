@@ -72,9 +72,9 @@
 
 <h2 align="center">Get started</h2><br>
 
-| Official Wallet | Official Miners |
-:----------------:|:----------------:
-[<img src="https://i.imgur.com/OEh0JxK.png">](https://duinocoin.com/getting-started#register)  |  [<img src="https://i.imgur.com/QNWkoee.png">](https://duinocoin.com/getting-started#pc)
+| Official Wallets | Official Miners |
+:-----------------:|:----------------:
+[<img src="https://i.imgur.com/msVtLHs.png">](https://duinocoin.com/getting-started#register)  |  [<img src="https://i.imgur.com/SMkKHOK.png">](https://duinocoin.com/getting-started#computer)
 
 #### Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a>.
 
