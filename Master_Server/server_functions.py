@@ -34,7 +34,8 @@ def receive_data(connection):
     else:
         data_pre_split = data
         data = data.decode("utf8").replace("\n", "").split(",")
-        data = Comma_Seperator_filter(data, data_pre_split)
+        if data[0].startswith("Pool"):
+            data = Comma_Seperator_filter(data, data_pre_split)
 
         return data
 
