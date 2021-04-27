@@ -1,6 +1,7 @@
 import sqlite3
 from server_functions import receive_data, send_data
 import ast
+import json
 
 database = 'crypto_database.db'
 database_timeout = 10
@@ -89,15 +90,16 @@ def PoolLoginRemove(connection, data, PoolPassword):
 
 class Pool_Function_class:
 
-    def __init__(connection):
+    def __init__(self, connection):
         self.poolID = None
         self.connection = connection
 
     def login(self, data):
         try:
             info = str(data[1])
-
             info = ast.literal_eval(info)
+            info = json.loads(info)
+            
             poolHost = info['host']
             poolPort = info['port']
             poolVersion_sent = info['version']
@@ -130,6 +132,7 @@ class Pool_Function_class:
         try:
             info = str(data[1])
             info = ast.literal_eval(info)
+            info = json.loads(info)
             
             rewards = info['rewards']
             blocks_to_add = int(info['blocks']['blockIncrease'])
