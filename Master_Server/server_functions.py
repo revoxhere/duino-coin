@@ -1,23 +1,22 @@
-
-def Comma_Seperator_filter(data, data2):
+def pool_info_parser(data, data2):
     if data[0] == "PoolSync":
-        leng_of_base = 9
-        new_data = (data2[leng_of_base:])
+        length_of_base = 9
+        new_data = (data2[length_of_base:])
         data = ['PoolSync', new_data]
 
     elif data[0] == "PoolLoginAdd":
-        leng_of_base = 14 + len(data[1])
-        new_data = (data2[leng_of_base:])
+        length_of_base = 14 + len(data[1])
+        new_data = (data2[length_of_base:])
         data = ['PoolLoginAdd', data[1], new_data]
 
     elif data[0] == "PoolLoginRemove":
-        leng_of_base = 17 + len(data[1])
-        new_data = (data2[leng_of_base:])
+        length_of_base = 17 + len(data[1])
+        new_data = (data2[length_of_base:])
         data = ['PoolLoginRemove', data[1], new_data]
 
     elif data[0] == "PoolLogin":
-        leng_of_base = 10
-        new_data = (data2[leng_of_base:])
+        length_of_base = 10
+        new_data = (data2[length_of_base:])
         data = ['PoolLogin', new_data]
 
     return data
@@ -26,7 +25,7 @@ def Comma_Seperator_filter(data, data2):
 def receive_data(connection):
     """ Returns received data from the connection,
         raises an exception on error """
-    data = connection.recv(128)
+    data = connection.recv(1024)
     if not data:
         connection.close()
         raise Exception("Connection closed unexpectedly")
@@ -34,7 +33,8 @@ def receive_data(connection):
     else:
         data_pre_split = data
         data = data.decode("utf8").replace("\n", "").split(",")
-        data = Comma_Seperator_filter(data, data_pre_split)
+        if data[0].startswith("Pool"):
+            data = pool_info_parser(data, data_pre_split)
 
         return data
 

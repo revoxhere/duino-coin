@@ -1,39 +1,44 @@
 # Duino-Coin Kolka algorithms and formulas
 # 2019-2021 Duino-Coin community
 from fastrand import pcg32bounded as fastrandint
-from math import floor, ceil
+from math import floor
 MULTIPLIER = 1
 
 
 def kolka_v1(basereward, sharetime, difficulty, workers, penalty=False):
     """ Kolka V1 reward system - to be extended in the future
         Authors: revox """
+    pc_mining_perc = .80
+    avr_mining_perc = .96
     if penalty:
-        output = float(int(int(sharetime) ** 2) / 1000000000) * -1
+        output = float(int(int(sharetime) ** 2) / 1000000) * -1
     else:
-        rand = floatmap(fastrandint(100), 0, 100, 0.85, 1.15)
-        output = ((MULTIPLIER * basereward
+        output = (MULTIPLIER * basereward
                    + float(sharetime) / 10000
-                   + float(difficulty) / 1000000000) * rand) / 2
-        kolka = output + (output * (0.75 ** (workers-1)))
-    return float(kolka)
+                   + float(difficulty) / 100000000)
+    if difficulty > 600:
+        output = output + (output * (pc_mining_perc ** (workers-1)))
+    else:
+        output = output + (output * (avr_mining_perc ** (workers-1)))
+
+    return float(output)
 
 
 def kolka_v2(current_difficulty, difficulty_list):
     """ Kolka V2 system - move miner to the next diff tier
         Authors: revox """
     if current_difficulty == "AVR":
-        return difficulty_list["ESP8266"]["difficulty"]
+        return "ESP8266"
     if current_difficulty == "ESP8266":
-        return difficulty_list["ESP32"]["difficulty"]
+        return "ESP32"
     if current_difficulty == "ESP32":
-        return difficulty_list["LOW"]["difficulty"]
+        return "LOW"
     if current_difficulty == "LOW":
-        return difficulty_list["MEDIUM"]["difficulty"]
+        return "MEDIUM"
     if current_difficulty == "MEDIUM":
-        return difficulty_list["NET"]["difficulty"]
+        return "NET"
     if current_difficulty == "NET":
-        return difficulty_list["EXTREME"]["difficulty"]
+        return "EXTREME"
 
 
 def kolka_v3(sharetime, expected_sharetime, difficulty):
@@ -65,7 +70,9 @@ def kolka_v3(sharetime, expected_sharetime, difficulty):
         # Checks if sharetime was exactly double than expected
         elif new_difficulty == 0:
             # Thus roughly half the difficulty
-            new_difficulty = int(ceil(difficulty * 0.5))
+            new_difficulty = int(difficulty * 0.5)
+    if new_difficulty <= 0:
+        new_difficulty = 1
     return int(new_difficulty)
 
 
