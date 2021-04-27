@@ -26,7 +26,7 @@ def Comma_Seperator_filter(data, data2):
 def receive_data(connection):
     """ Returns received data from the connection,
         raises an exception on error """
-    data = connection.recv(128)
+    data = connection.recv(1024)
     if not data:
         connection.close()
         raise Exception("Connection closed unexpectedly")
