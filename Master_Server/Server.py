@@ -476,6 +476,11 @@ def input_management():
             - changpass <user> <newpass> - changes password
             - ban <username> - bans username""")
 
+        elif command[0] == "chips":
+            print("Chip IDs gathered during this session "
+                  + "(for further examination): ")
+            print(" ".join(chip_ids))
+
         elif command[0] == "clear":
             os.system('clear')
 
@@ -632,7 +637,9 @@ def input_management():
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
                     hashed_pass = hashpw(
-                        str(command[2]).encode('utf-8'), gensalt(rounds=BCRYPT_ROUNDS))
+                        str(command[2]).encode('utf-8'),
+                        gensalt(rounds=BCRYPT_ROUNDS)
+                    )
                     with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
@@ -930,13 +937,14 @@ def protocol_ducos1(data, connection, address):
 
         is_first_share = False
 
-        # if req_difficulty == "AVR":
-        #     try:
-        #         chipID = str(result[4])
-        #         #chip_ids.append(chipID)
-        #         # print("Chip ID:", chipID)
-        #     except IndexError:
-        #         chipID = "None"
+        if req_difficulty == "AVR":
+            try:
+                chip_id = str(result[4])
+                if chip_id.startswith("DUCOID"):
+                    if not chip_id in chip_ids:
+                        chip_ids.append(chip_id)
+            except:
+                pass
 
         if (accepted_shares > 0
                 and accepted_shares % UPDATE_MINERAPI_EVERY == 0):
@@ -1656,7 +1664,6 @@ def protocol_get_balance(data, connection, username):
                 WHERE username = ?""",
                           (username,))
             balance = str(datab.fetchone()[3])
-            sleep(0.05)
             send_data(f'{float(balance):.20f}', connection)
     except Exception as e:
         print(e)
@@ -1804,6 +1811,13 @@ def handle(connection, address):
             if not data:
                 break
 
+            elif data[0] == "BALA":
+                """ Client requested balance check """
+                if logged_in:
+                    protocol_get_balance(data, connection, username)
+                else:
+                    send_data("NO,Not logged in", connection)
+
             elif data[0] == "JOB":
                 """ Client requested the DUCO-S1 mining protocol,
                     it's not our job so we pass him to the
@@ -1829,13 +1843,6 @@ def handle(connection, address):
             elif data[0] == "REGI":
                 """ Client requested registation """
                 protocol_register(data, connection)
-
-            elif data[0] == "BALA":
-                """ Client requested balance check """
-                if logged_in:
-                    protocol_get_balance(data, connection, username)
-                else:
-                    send_data("NO,Not logged in", connection)
 
             elif data[0] == "GTXL":
                 """ Client requested transaction list """
@@ -1882,7 +1889,7 @@ def handle(connection, address):
                                    PoolPassword=PoolPassword)
     except Exception:
         pass
-        #print(traceback.format_exc())
+        # print(traceback.format_exc())
     finally:
         #print("Closing socket")
         try:
@@ -1952,11 +1959,11 @@ if __name__ == "__main__":
 
     threading.Thread(target=get_duco_prices).start()
     threading.Thread(target=get_sys_usage).start()
-    
+
     threading.Thread(target=update_job_tiers).start()
     threading.Thread(target=create_jobs).start()
     threading.Thread(target=database_updater).start()
-    
+
     threading.Thread(target=create_main_api_file).start()
     threading.Thread(target=create_minerapi).start()
     threading.Thread(target=create_secondary_api_files).start()
