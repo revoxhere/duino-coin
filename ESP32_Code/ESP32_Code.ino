@@ -36,30 +36,44 @@ const char * host = "51.15.127.80"; // Static server IP
 const int port = 2811;
 
 // Task1code
-void Task1code( void * pvParameters ){
+void Task1code( void * pvParameters ) {
   unsigned int Shares1 = 0; // Share variable
 
-  Serial.println("\nCORE1 Connecting to Duino-Coin server..."); 
+  Serial.println("\nCORE1 Connecting to Duino-Coin server...");
   // Use WiFiClient class to create TCP connection
   WiFiClient client1;
-  Serial.println(client1.connect(host, port));
-  Serial.println();
+  client1.setTimeout(2);
+  Serial.println("CORE1 is connected: " + String(client1.connect(host, port)));
 
   String SERVER_VER = client1.readString(); // Server sends SERVER_VERSION after connecting
   digitalWrite(LED_BUILTIN, HIGH);   // Turn off built-in led
-  delay(150);
+  delay(50);
   digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
   Serial.println("CORE1 Connected to the server. Server version: " + String(SERVER_VER));
-  Serial.println();
   digitalWrite(LED_BUILTIN, HIGH);   // Turn off built-in led
-  delay(150);
+  delay(50);
   digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
 
   while (client1.connected()) {
     Serial.println("CORE1 Asking for a new job for user: " + String(ducouser));
-    Serial.println();
     client1.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
-
+    while(!client1.available()){
+      if (!client1.connected())
+        break;
+      delay(10);
+    }
+    yield();
+    if (!client1.connected())
+      break;
+    delay(100);
+    yield();
+    int buff1size = client1.available();
+    Serial.print("CORE1 Buffer size is ");
+    Serial.println(buff1size);
+    if (buff1size<=10) {
+      Serial.println("CORE1 Buffer size is too small. Requesting another job.");
+      continue;
+    }
     String       hash1 = client1.readStringUntil(','); // Read data to the first peroid - last block hash
     String        job1 = client1.readStringUntil(','); // Read data to the next peroid - expected hash
     unsigned int diff1 = client1.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
@@ -70,12 +84,11 @@ void Task1code( void * pvParameters ){
     size_t final_len = len / 2;
     unsigned char* job11 = (unsigned char*)malloc((final_len + 1) * sizeof(unsigned char));
     for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
-        job11[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
-    
+      job11[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
+
     byte shaResult1[20];
 
     Serial.println("CORE1 Job received: " + String(hash1) + " " + String(job1) + " " + String(diff1));
-    Serial.println();
     unsigned long StartTime1 = micros(); // Start time measurement
 
     for (unsigned long iJob1 = 0; iJob1 < diff1; iJob1++) { // Difficulty loop
@@ -85,54 +98,90 @@ void Task1code( void * pvParameters ){
       unsigned int payloadLenght1 = hash11.length();
 
       esp_sha(SHA1, payload1, payloadLenght1, shaResult1);
-      
-      int compareresult1 = memcmp(shaResult1, job11, sizeof(shaResult1));
-      
-      if (compareresult1 == 0) { // If result is found
+
+      if (memcmp(shaResult1, job11, sizeof(shaResult1)) == 0) { // If result is found
         unsigned long EndTime1 = micros(); // End time measurement
         unsigned long ElapsedTime1 = EndTime1 - StartTime1; // Calculate elapsed time
         float ElapsedTimeMiliSeconds1 = ElapsedTime1 / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds1 = ElapsedTimeMiliSeconds1 / 1000; // Convert to seconds
         float HashRate1 = iJob1 / ElapsedTimeSeconds1; // Calculate hashrate
+        if (!client1.connected()) {
+          Serial.println("CORE1 Lost connection. Trying to reconnect");
+          if (!client1.connect(host, port)) {
+            Serial.println("CORE1 connection failed");
+            break;
+          }
+          Serial.println("CORE1 Reconnection successful.");
+        }
         client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.3," + String(rigname)); // Send result to server
+        Serial.println("CORE1 Posting result and waiting for feedback.");
+        while(!client1.available()){
+          if (!client1.connected()) {
+            Serial.println("CORE1 Lost connection. Didn't receive feedback.");
+            break;
+          }
+          delay(10);
+          yield();
+        }
+        delay(100);
+        yield();
         String feedback1 = client1.readStringUntil('\n'); // Receive feedback
         Shares1++;
-        Serial.println(String(feedback1) + " share #" + String(Shares1) + " (" + String(iJob1) + ")" + " Hashrate: " + String(HashRate1) + " Free RAM: " + String(ESP.getFreeHeap()));
+        Serial.println("CORE1 " + String(feedback1) + " share #" + String(Shares1) + " (" + String(iJob1) + ")" + " Hashrate: " + String(HashRate1));
+        if (HashRate1 < 4000) {
+          Serial.println("CORE1 Low hashrate. Restarting");
+          client1.stop();
+          esp_restart();
+        }
         break; // Stop and ask for more work
       }
-    }  
+    }
   }
-  Serial.println("CORE1 Not connected. Restarting ESP");
-  Serial.println();
-  esp_restart(); // Restart the board
+  Serial.println("CORE1 Not connected. Restarting core 1");
+  client1.stop();
+  xTaskCreatePinnedToCore(Task1code, "Task1", 10000, NULL, 1, &Task1, 0);
+  vTaskDelete( NULL );
 }
 
 //Task2code
-void Task2code( void * pvParameters ){
+void Task2code( void * pvParameters ) {
   unsigned int Shares = 0; // Share variable
 
   Serial.println("\nCORE2 Connecting to Duino-Coin server...");
-  Serial.println();
   // Use WiFiClient class to create TCP connection
   WiFiClient client;
-  Serial.println(client.connect(host, port));
-  Serial.println();
+  client.setTimeout(2);
+  Serial.println("CORE2 is connected: " + String(client.connect(host, port)));
 
   String SERVER_VER = client.readString(); // Server sends SERVER_VERSION after connecting
   digitalWrite(LED_BUILTIN, HIGH);   // Turn off built-in led
-  delay(150);
+  delay(50);
   digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
   Serial.println("CORE2 Connected to the server. Server version: " + String(SERVER_VER));
-  Serial.println();
   digitalWrite(LED_BUILTIN, HIGH);   // Turn off built-in led
-  delay(150);
+  delay(50);
   digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
-  
+
   while (client.connected()) {
     Serial.println("CORE2 Asking for a new job for user: " + String(ducouser));
-    Serial.println();
     client.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
-
+    while(!client.available()){
+      if (!client.connected())
+        break;
+      delay(10);
+    }
+    yield();
+    if (!client.connected())
+      break;
+    delay(100);
+    yield();
+    int buff1size = client.available();
+    Serial.print("CORE1 Buffer size is ");
+    Serial.println(buff1size);
+    if (buff1size<=10) {
+      Serial.println("CORE1 Buffer size is too small. Requesting another job.");
+      continue;
+    }
     String       hash = client.readStringUntil(','); // Read data to the first peroid - last block hash
     String        job = client.readStringUntil(','); // Read data to the next peroid - expected hash
     unsigned int diff = client.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
@@ -143,12 +192,11 @@ void Task2code( void * pvParameters ){
     size_t final_len = len / 2;
     unsigned char* job1 = (unsigned char*)malloc((final_len + 1) * sizeof(unsigned char));
     for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
-        job1[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
-    
+      job1[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
+
     byte shaResult[20];
-    
+
     Serial.println("CORE2 Job received: " + String(hash) + " " + String(job) + " " + String(diff));
-    Serial.println();
     unsigned long StartTime = micros(); // Start time measurement
 
     for (unsigned long iJob = 0; iJob < diff; iJob++) { // Difficulty loop
@@ -165,26 +213,49 @@ void Task2code( void * pvParameters ){
       mbedtls_md_update(&ctx, (const unsigned char *) payload, payloadLength);
       mbedtls_md_finish(&ctx, shaResult);
       mbedtls_md_free(&ctx);
-      
-      int compareresult = memcmp(shaResult, job1, sizeof(shaResult));
-      
-      if (compareresult == 0) { // If result is found
+
+      if (memcmp(shaResult, job1, sizeof(shaResult)) == 0) { // If result is found
         unsigned long EndTime = micros(); // End time measurement
         unsigned long ElapsedTime = EndTime - StartTime; // Calculate elapsed time
         float ElapsedTimeMiliSeconds = ElapsedTime / 1000; // Convert to miliseconds
         float ElapsedTimeSeconds = ElapsedTimeMiliSeconds / 1000; // Convert to seconds
         float HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
+        if (!client.connected()) {
+          Serial.println("CORE1 Lost connection. Trying to reconnect");
+          if (!client.connect(host, port)) {
+            Serial.println("CORE1 connection failed");
+            break;
+          }
+          Serial.println("CORE1 Reconnection successful.");
+        }
         client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.3," + String(rigname)); // Send result to server
+        Serial.println("CORE1 Posting result and waiting for feedback.");
+        while(!client.available()){
+          if (!client.connected()) {
+            Serial.println("CORE1 Lost connection. Didn't receive feedback.");
+            break;
+          }
+          delay(10);
+          yield();
+        }
+        delay(100);
+        yield();
         String feedback = client.readStringUntil('\n'); // Receive feedback
         Shares++;
-        Serial.println(String(feedback) + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
+        Serial.println("CORE2 " + String(feedback) + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate));
+        if (HashRate < 4000) {
+          Serial.println("CORE2 Low hashrate. Restarting");
+          client.stop();
+          esp_restart();
+        }
         break; // Stop and ask for more work
       }
-    }  
+    }
   }
-  Serial.println("CORE2 Not connected. Restarting ESP");
-  Serial.println();
-  esp_restart(); // Restart the board
+  Serial.println("CORE2 Not connected. Restarting core 2");
+  client.stop();
+  xTaskCreatePinnedToCore(Task2code, "Task2", 10000, NULL, 2, &Task2, 1);
+  vTaskDelete( NULL );
 }
 
 void setup() {
@@ -202,11 +273,13 @@ void setup() {
   }
   Serial.println("\nConnected to WiFi!");
   Serial.println("Local IP address: " + WiFi.localIP().toString());
-  Serial.println();
-  xTaskCreatePinnedToCore(Task1code,"Task1",10000,NULL,1,&Task1,0);  //create a task with priority 1 and executed on core 0            
-  delay(500); 
-  xTaskCreatePinnedToCore(Task2code,"Task2",10000,NULL,2,&Task2,1);  //create a task with priority 2 and executed on core 1
-  delay(500);
+
+  pinMode(LED_BUILTIN,OUTPUT);
+  
+  xTaskCreatePinnedToCore(Task1code, "Task1", 10000, NULL, 1, &Task1, 0); //create a task with priority 1 and executed on core 0
+  delay(250);
+  xTaskCreatePinnedToCore(Task2code, "Task2", 10000, NULL, 2, &Task2, 1); //create a task with priority 2 and executed on core 1
+  delay(250);
 }
 
 void loop() {}

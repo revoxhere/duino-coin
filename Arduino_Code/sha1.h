@@ -44,4 +44,3 @@ extern Sha1Wrapper Sha1;
 #endif
 
 #endif
-

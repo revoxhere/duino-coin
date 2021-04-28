@@ -12,6 +12,7 @@
         "banner": "Official Duino-Coin © Python Miner",
         "donation_level": "Developer donation level: ",
 
+        "ask_algorithm": "Select mining algorithm you want to use (1-2): ",
         "ask_difficulty": "Select mining difficulty you want to use (1-3): ",
         "low_diff": "Low difficulty (for Raspberry Pis, older computers)",
         "medium_diff": "Medium difficulty (for typical computers)",
@@ -55,6 +56,7 @@
         "mining_thread": " Mining thread #",
         "mining_thread_starting": " is starting",
         "using_algo": " using DUCO-S1 algorithm with ",
+        "using_algo_xxh": " using XXHASH algorithm with ",
         "efficiency": "efficiency",
 
         "duco_python_miner": "Duino-Coin Python Miner (v",
@@ -68,7 +70,12 @@
 
         "mining_user": " User ",
         "mining_not_exist": " doesn't exist.",
-        "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s"
+        "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s",
+
+        "max_threads_notice": "Mining Duino-Coin with a lot of threads will cause decrease in profit - mining threads decreased to 8",
+        "max_hashrate_notice": "Mining Duino-Coin with powerful equipment may not be very profitable for you - we suggest trying Coin Magi (https://xmg.network) - our 'sister' coin",
+    
+        "recommended": "recommended"
     },
     "polish": {
         "translation_autor": "revox",
@@ -83,6 +90,7 @@
         "banner": "Oficjalna koparka Duino-Coin ©",
         "donation_level": "Poziom dotacji dla deweloperów: ",
 
+        "ask_algorithm": "Wybierz algorytm kopania który chcesz użyć (1-2): ",
         "ask_difficulty": "Wybierz trudność kopania której chcesz użyć (1-3): ",
         "low_diff": "Niska trudność (dla Raspberry Pi, starszych komputerów)",
         "medium_diff": "Średnia trudność (dla typowych komputerów)",
@@ -95,14 +103,14 @@
         "rig_identifier": "Identyfikator koparki: ",
 
         "basic_config_tool": "\nKreator pliku konfiguracyjnego Duino-Coin\nEdytuj plik ",
-        "edit_config_file_warning": "/Miner_config.cfg jeżeli chcesz coś poźniej zmienić.",
+        "edit_config_file_warning": "/Miner_config.cfg jeżeli chcesz coś poźniej zmienić.",
         "dont_have_account": "Nie posiadasz konta Duino-Coin? Użyj ",
         "wallet": "Wallet (Portfel)",
         "register_warning": " aby zarejestrować się na sieci.\n",
-        "ask_username": "Wprowadź swoją nazwę użytkownika Duino-Coin: ",
+        "ask_username": "Wprowadź swoją nazwę użytkownika Duino-Coin: ",
         "ask_intensity": "Wprowadź intensywność kopania (1-100)% (zalecane: 95): ",
-        "ask_threads": "Ile wątków chcesz użyć do kopania? (zalecane dla twojego systemu: ",
-        "ask_lower_difficulty": "Chcesz użyć zmniejszonej trudności kopania (dla wolniejszych komputerów)? (y/N): ",
+        "ask_threads": "Ile wątków chcesz użyć do kopania? (zalecane dla twojego systemu: ",
+        "ask_lower_difficulty": "Chcesz użyć zmniejszonej trudności kopania (dla wolniejszych komputerów)? (y/N): ",
         "ask_rig_identifier": "Chcesz dodać identyfikator (nazwę) dla tej koparki? (y/N): ",
         "ask_rig_name": "Wprowadź nazwę dla koparki: ",
         "ask_donation_level": "Ustaw poziom dotacji dla deweloperów (0-5) (zalecane: 1), nie zmniejszy to Twoich zysków: ",
@@ -110,23 +118,24 @@
         "load_config_error": " Problem z ładowaniem pliku konfiguracyjnego (",
         "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s",
 
-        "free_network_warning": " Sieć Duino-Coin jest w pełni darmową usługą i zawsze taka będzie",
+        "free_network_warning": " Sieć Duino-Coin jest w pełni darmową usługą i zawsze taka będzie",
         "donate_warning": "\nNie bierzemy żadnych prowizji z Twojego kopania, a utrzymanie serwera i opłacanie wymian jest kosztowne.\nMożesz nam bardzo pomóc w utrzymaniu odwiedzając ",
         "learn_more_donate": " aby złożyć dotację :)",
         "starting_donation": "Włączanie procesu dotacji",
-        "thanks_donation": " Bardzo dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
+        "thanks_donation": " Bardzo dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
 
         "data_error": " Problem pobierania danych z GitHuba! Ponowna próba za 10s.",
-        
+
         "connected": " Połączono",
         "connected_server": " z głównym serwerem Duino-Coin (v",
         "outdated_miner": " Koparka jest nieaktualna (v",
         "server_is_on_version": " serwer jest na v",
-        "update_warning": ", proszę pobrać najnowszą wersję z https://github.com/revoxhere/duino-coin/releases/",
+        "update_warning": ", proszę pobrać najnowszą wersję z https://github.com/revoxhere/duino-coin/releases/",
         "connecting_error": " Problem podczas łączenia z serwerem. Ponowna próba za 10s",
         "mining_thread": " Wątek koparki #",
         "mining_thread_starting": " uruchamia się",
         "using_algo": " używając algorytmu DUCO-S1 i ",
+        "using_algo_xxh": " używając algorytmu XXHASH i ",
         "efficiency": "intensywności",
 
         "duco_python_miner": "Duino-Coin Python Miner (v",
@@ -140,7 +149,12 @@
 
         "mining_user": " Użytkownik ",
         "mining_not_exist": " nie jest zarejestrowany.",
-        "mining_not_exist_warning": " Upewnij się że poprawnie wprowadziłeś nazwę użytkownika. Sprawdź swój plik konfiguracyjny. Ponowna próba za 10s"
+        "mining_not_exist_warning": " Upewnij się że poprawnie wprowadziłeś nazwę użytkownika. Sprawdź swój plik konfiguracyjny. Ponowna próba za 10s",
+
+        "max_threads_notice": "Kopanie Duino-Coin z wysoką ilością wątków spowoduje spadek w zyskach - zmniejszono liczbę wątków do 8",
+        "max_hashrate_notice": "Kopanie Duino-Coin używając mocnego komputera może nie być bardzo opłacalne - proponujemy wpróbować Coin Magi (https://xmg.network) - naszą 'siostrzaną' monetę",
+    
+        "recommended": "zalecany"
     },
     "spanish": {
         "translation_autor": "HGEpro",
@@ -162,7 +176,7 @@
 
         "low_diff_short": "Umbral bajo",
         "medium_diff_short": "Peso medio",
-        "net_diff_short": "Umbral controlado por la red", 
+        "net_diff_short": "Umbral controlado por la red",
         "algorithm": "Algoritmo: ",
         "rig_identifier": "Identificador del rig: ",
 
@@ -199,6 +213,7 @@
         "mining_thread": " Hilo de minado #",
         "mining_thread_starting": " está empezando",
         "using_algo": " usando el algoritmo DUCO-S1 con ",
+        "using_algo_xxh": " usando el algoritmo XXHASH con ",
         "efficiency": "eficiencia",
 
         "duco_python_miner": "Minero Duino-Coin en Python (v",
@@ -215,7 +230,7 @@
         "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s"
     },
     "french": {
-	   "translation_autor": "Bilaboz",
+	    "translation_autor": "Bilaboz",
         "sigint_detected": " SIGINT détecté - Fermeture...",
         "goodbye": " A bientôt!",
         "greeting_morning": "J'espère que vous passez une bonne matinée!",
@@ -227,7 +242,7 @@
         "banner": "Mineur Officiel (Python) Duino-Coin ©",
         "donation_level": "Niveau de donation pour le développeur: ",
 
-        "ask_difficulty" : "Veuillez sélectionner la difficulté d'exploitation que vous souhaitez utiliser (1-3): ",
+        "ask_difficulty" : "Veuillez sélectionner la difficulté de minage que vous souhaitez utiliser (1-3): ",
         "low_diff" : "Faible difficulté (pour les ordinateurs Raspberry Pis ou plus anciens)",
         "medium_diff" : "Difficulté moyenne (pour les ordinateurs normaux)",
         "net_diff" : "Difficulté du réseau (pour les ordinateurs puissants)",
@@ -239,7 +254,7 @@
         "rig_identifier": "Nom du mineur/rig: ",
 
         "basic_config_tool": "\nEditeur de configuration Duino-Coin\nEditez ",
-        "edit_config_file_warning": "le fichier /Miner_config.cfg si vous voulez le changer ultérieurement.",
+        "edit_config_file_warning": "le fichier /Miner_config.cfg si vous voulez changer votre configuration ultérieurement.",
         "dont_have_account": "Vous n'avez pas encore de compte Duino-Coin? Utilisez ",
         "wallet": "Porte-feuille",
         "register_warning": " pour en créer un.\n",
@@ -255,8 +270,8 @@
         "load_config_error_warning": "/Miner_config.cfg). Essayez de le supprimer et relancez le mineur. Exiting in 10s",
 
         "free_network_warning": " Le réseau Duino-Coin est un service complètement gratuit et le sera toujours",
-        "donate_warning": "\nNous ne prenons aucun frais sur votre minage.\nVous pouvez réellement nous aider à maintenir le serveur et garder un exchange avec peu de frais en activant la donation.\nVisitez ",
-        "learn_more_donate": " pour en apprendre plus sur comment vous pouvez nous aider :)",
+        "donate_warning": "\nNous ne prélevons aucun frais sur votre minage.\nVous pouvez nous aider à maintenir le serveur et garder un exchange avec peu de frais en activant la donation.\nVisitez ",
+        "learn_more_donate": " pour en apprendre d'avantage sur comment vous pouvez nous aider :)",
         "starting_donation": "Démarrage du service de donation",
         "thanks_donation": " Merci d'être un super donateur ❤️ \nVotre don nous aidera a maintenir le serveur et permettra un développement ultérieur",
 
@@ -271,6 +286,7 @@
         "mining_thread": " Thread de minage #",
         "mining_thread_starting": " est en train de démarrer",
         "using_algo": " utilisant l'algorithme DUCO-S1 avec ",
+        "using_algo_xxh": " utilisant l'algorithme XXHASH avec ",
         "efficiency": "d'intensité",
 
         "duco_python_miner": "Duino-Coin Python Miner (v",
@@ -342,6 +358,7 @@
         "mining_thread": " Поток майнера #",
         "mining_thread_starting": " запускается",
         "using_algo": " используя алгоритм DUCO-S1 с ",
+        "using_algo_xxh": " используя алгоритм XXHASH с ",
         "efficiency": "эффективностью",
 
         "duco_python_miner": "Duino-Coin Python майнер (v",
@@ -356,10 +373,10 @@
         "mining_user": " Пользователь ",
         "mining_not_exist": " не существует.",
         "mining_not_exist_warning": " Убедитесь в том, что вы правильно ввели имя пользователя. Пожалуйста, проверьте ваш файл настроек. Пробуем еще раз через 10с"
-    },    
+    },
     "german": {
         "translation_autor": "BastelPichi, EinWildesPanda",
-        "sigint_detected": " SIGINT erkannt - Schliesse Miner.",
+        "sigint_detected": " SIGINT erkannt - Schließe Miner.",
         "goodbye": " Bis Bald!",
         "greeting_morning": "Guten Morgen!",
         "greeting_noon": "Schönen Mittag",
@@ -383,7 +400,7 @@
 
         "basic_config_tool": "\nDuino-Coin simples Konfigurationstool\nBearbeite ",
         "edit_config_file_warning": "/Miner_config.cfg wenn du später Einstellungen verändern möchtest.",
-        "dont_have_account": "Du hast noch kein Duino-Coin-Account? Benutze ",
+        "dont_have_account": "Du hast noch keinen Duino-Coin Account? Benutze ",
         "wallet": "Wallet",
         "register_warning": " um dich zu registrieren.\n",
         "ask_username": "Gib deinen Duino-Coin Nutzernamen ein: ",
@@ -396,6 +413,7 @@
         "config_saved": "Konfiguration gespeichert! Der Miner wird gestartet...",
         "load_config_error": " Fehler beim Laden der Konfigurationsdatei (",
         "load_config_error_warning": "/Miner_config.cfg). Versuche sie zu entfernen und neu zu konfigurieren. Miner schließt in 10s",
+
         "free_network_warning": " das Duino-Coin Netzwerk ist immer kostenlos und wird es immer bleiben",
         "donate_warning": "\nWir nehmen keine Gebühren, wenn du schürfst.\nDu kannst uns mit der Weiterentwicklung helfen, indem du spendest.\nBesuche ",
         "learn_more_donate": " um zu lernen wie du helfen kannst :)",
@@ -412,6 +430,7 @@
         "mining_thread": " Mining thread #",
         "mining_thread_starting": " startet",
         "using_algo": " mit DUCO-S1 Algorithmus und ",
+        "using_algo_xxh": " mit XXHASH Algorithmus und ",
         "efficiency": "Effizienz",
 
         "duco_python_miner": "Duino-Coin Python Miner (v",
@@ -425,6 +444,144 @@
 
         "mining_user": " Benutzer ",
         "mining_not_exist": " existiert nicht.",
-        "mining_not_exist_warning": " Stelle sicher, dass du den Nuternamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s"
-    }	
+        "mining_not_exist_warning": " Stelle sicher, dass du den Nutzernamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s"
+    },
+    "chinese_simplified": {
+        "translation_autor": "suifengtec",
+        "sigint_detected": "检测到 SIGINT - 优雅退出.",
+        "goodbye": " 待会儿见!",
+        "greeting_morning": "早上好啊!",
+        "greeting_noon": "中午好",
+        "greeting_afternoon": "下午好",
+        "greeting_evening": "祝您有个舒适的夜晚",
+        "greeting_back": "欢迎回来",
+        "banner": "官方版 Duino-Coin © Python 矿工",
+        "donation_level": "开发者贡献等级: ",
+        "ask_algorithm": "选择您要使用的挖矿算法 (1-2): ",
+        "ask_difficulty": "选择您要使用的挖矿难度 (1-3): ",
+        "low_diff": "低难度（适用于树莓派以及较旧的计算机）",
+        "medium_diff": "中等难度(适用于一般的电脑)",
+        "net_diff": "网络难度(适用于强劲的电脑)",
+        "low_diff_short": "低难度",
+        "medium_diff_short": "中等难度",
+        "net_diff_short": "网络难度",
+        "algorithm": "算法: ",
+        "rig_identifier": "矿机标识符: ",
+        "basic_config_tool": "\nDuino-Coin 基础配置工具\n编辑 ",
+        "edit_config_file_warning": "/如果要更改 Miner_config.cfg 文件，请稍后。",
+        "dont_have_account": "还没有Duino-Coin帐户吗？ 使用 ",
+        "wallet": "钱包",
+        "register_warning": " 在服务器上注册个。\n",
+        "ask_username": "输入您的 Duino-Coin 用户名: ",
+        "ask_intensity": "设定挖矿强度（1-100）％（建议:95）: ",
+        "ask_threads": "设置挖矿线程（推荐用于您的系统: ",
+        "ask_lower_difficulty": "您是否想使用较低的难度进行挖掘（对于较慢的系统）？ (y/N): ",
+        "ask_rig_identifier": "您是否要向该矿机添加个标识符（名称）? (y/N): ",
+        "ask_rig_name": "输入想要的矿机名称(可含有英文字母,数字和下划线): ",
+        "ask_donation_level": "将开发者捐赠级别设置为（0-5）（建议：1），这不会减少您的收入: ",
+        "config_saved": "配置已保存！可以挖矿了",
+        "load_config_error": "载入配置文件时出错了 (",
+        "load_config_error_warning": "/Miner_config.cfg)。请尝试删除它,再次配置。将在10秒内退出",
+        "free_network_warning": " Duino-Coin网络是一项完全免费的服务，并将永远是",
+        "donate_warning": "\n我们不会从您的采矿中收取任何费用。\n您可以通过捐赠来真正帮助我们维护服务器和低价交易。\n访问 ",
+        "learn_more_donate": " 以进一步了解如何提供帮助 :)",
+        "starting_donation": "开始捐赠过程",
+        "thanks_donation": " 感谢您成为帅气或美丽的捐赠者 ❤️ \n您的捐款将帮助我们维护服务器并以及进一步开发该项目",
+        "data_error": " 从GitHub检索数据时出错！ 10秒后重试。",
+        "connected": " 已连接",
+        "connected_server": " 到 Duino-Coin 主服务器 (v",
+        "outdated_miner": " 挖矿软件已经过期了 (v",
+        "server_is_on_version": " 服务器上的版本是 v",
+        "update_warning": ", 请从 https://github.com/revoxhere/duino-coin/releases/ 下载最新的版本",
+        "connecting_error": " 连接服务器时出错。 10s重试。",
+        "mining_thread": " 挖矿线程 #",
+        "mining_thread_starting": " 正在开启",
+        "using_algo": " 使用 DUCO-S1 算法与 ",
+        "using_algo_xxh": " 使用 XXHASH 算法与 ",
+        "efficiency": "效率",
+        "duco_python_miner": "Duino-Coin Python 版矿工 (v",
+        "accepted_shares": "已接受的份额",
+        "accepted": " 已接受 ",
+        "block_found": " 找到块 ",
+        "internal_server_error": " 内部服务器错误.",
+        "retrying": " 10s重试",
+        "rejected": " 已拒绝 ",
+        "error_while_mining": " 挖矿时出错-最有可能是连接错误-将在5秒钟内重新启动。",
+        "mining_user": " 用户 ",
+        "mining_not_exist": " 不存在。",
+        "mining_not_exist_warning": " 确保您正确输入了用户名。请检查您的配置文件。 将在10秒内重试"
+    },  
+    "turkish": {    
+        "translation_autor": "Scatchie",    
+        "sigint_detected": " SIGINT algılandı - Çıkış yapılıyor.",  
+        "goodbye": " Görüşmek üzere!",  
+        "greeting_morning": "Günaydın", 
+        "greeting_noon": "İyi öğlenler",    
+        "greeting_afternoon": "İyi günler", 
+        "greeting_evening": "İyi akşamlar", 
+        "greeting_back": "Tekrar hoşgeldiniz",  
+
+        "banner": "Resmi Duino-Coin © Python Madencisi",    
+        "donation_level": "Geliştirici bağış seviyesi: ",   
+
+        "ask_algorithm": "Kullanmak istediğiniz madencilik algoritmasını seçin (1-2): ",    
+        "ask_difficulty": "Kullanmak istediğiniz madencilik zorluğunu seçin (1-3): ",   
+        "low_diff": "Düşük zorluk (Raspberry Pi ve eski bilgisayarlar için)",   
+        "medium_diff": "Orta zorluk (ortalama bilgisayarlar için)", 
+        "net_diff": "Ağ zorluğu (güçlü bilgisayarlar için)",    
+
+        "low_diff_short": "Düşük zorluk",   
+        "medium_diff_short": "Orta zorluk", 
+        "net_diff_short": "Ağ zorluğu", 
+        "algorithm": "Algoritma: ", 
+        "rig_identifier": "Donanım tanımlayıcı: ",  
+
+        "basic_config_tool": "\nDuino-Coin yapılandırma aracı\nDüzenleyin ",    
+        "edit_config_file_warning": "/Miner_config.cfg dosyasını eğer daha sonra değiştirmek istiyorsanız.",    
+        "dont_have_account": "Henüz bir Duino-Coin hesabınız yok mu? Kullanın ",    
+        "wallet": "Cüzdan", 
+        "register_warning": " sunucuya kayıt olmak için.\n",    
+        "ask_username": "Duino-Coin kullanıcı adınızı girin: ", 
+        "ask_intensity": "Madencilik gücünü seçin (1-100)% (önerilen: 95): ",   
+        "ask_threads": "Çalıştırmak istediğiniz madenci sayısını seçin (sisteminiz için önerilen: ",    
+        "ask_lower_difficulty": "Madencilik için daha düşük bir zorluk kullanmak ister misiniz (yavaş sistemler için)? (y/N): ",    
+        "ask_rig_identifier": "Bu donanıma bir tanımlayıcı (isim) eklemek ister misiniz? (y/N): ",  
+        "ask_rig_name": "İstediğiniz donanım adını girin: ",    
+        "ask_donation_level": "Geliştirici bağış seviyesini girin (0-5) (önerilen: 1), bu kazancınızı etkilemeyecektir: ",  
+        "config_saved": "Ayarlar kaydedildi! madenci başlatılıyor", 
+        "load_config_error": " Ayar dosyasını yüklerken bir hata meydana geldi (",  
+        "load_config_error_warning": "/Miner_config.cfg). Dosyayı kaldırmayı ve yapılandırıcıyı tekrar çalıştırmayı deneyin. 10 saniye içerisinde çıkış yapılıyor", 
+
+        "free_network_warning": " Duino-Coin ağı ücretsiz bir hizmettir ve her zaman ücretsiz olacaktır",   
+        "donate_warning": "\nMadencilik kazancınızdan vergi almıyoruz.\nBağış yaparak daha iyi hizmet sağlamamızı ve sunucuyu geliştirmemizi sağlayabilirsiniz.\nDaha nasıl yardım edebileceğinizi öğrenmek için ", 
+        "learn_more_donate": " adresini ziyaret edin :)",   
+        "starting_donation": "Bağış işlemi başlatılıyor",   
+        "thanks_donation": " Harika bir bağışçı olduğunuz için teşekkürler ❤️ \nBağışınız hizmet sağlamamıza ve sunucuyu geliştirmemize katkıda bulunacaktır",  
+
+        "data_error": " GitHub'dan veri alırken hata meydana geldi! 10 saniye içerisinde yeniden deneniyor.",   
+        "connected": " Bağlanıldı:",    
+        "connected_server": " Ana Duino-Coin sunucusu (v",  
+        "outdated_miner": " Eski sürüm bir madenci kullanıyorsunuz (v", 
+        "server_is_on_version": " sunucu sürümü v", 
+        "update_warning": ", lütfen en güncel sürümü indirin: https://github.com/revoxhere/duino-coin/releases/",   
+        "connecting_error": " Sunucuya bağlanırken bir hata meydana geldi. 10 saniye içerisinde yeniden deneniyor", 
+        "mining_thread": " Madencilik işlemi #",    
+        "mining_thread_starting": " başlıyor.", 
+        "using_algo": " Kullanılan algoritma: DUCO-S1. ",   
+        "using_algo_xxh": " Kullanılan algoritma: XXHASH. ",    
+        "efficiency": "verimlilik", 
+
+        "duco_python_miner": "Duino-Coin Python Madencisi (v",  
+        "accepted_shares": " kabul edilen gönderimler", 
+        "accepted": " Kabul edilen ",   
+        "block_found": " Bulunan blok ",    
+        "internal_server_error": " Sunucu hatası.", 
+        "retrying": " 10 saniye içerisinde yeniden deneniyor",  
+        "rejected": " Reddedilen ", 
+        "error_while_mining": " Kazım yapılırken bir hata meydana geldi - bir bağlantı hatası olabilir - 5 saniye içerisinde yeniden başlatılıyor.",    
+
+        "mining_user": " Kullanıcı ",   
+        "mining_not_exist": " mevcut değil.",   
+        "mining_not_exist_warning": " Kullanıcı adınızı doğru girdiğinizden emin olun. Lütfen ayar dosyanızı kontrol edin. 10 saniye içerisinde yeniden deneniyor"
+    }
 }

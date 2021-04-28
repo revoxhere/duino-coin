@@ -16,7 +16,5 @@
 	"cancelunwrap": " - sends back pending unwrap values to wallet - you should have some trx or tron energy for txn fees",
 	"finishunwraps": " - completes pending unwraps",
 	"exportwrapkey": " - exports wrapper private key"
-
     }
-
 }

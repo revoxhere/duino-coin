@@ -1,79 +1,94 @@
 //////////////////////////////////////////////////////////
-//  ____        _                    ____      _       
-// |  _ \ _   _(_)_ __   ___        / ___|___ (_)_ __  
-// | | | | | | | | '_ \ / _ \ _____| |   / _ \| | '_ \ 
-// | |_| | |_| | | | | | (_) |_____| |__| (_) | | | | |
-// |____/ \__,_|_|_| |_|\___/       \____\___/|_|_| |_|
-//  Code for Arduino boards v1.9
+//  _____        _                    _____      _
+// |  __ \      (_)                  / ____|    (_)
+// | |  | |_   _ _ _ __   ___ ______| |     ___  _ _ __
+// | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
+// | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
+// |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
+//  Code for Arduino boards v2.4
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
-//
-//  If you don't know how to start,
-//  visit our official website (duinocoin.com)
-//  and navigate to the Getting Started page for help.
-//  Happy mining!
 //////////////////////////////////////////////////////////
+//  https://github.com/revoxhere/duino-coin - GitHub
 //  https://duinocoin.com - Official Website
-//  https://github.com/revoxhere/duino-coin - Official GitHub
-//  https://discord.gg/k48Ht5y - Official Discord server
-//  https://github.com/revoxhere - @revox (Lead Duino-Coin developer)
-//  https://github.com/daknuett - @daknuett (Thanks for help in library migration!
-//  https://github.com/JoyBed - @JoyBed (Big thanks for many optimizations!)
+//  https://discord.gg/k48Ht5y - Discord
+//////////////////////////////////////////////////////////
+//  If you don't know what to do, visit official website
+//  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
-// If uncommented, the count is reversed.
-// This allows to not repeat searching the same numbers twice if you have a second Arduino searching the "conventional" way
-// and possibly increase efficiency of multi-Arduino setup.
-//#define REVERSE_SEARCH
-
-// Include SHA1 part of cryptosuite2 library
+// Include SHA1 library
+// Authors: https://github.com/daknuett, https://github.com/JoyBed, https://github.com/revox
 #include "sha1.h"
 #include <Arduino.h>
 #include "printf.h"
+#include "uniqueID.h"
 
-String result; // Create globals
-char buffer[64] = "";
-unsigned int iJob = 0;
+// Create globals
+char buffer[44];
+String IDstring = "DUCOID";
+String lastblockhash = "";
+String newblockhash = "";
+unsigned int difficulty = 0;
+unsigned int ducos1result = 0;
 
+// Setup stuff
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT); // Prepare built-in led pin as output
-  Serial.begin(115200); // Open serial port
-  if (Serial.available()) {
-    Serial.println("ready"); // Send start word to miner program
+  // Open serial port
+  Serial.begin(115200);
+  Serial.setTimeout(5000);
+  for (size_t i = 0; i < 8; i++)
+    IDstring += UniqueID[i];
+}
+
+// DUCO-S1A hasher
+int ducos1a(String lastblockhash, String newblockhash, int difficulty) {
+  // DUCO-S1 algorithm implementation for AVR boards (DUCO-S1A)
+  // Difficulty loop
+  int ducos1res = 0;
+  //Conversion to unsigned char *
+  const char * c = newblockhash.c_str();
+  size_t len = strlen(c);
+  size_t final_len = len / 2;
+  unsigned char* newblockhash1 = (unsigned char*)malloc((final_len + 1) * sizeof(unsigned char));
+  for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
+    newblockhash1[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
+  //Mining loop
+  for (int ducos1res = 0; ducos1res < difficulty * 100 + 1; ducos1res++) {
+    Sha1.init();
+    Sha1.print(lastblockhash + ducos1res);
+    // Get SHA1 result
+    uint8_t * hash_bytes = Sha1.result();
+    //Compare the two in C++ code
+    if (memcmp(hash_bytes, newblockhash1, sizeof(hash_bytes)) == 0) {
+      // If expected hash is equal to the found hash, return the result
+      return ducos1res;
+    }
   }
 }
 
+// Infinite loop
 void loop() {
-  String startStr = Serial.readStringUntil('\n');
-  if (startStr == "start") { // Wait for start word, serial.available caused problems
-    Serial.flush(); // Clear serial buffer
-    String hash = Serial.readStringUntil('\n'); // Read hash
-    String job = Serial.readStringUntil('\n'); // Read job
-    unsigned int diff = Serial.parseInt() * 100 + 1; // Read difficulty
-    unsigned long StartTime = micros(); // Start time measurement
-    #ifdef REVERSE_SEARCH
-    for (unsigned int iJob = diff; iJob >= 0; iJob--) { // Reversed difficulty loop
-    #else
-    for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
-    #endif
-      Sha1.init(); // Create SHA1 hasher
-      Sha1.print(String(hash) + String(iJob));
-      uint8_t * hash_bytes = Sha1.result(); // Get result
-      for (int i = 0; i < 10; i++) { // Cast result to array
-        for (int i = 0; i < 32; i++) {
-          buffer[2 * i] = "0123456789abcdef"[hash_bytes[i] >> 4]; // MSB to LSB (Depending on the address in hash_bytes)
-          // Choose that from the given array of characters
-          buffer[2 * i + 1] = "0123456789abcdef"[hash_bytes[i] & 0xf]; // Retreve the value from address next spot over
-        }
-      }
-      result = String(buffer); // Convert and prepare array
-      result.remove(40); // First 40 characters are good, rest is garbage
-      if (String(result) == String(job)) { // If result is found
-        unsigned long EndTime = micros(); // End time measurement
-        unsigned long ElapsedTime = EndTime - StartTime; // Calculate elapsed time
-        Serial.println(String(iJob) + "," + String(ElapsedTime)); // Send result back to the program with share time
-        break; // Stop the loop and wait for more work
-      }
-    }
+  // Wait for serial data
+  while (Serial.available() > 0) {
+    // Read last block hash
+    lastblockhash = Serial.readStringUntil(',');
+    // Read expected hash
+    newblockhash = Serial.readStringUntil(',');
+    // Read difficulty
+    difficulty = Serial.readStringUntil(',').toInt();
+    newblockhash.toUpperCase();
+    // Start time measurement
+    unsigned long startTime = micros();
+    // Call DUCO-S1A hasher
+    ducos1result = ducos1a(lastblockhash, newblockhash, difficulty);
+    // End time measurement
+    unsigned long endTime = micros();
+    // Calculate elapsed time
+    unsigned long elapsedTime = endTime - startTime;
+    // Send result back to the program with share time
+    Serial.print(String(ducos1result) + "," + String(elapsedTime) + "," + String(IDstring) + "\n");
+    // Wait a bit
+    delay(25);
   }
 }
