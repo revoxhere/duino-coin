@@ -63,6 +63,7 @@ BLOCK_REWARD = 7.7
 UPDATE_MINERAPI_EVERY = 5
 EXPECTED_SHARETIME = 12
 BCRYPT_ROUNDS = 8
+PING_SLEEP_TIME = 0.5 # check protocol duco-s1 or xxhash
 # DB files
 DATABASE = 'crypto_database.db'
 BLOCKCHAIN = 'duino_blockchain.db'
@@ -927,10 +928,31 @@ def protocol_ducos1(data, connection, address):
         numeric_result = job[2]
 
         job_sent_timestamp = utime.now()
-        result = receive_data(connection)
+        
+        number_of_pings = 0
+        time_spent_on_sending = 0
+        
+        #receiving result
+        while True:
+            result = recieve_data(connection)
+            if result[0] == 'PING':
+                start_sending = utime.now()
+                send_data(b'Pong!',connection)
+                time_spent_on_sending += (utime.now()-start_sending).total_seconds()
+                # avoiding dos attack
+                # should check number_of_pings
+                # to close connection with too many pings
+                number_of_pings += 1
+                sleep(PING_SLEEP_TIME)
+            else:
+                break
+                
         difference = utime.now() - job_sent_timestamp
 
         sharetime = difference.total_seconds()
+        # calculating sharetime respecting sleeptime for ping
+        sharetime -= (number_of_pings*PING_SLEEP_TIME)+time_spent_on_sending
+        
         reported_hashrate = round(float(result[1]))
         hashrate = int(numeric_result / sharetime)
         hashrate_is_estimated = False
@@ -1097,8 +1119,29 @@ def protocol_xxhash(data, connection, address):
         numeric_result = job[2]
 
         job_sent_timestamp = utime.now()
-        result = receive_data(connection)
+        
+        number_of_pings = 0
+        time_spent_on_sending = 0
+        
+        # receiving result
+        while True:
+            result = receive_data(connection)
+            if result[0] == 'PING':
+                start_sending = utime.now()
+                send_data(b'Pong!',connection)
+                time_spent_on_sending += (utime.now()-start_sending).total_seconds()
+                # avoiding dos attack
+                # should check number_of_pings
+                # to close connection with too many pings
+                number_of_pings += 1
+                sleep(PING_SLEEP_TIME)
+            else:
+                break
+                
         sharetime = (utime.now() - job_sent_timestamp).total_seconds()
+        # calculating sharetime respecting sleeptime for ping
+        sharetime -= (number_of_pings*PING_SLEEP_TIME)+time_spent_on_sending
+        
         hashrate = int(numeric_result / sharetime)
 
         is_first_share = False
