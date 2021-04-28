@@ -845,6 +845,7 @@ def protocol_ducos1(data, connection, address):
     global global_last_block_hash
     global global_blocks
     global workers
+    global PING_SLEEP_TIME
 
     ip_addr = address[0].replace("::ffff:", "")
 
@@ -1058,6 +1059,7 @@ def protocol_xxhash(data, connection, address):
     global global_last_block_hash
     global global_blocks
     global workers
+    global PING_SLEEP_TIME
 
     ip_addr = address[0].replace("::ffff:", "")
 
