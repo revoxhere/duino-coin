@@ -938,7 +938,7 @@ def protocol_ducos1(data, connection, address):
             result = receive_data(connection)
             if result[0] == 'PING':
                 start_sending = utime.now()
-                send_data(b'Pong!',connection)
+                send_data('Pong!',connection)
                 time_spent_on_sending += (utime.now()-start_sending).total_seconds()
                 # avoiding dos attack
                 # should check number_of_pings
@@ -1130,7 +1130,7 @@ def protocol_xxhash(data, connection, address):
             result = receive_data(connection)
             if result[0] == 'PING':
                 start_sending = utime.now()
-                send_data(b'Pong!',connection)
+                send_data('Pong!',connection)
                 time_spent_on_sending += (utime.now()-start_sending).total_seconds()
                 # avoiding dos attack
                 # should check number_of_pings
