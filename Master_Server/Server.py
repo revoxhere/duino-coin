@@ -944,7 +944,7 @@ def protocol_ducos1(data, connection, address):
                 # should check number_of_pings
                 # to close connection with too many pings
                 number_of_pings += 1
-                sleep(PING_SLEEP_TIME)
+                gevent.sleep(PING_SLEEP_TIME)
             else:
                 break
                 
@@ -1136,7 +1136,7 @@ def protocol_xxhash(data, connection, address):
                 # should check number_of_pings
                 # to close connection with too many pings
                 number_of_pings += 1
-                sleep(PING_SLEEP_TIME)
+                gevent.sleep(PING_SLEEP_TIME)
             else:
                 break
                 
