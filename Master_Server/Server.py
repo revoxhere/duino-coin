@@ -947,15 +947,19 @@ def protocol_ducos1(data, connection, address):
         sharetime = difference.total_seconds()
         # Calculate sharetime respecting sleeptime for ping
         sharetime -= (number_of_pings*PING_SLEEP_TIME)+time_spent_on_sending
+        hashrate = int(numeric_result / sharetime)
 
         # TODO
         if sharetime < 0.5:
             gevent.sleep(2)
 
-        reported_hashrate = round(float(result[1]))
-        hashrate = int(numeric_result / sharetime)
-        hashrate_is_estimated = False
-
+        try:
+            reported_hashrate = round(float(result[1]))
+            hashrate_is_estimated = False
+        except:
+            reported_hashrate = hashrate
+            hashrate_is_estimated = True
+        
         is_first_share = False
 
         if req_difficulty == "AVR":
