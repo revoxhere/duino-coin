@@ -870,7 +870,7 @@ def protocol_ducos1(data, connection, address):
             try:
                 workers[ip_addr] += 1
             except:
-                workers[ip_addr] = 0
+                workers[ip_addr] = 1
 
             try:
                 # Parse starting difficulty from the client
@@ -1104,7 +1104,7 @@ def protocol_xxhash(data, connection, address):
             try:
                 workers[ip_addr] += 1
             except:
-                workers[ip_addr] = 0
+                workers[ip_addr] = 1
 
             req_difficulty = "NET"
         else:
