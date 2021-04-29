@@ -16,6 +16,17 @@ import sys
 import time
 from pathlib import Path
 from signal import SIGINT, signal
+from base64 import b64decode, b64encode
+
+try:
+    from base64 import urlsafe_b64decode as b64d
+    from base64 import urlsafe_b64encode as b64e
+except ModuleNotFoundError:
+    print("Base64 is not installed. "
+          + "Please manually install \"base64\""
+          + "\nExiting in 15s.")
+    sleep(15)
+    _exit(1)
 
 try:
     from cryptography.fernet import Fernet, InvalidToken
@@ -184,7 +195,6 @@ def password_encrypt(
             iterations.to_bytes(4, 'big'),
             b64d(Fernet(key).encrypt(message))))
 
-
 def password_decrypt(
         token: bytes,
         password: str) -> bytes:
@@ -196,7 +206,6 @@ def password_decrypt(
         salt,
         iterations)
     return Fernet(key).decrypt(token)
-
 
 # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
 def handler(signal_received, frame):
@@ -333,7 +342,7 @@ while True:
 
                         config['wallet'] = {
                             "username": username,
-                            "password": password}
+                            "password": b64encode(bytes(password, encoding="utf8")).decode("utf-8")}
                         config['wrapper'] = {"use_wrapper": "false"}
 
                         with open("CLIWallet_config.cfg", "w") as configfile:  # Write data to file
@@ -453,7 +462,7 @@ while True:
         while True:
             config.read("CLIWallet_config.cfg")
             username = config["wallet"]["username"]
-            password = config["wallet"]["password"]
+            password = b64decode(config["wallet"]["password"]).decode("utf8")
             s.send(bytes(
                 "LOGI,"
                 + str(username)
@@ -564,7 +573,7 @@ while True:
 
             if command == "refresh":
                 continue
-
+  
             elif command == "send":
                 recipient = input(Style.RESET_ALL
                                   + Fore.WHITE
@@ -630,7 +639,8 @@ while True:
                       + Fore.YELLOW
                       + "\nSIGINT detected - Exiting gracefully."
                       + Style.NORMAL
-                      + " See you soon!")
+                      + " See you soon!" 
+                      + Style.RESET_ALL)
                 try:
                     s.send(bytes("CLOSE", encoding="utf8"))
                 except:
