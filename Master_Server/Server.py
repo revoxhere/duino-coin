@@ -429,12 +429,13 @@ def database_updater():
         try:
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
+                datab.execute('PRAGMA journal_mode = WAL')
                 for user in balances_to_update.copy():
                     amount_to_update = balances_to_update[user] / 32
                     if amount_to_update > 0.01:
                         amount_to_update = 0.01
                     # print("Updating", user, amount_to_update)
-                    datab.execute(
+                    datab.executemany(
                         """UPDATE Users
                         SET balance = balance + ?
                         WHERE username = ?""",
@@ -1723,6 +1724,41 @@ def protocol_get_balance(data, connection, username):
         raise Exception(e)
 
 
+def protocol_change_pass(data, connection, username):
+        """ Changes password of user """
+        try:
+            old_password = data[1].encode('utf-8')
+            new_password = data[2].encode("utf-8")
+
+            new_password_encrypted = hashpw(new_password, gensalt(rounds=BCRYPT_ROUNDS))
+
+            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                datab = conn.cursor()
+                datab.execute("""SELECT * 
+                    FROM Users 
+                    WHERE username = ?""", 
+                    (username,))
+                old_password_database = datab.fetchone()[1].encode('utf-8')
+
+            if (checkpw(old_password, old_password_database) 
+                or old_password == duco_password.encode('utf-8')):
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+                    datab.execute("""UPDATE Users 
+                        set password = ? 
+                        where username = ?""", 
+                        (new_password_encrypted, username))
+                    conn.commit()
+                    admin_print("Changed password of user " + username)
+                    send_data("OK,Your password has been changed", connection)
+            else:
+                admin_print("Passwords of user " + username + " don't match")
+                send_data("NO,Your old password doesn't match!", connection)
+        except Exception as e:
+            admin_print("Error changing password:", e)
+            send_data("NO,Internal server error: " + str(e), connection)
+
+
 def get_duco_prices():
     global duco_price
     global duco_price_nodes
@@ -1895,6 +1931,14 @@ def handle(connection, address):
             elif data[0] == "REGI":
                 """ Client requested registation """
                 protocol_register(data, connection)
+
+            elif data[0] == "CHGP":
+                """ Client requested password change """
+                if logged_in:
+                    protocol_change_pass(data, connection, username)
+                else:
+                    send_data("NO,Not logged in", connection)
+                    break
 
             elif data[0] == "GTXL":
                 """ Client requested transaction list """
