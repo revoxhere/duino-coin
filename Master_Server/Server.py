@@ -429,12 +429,13 @@ def database_updater():
         try:
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
+                datab.execute('PRAGMA journal_mode = WAL')
                 for user in balances_to_update.copy():
                     amount_to_update = balances_to_update[user] / 32
                     if amount_to_update > 0.01:
                         amount_to_update = 0.01
                     # print("Updating", user, amount_to_update)
-                    datab.execute(
+                    datab.executemany(
                         """UPDATE Users
                         SET balance = balance + ?
                         WHERE username = ?""",
@@ -896,7 +897,7 @@ def protocol_ducos1(data, connection, address):
             else:
                 req_difficulty = data[2]
 
-        if job_tiers[req_difficulty]["difficulty"] < 600:
+        if job_tiers[req_difficulty]["difficulty"] <= 600:
             job = get_pregenerated_job(req_difficulty)
             difficulty = job[3]
 
@@ -1359,6 +1360,12 @@ def get_blocks_list():
 
 def create_secondary_api_files():
     while True:
+        with open('chips.json', 'w') as outfile:
+            json.dump(
+                chip_ids,
+                outfile,
+                indent=2,
+                ensure_ascii=False)
         with open('transactions.json', 'w') as outfile:
             json.dump(
                 get_transaction_list(),
