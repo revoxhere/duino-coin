@@ -1974,6 +1974,7 @@ def handle(connection, address):
                     data=data, global_blocks=global_blocks)
 
             elif data[0] == "PoolLogout":
+                POOLCLASS = PF.Pool_Function_class(connection=connection)
                 POOLCLASS.logout(data=data)
 
             elif data[0] == "PoolLoginAdd":
