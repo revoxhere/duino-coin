@@ -429,13 +429,12 @@ def database_updater():
         try:
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
-                datab.execute('PRAGMA journal_mode = WAL')
                 for user in balances_to_update.copy():
                     amount_to_update = balances_to_update[user] / 32
                     if amount_to_update > 0.01:
                         amount_to_update = 0.01
                     # print("Updating", user, amount_to_update)
-                    datab.executemany(
+                    datab.execute(
                         """UPDATE Users
                         SET balance = balance + ?
                         WHERE username = ?""",
@@ -858,6 +857,7 @@ def protocol_ducos1(data, connection, address):
     override_difficulty = ""
 
     while True:
+        gevent.sleep(0.5)
         connection.settimeout(90)
         if is_first_share:
             try:
@@ -939,7 +939,7 @@ def protocol_ducos1(data, connection, address):
             result = receive_data(connection)
             if result[0] == 'PING':
                 start_sending = utime.now()
-                send_data('Pong!',connection)
+                send_data(b'Pong!',connection)
                 time_spent_on_sending += (utime.now()-start_sending).total_seconds()
                 # avoiding dos attack
                 # should check number_of_pings
@@ -1131,7 +1131,7 @@ def protocol_xxhash(data, connection, address):
             result = receive_data(connection)
             if result[0] == 'PING':
                 start_sending = utime.now()
-                send_data('Pong!',connection)
+                send_data(b'Pong!',connection)
                 time_spent_on_sending += (utime.now()-start_sending).total_seconds()
                 # avoiding dos attack
                 # should check number_of_pings
