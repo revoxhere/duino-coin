@@ -9,37 +9,33 @@
   </a>
   <br />
   <a href="https://github.com/revoxhere/duino-coin/blob/master/README.md">
-    <img src="https://img.shields.io/badge/English-fb6404.svg?style=for-the-badge" />
+    <img src="https://img.shields.io/badge/English-636e72.svg?style=for-the-badge" />
   </a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_es_LATAM.md">
-    <img src="https://img.shields.io/badge/-Espa%C3%B1ol-fb6404?style=for-the-badge" />
+    <img src="https://img.shields.io/badge/-Espa%C3%B1ol-636e72?style=for-the-badge" />
   </a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_zh_CN.md">
-    <img src="https://img.shields.io/badge/简体中文-fb6404.svg?style=for-the-badge" />
+    <img src="https://img.shields.io/badge/简体中文-636e72.svg?style=for-the-badge" />
   </a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_pl_PL.md">
-    <img src="https://img.shields.io/badge/Polski-fb6404.svg?style=for-the-badge" />
+    <img src="https://img.shields.io/badge/Polski-636e72.svg?style=for-the-badge" />
   </a>
 </p>
 <br />
 <p align = "center">
   <a href="https://wallet.duinocoin.com">
-    <img src="https://img.shields.io/badge/Online Wallet-555555.svg?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/badge/Online Wallet-8e44ad.svg?style=for-the-badge" /></a>
   <a href="https://play.google.com/store/apps/details?id=com.pripun.duinocoin">
-    <img src="https://img.shields.io/badge/Android App-555555.svg?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/badge/Android App-1abc9c.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
-    <img src="https://img.shields.io/badge/whitepaper-555555.svg?style=for-the-badge&logo=Academia" /></a>
-  <a href="https://app.codacy.com/manual/revoxhere/duino-coin?utm_source=github.com&utm_medium=referral&utm_content=revoxhere/duino-coin">
+    <img src="https://img.shields.io/badge/whitepaper-e84393.svg?style=for-the-badge&logo=Academia" /></a>
   <a href="https://youtu.be/bFnCdqMke34">
-    <img src="https://img.shields.io/badge/YouTube_Video-Watch-fb6404.svg?style=for-the-badge&logo=Youtube" /></a>
+    <img src="https://img.shields.io/badge/YouTube_Video-Watch-e74c3c.svg?style=for-the-badge&logo=Youtube" /></a>
     <br>
   <a href="https://discord.gg/kvBkccy">
-    <img src="https://img.shields.io/discord/677615191793467402.svg?color=ffa502&label=Discord&logo=Discord&style=for-the-badge" /></a>
-    <img src="https://img.shields.io/codacy/grade/a995acf7cd4c4211af6da874fe549ee5?color=f68e09&style=for-the-badge" /></a>
-  <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/badge/License-MIT-f97606.svg?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/discord/677615191793467402.svg?color=5539cc&label=Discord&logo=Discord&style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/releases/tag/2.4.5">
-    <img src="https://img.shields.io/badge/release-2.4.5-fb6404.svg?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/badge/last_release-2.4.5-ff4112.svg?style=for-the-badge" /></a>
 </p>
 
 <h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards, even Wifi routers and many more.</h2><br />
