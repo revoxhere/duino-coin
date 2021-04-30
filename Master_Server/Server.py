@@ -177,15 +177,19 @@ html = """\
 
 def create_backup():
     """ Creates a backup folder every day """
+    counter = 0
     while True:
         if not ospath.isdir('backups/'):
             os.mkdir('backups/')
+            counter = 0
 
         today = datetime.date.today()
-        if not ospath.isdir('backups/'+str(today)+'/'):
-            os.mkdir('backups/'+str(today))
-            copyfile(BLOCKCHAIN, "backups/"+str(today)+"/"+BLOCKCHAIN)
-            copyfile(DATABASE, "backups/"+str(today)+"/"+DATABASE)
+        if not ospath.isdir('backups/'+str(today)+'_'+str(counter)+'/'):
+            os.mkdir('backups/'+str(today)+'_'+str(counter))
+            copyfile(BLOCKCHAIN, "backups/"+str(today)+'_'+str(counter)+"/"+BLOCKCHAIN)
+            copyfile(DATABASE, "backups/"+str(today)+'_'+str(counter)+"/"+DATABASE)
+            copyfile(CONFIG_BLOCKS, "backups/"+str(today)+'_'+str(counter)+"/foundBlocks.db")
+            copyfile(CONFIG_TRANSACTIONS, "backups/"+str(today)+'_'+str(counter)+"/transactions.db")
             sleep(10)
             with open("prices.txt", "a") as pricesfile:
                 pricesfile.write("," + str(duco_price).rstrip("\n"))
@@ -196,7 +200,9 @@ def create_backup():
                 pricesJustSwapfile.write(
                     "," + str(duco_price_justswap).rstrip("\n"))
             admin_print("Backup finished")
-        sleep(3600)
+        hours = 2
+        counter+=1
+        sleep(60*60*hours)
 
 
 def permanent_ban(ip):
@@ -1007,9 +1013,9 @@ def protocol_ducos1(data, connection, address):
         if (accepted_shares > 0
                 and accepted_shares % UPDATE_MINERAPI_EVERY*2 == 0):
             """ These things don't need to run every share """  
-                if username in banlist: 
-                    permanent_ban(ip_addr)  
-                    raise Exception("User banned")
+            if username in banlist: 
+                permanent_ban(ip_addr)  
+                raise Exception("User banned")
             global_blocks += UPDATE_MINERAPI_EVERY*2
             global_last_block_hash = job[1]
 
