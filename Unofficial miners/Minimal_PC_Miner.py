@@ -27,7 +27,7 @@ def retrieve_server_ip():
                             + "revoxhere/"
                             + "duino-coin/gh-pages/"
                             + "serverip.txt")
-            with urllib.request.urlopen(serverip) as content:
+            with urllib.request.urlopen(serverip, context=ctx) as content:
                 # Read content and split into lines
                 content = content.read().decode().splitlines()
             global pool_address, pool_port
