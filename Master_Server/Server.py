@@ -259,7 +259,7 @@ def update_job_tiers():
             },
             "AVR": {
                 "difficulty": 5,
-                "reward": .0051,
+                "reward": .00575,
                 "max_hashrate": 180
             }
         }
@@ -2050,8 +2050,8 @@ def flush_iptables():
 if __name__ == "__main__":
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Loading database")
-    source = sqlite3.connect('crypto_database.db')
-    memory_db = sqlite3.connect(':memory:', check_same_thread=False)
+    source = sqlconn('crypto_database.db')
+    memory_db = sqlconn(':memory:', check_same_thread=False)
     source.backup(memory_db)
     admin_print("Launching background threads")
     threading.Thread(target=create_backup).start()
