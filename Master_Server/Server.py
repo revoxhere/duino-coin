@@ -1052,9 +1052,9 @@ def protocol_ducos1(data, connection, address):
             if fastrandint(BLOCK_PROBABILITY) == 1:
                 reward = generate_block(
                     username, reward, job[1], connection)
-                send_data("BLOCK\n", connection)
+                send_data(f"BLOCK,{reward}\n", connection)
             else:
-                send_data("GOOD\n", connection)
+                send_data(f"GOOD,{reward}\n", connection)
 
         else:
             rejected_shares += 1
@@ -1235,8 +1235,9 @@ def protocol_xxhash(data, connection, address):
                     balances_to_update[username] += reward
                 except:
                     balances_to_update[username] = reward
-
-            send_data("GOOD\n", connection)
+                send_data(f"GOOD,{reward}\n",connection)
+            else:
+                send_data("GOOD,0.0\n", connection)
 
         else:
             rejected_shares += 1
