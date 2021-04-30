@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v2.3)
+# Duino-Coin CLI Wallet (v2.45)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2020
@@ -16,6 +16,17 @@ import sys
 import time
 from pathlib import Path
 from signal import SIGINT, signal
+from base64 import b64decode, b64encode
+
+try:
+    from base64 import urlsafe_b64decode as b64d
+    from base64 import urlsafe_b64encode as b64e
+except ModuleNotFoundError:
+    print("Base64 is not installed. "
+          + "Please manually install \"base64\""
+          + "\nExiting in 15s.")
+    sleep(15)
+    _exit(1)
 
 try:
     from cryptography.fernet import Fernet, InvalidToken
@@ -38,6 +49,17 @@ except:
     print(now.strftime("%H:%M:%S ")
           + "Secrets is not installed. "
           + "Please install it using: python3 -m pip install secrets."
+          + "\nExiting in 15s.")
+    time.sleep(15)
+    os._exit(1)
+
+try:
+    import websocket
+except:
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ")
+          + "Websocket-client is not installed. "
+          + "Please install it using: python3 -m pip install websocket-client."
           + "\nExiting in 15s.")
     time.sleep(15)
     os._exit(1)
@@ -92,15 +114,11 @@ wrong_passphrase = False
 backend = default_backend()
 iterations = 100_000
 timeout = 30  # Socket timeout
-VER = 2.3
+VER = 2.45
 use_wrapper = False
+WS_URI = "wss://server.duinocoin.com:15808"
 # Serverip file
-ipfile = ("https://raw.githubusercontent.com/"
-          + "revoxhere/"
-          + "duino-coin/gh-pages/"
-          + "serverip.txt")
 config = configparser.ConfigParser()
-s = socket.socket()
 
 # Check if commands file exists
 if not Path("cli_wallet_commands.json").is_file():
@@ -177,7 +195,6 @@ def password_encrypt(
             iterations.to_bytes(4, 'big'),
             b64d(Fernet(key).encrypt(message))))
 
-
 def password_decrypt(
         token: bytes,
         password: str) -> bytes:
@@ -189,7 +206,6 @@ def password_decrypt(
         salt,
         iterations)
     return Fernet(key).decrypt(token)
-
 
 # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
 def handler(signal_received, frame):
@@ -208,44 +224,34 @@ signal(SIGINT, handler)  # Enable signal handler
 
 
 while True:
-    try:
+    try:  # Try to connect
+        s = websocket.create_connection(WS_URI)
+        s.settimeout(timeout)
+        SERVER_VER = s.recv().rstrip("\n")
+
         # Use request to grab data from raw github file
-        res = requests.get(ipfile, data=None)
-        if res.status_code == 200:  # Check for response
-            content = res.content.decode().splitlines()  # Read content and split into lines
-            pool_address = content[0]  # Line 1 = pool address
-            pool_port = content[1]  # Line 2 = pool port
-            try:  # Try to connect
-                s.connect((str(pool_address), int(pool_port)))
-                s.settimeout(timeout)
-                SERVER_VER = s.recv(3).decode().rstrip("\n")
-
-                # Use request to grab data from raw github file
-                jsonapi = requests.get(
-                    "https://raw.githubusercontent.com/"
-                    + "revoxhere/"
-                    + "duco-statistics/master/api.json",
-                    data=None)
-                if jsonapi.status_code == 200:  # Check for reponse
-                    content = jsonapi.content.decode()  # Read content and split into lines
-                    contentjson = json.loads(content)
-                    ducofiat = float(contentjson["Duco price"])
-                else:
-                    ducofiat = 0.0025  # If json api request fails, wallet will use this value
-                break  # If connection was established, continue
-
-            except Exception as e:  # If it wasn't, display a message
-                print(e)
-                print(Style.RESET_ALL
-                      + Fore.RED
-                      + "Cannot connect to the server. "
-                      + "It is probably under maintenance or temporarily down."
-                      + "\nRetrying in 15 seconds.")
-                time.sleep(15)
-                os.execl(sys.executable, sys.executable, *sys.argv)
+        jsonapi = requests.get(
+            "https://raw.githubusercontent.com/"
+            + "revoxhere/"
+            + "duco-statistics/master/api.json",
+            data=None)
+        if jsonapi.status_code == 200:  # Check for reponse
+            content = jsonapi.content.decode()  # Read content and split into lines
+            contentjson = json.loads(content)
+            ducofiat = float(contentjson["Duco price"])
         else:
-            print("Retrying connection...")
-            time.sleep(0.025)  # Restart if wrong status code
+            ducofiat = 0.0025  # If json api request fails, wallet will use this value
+        break  # If connection was established, continue
+
+    except Exception as e:  # If it wasn't, display a message
+        print(e)
+        print(Style.RESET_ALL
+                + Fore.RED
+                + "Cannot connect to the server. "
+                + "It is probably under maintenance or temporarily down."
+                + "\nRetrying in 15 seconds.")
+        time.sleep(15)
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
     except:
         print(Style.RESET_ALL
@@ -257,51 +263,34 @@ while True:
 
 
 def reconnect():
-    while True:  # Grab data grom GitHub section
-        try:
+    while True:
+        try:  # Try to connect
+            s = websocket.create_connection(WS_URI)
+            s.settimeout(timeout)
+            SERVER_VER = s.recv().rstrip("\n")
+
             # Use request to grab data from raw github file
-            res = requests.get(ipfile, data=None)
-            if res.status_code == 200:  # Check for response
-                content = res.content.decode().splitlines()  # Read content and split into lines
-                pool_address = content[0]  # Line 1 = pool address
-                pool_port = content[1]  # Line 2 = pool port
-                try:  # Try to connect
-                    s.connect((str(pool_address), int(pool_port)))
-                    s.settimeout(timeout)
-                    SERVER_VER = s.recv(3).decode().rstrip("\n")
-
-                    # Use request to grab data from raw github file
-                    jsonapi = requests.get(
-                        "https://raw.githubusercontent.com/"
-                        + "revoxhere/"
-                        + "duco-statistics/master/api.json",
-                        data=None)
-                    if jsonapi.status_code == 200:  # Check for reponse
-                        content = jsonapi.content.decode()  # Read content and split into lines
-                        contentjson = json.loads(content)
-                        ducofiat = float(contentjson["Duco price"])
-                    else:
-                        ducofiat = 0.0025  # If json api request fails, wallet will use this value
-
-                except:  # If it wasn't, display a message
-                    print(Style.RESET_ALL + Fore.RED
-                          + "Cannot connect to the server. "
-                          + "It is probably under maintenance or temporarily down."
-                          + "\nRetrying in 15 seconds.")
-                    time.sleep(15)
-                    os.execl(sys.executable, sys.executable, *sys.argv)
-                else:
-                    return s
+            jsonapi = requests.get(
+                "https://raw.githubusercontent.com/"
+                + "revoxhere/"
+                + "duco-statistics/master/api.json",
+                data=None)
+            if jsonapi.status_code == 200:  # Check for reponse
+                content = jsonapi.content.decode()  # Read content and split into lines
+                contentjson = json.loads(content)
+                ducofiat = float(contentjson["Duco price"])
             else:
-                print("Retrying connection...")
-                time.sleep(0.025)  # Restart if wrong status code
-        except:
-            print(Style.RESET_ALL
-                  + Fore.RED
-                  + " Cannot receive pool address and IP."
-                  + "\nExiting in 15 seconds .")
+                ducofiat = 0.0025  # If json api request fails, wallet will use this value
+
+        except:  # If it wasn't, display a message
+            print(Style.RESET_ALL + Fore.RED
+                    + "Cannot connect to the server. "
+                    + "It is probably under maintenance or temporarily down."
+                    + "\nRetrying in 15 seconds.")
             time.sleep(15)
-            os._exit(1)
+            os.execl(sys.executable, sys.executable, *sys.argv)
+        else:
+            return s
 
 
 while True:
@@ -343,7 +332,7 @@ while True:
                         + str(password)
                         + str(",placeholder"),
                         encoding="utf8"))
-                    loginFeedback = s.recv(64).decode().rstrip("\n").split(",")
+                    loginFeedback = s.recv().rstrip("\n").split(",")
                     server_timeout = False
 
                     if loginFeedback[0] == "OK":
@@ -353,7 +342,7 @@ while True:
 
                         config['wallet'] = {
                             "username": username,
-                            "password": password}
+                            "password": b64encode(bytes(password, encoding="utf8")).decode("utf-8")}
                         config['wrapper'] = {"use_wrapper": "false"}
 
                         with open("CLIWallet_config.cfg", "w") as configfile:  # Write data to file
@@ -413,7 +402,7 @@ while True:
                         + str(email),
                         encoding="utf8"))
 
-                    regiFeedback = s.recv(256).decode().rstrip("\n").split(",")
+                    regiFeedback = s.recv().rstrip("\n").split(",")
 
                     if regiFeedback[0] == "OK":
                         print(Style.RESET_ALL
@@ -473,7 +462,7 @@ while True:
         while True:
             config.read("CLIWallet_config.cfg")
             username = config["wallet"]["username"]
-            password = config["wallet"]["password"]
+            password = b64decode(config["wallet"]["password"]).decode("utf8")
             s.send(bytes(
                 "LOGI,"
                 + str(username)
@@ -482,7 +471,7 @@ while True:
                 + str(",placeholder"),
                 encoding="utf8"))
 
-            loginFeedback = s.recv(128).decode().rstrip("\n").split(",")
+            loginFeedback = s.recv().rstrip("\n").split(",")
             if loginFeedback[0] == "OK":
                 break
             else:
@@ -509,7 +498,7 @@ while True:
                     except:
                         trx_balance = 0
                 try:
-                    balance = round(float(s.recv(256).decode().rstrip("\n")), 8)
+                    balance = round(float(s.recv().rstrip("\n")), 8)
                     balanceusd = round(float(balance) * float(ducofiat), 6)
                     break
                 except:
@@ -584,7 +573,7 @@ while True:
 
             if command == "refresh":
                 continue
-
+  
             elif command == "send":
                 recipient = input(Style.RESET_ALL
                                   + Fore.WHITE
@@ -607,7 +596,7 @@ while True:
                     + str(amount),
                     encoding="utf8"))
                 while True:
-                    message = s.recv(1024).decode().rstrip("\n")
+                    message = s.recv().rstrip("\n")
                     print(Style.RESET_ALL
                           + Fore.BLUE
                           + "Server message: "
@@ -636,7 +625,7 @@ while True:
                     encoding="utf8"))
 
                 while True:
-                    message = s.recv(1024).decode().rstrip("\n")
+                    message = s.recv().rstrip("\n")
                     print(Style.RESET_ALL
                           + Fore.BLUE
                           + "Server message: "
@@ -650,7 +639,8 @@ while True:
                       + Fore.YELLOW
                       + "\nSIGINT detected - Exiting gracefully."
                       + Style.NORMAL
-                      + " See you soon!")
+                      + " See you soon!" 
+                      + Style.RESET_ALL)
                 try:
                     s.send(bytes("CLOSE", encoding="utf8"))
                 except:
@@ -797,7 +787,7 @@ while True:
 
                     try:
                         s.send(bytes("BALA", encoding="utf8"))
-                        balance = round(float(s.recv(256).decode().rstrip("\n")), 8)
+                        balance = round(float(s.recv().rstrip("\n")), 8)
                     except:
                         s = reconnect()
                     if float(amount) >= 10 and float(amount) <= balance:

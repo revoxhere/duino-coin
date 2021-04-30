@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.4)
+# Duino-Coin Python PC Miner (v2.45)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -24,6 +24,9 @@ from statistics import mean
 from subprocess import DEVNULL, Popen, check_call
 from threading import Thread as thrThread
 from time import ctime, sleep, strptime, time
+from multiprocessing import Lock
+
+thread_lock = Lock()
 
 
 def install(package):
@@ -100,39 +103,39 @@ except ModuleNotFoundError:
 
 
 # Global variables
-minerVersion = "2.4"  # Version number
-timeout = 15  # Socket timeout
-resourcesFolder = "PCMiner_" + str(minerVersion) + "_resources"
+MINER_VER = "2.45"  # Version number
+SOC_TIMEOUT = 30  # Socket timeout
+RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
 debug = "n"
-rigIdentifier = "None"
-requestedDiff = "NET"
+rig_identiier = "None"
+requested_diff = "NET"
 algorithm = "DUCO-S1"
-serveripfile = ("https://raw.githubusercontent.com/"
-                + "revoxhere/"
-                + "duino-coin/gh-pages/"
-                + "serverip.txt")  # Serverip file
+server_ip_file = ("https://raw.githubusercontent.com/"
+                  + "revoxhere/"
+                  + "duino-coin/gh-pages/"
+                  + "serverip.txt")  # Serverip file
 config = ConfigParser()
-donationlevel = 0
+donation_level = 0
 thread = []
 totalhashrate_mean = []
 
 # Create resources folder if it doesn't exist
-if not path.exists(resourcesFolder):
-    mkdir(resourcesFolder)
+if not path.exists(RESOURCES_DIR):
+    mkdir(RESOURCES_DIR)
 
 # Check if languages file exists
-if not Path(resourcesFolder + "/langs.json").is_file():
+if not Path(RESOURCES_DIR + "/langs.json").is_file():
     url = ("https://raw.githubusercontent.com/"
            + "revoxhere/"
            + "duino-coin/master/Resources/"
            + "PC_Miner_langs.json")
     r = requests.get(url)
-    with open(resourcesFolder + "/langs.json", "wb") as f:
+    with open(RESOURCES_DIR + "/langs.json", "wb") as f:
         f.write(r.content)
 
 # Load language file
-with open(resourcesFolder + "/langs.json", "r", encoding="utf8") as lang_file:
+with open(RESOURCES_DIR + "/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = jsonload(lang_file)
 
 # OS X invalid locale hack
@@ -141,30 +144,35 @@ if plsystem() == "Darwin":
         setlocale(LC_ALL, "en_US.UTF-8")
 
 # Check if miner is configured, if it isn't, autodetect language
-if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
-    locale = getdefaultlocale()[0]
-    if locale.startswith("es"):
-        lang = "spanish"
-    elif locale.startswith("pl"):
-        lang = "polish"
-    elif locale.startswith("fr"):
-        lang = "french"
-    elif locale.startswith("ru"):
-        lang = "russian"
-    elif locale.startswith("de"):
-        lang = "german"
-    elif locale.startswith("zh"):
-        lang = "chinese_simplified"
+try:
+    if not Path(RESOURCES_DIR + "/Miner_config.cfg").is_file():
+        locale = getdefaultlocale()[0]
+        if locale.startswith("es"):
+            lang = "spanish"
+        elif locale.startswith("pl"):
+            lang = "polish"
+        elif locale.startswith("fr"):
+            lang = "french"
+        elif locale.startswith("ru"):
+            lang = "russian"
+        elif locale.startswith("de"):
+            lang = "german"
+        elif locale.startswith("tr"):
+            lang = "turkish"
+        elif locale.startswith("zh"):
+            lang = "chinese_simplified"
+        else:
+            lang = "english"
     else:
-        lang = "english"
-else:
-    # Read language variable from configfile
-    try:
-        config.read(resourcesFolder + "/Miner_config.cfg")
-        lang = config["miner"]["language"]
-    except Exception:
-        # If it fails, fallback to english
-        lang = "english"
+        # Read language variable from configfile
+        try:
+            config.read(RESOURCES_DIR + "/Miner_config.cfg")
+            lang = config["miner"]["language"]
+        except Exception:
+            # If it fails, fallback to english
+            lang = "english"
+except:
+    lang = "english"
 
 
 def getString(string_name):
@@ -221,9 +229,9 @@ def Greeting():
     global greeting
     print(Style.RESET_ALL)
 
-    if requestedDiff == "LOW":
+    if requested_diff == "LOW":
         diffName = getString("low_diff_short")
-    elif requestedDiff == "MEDIUM":
+    elif requested_diff == "MEDIUM":
         diffName = getString("medium_diff_short")
     else:
         diffName = getString("net_diff_short")
@@ -250,7 +258,7 @@ def Greeting():
         + Style.RESET_ALL
         + Fore.MAGENTA
         + " (v"
-        + str(minerVersion)
+        + str(MINER_VER)
         + ") "
         + Fore.RESET
         + "2019-2021")
@@ -289,7 +297,7 @@ def Greeting():
             + getString("donation_level")
             + Style.BRIGHT
             + Fore.YELLOW
-            + str(donationlevel))
+            + str(donation_level))
     print(
         Style.DIM
         + Fore.YELLOW
@@ -311,7 +319,7 @@ def Greeting():
         + getString("rig_identifier")
         + Style.BRIGHT
         + Fore.YELLOW
-        + rigIdentifier)
+        + rig_identiier)
     print(
         Style.DIM
         + Fore.YELLOW
@@ -327,7 +335,7 @@ def Greeting():
 
     if osname == "nt":
         # Initial miner executable section
-        if not Path(resourcesFolder + "/Donate_executable.exe").is_file():
+        if not Path(RESOURCES_DIR + "/Donate_executable.exe").is_file():
             debugOutput(
                 "OS is Windows, downloading developer donation executable")
             url = ("https://github.com/"
@@ -335,11 +343,11 @@ def Greeting():
                    + "duino-coin/blob/useful-tools/"
                    + "DonateExecutableWindows.exe?raw=true")
             r = requests.get(url)
-            with open(resourcesFolder + "/Donate_executable.exe", "wb") as f:
+            with open(RESOURCES_DIR + "/Donate_executable.exe", "wb") as f:
                 f.write(r.content)
     elif osname == "posix":
         # Initial miner executable section
-        if not Path(resourcesFolder + "/Donate_executable").is_file():
+        if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
             debugOutput(
                 "OS is Windows, downloading developer donation executable")
             url = ("https://github.com/"
@@ -347,7 +355,7 @@ def Greeting():
                    + "duino-coin/blob/useful-tools/"
                    + "DonateExecutableLinux?raw=true")
             r = requests.get(url)
-            with open(resourcesFolder + "/Donate_executable", "wb") as f:
+            with open(RESOURCES_DIR + "/Donate_executable", "wb") as f:
                 f.write(r.content)
 
 
@@ -355,20 +363,20 @@ def loadConfig():
     # Config loading section
     global username
     global efficiency
-    global donationlevel
+    global donation_level
     global debug
     global threadcount
-    global requestedDiff
-    global rigIdentifier
+    global requested_diff
+    global rig_identiier
     global lang
     global algorithm
 
     # Initial configuration
-    if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
+    if not Path(RESOURCES_DIR + "/Miner_config.cfg").is_file():
         print(
             Style.BRIGHT
             + getString("basic_config_tool")
-            + resourcesFolder
+            + RESOURCES_DIR
             + getString("edit_config_file_warning"))
         print(
             Style.RESET_ALL
@@ -392,7 +400,9 @@ def loadConfig():
                 + Fore.RESET
                 + "1"
                 + Style.NORMAL
-                + " - DUCO-S1")
+                + " - DUCO-S1 ("
+                + getString("recommended")
+                + ")")
             print(
                 Style.RESET_ALL
                 + Style.BRIGHT
@@ -450,33 +460,33 @@ def loadConfig():
             + " - "
             + getString("net_diff"))
 
-        requestedDiff = input(
+        requested_diff = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_difficulty")
             + Fore.RESET
             + Style.BRIGHT)
 
-        rigIdentifier = input(
+        rig_identiier = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_rig_identifier")
             + Fore.RESET
             + Style.BRIGHT)
 
-        if rigIdentifier == "y" or rigIdentifier == "Y":
-            rigIdentifier = input(
+        if rig_identiier == "y" or rig_identiier == "Y":
+            rig_identiier = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_rig_name")
                 + Fore.RESET
                 + Style.BRIGHT)
         else:
-            rigIdentifier = "None"
+            rig_identiier = "None"
 
-        donationlevel = "0"
+        donation_level = "0"
         if osname == "nt" or osname == "posix":
-            donationlevel = input(
+            donation_level = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_donation_level")
@@ -496,8 +506,12 @@ def loadConfig():
         threadcount = sub(r"\D", "", threadcount)
         if threadcount == "":
             threadcount = cpu_count()
-        elif int(threadcount) > int(10):
-            threadcount = 10
+        elif int(threadcount) > int(8):
+            threadcount = 8
+            print(
+                Style.RESET_ALL
+                + Style.BRIGHT
+                + getString("max_threads_notice"))
         elif int(threadcount) < int(1):
             threadcount = 1
 
@@ -508,35 +522,36 @@ def loadConfig():
             algorithm = "DUCO-S1"
 
         # Check wheter diff setting is correct
-        if requestedDiff == "1":
-            requestedDiff = "LOW"
-        elif requestedDiff == "2":
-            requestedDiff = "MEDIUM"
+        if requested_diff == "1":
+            requested_diff = "LOW"
+        elif requested_diff == "2":
+            requested_diff = "MEDIUM"
         else:
-            requestedDiff = "NET"
+            requested_diff = "NET"
 
-        # Check wheter donationlevel is correct
-        donationlevel = sub(r"\D", "", donationlevel)
-        if donationlevel == "":
-            donationlevel = 1
-        elif float(donationlevel) > int(5):
-            donationlevel = 5
-        elif float(donationlevel) < int(0):
-            donationlevel = 0
+        # Check wheter donation_level is correct
+        donation_level = sub(r"\D", "", donation_level)
+        if donation_level == "":
+            donation_level = 1
+        elif float(donation_level) > int(5):
+            donation_level = 5
+        elif float(donation_level) < int(0):
+            donation_level = 0
 
         # Format data
         config["miner"] = {
             "username": username,
             "efficiency": efficiency,
             "threads": threadcount,
-            "requestedDiff": requestedDiff,
-            "donate": donationlevel,
-            "identifier": rigIdentifier,
+            "requested_diff": requested_diff,
+            "donate": donation_level,
+            "identifier": rig_identiier,
             "algorithm": algorithm,
             "language": lang,
-            "debug": "n"}
+            "debug": "n"
+        }
         # Write data to configfile
-        with open(resourcesFolder + "/Miner_config.cfg", "w") as configfile:
+        with open(RESOURCES_DIR + "/Miner_config.cfg", "w") as configfile:
             config.write(configfile)
 
         # Calulate efficiency for later use with sleep function
@@ -546,28 +561,28 @@ def loadConfig():
 
     else:
         # If config already exists, load data from it
-        config.read(resourcesFolder + "/Miner_config.cfg")
+        config.read(RESOURCES_DIR + "/Miner_config.cfg")
         username = config["miner"]["username"]
         efficiency = config["miner"]["efficiency"]
         threadcount = config["miner"]["threads"]
-        requestedDiff = config["miner"]["requestedDiff"]
-        donationlevel = config["miner"]["donate"]
+        requested_diff = config["miner"]["requested_diff"]
+        donation_level = config["miner"]["donate"]
         algorithm = config["miner"]["algorithm"]
-        rigIdentifier = config["miner"]["identifier"]
+        rig_identiier = config["miner"]["identifier"]
         debug = config["miner"]["debug"]
         # Calulate efficiency for use with sleep function
         efficiency = (100 - float(efficiency)) * 0.01
 
 
 def Donate():
-    global donationlevel
+    global donation_level
     global donatorrunning
     global donateExecutable
 
     if osname == "nt":
         cmd = (
             "cd "
-            + resourcesFolder
+            + RESOURCES_DIR
             + "& Donate_executable.exe "
             + "-o stratum+tcp://xmg.minerclaim.net:7008 "
             + "-u revox.donate "
@@ -576,14 +591,14 @@ def Donate():
     elif osname == "posix":
         cmd = (
             "cd "
-            + resourcesFolder
+            + RESOURCES_DIR
             + "&& chmod +x Donate_executable "
             + "&& ./Donate_executable "
             + "-o stratum+tcp://xmg.minerclaim.net:7008 "
             + "-u revox.donate "
             + "-p x -s 4 -e ")
 
-    if int(donationlevel) <= 0:
+    if int(donation_level) <= 0:
         prettyPrint(
             "sys0",
             Fore.YELLOW
@@ -597,17 +612,17 @@ def Donate():
         sleep(10)
 
     elif donatorrunning == False:
-        if int(donationlevel) == 5:
+        if int(donation_level) == 5:
             cmd += "95"
-        elif int(donationlevel) == 4:
+        elif int(donation_level) == 4:
             cmd += "75"
-        elif int(donationlevel) == 3:
+        elif int(donation_level) == 3:
             cmd += "50"
-        elif int(donationlevel) == 2:
+        elif int(donation_level) == 2:
             cmd += "20"
-        elif int(donationlevel) == 1:
+        elif int(donation_level) == 1:
             cmd += "10"
-        if int(donationlevel) > 0:
+        if int(donation_level) > 0:
             debugOutput(getString("starting_donation"))
             donatorrunning = True
             # Launch CMD as subprocess
@@ -631,7 +646,7 @@ def ducos1(
     # Loop from 1 too 100*diff
     for ducos1res in range(100 * int(difficulty) + 1):
         # Generate hash
-        temp_hash =  base_hash.copy()
+        temp_hash = base_hash.copy()
         temp_hash.update(str(ducos1res).encode('ascii'))
         ducos1 = temp_hash.hexdigest()
         # Check if result was found
@@ -671,11 +686,11 @@ def Thread(
         threadid,
         accepted,
         rejected,
-        requestedDiff,
+        requested_diff,
         khashcount,
         username,
         efficiency,
-        rigIdentifier,
+        rig_identiier,
         algorithm,
         hashrates_list,
         totalhashrate_mean):
@@ -685,7 +700,7 @@ def Thread(
         while True:
             try:
                 # Use request to grab data from raw github file
-                res = requests.get(serveripfile, data=None)
+                res = requests.get(server_ip_file, data=None)
                 if res.status_code == 200:
                     # Read content and split into lines
                     content = (res.content.decode().splitlines())
@@ -721,11 +736,11 @@ def Thread(
                 # Establish socket connection to the server
                 soc.connect((str(masterServer_address),
                              int(masterServer_port)))
-                soc.settimeout(timeout)
+                soc.settimeout(SOC_TIMEOUT)
                 serverVersion = soc.recv(3).decode().rstrip(
                     "\n")  # Get server version
                 debugOutput("Server version: " + serverVersion)
-                if (float(serverVersion) <= float(minerVersion)
+                if (float(serverVersion) <= float(MINER_VER)
                         and len(serverVersion) == 3):
                     # If miner is up-to-date, display a message and continue
                     prettyPrint(
@@ -746,7 +761,7 @@ def Thread(
                         "sys"
                         + str(threadid),
                         getString("outdated_miner")
-                        + minerVersion
+                        + MINER_VER
                         + ") -"
                         + getString("server_is_on_version")
                         + serverVersion
@@ -800,18 +815,18 @@ def Thread(
                 while True:
                     # Ask the server for job
                     if algorithm == "XXHASH":
-                        soc.send(bytes(
+                        soc.sendall(bytes(
                             "JOBXX,"
                             + str(username)
                             + ","
-                            + str(requestedDiff),
+                            + str(requested_diff),
                             encoding="utf8"))
                     else:
-                        soc.send(bytes(
+                        soc.sendall(bytes(
                             "JOB,"
                             + str(username)
                             + ","
-                            + str(requestedDiff),
+                            + str(requested_diff),
                             encoding="utf8"))
 
                     job = soc.recv(128).decode().rstrip("\n")
@@ -875,7 +890,7 @@ def Thread(
 
                     while True:
                         # Send result of hashing algorithm to the server
-                        soc.send(bytes(
+                        soc.sendall(bytes(
                             str(ducos1res)
                             + ","
                             + str(threadhashcount * 1000)
@@ -883,9 +898,9 @@ def Thread(
                             + "Official PC Miner ("
                             + str(algorithm)
                             + ") v"
-                            + str(minerVersion)
+                            + str(MINER_VER)
                             + ","
-                            + str(rigIdentifier),
+                            + str(rig_identiier),
                             encoding="utf8"))
 
                         responsetimetart = now()
@@ -914,174 +929,183 @@ def Thread(
                                 "%03.0f" % float(totalhashrate)
                                 + " kH/s")
 
+                        if (totalhashrate > 2000
+                                and accepted.value % 10 == 0):
+                            prettyPrint("sys0",
+                                        " " + getString("max_hashrate_notice"),
+                                        "warning")
+
                         if feedback == "GOOD":
                             # If result was correct
                             accepted.value += 1
                             title(
                                 getString("duco_python_miner")
-                                + str(minerVersion)
+                                + str(MINER_VER)
                                 + ") - "
                                 + str(accepted.value)
                                 + "/"
                                 + str(accepted.value + rejected.value)
                                 + getString("accepted_shares"))
-                            print(
-                                Style.RESET_ALL
-                                + Fore.WHITE
-                                + now().strftime(Style.DIM + "%H:%M:%S ")
-                                + Style.BRIGHT
-                                + algo_back_color
-                                + Fore.RESET
-                                + " cpu"
-                                + str(threadid)
-                                + " "
-                                + Back.RESET
-                                + Fore.GREEN
-                                + " ✓"
-                                + getString("accepted")
-                                + Fore.RESET
-                                + str(int(accepted.value))
-                                + "/"
-                                + str(int(accepted.value + rejected.value))
-                                + Fore.YELLOW
-                                + " ("
-                                + str(int(
-                                    (accepted.value
-                                        / (accepted.value + rejected.value)
-                                     * 100)))
-                                + "%)"
-                                + Style.NORMAL
-                                + Fore.RESET
-                                + " ∙ "
-                                + str("%05.2f" % float(computetime))
-                                + "s"
-                                + Style.NORMAL
-                                + " ∙ "
-                                + Fore.BLUE
-                                + Style.BRIGHT
-                                + str(formattedhashcount)
-                                + Fore.RESET
-                                + Style.NORMAL
-                                + " @ diff "
-                                + str(diff)
-                                + " ∙ "
-                                + Fore.CYAN
-                                + "ping "
-                                + str("%02.0f" % int(ping))
-                                + "ms")
+                            with thread_lock:
+                                print(
+                                    Style.RESET_ALL
+                                    + Fore.WHITE
+                                    + now().strftime(Style.DIM + "%H:%M:%S ")
+                                    + Style.BRIGHT
+                                    + algo_back_color
+                                    + Fore.RESET
+                                    + " cpu"
+                                    + str(threadid)
+                                    + " "
+                                    + Back.RESET
+                                    + Fore.GREEN
+                                    + " ✓"
+                                    + getString("accepted")
+                                    + Fore.RESET
+                                    + str(int(accepted.value))
+                                    + "/"
+                                    + str(int(accepted.value + rejected.value))
+                                    + Fore.YELLOW
+                                    + " ("
+                                    + str(int(
+                                        (accepted.value
+                                            / (accepted.value + rejected.value)
+                                         * 100)))
+                                    + "%)"
+                                    + Style.NORMAL
+                                    + Fore.RESET
+                                    + " ∙ "
+                                    + str("%05.2f" % float(computetime))
+                                    + "s"
+                                    + Style.NORMAL
+                                    + " ∙ "
+                                    + Fore.BLUE
+                                    + Style.BRIGHT
+                                    + str(formattedhashcount)
+                                    + Fore.RESET
+                                    + Style.NORMAL
+                                    + " @ diff "
+                                    + str(diff)
+                                    + " ∙ "
+                                    + Fore.CYAN
+                                    + "ping "
+                                    + str("%02.0f" % int(ping))
+                                    + "ms")
 
                         elif feedback == "BLOCK":
                             # If block was found
                             accepted.value += 1
                             title(
                                 getString("duco_python_miner")
-                                + str(minerVersion)
+                                + str(MINER_VER)
                                 + ") - "
                                 + str(accepted.value)
                                 + "/"
                                 + str(accepted.value + rejected.value)
                                 + getString("accepted_shares"))
-                            print(
-                                Style.RESET_ALL
-                                + Fore.WHITE
-                                + now().strftime(Style.DIM + "%H:%M:%S ")
-                                + Style.BRIGHT
-                                + algo_back_color
-                                + Fore.RESET
-                                + " cpu"
-                                + str(threadid)
-                                + " "
-                                + Back.RESET
-                                + Fore.CYAN
-                                + " ✓"
-                                + getString("block_found")
-                                + Fore.RESET
-                                + str(accepted.value)
-                                + "/"
-                                + str(accepted.value + rejected.value)
-                                + Fore.YELLOW
-                                + " ("
-                                + str(int(
-                                    (accepted.value
-                                        / (accepted.value + rejected.value)
-                                     * 100)))
-                                + "%)"
-                                + Style.NORMAL
-                                + Fore.RESET
-                                + " ∙ "
-                                + str("%05.2f" % float(computetime))
-                                + "s"
-                                + Style.NORMAL
-                                + " ∙ "
-                                + Fore.BLUE
-                                + Style.BRIGHT
-                                + str(formattedhashcount)
-                                + Fore.RESET
-                                + Style.NORMAL
-                                + " @ diff "
-                                + str(diff)
-                                + " ∙ "
-                                + Fore.CYAN
-                                + "ping "
-                                + str("%02.0f" % int(ping))
-                                + "ms")
+                            with thread_lock:
+                                print(
+                                    Style.RESET_ALL
+                                    + Fore.WHITE
+                                    + now().strftime(Style.DIM + "%H:%M:%S ")
+                                    + Style.BRIGHT
+                                    + algo_back_color
+                                    + Fore.RESET
+                                    + " cpu"
+                                    + str(threadid)
+                                    + " "
+                                    + Back.RESET
+                                    + Fore.CYAN
+                                    + " ✓"
+                                    + getString("block_found")
+                                    + Fore.RESET
+                                    + str(accepted.value)
+                                    + "/"
+                                    + str(accepted.value + rejected.value)
+                                    + Fore.YELLOW
+                                    + " ("
+                                    + str(int(
+                                        (accepted.value
+                                            / (accepted.value + rejected.value)
+                                         * 100)))
+                                    + "%)"
+                                    + Style.NORMAL
+                                    + Fore.RESET
+                                    + " ∙ "
+                                    + str("%05.2f" % float(computetime))
+                                    + "s"
+                                    + Style.NORMAL
+                                    + " ∙ "
+                                    + Fore.BLUE
+                                    + Style.BRIGHT
+                                    + str(formattedhashcount)
+                                    + Fore.RESET
+                                    + Style.NORMAL
+                                    + " @ diff "
+                                    + str(diff)
+                                    + " ∙ "
+                                    + Fore.CYAN
+                                    + "ping "
+                                    + str("%02.0f" % int(ping))
+                                    + "ms")
 
                         else:
                             # If result was incorrect
                             rejected.value += 1
                             title(
                                 getString("duco_python_miner")
-                                + str(minerVersion)
+                                + str(MINER_VER)
                                 + ") - "
                                 + str(accepted.value)
                                 + "/"
                                 + str(accepted.value + rejected.value)
                                 + getString("accepted_shares"))
-                            print(
-                                Style.RESET_ALL
-                                + Fore.WHITE
-                                + now().strftime(Style.DIM + "%H:%M:%S ")
-                                + algo_back_color
-                                + Back.YELLOW
-                                + Fore.RESET
-                                + " cpu"
-                                + str(threadid)
-                                + " "
-                                + Style.BRIGHT
-                                + Back.RESET
-                                + Fore.RED
-                                + " ✗"
-                                + getString("rejected")
-                                + Fore.RESET
-                                + str(accepted.value)
-                                + "/"
-                                + str(accepted.value + rejected.value)
-                                + Fore.YELLOW
-                                + " ("
-                                + str(int(
-                                    (accepted.value
-                                        / (accepted.value + rejected.value)
-                                     * 100)))
-                                + "%)"
-                                + Style.NORMAL
-                                + Fore.RESET
-                                + " ∙ "
-                                + str("%05.2f" % float(computetime))
-                                + "s"
-                                + Style.NORMAL
-                                + " ∙ "
-                                + Fore.BLUE
-                                + Style.BRIGHT
-                                + str(formattedhashcount)
-                                + Fore.RESET
-                                + Style.NORMAL
-                                + " @ diff "
-                                + str(diff)
-                                + " ∙ "
-                                + Fore.CYAN
-                                + "ping "
-                                + str("%02.0f" % int(ping))
-                                + "ms")
+                            with thread_lock:
+                                print(
+                                    Style.RESET_ALL
+                                    + Fore.WHITE
+                                    + now().strftime(Style.DIM + "%H:%M:%S ")
+                                    + algo_back_color
+                                    + Back.YELLOW
+                                    + Fore.RESET
+                                    + " cpu"
+                                    + str(threadid)
+                                    + " "
+                                    + Style.BRIGHT
+                                    + Back.RESET
+                                    + Fore.RED
+                                    + " ✗"
+                                    + getString("rejected")
+                                    + Fore.RESET
+                                    + str(accepted.value)
+                                    + "/"
+                                    + str(accepted.value + rejected.value)
+                                    + Fore.YELLOW
+                                    + " ("
+                                    + str(int(
+                                        (accepted.value
+                                            / (accepted.value + rejected.value)
+                                         * 100)))
+                                    + "%)"
+                                    + Style.NORMAL
+                                    + Fore.RESET
+                                    + " ∙ "
+                                    + str("%05.2f" % float(computetime))
+                                    + "s"
+                                    + Style.NORMAL
+                                    + " ∙ "
+                                    + Fore.BLUE
+                                    + Style.BRIGHT
+                                    + str(formattedhashcount)
+                                    + Fore.RESET
+                                    + Style.NORMAL
+                                    + " @ diff "
+                                    + str(diff)
+                                    + " ∙ "
+                                    + Fore.CYAN
+                                    + "ping "
+                                    + str("%02.0f" % int(ping))
+                                    + "ms")
                         break
                     break
             except Exception as e:
@@ -1098,6 +1122,7 @@ def Thread(
                 debugOutput("Error while mining: " + str(e))
                 sleep(5)
                 break
+
 
 def prettyPrint(messageType, message, state):
     # Print output messages in the DUCO "standard"
@@ -1117,20 +1142,21 @@ def prettyPrint(messageType, message, state):
     else:
         color = Fore.RED
 
-    print(Style.RESET_ALL
-          + Fore.WHITE
-          + now().strftime(Style.DIM + "%H:%M:%S ")
-          + Style.BRIGHT
-          + background
-          + " "
-          + messageType
-          + " "
-          + Back.RESET
-          + color
-          + Style.BRIGHT
-          + message
-          + Style.NORMAL
-          + Fore.RESET)
+    with thread_lock:
+        print(Style.RESET_ALL
+              + Fore.WHITE
+              + now().strftime(Style.DIM + "%H:%M:%S ")
+              + Style.BRIGHT
+              + background
+              + " "
+              + messageType
+              + " "
+              + Back.RESET
+              + color
+              + Style.BRIGHT
+              + message
+              + Style.NORMAL
+              + Fore.RESET)
 
 
 def initRichPresence():
@@ -1187,12 +1213,17 @@ if __name__ == "__main__":
     cpu = cpuinfo.get_cpu_info()
     # Colorama
     init(autoreset=True)
-    title(getString("duco_python_miner") + str(minerVersion) + ")")
+    title(getString("duco_python_miner") + str(MINER_VER) + ")")
 
     try:
-        from multiprocessing import Manager, Process, Value, cpu_count, current_process
+        from multiprocessing import (
+            Manager, 
+            Process, 
+            Value, 
+            cpu_count, 
+            current_process
+        )
         manager = Manager()
-        # Multiprocessing fix for pyinstaller
         # Multiprocessing globals
         khashcount = Value("i", 0)
         accepted = Value("i", 0)
@@ -1218,7 +1249,7 @@ if __name__ == "__main__":
         prettyPrint(
             "sys0",
             getString("load_config_error")
-            + resourcesFolder
+            + RESOURCES_DIR
             + getString("load_config_error_warning")
             + Style.NORMAL
             + Fore.RESET
@@ -1262,11 +1293,11 @@ if __name__ == "__main__":
                     x,
                     accepted,
                     rejected,
-                    requestedDiff,
+                    requested_diff,
                     khashcount,
                     username,
                     efficiency,
-                    rigIdentifier,
+                    rig_identiier,
                     algorithm,
                     hashrates_list,
                     totalhashrate_mean))

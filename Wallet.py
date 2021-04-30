@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Tkinter GUI Wallet (v2.4)
+# Duino-Coin Tkinter GUI Wallet (v2.45)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -18,7 +18,7 @@ from os import path, system
 from pathlib import Path
 from socket import socket
 from sqlite3 import connect as sqlconn
-from subprocess import check_call
+import subprocess
 from threading import Thread, Timer
 from time import sleep, time
 from tkinter import (BOTH, END, LEFT, RIGHT, Button, Checkbutton, E, Entry,
@@ -31,7 +31,7 @@ from webbrowser import open_new_tab
 from requests import get
 
 # Version number
-VERSION = 2.4
+VERSION = 2.45
 # Colors
 BACKGROUND_COLOR = "#121212"
 FONT_COLOR = "#fffdee"
@@ -52,6 +52,7 @@ balance = 0
 unpaid_balance = 0
 profitCheck = 0
 curr_bal = 0
+WS_URI = "wss://server.duinocoin.com:15808"
 
 
 def install(package):
@@ -279,16 +280,15 @@ class LoginFrame(Frame):
         password = self.entry_password.get()
 
         if username and password:
-            soc = socket()
-            soc.connect((pool_address, int(pool_port)))
-            soc.recv(3)
+            soc = websocket.create_connection(WS_URI)
+            soc.recv()
             soc.send(bytes(
                 "LOGI,"
                 + str(username)
                 + ","
                 + str(password),
                 encoding="utf8"))
-            response = soc.recv(64).decode("utf8").rstrip("\n")
+            response = soc.recv().rstrip("\n")
             response = response.split(",")
 
             if response[0] == "OK":
@@ -319,9 +319,8 @@ class LoginFrame(Frame):
 
         if emailS and usernameS and passwordS and confpasswordS:
             if passwordS == confpasswordS:
-                soc = socket()
-                soc.connect((pool_address, int(pool_port)))
-                soc.recv(3)
+                soc = websocket.create_connection(WS_URI)
+                soc.recv()
                 soc.send(
                     bytes(
                         "REGI,"
@@ -331,7 +330,7 @@ class LoginFrame(Frame):
                         + ","
                         + str(emailS),
                         encoding="utf8"))
-                response = soc.recv(128).decode("utf8").rstrip("\n")
+                response = soc.recv().rstrip("\n")
                 response = response.split(",")
 
                 if response[0] == "OK":
@@ -855,13 +854,18 @@ def currency_converter_window(handler):
 
 def statistics_window(handler):
     statsApi = get(
-        "https://raw.githubusercontent.com/"
-        + "revoxhere/"
-        + "duco-statistics/master/"
-        + "api.json",
+        "https://server.duinocoin.com"
+        + "/api.json",
         data=None)
     if statsApi.status_code == 200:  # Check for reponse
         statsApi = statsApi.json()
+
+    miner_api = get(
+        "https://server.duinocoin.com"
+        + "/miners.json",
+        data=None)
+    if miner_api.status_code == 200:  # Check for reponse
+        miner_api = miner_api.json()
 
     statsWindow = Toplevel()
     statsWindow.resizable(False, False)
@@ -895,23 +899,24 @@ def statistics_window(handler):
         padx=5)
     i = 0
     totalHashrate = 0
-    for threadid in statsApi["Miners"]:
-        if username in statsApi["Miners"][threadid]["User"]:
-            rigId = statsApi["Miners"][threadid]["Identifier"]
+
+    for threadid in miner_api:
+        if username in miner_api[threadid]["User"]:
+            rigId = miner_api[threadid]["Identifier"]
             if rigId == "None":
                 rigId = ""
             else:
                 rigId += ": "
-            software = statsApi["Miners"][threadid]["Software"]
-            hashrate = str(round(statsApi["Miners"][threadid]["Hashrate"], 2))
+            software = miner_api[threadid]["Software"]
+            hashrate = str(round(miner_api[threadid]["Hashrate"], 2))
             totalHashrate += float(hashrate)
-            difficulty = str(statsApi["Miners"][threadid]["Diff"])
+            difficulty = str(miner_api[threadid]["Diff"])
             shares = (
-                str(statsApi["Miners"][threadid]["Accepted"])
+                str(miner_api[threadid]["Accepted"])
                 + "/"
                 + str(
-                    statsApi["Miners"][threadid]["Accepted"]
-                    + statsApi["Miners"][threadid]["Rejected"]))
+                    miner_api[threadid]["Accepted"]
+                    + miner_api[threadid]["Rejected"]))
 
             Active_workers_listbox.insert(
                 i,
@@ -987,8 +992,10 @@ def statistics_window(handler):
         pady=(0, 5),
         padx=5)
 
+    num = 0
     for i in statsApi["Top 10 richest miners"]:
-        Top_10_listbox.insert(i, statsApi["Top 10 richest miners"][i])
+        Top_10_listbox.insert(num, i)
+        num += 1
 
     Top_10_listbox.select_set(32)
     Top_10_listbox.event_generate("<<ListboxSelect>>")
@@ -1098,9 +1105,8 @@ def wrapper_window(handler):
     def Wrap():
         amount = amountWrap.get()
         print("Got amount: ", amount)
-        soc = socket()
-        soc.connect((pool_address, int(pool_port)))
-        soc.recv(3)
+        soc = websocket.create_connection(WS_URI)
+        soc.recv()
         try:
             float(amount)
         except Exception:
@@ -1112,7 +1118,7 @@ def wrapper_window(handler):
                 + ","
                 + str(password),
                 encoding="utf8"))
-            _ = soc.recv(10)
+            _ = soc.recv()
             soc.send(
                 bytes(
                     "WRAP,"
@@ -1184,9 +1190,8 @@ def unwrapper_window(handler):
 
         amount = amountUnWrap.get()
         print("Got amount:", amount)
-        soc = socket()
-        soc.connect((pool_address, int(pool_port)))
-        soc.recv(3)
+        soc = websocket.create_connection(WS_URI)
+        soc.recv()
         try:
             float(amount)
         except Exception:
@@ -1197,7 +1202,7 @@ def unwrapper_window(handler):
                 + str(username)
                 + ","
                 + str(password), encoding="utf8"))
-            _ = soc.recv(10)
+            _ = soc.recv()
             if use_wrapper:
                 pendingvalues = wduco.functions.pendingWithdrawals(
                     pub_key, username)
@@ -1422,16 +1427,15 @@ def settings_window(handler):
             if oldpasswordS != newpasswordS:
                 if oldpasswordS and newpasswordS and confpasswordS:
                     if newpasswordS == confpasswordS:
-                        soc = socket()
-                        soc.connect((pool_address, int(pool_port)))
-                        soc.recv(3)
+                        soc = websocket.create_connection(WS_URI)
+                        soc.recv()
                         soc.send(
                             bytes(
                                 "LOGI,"
                                 + str(username)
                                 + ","
                                 + str(password), encoding="utf8"))
-                        soc.recv(2)
+                        soc.recv()
                         soc.send(
                             bytes(
                                 "CHGP,"
@@ -1439,8 +1443,7 @@ def settings_window(handler):
                                 + ","
                                 + str(newpasswordS),
                                 encoding="utf8"))
-                        response = soc.recv(128).decode(
-                            "utf8").rstrip("\n").split(",")
+                        response = soc.recv().rstrip("\n").split(",")
                         soc.close()
 
                         if not "OK" in response[0]:
@@ -1788,20 +1791,19 @@ def get_balance():
     global global_balance
     global gtxl
     try:
-        soc = socket()
-        soc.connect((pool_address, int(pool_port)))
-        soc.recv(3)
+        soc = websocket.create_connection(WS_URI)
+        soc.recv()
         soc.send(bytes(
             "LOGI,"
             + str(username)
             + ","
             + str(password), encoding="utf8"))
-        _ = soc.recv(2)
+        _ = soc.recv()
         soc.send(bytes(
             "BALA",
             encoding="utf8"))
         oldbalance = balance
-        balance = float(soc.recv(64).decode().rstrip("\n"))
+        balance = float(soc.recv().rstrip("\n"))
         global_balance = round(float(balance), 8)
 
         try:
@@ -1809,7 +1811,7 @@ def get_balance():
             soc.send(bytes(
                 "GTXL," + str(username) + ",7",
                 encoding="utf8"))
-            gtxl = str(soc.recv(8096).decode().rstrip(
+            gtxl = str(soc.recv().rstrip(
                 "\n").replace("\'", "\""))
             gtxl = jsonloads(gtxl)
         except Exception as e:
@@ -1959,9 +1961,8 @@ def send_funds_protocol(handler):
         + str(recipientStr),
         icon="warning",)
     if MsgBox == "yes":
-        soc = socket()
-        soc.connect((pool_address, int(pool_port)))
-        soc.recv(3)
+        soc = websocket.create_connection(WS_URI)
+        soc.recv()
 
         soc.send(bytes(
             "LOGI,"
@@ -1969,7 +1970,7 @@ def send_funds_protocol(handler):
             + ","
             + str(password),
             encoding="utf8"))
-        response = soc.recv(2)
+        response = soc.recv()
         soc.send(
             bytes(
                 "SEND,"
@@ -1979,7 +1980,7 @@ def send_funds_protocol(handler):
                 + ","
                 + str(amountStr),
                 encoding="utf8"))
-        response = soc.recv(128).decode().rstrip("\n").split(",")
+        response = soc.recv().rstrip("\n").split(",")
         soc.close()
 
         if "OK" in str(response[0]):
@@ -2500,6 +2501,14 @@ except ModuleNotFoundError:
     _exit(1)
 
 try:
+    import websocket
+except ModuleNotFoundError:
+    print("websocket-client is not installed. "
+          + "Wallet will try to install it. "
+          + "If it fails, please manually install \"websocket-client\".")
+    install("websocket-client")
+
+try:
     import tronpy
     from tronpy.keys import PrivateKey
     TRONPY_ENABLED = True
@@ -2515,15 +2524,6 @@ else:
     except:
         TRONPY_ENABLED = False
         print("Tron-side error, disabling wrapper for this session")
-
-with urlopen(
-    "https://raw.githubusercontent.com/"
-    + "revoxhere/"
-    + "duino-coin/gh-pages/"
-        + "serverip.txt") as content:
-    content = content.read().decode().splitlines()
-    pool_address = content[0]
-    pool_port = content[1]
 
 if not path.exists(resources):
     mkdir(resources)

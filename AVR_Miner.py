@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.4)
+# Duino-Coin Python AVR Miner (v2.45)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -22,7 +22,9 @@ from signal import SIGINT, signal
 from socket import socket
 from subprocess import DEVNULL, Popen, check_call
 from threading import Thread as thrThread
+from threading import Lock
 from time import ctime, sleep, strptime, time
+import select
 
 
 def install(package):
@@ -86,39 +88,41 @@ except ModuleNotFoundError:
     install("pypresence")
 
 # Global variables
-minerVersion = "2.4"  # Version number
-timeout = 15  # Socket timeout
-resourcesFolder = "AVRMiner_" + str(minerVersion) + "_resources"
+MINER_VER = "2.45"  # Version number
+SOCKET_TIMEOUT = 30
+AVR_TIMEOUT = 7
+RESOURCES_DIR = "AVRMiner_" + str(MINER_VER) + "_resources"
 shares = [0, 0]
 diff = 0
-donatorrunning = False
+donator_running = False
 job = ""
 debug = "n"
-rigIdentifier = "None"
+rig_identifier = "None"
 # Serverip file
-serveripfile = ("https://raw.githubusercontent.com/"
-                + "revoxhere/"
-                + "duino-coin/gh-pages/serverip.txt")
-config = ConfigParser()
-donationlevel = 0
+server_ip_file = ("https://raw.githubusercontent.com/"
+                  + "revoxhere/"
+                  + "duino-coin/gh-pages/serverip.txt")
+donation_level = 0
 hashrate = 0
+config = ConfigParser()
+thread_lock = Lock()
 
 # Create resources folder if it doesn't exist
-if not path.exists(resourcesFolder):
-    mkdir(resourcesFolder)
+if not path.exists(RESOURCES_DIR):
+    mkdir(RESOURCES_DIR)
 
 # Check if languages file exists
-if not Path(resourcesFolder + "/langs.json").is_file():
+if not Path(RESOURCES_DIR + "/langs.json").is_file():
     url = ("https://raw.githubusercontent.com/"
            + "revoxhere/"
            + "duino-coin/master/Resources/"
            + "AVR_Miner_langs.json")
     r = requests.get(url)
-    with open(resourcesFolder + "/langs.json", "wb") as f:
+    with open(RESOURCES_DIR + "/langs.json", "wb") as f:
         f.write(r.content)
 
 # Load language file
-with open(resourcesFolder + "/langs.json", "r", encoding="utf8") as lang_file:
+with open(RESOURCES_DIR + "/langs.json", "r", encoding="utf8") as lang_file:
     lang_file = jsonload(lang_file)
 
 # OS X invalid locale hack
@@ -127,30 +131,35 @@ if system() == 'Darwin':
         setlocale(LC_ALL, 'en_US.UTF-8')
 
 # Check if miner is configured, if it isn't, autodetect language
-if not Path(resourcesFolder + "/Miner_config.cfg").is_file():
-    locale = getdefaultlocale()[0]
-    if locale.startswith("es"):
-        lang = "spanish"
-    elif locale.startswith("sk"):
-        lang = "slovak"
-    elif locale.startswith("ru"):
-        lang = "russian"
-    elif locale.startswith("pl"):
-        lang = "polish"
-    elif locale.startswith("fr"):
-        lang = "french"
-    elif locale.startswith("zh"):
-        lang = "chinese_simplified"
+try:
+    if not Path(RESOURCES_DIR + "/Miner_config.cfg").is_file():
+        locale = getdefaultlocale()[0]
+        if locale.startswith("es"):
+            lang = "spanish"
+        elif locale.startswith("sk"):
+            lang = "slovak"
+        elif locale.startswith("ru"):
+            lang = "russian"
+        elif locale.startswith("pl"):
+            lang = "polish"
+        elif locale.startswith("fr"):
+            lang = "french"
+        elif locale.startswith("tr"):
+            lang = "turkish"
+        elif locale.startswith("zh"):
+            lang = "chinese_simplified"
+        else:
+            lang = "english"
     else:
-        lang = "english"
-else:
-    try:
-        # Read language from configfile
-        config.read(resourcesFolder + "/Miner_config.cfg")
-        lang = config["arduminer"]["language"]
-    except Exception:
-        # If it fails, fallback to english
-        lang = "english"
+        try:
+            # Read language from configfile
+            config.read(RESOURCES_DIR + "/Miner_config.cfg")
+            lang = config["arduminer"]["language"]
+        except Exception:
+            # If it fails, fallback to english
+            lang = "english"
+except:
+    lang = "english"
 
 
 def getString(string_name):
@@ -188,6 +197,7 @@ def Connect():
     # Server connection
     global masterServer_address
     global masterServer_port
+    global SOCKET_TIMEOUT
     while True:
         try:
             try:
@@ -199,14 +209,16 @@ def Connect():
                         + str(":")
                         + str(masterServer_port))
             socConn = socket()
-            socConn.settimeout(timeout)
+            socConn.settimeout(SOCKET_TIMEOUT)
             # Establish socket connection to the server
             socConn.connect(
                 (str(masterServer_address), int(masterServer_port)))
             # Get server version
-            serverVersion = socConn.recv(3).decode().rstrip("\n")
+            ready = select.select([socConn], [], [], SOCKET_TIMEOUT)
+            if ready[0]:
+                serverVersion = socConn.recv(10).decode().rstrip("\n")
             debugOutput("Server version: " + serverVersion)
-            if (float(serverVersion) <= float(minerVersion)
+            if (float(serverVersion) <= float(MINER_VER)
                     and len(serverVersion) == 3):
                 # If miner is up-to-date, display a message and continue
                 prettyPrint(
@@ -223,7 +235,7 @@ def Connect():
                 prettyPrint(
                     "sys0",
                     " Miner is outdated (v"
-                    + minerVersion
+                    + MINER_VER
                     + ") -"
                     + getString("server_is_on_version")
                     + serverVersion
@@ -248,6 +260,7 @@ def Connect():
 
 
 def connectToAVR(com):
+    global AVR_TIMEOUT
     try:
         # Close previous serial connections (if any)
         comConn.close()
@@ -258,7 +271,7 @@ def connectToAVR(com):
     comConn = serial.Serial(
         com,
         baudrate=115200,
-        timeout=5)
+        timeout=AVR_TIMEOUT)
     prettyPrint(
         "usb"
         + str(''.join(filter(str.isdigit, com))),
@@ -296,18 +309,18 @@ signal(SIGINT, handler)
 def loadConfig():
     # Config loading section
     global username
-    global donationlevel
+    global donation_level
     global avrport
     global debug
     global requestedDiff
-    global rigIdentifier
+    global rig_identifier
 
     # Initial configuration section
-    if not Path(str(resourcesFolder) + "/Miner_config.cfg").is_file():
+    if not Path(str(RESOURCES_DIR) + "/Miner_config.cfg").is_file():
         print(
             Style.BRIGHT
             + getString("basic_config_tool")
-            + resourcesFolder
+            + RESOURCES_DIR
             + getString("edit_config_file_warning"))
 
         print(
@@ -369,52 +382,52 @@ def loadConfig():
         else:
             requestedDiff = "AVR"
 
-        rigIdentifier = input(
+        rig_identifier = input(
             Style.RESET_ALL
             + Fore.YELLOW
             + getString("ask_rig_identifier")
             + Fore.RESET
             + Style.BRIGHT)
-        if rigIdentifier == "y" or rigIdentifier == "Y":
-            rigIdentifier = input(
+        if rig_identifier == "y" or rig_identifier == "Y":
+            rig_identifier = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_rig_name")
                 + Fore.RESET
                 + Style.BRIGHT)
         else:
-            rigIdentifier = "None"
+            rig_identifier = "None"
 
-        donationlevel = "0"
+        donation_level = "0"
         if osname == "nt" or osname == "posix":
-            donationlevel = input(
+            donation_level = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + getString("ask_donation_level")
                 + Fore.RESET
                 + Style.BRIGHT)
 
-        # Check wheter donationlevel is correct
-        donationlevel = sub(r"\D", "", donationlevel)
-        if donationlevel == '':
-            donationlevel = 1
-        if float(donationlevel) > int(5):
-            donationlevel = 5
-        if float(donationlevel) < int(0):
-            donationlevel = 0
+        # Check wheter donation_level is correct
+        donation_level = sub(r"\D", "", donation_level)
+        if donation_level == '':
+            donation_level = 1
+        if float(donation_level) > int(5):
+            donation_level = 5
+        if float(donation_level) < int(0):
+            donation_level = 0
 
         # Format data
         config["arduminer"] = {
             "username": username,
             "avrport": avrport,
-            "donate": donationlevel,
+            "donate": donation_level,
             "language": lang,
-            "identifier": rigIdentifier,
+            "identifier": rig_identifier,
             "difficulty": requestedDiff,
             "debug": "n"}
 
         # Write data to file
-        with open(str(resourcesFolder)
+        with open(str(RESOURCES_DIR)
                   + "/Miner_config.cfg", "w") as configfile:
             config.write(configfile)
 
@@ -422,13 +435,13 @@ def loadConfig():
         print(Style.RESET_ALL + getString("config_saved"))
 
     else:  # If config already exists, load from it
-        config.read(str(resourcesFolder) + "/Miner_config.cfg")
+        config.read(str(RESOURCES_DIR) + "/Miner_config.cfg")
         username = config["arduminer"]["username"]
         avrport = config["arduminer"]["avrport"]
         avrport = avrport.split(",")
-        donationlevel = config["arduminer"]["donate"]
+        donation_level = config["arduminer"]["donate"]
         debug = config["arduminer"]["debug"]
-        rigIdentifier = config["arduminer"]["identifier"]
+        rig_identifier = config["arduminer"]["identifier"]
         requestedDiff = config["arduminer"]["difficulty"]
 
 
@@ -461,7 +474,7 @@ def Greeting():
         + Style.RESET_ALL
         + Fore.MAGENTA
         + " (v"
-        + str(minerVersion)
+        + str(MINER_VER)
         + ") "
         + Fore.RESET
         + "2019-2021")
@@ -495,7 +508,7 @@ def Greeting():
             + getString("donation_level")
             + Style.BRIGHT
             + Fore.YELLOW
-            + str(donationlevel))
+            + str(donation_level))
     print(
         Style.DIM
         + Fore.MAGENTA
@@ -518,7 +531,7 @@ def Greeting():
         + getString("rig_identifier")
         + Style.BRIGHT
         + Fore.YELLOW
-        + rigIdentifier)
+        + rig_identifier)
 
     print(
         Style.DIM
@@ -535,7 +548,7 @@ def Greeting():
 
     if osname == "nt":
         # Initial miner executable section
-        if not Path(resourcesFolder + "/Donate_executable.exe").is_file():
+        if not Path(RESOURCES_DIR + "/Donate_executable.exe").is_file():
             debugOutput(
                 "OS is Windows, downloading developer donation executable")
             url = ("https://github.com/"
@@ -543,25 +556,25 @@ def Greeting():
                    + "duino-coin/blob/useful-tools/"
                    + "DonateExecutableWindows.exe?raw=true")
             r = requests.get(url)
-            with open(resourcesFolder + "/Donate_executable.exe", "wb") as f:
+            with open(RESOURCES_DIR + "/Donate_executable.exe", "wb") as f:
                 f.write(r.content)
     elif osname == "posix":
         # Initial miner executable section
-        if not Path(resourcesFolder + "/Donate_executable").is_file():
+        if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
             debugOutput(
-                "OS is Windows, downloading developer donation executable")
+                "OS is *nix, downloading developer donation executable")
             url = ("https://github.com/"
                    + "revoxhere/"
                    + "duino-coin/blob/useful-tools/"
                    + "DonateExecutableLinux?raw=true")
             r = requests.get(url)
-            with open(resourcesFolder + "/Donate_executable", "wb") as f:
+            with open(RESOURCES_DIR + "/Donate_executable", "wb") as f:
                 f.write(r.content)
 
 
 def restart_miner():
     try:
-        if donatorrunning:
+        if donator_running:
             donateExecutable.terminate()
     except Exception as e:
         prettyPrint(
@@ -586,14 +599,14 @@ def restart_miner():
 
 
 def Donate():
-    global donationlevel
-    global donatorrunning
+    global donation_level
+    global donator_running
     global donateExecutable
 
     if osname == "nt":
         cmd = (
             "cd "
-            + resourcesFolder
+            + RESOURCES_DIR
             + "& Donate_executable.exe "
             + "-o stratum+tcp://xmg.minerclaim.net:7008 "
             + "-u revox.donate "
@@ -602,14 +615,14 @@ def Donate():
     elif osname == "posix":
         cmd = (
             "cd "
-            + resourcesFolder
+            + RESOURCES_DIR
             + "&& chmod +x Donate_executable "
             + "&& ./Donate_executable "
             + "-o stratum+tcp://xmg.minerclaim.net:7008 "
             + "-u revox.donate "
             + "-p x -s 4 -e ")
 
-    if int(donationlevel) <= 0:
+    if int(donation_level) <= 0:
         prettyPrint(
             "sys0",
             Fore.YELLOW
@@ -620,22 +633,22 @@ def Donate():
             + Fore.YELLOW
             + getString("learn_more_donate"),
             "warning")
-        sleep(10)
+        sleep(5)
 
-    elif donatorrunning == False:
-        if int(donationlevel) == 5:
-            cmd += "95"
-        elif int(donationlevel) == 4:
-            cmd += "75"
-        elif int(donationlevel) == 3:
+    elif donator_running == False:
+        if int(donation_level) == 5:
             cmd += "50"
-        elif int(donationlevel) == 2:
+        elif int(donation_level) == 4:
+            cmd += "40"
+        elif int(donation_level) == 3:
+            cmd += "30"
+        elif int(donation_level) == 2:
             cmd += "20"
-        elif int(donationlevel) == 1:
+        elif int(donation_level) == 1:
             cmd += "10"
-        if int(donationlevel) > 0:
+        if int(donation_level) > 0:
             debugOutput(getString("starting_donation"))
-            donatorrunning = True
+            donator_running = True
             # Launch CMD as subprocess
             donateExecutable = Popen(
                 cmd, shell=True, stderr=DEVNULL)
@@ -703,20 +716,21 @@ def prettyPrint(messageType, message, state):
     else:
         color = Fore.RED
 
-    print(Style.RESET_ALL
-          + Fore.WHITE
-          + now().strftime(Style.DIM + "%H:%M:%S ")
-          + Style.BRIGHT
-          + background
-          + " "
-          + messageType
-          + " "
-          + Back.RESET
-          + color
-          + Style.BRIGHT
-          + message
-          + Style.NORMAL
-          + Fore.RESET)
+    with thread_lock:
+        print(Style.RESET_ALL
+              + Fore.WHITE
+              + now().strftime(Style.DIM + "%H:%M:%S ")
+              + Style.BRIGHT
+              + background
+              + " "
+              + messageType
+              + " "
+              + Back.RESET
+              + color
+              + Style.BRIGHT
+              + message
+              + Style.NORMAL
+              + Fore.RESET)
 
 
 def AVRMine(com):
@@ -725,12 +739,14 @@ def AVRMine(com):
     global hashrate
     global masterServer_address
     global masterServer_port
+    global MINER_VER
+    global SOCKET_TIMEOUT
     while True:
         # Grab server IP and port
         while True:
             try:
                 # Use request to grab data from raw github file
-                res = requests.get(serveripfile, data=None)
+                res = requests.get(server_ip_file, data=None)
                 if res.status_code == 200:
                     # Read content and split into lines
                     content = (res.content.decode().splitlines())
@@ -793,7 +809,7 @@ def AVRMine(com):
                 try:
                     # Send job request
                     debugOutput("Requested job from the server")
-                    socConn.send(
+                    socConn.sendall(
                         bytes(
                             "JOB,"
                             + str(username)
@@ -801,7 +817,9 @@ def AVRMine(com):
                             + str(requestedDiff),
                             encoding="utf8"))
                     # Retrieve work
-                    job = socConn.recv(85).decode()
+                    ready = select.select([socConn], [], [], SOCKET_TIMEOUT)
+                    if ready[0]:
+                        job = socConn.recv(100).decode()
                     # Split received data
                     job = job.rstrip("\n").split(",")
 
@@ -881,8 +899,7 @@ def AVRMine(com):
                                     + str(e)
                                     + ")",
                                     "error")
-                                comConn = connectToAVR(com)
-                                errorCounter = 0
+                                restart_miner()
                             debugOutput(
                                 "Exception with to serial: " + str(e))
                             sleep(1)
@@ -938,18 +955,17 @@ def AVRMine(com):
                         debugOutput("Error splitting data: " + str(e))
                         sleep(1)
 
-
                 try:
                     # Send result to the server
-                    socConn.send(
+                    socConn.sendall(
                         bytes(
                             str(ducos1result)
                             + ","
                             + str(hashrate)
                             + ",Official AVR Miner (DUCO-S1A) v"
-                            + str(minerVersion)
+                            + str(MINER_VER)
                             + ","
-                            + str(rigIdentifier)
+                            + str(rig_identifier)
                             + ","
                             + str(chipID),
                             encoding="utf8"))
@@ -972,7 +988,10 @@ def AVRMine(com):
                     try:
                         responsetimetart = now()
                         # Get feedback
-                        feedback = socConn.recv(48).decode().rstrip("\n")
+                        ready = select.select(
+                            [socConn], [], [], SOCKET_TIMEOUT)
+                        if ready[0]:
+                            feedback = socConn.recv(48).decode().rstrip("\n")
                         responsetimestop = now()
                         # Measure server ping
                         timeDelta = (responsetimestop -
@@ -1002,174 +1021,176 @@ def AVRMine(com):
                     shares[0] += 1
                     title(
                         getString("duco_avr_miner")
-                        + str(minerVersion)
+                        + str(MINER_VER)
                         + ") - "
                         + str(shares[0])
                         + "/"
                         + str(shares[0] + shares[1])
                         + getString("accepted_shares"))
-                    print(
-                        Style.RESET_ALL
-                        + Fore.WHITE
-                        + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.MAGENTA
-                        + Fore.RESET
-                        + " usb"
-                        + str(''.join(filter(str.isdigit, com)))
-                        + " "
-                        + Back.RESET
-                        + Fore.GREEN
-                        + " ✓"
-                        + getString("accepted")
-                        + Fore.RESET
-                        + str(int(shares[0]))
-                        + "/"
-                        + str(int(shares[0] + shares[1]))
-                        + Fore.YELLOW
-                        + " ("
-                        + str(int((shares[0]
-                                   / (shares[0] + shares[1]) * 100)))
-                        + "%)"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " ∙ "
-                        + str("%01.3f" % float(computetime))
-                        + "s"
-                        + Style.NORMAL
-                        + " ∙ "
-                        + Fore.BLUE
-                        + Style.BRIGHT
-                        + str(round(hashrate))
-                        + " H/s"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " @ diff "
-                        + str(diff)
-                        + " ∙ "
-                        + Fore.CYAN
-                        + "ping "
-                        + str("%02.0f" % int(ping))
-                        + "ms")
+                    with thread_lock:
+                        print(
+                            Style.RESET_ALL
+                            + Fore.WHITE
+                            + now().strftime(Style.DIM + "%H:%M:%S ")
+                            + Style.BRIGHT
+                            + Back.MAGENTA
+                            + Fore.RESET
+                            + " usb"
+                            + str(''.join(filter(str.isdigit, com)))
+                            + " "
+                            + Back.RESET
+                            + Fore.GREEN
+                            + " ✓"
+                            + getString("accepted")
+                            + Fore.RESET
+                            + str(int(shares[0]))
+                            + "/"
+                            + str(int(shares[0] + shares[1]))
+                            + Fore.YELLOW
+                            + " ("
+                            + str(int((shares[0]
+                                       / (shares[0] + shares[1]) * 100)))
+                            + "%)"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " ∙ "
+                            + str("%01.3f" % float(computetime))
+                            + "s"
+                            + Style.NORMAL
+                            + " ∙ "
+                            + Fore.BLUE
+                            + Style.BRIGHT
+                            + str(round(hashrate))
+                            + " H/s"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " @ diff "
+                            + str(diff)
+                            + " ∙ "
+                            + Fore.CYAN
+                            + "ping "
+                            + str("%02.0f" % int(ping))
+                            + "ms")
 
                 elif feedback == "BLOCK":
                     # If block was found
                     shares[0] += 1
                     title(
                         getString("duco_avr_miner")
-                        + str(minerVersion)
+                        + str(MINER_VER)
                         + ") - "
                         + str(shares[0])
                         + "/"
                         + str(shares[0] + shares[1])
                         + getString("accepted_shares"))
-                    print(
-                        Style.RESET_ALL
-                        + Fore.WHITE
-                        + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.MAGENTA
-                        + Fore.RESET
-                        + " usb"
-                        + str(''.join(filter(str.isdigit, com)))
-                        + " "
-                        + Back.RESET
-                        + Fore.CYAN
-                        + " ✓"
-                        + getString("block_found")
-                        + Fore.RESET
-                        + str(int(shares[0]))
-                        + "/"
-                        + str(int(shares[0] + shares[1]))
-                        + Fore.YELLOW
-                        + " ("
-                        + str(int((shares[0]
-                                   / (shares[0] + shares[1]) * 100)))
-                        + "%)"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " ∙ "
-                        + str("%01.3f" % float(computetime))
-                        + "s"
-                        + Style.NORMAL
-                        + " ∙ "
-                        + Fore.BLUE
-                        + Style.BRIGHT
-                        + str(int(hashrate))
-                        + " H/s"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " @ diff "
-                        + str(diff)
-                        + " ∙ "
-                        + Fore.CYAN
-                        + "ping "
-                        + str("%02.0f" % int(ping))
-                        + "ms")
+                    with thread_lock:
+                        print(
+                            Style.RESET_ALL
+                            + Fore.WHITE
+                            + now().strftime(Style.DIM + "%H:%M:%S ")
+                            + Style.BRIGHT
+                            + Back.MAGENTA
+                            + Fore.RESET
+                            + " usb"
+                            + str(''.join(filter(str.isdigit, com)))
+                            + " "
+                            + Back.RESET
+                            + Fore.CYAN
+                            + " ✓"
+                            + getString("block_found")
+                            + Fore.RESET
+                            + str(int(shares[0]))
+                            + "/"
+                            + str(int(shares[0] + shares[1]))
+                            + Fore.YELLOW
+                            + " ("
+                            + str(int((shares[0]
+                                       / (shares[0] + shares[1]) * 100)))
+                            + "%)"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " ∙ "
+                            + str("%01.3f" % float(computetime))
+                            + "s"
+                            + Style.NORMAL
+                            + " ∙ "
+                            + Fore.BLUE
+                            + Style.BRIGHT
+                            + str(int(hashrate))
+                            + " H/s"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " @ diff "
+                            + str(diff)
+                            + " ∙ "
+                            + Fore.CYAN
+                            + "ping "
+                            + str("%02.0f" % int(ping))
+                            + "ms")
 
                 else:
                     # If result was incorrect
                     shares[1] += 1
                     title(
                         getString("duco_avr_miner")
-                        + str(minerVersion)
+                        + str(MINER_VER)
                         + ") - "
                         + str(shares[0])
                         + "/"
                         + str(shares[0] + shares[1])
                         + getString("accepted_shares"))
-                    print(
-                        Style.RESET_ALL
-                        + Fore.WHITE
-                        + now().strftime(Style.DIM + "%H:%M:%S ")
-                        + Style.BRIGHT
-                        + Back.MAGENTA
-                        + Fore.RESET
-                        + " usb"
-                        + str(''.join(filter(str.isdigit, com)))
-                        + " "
-                        + Back.RESET
-                        + Fore.RED
-                        + " ✗"
-                        + getString("rejected")
-                        + Fore.RESET
-                        + str(int(shares[0]))
-                        + "/"
-                        + str(int(shares[0] + shares[1]))
-                        + Fore.YELLOW
-                        + " ("
-                        + str(int((shares[0]
-                                   / (shares[0] + shares[1]) * 100)))
-                        + "%)"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " ∙ "
-                        + str("%01.3f" % float(computetime))
-                        + "s"
-                        + Style.NORMAL
-                        + " ∙ "
-                        + Fore.BLUE
-                        + Style.BRIGHT
-                        + str(int(hashrate))
-                        + " H/s"
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + " @ diff "
-                        + str(diff)
-                        + " ∙ "
-                        + Fore.CYAN
-                        + "ping "
-                        + str("%02.0f" % int(ping))
-                        + "ms")
+                    with thread_lock:
+                        print(
+                            Style.RESET_ALL
+                            + Fore.WHITE
+                            + now().strftime(Style.DIM + "%H:%M:%S ")
+                            + Style.BRIGHT
+                            + Back.MAGENTA
+                            + Fore.RESET
+                            + " usb"
+                            + str(''.join(filter(str.isdigit, com)))
+                            + " "
+                            + Back.RESET
+                            + Fore.RED
+                            + " ✗"
+                            + getString("rejected")
+                            + Fore.RESET
+                            + str(int(shares[0]))
+                            + "/"
+                            + str(int(shares[0] + shares[1]))
+                            + Fore.YELLOW
+                            + " ("
+                            + str(int((shares[0]
+                                       / (shares[0] + shares[1]) * 100)))
+                            + "%)"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " ∙ "
+                            + str("%01.3f" % float(computetime))
+                            + "s"
+                            + Style.NORMAL
+                            + " ∙ "
+                            + Fore.BLUE
+                            + Style.BRIGHT
+                            + str(int(hashrate))
+                            + " H/s"
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + " @ diff "
+                            + str(diff)
+                            + " ∙ "
+                            + Fore.CYAN
+                            + "ping "
+                            + str("%02.0f" % int(ping))
+                            + "ms")
                 break
-
 
 
 if __name__ == "__main__":
     # Colorama
     init(autoreset=True)
     # Window title
-    title(getString("duco_avr_miner") + str(minerVersion) + ")")
+    title(getString("duco_avr_miner") + str(MINER_VER) + ")")
 
     try:
         # Load config file or create new one
@@ -1179,7 +1200,7 @@ if __name__ == "__main__":
         prettyPrint(
             "sys0",
             getString("load_config_error")
-            + resourcesFolder
+            + RESOURCES_DIR
             + getString("load_config_error_warning")
             + Style.NORMAL
             + Fore.RESET

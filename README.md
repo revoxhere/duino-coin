@@ -5,41 +5,39 @@
 
 <p align = "center">
   <a href="https://duinocoin.com">
-    <img width="80%" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" />
+    <img width="300em" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" />
   </a>
   <br />
   <a href="https://github.com/revoxhere/duino-coin/blob/master/README.md">
-    <img src="https://img.shields.io/badge/English-fb6404.svg?style=for-the-badge" />
+    <img src="https://img.shields.io/badge/English-0097e6.svg?style=for-the-badge" />
+  </a>
+  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_es_LATAM.md">
+    <img src="https://img.shields.io/badge/-Espa%C3%B1ol-ff793f?style=for-the-badge" />
   </a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_zh_CN.md">
-    <img src="https://img.shields.io/badge/简体中文-fb6404.svg?style=for-the-badge" />
+    <img src="https://img.shields.io/badge/简体中文-2ed573.svg?style=for-the-badge" />
   </a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_pl_PL.md">
-    <img src="https://img.shields.io/badge/Polski-fb6404.svg?style=for-the-badge" />
+    <img src="https://img.shields.io/badge/Polski-e66767.svg?style=for-the-badge" />
   </a>
-</p>
-<br />
-<p align = "center">
+  <br />
   <a href="https://wallet.duinocoin.com">
-    <img src="https://img.shields.io/badge/Online Wallet-555555.svg?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/badge/Online Wallet-8e44ad.svg?style=for-the-badge&logo=Web" /></a>
   <a href="https://play.google.com/store/apps/details?id=com.pripun.duinocoin">
-    <img src="https://img.shields.io/badge/Android App-555555.svg?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/badge/Android App-e84393.svg?style=for-the-badge&logo=Android" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
-    <img src="https://img.shields.io/badge/whitepaper-555555.svg?style=for-the-badge&logo=Academia" /></a>
-  <a href="https://app.codacy.com/manual/revoxhere/duino-coin?utm_source=github.com&utm_medium=referral&utm_content=revoxhere/duino-coin">
+    <img src="https://img.shields.io/badge/whitepaper-1abc9c.svg?style=for-the-badge&logo=Academia" /></a>
+  <br>
   <a href="https://youtu.be/bFnCdqMke34">
-    <img src="https://img.shields.io/badge/YouTube_Video-Watch-fb6404.svg?style=for-the-badge&logo=Youtube" /></a>
-    <br>
+    <img src="https://img.shields.io/badge/Video-Watch-e74c3c.svg?style=for-the-badge&logo=Youtube" /></a>
   <a href="https://discord.gg/kvBkccy">
-    <img src="https://img.shields.io/discord/677615191793467402.svg?color=ffa502&label=Discord&logo=Discord&style=for-the-badge" /></a>
-    <img src="https://img.shields.io/codacy/grade/a995acf7cd4c4211af6da874fe549ee5?color=f68e09&style=for-the-badge" /></a>
-  <a href="https://opensource.org/licenses/MIT">
-    <img src="https://img.shields.io/badge/License-MIT-f97606.svg?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/releases/tag/2.4">
-    <img src="https://img.shields.io/badge/release-2.4-fb6404.svg?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/discord/677615191793467402.svg?color=5539cc&label=Discord&logo=Discord&style=for-the-badge" /></a>
+  <a href="https://github.com/revoxhere/duino-coin/releases/tag/2.4.5">
+    <img src="https://img.shields.io/badge/release-2.4.5-ff4112.svg?style=for-the-badge" /></a>
 </p>
 
-<h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards, even Wifi routers and many more.</h2><br />
+<h3 align="center">Duino-Coin is a coin that can be mined with Arduinos, ESP boards, Raspberry Pis, computers, and many more</h3>
+<h4 align="center">including Wi-Fi routers, smart TVs, smartphones, smartwatches, SBCs, MCUs, GPUs - you name it!</h4><br />
 
 <table align="center">
   <tr>
@@ -72,11 +70,12 @@
 
 <h2 align="center">Get started</h2><br>
 
-| Official Wallet | Official Miners |
-:----------------:|:----------------:
-[<img src="https://i.imgur.com/OEh0JxK.png">](https://duinocoin.com/getting-started#register)  |  [<img src="https://i.imgur.com/QNWkoee.png">](https://duinocoin.com/getting-started#pc)
+Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a>.<br>
+Frequently asked questions and answers, troubleshooting help can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
 
-#### Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a>.
+| Official Wallets | Official Miners |
+:-----------------:|:----------------:
+[<img src="https://i.imgur.com/msVtLHs.png">](https://duinocoin.com/getting-started#register)  |  [<img src="https://i.imgur.com/SMkKHOK.png">](https://duinocoin.com/getting-started#computer)
 
 <h3 align="center">Installing Duino-Coin</h2><br>
 
@@ -97,7 +96,7 @@ If you are on Windows, download [Python 3](https://www.python.org/downloads/), t
 ```BASH
 py -m pip install -r requirements.txt
 ```
-Note: Make sure python and pip are added to your PATH
+Note for Windows users: Make sure python and pip are added to your PATH
 
 After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py` OR `py PC_Miner.py`).
 
@@ -115,6 +114,7 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
+*   [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - Python script to mine Duino-Coin on routers by BastelPichi
 *   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - mine with less connections on multiple devices by DoctorEenot
 *   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - MicroPython miner or ESP boards by fabiopolancoe
 *   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Python miner for Nintendo 3DS by PhereloHD & HGEpro
@@ -131,6 +131,8 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 <!--*   [Multithreaded Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Multithreaded_PC_Miner.py) by Bilaboz (DEPRECATED) -->
 
 **Other tools:**
+<!--*   [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) and troubleshooting helper by Lulaschkas (NOT READY YET) -->
+*   [duco-miners](https://github.com/dansinclair25/duco-miners) CLI mining dashboard made by dansinclair25
 *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
 *   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) for Chrome and derivatives by LDarki
 *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) account statistics website by siunus
@@ -142,36 +144,7 @@ This list will be actively updated. If you want to add software to this list, su
 
 <h3 align="center">wDUCO tutorial</h3><br>
 
-wDUCO is DUCO wrapped on the Tron network. Currently there aren't many uses for it, other than just storing funds in external wallet or exchanging wDUCO to another token on JustSwap. Before doing anything, make sure you have `tronpy` (tron lib) and `cryptography` (for encrypting private key) modules for python3 installed.
-
-### Configuring wDUCO Wrapper
-
-1. Open your DUCO GUI (desktop) or CLI (console) Wallet
-2. If you're using the GUI Wallet:
-    1. Open the settings tab
-    2. Click the **Configure Wrapper** button
-3. If you're using the CLI Wallet:
-    1. Start wrapper configuration tool by typing `wrapperconf`
-4. Input your private key (for example your tronlink key) and set a passphrase used for encrypting it
-
-### Configuring wDUCO Wrapper in the CLI Wallet
-
-### Wrapping DUCO
-
-After setting up the wrapper in one of the two wallets, you can wrap DUCOs (convert them to wDUCO).
-
-1. Open your Wallet
-2. Type `wrap` to start the wrapping process OR click **Wrap DUCO** button
-3. Follow the instructions displayed by the wallet
-
-### Unwrapping DUCO
-
-After setting up the wrapper in one of the two wallets, you can unwrap wDUCOs (convert them to DUCO).
-**Note: make sure you have some TRX in your wallet for the fees!** Unwraping will use ~5 TRX (~0.5 USD) as fees.
-
-1. Open your Wallet
-2. Type `unwrap` to start the unwrapping process OR click **Unwrap DUCO** button
-3. Follow the instructions displayed by the wallet
+Duino-Coin is a hybrid currency, meaning that it can be converted to wDUCO which is DUCO wrapped on the [Tron](https://tron.network) network (as a token). Currently there aren't many uses for it, other than just storing funds in external wallet or exchanging wDUCO to another token on JustSwap. Tutorial on using wDUCO is available in the [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
 
 <h2 align="center">Development</h2><br>
 
@@ -188,13 +161,16 @@ How to help?
 
 Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch.
 
-<h2 align="center">Some of the officially tested devices</h2><br>
+<h2 align="center">Some of the officially tested devices (DUCO-S1)</h2><br>
 
-*   Arduino Pro Mini / Uno / Nano (ATmega328p @ 16 MHz 5V): ~155 H/s (15-20 DUCO/day)
-*   NodeMCU (ESP8266 @ 160 MHz): ~9.3 kH/s (~4.5 kH/s at 80 MHz clock) (8-12 DUCO/day)
+*   Arduino Pro Mini / Uno / Nano (ATmega328p at 16 MHz clock and 5V): ~155 H/s (15-20 DUCO/day)
+*   NodeMCU (ESP8266 at 160 MHz clock): ~9.3 kH/s (~4.5 kH/s at 80 MHz clock) (8-12 DUCO/day)
 *   ESP32 (dual-threaded): ~13 kH/s (6 kH/s (core1) and 7 kH/s (core2)) (WIP)
-
-Hashrate Calculators for AVR/ESP8266 platforms are available in the [Useful tools branch](https://github.com/revoxhere/duino-coin/tree/useful-tools).
+*   Raspberry Pi Zero: ~17 kH/s
+*   Raspberry Pi 3 (4 threads): ~440 kH/s
+*   Raspberry Pi 4 (4 threads): ~1.3 MH/s
+*   Intel Core i5-3230M (4 threads): ~1.4 MH/s
+*   Intel Core i5-7200U (4 threads): ~1.6 MH/s
 
 <h2 align="center">License</h2><br>
 
