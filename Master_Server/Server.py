@@ -450,6 +450,7 @@ def database_updater():
         try:
             dest = sqlconn('crypto_database.db')
             memory_db.backup(dest)
+            dest.commit()
 
             # TODO: maybe also make the thing like above for the blockchain
             with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
@@ -529,6 +530,7 @@ def input_management():
             if confirm == "Y" or confirm == "y" or confirm == "":
                 dest = sqlconn('crypto_database.db')
                 memory_db.backup(dest)
+                dest.commit()
                 os._exit(0)
             else:
                 admin_print("Canceled")
@@ -541,6 +543,7 @@ def input_management():
                 os.system('clear')
                 dest = sqlconn('crypto_database.db')
                 memory_db.backup(dest)
+                dest.commit()
                 os.execl(sys.executable, sys.executable, *sys.argv)
             else:
                 admin_print("Canceled")
