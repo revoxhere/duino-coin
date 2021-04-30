@@ -36,7 +36,8 @@
     <img src="https://img.shields.io/badge/release-2.4.5-ff4112.svg?style=for-the-badge" /></a>
 </p>
 
-<h2 align="center">Duino-Coin is a coin that can be mined with Computers, Raspberry Pis, Arduinos, ESP boards, even Wifi routers and many more.</h2><br />
+<h3 align="center">Duino-Coin is a coin that can be mined with Arduinos, ESP boards, Raspberry Pis, computers, and many more...</h3>
+<h4 align="center">...including Wi-Fi routers, smart TVs, smartphones, smartwatches, SBCs, MCUs, GPUs - you name it!</h4><br />
 
 <table align="center">
   <tr>
@@ -69,11 +70,12 @@
 
 <h2 align="center">Get started</h2><br>
 
+Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a>.<br>
+Frequently asked questions and answers, troubleshooting help can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
+
 | Official Wallets | Official Miners |
 :-----------------:|:----------------:
 [<img src="https://i.imgur.com/msVtLHs.png">](https://duinocoin.com/getting-started#register)  |  [<img src="https://i.imgur.com/SMkKHOK.png">](https://duinocoin.com/getting-started#computer)
-
-#### Official getting started guides for creating an account and setting up miners on variety of devices are available <a href="https://revoxhere.github.io/duino-coin/getting-started">on the official website</a>.
 
 <h3 align="center">Installing Duino-Coin</h2><br>
 
@@ -139,10 +141,6 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 <!--*   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz (DEPRECATED) -->
 
 This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
-
-<h2 align="center">FAQ</h2><br>
-
-Frequently asked questions and answers are available in the [Wiki section](https://github.com/revoxhere/duino-coin/wiki/FAQ) of the duino-coin repository.
 
 <h3 align="center">wDUCO tutorial</h3><br>
 
