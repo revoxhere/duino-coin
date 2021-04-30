@@ -132,16 +132,23 @@ If you want to easily access the Duino-Coin API with your Python3 apps, [@connor
 
 We suggest using these colors in creating DUCO-Related apps:
 
-Branding colors:
+### Branding colors
 
-* White accent: `#0f0f0f`
-* Orange accent: `#ff4112`
-* Sun yellow accent: `#ffb412`
-* Magenta accent: `#f31291`
-* Dark accent: `#121212`
+* White accent: `#fafafa` ![#fafafa](https://via.placeholder.com/15/fafafa/000000?text=+)
+* Orange accent: `#ff4112` ![#ff4112](https://via.placeholder.com/15/ff4112/000000?text=+)
+* Sun yellow accent: `#ffb412` ![#ffb412](https://via.placeholder.com/15/ffb412/000000?text=+)
+* Magenta accent: `#f31291` ![#f31291](https://via.placeholder.com/15/f31291/000000?text=+)
+* Dark accent: `#121212` ![#121212](https://via.placeholder.com/15/121212/000000?text=+)
 
 Gradient variations of the colors above are a welcome touch.
 
-GUI colors:
-* Background: `#121212` (Dark) or `#fffdee` (Light)
-* Font color: `#fffdee` (Dark) or `#0f0f0f` (Light)
+#### GUI colors
+* Background: `#121212` (Dark) ![#121212](https://via.placeholder.com/15/121212/000000?text=+) or `#fffdee` (Light) ![#fffdee](https://via.placeholder.com/15/fffdee/000000?text=+)
+* Font color: `#fffdee` (Dark) ![#fffdee](https://via.placeholder.com/15/fffdee/000000?text=+) or `#0f0f0f` (Light) ![#0f0f0f](https://via.placeholder.com/15/0f0f0f/000000?text=+)
+
+### Icons
+
+<img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco-alt.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/WebMiner.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/PCMiner.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/AVRMiner.png" width="128px">
+<img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png" width="512px">
+
+More resources available in the [Resources folder](https://github.com/revoxhere/duino-coin/tree/master/Resources)
