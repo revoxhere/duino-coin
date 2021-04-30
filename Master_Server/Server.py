@@ -448,9 +448,8 @@ def database_updater():
     """ Save in-memory databse to .db files """
     while True:
         try:
-            source = sqlconn(':memory:')
-            dest = sqlconn('existing_db.db')
-            source.backup(dest)
+            dest = sqlconn('crypto_database.db')
+            memory_db.backup(dest)
 
             # TODO: maybe also make the thing like above for the blockchain
             with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
@@ -528,6 +527,8 @@ def input_management():
             admin_print("Are you sure you want to exit DUCO server?")
             confirm = input("  Y/n")
             if confirm == "Y" or confirm == "y" or confirm == "":
+                dest = sqlconn('crypto_database.db')
+                memory_db.backup(dest)
                 os._exit(0)
             else:
                 admin_print("Canceled")
@@ -538,6 +539,8 @@ def input_management():
             if confirm == "Y" or confirm == "y" or confirm == "":
                 os.system("sudo iptables -F INPUT")
                 os.system('clear')
+                dest = sqlconn('crypto_database.db')
+                memory_db.backup(dest)
                 os.execl(sys.executable, sys.executable, *sys.argv)
             else:
                 admin_print("Canceled")
