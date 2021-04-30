@@ -6,6 +6,7 @@ import socket
 import sys  # Only python3 included libraries
 import time
 import urllib.request
+import ssl
 
 soc = socket.socket()
 soc.settimeout(10)
@@ -19,6 +20,9 @@ def retrieve_server_ip():
     pool_obtained = False
     while not pool_obtained:
         try:
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
             serverip = ("https://raw.githubusercontent.com/"
                             + "revoxhere/"
                             + "duino-coin/gh-pages/"
