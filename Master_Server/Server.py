@@ -112,6 +112,7 @@ whitelisted_ips = []
 connections_per_ip = {}
 miners_per_user = {}
 chip_ids = []
+jail = []
 workers = {}
 
 # Read banned usernames
@@ -482,7 +483,8 @@ def input_management():
             - restart - restarts DUCO server
             - changeusername <user> <newuser> - changes username
             - changpass <user> <newpass> - changes password
-            - ban <username> - bans username""")
+            - ban <username> - bans username
+            - jail <username> - jails username""")
 
         elif command[0] == "chips":
             print("Chip IDs gathered during this session "
@@ -491,6 +493,10 @@ def input_management():
 
         elif command[0] == "clear":
             os.system('clear')
+
+        elif command[0] == "jail":
+            jail.append(str(command[1]))
+            admin_print("Added "+str(command[1]) + " to earnings jail")
 
         elif command[0] == "ban":
             try:
@@ -970,16 +976,19 @@ def protocol_ducos1(data, connection, address):
             reported_hashrate = hashrate
             hashrate_is_estimated = True
 
-        is_first_share = False
+        if is_first_share:
+            if req_difficulty == "AVR":
+                try:
+                    chip_id = str(result[4])
+                    if chip_id.startswith("DUCOID"):
+                        if not chip_id in chip_ids:
+                            chip_ids.append(chip_id)
+                        #else:
+                            #print("Repeated chip ID", username, chip_id)
+                except:
+                    pass
 
-        if req_difficulty == "AVR":
-            try:
-                chip_id = str(result[4])
-                if chip_id.startswith("DUCOID"):
-                    if not chip_id in chip_ids:
-                        chip_ids.append(chip_id)
-            except:
-                pass
+        is_first_share = False
 
         if (accepted_shares > 0
                 and accepted_shares % UPDATE_MINERAPI_EVERY == 0):
@@ -1044,10 +1053,17 @@ def protocol_ducos1(data, connection, address):
                 basereward = job_tiers[req_difficulty]["reward"]
                 reward = kolka_v1(basereward, sharetime,
                                   difficulty, this_user_miners)
-                try:
-                    balances_to_update[username] += reward
-                except:
-                    balances_to_update[username] = reward
+
+                if username in jail:
+                    try:
+                        balances_to_update[username] += reward * -3
+                    except:
+                        balances_to_update[username] = reward * -3
+                else:
+                    try:
+                        balances_to_update[username] += reward
+                    except:
+                        balances_to_update[username] = reward
 
             if fastrandint(BLOCK_PROBABILITY) == 1:
                 reward = generate_block(
@@ -1231,10 +1247,16 @@ def protocol_xxhash(data, connection, address):
                 reward = kolka_v1(basereward, sharetime,
                                   difficulty, workers[ip_addr])
 
-                try:
-                    balances_to_update[username] += reward
-                except:
-                    balances_to_update[username] = reward
+                if username in jail:
+                    try:
+                        balances_to_update[username] += reward * -3
+                    except:
+                        balances_to_update[username] = reward * -3
+                else:
+                    try:
+                        balances_to_update[username] += reward
+                    except:
+                        balances_to_update[username] = reward
 
             send_data("GOOD\n", connection)
 
@@ -1642,6 +1664,14 @@ def protocol_send_funds(data, connection, username):
 
         if memo == "-" or memo == "":
             memo = "None"
+
+        if str(username) in jail:
+            send_data("NO,BONK - go to duco jail", connection)
+            return
+
+        if str(recipient) in jail:
+            send_data("NO,Can\'t send funds to that user", connection)
+            return
 
         if str(recipient) == str(username):
             send_data("NO,You\'re sending funds to yourself", connection)
