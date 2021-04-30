@@ -146,38 +146,13 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 
 This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
 
+<h2 align="center">FAQ</h2><br>
+
+Frequently asked questions and answers are available in the [Wiki section](https://github.com/revoxhere/duino-coin/wiki/FAQ) of the duino-coin repository.
+
 <h3 align="center">wDUCO tutorial</h3><br>
 
-wDUCO is DUCO wrapped on the Tron network. Currently there aren't many uses for it, other than just storing funds in external wallet or exchanging wDUCO to another token on JustSwap. Before doing anything, make sure you have `tronpy` (tron lib) and `cryptography` (for encrypting private key) modules for python3 installed.
-
-### Configuring wDUCO Wrapper
-
-1. Open your DUCO GUI (desktop) or CLI (console) Wallet
-2. If you're using the GUI Wallet:
-    1. Open the settings tab
-    2. Click the **Configure Wrapper** button
-3. If you're using the CLI Wallet:
-    1. Start wrapper configuration tool by typing `wrapperconf`
-4. Input your private key (for example your tronlink key) and set a passphrase used for encrypting it
-
-### Configuring wDUCO Wrapper in the CLI Wallet
-
-### Wrapping DUCO
-
-After setting up the wrapper in one of the two wallets, you can wrap DUCOs (convert them to wDUCO).
-
-1. Open your Wallet
-2. Type `wrap` to start the wrapping process OR click **Wrap DUCO** button
-3. Follow the instructions displayed by the wallet
-
-### Unwrapping DUCO
-
-After setting up the wrapper in one of the two wallets, you can unwrap wDUCOs (convert them to DUCO).
-**Note: make sure you have some TRX in your wallet for the fees!** Unwraping will use ~5 TRX (~0.5 USD) as fees.
-
-1. Open your Wallet
-2. Type `unwrap` to start the unwrapping process OR click **Unwrap DUCO** button
-3. Follow the instructions displayed by the wallet
+Duino-Coin is a hybrid currency, meaning that it can be converted to wDUCO which is DUCO wrapped on the [Tron](https://tron.network) network (as a token). Currently there aren't many uses for it, other than just storing funds in external wallet or exchanging wDUCO to another token on JustSwap. Tutorial on using wDUCO is available in the [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
 
 <h2 align="center">Development</h2><br>
 
