@@ -5,7 +5,7 @@
 
 <p align = "center">
   <a href="https://duinocoin.com">
-    <img width="80%" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" />
+    <img width="300em" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" />
   </a>
   <br />
   <a href="https://github.com/revoxhere/duino-coin/blob/master/README.md">
@@ -36,8 +36,8 @@
     <img src="https://img.shields.io/badge/release-2.4.5-ff4112.svg?style=for-the-badge" /></a>
 </p>
 
-<h3 align="center">Duino-Coin is a coin that can be mined with Arduinos, ESP boards, Raspberry Pis, computers, and many more...</h3>
-<h4 align="center">...including Wi-Fi routers, smart TVs, smartphones, smartwatches, SBCs, MCUs, GPUs - you name it!</h4><br />
+<h3 align="center">Duino-Coin is a coin that can be mined with Arduinos, ESP boards, Raspberry Pis, computers, and many more</h3>
+<h4 align="center">including Wi-Fi routers, smart TVs, smartphones, smartwatches, SBCs, MCUs, GPUs - you name it!</h4><br />
 
 <table align="center">
   <tr>
