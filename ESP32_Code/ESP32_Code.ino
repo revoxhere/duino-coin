@@ -116,7 +116,7 @@ void Task1code( void * pvParameters ) {
       job1.toUpperCase();
       const char * c = job1.c_str();
       
-      len = strlen(c);
+      len = job1.length();
       final_len = len / 2;
       memset(job11, 0, sizeofjob11);
       for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
@@ -262,7 +262,7 @@ void Task2code( void * pvParameters ) {
       job.toUpperCase();
       const char * c = job.c_str();
       
-      len = strlen(c);
+      len = job.length();
       final_len = len / 2;
       memset(job1, 0, sizeofjob1);
       for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
