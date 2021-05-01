@@ -25,12 +25,12 @@ const char* ducouser = "Your Duino-Coin username";  // Change this to your Duino
 const char* rigname  = "ESP32";                     // Change this if you want to display a custom rig name in the Wallet
 #define LED_BUILTIN     2                           // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
 
-#include "mbedtls/md.h" // Include software hashing library
 #include "hwcrypto/sha.h" // Include hardware accelerated hashing library
 #include <WiFi.h>
 
 TaskHandle_t Task1;
 TaskHandle_t Task2;
+SemaphoreHandle_t xMutex;
 
 const char * host = "51.15.127.80"; // Static server IP
 const int port = 2811;
@@ -56,6 +56,7 @@ void Task1code( void * pvParameters ) {
 
   while (client1.connected()) {
     Serial.println("CORE1 Asking for a new job for user: " + String(ducouser));
+    client1.flush();
     client1.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
     while(!client1.available()){
       if (!client1.connected())
@@ -77,6 +78,7 @@ void Task1code( void * pvParameters ) {
     String       hash1 = client1.readStringUntil(','); // Read data to the first peroid - last block hash
     String        job1 = client1.readStringUntil(','); // Read data to the next peroid - expected hash
     unsigned int diff1 = client1.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
+    client1.flush();
     job1.toUpperCase();
     const char * c = job1.c_str();
 
@@ -92,12 +94,12 @@ void Task1code( void * pvParameters ) {
     unsigned long StartTime1 = micros(); // Start time measurement
 
     for (unsigned long iJob1 = 0; iJob1 < diff1; iJob1++) { // Difficulty loop
-      yield(); // uncomment if ESP watchdog triggers
-      String hash11 = String(hash1) + String(iJob1);
-      const unsigned char* payload1 = (const unsigned char*) hash11.c_str();
+      String hash11 = hash1 + String(iJob1);
       unsigned int payloadLenght1 = hash11.length();
 
-      esp_sha(SHA1, payload1, payloadLenght1, shaResult1);
+      while( xSemaphoreTake( xMutex, portMAX_DELAY ) != pdTRUE );
+      esp_sha(SHA1, (const unsigned char*)hash11.c_str(), payloadLenght1, shaResult1);
+      xSemaphoreGive( xMutex );
 
       if (memcmp(shaResult1, job11, sizeof(shaResult1)) == 0) { // If result is found
         unsigned long EndTime1 = micros(); // End time measurement
@@ -113,6 +115,7 @@ void Task1code( void * pvParameters ) {
           }
           Serial.println("CORE1 Reconnection successful.");
         }
+        client1.flush();
         client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.3," + String(rigname)); // Send result to server
         Serial.println("CORE1 Posting result and waiting for feedback.");
         while(!client1.available()){
@@ -126,10 +129,12 @@ void Task1code( void * pvParameters ) {
         delay(100);
         yield();
         String feedback1 = client1.readStringUntil('\n'); // Receive feedback
+        client1.flush();
         Shares1++;
         Serial.println("CORE1 " + String(feedback1) + " share #" + String(Shares1) + " (" + String(iJob1) + ")" + " Hashrate: " + String(HashRate1));
         if (HashRate1 < 4000) {
           Serial.println("CORE1 Low hashrate. Restarting");
+          client1.flush();
           client1.stop();
           esp_restart();
         }
@@ -138,6 +143,7 @@ void Task1code( void * pvParameters ) {
     }
   }
   Serial.println("CORE1 Not connected. Restarting core 1");
+  client1.flush();
   client1.stop();
   xTaskCreatePinnedToCore(Task1code, "Task1", 10000, NULL, 1, &Task1, 0);
   vTaskDelete( NULL );
@@ -164,6 +170,7 @@ void Task2code( void * pvParameters ) {
 
   while (client.connected()) {
     Serial.println("CORE2 Asking for a new job for user: " + String(ducouser));
+    client.flush();
     client.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
     while(!client.available()){
       if (!client.connected())
@@ -185,6 +192,7 @@ void Task2code( void * pvParameters ) {
     String       hash = client.readStringUntil(','); // Read data to the first peroid - last block hash
     String        job = client.readStringUntil(','); // Read data to the next peroid - expected hash
     unsigned int diff = client.readStringUntil('\n').toInt() * 100 + 1; // Read and calculate remaining data - difficulty
+    client.flush();
     job.toUpperCase();
     const char * c = job.c_str();
 
@@ -200,19 +208,12 @@ void Task2code( void * pvParameters ) {
     unsigned long StartTime = micros(); // Start time measurement
 
     for (unsigned long iJob = 0; iJob < diff; iJob++) { // Difficulty loop
-      yield(); // uncomment if ESP watchdog triggers
-      String hash1 = String(hash) + String(iJob);
-      const unsigned char* payload = (const unsigned char*) hash1.c_str();
+      String hash1 = hash + String(iJob);
       unsigned int payloadLength = hash1.length();
 
-      mbedtls_md_context_t ctx;
-      mbedtls_md_type_t md_type = MBEDTLS_MD_SHA1;
-      mbedtls_md_init(&ctx);
-      mbedtls_md_setup(&ctx, mbedtls_md_info_from_type(md_type), 0);
-      mbedtls_md_starts(&ctx);
-      mbedtls_md_update(&ctx, (const unsigned char *) payload, payloadLength);
-      mbedtls_md_finish(&ctx, shaResult);
-      mbedtls_md_free(&ctx);
+      while( xSemaphoreTake( xMutex, portMAX_DELAY ) != pdTRUE );
+      esp_sha(SHA1, (const unsigned char*)hash1.c_str(), payloadLength, shaResult);
+      xSemaphoreGive( xMutex );
 
       if (memcmp(shaResult, job1, sizeof(shaResult)) == 0) { // If result is found
         unsigned long EndTime = micros(); // End time measurement
@@ -228,6 +229,7 @@ void Task2code( void * pvParameters ) {
           }
           Serial.println("CORE1 Reconnection successful.");
         }
+        client.flush();
         client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.3," + String(rigname)); // Send result to server
         Serial.println("CORE1 Posting result and waiting for feedback.");
         while(!client.available()){
@@ -241,10 +243,12 @@ void Task2code( void * pvParameters ) {
         delay(100);
         yield();
         String feedback = client.readStringUntil('\n'); // Receive feedback
+        client.flush();
         Shares++;
         Serial.println("CORE2 " + String(feedback) + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate));
         if (HashRate < 4000) {
           Serial.println("CORE2 Low hashrate. Restarting");
+          client.flush();
           client.stop();
           esp_restart();
         }
@@ -253,6 +257,7 @@ void Task2code( void * pvParameters ) {
     }
   }
   Serial.println("CORE2 Not connected. Restarting core 2");
+  client.flush();
   client.stop();
   xTaskCreatePinnedToCore(Task2code, "Task2", 10000, NULL, 2, &Task2, 1);
   vTaskDelete( NULL );
@@ -276,6 +281,7 @@ void setup() {
 
   pinMode(LED_BUILTIN,OUTPUT);
   
+  xMutex = xSemaphoreCreateMutex();
   xTaskCreatePinnedToCore(Task1code, "Task1", 10000, NULL, 1, &Task1, 0); //create a task with priority 1 and executed on core 0
   delay(250);
   xTaskCreatePinnedToCore(Task2code, "Task2", 10000, NULL, 2, &Task2, 1); //create a task with priority 2 and executed on core 1
