@@ -24,7 +24,9 @@ const char* password = "Your WiFi password";        // Change this to your WiFi 
 const char* ducouser = "Your Duino-Coin username";  // Change this to your Duino-Coin username
 const char* rigname  = "ESP32";                     // Change this if you want to display a custom rig name in the Wallet
 #define LED_BUILTIN     2                           // Change this if your board has built-in led on non-standard pin (NodeMCU - 16 or 2)
+#define WDT_TIMEOUT 50                              // Define watchdog timer seconds
 
+#include <esp_task_wdt.h>                           //Include WDT libary
 #include "hwcrypto/sha.h" // Include hardware accelerated hashing library
 #include <WiFi.h>
 
@@ -37,6 +39,7 @@ const int port = 2811;
 
 // Task1code
 void Task1code( void * pvParameters ) {
+  esp_task_wdt_add(NULL);
   WiFiClient client1;  
   unsigned long Shares1 = 0; // Share variable
   String SERVER_VER = "";
@@ -89,6 +92,7 @@ void Task1code( void * pvParameters ) {
     digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
     
     while (client1.connected()) {
+      esp_task_wdt_reset();
       Serial.println("CORE1 Asking for a new job for user: " + String(ducouser));
       client1.flush();
       client1.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
@@ -183,6 +187,7 @@ void Task1code( void * pvParameters ) {
 
 //Task2code
 void Task2code( void * pvParameters ) {
+  esp_task_wdt_add(NULL);
   WiFiClient client;
   unsigned long Shares = 0;
   String SERVER_VER = "";
@@ -235,6 +240,7 @@ void Task2code( void * pvParameters ) {
     digitalWrite(LED_BUILTIN, LOW);   // Turn on built-in led
     
     while (client.connected()) {
+      esp_task_wdt_reset();
       Serial.println("CORE2 Asking for a new job for user: " + String(ducouser));
       client.flush();
       client.print("JOB," + String(ducouser) + ",ESP32"); // Ask for new job
@@ -335,7 +341,7 @@ void setup() {
   Serial.print("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
   WiFi.begin(ssid, password); // Connect to wifi
-
+  esp_task_wdt_init(WDT_TIMEOUT, true); // Init Watchdog timer
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
