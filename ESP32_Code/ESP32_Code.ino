@@ -30,6 +30,7 @@ const char* rigname  = "ESP32";                     // Change this if you want t
 #include "hwcrypto/sha.h" // Include hardware accelerated hashing library
 #include <WiFi.h>
 
+TaskHandle_t WiFirec;
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 SemaphoreHandle_t xMutex;
@@ -37,9 +38,69 @@ SemaphoreHandle_t xMutex;
 const char * host = "51.15.127.80"; // Static server IP
 const int port = 2811;
 
+volatile int wifiStatus = 0;
+volatile int wifiPrev = WL_CONNECTED;
+
+void WiFireconnect( void * pvParameters ) {
+  //wifiStatus = WiFi.status();
+  //wifiPrev = wifiStatus;
+  delay(1000);
+  int n = 0;
+  esp_task_wdt_add(NULL);
+  for(;;) {
+    wifiStatus = WiFi.status();
+    if ((wifiStatus == WL_CONNECTED)&&(wifiPrev != WL_CONNECTED)) {
+      esp_task_wdt_reset();
+      Serial.println("\nConnected to WiFi!");
+      Serial.println("Local IP address: " + WiFi.localIP().toString());
+      Serial.println();
+    }
+    else if ((wifiStatus != WL_CONNECTED)&&(wifiPrev == WL_CONNECTED)) {
+      esp_task_wdt_reset();
+      Serial.println("\nWiFi disconnected!");
+      WiFi.disconnect();
+      Serial.println("Scanning for WiFi networks");
+      n = WiFi.scanNetworks();
+      Serial.println("Scan done");
+      if (n == 0) {
+          Serial.println("No networks found. Resetting ESP32.");
+          esp_restart();
+      } else {
+          Serial.print(n);
+          Serial.println(" networks found");
+          for (int i = 0; i < n; ++i) {
+              // Print SSID and RSSI for each network found
+              Serial.print(i + 1);
+              Serial.print(": ");
+              Serial.print(WiFi.SSID(i));
+              Serial.print(" (");
+              Serial.print(WiFi.RSSI(i));
+              Serial.print(")");
+              Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
+              delay(10);
+          }
+      }
+      esp_task_wdt_reset();
+      Serial.println();
+      Serial.println("Please, check if your WiFi network is on the list and check if it's strong enough (>-90dBm).");
+      Serial.println("ESP32 will reset itself after "+String(WDT_TIMEOUT)+" seconds if can't connect to the network");
+      Serial.print("Connecting to: " + String(ssid));
+      WiFi.reconnect();
+    }
+    else if ((wifiStatus == WL_CONNECTED)&&(wifiPrev == WL_CONNECTED)) {
+      esp_task_wdt_reset();
+      delay(1000);
+    }
+    if(wifiStatus != WL_CONNECTED) {
+        Serial.print(".");
+    }
+    wifiPrev = wifiStatus;
+    delay(500);
+  }
+}
+
 // Task1code
 void Task1code( void * pvParameters ) {
-  esp_task_wdt_add(NULL);
   WiFiClient client1;  
   unsigned long Shares1 = 0; // Share variable
   String SERVER_VER = "";
@@ -61,8 +122,12 @@ void Task1code( void * pvParameters ) {
   float ElapsedTimeSeconds1 = 0.0;
   float HashRate1 = 0.0;
   String feedback1 = "";
-  
-  TASK1LOOP: for(;;) {
+  esp_task_wdt_add(NULL);
+  for(;;) {
+    while(wifiStatus != WL_CONNECTED){
+      delay(1000);
+      esp_task_wdt_reset();
+    }
     Shares1 = 0; // Share variable
     Serial.println("\nCORE1 Connecting to Duino-Coin server...");
     // Use WiFiClient class to create TCP connection
@@ -187,7 +252,6 @@ void Task1code( void * pvParameters ) {
 
 //Task2code
 void Task2code( void * pvParameters ) {
-  esp_task_wdt_add(NULL);
   WiFiClient client;
   unsigned long Shares = 0;
   String SERVER_VER = "";
@@ -209,7 +273,12 @@ void Task2code( void * pvParameters ) {
   float ElapsedTimeSeconds = 0.0;
   float HashRate = 0.0;
   String feedback = "";
-  TASK2LOOP: for(;;) {
+  esp_task_wdt_add(NULL);
+  for(;;) {
+    while(wifiStatus != WL_CONNECTED){
+      delay(1000);
+      esp_task_wdt_reset();
+    }
     Shares = 0; // Share variable
     
     Serial.println("\nCORE2 Connecting to Duino-Coin server...");
@@ -334,24 +403,18 @@ void Task2code( void * pvParameters ) {
 }
 
 void setup() {
-  // disableCore0WDT();
-  // disableCore1WDT();
-  Serial.begin(115200); // Start serial connection
+  //disableCore0WDT();
+  //disableCore1WDT();
+  Serial.begin(500000); // Start serial connection
   Serial.println("\n\nDuino-Coin ESP32 Miner v2.3");
-  Serial.print("Connecting to: " + String(ssid));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
   WiFi.begin(ssid, password); // Connect to wifi
   esp_task_wdt_init(WDT_TIMEOUT, true); // Init Watchdog timer
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\nConnected to WiFi!");
-  Serial.println("Local IP address: " + WiFi.localIP().toString());
-
   pinMode(LED_BUILTIN,OUTPUT);
   
   xMutex = xSemaphoreCreateMutex();
+  xTaskCreatePinnedToCore(WiFireconnect, "WiFirec", 10000, NULL, 3, &WiFirec, 0); //create a task with priority 3 and executed on core 0
+  delay(250);
   xTaskCreatePinnedToCore(Task1code, "Task1", 10000, NULL, 1, &Task1, 0); //create a task with priority 1 and executed on core 0
   delay(250);
   xTaskCreatePinnedToCore(Task2code, "Task2", 10000, NULL, 2, &Task2, 1); //create a task with priority 2 and executed on core 1
