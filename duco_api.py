@@ -269,8 +269,13 @@ class Miner:
         self.should_stop = False
         self.last_job = {}
         self.miner_q = queue.Queue()
+        self.pool_address = None
+        self.pool_port = None
 
     def start(self):
+        if not self.pool_address or not self.pool_port:
+            self._get_server_address()
+
         for _ in range(self.num_workers):
             x = threading.Thread(target=self.worker)
             x.start()
@@ -281,20 +286,82 @@ class Miner:
     def get_q(self):
         return self.miner_q.get()
 
-    def worker(self): # Mining section\
-        soc = socket.socket()
-        
+    def _get_server_address(self):
         try:
             serverinfo = requests.get(Endpoints.server).text.splitlines()
         except Exception as e:
             print(f'Cannot get server details: {e}')
 
-        pool_address = serverinfo[0]
-        pool_port = int(serverinfo[1])
+        self.pool_address = serverinfo[0]
+        self.pool_port = int(serverinfo[1])
 
+    def connect_to_server(self, soc):
         # This section connects and logs user to the server
-        soc.connect((str(pool_address), int(pool_port)))
-        server_version = soc.recv(3).decode()  # Get server version
+        soc.connect((str(self.pool_address), int(self.pool_port)))
+        return soc.recv(3).decode()  # Get server version
+
+    def request_job(self, soc):
+        soc.sendall(bytes(
+            'JOB,'
+            + str(self.username)
+            +','
+            + self.diff,
+            encoding='utf8'))
+
+            # Receive work
+        return soc.recv(1024).decode().rstrip('\n')
+
+    def send_result(self, soc, result, hashrate):
+        soc.send(bytes(
+            str(result)
+            + ','
+            + str(hashrate)
+            + ',Minimal_PC_Miner',
+            encoding='utf8'))
+
+        # Get feedback about the result
+        return soc.recv(1024).decode().rstrip('\n')
+
+    def hash(self, h, res):
+        return hashlib.sha1(
+            str(
+                h
+                + str(res)
+            ).encode('utf-8')).hexdigest()
+
+    def hash_is_correct(self, exp, act):
+        return exp == act
+
+    def on_good_job(self, result, hashrate, difficulty):
+        self.miner_q.put({'Status': 'Accepted share',
+                        'Result': result,
+                        'Hashrate': int(hashrate/1000),
+                        'Difficulty': difficulty})
+        print('Accepted share',
+                result,
+                'Hashrate',
+                int(hashrate/1000),
+                'kH/s',
+                'Difficulty',
+                difficulty)
+
+    def on_bad_job(self, result, hashrate, difficulty):
+        self.miner_q.put({'Status': 'Rejected share',
+                        'Result': result,
+                        'Hashrate': int(hashrate/1000),
+                        'Difficulty': difficulty})
+        print('Rejected share',
+                result,
+                'Hashrate',
+                int(hashrate/1000),
+                'kH/s',
+                'Difficulty',
+                difficulty)
+
+    def worker(self): # Mining section\
+        soc = socket.socket()
+
+        server_version = self.connect_to_server(soc)
         print('Server is on version', server_version)
 
         while True:
@@ -303,83 +370,72 @@ class Miner:
                 print('Stopping Worker')
                 break
             
-            # Send job request
-            soc.sendall(bytes(
-                'JOB,'
-                + str(self.username)
-                +','
-                + self.diff,
-                encoding='utf8'))
-
             # Receive work
-            job = soc.recv(1024).decode().rstrip('\n')
-            # Split received data to job and difficulty
-            job = job.split(',')
+            job = self.request_job(soc).split(',')
+            
             difficulty = job[2]
 
             hashingStartTime = time.time()
             for result in range(100 * int(difficulty) + 1):
                 # Calculate hash with difficulty
-                ducos1 = hashlib.sha1(
-                    str(
-                        job[0]
-                        + str(result)
-                    ).encode('utf-8')).hexdigest()
+                hash_result = self.hash(job[0], result)
 
                 # If hash is even with expected hash result
-                if job[1] == ducos1:
+                if self.hash_is_correct(job[1], hash_result):
                     hashingStopTime = time.time()
                     timeDifference = hashingStopTime - hashingStartTime
                     hashrate = result / timeDifference
 
-                    # Send numeric result to the server
-                    soc.send(bytes(
-                        str(result)
-                        + ','
-                        + str(hashrate)
-                        + ',Minimal_PC_Miner',
-                        encoding='utf8'))
-
                     # Get feedback about the result
-                    feedback = soc.recv(1024).decode().rstrip('\n')
+                    feedback = self.send_result(soc, result, hashrate)
                     # If result was good
                     if feedback == 'GOOD':
-                        self.miner_q.put({'Status': 'Accepted share',
-                                        'Result': result,
-                                        'Hashrate': int(hashrate/1000),
-                                        'Difficulty': difficulty})
-                        print('Accepted share',
-                              result,
-                              'Hashrate',
-                              int(hashrate/1000),
-                              'kH/s',
-                              'Difficulty',
-                              difficulty)
+                        self.on_good_job(result, hashrate, difficulty)
                         break
                     # If result was incorrect
                     elif feedback == 'BAD':
-                        self.miner_q.put({'Status': 'Rejected share',
-                                        'Result': result,
-                                        'Hashrate': int(hashrate/1000),
-                                        'Difficulty': difficulty})
-                        print('Rejected share',
-                              result,
-                              'Hashrate',
-                              int(hashrate/1000),
-                              'kH/s',
-                              'Difficulty',
-                              difficulty)
+                        self.on_bad_job(result, hashrate, difficulty)
                         break
 
         soc.close()
         return
 
+
+class DUCOMiner(Miner):
+    pass
+
+
+class XXHASHMiner(Miner):
+
+    def request_job(self, soc):
+        soc.sendall(bytes(
+            'JOBXX,'
+            + str(self.username)
+            +','
+            + self.diff,
+            encoding='utf8'))
+
+            # Receive work
+        return soc.recv(1024).decode().rstrip('\n')
+
+    def hash(self, h, res):
+        return xxhash.xxh64(
+            str(h) + str(res), seed=2811)
+
 if __name__ == '__main__':
-    # print(Transactions().all_time_transacted())
-    miner = Miner('dansinclair25', 10, 'LOW')
+
+    ## Standard DUCO-S1 miner
+    # miner = DUCOMiner('dansinclair25', 1, 'LOW')
+
+    ## XXHASH Miner
+    # try:
+    #     import xxhash
+    # except ModuleNotFoundError:
+    #     print('You need to insallt XXHASH before using this miner')
+    
+    # miner = XXHASHMiner('dansinclair25', 1, 'NET')
 
     miner.start()
-    # miner.start(username='connorhess')
 
     while True:
         try:
