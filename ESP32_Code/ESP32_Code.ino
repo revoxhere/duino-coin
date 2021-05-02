@@ -42,7 +42,6 @@ volatile int wifiStatus = 0;
 volatile int wifiPrev = WL_CONNECTED;
 
 void WiFireconnect( void * pvParameters ) {
-  bool ESP_reset = true;
   //wifiStatus = WiFi.status();
   //wifiPrev = wifiStatus;
   delay(1000);
