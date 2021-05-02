@@ -334,8 +334,8 @@ void Task2code( void * pvParameters ) {
 }
 
 void setup() {
-  disableCore0WDT();
-  disableCore1WDT();
+  // disableCore0WDT();
+  // disableCore1WDT();
   Serial.begin(115200); // Start serial connection
   Serial.println("\n\nDuino-Coin ESP32 Miner v2.3");
   Serial.print("Connecting to: " + String(ssid));
