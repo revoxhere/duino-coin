@@ -85,7 +85,7 @@ There are no dependencies required.
 
 <hr>
 
-If you want to run the programs from source, you may need to install some dependencies. Here's how to do it on debian-based distros(e.g. Ubuntu, Debian, raspian):
+If you want to run the programs from source, you may need to install some dependencies. Here's how to do it on debian-based distros (e.g. Ubuntu, Debian, Raspian):
 ```BASH
 sudo apt install python3 python3-pip git
 git clone https://github.com/revoxhere/duino-coin
