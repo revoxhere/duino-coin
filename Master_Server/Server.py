@@ -57,13 +57,14 @@ SAVE_TIME = 5
 DB_TIMEOUT = 10
 SERVER_VER = 2.4
 READY_HASHES_NUM = 1000
-MOTD = """Kolka is superior"""
+MOTD = """You are mining on the official Duino-Coin master server, have fun!"""
 BLOCK_PROBABILITY = 1000000
 BLOCK_REWARD = 7.7
 UPDATE_MINERAPI_EVERY = 5
 EXPECTED_SHARETIME = 12
+MAX_REJECTED_SHARES = 10
 BCRYPT_ROUNDS = 8
-PING_SLEEP_TIME = 0.5 # check protocol duco-s1 or xxhash
+PING_SLEEP_TIME = 0.5  # check protocol duco-s1 or xxhash
 # DB files
 DATABASE = 'crypto_database.db'
 BLOCKCHAIN = 'duino_blockchain.db'
@@ -114,6 +115,7 @@ miners_per_user = {}
 chip_ids = []
 jail = []
 workers = {}
+registrations = {}
 
 # Read banned usernames
 with open(CONFIG_BANS, "r") as bannedusrfile:
@@ -187,10 +189,14 @@ def create_backup():
         today = datetime.date.today()
         if not ospath.isdir('backups/'+str(today)+'_'+str(counter)+'/'):
             os.mkdir('backups/'+str(today)+'_'+str(counter))
-            copyfile(BLOCKCHAIN, "backups/"+str(today)+'_'+str(counter)+"/"+BLOCKCHAIN)
-            copyfile(DATABASE, "backups/"+str(today)+'_'+str(counter)+"/"+DATABASE)
-            copyfile(CONFIG_BLOCKS, "backups/"+str(today)+'_'+str(counter)+"/foundBlocks.db")
-            copyfile(CONFIG_TRANSACTIONS, "backups/"+str(today)+'_'+str(counter)+"/transactions.db")
+            copyfile(BLOCKCHAIN, "backups/"+str(today) +
+                     '_'+str(counter)+"/"+BLOCKCHAIN)
+            copyfile(DATABASE, "backups/"+str(today) +
+                     '_'+str(counter)+"/"+DATABASE)
+            copyfile(CONFIG_BLOCKS, "backups/"+str(today) +
+                     '_'+str(counter)+"/foundBlocks.db")
+            copyfile(CONFIG_TRANSACTIONS, "backups/"+str(today) +
+                     '_'+str(counter)+"/transactions.db")
             sleep(10)
             with open("prices.txt", "a") as pricesfile:
                 pricesfile.write("," + str(duco_price).rstrip("\n"))
@@ -202,7 +208,7 @@ def create_backup():
                     "," + str(duco_price_justswap).rstrip("\n"))
             admin_print("Backup finished")
         hours = 2
-        counter+=1
+        counter += 1
         sleep(60*60*hours)
 
 
@@ -491,12 +497,12 @@ def input_management():
                   + "(for further examination): ")
             print(" ".join(chip_ids))
 
-        elif command[0] == "clear":
-            os.system('clear')
-
         elif command[0] == "jail":
             jail.append(str(command[1]))
             admin_print("Added "+str(command[1]) + " to earnings jail")
+
+        elif command[0] == "clear":
+            os.system('clear')
 
         elif command[0] == "ban":
             try:
@@ -650,17 +656,16 @@ def input_management():
 
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
-                    hashed_pass = hashpw(
-                        str(command[2]).encode('utf-8'),
-                        gensalt(rounds=BCRYPT_ROUNDS)
-                    )
+                    password = hashpw(command[2].encode(
+                        'utf-8'), gensalt(rounds=BCRYPT_ROUNDS))
+                    print(password)
                     with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
                         datab.execute(
                             """UPDATE Users
                             set password = ?
                             where username = ?""",
-                            (str(hashed_pass), command[1]))
+                            (password, command[1]))
                         conn.commit()
                         admin_print("Changed password of user " +
                                     str(command[1]))
@@ -823,7 +828,10 @@ def create_share_ducos1(last_block_hash, difficulty):
     try:
         if difficulty <= 0:
             difficulty = 1
-        numeric_result = fastrandint(100 * difficulty)
+        try:
+            numeric_result = fastrandint(100 * difficulty)
+        except:
+            numeric_result = 100
         expected_hash_str = bytes(
             str(last_block_hash)
             + str(numeric_result), encoding="utf8")
@@ -850,18 +858,18 @@ def create_share_xxhash(last_block_hash, difficulty):
         print("XXHASH ERR:", e)
 
 
-def protocol_ducos1(data, connection, address):
-    """ DUCO-S1 (and DUCO-S1A) Mining protocol handler
+def protocol_mine(data, connection, address, using_xxhash=False):
+    """ DUCO-S1 (-S1A) & XXHASH Mining protocol handler
         Takes:  data (JOB,username,requested_difficulty),
                 connection object, minerapi access
         Returns to main thread if non-mining data is submitted """
+    connection.settimeout(90)
     global global_last_block_hash
     global global_blocks
     global workers
     global PING_SLEEP_TIME
 
     ip_addr = address[0].replace("::ffff:", "")
-
     accepted_shares, rejected_shares = 0, 0
     global_last_block_hash_cp = global_last_block_hash
     thread_miner_api = {}
@@ -870,8 +878,6 @@ def protocol_ducos1(data, connection, address):
     override_difficulty = ""
 
     while True:
-        gevent.sleep(0.5)
-        connection.settimeout(90)
         if is_first_share:
             try:
                 username = str(data[1])
@@ -895,13 +901,16 @@ def protocol_ducos1(data, connection, address):
                 permanent_ban(ip_addr)
                 raise Exception("User banned")
 
-            try:
-                # Parse starting difficulty from the client
-                req_difficulty = str(data[2])
-                if not req_difficulty in job_tiers:
+            if using_xxhash:
+                req_difficulty = "XXHASH"
+            else:
+                try:
+                    # Parse starting difficulty from the client
+                    req_difficulty = str(data[2])
+                    if not req_difficulty in job_tiers:
+                        req_difficulty = "NET"
+                except:
                     req_difficulty = "NET"
-            except:
-                req_difficulty = "NET"
         else:
             data = receive_data(connection)
 
@@ -915,10 +924,13 @@ def protocol_ducos1(data, connection, address):
             difficulty = job[3]
 
         elif is_first_share:
-            try:
-                difficulty = job_tiers[req_difficulty]["difficulty"]
-            except:
-                difficulty = job_tiers["NET"]["difficulty"]
+            if using_xxhash:
+                difficulty = job_tiers["XXHASH"]["difficulty"]
+            else:
+                try:
+                    difficulty = job_tiers[req_difficulty]["difficulty"]
+                except:
+                    difficulty = job_tiers["NET"]["difficulty"]
 
         else:
             difficulty = kolka_v3(
@@ -935,7 +947,11 @@ def protocol_ducos1(data, connection, address):
             # The expected sharetime should be about 10 times lower than before
             #expected_test_sharetime = sharetime / 10
 
-        job = create_share_ducos1(global_last_block_hash_cp, difficulty)
+        if using_xxhash:
+            job = create_share_xxhash(global_last_block_hash_cp, difficulty)
+        else:
+            job = create_share_ducos1(global_last_block_hash_cp, difficulty)
+
         send_data(job[0] + "," + job[1] + "," + str(difficulty) + "\n",
                   connection)
 
@@ -943,17 +959,18 @@ def protocol_ducos1(data, connection, address):
         numeric_result = job[2]
 
         job_sent_timestamp = utime.now()
-        
+
         number_of_pings = 0
         time_spent_on_sending = 0
-        
+
         # Receiving result
         while True:
             result = receive_data(connection)
             if result[0] == 'PING':
                 start_sending = utime.now()
-                send_data('Pong!',connection)
-                time_spent_on_sending += (utime.now()-start_sending).total_seconds()
+                send_data('Pong!', connection)
+                time_spent_on_sending += (utime.now() -
+                                          start_sending).total_seconds()
                 # avoiding dos attack
                 # should check number_of_pings
                 # to close connection with too many pings
@@ -961,14 +978,14 @@ def protocol_ducos1(data, connection, address):
                 gevent.sleep(PING_SLEEP_TIME)
             else:
                 break
-                
+
         difference = utime.now() - job_sent_timestamp
 
         sharetime = difference.total_seconds()
         # Calculating sharetime respecting sleeptime for ping
         sharetime -= (number_of_pings*PING_SLEEP_TIME)+time_spent_on_sending
         hashrate = int(numeric_result / sharetime)
-        
+
         try:
             reported_hashrate = round(float(result[1]))
             hashrate_is_estimated = False
@@ -976,23 +993,28 @@ def protocol_ducos1(data, connection, address):
             reported_hashrate = hashrate
             hashrate_is_estimated = True
 
-        if is_first_share:
-            if req_difficulty == "AVR":
+        if not using_xxhash and req_difficulty == "AVR":
+            if is_first_share:
                 try:
                     chip_id = str(result[4])
                     if chip_id.startswith("DUCOID"):
                         if not chip_id in chip_ids:
                             chip_ids.append(chip_id)
-                        #else:
+                        # else:
                             #print("Repeated chip ID", username, chip_id)
                 except:
                     pass
 
         is_first_share = False
 
+        if rejected_shares > MAX_REJECTED_SHARES:
+            permanent_ban(ip_addr)
+
         if (accepted_shares > 0
-                and accepted_shares % UPDATE_MINERAPI_EVERY == 0):
-            """ These things don't need to run every share """  
+                and accepted_shares % UPDATE_MINERAPI_EVERY == 0
+            or rejected_shares > 0
+                and rejected_shares % UPDATE_MINERAPI_EVERY == 0):
+            """ These things don't need to run every share """
             try:
                 # Check miner software for unallowed characters
                 miner_name = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[2])
@@ -1012,18 +1034,23 @@ def protocol_ducos1(data, connection, address):
                 "Sharetime":    sharetime,
                 "Accepted":     accepted_shares,
                 "Rejected":     rejected_shares,
-                "Algorithm":    "DUCO-S1",
                 "Diff":         difficulty,
                 "Software":     str(miner_name),
                 "Identifier":   str(rig_identifier)
             }
+
+            if using_xxhash:
+                thread_miner_api["Algorithm"] = "XXHASH"
+            else:
+                thread_miner_api["Algorithm"] = "DUCO-S1"
+
             minerapi[thread_id] = thread_miner_api
 
         if (accepted_shares > 0
                 and accepted_shares % UPDATE_MINERAPI_EVERY*2 == 0):
-            """ These things don't need to run every share """  
-            if username in banlist: 
-                permanent_ban(ip_addr)  
+            """ These things don't need to run every share """
+            if username in banlist:
+                permanent_ban(ip_addr)
                 raise Exception("User banned")
             global_blocks += UPDATE_MINERAPI_EVERY*2
             global_last_block_hash = job[1]
@@ -1066,199 +1093,15 @@ def protocol_ducos1(data, connection, address):
                         balances_to_update[username] = reward
 
             if fastrandint(BLOCK_PROBABILITY) == 1:
-                reward = generate_block(
-                    username, reward, job[1], connection)
+                if using_xxhash:
+                    reward = generate_block(
+                        username, reward, job[1], connection, xxhash=True)
+                else:
+                    reward = generate_block(
+                        username, reward, job[1], connection)
                 send_data("BLOCK\n", connection)
             else:
                 send_data("GOOD\n", connection)
-
-        else:
-            rejected_shares += 1
-
-            penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-            try:
-                balances_to_update[username] += penalty
-            except:
-                balances_to_update[username] = penalty
-
-            send_data("BAD\n", connection)
-
-
-def protocol_xxhash(data, connection, address):
-    """ XXHASH mining protocol handler
-        Takes:  data (JOB,username,requested_difficulty),
-                connection object, minerapi access
-        Returns to main thread if non-mining data is submitted """
-    global global_last_block_hash
-    global global_blocks
-    global workers
-    global PING_SLEEP_TIME
-
-    ip_addr = address[0].replace("::ffff:", "")
-
-    accepted_shares, rejected_shares = 0, 0
-    global_last_block_hash_cp = global_last_block_hash
-    thread_miner_api = {}
-    is_first_share = True
-    thread_id = id(gevent.getcurrent())
-    override_difficulty = ""
-
-    while True:
-        connection.settimeout(90)
-        if is_first_share:
-            try:
-                username = str(data[1])
-                if not user_exists(username):
-                    send_data(
-                        "BAD,This user doesn't exist\n",
-                        connection)
-                    raise Exception("Incorrect username")
-            except Exception as e:
-                send_data(
-                    "BAD,Not enough data\n",
-                    connection)
-                raise Exception("Incorrect username")
-
-            if username in banlist:
-                permanent_ban(ip)
-                raise Exception("User banned")
-
-            try:
-                workers[ip_addr] += 1
-            except:
-                workers[ip_addr] = 1
-
-            req_difficulty = "NET"
-        else:
-            data = receive_data(connection)
-
-            if override_difficulty:
-                req_difficulty = override_difficulty
-            else:
-                req_difficulty = data[2]
-
-        if is_first_share:
-            difficulty = job_tiers["NET"]["difficulty"]
-
-        else:
-            difficulty = kolka_v3(
-                sharetime, EXPECTED_SHARETIME, difficulty)
-
-        job = create_share_xxhash(global_last_block_hash_cp, difficulty)
-        send_data(str(job[0]) + ","
-                  + str(job[1]) + ","
-                  + str(difficulty) + "\n",
-                  connection)
-
-        max_hashrate = job_tiers[req_difficulty]["max_hashrate"]
-        numeric_result = job[2]
-
-        job_sent_timestamp = utime.now()
-        
-        number_of_pings = 0
-        time_spent_on_sending = 0
-        
-        # receiving result
-        while True:
-            result = receive_data(connection)
-            if result[0] == 'PING':
-                start_sending = utime.now()
-                send_data('Pong!',connection)
-                time_spent_on_sending += (utime.now()-start_sending).total_seconds()
-                # avoiding dos attack
-                # should check number_of_pings
-                # to close connection with too many pings
-                number_of_pings += 1
-                gevent.sleep(PING_SLEEP_TIME)
-            else:
-                break
-                
-        sharetime = (utime.now() - job_sent_timestamp).total_seconds()
-        # calculating sharetime respecting sleeptime for ping
-        sharetime -= (number_of_pings*PING_SLEEP_TIME)+time_spent_on_sending
-        
-        hashrate = int(numeric_result / sharetime)
-
-        is_first_share = False
-
-        hashrate_is_estimated = False
-
-        try:
-            # Check miner software for unallowed characters
-            miner_name = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[2])
-        except:
-            miner_name = "Unknown miner"
-
-        try:
-            # Check rig identifier for unallowed characters
-            rig_identifier = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[3])
-        except:
-            rig_identifier = "None"
-
-        if accepted_shares % UPDATE_MINERAPI_EVERY == 0:
-            thread_miner_api = {
-                "User":         str(username),
-                "Hashrate":     hashrate,
-                "Is estimated": hashrate_is_estimated,
-                "Sharetime":    sharetime,
-                "Accepted":     accepted_shares,
-                "Rejected":     rejected_shares,
-                "Algorithm":    "XXHASH",
-                "Diff":         difficulty,
-                "Software":     str(miner_name),
-                "Identifier":   str(rig_identifier)
-            }
-            minerapi[thread_id] = thread_miner_api
-
-        if accepted_shares % UPDATE_MINERAPI_EVERY*2 == 0:
-            global_blocks += UPDATE_MINERAPI_EVERY*2
-            global_last_block_hash = job[1]
-
-        if req_difficulty == "AVR":
-            if hashrate < max_hashrate*0.75:
-                rejected_shares += 1
-
-                penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-                try:
-                    balances_to_update[username] += penalty
-                except:
-                    balances_to_update[username] = penalty
-
-                send_data("BAD\n", connection)
-
-        if hashrate > max_hashrate:
-            rejected_shares += 1
-
-            penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-            try:
-                balances_to_update[username] += penalty
-            except:
-                balances_to_update[username] = penalty
-
-            override_difficulty = kolka_v2(req_difficulty, job_tiers)
-
-            send_data("BAD\n", connection)
-
-        elif int(result[0]) == job[2]:
-            accepted_shares += 1
-
-            if accepted_shares > 3:
-                basereward = job_tiers[req_difficulty]["reward"]
-                reward = kolka_v1(basereward, sharetime,
-                                  difficulty, workers[ip_addr])
-
-                if username in jail:
-                    try:
-                        balances_to_update[username] += reward * -3
-                    except:
-                        balances_to_update[username] = reward * -3
-                else:
-                    try:
-                        balances_to_update[username] += reward
-                    except:
-                        balances_to_update[username] = reward
-
-            send_data("GOOD\n", connection)
 
         else:
             rejected_shares += 1
@@ -1515,6 +1358,7 @@ def protocol_login(data, connection):
         in the database, returns bool as login state """
     username = str(data[1])
     password = str(data[2]).encode('utf-8')
+
     if user_exists(username):
         if match(r"^[A-Za-z0-9_-]*$", username):
             try:
@@ -1599,13 +1443,27 @@ def send_registration_email(username, email):
         return False
 
 
-def protocol_register(data, connection):
+def protocol_register(data, connection, address):
     """ Register a new user, return on error """
     username = str(data[1])
     unhashed_pass = str(data[2]).encode('utf-8')
     email = str(data[3])
 
+    ip = address[0].replace("::ffff:", "")
+
     """ Do some basic checks """
+    try:
+        if registrations[ip]:
+            if (ip == "51.15.127.80"
+                or ip == "wallet.duinocoin.com"
+                    or ip == "34.233.38.119"):
+                pass
+            else:
+                send_data("NO,Too many registrations", connection)
+                return
+    except:
+        pass
+
     if not match(r"^[A-Za-z0-9_-]*$", username):
         send_data("NO,Unallowed characters used", connection)
         return
@@ -1635,6 +1493,7 @@ def protocol_register(data, connection):
     if send_registration_email(username, email):
         """ Register a new account if  the registration
             e-mail was sent sucessfully """
+        registrations[ip] = 1
         try:
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
@@ -1665,12 +1524,12 @@ def protocol_send_funds(data, connection, username):
         if memo == "-" or memo == "":
             memo = "None"
 
-        if str(username) in jail:
-            send_data("NO,BONK - go to duco jail", connection)
-            return
-
         if str(recipient) in jail:
             send_data("NO,Can\'t send funds to that user", connection)
+            return
+
+        if str(username) in jail:
+            send_data("NO,BONK - go to duco jail", connection)
             return
 
         if str(recipient) == str(username):
@@ -1770,38 +1629,48 @@ def protocol_get_balance(data, connection, username):
 
 
 def protocol_change_pass(data, connection, username):
-        """ Changes password of user """
+    """ Changes password of user """
+    try:
+        old_password = data[1].encode('utf-8')
+        new_password = data[2].encode("utf-8")
+
+        new_password_encrypted = hashpw(
+            new_password, gensalt(rounds=BCRYPT_ROUNDS))
+
         try:
-            old_password = data[1].encode('utf-8')
-            new_password = data[2].encode("utf-8")
-
-            new_password_encrypted = hashpw(new_password, gensalt(rounds=BCRYPT_ROUNDS))
-
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
                 datab.execute("""SELECT * 
-                    FROM Users 
-                    WHERE username = ?""", 
-                    (username,))
+                        FROM Users 
+                        WHERE username = ?""",
+                              (username,))
                 old_password_database = datab.fetchone()[1].encode('utf-8')
+        except:
+            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                datab = conn.cursor()
+                datab.execute("""SELECT * 
+                        FROM Users 
+                        WHERE username = ?""",
+                              (username,))
+                old_password_database = datab.fetchone()[1]
 
-            if (checkpw(old_password, old_password_database) 
+        if (checkpw(old_password, old_password_database)
                 or old_password == duco_password.encode('utf-8')):
-                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                    datab = conn.cursor()
-                    datab.execute("""UPDATE Users 
+            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                datab = conn.cursor()
+                datab.execute("""UPDATE Users 
                         set password = ? 
-                        where username = ?""", 
-                        (new_password_encrypted, username))
-                    conn.commit()
-                    admin_print("Changed password of user " + username)
-                    send_data("OK,Your password has been changed", connection)
-            else:
-                admin_print("Passwords of user " + username + " don't match")
-                send_data("NO,Your old password doesn't match!", connection)
-        except Exception as e:
-            admin_print("Error changing password:", e)
-            send_data("NO,Internal server error: " + str(e), connection)
+                        where username = ?""",
+                              (new_password_encrypted, username))
+                conn.commit()
+                admin_print("Changed password of user " + username)
+                send_data("OK,Your password has been changed", connection)
+        else:
+            admin_print("Passwords of user " + username + " don't match")
+            send_data("NO,Your old password doesn't match!", connection)
+    except Exception as e:
+        admin_print("Error changing password:", e)
+        send_data("NO,Internal server error: " + str(e), connection)
 
 
 def get_duco_prices():
@@ -1955,12 +1824,11 @@ def handle(connection, address):
                 """ Client requested the DUCO-S1 mining protocol,
                     it's not our job so we pass him to the
                     DUCO-S1 job handler """
-                protocol_ducos1(data, connection, address)
+                protocol_mine(data, connection, address)
 
             elif data[0] == "JOBXX":
-                """ Pass the client to the
-                    XXHASH job handler """
-                protocol_xxhash(data, connection, address)
+                """ Same situation as above, just use the XXHASH switch """
+                protocol_mine(data, connection, address, using_xxhash=True)
 
             elif data[0] == "LOGI":
                 """ Client requested authentication """
@@ -1975,7 +1843,7 @@ def handle(connection, address):
 
             elif data[0] == "REGI":
                 """ Client requested registation """
-                protocol_register(data, connection)
+                protocol_register(data, connection, address)
 
             elif data[0] == "CHGP":
                 """ Client requested password change """
@@ -2097,7 +1965,8 @@ if __name__ == "__main__":
 
     threading.Thread(target=countips).start()
     threading.Thread(target=resetips).start()
-    threading.Thread(target=flush_iptables).start()
+    # Maybe it fixed itself???
+    #threading.Thread(target=flush_iptables).start()
 
     threading.Thread(target=get_duco_prices).start()
     threading.Thread(target=get_sys_usage).start()
