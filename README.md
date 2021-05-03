@@ -163,14 +163,23 @@ Server source code, documentation for API calls and official libraries for devel
 
 <h2 align="center">Some of the officially tested devices (DUCO-S1)</h2><br>
 
-*   Arduino Pro Mini / Uno / Nano (ATmega328p at 16 MHz clock and 5V): ~155 H/s (15-20 DUCO/day)
-*   NodeMCU (ESP8266 at 160 MHz clock): ~9.3 kH/s (~4.5 kH/s at 80 MHz clock) (6-8 DUCO/day)
-*   ESP32 (dual-threaded): ~13 kH/s (6 kH/s (core1) and 7 kH/s (core2)) (WIP)
-*   Raspberry Pi Zero: ~17 kH/s
-*   Raspberry Pi 3 (4 threads): ~440 kH/s
-*   Raspberry Pi 4 (4 threads): ~1.3 MH/s
-*   Intel Core i5-3230M (4 threads): ~1.4 MH/s
-*   Intel Core i5-7200U (4 threads): ~1.6 MH/s
+| Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
+|-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
+| Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 170 H/s                           | 1                 | 0.2 W          | 15-20               |
+| NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 9.3 kH/s                          | 1                 | 0.6 W          | 6-8                 |
+| ESP32                                                     | 27 kH/s                           | 2                 | 1.25 W         | -                   |
+| Raspberry Pi Zero                                         | 17 kH/s                           | 1                 | 0.7 W          | -                   |
+| Raspberry Pi 3                                            | 440 kH/s                          | 4                 | 5.1 W          | -                   |
+| Raspberry Pi 4                                            | 1.3 MH/s                          | 4                 | 6.4 W          | -                   |
+| Atomic Pi                                                 | 690 kH/s                          | 4                 | 6 W            | -                   |
+| Orange Pi Zero 2                                          | 740 kH/s                          | 4                 | 2.55 W         | -                   |
+| Khadas Vim 2 Pro                                          | 1.12 MH/s                         | 8                 | 6.2 W          | -                   |
+| Libre Computers Tritium H5CC                              | 480 kH/s                          | 4                 | 5 W            | -                   |
+| Libre Computers Le Potato                                 | 410 kH/s                          | 4                 | 5 W            | -                   |
+| Pine64 ROCK64                                             | 640 kH/s                          | 4                 | 5 W            | -                   |
+| Intel Core i5-3230M                                       | 1.4 MH/s                          | 4                 | -              | 6-7                 |
+| Intel Core i5-7200U                                       | 1.6 MH/s                          | 4                 | -              | -                   |
+| Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | -                   |
 
 <h2 align="center">License</h2><br>
 
