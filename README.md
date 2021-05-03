@@ -180,6 +180,7 @@ Server source code, documentation for API calls and official libraries for devel
 | Intel Core i5-3230M                                       | 1.4 MH/s                          | 4                 | -              | 6-7                 |
 | Intel Core i5-7200U                                       | 1.6 MH/s                          | 4                 | -              | -                   |
 | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | -                   |
+| Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | -              | 5-6                 |
 
 <h2 align="center">License</h2><br>
 
