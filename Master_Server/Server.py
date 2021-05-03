@@ -1802,6 +1802,7 @@ def protocol_get_transactions(data, connection):
 def handle(connection, address):
     """ Handler for every client """
     global global_connections
+    global global_blocks
 
     ip_addr = address[0].replace("::ffff:", "")
     thread_id = id(gevent.getcurrent())
@@ -1897,8 +1898,13 @@ def handle(connection, address):
                 POOLCLASS.login(data=data)
 
             elif data[0] == "PoolSync":
-                global_blocks = POOLCLASS.sync(
-                    data=data, global_blocks=global_blocks)
+                blocks_to_add = POOLCLASS.sync(data, global_blocks)
+                global_blocks += blocks_to_add
+
+            elif data[0] == "PoolPreSync":
+                sync_data = POOLCLASS.pre_sync(connection)
+                blocks_to_add = POOLCLASS.sync(sync_data, global_blocks)
+                global_blocks += blocks_to_add
 
             elif data[0] == "PoolLogout":
                 POOLCLASS = PF.Pool_Function_class(connection=connection)
