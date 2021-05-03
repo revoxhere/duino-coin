@@ -14,8 +14,8 @@ def kolka_v1(basereward, sharetime, difficulty, workers, penalty=False):
         output = float(int(int(sharetime) ** 2) / 1000000) * -1
     else:
         output = (MULTIPLIER * basereward
-                   + float(sharetime) / 10000
-                   + float(difficulty) / 100000000)
+                  + float(sharetime) / 10000
+                  + float(difficulty) / 100000000)
     if difficulty > 600:
         output = output + (output * (pc_mining_perc ** (workers-1)))
     else:
@@ -25,7 +25,7 @@ def kolka_v1(basereward, sharetime, difficulty, workers, penalty=False):
 
 
 def kolka_v2(current_difficulty, difficulty_list):
-    """ Kolka V2 system - move miner to the next diff tier
+    """ Part of Kolka V2 system - move miner to the next diff tier
         Authors: revox """
     if current_difficulty == "AVR":
         return "ESP8266"
@@ -67,34 +67,13 @@ def kolka_v3(sharetime, expected_sharetime, difficulty):
                 getting diffs equal to 0 """
             new_difficulty = floor(int(difficulty / (abs(p) + 2)) * 0.9) + 1
 
-        # Checks if sharetime was exactly double than expected
+        # Check if sharetime was exactly double than expected
         elif new_difficulty == 0:
-            # Thus roughly half the difficulty
+            # Thus roughly halve the difficulty
             new_difficulty = int(difficulty * 0.5)
-    if new_difficulty <= 0:
-        new_difficulty = 1
+    if new_difficulty <= 1000:
+        new_difficulty = 1000
     return int(new_difficulty)
-
-
-def kolka_v4(sharetime, expected_test_sharetime):
-    """ Experimental Kolka V4 - sharetime exploit test
-        Author: EinWildesPanda"""
-
-    """ Calculates how far apart the shares are (in percent)"""
-    p = sharetime / expected_test_sharetime
-    """ Checks whether the sharetime took more 
-        than 50% longer than it should've """
-    if p > 1.5:
-        rejectedShares += 1
-        """ Calculate penalty dependent on share 
-            submission time - Kolka V1 combined with V4 """
-        penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-        try:
-            """ Adds username to the dict so it will
-                be penalized in the next DB update """
-            balancesToUpdate[username] += penalty
-        except Exception:
-            balancesToUpdate[username] = penalty
 
 
 def floatmap(x, in_min, in_max, out_min, out_max):
