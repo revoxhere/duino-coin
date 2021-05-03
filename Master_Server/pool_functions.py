@@ -124,6 +124,22 @@ class Pool_Function_class:
         else:
             send_data(data="LoginFailed", connection=self.connection)
 
+    def pre_sync(self, connection):
+        if self.poolID == None:
+            send_data(data="No PoolID provided", connection=self.connection)
+
+        send_data("OK", connection)
+        data = connection.recv(10240)
+
+        data_pre_split = data
+        data = data.decode("utf8").replace("\n", "").split(",")
+
+        length_of_base = 0
+        new_data = (data_pre_split[length_of_base:])
+        data = ['PoolSync', new_data]
+
+        return data
+
 
     def sync(self, data, global_blocks):
         if self.poolID == None:
@@ -144,8 +160,6 @@ class Pool_Function_class:
 
         # ============
 
-        global_blocks += blocks_to_add
-
         with sqlite3.connect(database, timeout=database_timeout) as conn:
             datab = conn.cursor()
             for user in rewards.keys():
@@ -155,6 +169,7 @@ class Pool_Function_class:
             conn.commit()
 
         # ============
+
         data_send = {"totalBlocks": global_blocks,
                     "diffIncrease": DIFF_INCREASES_PER}
 
@@ -162,7 +177,7 @@ class Pool_Function_class:
 
         send_data(data=f"SyncOK,{data_send}", connection=self.connection)
 
-        return global_blocks
+        return blocks_to_add
 
 
     def logout(self, data):
