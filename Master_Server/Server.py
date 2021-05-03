@@ -826,8 +826,6 @@ def sleep_by_cpu_usage(upper_limit):
 def create_share_ducos1(last_block_hash, difficulty):
     """ Creates and returns a job for DUCO-S1 algo """
     try:
-        if difficulty <= 0:
-            difficulty = 1
         try:
             numeric_result = fastrandint(100 * difficulty)
         except:
@@ -845,9 +843,10 @@ def create_share_ducos1(last_block_hash, difficulty):
 def create_share_xxhash(last_block_hash, difficulty):
     """ Creates and returns a job for XXHASH algo """
     try:
-        if difficulty <= 0:
-            difficulty = 1
-        numeric_result = fastrandint(100 * difficulty)
+        try:
+            numeric_result = fastrandint(100 * difficulty)
+        except:
+            numeric_result = 100
         expected_hash_str = bytes(
             str(last_block_hash)
             + str(numeric_result), encoding="utf8")
@@ -1056,6 +1055,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             global_last_block_hash = job[1]
 
         if hashrate > max_hashrate:
+            """ Kolka V2 hashrate check """
             rejected_shares += 1
 
             penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
@@ -1068,7 +1068,21 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
             send_data("BAD\n", connection)
 
+        if req_difficulty == "AVR":
+            """ Kolka V2 hashrate check for AVRs """
+            if hashrate < max_hashrate*0.9:
+                rejected_shares += 1
+
+                penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
+                try:
+                    balances_to_update[username] += penalty
+                except:
+                    balances_to_update[username] = penalty
+
+                send_data("BAD\n", connection)
+
         elif int(result[0]) == job[2]:
+            """ Correct result received """
             accepted_shares += 1
 
             try:
@@ -1093,6 +1107,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                         balances_to_update[username] = reward
 
             if fastrandint(BLOCK_PROBABILITY) == 1:
+                """ Block found """
                 if using_xxhash:
                     reward = generate_block(
                         username, reward, job[1], connection, xxhash=True)
@@ -1104,6 +1119,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 send_data("GOOD\n", connection)
 
         else:
+            """ Incorrect result received """
             rejected_shares += 1
 
             penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
@@ -1934,7 +1950,7 @@ def countips():
         for ip in connections_per_ip.copy():
             try:
                 if connections_per_ip[ip] > 50 and not ip in whitelisted_ips:
-                    print("Banning DDoSing IP: " + ip)
+                    #admin_print("Banning DDoSing IP: " + ip)
                     permanent_ban(ip)
             except:
                 pass
@@ -1954,8 +1970,8 @@ def flush_iptables():
         low levels. Why? No idea """
     while True:
         os.system("sudo iptables -F INPUT")
-        admin_print("Flushed iptables")
-        sleep(60*10)
+        #admin_print("Flushed iptables")
+        sleep(60*15)
 
 
 if __name__ == "__main__":
@@ -1965,8 +1981,7 @@ if __name__ == "__main__":
 
     threading.Thread(target=countips).start()
     threading.Thread(target=resetips).start()
-    # Maybe it fixed itself???
-    #threading.Thread(target=flush_iptables).start()
+    threading.Thread(target=flush_iptables).start()
 
     threading.Thread(target=get_duco_prices).start()
     threading.Thread(target=get_sys_usage).start()
