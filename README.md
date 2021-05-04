@@ -35,13 +35,13 @@ After loging-in you have access to the following commands:
     *   You can also use `JOB,username` (or `JOBXX,username` for XXHASH) to mine without loging-in
 
     *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, you'll get the network diff) where diff is one of the below:
-        * `AVR`     - diff      5 - used for official AVR boards mining
-        * `ESP`     - diff    125 - used for official ESP8266 boards mining **(BEING DEPRECATED)**
-        * `ESP8266` - diff    500 - used for official ESP8266 boards mining **(FOR NEW 2.4 CODE)**
-        * `ESP32`   - diff    500 - used for official ESP32 boards mining
-        * `LOW`     - diff     4k - used for official Web Miner
-        * `MEDIUM`  - diff    40k - used for lower-diff PC mining
-        * `NET`     - diff  ~100k - used for PC mining - network difficulty
+        * `AVR`     - diff      7 - used for mining on Arduino, AVR boards
+        * `DUE`     - diff   1000 - planned for mining on Arduino Due boards
+        * `ESP8266` - diff   1000 - used for mining on ESP8266 boards 
+        * `ESP32`   - diff   1500 - used for mining on ESP32 boards
+        * `LOW`     - diff     5k - used for mining on Web Miner, RPis, PC
+        * `MEDIUM`  - diff    40k - used for mining on PC
+        * `NET`     - diff  ~100k - used for mining on PC (network difficulty)
         * `EXTREME` - diff   950k - not used anywhere officially
     
     *   When sending the mining result, you can pass the hashrate count and the name of the miner along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s) and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner"
