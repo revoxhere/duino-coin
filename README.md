@@ -166,6 +166,7 @@ Server source code, documentation for API calls and official libraries for devel
 | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
 |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
 | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 170 H/s                           | 1                 | 0.2 W          | 15-20               |
+| Teensy 4.1                                                | 12.8 kH/s                         | 1                 | -              | -                   |
 | NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 9.3 kH/s                          | 1                 | 0.6 W          | 6-8                 |
 | ESP32                                                     | 27 kH/s                           | 2                 | 1.25 W         | -                   |
 | Raspberry Pi Zero                                         | 17 kH/s                           | 1                 | 0.7 W          | -                   |
