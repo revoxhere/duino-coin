@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for Arduino boards v2.5
+//  Code for Arduino boards v2.51
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -34,6 +34,7 @@ unsigned int ducos1result = 0;
 unsigned char* newblockhash1;
 size_t sizeofhash = 100;
 
+
 // Setup stuff
 void setup() {
   // Prepare built-in led pin as output
@@ -42,10 +43,14 @@ void setup() {
   Serial.begin(115200);
   Serial.setTimeout(7000);
   // Allocating memory for the hash calculation
-  newblockhash1 = (unsigned char*)malloc(sizeofhash * sizeof(unsigned char));
+  newblockhash1 = (unsigned char * ) malloc(sizeofhash * sizeof(unsigned char));
   // Grab Arduino chip ID
-  for (size_t i = 0; i < 8; i++)
+  for (size_t i = 0; i < 8; i++) {
+    if (UniqueID[i] < 10) {
+      IDstring += "0";
+    }
     IDstring += UniqueID[i];
+  }
 }
 
 // DUCO-S1A hasher
@@ -66,7 +71,7 @@ int ducos1a(String lastblockhash, String newblockhash, int difficulty) {
     Sha1.print(lastblockhash + String(ducos1res));
     // Get SHA1 result
     uint8_t * hash_bytes = Sha1.result();
-    if (memcmp(hash_bytes, newblockhash1, SHA1_HASH_LEN*sizeof(char)) == 0) {
+    if (memcmp(hash_bytes, newblockhash1, SHA1_HASH_LEN * sizeof(char)) == 0) {
       // If expected hash is equal to the found hash, return the result
       return ducos1res;
     }
@@ -85,7 +90,7 @@ void loop() {
     // Read difficulty
     difficulty = Serial.readStringUntil(',').toInt();
     // Clearing the receive buffer reading one job.
-    while(Serial.available())
+    while (Serial.available())
       Serial.read();
     newblockhash.toUpperCase();
     // Start time measurement
@@ -97,7 +102,7 @@ void loop() {
     // Calculate elapsed time
     unsigned long elapsedTime = endTime - startTime;
     // Clearing the receive buffer before sending the result.
-    while(Serial.available())
+    while (Serial.available())
       Serial.read();
     // Send result back to the program with share time
     Serial.print(String(ducos1result) + "," + String(elapsedTime) + "," + String(IDstring) + "\n");
