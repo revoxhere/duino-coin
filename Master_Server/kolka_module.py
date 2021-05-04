@@ -16,7 +16,7 @@ def kolka_v1(basereward, sharetime, difficulty, workers, penalty=False):
         output = (MULTIPLIER * basereward
                   + float(sharetime) / 10000
                   + float(difficulty) / 100000000)
-    if difficulty > 600:
+    if difficulty > 2000:
         output = output + (output * (pc_mining_perc ** (workers-1)))
     else:
         output = output + (output * (avr_mining_perc ** (workers-1)))
@@ -71,8 +71,8 @@ def kolka_v3(sharetime, expected_sharetime, difficulty):
         elif new_difficulty == 0:
             # Thus roughly halve the difficulty
             new_difficulty = int(difficulty * 0.5)
-    if new_difficulty <= 1000:
-        new_difficulty = 1000
+    if new_difficulty < 2500:
+        new_difficulty = 2500
     return int(new_difficulty)
 
 
