@@ -256,24 +256,24 @@ def update_job_tiers():
                 "max_hashrate": 200000
             },
             "ESP32": {
-                "difficulty": 600,
-                "reward": .004,
-                "max_hashrate": 13000
+                "difficulty": 2000,
+                "reward": .00375,
+                "max_hashrate": 16000
             },
             "ESP8266": {
-                "difficulty": 500,
-                "reward": .00375,
+                "difficulty": 1000,
+                "reward": .0045,
                 "max_hashrate": 11000
             },
             "DUE": {
-                "difficulty": 500,
+                "difficulty": 1000,
                 "reward": .003,
                 "max_hashrate": 7000
             },
             "AVR": {
-                "difficulty": 5,
-                "reward": .00575,
-                "max_hashrate": 180
+                "difficulty": 7,
+                "reward": .0065,
+                "max_hashrate": 170
             }
         }
         sleep(60)
@@ -918,7 +918,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             else:
                 req_difficulty = data[2]
 
-        if job_tiers[req_difficulty]["difficulty"] <= 600:
+        if job_tiers[req_difficulty]["difficulty"] <= job_tiers["ESP32"]["difficulty"]:
             job = get_pregenerated_job(req_difficulty)
             difficulty = job[3]
 
@@ -1068,18 +1068,18 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
             send_data("BAD\n", connection)
 
-        if req_difficulty == "AVR":
-            """ Kolka V2 hashrate check for AVRs """
-            if hashrate < max_hashrate*0.9:
-                rejected_shares += 1
+        # elif req_difficulty == "AVR":
+        #     """ Kolka V2 hashrate check for AVRs """
+        #     if not reported_hashrate > 10:
+        #         rejected_shares += 1
 
-                penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-                try:
-                    balances_to_update[username] += penalty
-                except:
-                    balances_to_update[username] = penalty
+        #         penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
+        #         try:
+        #             balances_to_update[username] += penalty
+        #         except:
+        #             balances_to_update[username] = penalty
 
-                send_data("BAD\n", connection)
+        #         send_data("BAD\n", connection)
 
         elif int(result[0]) == job[2]:
             """ Correct result received """
@@ -1257,12 +1257,6 @@ def get_blocks_list():
 
 def create_secondary_api_files():
     while True:
-        with open('chips.json', 'w') as outfile:
-            json.dump(
-                chip_ids,
-                outfile,
-                indent=2,
-                ensure_ascii=False)
         with open('transactions.json', 'w') as outfile:
             json.dump(
                 get_transaction_list(),
