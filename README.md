@@ -114,6 +114,7 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
+*   [duino-coin-kodi](https://github.com/SandUhrGucker/duino-coin-kodi) - mining addon for Kodi Media Center by SandUhrGucker
 *   [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - Python script to mine Duino-Coin on routers by BastelPichi
 *   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - mine with less connections on multiple devices by DoctorEenot
 *   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - MicroPython miner or ESP boards by fabiopolancoe
