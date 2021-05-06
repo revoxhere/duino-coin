@@ -179,10 +179,12 @@ Server source code, documentation for API calls and official libraries for devel
 | Libre Computers Tritium H5CC                              | 480 kH/s                          | 4                 | 5 W            | -                   |
 | Libre Computers Le Potato                                 | 410 kH/s                          | 4                 | 5 W            | -                   |
 | Pine64 ROCK64                                             | 640 kH/s                          | 4                 | 5 W            | -                   |
+| Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | -              | 5-6                 |
 | Intel Core i5-3230M                                       | 1.48 MH/s                         | 4                 | -              | 6.1                 |
 | Intel Core i5-7200U                                       | 1.62 MH/s                         | 4                 | -              | 7.5                 |
+| Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | -              | 9.1                 |   
 | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | -                   |
-| Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | -              | 5-6                 |
+
 
 <h2 align="center">License</h2><br>
 
