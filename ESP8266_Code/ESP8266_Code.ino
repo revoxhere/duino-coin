@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards - V2.4
+//  Code for ESP8266 boards - V2.4.6
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -108,7 +108,21 @@ namespace {
     ESP.reset();
   }
 
+  void VerifyWifi() {
+    unsigned long lastMillis = millis();
+    
+    while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) {
+      WiFi.reconnect();
+
+      if ((millis() - lastMillis) > 60000) {
+        // after 1-minute of failed re-connects... 
+        RestartESP("Unable to reconnect to wifi...");
+      }
+    }
+  }
+
   void handleSystemEvents(void) {
+    VerifyWifi();
     ArduinoOTA.handle();
     yield();
   }
@@ -173,9 +187,8 @@ namespace {
 
 void setup() {
   Serial.begin(115200); // Start serial connection
-  Serial.println("\nDuino-Coin ESP8266 Miner v2.4.5");
+  Serial.println("\nDuino-Coin ESP8266 Miner v2.4.6");
 
-  delay(rand() % 1000); // delay up to 1sec to stagger start-ups
   pinMode(LED_BUILTIN, OUTPUT); // prepare for blink() function
 
   SetupWifi();
@@ -185,6 +198,7 @@ void setup() {
 }
 
 void loop() {
+  VerifyWifi();
   ArduinoOTA.handle(); // Enable OTA handler
   ConnectToServer();
 
@@ -211,7 +225,7 @@ void loop() {
       float ElapsedTimeSeconds = ElapsedTime * .000001f; // Convert to seconds
       float HashRate = iJob / ElapsedTimeSeconds;
 
-      client.print(String(iJob) + "," + String(HashRate) + ",ESP8266 Miner v2.4.5" + "," + String(rigIdentifier)); // Send result to server
+      client.print(String(iJob) + "," + String(HashRate) + ",ESP8266 Miner v2.4.6" + "," + String(rigIdentifier)); // Send result to server
       waitForClientData();
 
       Shares++;
@@ -220,7 +234,7 @@ void loop() {
       break; // Stop and ask for more work
     }
 
-    if (max_micros_elapsed(micros(), 400000)) 
+    if (max_micros_elapsed(micros(), 250000)) 
       handleSystemEvents();
       
   }
