@@ -89,7 +89,7 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = "2.47"  # Version number
-SOCKET_TIMEOUT = 30
+SOCKET_TIMEOUT = 15
 AVR_TIMEOUT = 7
 RESOURCES_DIR = "AVRMiner_" + str(MINER_VER) + "_resources"
 shares = [0, 0]
@@ -534,32 +534,6 @@ def greeting():
                 f.write(r.content)
 
 
-def restart_miner():
-    try:
-        if donator_running:
-            donateExecutable.terminate()
-    except Exception as e:
-        pretty_print(
-            "sys0",
-            "Error closing donate executable"
-            + Style.NORMAL
-            + Fore.RESET
-            + " ("
-            + str(e)
-            + ")",
-            "error")
-    try:
-        execl(sys.executable, sys.executable, *sys.argv)
-    except Exception as e:
-        pretty_print(
-            "sys0",
-            "Error restarting miner"
-            + " ("
-            + str(e)
-            + ")",
-            "error")
-
-
 def donate():
     global donation_level
     global donator_running
@@ -735,34 +709,16 @@ def mine_avr(com):
                 debug_output("GitHub error: " + str(e))
                 sleep(10)
 
-        while True:
-            try:
-                # Connect to the serial port
-                # comConn = connectToAVR(com)
-                pretty_print(
-                    "sys"
-                    + str(''.join(filter(str.isdigit, com))),
-                    get_string("mining_start")
-                    + Style.NORMAL
-                    + Fore.RESET
-                    + get_string("mining_algorithm")
-                    + str(com)
-                    + ")",
-                    "success")
-                break
-
-            except Exception as e:
-                pretty_print(
-                    "usb"
-                    + str(''.join(filter(str.isdigit, com))),
-                    get_string("mining_avr_connection_error")
-                    + Style.NORMAL
-                    + Fore.RESET
-                    + " (avr connection err: "
-                    + str(e)
-                    + ")",
-                    "error")
-                sleep(5)
+        pretty_print(
+            "sys"
+            + str(''.join(filter(str.isdigit, com))),
+            get_string("mining_start")
+            + Style.NORMAL
+            + Fore.RESET
+            + get_string("mining_algorithm")
+            + str(com)
+            + ")",
+            "success")
 
         while True:
             while True:
@@ -815,8 +771,8 @@ def mine_avr(com):
                         + ")",
                         "error")
                     debug_output("Connection error: " + str(e))
-                    sleep(10)
-                    restart_miner()
+                    sleep(5)
+                    soc = connect()
 
             while True:
                 while True:
@@ -914,7 +870,7 @@ def mine_avr(com):
                         "error")
                     debug_output("Connection error: " + str(e))
                     sleep(5)
-                    restart_miner()
+                    soc = connect()
 
                 while True:
                     try:
@@ -946,10 +902,7 @@ def mine_avr(com):
                             + ")",
                             "error")
                         debug_output("Error parsing response: "
-                                     + str(e)
-                                     + ", restarting miner")
-                        sleep(1)
-                        restart_miner()
+                                     + str(e))
 
                 if feedback == "GOOD":
                     # If result was correct
