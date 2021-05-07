@@ -197,6 +197,8 @@ def create_backup():
                      '_'+str(counter)+"/foundBlocks.db")
             copyfile(CONFIG_TRANSACTIONS, "backups/"+str(today) +
                      '_'+str(counter)+"/transactions.db")
+
+        if not ospath.isdir('backups/'+str(today)+'_0/'):
             sleep(10)
             with open("prices.txt", "a") as pricesfile:
                 pricesfile.write("," + str(duco_price).rstrip("\n"))
@@ -207,6 +209,7 @@ def create_backup():
                 pricesJustSwapfile.write(
                     "," + str(duco_price_justswap).rstrip("\n"))
             admin_print("Backup finished")
+
         hours = 2
         counter += 1
         sleep(60*60*hours)
@@ -271,8 +274,8 @@ def update_job_tiers():
                 "max_hashrate": 7000
             },
             "AVR": {
-                "difficulty": 7,
-                "reward": .0065,
+                "difficulty": 5,
+                "reward": .005,
                 "max_hashrate": 170
             }
         }
@@ -1665,7 +1668,7 @@ def protocol_change_pass(data, connection, username):
                 old_password_database = datab.fetchone()[1]
 
         if (checkpw(old_password, old_password_database)
-                or old_password == duco_password.encode('utf-8')):
+                or old_password == DUCO_PASS.encode('utf-8')):
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
                 datab.execute("""UPDATE Users 
@@ -1830,6 +1833,13 @@ def handle(connection, address):
                     protocol_get_balance(data, connection, username)
                 else:
                     send_data("NO,Not logged in", connection)
+
+            elif data[0] == "UEXI":
+                """ Client requested to check wheter user is registered """
+                if user_exists(data[1]):
+                    send_data("OK,User is registered", connection)
+                else:
+                    send_data("NO,User is not registered", connection)
 
             elif data[0] == "JOB":
                 """ Client requested the DUCO-S1 mining protocol,
