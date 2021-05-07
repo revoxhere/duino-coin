@@ -583,5 +583,78 @@
         "mining_user": " Kullanıcı ",   
         "mining_not_exist": " mevcut değil.",   
         "mining_not_exist_warning": " Kullanıcı adınızı doğru girdiğinizden emin olun. Lütfen ayar dosyanızı kontrol edin. 10 saniye içerisinde yeniden deneniyor"
+    },
+    "portuguese": {
+        "translation_autor": "bonsai",
+        "sigint_detected": " SIGINT detectado - Saindo corretamente.",
+        "goodbye": " Até!",
+        "greeting_morning": "Bom dia",
+        "greeting_noon": "Bom dia",
+        "greeting_afternoon": "Boa tarde",
+        "greeting_evening": "Boa noite",
+        "greeting_back": "Bem vindo de volta",
+
+        "banner": "Oficial Duino-Coin © Python Miner",
+        "donation_level": "Nivel de doação as desenvolvedores: ",
+
+        "ask_difficulty": "Selecione uma dificuldade para mineração (1-3):",
+        "low_diff": "Dificultade baixa (para Raspberry Pis e computadores mais antigos)",
+        "medium_diff": "Dificultade média (para computadores normais)",
+        "net_diff": "Dificuldade da Network (para equipamentos potentes)",
+
+        "low_diff_short": "Dificuldade baixa",
+        "medium_diff_short": "Dificuldade média",
+        "net_diff_short": "Dificuldade da Network",
+        "algorithm": "Algoritmo: ",
+        "rig_identifier": "Nome da rig: ",
+
+        "basic_config_tool": "\nFerramenta de configuração básica do Duino-Coin\nEdita ",
+        "edit_config_file_warning": "Se você quiser trocar as configurações mais tarde /Miner_config.cfg é o arquivo.",
+        "dont_have_account": "Você já tem uma conta no Duino-Coin? Se sim use-a.",
+        "wallet": "Carteira",
+        "register_warning": " Pare se registrar no servidor.\n",
+        "ask_username": "Seu nome na Duino-Coin: ",
+        "ask_intensity": "Intensidade da Mineração (1-100)% (recomendado: 95): ",
+        "ask_threads": "Quantas núcleos você deseja que sejam utilizados (recomendado para o seu sistema: ",
+        "ask_lower_difficulty": "Deseja usar uma intensidade mais baixa (para sistemas de baixo rendimiento)? (y/N): ",
+        "ask_rig_identifier": "Você quer dar um nome (nome) a esta rig? (y/N): ",
+        "ask_rig_name": "Digite o nome desejado: ",
+        "ask_donation_level": "Quantidaded de doação (0-5) (recomendado: 1), a escolha não redusirá seus ganhos: ",
+        "config_saved": "Configuração feita com sucesso! Começando a minerar",
+        "load_config_error": " Error ao carregar ao carregar o arquivo de configuração (",
+        "load_config_error_warning": "/Miner_config.cfg). Remova-o e tente novamente. Desligando em 10s",
+
+        "free_network_warning": "Duino-Coin é uma plataforma gratuita e sempre será.",
+        "donate_warning": "\nNão recebemos nada pela sua mineração.\nSe quiser nos ajudar, doe em nosso site.\nVisite ",
+        "learn_more_donate": " para saber como nos ajudar :)",
+        "starting_donation": "Iniciando o processo de doação.",
+        "thanks_donation": " Obrigado por doar ❤️ Seu apoio, idependente do tamanho ajuda muito.",
+
+        "data_error": " Erro ao tentar extrair os arquivos do GitHub! Tentando novamente em 10s.",
+
+        "connected": " Conectado",
+        "connected_server": " servidor principal do Duino-Coin (v",
+        "outdated_miner": " seu minerador está desatualizado (v",
+        "server_is_on_version": " o servidor está na versão",
+        "update_warning": ", por favor baixe a ultima versão no https://github.com/revoxhere/duino-coin/releases/",
+        "connecting_error": " Erro ao tentar se conectar ao servidor. Tentando novamente em 10s",
+        "mining_thread": " Mineração no núcleo #",
+        "mining_thread_starting": " está começando",
+        "using_algo": " usando o algoritimo DUCO-S1 com ",
+        "using_algo_xxh": " usando o algoritmo XXHASH com ",
+        "efficiency": "eficiência",
+
+        "duco_python_miner": "Minerando Duino-Coin em Python (v",
+        "accepted_shares": " shares aceitas",
+        "accepted": " Aceito ",
+        "block_found": " Bloco encontrado ",
+        "internal_server_error": " Erro interno do servidor.",
+        "retrying": " Tentando novamente em 10s.",
+        "rejected": " Recusado ",
+        "error_while_mining": " Erro ao tentar minerar - provavelmente é um erro de conexão - tentando novamente em 5s.",
+
+        "mining_user": " User ",
+        "mining_not_exist": " não existe",
+        "mining_not_exist_warning": " Usuario incorreto, confira-o. Tentando novamente em 10s"
     }
 }
