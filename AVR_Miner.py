@@ -146,6 +146,8 @@ try:
             lang = "french"
         elif locale.startswith("tr"):
             lang = "turkish"
+        elif locale.startswith("pt"):
+            lang = "portugese"
         elif locale.startswith("zh"):
             lang = "chinese_simplified"
         else:
