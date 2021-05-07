@@ -31,11 +31,10 @@ If the registration fails, the server will send `NO,Reason of failed registratio
 After loging-in you have access to the following commands:
 *   `PING` - Server will return "Pong!" message ASAP 
 *   `BALA` - Server will return balance of current user
-*   `JOB` - Server will return job for mining using DUCO-S1 (-S1A)
-    *   You can also use `JOB,username` (or `JOBXX,username` for XXHASH) to mine without loging-in
-
-    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, you'll get the network diff) where diff is one of the below:
-        * `AVR`     - diff      7 - used for mining on Arduino, AVR boards
+*   `UEXI,username` - Server will check if the user is registered and return `NO,User is not registered` or `OK,User is registered`
+*   `JOB,username` (or `JOBXX,username` for XXHASH) - Server will return job for mining using DUCO-S1 (-S1A)
+    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, the network diff will be given) where diff is one of the below:
+        * `AVR`     - diff      5 - used for mining on Arduino, AVR boards
         * `DUE`     - diff   1000 - planned for mining on Arduino Due boards
         * `ESP8266` - diff   1000 - used for mining on ESP8266 boards 
         * `ESP32`   - diff   1500 - used for mining on ESP32 boards
