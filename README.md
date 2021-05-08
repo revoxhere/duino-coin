@@ -182,7 +182,9 @@ Server source code, documentation for API calls and official libraries for devel
 | Libre Computers Le Potato                                 | 410 kH/s                          | 4                 | 5 W            | -                   |
 | Pine64 ROCK64                                             | 640 kH/s                          | 4                 | 5 W            | -                   |
 | Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | -              | 5-6                 |
+| Intel Core i5-2430M                                       | 1.18 MH/s                         | 4                 | -              | 6.5                 |
 | Intel Core i5-3230M                                       | 1.48 MH/s                         | 4                 | -              | 6.1                 |
+| Intel Core i5-5350U                                       | 1.35 MH/s                         | 4                 | -              | 6.0                 |
 | Intel Core i5-7200U                                       | 1.62 MH/s                         | 4                 | -              | 7.5                 |
 | Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | -              | 9.1                 |   
 | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | -                   |
