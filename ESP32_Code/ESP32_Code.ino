@@ -27,11 +27,21 @@ const char* rigname  = "ESP32";                     // Change this if you want t
 #define WDT_TIMEOUT 60                              // Define watchdog timer seconds
 
 //////////////////////////////////////////////////////////
+//  If you're using the ESP32-CAM board or other board
+//  that doesn't support OTA (Over-The-Air programming)
+//  comment the ENABLE_OTA definition line
+//  (#define ENABLE_OTA)
+//////////////////////////////////////////////////////////
+
+#define ENABLE_OTA
+
+//////////////////////////////////////////////////////////
 //  If you don't want to use the Serial interface comment
 //  the ENABLE_SERIAL definition line (#define ENABLE_SERIAL)
 //////////////////////////////////////////////////////////
 
 #define ENABLE_SERIAL
+
 #ifndef ENABLE_SERIAL
 // disable Serial output
 #define Serial DummySerial
@@ -49,7 +59,10 @@ public:
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
+
+#ifdef ENABLE_OTA
 #include <ArduinoOTA.h>
+#endif
 
 TaskHandle_t WiFirec;
 TaskHandle_t Task1;
@@ -70,7 +83,11 @@ void WiFireconnect( void * pvParameters ) {
   esp_task_wdt_add(NULL);
   for(;;) {
     wifiStatus = WiFi.status();
+    
+    #ifdef ENABLE_OTA
     ArduinoOTA.handle();
+    #endif
+    
     if (OTA_status)  // If the OTA is working then reset the watchdog.
       esp_task_wdt_reset();
     // check if WiFi status has changed.
@@ -458,7 +475,8 @@ void setup() {
   // Password can be set with it's md5 value as well
   // MD5(admin) = 21232f297a57a5a743894a0e4a801fc3
   // ArduinoOTA.setPasswordHash("21232f297a57a5a743894a0e4a801fc3");
-  
+
+  #ifdef ENABLE_OTA
   ArduinoOTA
     .onStart([]() {
       String type;
@@ -490,6 +508,7 @@ void setup() {
     });
   
   ArduinoOTA.begin();
+  #endif
   
   esp_task_wdt_init(WDT_TIMEOUT, true); // Init Watchdog timer
   pinMode(LED_BUILTIN,OUTPUT);
