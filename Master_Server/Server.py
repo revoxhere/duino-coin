@@ -71,6 +71,7 @@ BLOCKCHAIN = 'duino_blockchain.db'
 CONFIG_BASE_DIR = "config"
 CONFIG_TRANSACTIONS = CONFIG_BASE_DIR + "/transactions.db"
 CONFIG_BLOCKS = CONFIG_BASE_DIR + "/foundBlocks.db"
+CONFIG_MINERAPI = CONFIG_BASE_DIR + "/minerapi.db"
 CONFIG_BANS = CONFIG_BASE_DIR + "/banned.txt"
 CONFIG_WHITELIST = CONFIG_BASE_DIR + "/whitelisted.txt"
 CONFIG_WHITELIST_USR = CONFIG_BASE_DIR + "/whitelistedUsernames.txt"
@@ -282,17 +283,38 @@ def update_job_tiers():
         sleep(60)
 
 
+""" In-memory db for minerapi """
+memory = sqlconn(":memory:",
+                 check_same_thread=False)
+memory_datab = memory.cursor()
+
+memory_datab.execute(
+    """CREATE TABLE
+    IF NOT EXISTS
+    Miners(
+    threadid   TEXT,
+    username   TEXT,
+    hashrate   REAL,
+    sharetime  REAL,
+    accepted   INTEGER,
+    rejected   INTEGER,
+    diff       INTEGER,
+    software   TEXT,
+    identifier TEXT,
+    algorithm  TEXT)""")
+memory.commit()
+
 if not os.path.isfile(CONFIG_TRANSACTIONS):
     with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute(
-            """CREATE TABLE 
-            IF NOT EXISTS 
+            """CREATE TABLE
+            IF NOT EXISTS
             Transactions(
-            timestamp TEXT, 
-            username TEXT, 
-            recipient TEXT, 
-            amount REAL, 
+            timestamp TEXT,
+            username TEXT,
+            recipient TEXT,
+            amount REAL,
             hash TEXT,
             memo TEXT)""")
         conn.commit()
@@ -301,12 +323,12 @@ if not os.path.isfile(CONFIG_BLOCKS):
     with sqlconn(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute(
-            """CREATE TABLE 
-            IF NOT EXISTS 
+            """CREATE TABLE
+            IF NOT EXISTS
             Blocks(
-            timestamp TEXT, 
-            finder TEXT, 
-            amount REAL, 
+            timestamp TEXT,
+            finder TEXT,
+            amount REAL,
             hash TEXT)""")
         conn.commit()
 
@@ -805,12 +827,12 @@ def generate_block(username, reward, new_block_hash, connection, xxhash=False):
         datab = conn.cursor()
         timestamp = now().strftime("%d/%m/%Y %H:%M:%S")
         datab.execute(
-            """INSERT INTO 
+            """INSERT INTO
             Blocks(
-            timestamp, 
-            finder, 
-            amount, 
-            hash) 
+            timestamp,
+            finder,
+            amount,
+            hash)
             VALUES(?, ?, ?, ?)""",
             (timestamp, username + " (" + algo + ")",
                 reward, new_block_hash))
@@ -945,11 +967,11 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             #    (10 options, 11 and 12 = test; ergo 2 out of 12)
             #    TODO: Maybe make this more random """
             # Drop the nonce to force a lower sharetime
-            #rand = fastrandint(10 * difficulty)
+            # rand = fastrandint(10 * difficulty)
             # Set to true to avoid increasing the difficulty by magnitudes
-            #is_sharetime_test = True
+            # is_sharetime_test = True
             # The expected sharetime should be about 10 times lower than before
-            #expected_test_sharetime = sharetime / 10
+            # expected_test_sharetime = sharetime / 10
 
         if using_xxhash:
             job = create_share_xxhash(global_last_block_hash_cp, difficulty)
@@ -1005,7 +1027,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                         if not chip_id in chip_ids:
                             chip_ids.append(chip_id)
                         # else:
-                            #print("Repeated chip ID", username, chip_id)
+                            # print("Repeated chip ID", username, chip_id)
                 except:
                     pass
 
@@ -1346,9 +1368,8 @@ def create_main_api_file():
         }
 
         with open('api.json', 'w') as outfile:
-            # Write JSON to file
             json.dump(
-                server_api,
+                server_api.copy(),
                 outfile,
                 indent=2,
                 ensure_ascii=False)
@@ -1365,6 +1386,33 @@ def create_minerapi():
                 outfile,
                 indent=2,
                 ensure_ascii=False)
+
+        memory_datab.execute("DELETE FROM Miners")
+        memory.commit()
+
+        for threadid in minerapi:
+            memory_datab.execute(
+                """INSERT INTO Miners
+                (threadid, username, hashrate,
+                sharetime, accepted, rejected,
+                diff, software, identifier, algorithm)
+                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (threadid,
+                 minerapi[threadid]["User"],
+                 minerapi[threadid]["Hashrate"],
+                 minerapi[threadid]["Sharetime"],
+                 minerapi[threadid]["Accepted"],
+                 minerapi[threadid]["Rejected"],
+                 minerapi[threadid]["Diff"],
+                 minerapi[threadid]["Software"],
+                 minerapi[threadid]["Identifier"],
+                 minerapi[threadid]["Algorithm"]))
+            memory.commit()
+
+        with sqlconn(CONFIG_MINERAPI) as disk_conn:
+            memory.backup(disk_conn)
+            disk_conn.commit()
+            
         sleep(10)
 
 
@@ -1655,16 +1703,16 @@ def protocol_change_pass(data, connection, username):
         try:
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
-                datab.execute("""SELECT * 
-                        FROM Users 
+                datab.execute("""SELECT *
+                        FROM Users
                         WHERE username = ?""",
                               (username,))
                 old_password_database = datab.fetchone()[1].encode('utf-8')
         except:
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
-                datab.execute("""SELECT * 
-                        FROM Users 
+                datab.execute("""SELECT *
+                        FROM Users
                         WHERE username = ?""",
                               (username,))
                 old_password_database = datab.fetchone()[1]
@@ -1673,8 +1721,8 @@ def protocol_change_pass(data, connection, username):
                 or old_password == DUCO_PASS.encode('utf-8')):
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
-                datab.execute("""UPDATE Users 
-                        set password = ? 
+                datab.execute("""UPDATE Users
+                        set password = ?
                         where username = ?""",
                               (new_password_encrypted, username))
                 conn.commit()
@@ -1793,7 +1841,7 @@ def protocol_get_transactions(data, connection):
         transactionsToReturnStr = str(transactionsToReturn)
         send_data(transactionsToReturnStr, connection)
     except Exception as e:
-        #admin_print("Error getting transactions: " + str(e))
+        # admin_print("Error getting transactions: " + str(e))
         send_data("NO,Internal server error: "+str(e), connection)
         raise Exception("Error getting transactions")
 
@@ -1929,7 +1977,7 @@ def handle(connection, address):
         pass
         # print(traceback.format_exc())
     finally:
-        #print("Closing socket")
+        # print("Closing socket")
         try:
             minerapi.pop(thread_id)
         except:
@@ -1955,14 +2003,14 @@ def handle(connection, address):
 
 
 def countips():
-    """ Check if someone is making more than 
+    """ Check if someone is making more than
         n connections in a peroid of n seconds,
         if so - ban the IP - easy anti-ddos system """
     while True:
         for ip in connections_per_ip.copy():
             try:
                 if connections_per_ip[ip] > 50 and not ip in whitelisted_ips:
-                    #admin_print("Banning DDoSing IP: " + ip)
+                    # admin_print("Banning DDoSing IP: " + ip)
                     permanent_ban(ip)
             except:
                 pass
@@ -1982,7 +2030,7 @@ def flush_iptables():
         low levels. Why? No idea """
     while True:
         os.system("sudo iptables -F INPUT")
-        #admin_print("Flushed iptables")
+        # admin_print("Flushed iptables")
         sleep(60*15)
 
 
