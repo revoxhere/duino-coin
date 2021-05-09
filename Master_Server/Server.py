@@ -61,7 +61,7 @@ MOTD = """You are mining on the official Duino-Coin master server, have fun!"""
 BLOCK_PROBABILITY = 1000000
 BLOCK_REWARD = 7.7
 UPDATE_MINERAPI_EVERY = 5
-EXPECTED_SHARETIME = 12
+EXPECTED_SHARETIME = 22
 MAX_REJECTED_SHARES = 10
 BCRYPT_ROUNDS = 8
 PING_SLEEP_TIME = 0.5  # check protocol duco-s1 or xxhash
@@ -266,7 +266,7 @@ def update_job_tiers():
             "ESP8266": {
                 "difficulty": 1000,
                 "reward": .0045,
-                "max_hashrate": 11000
+                "max_hashrate": 13000
             },
             "DUE": {
                 "difficulty": 1000,
@@ -828,16 +828,17 @@ def sleep_by_cpu_usage(upper_limit):
 
 def create_share_ducos1(last_block_hash, difficulty):
     """ Creates and returns a job for DUCO-S1 algo """
+    last_block_hash_cp = last_block_hash
     try:
         try:
             numeric_result = fastrandint(100 * difficulty)
         except:
-            numeric_result = 100
+            numeric_result = randint(0, 100 * difficulty)
         expected_hash_str = bytes(
-            str(last_block_hash)
+            str(last_block_hash_cp)
             + str(numeric_result), encoding="utf8")
         expected_hash = sha1(expected_hash_str)
-        job = [last_block_hash, expected_hash.hexdigest(), numeric_result]
+        job = [last_block_hash_cp, expected_hash.hexdigest(), numeric_result]
         return job
     except Exception as e:
         print("DUCOS1 ERR:", e)
@@ -845,16 +846,17 @@ def create_share_ducos1(last_block_hash, difficulty):
 
 def create_share_xxhash(last_block_hash, difficulty):
     """ Creates and returns a job for XXHASH algo """
+    last_block_hash_cp = last_block_hash
     try:
         try:
             numeric_result = fastrandint(100 * difficulty)
         except:
-            numeric_result = 100
+            numeric_result = randint(0, 100 * difficulty)
         expected_hash_str = bytes(
-            str(last_block_hash)
+            str(last_block_hash_cp)
             + str(numeric_result), encoding="utf8")
         expected_hash = xxh64(expected_hash_str, seed=2811)
-        job = [last_block_hash, expected_hash.hexdigest(), numeric_result]
+        job = [last_block_hash_cp, expected_hash.hexdigest(), numeric_result]
         return job
     except Exception as e:
         print("XXHASH ERR:", e)
