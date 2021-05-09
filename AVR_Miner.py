@@ -780,18 +780,21 @@ def mine_avr(com):
                                 baudrate=115200,
                                 timeout=AVR_TIMEOUT) as ser:
                         while True:
-                            ser.write(bytes(str(job[0]
-                                                + "," + job[1]
-                                                + "," + job[2]
-                                                + ","),
-                                            encoding="utf-8"))
-
-                            result = ser.readline().decode()
-                            result = result.rstrip("\n").split(",")
-
                             try:
-                                if result[0] and result[1]:
-                                    break
+                                ser.write(bytes(str(job[0]
+                                                    + "," + job[1]
+                                                    + "," + job[2]
+                                                    + ","),
+                                                encoding="utf-8"))
+
+                                result = ser.readline().decode()
+                                result = result.rstrip("\n").split(",")
+
+                                try:
+                                    if result[0] and result[1]:
+                                        break
+                                except:
+                                    pass
                             except:
                                 pass
 
@@ -903,6 +906,8 @@ def mine_avr(com):
                             "error")
                         debug_output("Error parsing response: "
                                      + str(e))
+                        sleep(5)
+                        soc = connect()
 
                 if feedback == "GOOD":
                     # If result was correct
