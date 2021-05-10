@@ -76,6 +76,8 @@ volatile int wifiStatus = 0;
 volatile int wifiPrev = WL_CONNECTED;
 volatile bool OTA_status = false;
 
+volatile char ID[23]; // DUCO MCU ID
+
 void WiFireconnect( void * pvParameters ) {
   int n = 0;
   unsigned long previousMillis = 0;
@@ -266,7 +268,7 @@ void Task1code( void * pvParameters ) {
             Serial.println(F("CORE1 Reconnection successful."));
           }
           client1.flush();
-          client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.3," + String(rigname)); // Send result to server
+          client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.3," + String(rigname) + "," + String((char*)ID)); // Send result to server
           Serial.println(F("CORE1 Posting result and waiting for feedback."));
           while(!client1.available()){
             if (!client1.connected()) {
@@ -420,7 +422,7 @@ void Task2code( void * pvParameters ) {
             Serial.println(F("CORE2 Reconnection successful."));
           }
           client.flush();
-          client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.3," + String(rigname)); // Send result to server
+          client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.3," + String(rigname) + "," + String((char*)ID)); // Send result to server
           Serial.println(F("CORE2 Posting result and waiting for feedback."));
           while(!client.available()){
             if (!client.connected()) {
@@ -457,9 +459,14 @@ void setup() {
   //disableCore1WDT();
   Serial.begin(500000); // Start serial connection
   Serial.println("\n\nDuino-Coin ESP32 Miner v2.3");
+  
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
   btStop();
   WiFi.begin(ssid, password); // Connect to wifi
+  
+  uint64_t chipid = ESP.getEfuseMac(); // Getting chip ID
+  uint16_t chip = (uint16_t)(chipid >> 32); // Preparing for printing a 64 bit value (it's actually 48 bits long) into a char array
+  snprintf((char*)ID, 23, "DUCOID%04X%08X", chip, (uint32_t)chipid); // Storing the 48 bit chip ID into a char array.
   
   OTA_status = false;
   
