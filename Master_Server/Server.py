@@ -75,6 +75,7 @@ CONFIG_MINERAPI = CONFIG_BASE_DIR + "/minerapi.db"
 CONFIG_BANS = CONFIG_BASE_DIR + "/banned.txt"
 CONFIG_WHITELIST = CONFIG_BASE_DIR + "/whitelisted.txt"
 CONFIG_WHITELIST_USR = CONFIG_BASE_DIR + "/whitelistedUsernames.txt"
+API_JSON_URL = "api.json"
 
 config = configparser.ConfigParser()
 try:  # Read sensitive data from config file
@@ -1367,7 +1368,7 @@ def create_main_api_file():
             "Miners":                "server.duinocoin.com/miners.json"
         }
 
-        with open('api.json', 'w') as outfile:
+        with open(API_JSON_URL, 'w') as outfile:
             json.dump(
                 server_api.copy(),
                 outfile,
@@ -1390,24 +1391,27 @@ def create_minerapi():
         memory_datab.execute("DELETE FROM Miners")
         memory.commit()
 
-        for threadid in minerapi:
-            memory_datab.execute(
-                """INSERT INTO Miners
-                (threadid, username, hashrate,
-                sharetime, accepted, rejected,
-                diff, software, identifier, algorithm)
-                VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (threadid,
-                 minerapi[threadid]["User"],
-                 minerapi[threadid]["Hashrate"],
-                 minerapi[threadid]["Sharetime"],
-                 minerapi[threadid]["Accepted"],
-                 minerapi[threadid]["Rejected"],
-                 minerapi[threadid]["Diff"],
-                 minerapi[threadid]["Software"],
-                 minerapi[threadid]["Identifier"],
-                 minerapi[threadid]["Algorithm"]))
-            memory.commit()
+        for threadid in minerapi.copy():
+            try:
+                memory_datab.execute(
+                    """INSERT INTO Miners
+                    (threadid, username, hashrate,
+                    sharetime, accepted, rejected,
+                    diff, software, identifier, algorithm)
+                    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (threadid,
+                     minerapi[threadid]["User"],
+                     minerapi[threadid]["Hashrate"],
+                     minerapi[threadid]["Sharetime"],
+                     minerapi[threadid]["Accepted"],
+                     minerapi[threadid]["Rejected"],
+                     minerapi[threadid]["Diff"],
+                     minerapi[threadid]["Software"],
+                     minerapi[threadid]["Identifier"],
+                     minerapi[threadid]["Algorithm"]))
+            except:
+                pass
+        memory.commit()
 
         with sqlconn(CONFIG_MINERAPI) as disk_conn:
             memory.backup(disk_conn)
