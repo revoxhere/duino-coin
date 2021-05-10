@@ -100,17 +100,6 @@ Note for Windows users: Make sure python and pip are added to your PATH
 
 After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py` OR `py PC_Miner.py`).
 
-<hr>
-
-You can also get the whole Duino-Coin bundle on the AUR - just install it with your favourite AUR Helper:
-
-```BASH
-sudo pacman -S yay
-yay -S duino-coin
-```
-
-Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD).
-
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
