@@ -2,6 +2,7 @@
 - [Commnicating with the master server](#Commnicating-with-the-master-server)
   * [Socket API](#Socket-API)
   * [HTTP JSON API](#HTTP-JSON-API)
+  * [REST JSON API](#REST-JSON-API)
 - [C DUCO library](#C-DUCO-library)
 - [Python3 DUCO module](#Python3-DUCO-module)
 - [Branding colors](#Branding)
@@ -118,6 +119,11 @@ You can use one of the following links to get some data from Duino-Coin Server:
             "Amount generated": 7.00026306
          }
         ```
+        
+### REST JSON API
+
+Documentation for DUCO REST api is available here: [duco-rest-api](https://github.com/dansinclair25/duco-rest-api).
+To access these functions, add port 5000 to the URL: `https://server.duinocoin.com:5000/query`.
 
 ## C DUCO library
 
