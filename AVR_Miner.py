@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.47)
+# Duino-Coin Python AVR Miner (v2.48)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -88,9 +88,9 @@ except ModuleNotFoundError:
     install("pypresence")
 
 # Global variables
-MINER_VER = "2.47"  # Version number
+MINER_VER = "2.48"  # Version number
 SOCKET_TIMEOUT = 15
-AVR_TIMEOUT = 7
+AVR_TIMEOUT = 3.34
 RESOURCES_DIR = "AVRMiner_" + str(MINER_VER) + "_resources"
 shares = [0, 0]
 diff = 0
@@ -318,7 +318,7 @@ def load_config():
         print(Style.RESET_ALL
               + Fore.YELLOW
               + get_string("ports_message"))
-        portlist = serial.tools.list_ports.comports()
+        portlist = serial.tools.list_ports.comports(include_links=True)
         for port in portlist:
             print(Style.RESET_ALL
                   + Style.BRIGHT
@@ -329,24 +329,36 @@ def load_config():
               + Fore.YELLOW
               + get_string("ports_notice"))
 
+        port_names = []
+        for port in portlist:
+            port_names.append(port.device)
+
         avrport = ""
         while True:
-            avrport += input(
+            current_port = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
                 + get_string("ask_avrport")
                 + Fore.RESET
                 + Style.BRIGHT)
-            confirmation = input(
-                Style.RESET_ALL
-                + Fore.YELLOW
-                + get_string("ask_anotherport")
-                + Fore.RESET
-                + Style.BRIGHT)
-            if confirmation == "y" or confirmation == "Y":
-                avrport += ","
+
+            if current_port in port_names:
+                avrport += current_port
+                confirmation = input(
+                    Style.RESET_ALL
+                    + Fore.YELLOW
+                    + get_string("ask_anotherport")
+                    + Fore.RESET
+                    + Style.BRIGHT)
+
+                if confirmation == "y" or confirmation == "Y":
+                    avrport += ","
+                else:
+                    break
             else:
-                break
+                print(Style.RESET_ALL
+                      + Fore.RED
+                      + "Please enter a valid COM port from the list above")
 
         rig_identifier = input(
             Style.RESET_ALL
@@ -781,12 +793,15 @@ def mine_avr(com):
                                 timeout=AVR_TIMEOUT) as ser:
                         while True:
                             try:
+                                debug_output("Sending job to AVR")
                                 ser.write(bytes(str(job[0]
                                                     + "," + job[1]
                                                     + "," + job[2]
                                                     + ","),
                                                 encoding="utf-8"))
+                                ser.flush()
 
+                                debug_output("Reading result from AVR")
                                 result = ser.readline().decode()
                                 result = result.rstrip("\n").split(",")
 
@@ -794,9 +809,9 @@ def mine_avr(com):
                                     if result[0] and result[1]:
                                         break
                                 except:
-                                    pass
+                                    debug_output("Retrying reading data")
                             except:
-                                pass
+                                debug_output("Retrying sending data")
 
                     try:
                         debug_output(
