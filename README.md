@@ -125,6 +125,7 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 <!--*   [Multithreaded Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Multithreaded_PC_Miner.py) by Bilaboz (DEPRECATED) -->
 
 **Other tools:**
+*   [Duino-Coin Arduino library](https://github.com/ricaun/arduino-DuinoCoin) by ricaun
 *   [DuinoCoinI2C](https://github.com/ricaun/DuinoCoinI2C) - Use ESP8266 as a master for Arduinos by ricaun
 *   [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) and troubleshooting helper by Lulaschkas
 *   [duco-miners](https://github.com/dansinclair25/duco-miners) CLI mining dashboard made by dansinclair25
