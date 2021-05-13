@@ -168,6 +168,7 @@ Server source code, documentation for API calls and official libraries for devel
 | Raspberry Pi Zero                                         | 17 kH/s                           | 1                 | 0.7 W          | -                   |
 | Raspberry Pi 3                                            | 440 kH/s                          | 4                 | 5.1 W          | -                   |
 | Raspberry Pi 4                                            | 1.3 MH/s                          | 4                 | 6.4 W          | -                   |
+| ODROID XU4                                                | 1.0 MH/s                          | 8                 | 5 W            | 9                   |
 | Atomic Pi                                                 | 690 kH/s                          | 4                 | 6 W            | -                   |
 | Orange Pi Zero 2                                          | 740 kH/s                          | 4                 | 2.55 W         | -                   |
 | Khadas Vim 2 Pro                                          | 1.12 MH/s                         | 8                 | 6.2 W          | -                   |
