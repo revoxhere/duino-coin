@@ -64,6 +64,7 @@ UPDATE_MINERAPI_EVERY = 5
 EXPECTED_SHARETIME = 22
 MAX_REJECTED_SHARES = 10
 BCRYPT_ROUNDS = 8
+MAX_WORKERS = 50
 PING_SLEEP_TIME = 0.5  # check protocol duco-s1 or xxhash
 # DB files
 DATABASE = 'crypto_database.db'
@@ -75,7 +76,7 @@ CONFIG_MINERAPI = CONFIG_BASE_DIR + "/minerapi.db"
 CONFIG_BANS = CONFIG_BASE_DIR + "/banned.txt"
 CONFIG_WHITELIST = CONFIG_BASE_DIR + "/whitelisted.txt"
 CONFIG_WHITELIST_USR = CONFIG_BASE_DIR + "/whitelistedUsernames.txt"
-API_JSON_URL = "api.json"
+API_JSON_URI = "api.json"
 
 config = configparser.ConfigParser()
 try:  # Read sensitive data from config file
@@ -241,7 +242,7 @@ def update_job_tiers():
             "XXHASH": {
                 "difficulty": 50000,
                 "reward": .0003,
-                "max_hashrate": 4500000
+                "max_hashrate": 900000
             },
             "NET": {
                 "difficulty": int(global_blocks
@@ -515,6 +516,7 @@ def input_management():
             - restart - restarts DUCO server
             - changeusername <user> <newuser> - changes username
             - changpass <user> <newpass> - changes password
+            - remove <username> - removes user
             - ban <username> - bans username
             - jail <username> - jails username""")
 
@@ -572,6 +574,36 @@ def input_management():
                 os.execl(sys.executable, sys.executable, *sys.argv)
             else:
                 admin_print("Canceled")
+
+        elif command[0] == "remove":
+            try:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+                    datab.execute(
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
+                        (command[1],))
+                    old_username = str(datab.fetchone()[0])
+
+                admin_print("Remove user "
+                            + old_username
+                            + "?")
+
+                confirm = input("  Y/n")
+                if confirm == "Y" or confirm == "y" or confirm == "":
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                        datab = conn.cursor()
+                        datab.execute(
+                            """DELETE FROM Users
+                            where username = ?""",
+                            (old_username))
+                        conn.commit()
+                        admin_print("Removed user " + str(command[2]))
+                else:
+                    admin_print("Canceled")
+            except Exception as e:
+                admin_print("Error: " + str(e))
 
         elif command[0] == "balance":
             try:
@@ -898,13 +930,13 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
     ip_addr = address[0].replace("::ffff:", "")
     accepted_shares, rejected_shares = 0, 0
-    global_last_block_hash_cp = global_last_block_hash
     thread_miner_api = {}
     is_first_share = True
     thread_id = id(gevent.getcurrent())
     override_difficulty = ""
 
     while True:
+        global_last_block_hash_cp = global_last_block_hash
         if is_first_share:
             try:
                 username = str(data[1])
@@ -921,8 +953,17 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
             try:
                 workers[ip_addr] += 1
+                workers[username] += 1
             except:
                 workers[ip_addr] = 1
+                workers[username] = 1
+
+            if MAX_WORKERS < workers[ip_addr] or MAX_WORKERS < workers[username]:
+                if not username in whitelisted_usernames:
+                    send_data(
+                        "BAD,Too many workers\n",
+                        connection)
+                    raise Exception("Too many workers")
 
             if username in banlist:
                 permanent_ban(ip_addr)
@@ -982,7 +1023,10 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         send_data(job[0] + "," + job[1] + "," + str(difficulty) + "\n",
                   connection)
 
-        max_hashrate = job_tiers[req_difficulty]["max_hashrate"]
+        if using_xxhash:
+            max_hashrate = job_tiers["XXHASH"]["max_hashrate"]
+        else:
+            max_hashrate = job_tiers[req_difficulty]["max_hashrate"]
         numeric_result = job[2]
 
         job_sent_timestamp = utime.now()
@@ -1086,13 +1130,14 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             """ Kolka V2 hashrate check """
             rejected_shares += 1
 
-            penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-            try:
-                balances_to_update[username] += penalty
-            except:
-                balances_to_update[username] = penalty
+            #penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
+            #try:
+                #balances_to_update[username] += penalty
+            #except:
+                #balances_to_update[username] = penalty
 
-            override_difficulty = kolka_v2(req_difficulty, job_tiers)
+            if not using_xxhash:
+                override_difficulty = kolka_v2(req_difficulty, job_tiers)
 
             send_data("BAD\n", connection)
 
@@ -1150,11 +1195,11 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             """ Incorrect result received """
             rejected_shares += 1
 
-            penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-            try:
-                balances_to_update[username] += penalty
-            except:
-                balances_to_update[username] = penalty
+            #penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
+            #try:
+                #balances_to_update[username] += penalty
+            #except:
+                #balances_to_update[username] = penalty
 
             send_data("BAD\n", connection)
 
@@ -1368,7 +1413,7 @@ def create_main_api_file():
             "Miners":                "server.duinocoin.com/miners.json"
         }
 
-        with open(API_JSON_URL, 'w') as outfile:
+        with open(API_JSON_URI, 'w') as outfile:
             json.dump(
                 server_api.copy(),
                 outfile,
@@ -1900,10 +1945,12 @@ def handle(connection, address):
                     it's not our job so we pass him to the
                     DUCO-S1 job handler """
                 protocol_mine(data, connection, address)
+                username = data[1]
 
             elif data[0] == "JOBXX":
                 """ Same situation as above, just use the XXHASH switch """
                 protocol_mine(data, connection, address, using_xxhash=True)
+                username = data[1]
 
             elif data[0] == "LOGI":
                 """ Client requested authentication """
