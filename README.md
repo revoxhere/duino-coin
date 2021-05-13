@@ -19,6 +19,8 @@
   </a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_pl_PL.md">
     <img src="https://img.shields.io/badge/Polski-e66767.svg?style=for-the-badge" />
+  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_ru_RU.md">
+    <img src="https://img.shields.io/badge/русский-3dc1d3.svg?style=for-the-badge" />
   </a>
   <br />
   <a href="https://wallet.duinocoin.com">
