@@ -165,7 +165,7 @@ Server source code, documentation for API calls and official libraries for devel
 | Teensy 4.1                                                | 12.8 kH/s                         | 1                 | -              | -                   |
 | NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 9.3 kH/s                          | 1                 | 0.6 W          | 6-8                 |
 | ESP32                                                     | 23 kH/s                           | 2                 | 1 W            | 8-9                 |
-| Raspberry Pi Zero                                         | 17 kH/s                           | 1                 | 0.7 W          | -                   |
+| Raspberry Pi Zero                                         | 17 kH/s                           | 1                 | 1.1 W          | -                   |
 | Raspberry Pi 3                                            | 440 kH/s                          | 4                 | 5.1 W          | -                   |
 | Raspberry Pi 4                                            | 1.3 MH/s                          | 4                 | 6.4 W          | -                   |
 | ODROID XU4                                                | 1.0 MH/s                          | 8                 | 5 W            | 9                   |
