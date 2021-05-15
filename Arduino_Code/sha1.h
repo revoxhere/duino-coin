@@ -30,7 +30,7 @@ class Sha1Wrapper : public Print
 		void init(void);
 		uint8_t * result(void);
 #ifdef SHA1_ENABLE_HMAC
-		void initHmac(const uint8_t * secret, unsigned int secretLength);
+		void initHmac(const uint8_t * secret, uint16_t secretLength);
 		uint8_t * resultHmac(void);
 #endif
 		virtual size_t write(uint8_t);
