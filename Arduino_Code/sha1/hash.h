@@ -33,7 +33,7 @@ void sha1_hasher_add_byte(sha1_hasher_t hasher, uint8_t byte);
  * once the hasher has been pad'ed (this happens, when 
  * sha1_hasher_gethash or sha1_hasher_gethmac are invoced).
  * */
-int sha1_hasher_putc(sha1_hasher_t hasher, uint8_t byte);
+uint8_t sha1_hasher_putc(sha1_hasher_t hasher, uint8_t byte);
 
 void sha1_hasher_pad(sha1_hasher_t hasher);
 
