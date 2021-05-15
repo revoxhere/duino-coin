@@ -742,6 +742,13 @@ def Thread(
                 serverVersion = soc.recv(3).decode().rstrip(
                     "\n")  # Get server version
                 debugOutput("Server version: " + serverVersion)
+
+                soc.send(bytes("MOTD", encoding="utf8"))
+                motd = soc.recv(1024).decode().rstrip("\n")
+
+                print(Fore.BLUE + motd + Fore.RESET + "\n")
+
+
                 if (float(serverVersion) <= float(MINER_VER)
                         and len(serverVersion) == 3):
                     # If miner is up-to-date, display a message and continue
