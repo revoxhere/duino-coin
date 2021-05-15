@@ -33,7 +33,7 @@ sha1_hasher_t sha1_hasher_new(void)
 void sha1_hasher_init(sha1_hasher_t hasher)
 {
 #ifdef __AVR__
-	int i;
+	uint8_t i;
 	for(i = 0; i < SHA1_HASH_LEN / 4; i++)
 	{
 		hasher->state.words[i] = pgm_read_dword(sha1_init_state + i);
