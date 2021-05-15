@@ -27,32 +27,37 @@
 // Create globals
 String lastblockhash = "";
 String newblockhash = "";
-unsigned int difficulty = 0;
-unsigned int ducos1result = 0;
+String DUCOID = "";
+uint16_t difficulty = 0;
+uint16_t ducos1result = 0;
+const uint16_t job_maxsize = 104; // 40+40+20+3 is the maximum size of a job
+uint8_t job[job_maxsize];
 
 // Setup stuff
 void setup() {
   // Prepare built-in led pin as output
   pinMode(LED_BUILTIN, OUTPUT);
+  DUCOID = get_DUCOID();
   // Open serial port
   Serial.begin(115200);
   Serial.setTimeout(7000);
+  while(!Serial); // For Arduino Leonardo or any board with the ATmega32U4
+  Serial.flush();
 }
 
 // DUCO-S1A hasher
-int ducos1a(String lastblockhash, String newblockhash, int difficulty)
+uint16_t ducos1a(String lastblockhash, String newblockhash, uint16_t difficulty)
 {
   // DUCO-S1 algorithm implementation for AVR boards (DUCO-S1A)
   newblockhash.toUpperCase();
   const char *c = newblockhash.c_str();
-  size_t len = strlen(c);
-  size_t final_len = len / 2;
-  uint8_t job[final_len + 1];
+  size_t final_len = newblockhash.length() / 2;
+  memset(job, 0, job_maxsize);
   for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
     job[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
 
   // Difficulty loop
-  for (int ducos1res = 0; ducos1res < difficulty * 100 + 1; ducos1res++)
+  for (uint16_t ducos1res = 0; ducos1res < difficulty * 100 + 1; ducos1res++)
   {
     Sha1.init();
     Sha1.print(lastblockhash + ducos1res);
@@ -93,18 +98,16 @@ void loop() {
     while (Serial.available())
       Serial.read();
     // Start time measurement
-    unsigned long startTime = micros();
+    uint32_t startTime = micros();
     // Call DUCO-S1A hasher
     ducos1result = ducos1a(lastblockhash, newblockhash, difficulty);
-    // End time measurement
-    unsigned long endTime = micros();
     // Calculate elapsed time
-    unsigned long elapsedTime = endTime - startTime;
+    uint32_t elapsedTime = micros() - startTime;
     // Clearing the receive buffer before sending the result.
     while (Serial.available())
       Serial.read();
     // Send result back to the program with share time
-    Serial.print(String(ducos1result) + "," + String(elapsedTime) + "," + String(get_DUCOID()) + "\n");
+    Serial.print(String(ducos1result) + "," + String(elapsedTime) + "," + DUCOID + "\n");
     // Turn on built-in led
     PORTB = PORTB | B00100000;
     // Wait a bit

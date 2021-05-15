@@ -24,7 +24,7 @@ void Sha1Wrapper::init(void)
 }
 
 #ifdef SHA1_ENABLE_HMAC
-void Sha1Wrapper::initHmac(const uint8_t * secret, unsigned int secretLength)
+void Sha1Wrapper::initHmac(const uint8_t * secret, uint16_t secretLength)
 {
 	sha1_hasher_init_hmac(&_hasher, secret, secretLength);
 }

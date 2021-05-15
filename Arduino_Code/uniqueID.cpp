@@ -33,7 +33,7 @@ ArduinoUniqueID::ArduinoUniqueID()
 	id[7] = chipid >> 40;
 
 #elif defined(ARDUINO_ARCH_SAM)
-	unsigned int status ;
+	uint16_t status ;
 	/* Send the Start Read unique Identifier command (STUI) by writing the Flash Command Register with the STUI command.*/
 	EFC1->EEFC_FCR = (0x5A << 24) | EFC_FCMD_STUI;
 	do
@@ -47,7 +47,7 @@ ArduinoUniqueID::ArduinoUniqueID()
 	pdwUniqueID[1] = *(uint32_t *)(IFLASH1_ADDR + 4);
 	pdwUniqueID[2] = *(uint32_t *)(IFLASH1_ADDR + 8);
 	pdwUniqueID[3] = *(uint32_t *)(IFLASH1_ADDR + 12);
-	for (int i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < 4; i++)
 	{
 		id[i*4+0] = (uint8_t)(pdwUniqueID[i] >> 24);
 		id[i*4+1] = (uint8_t)(pdwUniqueID[i] >> 16);
@@ -89,7 +89,7 @@ ArduinoUniqueID::ArduinoUniqueID()
 	pdwUniqueID[2] = SERIAL_NUMBER_WORD_2;
 	pdwUniqueID[3] = SERIAL_NUMBER_WORD_3;
 
-	for (int i = 0; i < 4; i++)
+	for (uint8_t i = 0; i < 4; i++)
 	{
 		id[i*4+0] = (uint8_t)(pdwUniqueID[i] >> 24);
 		id[i*4+1] = (uint8_t)(pdwUniqueID[i] >> 16);
@@ -102,7 +102,7 @@ ArduinoUniqueID::ArduinoUniqueID()
 	pdwUniqueID[0] = HAL_GetUIDw0();
 	pdwUniqueID[1] = HAL_GetUIDw1();
 	pdwUniqueID[2] = HAL_GetUIDw2();
-	for (int i = 0; i < 3; i++)
+	for (uint8_t i = 0; i < 3; i++)
 	{
 		id[i*4+0] = (uint8_t)(pdwUniqueID[i] >> 24);
 		id[i*4+1] = (uint8_t)(pdwUniqueID[i] >> 16);
