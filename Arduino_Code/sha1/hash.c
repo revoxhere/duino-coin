@@ -21,14 +21,14 @@
 
 void sha1_hash_block(sha1_hasher_t hasher)
 {
-	int i;
+	uint8_t i;
 	uint32_t a, b, c, d, e, temp;
 
 	// XXX: Omit initializing the message schedule.
 	// See how I did this below.
 	// Allocating the message schedule would eat 2k RAM
 	// which is a no-go on an AVR. 
-	int i4;
+	uint8_t i4;
 	// On x86 we have to change the byte order, because...
 	// I actually do not know.
 	for(i = i4 = 0; i < 16; i++, i4 += 4)
@@ -117,7 +117,7 @@ void sha1_hasher_add_byte(sha1_hasher_t hasher, uint8_t byte)
  * once the hasher has been pad'ed (this happens, when 
  * sha1_hasher_gethash or sha1_hasher_gethmac are invoced).
  * */
-int sha1_hasher_putc(sha1_hasher_t hasher, uint8_t byte)
+uint8_t sha1_hasher_putc(sha1_hasher_t hasher, uint8_t byte)
 {
 	if(hasher->_lock)
 	{
@@ -156,7 +156,7 @@ void sha1_hasher_pad(sha1_hasher_t hasher)
 uint8_t * sha1_hasher_gethash(sha1_hasher_t hasher)
 {
 	sha1_hasher_pad(hasher);
-	int i;
+	uint8_t i;
 
 	// switch byte order.
 	for(i = 0; i < 8; i++)
@@ -176,7 +176,7 @@ uint8_t * sha1_hasher_gethash(sha1_hasher_t hasher)
 #ifdef SHA1_ENABLE_HMAC
 void sha1_hasher_init_hmac(sha1_hasher_t hasher, const uint8_t * key, size_t key_len)
 {
-	int i;
+	uint8_t i;
 	memset(hasher->hmac_key_buffer, 0, SHA1_BLOCK_LEN);
 
 	if(key_len > SHA1_BLOCK_LEN)
@@ -203,7 +203,7 @@ void sha1_hasher_init_hmac(sha1_hasher_t hasher, const uint8_t * key, size_t key
 }
 uint8_t * sha1_hasher_gethmac(sha1_hasher_t hasher)
 {
-	int i;
+	uint8_t i;
 	memcpy(hasher->hmac_inner_hash, sha1_hasher_gethash(hasher),
 			SHA1_HASH_LEN);
 	sha1_hasher_init(hasher);
