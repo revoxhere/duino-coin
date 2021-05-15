@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for Arduino boards v2.51
+//  Code for Arduino boards v2.52
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ void setup() {
   DUCOID = get_DUCOID();
   // Open serial port
   Serial.begin(115200);
-  Serial.setTimeout(7000);
+  Serial.setTimeout(3334);
   while(!Serial); // For Arduino Leonardo or any board with the ATmega32U4
   Serial.flush();
 }
