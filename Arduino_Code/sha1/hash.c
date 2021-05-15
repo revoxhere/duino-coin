@@ -159,7 +159,7 @@ uint8_t * sha1_hasher_gethash(sha1_hasher_t hasher)
 	uint8_t i;
 
 	// switch byte order.
-	for(i = 0; i < 8; i++)
+	for(i = 0; i < (SHA1_HASH_LEN / 4); i++)
 	{
 		uint32_t a, b;
 		a = hasher->state.words[i];
