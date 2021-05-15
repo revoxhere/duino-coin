@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.48)
+# Duino-Coin Python AVR Miner (v2.49)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -24,6 +24,7 @@ from subprocess import DEVNULL, Popen, check_call
 from threading import Thread as thrThread
 from threading import Lock
 from time import ctime, sleep, strptime, time
+from statistics import mean
 import select
 
 
@@ -88,11 +89,12 @@ except ModuleNotFoundError:
     install("pypresence")
 
 # Global variables
-MINER_VER = "2.48"  # Version number
+MINER_VER = "2.49"  # Version number
 SOCKET_TIMEOUT = 15
 AVR_TIMEOUT = 3.34
 RESOURCES_DIR = "AVRMiner_" + str(MINER_VER) + "_resources"
 shares = [0, 0]
+hashrate_mean = []
 diff = 0
 donator_running = False
 job = ""
@@ -825,6 +827,10 @@ def mine_avr(com):
                             int(result[0]) * 1000000 / int(result[1]), 2)
                         debug_output(
                             "Calculated hashrate (" + str(hashrate) + ")")
+
+                        hashrate_mean.append(hashrate)
+                        # Get average from the last 20 hashrate measurements
+                        hashrate = mean(hashrate_mean[-20:])
                         try:
                             chipID = result[2]
                             debug_output(
@@ -977,7 +983,7 @@ def mine_avr(com):
                             + " ∙ "
                             + Fore.CYAN
                             + "ping "
-                            + str("%02.0f" % int(ping))
+                            + str("%03.0f" % int(ping))
                             + "ms")
 
                 elif feedback == "BLOCK":
