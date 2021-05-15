@@ -98,11 +98,11 @@ void loop() {
     while (Serial.available())
       Serial.read();
     // Start time measurement
-    uint16_t startTime = micros();
+    uint32_t startTime = micros();
     // Call DUCO-S1A hasher
     ducos1result = ducos1a(lastblockhash, newblockhash, difficulty);
     // Calculate elapsed time
-    uint16_t elapsedTime = micros() - startTime;
+    uint32_t elapsedTime = micros() - startTime;
     // Clearing the receive buffer before sending the result.
     while (Serial.available())
       Serial.read();
