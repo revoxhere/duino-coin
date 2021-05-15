@@ -86,7 +86,7 @@ String get_DUCOID() {
 // Infinite loop
 void loop() {
   // Wait for serial data
-  while (Serial.available() > 0) {
+  if (Serial.available() > 0) {
     memset(job, 0, job_maxsize);
     // Read last block hash
     lastblockhash = Serial.readStringUntil(',');
