@@ -51,15 +51,15 @@ uint16_t ducos1a(String lastblockhash, String newblockhash, uint16_t difficulty)
   // DUCO-S1 algorithm implementation for AVR boards (DUCO-S1A)
   newblockhash.toUpperCase();
   const char *c = newblockhash.c_str();
-  size_t final_len = newblockhash.length() / 2;
+  size_t final_len = newblockhash.length() >> 1;
   for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
-    job[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
+    job[j] = ((((c[i] & 0x1F) + 9) % 25) << 4) + ((c[i + 1] & 0x1F) + 9) % 25;
 
   // Difficulty loop
   for (uint16_t ducos1res = 0; ducos1res < difficulty * 100 + 1; ducos1res++)
   {
     Sha1.init();
-    Sha1.print(lastblockhash + ducos1res);
+    Sha1.print(lastblockhash + String(ducos1res));
     // Get SHA1 result
     uint8_t *hash_bytes = Sha1.result();
     if (memcmp(hash_bytes, job, SHA1_HASH_LEN) == 0)
