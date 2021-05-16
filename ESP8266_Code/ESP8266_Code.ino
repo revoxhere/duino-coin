@@ -65,7 +65,7 @@ namespace {
   #define END_TOKEN  '\n'
   #define SEP_TOKEN  ','
 
-  #define LED_BUILTIN 1
+  #define LED_BUILTIN 2
 
   #define BLINK_SHARE_FOUND    1
   #define BLINK_SETUP_COMPLETE 2
