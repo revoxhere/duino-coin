@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards - V2.4.6
+//  Code for ESP8266 boards - V2.4.7
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -24,21 +24,43 @@
 #include <ESP8266mDNS.h> // OTA libraries
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
+
+//////////////////////////////////////////////////////////
+// NOTE: If during compilation, the below line causes a
+// "fatal error: Crypto.h: No such file or directory"
+// message to occur; it means that you do NOT have the
+// latest version of the ESP8266/Arduino Core library.
+//
+// To install/upgrade it, go to the below link and 
+// follow the instructions of the readme file: 
+// 
+//       https://github.com/esp8266/Arduino
+//////////////////////////////////////////////////////////
 #include <Crypto.h>  // experimental SHA1 crypto library
 using namespace experimental::crypto;
+
+#include <Ticker.h>
 
 namespace {
   const char* ssid          = "WiFi SSID";   // Change this to your WiFi SSID
   const char* password      = "WiFi Pass";    // Change this to your WiFi password
   const char* ducouser      = "DUCO Username";     // Change this to your Duino-Coin username
   const char* rigIdentifier = "None";       // Change this if you want a custom miner name
-
+  
   const char * host = "51.15.127.80"; // Static server IP
   const int port = 2811;
   unsigned int Shares = 0; // Share variable
 
   WiFiClient client;
   String clientBuffer = "";
+
+  // Loop WDT... please don't feed me...
+  // See lwdtcb() and lwdtFeed() below
+  Ticker lwdTimer; 
+  #define LWD_TIMEOUT   60000
+
+  unsigned long lwdCurrentMillis = 0;
+  unsigned long lwdTimeOutMillis = LWD_TIMEOUT;
 
   #define END_TOKEN  '\n'
   #define SEP_TOKEN  ','
@@ -53,6 +75,7 @@ namespace {
   void SetupWifi() {
     Serial.println("Connecting to: " + String(ssid));
     WiFi.mode(WIFI_STA); // Setup ESP in client mode
+    WiFi.setSleepMode(WIFI_NONE_SLEEP);
     WiFi.begin(ssid, password); // Connect to wifi
 
     int wait_passes = 0;
@@ -108,17 +131,22 @@ namespace {
     ESP.reset();
   }
 
-  void VerifyWifi() {
-    unsigned long lastMillis = millis();
-    
-    while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) {
-      WiFi.reconnect();
+  // Our new WDT to help prevent freezes
+  // code concept taken from https://sigmdel.ca/michel/program/esp8266/arduino/watchdogs2_en.html
+  void ICACHE_RAM_ATTR lwdtcb(void) 
+  {
+    if ((millis() - lwdCurrentMillis > LWD_TIMEOUT) || (lwdTimeOutMillis - lwdCurrentMillis != LWD_TIMEOUT))
+      RestartESP("Loop WDT Failed!");
+  }
 
-      if ((millis() - lastMillis) > 60000) {
-        // after 1-minute of failed re-connects... 
-        RestartESP("Unable to reconnect to wifi...");
-      }
-    }
+  void lwdtFeed(void) {
+    lwdCurrentMillis = millis();
+    lwdTimeOutMillis = lwdCurrentMillis + LWD_TIMEOUT;
+  }
+
+  void VerifyWifi() {
+    while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) 
+      WiFi.reconnect();
   }
 
   void handleSystemEvents(void) {
@@ -165,8 +193,7 @@ namespace {
       return;
 
     Serial.println("\nConnecting to Duino-Coin server...");
-    if (!client.connect(host, port)) 
-      RestartESP("Connection failed.");
+    while (!client.connect(host, port));
   
     waitForClientData();
     Serial.println("Connected to the server. Server version: " + clientBuffer );
@@ -187,17 +214,22 @@ namespace {
 
 void setup() {
   Serial.begin(115200); // Start serial connection
-  Serial.println("\nDuino-Coin ESP8266 Miner v2.4.6");
+  Serial.println("\nDuino-Coin ESP8266 Miner v2.4.7");
 
   pinMode(LED_BUILTIN, OUTPUT); // prepare for blink() function
 
   SetupWifi();
   SetupOTA();
-
+  
+  lwdtFeed();
+  lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb); 
+  
   blink(BLINK_SETUP_COMPLETE); // Blink 2 times - indicate sucessfull connection with wifi network
 }
 
 void loop() {
+  lwdtFeed(); // Feed the DOG! You now have 1-minute to feed me again or I cause Reboot...!
+
   VerifyWifi();
   ArduinoOTA.handle(); // Enable OTA handler
   ConnectToServer();
@@ -225,7 +257,7 @@ void loop() {
       float ElapsedTimeSeconds = ElapsedTime * .000001f; // Convert to seconds
       float HashRate = iJob / ElapsedTimeSeconds;
 
-      client.print(String(iJob) + "," + String(HashRate) + ",ESP8266 Miner v2.4.6" + "," + String(rigIdentifier)); // Send result to server
+      client.print(String(iJob) + "," + String(HashRate) + ",ESP8266 Miner v2.4.7" + "," + String(rigIdentifier)); // Send result to server
       waitForClientData();
 
       Shares++;
