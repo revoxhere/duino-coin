@@ -104,7 +104,7 @@ void WiFireconnect( void * pvParameters ) {
       Serial.println(F("\nWiFi disconnected!"));
       WiFi.disconnect();
       Serial.println(F("Scanning for WiFi networks"));
-      n = WiFi.scanNetworks();
+      n = WiFi.scanNetworks(false, true);
       Serial.println(F("Scan done"));
       if (n == 0) {
           Serial.println(F("No networks found. Resetting ESP32."));
