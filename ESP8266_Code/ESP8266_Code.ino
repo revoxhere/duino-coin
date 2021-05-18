@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards - V2.4.7
+//  Code for ESP8266 boards - V2.52
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -214,7 +214,7 @@ namespace {
 
 void setup() {
   Serial.begin(115200); // Start serial connection
-  Serial.println("\nDuino-Coin ESP8266 Miner v2.4.7");
+  Serial.println("\nDuino-Coin ESP8266 Miner v2.52");
 
   pinMode(LED_BUILTIN, OUTPUT); // prepare for blink() function
 
@@ -257,7 +257,7 @@ void loop() {
       float ElapsedTimeSeconds = ElapsedTime * .000001f; // Convert to seconds
       float HashRate = iJob / ElapsedTimeSeconds;
 
-      client.print(String(iJob) + "," + String(HashRate) + ",ESP8266 Miner v2.4.7" + "," + String(rigIdentifier)); // Send result to server
+      client.print(String(iJob) + "," + String(HashRate) + ",ESP8266 Miner v2.52" + "," + String(rigIdentifier)); // Send result to server
       waitForClientData();
 
       Shares++;
