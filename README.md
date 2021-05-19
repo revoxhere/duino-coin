@@ -2,6 +2,7 @@
 - [Commnicating with the master server](#Commnicating-with-the-master-server)
   * [Socket API](#Socket-API)
   * [HTTP JSON API](#HTTP-JSON-API)
+  * [REST JSON API](#REST-JSON-API)
 - [C DUCO library](#C-DUCO-library)
 - [Python3 DUCO module](#Python3-DUCO-module)
 - [Branding colors](#Branding)
@@ -31,17 +32,16 @@ If the registration fails, the server will send `NO,Reason of failed registratio
 After loging-in you have access to the following commands:
 *   `PING` - Server will return "Pong!" message ASAP 
 *   `BALA` - Server will return balance of current user
-*   `JOB` - Server will return job for mining using DUCO-S1 (-S1A)
-    *   You can also use `JOB,username` (or `JOBXX,username` for XXHASH) to mine without loging-in
-
-    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, you'll get the network diff) where diff is one of the below:
-        * `AVR`     - diff      5 - used for official AVR boards mining
-        * `ESP`     - diff    125 - used for official ESP8266 boards mining **(BEING DEPRECATED)**
-        * `ESP8266` - diff    500 - used for official ESP8266 boards mining **(FOR NEW 2.4 CODE)**
-        * `ESP32`   - diff    500 - used for official ESP32 boards mining
-        * `LOW`     - diff     4k - used for official Web Miner
-        * `MEDIUM`  - diff    40k - used for lower-diff PC mining
-        * `NET`     - diff  ~100k - used for PC mining - network difficulty
+*   `UEXI,username` - Server will check if the user is registered and return `NO,User is not registered` or `OK,User is registered`
+*   `JOB,username` (or `JOBXX,username` for XXHASH) - Server will return job for mining using DUCO-S1 (-S1A)
+    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, the network diff will be given) where diff is one of the below:
+        * `AVR`     - diff      5 - used for mining on Arduino, AVR boards
+        * `DUE`     - diff   1000 - planned for mining on Arduino Due boards
+        * `ESP8266` - diff   1000 - used for mining on ESP8266 boards 
+        * `ESP32`   - diff   1500 - used for mining on ESP32 boards
+        * `LOW`     - diff     5k - used for mining on Web Miner, RPis, PC
+        * `MEDIUM`  - diff    40k - used for mining on PC
+        * `NET`     - diff  ~100k - used for mining on PC (network difficulty)
         * `EXTREME` - diff   950k - not used anywhere officially
     
     *   When sending the mining result, you can pass the hashrate count and the name of the miner along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s) and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner"
@@ -119,6 +119,11 @@ You can use one of the following links to get some data from Duino-Coin Server:
             "Amount generated": 7.00026306
          }
         ```
+        
+### REST JSON API
+
+Documentation for DUCO REST api is available here: [duco-rest-api](https://github.com/dansinclair25/duco-rest-api).
+To access these functions, add port 5000 to the URL: `https://server.duinocoin.com:5000/query`.
 
 ## C DUCO library
 
