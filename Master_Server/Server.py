@@ -27,14 +27,15 @@ from sys import exit
 from re import sub, match
 from sqlite3 import connect as sqlconn
 from os import path as ospath
-from kolka_module import *
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from collections import OrderedDict
 from operator import itemgetter
 # Duino-Coin server libraries
 import pool_functions as PF
+from kolka_module import *
 from server_functions import receive_data, send_data
+from kolka_chip_module import *
 # python3 -m pip install bcrypt
 from bcrypt import checkpw, hashpw, gensalt
 # python3 -m pip install fastrand
@@ -467,6 +468,7 @@ def floatmap(x, in_min, in_max, out_min, out_max):
 
 
 def database_updater():
+    db_err_counter = 0
     while True:
         try:
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
@@ -498,6 +500,11 @@ def database_updater():
                 conn.commit()
         except Exception as e:
             admin_print("Database error:", e)
+            db_err_counter += 1
+            if db_err_counter > 5:
+                admin_print("Restarting server - too many DB errs")
+                os.system("sudo iptables -F INPUT")
+                os.execl(sys.executable, sys.executable, *sys.argv)
         sleep(SAVE_TIME)
 
 
@@ -909,7 +916,7 @@ def create_share_ducos1(last_block_hash, difficulty):
         expected_hash_str = bytes(
             str(last_block_hash_cp)
             + str(numeric_result
-        ), encoding="utf8")
+                  ), encoding="utf8")
         expected_hash = sha1(expected_hash_str)
         job = [last_block_hash_cp, expected_hash.hexdigest(), numeric_result]
         return job
@@ -928,7 +935,7 @@ def create_share_xxhash(last_block_hash, difficulty):
         expected_hash_str = bytes(
             str(last_block_hash_cp)
             + str(numeric_result
-        ), encoding="utf8")
+                  ), encoding="utf8")
         expected_hash = xxh64(expected_hash_str, seed=2811)
         job = [last_block_hash_cp, expected_hash.hexdigest(), numeric_result]
         return job
@@ -1030,7 +1037,10 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             # The expected sharetime should be about 10 times lower than before
             # expected_test_sharetime = sharetime / 10
 
-        try:
+        if (accepted_shares > 0
+                and accepted_shares % UPDATE_MINERAPI_EVERY*5 == 0
+            or rejected_shares > 0
+                and rejected_shares % UPDATE_MINERAPI_EVERY*5 == 0):
             try:
                 ip_workers = workers[ip_addr]
             except:
@@ -1045,8 +1055,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                         "BAD,Too many workers\n",
                         connection)
                     raise Exception("Too many workers")
-        except:
-            pass
 
         if using_xxhash:
             job = create_share_xxhash(global_last_block_hash_cp, difficulty)
@@ -1099,11 +1107,16 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         if abs(reported_hashrate - hashrate) > 5000:
             reported_hashrate = hashrate
 
+        wrong_chip_id = False
         if not using_xxhash and req_difficulty == "AVR":
             try:
-                chip_id = str(result[4])
+                chip_id = str(result[4]).rstrip()
+                if not check_id(chip_id):
+                    #print("Possible wrong chip:", username, chip_id)
+                    wrong_chip_id = True
             except:
-                chip_id = "None"
+                wrong_chip_id = True
+
             chip_ids[username].append(chip_id)
 
         if rejected_shares > MAX_REJECTED_SHARES:
@@ -1154,6 +1167,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             if username in banlist:
                 permanent_ban(ip_addr)
                 raise Exception("User banned")
+
             global_blocks += UPDATE_MINERAPI_EVERY*5
             global_last_block_hash = job[1]
 
@@ -1161,18 +1175,12 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             """ Kolka V2 hashrate check """
             rejected_shares += 1
 
-            # penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-            # try:
-            # balances_to_update[username] += penalty
-            # except:
-            # balances_to_update[username] = penalty
-
             if not using_xxhash:
                 override_difficulty = kolka_v2(req_difficulty, job_tiers)
 
             send_data("BAD\n", connection)
 
-        # elif req_difficulty == "AVR":
+        #elif req_difficulty == "AVR":
         #     """ Kolka V2 hashrate check for AVRs """
         #     if not reported_hashrate > 10:
         #         rejected_shares += 1
@@ -1189,18 +1197,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             """ Correct result received """
             accepted_shares += 1
 
-            if fastrandint(BLOCK_PROBABILITY) != 1:
-                send_data("GOOD\n", connection)
-            else:
-                """ Block found """
-                if using_xxhash:
-                    reward = generate_block(
-                        username, reward, job[1], connection, xxhash=True)
-                else:
-                    reward = generate_block(
-                        username, reward, job[1], connection)
-                send_data("BLOCK\n", connection)
-
             try:
                 if workers[ip_addr] < workers[username]:
                     this_user_miners = workers[username]
@@ -1213,6 +1209,9 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 basereward = job_tiers[req_difficulty]["reward"]
                 reward = kolka_v1(basereward, sharetime,
                                   difficulty, this_user_miners)
+                if wrong_chip_id:
+                    reward = reward / 10
+                    ### TODO
 
                 if username in jail:
                     try:
@@ -1229,15 +1228,21 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                     except:
                         balances_to_update[username] = reward
 
+            if fastrandint(BLOCK_PROBABILITY) != 1:
+                send_data("GOOD\n", connection)
+            else:
+                """ Block found """
+                if using_xxhash:
+                    reward = generate_block(
+                        username, reward, job[1], connection, xxhash=True)
+                else:
+                    reward = generate_block(
+                        username, reward, job[1], connection)
+                send_data("BLOCK\n", connection)
+
         else:
             """ Incorrect result received """
             rejected_shares += 1
-
-            # penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-            # try:
-            # balances_to_update[username] += penalty
-            # except:
-            # balances_to_update[username] = penalty
 
             send_data("BAD\n", connection)
 
@@ -1276,6 +1281,23 @@ def hashrate_prefix(hashrate: int, accuracy: int):
     else:
         prefix = " H/s"
     return str(round(hashrate, accuracy)) + str(prefix)
+
+
+def power_prefix(wattage: int, accuracy: int):
+    """ Input: hattage as int
+        Output rounded wattage with scientific prefix as string """
+    if wattage >= 900000000:
+        prefix = " GW"
+        wattage = wattage / 1000000000
+    elif wattage >= 900000:
+        prefix = " MW"
+        wattage = wattage / 1000000
+    elif wattage >= 900:
+        prefix = " kW"
+        wattage = wattage / 1000
+    else:
+        prefix = " W"
+    return str(round(wattage, accuracy)) + str(prefix)
 
 
 def count_registered_users():
@@ -1370,6 +1392,12 @@ def get_blocks_list():
 
 def create_secondary_api_files():
     while True:
+        with open('chips.json', 'w') as outfile:
+            json.dump(
+                chip_ids.copy(),
+                outfile,
+                indent=2,
+                ensure_ascii=False)
         with open('transactions.json', 'w') as outfile:
             json.dump(
                 get_transaction_list(),
@@ -1400,7 +1428,7 @@ def create_main_api_file():
 
     while True:
         try:
-            total_hashrate = 0
+            total_hashrate, net_wattage = 0, 0
             ducos1_hashrate, xxhash_hashrate = 0, 0
             minerapi_public, miners_per_user = {}, {}
             miner_list = []
@@ -1411,23 +1439,44 @@ def create_main_api_file():
                         ducos1_hashrate += minerapi[miner]["Hashrate"]
                     else:
                         xxhash_hashrate += minerapi[miner]["Hashrate"]
+
+                    # Calculate power usage
+                    if "ESP32" in minerapi[miner]["Software"].upper():
+                        # 1,4W (but 2 cores) for ESP32 @ peak 480mA/3,3V
+                        net_wattage += 0.7
+                    elif "ESP8266" in minerapi[miner]["Software"].upper():
+                        # 1,3W for ESP8266 @ peak 400mA/3,3V
+                        net_wattage += 1.3
+                    elif "AVR" in minerapi[miner]["Software"].upper():
+                        # 0,2W for Arduino @ peak 40mA/5V
+                        net_wattage += 0.2
+                    else:
+                        if ("RASPBERRY" in minerapi[miner]["Identifier"].upper()
+                            or "PI" in minerapi[miner]["Identifier"].upper()):
+                            # 3,875 for one Pi4 core - Pi4 max 15,8W
+                            net_wattage += 3.875
+                        else:
+                            # ~70W for typical CPU and 8 mining threads (9W per mining thread)
+                            net_wattage += 9
+
                     miner_list.append(minerapi[miner]["User"])
                 except:
                     pass
 
-            total_hashrate = hashrate_prefix(
+            net_wattage=power_prefix(float(net_wattage), 2)
+            total_hashrate=hashrate_prefix(
                 int(xxhash_hashrate + ducos1_hashrate), 4)
-            xxhash_hashrate = hashrate_prefix(int(xxhash_hashrate), 1)
-            ducos1_hashrate = hashrate_prefix(int(ducos1_hashrate), 1)
+            xxhash_hashrate=hashrate_prefix(int(xxhash_hashrate), 1)
+            ducos1_hashrate=hashrate_prefix(int(ducos1_hashrate), 1)
 
             for user in miner_list:
-                miners_per_user[user] = miner_list.count(user)
+                miners_per_user[user]=miner_list.count(user)
 
-            miners_per_user = OrderedDict(
+            miners_per_user=OrderedDict(
                 sorted(
                     miners_per_user.items(),
-                    key=itemgetter(1),
-                    reverse=True
+                    key = itemgetter(1),
+                    reverse = True
                 )
             )
 
@@ -1435,7 +1484,13 @@ def create_main_api_file():
                 'sudo netstat -anp | grep 2811 | wc -l',
                 stdout=subprocess.PIPE,
                 shell=True
-            ).stdout.decode()
+            ).stdout.decode().rstrip()
+
+
+            kolka_dict = {
+                "Jailed": len(jail),
+                "Banned:": len(banlist)
+            }
 
             server_api = {
                 "Duino-Coin Server API": "github.com/revoxhere/duino-coin",
@@ -1445,6 +1500,7 @@ def create_main_api_file():
                 "Server CPU usage":      global_cpu_usage,
                 "Server RAM usage":      global_ram_usage,
                 "Last update":           now().strftime("%d/%m/%Y %H:%M:%S (UTC)"),
+                "Net energy usage":      net_wattage,
                 "Pool hashrate":         total_hashrate,
                 "DUCO-S1 hashrate":      ducos1_hashrate,
                 "XXHASH hashrate":       xxhash_hashrate,
@@ -1456,6 +1512,7 @@ def create_main_api_file():
                 "Current difficulty":    job_tiers["NET"]["difficulty"],
                 "Mined blocks":          global_blocks,
                 "Last block hash":       global_last_block_hash[:10]+"...",
+                "Kolka":                 kolka_dict,
                 "Top 10 richest miners": get_richest_users(10),
                 "Active workers":        miners_per_user,
                 "Miners":                "server.duinocoin.com/miners.json"
@@ -1467,8 +1524,8 @@ def create_main_api_file():
                     outfile,
                     indent=2,
                     ensure_ascii=False)
-        except Exception as e:
-            print("API err:", e)
+        except Exception:
+            print("API err:", traceback.format_exc())
 
         sleep(SAVE_TIME)
 
@@ -2147,9 +2204,16 @@ if __name__ == "__main__":
 
     threading.Thread(target=input_management).start()
     try:
-        admin_print("Master Server is listening on port", PORT)
         pool = Pool(10000)
-        StreamServer((HOSTNAME, PORT), handle, spawn=pool).serve_forever()
+        server = StreamServer(
+            (HOSTNAME, PORT),
+            handle=handle,
+            spawn=pool)
+        server.max_accept = 10000
+        server.min_delay = 0
+        server.max_delay = 0
+        admin_print("Master Server is listening on port", PORT)
+        server.serve_forever(0.00001)
     except Exception as e:
         admin_print("Unexpected exception: ", e)
     finally:
