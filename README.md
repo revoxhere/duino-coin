@@ -106,7 +106,6 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 <h3 align="center">Community-made software</h3><br>
 
 **Other miners known to work with Duino-Coin:**
-*   [JSDuino](https://github.com/Kaffidev/JSDuino/blob/main/index.js) - NodeJS Miner by Kaffidev
 *   [duino-coin-kodi](https://github.com/SandUhrGucker/duino-coin-kodi) - Mining addon for Kodi Media Center by SandUhrGucker
 *   [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - Python script to mine Duino-Coin on routers by BastelPichi
 *   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - mine with less connections on multiple devices by DoctorEenot
