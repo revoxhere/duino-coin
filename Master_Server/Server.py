@@ -102,7 +102,6 @@ except Exception as e:
         NodeS_Username = ???""")
     exit()
 
-
 global_blocks = 1
 duco_price, duco_price_justswap, duco_price_nodes = 0, 0, 0
 global_cpu_usage, global_ram_usage = 100, 100
@@ -216,7 +215,7 @@ def create_backup():
                     "," + str(duco_price_justswap).rstrip("\n"))
             admin_print("Backup finished")
 
-        hours = 2
+        hours = 3
         counter += 1
         sleep(60*60*hours)
 
@@ -282,7 +281,7 @@ def update_job_tiers():
             "AVR": {
                 "difficulty": 5,
                 "reward": .005,
-                "max_hashrate": 175
+                "max_hashrate": 200
             }
         }
         sleep(60)
@@ -916,7 +915,7 @@ def create_share_ducos1(last_block_hash, difficulty):
         expected_hash_str = bytes(
             str(last_block_hash_cp)
             + str(numeric_result
-                  ), encoding="utf8")
+                  ), encoding="utf-8")
         expected_hash = sha1(expected_hash_str)
         job = [last_block_hash_cp, expected_hash.hexdigest(), numeric_result]
         return job
@@ -935,7 +934,7 @@ def create_share_xxhash(last_block_hash, difficulty):
         expected_hash_str = bytes(
             str(last_block_hash_cp)
             + str(numeric_result
-                  ), encoding="utf8")
+                  ), encoding="utf-8")
         expected_hash = xxh64(expected_hash_str, seed=2811)
         job = [last_block_hash_cp, expected_hash.hexdigest(), numeric_result]
         return job
@@ -1180,7 +1179,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
             send_data("BAD\n", connection)
 
-        #elif req_difficulty == "AVR":
+        # elif req_difficulty == "AVR":
         #     """ Kolka V2 hashrate check for AVRs """
         #     if not reported_hashrate > 10:
         #         rejected_shares += 1
@@ -1211,7 +1210,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                                   difficulty, this_user_miners)
                 if wrong_chip_id:
                     reward = reward / 10
-                    ### TODO
+                    # TODO
 
                 if username in jail:
                     try:
@@ -1452,7 +1451,7 @@ def create_main_api_file():
                         net_wattage += 0.2
                     else:
                         if ("RASPBERRY" in minerapi[miner]["Identifier"].upper()
-                            or "PI" in minerapi[miner]["Identifier"].upper()):
+                                or "PI" in minerapi[miner]["Identifier"].upper()):
                             # 3,875 for one Pi4 core - Pi4 max 15,8W
                             net_wattage += 3.875
                         else:
@@ -1463,20 +1462,20 @@ def create_main_api_file():
                 except:
                     pass
 
-            net_wattage=power_prefix(float(net_wattage), 2)
-            total_hashrate=hashrate_prefix(
+            net_wattage = power_prefix(float(net_wattage), 2)
+            total_hashrate = hashrate_prefix(
                 int(xxhash_hashrate + ducos1_hashrate), 4)
-            xxhash_hashrate=hashrate_prefix(int(xxhash_hashrate), 1)
-            ducos1_hashrate=hashrate_prefix(int(ducos1_hashrate), 1)
+            xxhash_hashrate = hashrate_prefix(int(xxhash_hashrate), 1)
+            ducos1_hashrate = hashrate_prefix(int(ducos1_hashrate), 1)
 
             for user in miner_list:
-                miners_per_user[user]=miner_list.count(user)
+                miners_per_user[user] = miner_list.count(user)
 
-            miners_per_user=OrderedDict(
+            miners_per_user = OrderedDict(
                 sorted(
                     miners_per_user.items(),
-                    key = itemgetter(1),
-                    reverse = True
+                    key=itemgetter(1),
+                    reverse=True
                 )
             )
 
@@ -1485,7 +1484,6 @@ def create_main_api_file():
                 stdout=subprocess.PIPE,
                 shell=True
             ).stdout.decode().rstrip()
-
 
             kolka_dict = {
                 "Jailed": len(jail),
@@ -2021,7 +2019,7 @@ def handle(connection, address):
         while True:
             # Wait until client sends data
             data = receive_data(connection)
-            if not data:
+            if not data or data == "EXIT":
                 break
 
             elif data[0] == "BALA":
@@ -2122,6 +2120,7 @@ def handle(connection, address):
                 PF.PoolLoginRemove(connection=connection,
                                    data=data,
                                    PoolPassword=PoolPassword)
+            gevent.sleep(.5)
     except Exception:
         pass
         # print(traceback.format_exc())
@@ -2204,16 +2203,16 @@ if __name__ == "__main__":
 
     threading.Thread(target=input_management).start()
     try:
-        pool = Pool(10000)
         server = StreamServer(
             (HOSTNAME, PORT),
-            handle=handle,
-            spawn=pool)
+            handle,
+            backlog=100,
+            spawn=10000)
         server.max_accept = 10000
         server.min_delay = 0
         server.max_delay = 0
         admin_print("Master Server is listening on port", PORT)
-        server.serve_forever(0.00001)
+        server.serve_forever(0)
     except Exception as e:
         admin_print("Unexpected exception: ", e)
     finally:
