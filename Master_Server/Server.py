@@ -1882,6 +1882,162 @@ def protocol_change_pass(data, connection, username):
         send_data("NO,Internal server error: " + str(e), connection)
 
 
+
+def protocol_wrap_wduco(username, tron_address, amount):
+    try:
+        with sqlite3.connect(database) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                "SELECT * FROM Users WHERE username = ?", (username,))
+            # Get current balance
+            balance = float(datab.fetchone()[3])
+    except Exception:
+        return "NO,Can't check balance"
+
+    if float(balance) < float(amount) or float(amount) <= 0:
+        return "NO,Incorrect amount"
+    elif float(balance) >= float(amount) and float(amount) > 0:
+        balancebackup = balance
+        adminLog(
+            "wrapper", "Backed up balance: " + str(balancebackup))
+        try:
+            adminLog(
+                "wrapper", "All checks done, initiating wrapping routine")
+            # Remove amount from senders' balance
+            balance -= float(amount)
+            adminLog(
+                "wrapper", "DUCO removed from pending balance")
+            with sqlite3.connect(database) as conn:
+                datab = conn.cursor()
+                datab.execute(
+                    "UPDATE Users set balance = ? where username = ?", (balance, username))
+                conn.commit()
+            adminLog(
+                "wrapper", "DUCO balance sent to DB, sending tron transaction")
+            adminLog("wrapper", "Tron wrapper called")
+            txn = wduco.functions.wrap(tron_address, int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(20_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+            adminLog("wrapper", "Txid: " + txn.txid)
+            txn = txn.broadcast()
+            adminLog(
+                "wrapper", "Sent wrap tx to TRON network")
+            txnsucceeded = txn.wait()
+                if txnsucceeded:
+                    trontxfeedback = txn.result()
+                else:
+                    trontxfeedback = False
+
+            if trontxfeedback:
+                adminLog(
+                    "wrapper", "Successful wrapping")
+                try:
+                    with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
+                        datab = tranconn.cursor()
+                        now = datetime.datetime.now()
+                        formatteddatetime = now.strftime(
+                            "%d/%m/%Y %H:%M:%S")
+                        datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (
+                            formatteddatetime, username, str("wrapper - ")+str(tron_address), amount, lastBlockHash))
+                        tranconn.commit()
+                        return "OK,check your balances,"+str(lastBlockHash)
+                except Exception:
+                    pass
+            else:
+                try:
+                    datab.execute(
+                        "UPDATE Users set balance = ? where username = ?", (balancebackup, username))
+                    return "NO,Unknown error, transaction reverted"
+                except Exception:
+                    pass
+        except Exception:
+            pass
+    else:
+        return "NO,Wrapper disabled"
+        adminLog("wrapper", "Wrapper is disabled")
+
+
+
+def protocol_unwrap_wduco(username, tron_address, amount):
+        while True:
+            try:
+                with sqlite3.connect(database) as conn:
+                    adminLog(
+                        "unwrapper", "Retrieving user balance")
+                    datab = conn.cursor()
+                    datab.execute(
+                        "SELECT * FROM Users WHERE username = ?", (username,))
+                    # Get current balance
+                    balance = float(datab.fetchone()[3])
+                    break
+            except Exception:
+                pass
+        print("Balance retrieved")
+        wbalance = float(
+            int(wduco.functions.pendingWithdrawals(tron_address, username)))/10**6
+        if float(amount) <= float(wbalance) and float(amount) > 0:
+
+            if float(amount) <= float(wbalance):
+                adminLog("unwrapper", "Correct amount")
+                balancebackup = balance
+                adminLog("unwrapper", "Updating DUCO Balance")
+                balancebackup = balance
+                balance = str(float(balance)+float(amount))
+                while True:
+                    try:
+                        with sqlite3.connect(database) as conn:
+                            datab = conn.cursor()
+                            datab.execute(
+                                "UPDATE Users set balance = ? where username = ?", (balance, username))
+                            conn.commit()
+                            break
+                    except Exception:
+                        pass
+                try:
+                    adminLog(
+                        "unwrapper", "Sending tron transaction")
+                    txn = wduco.functions.confirmWithdraw(username, tron_address, int(float(amount)*10**6)).with_owner(wrapper_public_key).fee_limit(20_000_000).build().sign(PrivateKey(bytes.fromhex(wrapper_private_key)))
+                    adminLog("unwrapper", "Txid: " + txn.txid)
+                    txn = txn.broadcast()
+                    adminLog(
+                        "unwrapper", "Sent confirm tx to tron network")
+                    txnsucceeded = txn.wait()
+                        if txnsucceeded:
+                            trontxfeedback = txn.result()
+                        else:
+                            trontxfeedback = False
+
+                    if trontxfeedback:
+                        adminLog(
+                            "unwrapper", "Successful unwrapping")
+                        try:
+                            with sqlite3.connect(config_db_transactions, timeout=database_timeout) as tranconn:
+                                datab = tranconn.cursor()
+                                now = datetime.datetime.now()
+                                formatteddatetime = now.strftime(
+                                    "%d/%m/%Y %H:%M:%S")
+                                datab.execute('''INSERT INTO Transactions(timestamp, username, recipient, amount, hash) VALUES(?, ?, ?, ?, ?)''', (
+                                    formatteddatetime, str("Wrapper - ")+str(tron_address), username, amount, lastBlockHash))
+                                tranconn.commit()
+                            return "OK,Success, check your balances,"+str(lastBlockHash)
+                        except Exception:
+                            pass
+                    else:
+                        while True:
+                            try:
+                                with sqlite3.connect(database) as conn:
+                                    datab = conn.cursor()
+                                    datab.execute(
+                                        "UPDATE Users set balance = ? where username = ?", (balancebackup, username))
+                                    conn.commit()
+                                    break
+                            except Exception:
+                                pass
+                except Exception:
+                    adminLog(
+                        "unwrapper", "Error with Tron blockchain")
+                    return "NO,error with Tron blockchain"
+
+
+
 def get_duco_prices():
     global duco_price
     global duco_price_nodes
@@ -2120,6 +2276,44 @@ def handle(connection, address):
                 PF.PoolLoginRemove(connection=connection,
                                    data=data,
                                    PoolPassword=PoolPassword)
+
+
+     ######################################################################
+            elif str(data[0]) == "WRAP" and str(username) != "":
+                if use_wrapper and wrapper_permission:
+                    adminLog(
+                        "wrapper", "Starting wrapping protocol by " + username)
+                    try:
+                        amount = str(data[1])
+                        tron_address = str(data[2])
+                    except IndexError:
+                        c.send(bytes("NO,Not enough data", encoding="utf8"))
+                        break
+                    else:
+                        wrapfeedback = protocol_wrap_wduco(username, tron_address, amount)
+                        if wrapfeedback != None:
+                            soc.send(bytes(wrapfeedback, encoding="utf8"))
+                        else:
+                            soc.send(bytes("OK,None was returned", encodinn="utf8"))
+
+            ######################################################################
+            elif str(data[0]) == "UNWRAP" and str(username) != "":
+                if use_wrapper and wrapper_permission:
+                    adminLog(
+                        "unwrapper", "Starting unwraping protocol by " + username)
+                    amount = str(data[1])
+                    tron_address = str(data[2])
+                    unwrapfeedback = protocol_unwrap_wduco(username, tron_address, amount)
+                    if unwrapfeedback != None:
+                        soc.send(bytes(unwrapfeedback, encoding="utf8"))
+                    else:
+                        soc.send(bytes("OK,None was returned", encodinn="utf8"))
+                else:
+                    adminLog("unwrapper", "Wrapper disabled")
+                    try:
+                        c.send(bytes("NO,Wrapper disabled", encoding="utf8"))
+                    except Exception:
+                        break
             gevent.sleep(.5)
     except Exception:
         pass
