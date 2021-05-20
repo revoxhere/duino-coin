@@ -91,7 +91,7 @@ except ModuleNotFoundError:
 # Global variables
 MINER_VER = '2.49'  # Version number
 SOCKET_TIMEOUT = 15
-AVR_TIMEOUT = 2.7  # diff 5(*100) / 190 H/s = 2.6
+AVR_TIMEOUT = 3  # diff 5(*100) / 190 H/s = 2.6, rounded to nearest int
 BAUDRATE = 115200
 RESOURCES_DIR = 'AVRMiner_' + str(MINER_VER) + '_resources'
 shares = [0, 0]
@@ -224,6 +224,8 @@ def connect():
             ready = select.select([soc], [], [], SOCKET_TIMEOUT)
             if ready[0]:
                 serverVersion = soc.recv(10).decode().rstrip('\n')
+            else:
+                raise Exception("No ver received")
 
             debug_output('Server version: ' + serverVersion)
             if float(serverVersion) <= float(MINER_VER):
@@ -818,7 +820,10 @@ def mine_avr(com):
                 while True:
                     retry_counter = 0
                     while True:
+                        if retry_counter >= 3:
+                            break
                         try:
+                            
                             debug_output(com + ': sending job to AVR')
                             ser.write(
                                 bytes(
@@ -827,10 +832,14 @@ def mine_avr(com):
                                         + ',' + job[1]
                                         + ',' + job[2]
                                         + ','), encoding='utf8'))
-                            ser.flush()
+
 
                             debug_output(com + ': reading result from AVR')
-                            result = ser.read(40).decode().rstrip()
+                            result = ser.read_until(b'\r\n').decode().strip()
+                            ser.flush()
+
+                            if "\x00" in result or not result:
+                                raise Exception("Empty data received")
 
                             debug_output(com + ': retrieved result: '
                                          + str(result)
@@ -849,9 +858,6 @@ def mine_avr(com):
                             debug_output(
                                 com + ': retrying sending data: ' + str(e))
                             retry_counter += 1
-                        if retry_counter >= 3:
-                            break
-                        sleep(AVR_TIMEOUT)
 
                     try:
                         ducos1result = result[0]
