@@ -68,6 +68,7 @@ MAX_REJECTED_SHARES = 10
 BCRYPT_ROUNDS = 8
 MAX_WORKERS = 50
 PING_SLEEP_TIME = 0.5  # check protocol duco-s1 or xxhash
+MAX_NUMBER_OF_PINGS = 5
 # DB files
 DATABASE = 'crypto_database.db'
 BLOCKCHAIN = 'duino_blockchain.db'
@@ -1067,7 +1068,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         # Receiving the result
         number_of_pings = 0
         time_spent_on_sending = 0
-        while True:
+        while number_of_pings < MAX_NUMBER_OF_PINGS:
             result = receive_data(connection)
             if result[0] == 'PING':
                 start_sending = utime.now()
