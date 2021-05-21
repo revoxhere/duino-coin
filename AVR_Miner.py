@@ -835,7 +835,7 @@ def mine_avr(com):
 
 
                             debug_output(com + ': reading result from AVR')
-                            result = ser.read_until(b'\r\n').decode().strip()
+                            result = ser.read_until(b'\n').decode().strip()
                             ser.flush()
 
                             if "\x00" in result or not result:
