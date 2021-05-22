@@ -34,8 +34,9 @@ from operator import itemgetter
 # Duino-Coin server libraries
 import pool_functions as PF
 from kolka_module import *
-from server_functions import receive_data, send_data
+from server_functions import *
 from kolka_chip_module import *
+from wrapped_duco_functions import *
 # python3 -m pip install bcrypt
 from bcrypt import checkpw, hashpw, gensalt
 # python3 -m pip install fastrand
