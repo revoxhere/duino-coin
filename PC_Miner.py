@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.45)
+# Duino-Coin Python PC Miner (v2.46)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -103,7 +103,7 @@ except ModuleNotFoundError:
 
 
 # Global variables
-MINER_VER = "2.45"  # Version number
+MINER_VER = "2.46"  # Version number
 SOC_TIMEOUT = 30  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
@@ -743,11 +743,12 @@ def Thread(
                     "\n")  # Get server version
                 debugOutput("Server version: " + serverVersion)
 
-                soc.send(bytes("MOTD", encoding="utf8"))
-                motd = soc.recv(1024).decode().rstrip("\n")
-
-                print(Fore.BLUE + motd + Fore.RESET + "\n")
-
+                if threadid == 0:
+                    soc.send(bytes("MOTD", encoding="utf8"))
+                    motd = soc.recv(1024).decode().rstrip("\n")
+                    prettyPrint("net" + str(threadid),
+                                " " + motd,
+                                "warning")
 
                 if (float(serverVersion) <= float(MINER_VER)
                         and len(serverVersion) == 3):
@@ -939,7 +940,7 @@ def Thread(
                                 + " kH/s")
 
                         if (totalhashrate > 2000
-                                and accepted.value % 10 == 0):
+                                and accepted.value % 30 == 0):
                             prettyPrint("sys0",
                                         " " + getString("max_hashrate_notice"),
                                         "warning")
@@ -998,7 +999,7 @@ def Thread(
                                     + " ∙ "
                                     + Fore.CYAN
                                     + "ping "
-                                    + str("%02.0f" % int(ping))
+                                    + str("%03.0f" % int(ping))
                                     + "ms")
 
                         elif feedback == "BLOCK":
@@ -1055,7 +1056,7 @@ def Thread(
                                     + " ∙ "
                                     + Fore.CYAN
                                     + "ping "
-                                    + str("%02.0f" % int(ping))
+                                    + str("%03.0f" % int(ping))
                                     + "ms")
 
                         else:
@@ -1113,7 +1114,7 @@ def Thread(
                                     + " ∙ "
                                     + Fore.CYAN
                                     + "ping "
-                                    + str("%02.0f" % int(ping))
+                                    + str("%03.0f" % int(ping))
                                     + "ms")
                         break
                     break
