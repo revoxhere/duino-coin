@@ -351,7 +351,7 @@ def Greeting():
         # Initial miner executable section
         if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
             debugOutput(
-                "OS is Windows, downloading developer donation executable")
+                "OS is POSIX-like, downloading developer donation executable")
             url = ("https://github.com/"
                    + "revoxhere/"
                    + "duino-coin/blob/useful-tools/"
