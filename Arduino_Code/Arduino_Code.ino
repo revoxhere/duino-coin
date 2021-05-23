@@ -28,8 +28,13 @@
 String lastblockhash = "";
 String newblockhash = "";
 String DUCOID = "";
+#ifdef ARDUINO_ARCH_AVR
 uint16_t difficulty = 0;
 uint16_t ducos1result = 0;
+#else
+uint32_t difficulty = 0;
+uint32_t ducos1result = 0;
+#endif
 const uint16_t job_maxsize = 104; // 40+40+20+3 is the maximum size of a job
 uint8_t job[job_maxsize];
 
@@ -46,7 +51,11 @@ void setup() {
 }
 
 // DUCO-S1A hasher
+#ifdef ARDUINO_ARCH_AVR
 uint16_t ducos1a(String lastblockhash, String newblockhash, uint16_t difficulty)
+#else
+uint32_t ducos1a(String lastblockhash, String newblockhash, uint16_t difficulty)
+#endif
 {
   // DUCO-S1 algorithm implementation for AVR boards (DUCO-S1A)
   newblockhash.toUpperCase();
@@ -56,13 +65,20 @@ uint16_t ducos1a(String lastblockhash, String newblockhash, uint16_t difficulty)
     job[j] = ((((c[i] & 0x1F) + 9) % 25) << 4) + ((c[i + 1] & 0x1F) + 9) % 25;
 
   // Difficulty loop
+  #ifdef ARDUINO_ARCH_AVR
+  // If the difficulty is too high for AVR architecture then return 0
+  if (difficulty > 655)
+    return 0;
   for (uint16_t ducos1res = 0; ducos1res < difficulty * 100 + 1; ducos1res++)
+  #else
+  for (uint32_t ducos1res = 0; ducos1res < difficulty * 100 + 1; ducos1res++)
+  #endif
   {
     Sha1.init();
     Sha1.print(lastblockhash + String(ducos1res));
     // Get SHA1 result
     uint8_t *hash_bytes = Sha1.result();
-    if (memcmp(hash_bytes, job, SHA1_HASH_LEN) == 0)
+    if (memcmp(hash_bytes, job, SHA1_HASH_LEN*sizeof(char)) == 0)
     {
       // If expected hash is equal to the found hash, return the result
       return ducos1res;
@@ -109,10 +125,18 @@ void loop() {
     // Send result back to the program with share time
     Serial.print(String(ducos1result) + "," + String(elapsedTime) + "," + DUCOID + "\n");
     // Turn on built-in led
+    #ifdef ARDUINO_ARCH_AVR
     PORTB = PORTB | B00100000;
+    #else
+    digitalWrite(LED_BUILTIN, HIGH);
+    #endif
     // Wait a bit
     delay(25);
     // Turn off built-in led
+    #ifdef ARDUINO_ARCH_AVR
     PORTB = PORTB & B11011111;
+    #else
+    digitalWrite(LED_BUILTIN, LOW);
+    #endif
   }
 }
