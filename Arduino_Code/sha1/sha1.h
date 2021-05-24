@@ -23,7 +23,7 @@
 #include <stddef.h>
 //#include <unistd.h>
 
-#ifdef __AVR__
+#ifndef ssize_t
 #define ssize_t long int
 #endif
 
