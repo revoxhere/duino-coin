@@ -17,6 +17,9 @@
 //  and navigate to Getting Started page. Happy mining!
 //////////////////////////////////////////////////////////
 
+#ifndef LED_BUILTIN
+#define LED_BUILTIN 13
+#endif
 // Include SHA1 library
 // Authors: https://github.com/daknuett, https://github.com/JoyBed, https://github.com/revox
 // Improvements: https://github.com/joaquinbvw
