@@ -57,7 +57,7 @@ void setup() {
 #ifdef ARDUINO_ARCH_AVR
 uint16_t ducos1a(String lastblockhash, String newblockhash, uint16_t difficulty)
 #else
-uint32_t ducos1a(String lastblockhash, String newblockhash, uint16_t difficulty)
+uint32_t ducos1a(String lastblockhash, String newblockhash, uint32_t difficulty)
 #endif
 {
   // DUCO-S1 algorithm implementation for AVR boards (DUCO-S1A)
@@ -112,7 +112,7 @@ void loop() {
     // Read expected hash
     newblockhash = Serial.readStringUntil(',');
     // Read difficulty
-    difficulty = Serial.readStringUntil(',').toInt();
+    difficulty = strtoul(Serial.readStringUntil('\n').c_str(), NULL, 10);
     // Clearing the receive buffer reading one job.
     while (Serial.available())
       Serial.read();
