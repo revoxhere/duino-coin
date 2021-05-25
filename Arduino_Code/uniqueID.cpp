@@ -168,6 +168,8 @@ ArduinoUniqueID::ArduinoUniqueID()
   id[13] = mac[3];
   id[14] = mac[4];
   id[15] = mac[5];
+#elif defined(ARDUINO_ARCH_MBED_RP2040)
+  getUniqueSerialNumber(id);
 #endif
 }
 
