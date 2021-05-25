@@ -639,7 +639,8 @@ def Donate():
 def ducos1(
         lastBlockHash,
         expectedHash,
-        difficulty):
+        difficulty,
+        efficiency):
     # DUCO-S1 algorithm
     # Measure starting time
     timeStart = time()
@@ -647,6 +648,9 @@ def ducos1(
     temp_hash = None
     # Loop from 1 too 100*diff
     for ducos1res in range(100 * int(difficulty) + 1):
+        # If efficiency lower than 100% sleep to use less CPU
+        if ducos1res % 1000000 == 0 and float(100 - efficiency * 100) < 100:
+            sleep(float(efficiency))
         # Generate hash
         temp_hash = base_hash.copy()
         temp_hash.update(str(ducos1res).encode('ascii'))
@@ -664,12 +668,16 @@ def ducos1(
 def ducos1xxh(
         lastBlockHash,
         expectedHash,
-        difficulty):
+        difficulty,
+        efficiency):
     # XXHASH algorithm
     # Measure starting time
     timeStart = time()
     # Loop from 1 too 100*diff
     for ducos1xxres in range(100 * int(difficulty) + 1):
+        # If efficiency lower than 100% sleep to use less CPU
+        if ducos1xxres % 1000000 == 0 and float(100 - efficiency * 100) < 100:
+            sleep(float(efficiency))
         # Generate hash
         ducos1xx = xxhash.xxh64(
             str(lastBlockHash) + str(ducos1xxres), seed=2811)
@@ -818,10 +826,6 @@ def Thread(
         # Mining section
         while True:
             try:
-                # If efficiency lower than 100...
-                if float(100 - efficiency * 100) < 100:
-                    # ...sleep some time
-                    sleep(float(efficiency * 5))
                 while True:
                     # Ask the server for job
                     if algorithm == "XXHASH":
@@ -869,10 +873,10 @@ def Thread(
                     computetimeStart = time()
                     if algorithm == "XXHASH":
                         algo_back_color = Back.CYAN
-                        result = ducos1xxh(job[0], job[1], diff)
+                        result = ducos1xxh(job[0], job[1], diff, efficiency)
                     else:
                         algo_back_color = Back.YELLOW
-                        result = ducos1(job[0], job[1], diff)
+                        result = ducos1(job[0], job[1], diff, efficiency)
                     computetimeStop = time()
                     # Measure compute time
                     computetime = computetimeStop - computetimeStart
@@ -1227,10 +1231,10 @@ if __name__ == "__main__":
 
     try:
         from multiprocessing import (
-            Manager, 
-            Process, 
-            Value, 
-            cpu_count, 
+            Manager,
+            Process,
+            Value,
+            cpu_count,
             current_process
         )
         manager = Manager()
