@@ -20,6 +20,7 @@ import json
 import smtplib
 import subprocess
 import traceback
+from statistics import mean
 from random import randint
 from hashlib import sha1
 from time import time, sleep
@@ -65,7 +66,7 @@ MOTD = """You are mining on the official Duino-Coin master server, have fun!"""
 BLOCK_PROBABILITY = 1000000
 BLOCK_REWARD = 7.7
 UPDATE_MINERAPI_EVERY = 5
-EXPECTED_SHARETIME = 15
+EXPECTED_SHARETIME = 25
 MAX_REJECTED_SHARES = 10
 BCRYPT_ROUNDS = 8
 MAX_WORKERS = 50
@@ -106,7 +107,7 @@ except Exception as e:
 
 global_blocks = 1
 duco_price, duco_price_justswap, duco_price_nodes = 0, 0, 0
-global_cpu_usage, global_ram_usage = 100, 100
+global_cpu_usage, global_ram_usage = [50], [50]
 minerapi = {}
 job_tiers = {}
 balances_to_update = {}
@@ -123,7 +124,7 @@ chip_ids = {}
 jail = []
 workers = {}
 registrations = {}
-
+estimated_profits = {}
 # Read banned usernames
 with open(CONFIG_BANS, "r") as bannedusrfile:
     bannedusr = bannedusrfile.read().splitlines()
@@ -254,7 +255,6 @@ def temporary_ban(ip):
         threading.Timer(120, unban, [ip]).start()
 
 
-
 def update_job_tiers():
     global job_tiers
     while True:
@@ -287,12 +287,12 @@ def update_job_tiers():
                 "max_hashrate": 200000
             },
             "ESP32": {
-                "difficulty": 2000,
+                "difficulty": 2400,
                 "reward": .00375,
                 "max_hashrate": 16000
             },
             "ESP8266": {
-                "difficulty": 1000,
+                "difficulty": 1337,
                 "reward": .0045,
                 "max_hashrate": 13000
             },
@@ -302,7 +302,7 @@ def update_job_tiers():
                 "max_hashrate": 7000
             },
             "AVR": {
-                "difficulty": 5,
+                "difficulty": 6,
                 "reward": .005,
                 "max_hashrate": 200
             }
@@ -500,7 +500,13 @@ def database_updater():
                     amount_to_update = balances_to_update[user] / 32
                     if amount_to_update > 0.01:
                         amount_to_update = 0.01
-                    # print("Updating", user, amount_to_update)
+
+                    try:
+                        estimated_profits[user].append(amount_to_update)
+                    except:
+                        estimated_profits[user] = []
+                        estimated_profits[user].append(amount_to_update)
+
                     datab.execute(
                         """UPDATE Users
                         SET balance = balance + ?
@@ -911,7 +917,7 @@ def generate_block(username, reward, new_block_hash, connection, xxhash=False):
 
 def sleep_by_cpu_usage(upper_limit):
     """ Suspends execution depending on current cpu usage """
-    sleeptime = floatmap(global_cpu_usage, 0, 100, 0, upper_limit)
+    sleeptime = floatmap(global_cpu_usage[-1], 0, 100, 0, upper_limit)
     sleep(sleeptime)
 
 
@@ -970,7 +976,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         Takes:  data (JOB,username,requested_difficulty),
                 connection object, minerapi access
         Returns to main thread if non-mining data is submitted """
-    connection.settimeout(90)
     global global_last_block_hash
     global global_blocks
     global workers
@@ -982,6 +987,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
     is_first_share = True
     thread_id = id(gevent.getcurrent())
     override_difficulty = ""
+    connection.settimeout(90)
 
     while True:
         global_last_block_hash_cp = global_last_block_hash
@@ -1059,24 +1065,21 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             # The expected sharetime should be about 10 times lower than before
             # expected_test_sharetime = sharetime / 10
 
-        if (accepted_shares > 0
-                and accepted_shares % UPDATE_MINERAPI_EVERY*5 == 0
-            or rejected_shares > 0
-                and rejected_shares % UPDATE_MINERAPI_EVERY*5 == 0):
-            try:
-                ip_workers = workers[ip_addr]
-            except:
-                ip_workers = 1
-            try:
-                usr_workers = miners_per_user[username]
-            except:
-                usr_workers = 1
-            if check_workers(ip_workers, usr_workers):
-                if not username in whitelisted_usernames:
-                    send_data(
-                        "BAD,Too many workers\n",
-                        connection)
-                    raise Exception("Too many workers")
+        try:
+            ip_workers = workers[ip_addr]
+        except:
+            ip_workers = 1
+        try:
+            usr_workers = miners_per_user[username]
+        except:
+            usr_workers = 1
+
+        if check_workers(ip_workers, usr_workers):
+            if not username in whitelisted_usernames:
+                send_data(
+                    "BAD,Too many workers\n",
+                    connection)
+                raise Exception("Too many workers")
 
         if using_xxhash:
             job = create_share_xxhash(global_last_block_hash_cp, difficulty)
@@ -1200,6 +1203,10 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             if not using_xxhash:
                 override_difficulty = kolka_v2(req_difficulty, job_tiers)
 
+            if req_difficulty == "AVR":
+                temporary_ban(ip_addr)
+                raise Exception("User banned")
+
             send_data("BAD\n", connection)
 
         # elif req_difficulty == "AVR":
@@ -1269,6 +1276,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             send_data("BAD\n", connection)
 
         is_first_share = False
+        gevent.sleep(0.5)
 
 
 def admin_print(*message):
@@ -1283,8 +1291,8 @@ def get_sys_usage():
     global global_cpu_usage
     global global_ram_usage
     while True:
-        global_cpu_usage = psutil.cpu_percent()
-        global_ram_usage = psutil.virtual_memory()[2]
+        global_cpu_usage.append(psutil.cpu_percent())
+        global_ram_usage.append(psutil.virtual_memory()[2])
         sleep(5)
 
 
@@ -1324,11 +1332,14 @@ def power_prefix(wattage: int, accuracy: int):
 
 def count_registered_users():
     """ Count all registered users and returns an int """
-    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-        datab = conn.cursor()
-        datab.execute("SELECT COUNT(username) FROM Users")
-        registeredUsers = datab.fetchone()[0]
-        return int(registeredUsers)
+    try:
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute("SELECT COUNT(username) FROM Users")
+            registeredUsers = datab.fetchone()[0]
+            return int(registeredUsers)
+    except:
+        return 0
 
 
 def count_total_duco():
@@ -1348,14 +1359,13 @@ def get_richest_users(num):
     leaders = []
     with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
-        datab.execute("SELECT * FROM Users ORDER BY balance DESC")
-        i = 0
+        datab.execute("""SELECT * 
+            FROM Users 
+            ORDER BY balance DESC
+            LIMIT """ + str(num))
         for row in datab.fetchall():
             leaders.append(
                 str(round((float(row[3])), 4)) + " DUCO - " + row[0])
-            i += 1
-            if i > num:
-                break
     return(leaders)
 
 
@@ -1414,12 +1424,6 @@ def get_blocks_list():
 
 def create_secondary_api_files():
     while True:
-        with open('chips.json', 'w') as outfile:
-            json.dump(
-                chip_ids.copy(),
-                outfile,
-                indent=2,
-                ensure_ascii=False)
         with open('transactions.json', 'w') as outfile:
             json.dump(
                 get_transaction_list(),
@@ -1518,8 +1522,8 @@ def create_main_api_file():
                 "Server version":        SERVER_VER,
                 "Active connections":    global_connections,
                 "Open threads":          threading.activeCount(),
-                "Server CPU usage":      global_cpu_usage,
-                "Server RAM usage":      global_ram_usage,
+                "Server CPU usage":      mean(global_cpu_usage[-5:]),
+                "Server RAM usage":      mean(global_ram_usage[-5:]),
                 "Last update":           now().strftime("%d/%m/%Y %H:%M:%S (UTC)"),
                 "Net energy usage":      net_wattage,
                 "Pool hashrate":         total_hashrate,
@@ -1548,7 +1552,7 @@ def create_main_api_file():
         except Exception:
             print("API err:", traceback.format_exc())
 
-        sleep(SAVE_TIME)
+        sleep_by_cpu_usage(SAVE_TIME+2)
 
 
 def create_minerapi():
@@ -2030,14 +2034,15 @@ def handle(connection, address):
         connections_per_ip[ip_addr] = 1
 
     try:
+        """ Send server version """
+        send_data(SERVER_VER, connection)
+
         if (ip_addr == "51.15.127.80"
             or ip_addr == "wallet.duinocoin.com"
                 or ip_addr == "34.233.38.119"):
             connection.settimeout(60*30)
         else:
-            connection.settimeout(20)
-        """ Send server version """
-        send_data(SERVER_VER, connection)
+            connection.settimeout(10)
 
         while True:
             # Wait until client sends data
@@ -2045,7 +2050,7 @@ def handle(connection, address):
             if not data or data == "EXIT":
                 break
 
-            #################################### MINING FUNCTIONS
+            # MINING FUNCTIONS
 
             elif data[0] == "JOB":
                 """ Client requested the DUCO-S1 mining protocol,
@@ -2059,7 +2064,7 @@ def handle(connection, address):
                 protocol_mine(data, connection, address, using_xxhash=True)
                 username = data[1]
 
-            #################################### USER FUNCTIONS
+            # USER FUNCTIONS
 
             elif data[0] == "LOGI":
                 """ Client requested authentication """
@@ -2078,6 +2083,15 @@ def handle(connection, address):
                     protocol_get_balance(data, connection, username)
                 else:
                     send_data("NO,Not logged in", connection)
+
+            elif data[0] == "ESTP":
+                """ Client requested estimate profit check
+                    check def database_updater to see where this data comes from """
+                try:
+                    send_data(
+                        str(mean(estimated_profits[data[1]][-100:])*17280), connection)
+                except Exception as e:
+                    send_data(str(e), connection)
 
             elif data[0] == "UEXI":
                 """ Client requested to check wheter user is registered """
@@ -2118,12 +2132,13 @@ def handle(connection, address):
                 """ Client requested to send him the MOTD """
                 send_data(MOTD, connection)
 
-            #################################### WRAPPED DUCO FUNCTIONS by yanis
+            # WRAPPED DUCO FUNCTIONS by yanis
 
             elif data[0] == "WRAP":
                 if logged_in:
                     if use_wrapper and wrapper_permission:
-                        admin_print("Starting wrapping protocol by " + username)
+                        admin_print(
+                            "Starting wrapping protocol by " + username)
                         try:
                             amount = str(data[1])
                             tron_address = str(data[2])
@@ -2131,7 +2146,8 @@ def handle(connection, address):
                             c.send(bytes("NO,Not enough data", encoding="utf8"))
                             break
                         else:
-                            wrapfeedback = protocol_wrap_wduco(username, tron_address, amount)
+                            wrapfeedback = protocol_wrap_wduco(
+                                username, tron_address, amount)
                             if wrapfeedback:
                                 send_data(wrapfeedback, connection)
                             else:
@@ -2144,7 +2160,8 @@ def handle(connection, address):
             elif data[0] == "UNWRAP":
                 if logged_in:
                     if use_wrapper and wrapper_permission:
-                        admin_print("Starting unwraping protocol by " + username)
+                        admin_print(
+                            "Starting unwraping protocol by " + username)
                         try:
                             amount = str(data[1])
                             tron_address = str(data[2])
@@ -2152,7 +2169,8 @@ def handle(connection, address):
                             c.send(bytes("NO,Not enough data", encoding="utf8"))
                             break
                         else:
-                            unwrapfeedback = protocol_unwrap_wduco(username, tron_address, amount)
+                            unwrapfeedback = protocol_unwrap_wduco(
+                                username, tron_address, amount)
                             if unwrapfeedback:
                                 send_data(unwrapfeedback, connection)
                             else:
@@ -2162,7 +2180,7 @@ def handle(connection, address):
                 else:
                     send_data("NO,Not logged in", connection)
 
-            #################################### POOL FUNCTIONS
+            # POOL FUNCTIONS
 
             elif data[0] == "POOLList":
                 PF.PoolList(connection=connection)
@@ -2229,7 +2247,7 @@ def countips():
     while True:
         for ip in connections_per_ip.copy():
             try:
-                if connections_per_ip[ip] > 50 and not ip in whitelisted_ips:
+                if connections_per_ip[ip] > MAX_WORKERS and not ip in whitelisted_ips:
                     # admin_print("Banning DDoSing IP: " + ip)
                     permanent_ban(ip)
             except:
@@ -2279,13 +2297,10 @@ if __name__ == "__main__":
         server = StreamServer(
             (HOSTNAME, PORT),
             handle,
-            backlog=8096,
-            spawn=10240)
-        server.max_accept = 10000
-        server.min_delay = 0
-        server.max_delay = 0
+            backlog=4,
+            spawn=10000)
         admin_print("Master Server is listening on port", PORT)
-        server.serve_forever(0)
+        server.serve_forever(1)
     except Exception as e:
         admin_print("Unexpected exception: ", e)
     finally:
