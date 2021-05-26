@@ -112,7 +112,7 @@ void loop() {
     // Read expected hash
     newblockhash = Serial.readStringUntil(',');
     // Read difficulty
-    difficulty = strtoul(Serial.readStringUntil('\n').c_str(), NULL, 10);
+    difficulty = strtoul(Serial.readStringUntil(',').c_str(), NULL, 10);
     // Clearing the receive buffer reading one job.
     while (Serial.available())
       Serial.read();
