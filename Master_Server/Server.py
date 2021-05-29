@@ -207,7 +207,7 @@ def create_backup():
                      '_'+str(counter)+"/transactions.db")
 
         if not ospath.isdir('backups/'+str(today)+'_0/'):
-            sleep(10)
+            gevent.sleep(10)
             with open("prices.txt", "a") as pricesfile:
                 pricesfile.write("," + str(duco_price).rstrip("\n"))
             with open("pricesNodeS.txt", "a") as pricesNodeSfile:
@@ -220,7 +220,7 @@ def create_backup():
 
         hours = 3
         counter += 1
-        sleep(60*60*hours)
+        gevent.sleep(60*60*hours)
 
 
 def permanent_ban(ip):
@@ -232,14 +232,14 @@ def permanent_ban(ip):
     else:
         os.system("sudo iptables -I INPUT -s "
                   + str(ip)
-                  + " -j DROP")
+                  + " -j DROP &> /dev/null")
 
 
 def unban(ip):
     # Unban IP
     os.system("sudo iptables -D INPUT -s "
               + str(ip)
-              + " -j DROP")
+              + " -j DROP &> /dev/null")
 
 
 def temporary_ban(ip):
@@ -251,7 +251,7 @@ def temporary_ban(ip):
     else:
         os.system("sudo iptables -I INPUT -s "
                   + str(ip)
-                  + " -j DROP")
+                  + " -j DROP &> /dev/null")
         threading.Timer(120, unban, [ip]).start()
 
 
@@ -260,12 +260,12 @@ def update_job_tiers():
     while True:
         job_tiers = {
             "EXTREME": {
-                "difficulty": 950000,
+                "difficulty": 1500000,
                 "reward": 0,
                 "max_hashrate": 999999999
             },
             "XXHASH": {
-                "difficulty": 50000,
+                "difficulty": 750000,
                 "reward": .0003,
                 "max_hashrate": 900000
             },
@@ -277,12 +277,12 @@ def update_job_tiers():
                 "max_hashrate": 1000000
             },
             "MEDIUM": {
-                "difficulty": int(50000 * DIFF_MULTIPLIER),
+                "difficulty": int(75000 * DIFF_MULTIPLIER),
                 "reward": .0012811,
                 "max_hashrate": 500000
             },
             "LOW": {
-                "difficulty": int(5000 * DIFF_MULTIPLIER),
+                "difficulty": int(7500 * DIFF_MULTIPLIER),
                 "reward": .0022811,
                 "max_hashrate": 200000
             },
@@ -292,7 +292,7 @@ def update_job_tiers():
                 "max_hashrate": 16000
             },
             "ESP8266": {
-                "difficulty": 1337,
+                "difficulty": 1500,
                 "reward": .0045,
                 "max_hashrate": 13000
             },
@@ -301,13 +301,18 @@ def update_job_tiers():
                 "reward": .003,
                 "max_hashrate": 7000
             },
+            "ARM": {
+                "difficulty": 500,
+                "reward": .003,
+                "max_hashrate": 5000
+            },
             "AVR": {
                 "difficulty": 6,
                 "reward": .005,
                 "max_hashrate": 200
             }
         }
-        sleep(60)
+        gevent.sleep(60)
 
 
 """ In-memory db for minerapi """
@@ -442,7 +447,7 @@ def create_jobs():
                 "numeric_result": rand,
                 "expected_hash": temp_hash.hexdigest(),
                 "last_block_hash": str(global_last_block_hash_cp)}
-        sleep(60)
+        gevent.sleep(60)
 
 
 def get_pregenerated_job(req_difficulty):
@@ -499,7 +504,7 @@ def database_updater():
                 for user in balances_to_update.copy():
                     amount_to_update = balances_to_update[user] / 32
                     if amount_to_update > 0.01:
-                        amount_to_update = 0.01
+                        amount_to_update = floatmap(amount_to_update, 0.01, 0.5, 0.09, 0.015)
 
                     try:
                         estimated_profits[user].append(amount_to_update)
@@ -533,7 +538,7 @@ def database_updater():
                 admin_print("Restarting server - too many DB errs")
                 os.system("sudo iptables -F INPUT")
                 os.execl(sys.executable, sys.executable, *sys.argv)
-        sleep(SAVE_TIME)
+        gevent.sleep(SAVE_TIME)
 
 
 def input_management():
@@ -984,9 +989,11 @@ def protocol_mine(data, connection, address, using_xxhash=False):
     ip_addr = address[0].replace("::ffff:", "")
     accepted_shares, rejected_shares = 0, 0
     thread_miner_api = {}
+    reported_hashrate_list = []
     is_first_share = True
     thread_id = id(gevent.getcurrent())
     override_difficulty = ""
+    reward = 0
     connection.settimeout(90)
 
     while True:
@@ -1131,6 +1138,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
         if abs(reported_hashrate - hashrate) > 5000:
             reported_hashrate = hashrate
+            hashrate_is_estimated = True
 
         wrong_chip_id = False
         if not using_xxhash and req_difficulty == "AVR":
@@ -1167,15 +1175,18 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
             thread_miner_api = {
                 "User":         str(username),
-                "Hashrate":     reported_hashrate,
                 "Is estimated": str(hashrate_is_estimated),
                 "Sharetime":    sharetime,
                 "Accepted":     accepted_shares,
                 "Rejected":     rejected_shares,
                 "Diff":         difficulty,
                 "Software":     str(miner_name),
-                "Identifier":   str(rig_identifier)
+                "Identifier":   str(rig_identifier),
+                "Earnings":     reward
             }
+
+            reported_hashrate_list.append(reported_hashrate)
+            thread_miner_api["Hashrate"] = mean(reported_hashrate_list[-5:])
 
             if using_xxhash:
                 thread_miner_api["Algorithm"] = "XXHASH"
@@ -1202,10 +1213,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
             if not using_xxhash:
                 override_difficulty = kolka_v2(req_difficulty, job_tiers)
-
-            if req_difficulty == "AVR":
-                temporary_ban(ip_addr)
-                raise Exception("User banned")
 
             send_data("BAD\n", connection)
 
@@ -1276,7 +1283,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             send_data("BAD\n", connection)
 
         is_first_share = False
-        gevent.sleep(0.5)
+        gevent.sleep(.5)
 
 
 def admin_print(*message):
@@ -1293,7 +1300,7 @@ def get_sys_usage():
     while True:
         global_cpu_usage.append(psutil.cpu_percent())
         global_ram_usage.append(psutil.virtual_memory()[2])
-        sleep(5)
+        gevent.sleep(5)
 
 
 def hashrate_prefix(hashrate: int, accuracy: int):
@@ -1428,23 +1435,23 @@ def create_secondary_api_files():
             json.dump(
                 get_transaction_list(),
                 outfile,
-                indent=2,
+                indent=1,
                 ensure_ascii=False)
-        sleep(10)
+        gevent.sleep(10)
         with open('foundBlocks.json', 'w') as outfile:
             json.dump(
                 get_blocks_list(),
                 outfile,
-                indent=2,
+                indent=1,
                 ensure_ascii=False)
-        sleep(10)
+        gevent.sleep(10)
         with open('balances.json', 'w') as outfile:
             json.dump(
                 get_balance_list(),
                 outfile,
-                indent=2,
+                indent=1,
                 ensure_ascii=False)
-        sleep(10)
+        gevent.sleep(10)
 
 
 def create_main_api_file():
@@ -1458,6 +1465,13 @@ def create_main_api_file():
             ducos1_hashrate, xxhash_hashrate = 0, 0
             minerapi_public, miners_per_user = {}, {}
             miner_list = []
+            miner_dict = {
+                "GPU": 0,
+                "CPU": 0,
+                "ESP32": 0,
+                "ESP8266": 0,
+                "Arduino": 0
+            }
             for miner in minerapi.copy():
                 try:
                     # Add miner hashrate to the server hashrate
@@ -1470,20 +1484,28 @@ def create_main_api_file():
                     if "ESP32" in minerapi[miner]["Software"].upper():
                         # 1,4W (but 2 cores) for ESP32 @ peak 480mA/3,3V
                         net_wattage += 0.7
+                        miner_dict["ESP32"] += 1
                     elif "ESP8266" in minerapi[miner]["Software"].upper():
                         # 1,3W for ESP8266 @ peak 400mA/3,3V
                         net_wattage += 1.3
+                        miner_dict["ESP8266"] += 1
                     elif "AVR" in minerapi[miner]["Software"].upper():
                         # 0,2W for Arduino @ peak 40mA/5V
                         net_wattage += 0.2
+                        miner_dict["Arduino"] += 1
                     else:
                         if ("RASPBERRY" in minerapi[miner]["Identifier"].upper()
                                 or "PI" in minerapi[miner]["Identifier"].upper()):
                             # 3,875 for one Pi4 core - Pi4 max 15,8W
                             net_wattage += 3.875
+                            miner_dict["CPU"] += 1
                         else:
                             # ~70W for typical CPU and 8 mining threads (9W per mining thread)
                             net_wattage += 9
+                        if job_tiers["EXTREME"]["difficulty"] < minerapi[miner]["Difficulty"]:
+                            miner_dict["GPU"] += 1
+                        else: 
+                            miner_dict["CPU"] += 1
 
                     miner_list.append(minerapi[miner]["User"])
                 except:
@@ -1538,6 +1560,7 @@ def create_main_api_file():
                 "Mined blocks":          global_blocks,
                 "Last block hash":       global_last_block_hash[:10]+"...",
                 "Kolka":                 kolka_dict,
+                "Miner distribution":    miner_dict,
                 "Top 10 richest miners": get_richest_users(10),
                 "Active workers":        miners_per_user,
                 "Miners":                "server.duinocoin.com/miners.json"
@@ -1547,12 +1570,12 @@ def create_main_api_file():
                 json.dump(
                     server_api.copy(),
                     outfile,
-                    indent=2,
+                    indent=1,
                     ensure_ascii=False)
         except Exception:
             print("API err:", traceback.format_exc())
 
-        sleep_by_cpu_usage(SAVE_TIME+2)
+        sleep_by_cpu_usage(SAVE_TIME+3)
 
 
 def create_minerapi():
@@ -1587,7 +1610,7 @@ def create_minerapi():
             memory.backup(disk_conn)
             disk_conn.commit()
 
-        sleep(10)
+        gevent.sleep(10)
 
 
 def protocol_login(data, connection):
@@ -1970,7 +1993,7 @@ def get_duco_prices():
             )
         else:
             duco_price_justswap = 0
-        sleep(360)
+        gevent.sleep(360)
 
 
 def protocol_get_transactions(data, connection):
@@ -2214,7 +2237,7 @@ def handle(connection, address):
             gevent.sleep(.5)
     except Exception:
         pass
-        # print(traceback.format_exc())
+        #print(traceback.format_exc())
     finally:
         # print("Closing socket")
         try:
@@ -2252,13 +2275,13 @@ def countips():
                     permanent_ban(ip)
             except:
                 pass
-        sleep(5)
+        gevent.sleep(5)
 
 
 def resetips():
     """ Reset connections per IP values every n sec """
     while True:
-        sleep(30)
+        gevent.sleep(30)
         connections_per_ip.clear()
 
 
@@ -2269,7 +2292,7 @@ def flush_iptables():
     while True:
         os.system("sudo iptables -F INPUT")
         # admin_print("Flushed iptables")
-        sleep(60*15)
+        gevent.sleep(60*15)
 
 
 if __name__ == "__main__":
@@ -2297,7 +2320,7 @@ if __name__ == "__main__":
         server = StreamServer(
             (HOSTNAME, PORT),
             handle,
-            backlog=4,
+            backlog=2,
             spawn=10000)
         admin_print("Master Server is listening on port", PORT)
         server.serve_forever(1)
