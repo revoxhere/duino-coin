@@ -32,32 +32,31 @@ If the registration fails, the server will send `NO,Reason of failed registratio
 After loging-in you have access to the following commands:
 *   `PING` - Server will return "Pong!" message ASAP 
 *   `BALA` - Server will return balance of current user
+*   `ESTP,username` - Server will return the 24h estimated profits of user
 *   `UEXI,username` - Server will check if the user is registered and return `NO,User is not registered` or `OK,User is registered`
 *   `JOB,username` (or `JOBXX,username` for XXHASH) - Server will return job for mining using DUCO-S1 (-S1A)
     *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, the network diff will be given) where diff is one of the below:
-        * `AVR`     - diff      5 - used for mining on Arduino, AVR boards
+        * `AVR`     - diff      6 - used for mining on Arduino, AVR boards
+        * `ARM`     - diff    500 - not used anywhere officially yet
         * `DUE`     - diff   1000 - planned for mining on Arduino Due boards
-        * `ESP8266` - diff   1000 - used for mining on ESP8266 boards 
-        * `ESP32`   - diff   1500 - used for mining on ESP32 boards
-        * `LOW`     - diff     5k - used for mining on Web Miner, RPis, PC
-        * `MEDIUM`  - diff    40k - used for mining on PC
-        * `NET`     - diff  ~100k - used for mining on PC (network difficulty)
-        * `EXTREME` - diff   950k - not used anywhere officially
-    
+        * `ESP8266` - diff   1500 - used for mining on ESP8266 boards 
+        * `ESP32`   - diff   2400 - used for mining on ESP32 boards
+        * `LOW`     - diff   7.5k - used for mining on Web Miner, RPis, PC
+        * `MEDIUM`  - diff    75k - used for mining on PC
+        * `NET`     - diff  ~500k - used for mining on PC (network difficulty)
+        * `EXTREME` - diff    1M+ - not used anywhere officially yet
     *   When sending the mining result, you can pass the hashrate count and the name of the miner along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s) and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner"
         *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
         *   If software name is not received, server uses `"Software": "Unknown"` in the API
         *   If rig name is not received, server uses `"Identifier": "None"` in the API
-    *   **PLANNED:** AVR Miners will additionally send their atmega chip IDs after the rig identifier. This will be used as another Kolka V4 security layer to verify AVR miners.
-        * Chip IDs are returned in this format: `DUCOID<15 decimal identifier numbers>` (e.g. `DUCOID885544117755588`) 
-*   `JOBXX` - Server will return job for mining using XXHASH algorithm; documentation is the same as with DUCO-S1 job protocol; for now the only available difficulty is `NET`.
-*   `SEND,-,recipientUsername,amount` - Send funds to someone, the server will return a message about the state of the transaction
+*   `JOBXX` - Server will return job for mining using XXHASH algorithm; documentation is the same as with DUCO-S1 job protocol
+*   `SEND,message,recipients_username,amount` - Send funds to someone, the server will return a message about the state of the transaction
 *   `GTXL,username,num` - Get last *num* of transactions involving *username* (both deposits and withdrawals)
 *   `CHGP,oldPassword,newPassword` - Change password of current user
 *   `WRAP,amount,tronAddress` - Wrap DUCO on Tron network (wDUCO)
-*    wDUCO unwrapping protocol:
-     1.  Send a Tron transaction with method `initiateWithdraw(ducoUsername,amount)`
-     2.  Send a server call `UNWRAP,amount,tronAddress`
+*    wDUCO unwrapping:
+     1.  Send a Tron transaction with method `initiateWithdraw(duco_username,amount)`
+     2.  Send a server call `UNWRAP,amount,tron_address`
 
 ### HTTP JSON API
 
