@@ -184,6 +184,7 @@ Server source code, documentation for API calls and official libraries for devel
 | Intel Core i5-7200U                                       | 1.62 MH/s                         | 4                 | -              | 7.5                 |
 | Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | -              | 9.1                 |   
 | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | -                   |
+| AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 67 W           | 15.44               |
 
 
 <h2 align="center">License</h2><br>
