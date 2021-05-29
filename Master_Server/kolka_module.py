@@ -10,24 +10,32 @@ def kolka_v1(basereward, sharetime, difficulty, workers, penalty=False):
         Authors: revox """
     pc_mining_perc = .80
     avr_mining_perc = .96
+    highest_avr_diff = 2400
+    highest_pc_diff = 350000
+
     if penalty:
         output = float(int(int(sharetime) ** 2) / 1000000) * -1
     else:
         output = (MULTIPLIER * basereward
                   + float(sharetime) / 10000
                   + float(difficulty) / 100000000)
-    if difficulty > 2000:
-        output = output + (output * (pc_mining_perc ** (workers-1)))
+    if difficulty > highest_pc_diff:
+        output = output * (pc_mining_perc ** (workers-1)) / 177
+    elif difficulty > highest_avr_diff:
+        output = output * (pc_mining_perc ** (workers-1))
     else:
-        output = output + (output * (avr_mining_perc ** (workers-1)))
+        output = output * (avr_mining_perc ** (workers-1))
 
-    return float(output)
+    return float(2*output)
 
 
 def kolka_v2(current_difficulty, difficulty_list):
     """ Part of Kolka V2 system - move miner to the next diff tier
         Authors: revox """
+        
     if current_difficulty == "AVR":
+        return "ARM"
+    if current_difficulty == "ARM":
         return "ESP8266"
     if current_difficulty == "ESP8266":
         return "ESP32"
@@ -71,8 +79,8 @@ def kolka_v3(sharetime, expected_sharetime, difficulty):
         elif new_difficulty == 0:
             # Thus roughly halve the difficulty
             new_difficulty = int(difficulty * 0.5)
-    if new_difficulty < 2500:
-        new_difficulty = 2500
+    if new_difficulty < 5000:
+        new_difficulty = 5000
     return int(new_difficulty)
 
 
