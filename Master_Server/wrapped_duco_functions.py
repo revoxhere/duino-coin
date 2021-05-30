@@ -135,9 +135,9 @@ def protocol_wrap_wduco(username, tron_address, amount):
                                               amount,
                                               lastBlockHash))
                             tranconn.commit()
-                            return "OK,Sucessfull wrapping,"+str(lastBlockHash)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        print(e)
+                    return "OK,Sucessfull wrapping,"+str(lastBlockHash)
                 else:
                     try:
                         datab.execute(
@@ -219,28 +219,31 @@ def protocol_unwrap_wduco(username, tron_address, amount):
 
                     if trontxfeedback:
                         print("Successful unwrapping")
-                        with sqlite3.connect(config_db_transactions,
-                                             timeout=database_timeout) as tranconn:
-                            datab = tranconn.cursor()
-                            now = datetime.datetime.now()
-                            formatteddatetime = now.strftime(
-                                "%d/%m/%Y %H:%M:%S")
-                            lastBlockHash = sha1(
-                                tron_address+str(amount)).hexdigest()
-                            datab.execute("""INSERT INTO 
-                                    Transactions(
-                                    timestamp, 
-                                    username, 
-                                    recipient, 
-                                    amount, 
-                                    hash) 
-                                    VALUES(?, ?, ?, ?, ?)""",
-                                          (formatteddatetime,
-                                           str("Wrapper - ")+str(tron_address),
-                                              username,
-                                              amount,
-                                              lastBlockHash))
-                            tranconn.commit()
+                        try:
+                            with sqlite3.connect(config_db_transactions,
+                                                 timeout=database_timeout) as tranconn:
+                                datab = tranconn.cursor()
+                                now = datetime.datetime.now()
+                                formatteddatetime = now.strftime(
+                                    "%d/%m/%Y %H:%M:%S")
+                                lastBlockHash = sha1(
+                                    tron_address+str(amount)).hexdigest()
+                                datab.execute("""INSERT INTO 
+                                        Transactions(
+                                        timestamp, 
+                                        username, 
+                                        recipient, 
+                                        amount, 
+                                        hash) 
+                                        VALUES(?, ?, ?, ?, ?)""",
+                                              (formatteddatetime,
+                                               str("Wrapper - ")+str(tron_address),
+                                                  username,
+                                                  amount,
+                                                  lastBlockHash))
+                                tranconn.commit()
+                        except Exception as e:
+                            print(e)
                         return "OK,Sucessfull unwrap,"+str(lastBlockHash)
                     else:
                         while True:
