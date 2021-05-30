@@ -525,30 +525,31 @@ def greeting():
         + str(username)
         + '!\n')
 
-    if osname == 'nt':
-        # Initial miner executable section
-        if not Path(RESOURCES_DIR + '/donate_executable.exe').is_file():
-            debug_output(
-                'OS is Windows, downloading developer donation executable')
-            url = ('https://github.com/'
-                   + 'revoxhere/'
-                   + 'duino-coin/blob/useful-tools/'
-                   + 'donateExecutableWindows.exe?raw=true')
-            r = requests.get(url)
-            with open(RESOURCES_DIR + '/donate_executable.exe', 'wb') as f:
-                f.write(r.content)
-    elif osname == 'posix':
-        # Initial miner executable section
-        if not Path(RESOURCES_DIR + '/donate_executable').is_file():
-            debug_output(
-                'OS is *nix, downloading developer donation executable')
-            url = ('https://github.com/'
-                   + 'revoxhere/'
-                   + 'duino-coin/blob/useful-tools/'
-                   + 'donateExecutableLinux?raw=true')
-            r = requests.get(url)
-            with open(RESOURCES_DIR + '/donate_executable', 'wb') as f:
-                f.write(r.content)
+    if donation_level > 0:
+        if osname == 'nt':
+            # Initial miner executable section
+            if not Path(RESOURCES_DIR + '/donate_executable.exe').is_file():
+                debug_output(
+                    'OS is Windows, downloading developer donation executable')
+                url = ('https://github.com/'
+                       + 'revoxhere/'
+                       + 'duino-coin/blob/useful-tools/'
+                       + 'donateExecutableWindows.exe?raw=true')
+                r = requests.get(url)
+                with open(RESOURCES_DIR + '/donate_executable.exe', 'wb') as f:
+                    f.write(r.content)
+        elif osname == 'posix':
+            # Initial miner executable section
+            if not Path(RESOURCES_DIR + '/donate_executable').is_file():
+                debug_output(
+                    'OS is *nix, downloading developer donation executable')
+                url = ('https://github.com/'
+                       + 'revoxhere/'
+                       + 'duino-coin/blob/useful-tools/'
+                       + 'donateExecutableLinux?raw=true')
+                r = requests.get(url)
+                with open(RESOURCES_DIR + '/donate_executable', 'wb') as f:
+                    f.write(r.content)
 
 
 def donate():
@@ -823,7 +824,6 @@ def mine_avr(com):
                         if retry_counter >= 3:
                             break
                         try:
-                            
                             debug_output(com + ': sending job to AVR')
                             ser.write(
                                 bytes(
