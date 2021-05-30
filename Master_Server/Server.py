@@ -1633,7 +1633,7 @@ def create_main_api_file():
                             net_wattage += 9
                             miner_dict["CPU"] += 1
 
-                    elif 350000 < minerapi[miner]["Difficulty"]:
+                    elif minerapi[miner]["Diff"] > 350000 or "OPENCL" in minerapi[miner]["Software"].upper():
                         net_wattage += 50
                         miner_dict["GPU"] += 1
                         
