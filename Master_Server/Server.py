@@ -2287,24 +2287,21 @@ def handle(connection, address):
 
             elif data[0] == "WRAP":
                 if logged_in:
-                    if use_wrapper and wrapper_permission:
-                        admin_print(
-                            "Starting wrapping protocol by " + username)
-                        try:
-                            amount = str(data[1])
-                            tron_address = str(data[2])
-                        except IndexError:
-                            c.send(bytes("NO,Not enough data", encoding="utf8"))
-                            break
-                        else:
-                            wrapfeedback = protocol_wrap_wduco(
-                                username, tron_address, amount)
-                            if wrapfeedback:
-                                send_data(wrapfeedback, connection)
-                            else:
-                                send_data("OK,Nothing returned", connection)
+                    admin_print(
+                        "Starting wrapping protocol by " + username)
+                    try:
+                        amount = str(data[1])
+                        tron_address = str(data[2])
+                    except IndexError:
+                        c.send(bytes("NO,Not enough data", encoding="utf8"))
+                        break
                     else:
-                        send_data("NO,Wrapper is disabled", connection)
+                        wrapfeedback = protocol_wrap_wduco(
+                            username, tron_address, amount)
+                        if wrapfeedback:
+                            send_data(wrapfeedback, connection)
+                        else:
+                            send_data("OK,Nothing returned", connection)
                 else:
                     send_data("NO,Not logged in", connection)
 
