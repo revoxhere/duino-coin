@@ -64,9 +64,9 @@ SERVER_VER = 2.4
 READY_HASHES_NUM = 1000
 MOTD = """You are mining on the official Duino-Coin master server, have fun!"""
 BLOCK_PROBABILITY = 1000000
-BLOCK_REWARD = 7.7
-UPDATE_MINERAPI_EVERY = 5
-EXPECTED_SHARETIME = 25
+BLOCK_REWARD = 28.11
+UPDATE_MINERAPI_EVERY = 3
+EXPECTED_SHARETIME = 20
 MAX_REJECTED_SHARES = 10
 BCRYPT_ROUNDS = 8
 MAX_WORKERS = 50
@@ -108,6 +108,7 @@ except Exception as e:
 global_blocks = 1
 duco_price, duco_price_justswap, duco_price_nodes = 0, 0, 0
 global_cpu_usage, global_ram_usage = [50], [50]
+global_connections = 1
 minerapi = {}
 job_tiers = {}
 balances_to_update = {}
@@ -179,6 +180,33 @@ html = """\
        to chat, take part in giveaways, trade and get
        help from other Duino-Coin users.<br><br>
        Happy mining!<br>
+       <italic>Sincerely, Duino-Coin Team</italic>
+    </p>
+  </body>
+</html>
+"""
+
+# Ban email - text version
+textBan = """\
+Hi there!
+We have noticed behavior on your account that 
+does not comply with our terms of service.
+As a result, your account has been 
+permanently banned.
+Sincerely, Duino-Coin Team"""
+
+# Ban email - HTML version
+htmlBan = """\
+<html>
+  <body>
+    <img src="https://github.com/revoxhere/duino-coin/raw/master/Resources/ducobanner.png?raw=true"
+    width="360px" height="auto"><br>
+    <h3>Hi there!</h3>
+    <h4>We have noticed behavior on your account that does not comply with our 
+    <a href="https://github.com/revoxhere/duino-coin#terms-of-service">
+    terms of service
+    </a>.</h4>
+    <p>As a result, your account has been permanently banned.<br>
        <italic>Sincerely, Duino-Coin Team</italic>
     </p>
   </body>
@@ -266,7 +294,7 @@ def update_job_tiers():
             },
             "XXHASH": {
                 "difficulty": 750000,
-                "reward": .0003,
+                "reward": .0006,
                 "max_hashrate": 900000
             },
             "NET": {
@@ -504,7 +532,8 @@ def database_updater():
                 for user in balances_to_update.copy():
                     amount_to_update = balances_to_update[user] / 32
                     if amount_to_update > 0.01:
-                        amount_to_update = floatmap(amount_to_update, 0.01, 0.5, 0.09, 0.015)
+                        amount_to_update = floatmap(
+                            amount_to_update, 0.01, 0.5, 0.09, 0.015)
 
                     try:
                         estimated_profits[user].append(amount_to_update)
@@ -590,7 +619,7 @@ def input_management():
                     conn.commit()
                 admin_print("Changed password")
             except Exception as e:
-                admin_print("Error changing password: "+str(e))
+                admin_print("Error changing password: " + str(e))
 
             with open(CONFIG_BANS, 'a') as bansfile:
                 bansfile.write(str(username) + "\n")
@@ -599,8 +628,96 @@ def input_management():
             try:
                 banlist.append(str(username))
                 admin_print("Added username to blocked usernames")
-            except Exception:
-                admin_print("Error adding username to blocked usernames")
+            except Exception as e:
+                admin_print("Error adding username to blocked usernames: " + str(e))
+
+            try:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+                    datab.execute(
+                        """SELECT * 
+                    FROM Users 
+                    WHERE username = ?""",
+                        (username,))
+                    email = str(datab.fetchone()[2])
+
+                    message = MIMEMultipart("alternative")
+                    message["Subject"] = "ToS violation on account " + \
+                        str(username)
+                    message["From"] = DUCO_EMAIL
+                    message["To"] = email
+
+                    part1 = MIMEText(textBan, "plain")
+                    part2 = MIMEText(htmlBan, "html")
+                    message.attach(part1)
+                    message.attach(part2)
+
+                    context = ssl.create_default_context()
+                    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtpserver:
+                        smtpserver.login(DUCO_EMAIL, DUCO_PASS)
+                        smtpserver.sendmail(
+                            DUCO_EMAIL, email, message.as_string())
+                    admin_print("Sent email to", str(email))
+            except Exception as e:
+                admin_print("Error sending email: " + str(e))
+
+            try:
+                recipient = "giveaways"
+                global_last_block_hash_cp = global_last_block_hash
+                memo = "Kolka ban"
+
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+                    datab.execute(
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
+                        (username,))
+                    balance = float(datab.fetchone()[3])
+                    amount = balance
+
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+
+                    balance -= float(amount)
+                    datab.execute(
+                        """UPDATE Users
+                        set balance = ?
+                        where username = ?""",
+                        (balance, username))
+
+                    datab.execute(
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
+                        (recipient,))
+                    recipientbal = float(datab.fetchone()[3])
+
+                    recipientbal += float(amount)
+                    datab.execute(
+                        """UPDATE Users
+                        set balance = ?
+                        where username = ?""",
+                        (f'{float(recipientbal):.20f}', recipient))
+                    conn.commit()
+
+                with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+                    formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
+                    datab.execute(
+                        """INSERT INTO Transactions
+                        (timestamp, username, recipient, amount, hash, memo)
+                        VALUES(?, ?, ?, ?, ?, ?)""",
+                        (formatteddatetime,
+                            username,
+                            recipient,
+                            amount,
+                            global_last_block_hash_cp,
+                            memo))
+                    conn.commit()
+                admin_print("Transferred balance to giveaways account")
+            except Exception as e:
+                admin_print("Error transfering balance: " + traceback.format_exc())
 
         elif command[0] == "exit":
             admin_print("Are you sure you want to exit DUCO server?")
@@ -1297,7 +1414,13 @@ def now():
 def get_sys_usage():
     global global_cpu_usage
     global global_ram_usage
+    global global_connections
     while True:
+        global_connections = subprocess.run(
+            'sudo netstat -anp | grep 2811 | wc -l',
+            stdout=subprocess.PIPE,
+            shell=True
+        ).stdout.decode().rstrip()
         global_cpu_usage.append(psutil.cpu_percent())
         global_ram_usage.append(psutil.virtual_memory()[2])
         gevent.sleep(5)
@@ -1468,9 +1591,11 @@ def create_main_api_file():
             miner_dict = {
                 "GPU": 0,
                 "CPU": 0,
+                "RPi": 0,
                 "ESP32": 0,
                 "ESP8266": 0,
-                "Arduino": 0
+                "Arduino": 0,
+                "Other": 0
             }
             for miner in minerapi.copy():
                 try:
@@ -1485,27 +1610,36 @@ def create_main_api_file():
                         # 1,4W (but 2 cores) for ESP32 @ peak 480mA/3,3V
                         net_wattage += 0.7
                         miner_dict["ESP32"] += 1
+
                     elif "ESP8266" in minerapi[miner]["Software"].upper():
                         # 1,3W for ESP8266 @ peak 400mA/3,3V
                         net_wattage += 1.3
                         miner_dict["ESP8266"] += 1
+
                     elif "AVR" in minerapi[miner]["Software"].upper():
                         # 0,2W for Arduino @ peak 40mA/5V
                         net_wattage += 0.2
                         miner_dict["Arduino"] += 1
-                    else:
+
+                    elif "PC" in minerapi[miner]["Software"].upper():
                         if ("RASPBERRY" in minerapi[miner]["Identifier"].upper()
                                 or "PI" in minerapi[miner]["Identifier"].upper()):
                             # 3,875 for one Pi4 core - Pi4 max 15,8W
                             net_wattage += 3.875
-                            miner_dict["CPU"] += 1
+                            miner_dict["RPi"] += 1
+
                         else:
                             # ~70W for typical CPU and 8 mining threads (9W per mining thread)
                             net_wattage += 9
-                        if job_tiers["EXTREME"]["difficulty"] < minerapi[miner]["Difficulty"]:
-                            miner_dict["GPU"] += 1
-                        else: 
                             miner_dict["CPU"] += 1
+
+                    elif 350000 < minerapi[miner]["Difficulty"]:
+                        net_wattage += 50
+                        miner_dict["GPU"] += 1
+                        
+                    else:
+                        net_wattage += 5
+                        miner_dict["Other"] += 1
 
                     miner_list.append(minerapi[miner]["User"])
                 except:
@@ -1527,12 +1661,6 @@ def create_main_api_file():
                     reverse=True
                 )
             )
-
-            global_connections = subprocess.run(
-                'sudo netstat -anp | grep 2811 | wc -l',
-                stdout=subprocess.PIPE,
-                shell=True
-            ).stdout.decode().rstrip()
 
             kolka_dict = {
                 "Jailed": len(jail),
@@ -2237,7 +2365,7 @@ def handle(connection, address):
             gevent.sleep(.5)
     except Exception:
         pass
-        #print(traceback.format_exc())
+        # print(traceback.format_exc())
     finally:
         # print("Closing socket")
         try:
@@ -2295,6 +2423,16 @@ def flush_iptables():
         gevent.sleep(60*15)
 
 
+def duino_stats_restart_handle():
+    while True:
+        if ospath.isfile("config/restart_signal"):
+            os.remove("config/restart_signal")
+            os.system("sudo iptables -F INPUT")
+            admin_print("Server restarted by Duino-Stats command")
+            os.execl(sys.executable, sys.executable, *sys.argv)
+        sleep(1)
+
+
 if __name__ == "__main__":
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
@@ -2304,6 +2442,7 @@ if __name__ == "__main__":
     threading.Thread(target=resetips).start()
     threading.Thread(target=flush_iptables).start()
 
+    threading.Thread(target=duino_stats_restart_handle).start()
     threading.Thread(target=get_duco_prices).start()
     threading.Thread(target=get_sys_usage).start()
 
@@ -2320,8 +2459,8 @@ if __name__ == "__main__":
         server = StreamServer(
             (HOSTNAME, PORT),
             handle,
-            backlog=2,
-            spawn=10000)
+            backlog=1,
+            spawn=15000)
         admin_print("Master Server is listening on port", PORT)
         server.serve_forever(1)
     except Exception as e:
