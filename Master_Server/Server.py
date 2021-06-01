@@ -20,6 +20,7 @@ import json
 import smtplib
 import subprocess
 import traceback
+import libducohash
 from statistics import mean
 from random import randint
 from hashlib import sha1
@@ -37,7 +38,6 @@ import pool_functions as PF
 from kolka_module import *
 from server_functions import *
 from kolka_chip_module import *
-from wrapped_duco_functions import *
 # python3 -m pip install bcrypt
 from bcrypt import checkpw, hashpw, gensalt
 # python3 -m pip install fastrand
@@ -246,7 +246,7 @@ def create_backup():
                     "," + str(duco_price_justswap).rstrip("\n"))
             admin_print("Backup finished")
 
-        hours = 3
+        hours = 6
         counter += 1
         gevent.sleep(60*60*hours)
 
@@ -531,9 +531,11 @@ def database_updater():
                 datab.execute('PRAGMA journal_mode = WAL')
                 for user in balances_to_update.copy():
                     amount_to_update = balances_to_update[user] / 32
-                    if amount_to_update > 0.01:
+                    if amount_to_update > 0.2:
+                        amount_to_update = amount_to_update / 100
+                    if amount_to_update > 0.02:
                         amount_to_update = floatmap(
-                            amount_to_update, 0.01, 0.5, 0.09, 0.015)
+                            amount_to_update, 0.02, 0.5, 0.02, 0.025)
 
                     try:
                         estimated_profits[user].append(amount_to_update)
@@ -1063,12 +1065,11 @@ def create_share_ducos1(last_block_hash, difficulty):
             numeric_result = fastrandint(100 * difficulty)
         except:
             numeric_result = randint(0, 100 * difficulty)
-        expected_hash_str = bytes(
+        expected_hash_str = str(
             str(last_block_hash_cp)
-            + str(numeric_result
-                  ), encoding="utf-8")
-        expected_hash = sha1(expected_hash_str)
-        job = [last_block_hash_cp, expected_hash.hexdigest(), numeric_result]
+            + str(numeric_result))
+        expected_hash = libducohash.hash(expected_hash_str)
+        job = [last_block_hash_cp, expected_hash, numeric_result]
         return job
     except Exception as e:
         print("DUCOS1 ERR:", e)
@@ -1106,12 +1107,11 @@ def protocol_mine(data, connection, address, using_xxhash=False):
     ip_addr = address[0].replace("::ffff:", "")
     accepted_shares, rejected_shares = 0, 0
     thread_miner_api = {}
-    reported_hashrate_list = []
     is_first_share = True
     thread_id = id(gevent.getcurrent())
     override_difficulty = ""
     reward = 0
-    connection.settimeout(90)
+    connection.settimeout(EXPECTED_SHARETIME*2)
 
     while True:
         global_last_block_hash_cp = global_last_block_hash
@@ -1178,17 +1178,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             difficulty = kolka_v3(
                 sharetime, EXPECTED_SHARETIME, difficulty)
 
-        # if not is_first_share:
-            # """ There's a 16.6% to get a sharetime-exploit test
-            #    (10 options, 11 and 12 = test; ergo 2 out of 12)
-            #    TODO: Maybe make this more random """
-            # Drop the nonce to force a lower sharetime
-            # rand = fastrandint(10 * difficulty)
-            # Set to true to avoid increasing the difficulty by magnitudes
-            # is_sharetime_test = True
-            # The expected sharetime should be about 10 times lower than before
-            # expected_test_sharetime = sharetime / 10
-
         try:
             ip_workers = workers[ip_addr]
         except:
@@ -1253,7 +1242,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             reported_hashrate = hashrate
             hashrate_is_estimated = True
 
-        if abs(reported_hashrate - hashrate) > 5000:
+        if abs(reported_hashrate - hashrate) > 10000:
             reported_hashrate = hashrate
             hashrate_is_estimated = True
 
@@ -1262,7 +1251,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             try:
                 chip_id = str(result[4]).rstrip()
                 if not check_id(chip_id):
-                    #print("Possible wrong chip:", username, chip_id)
                     wrong_chip_id = True
             except:
                 wrong_chip_id = True
@@ -1302,8 +1290,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 "Earnings":     reward
             }
 
-            reported_hashrate_list.append(reported_hashrate)
-            thread_miner_api["Hashrate"] = mean(reported_hashrate_list[-5:])
+            thread_miner_api["Hashrate"] = reported_hashrate
 
             if using_xxhash:
                 thread_miner_api["Algorithm"] = "XXHASH"
@@ -1332,19 +1319,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 override_difficulty = kolka_v2(req_difficulty, job_tiers)
 
             send_data("BAD\n", connection)
-
-        # elif req_difficulty == "AVR":
-        #     """ Kolka V2 hashrate check for AVRs """
-        #     if not reported_hashrate > 10:
-        #         rejected_shares += 1
-
-        #         penalty = kolka_v1(0, sharetime, 0, 0, penalty=True)
-        #         try:
-        #             balances_to_update[username] += penalty
-        #         except:
-        #             balances_to_update[username] = penalty
-
-        #         send_data("BAD\n", connection)
 
         elif int(result[0]) == job[2]:
             """ Correct result received """
@@ -1400,7 +1374,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             send_data("BAD\n", connection)
 
         is_first_share = False
-        gevent.sleep(.5)
 
 
 def admin_print(*message):
@@ -1446,13 +1419,13 @@ def hashrate_prefix(hashrate: int, accuracy: int):
 def power_prefix(wattage: int, accuracy: int):
     """ Input: hattage as int
         Output rounded wattage with scientific prefix as string """
-    if wattage >= 900000000:
+    if wattage >= 1000000000:
         prefix = " GW"
         wattage = wattage / 1000000000
-    elif wattage >= 900000:
+    elif wattage >= 1000000:
         prefix = " MW"
         wattage = wattage / 1000000
-    elif wattage >= 900:
+    elif wattage >= 1000:
         prefix = " kW"
         wattage = wattage / 1000
     else:
@@ -1554,27 +1527,13 @@ def get_blocks_list():
 
 def create_secondary_api_files():
     while True:
-        with open('transactions.json', 'w') as outfile:
-            json.dump(
-                get_transaction_list(),
-                outfile,
-                indent=1,
-                ensure_ascii=False)
-        gevent.sleep(10)
         with open('foundBlocks.json', 'w') as outfile:
             json.dump(
                 get_blocks_list(),
                 outfile,
                 indent=1,
                 ensure_ascii=False)
-        gevent.sleep(10)
-        with open('balances.json', 'w') as outfile:
-            json.dump(
-                get_balance_list(),
-                outfile,
-                indent=1,
-                ensure_ascii=False)
-        gevent.sleep(10)
+        gevent.sleep(60)
 
 
 def create_main_api_file():
@@ -1633,7 +1592,7 @@ def create_main_api_file():
                             net_wattage += 9
                             miner_dict["CPU"] += 1
 
-                    elif minerapi[miner]["Diff"] > 350000 or "OPENCL" in minerapi[miner]["Software"].upper():
+                    elif "OPENCL" in minerapi[miner]["Software"].upper():
                         net_wattage += 50
                         miner_dict["GPU"] += 1
                         
@@ -1690,20 +1649,19 @@ def create_main_api_file():
                 "Kolka":                 kolka_dict,
                 "Miner distribution":    miner_dict,
                 "Top 10 richest miners": get_richest_users(10),
-                "Active workers":        miners_per_user,
-                "Miners":                "server.duinocoin.com/miners.json"
+                "Active workers":        miners_per_user
             }
 
             with open(API_JSON_URI, 'w') as outfile:
                 json.dump(
-                    server_api.copy(),
+                    server_api,
                     outfile,
                     indent=1,
                     ensure_ascii=False)
         except Exception:
             print("API err:", traceback.format_exc())
 
-        sleep_by_cpu_usage(SAVE_TIME+3)
+        gevent.sleep(SAVE_TIME)
 
 
 def create_minerapi():
@@ -1738,7 +1696,7 @@ def create_minerapi():
             memory.backup(disk_conn)
             disk_conn.commit()
 
-        gevent.sleep(10)
+        gevent.sleep(15)
 
 
 def protocol_login(data, connection):
@@ -2293,7 +2251,7 @@ def handle(connection, address):
                         amount = str(data[1])
                         tron_address = str(data[2])
                     except IndexError:
-                        c.send(bytes("NO,Not enough data", encoding="utf8"))
+                        send_data("NO,Not enough data", connection)
                         break
                     else:
                         wrapfeedback = protocol_wrap_wduco(
@@ -2314,7 +2272,7 @@ def handle(connection, address):
                             amount = str(data[1])
                             tron_address = str(data[2])
                         except IndexError:
-                            c.send(bytes("NO,Not enough data", encoding="utf8"))
+                            send_data("NO,Not enough data", connection)
                             break
                         else:
                             unwrapfeedback = protocol_unwrap_wduco(
@@ -2359,7 +2317,7 @@ def handle(connection, address):
                 PF.PoolLoginRemove(connection=connection,
                                    data=data,
                                    PoolPassword=PoolPassword)
-            gevent.sleep(.5)
+            gevent.sleep(1)
     except Exception:
         pass
         # print(traceback.format_exc())
@@ -2431,6 +2389,7 @@ def duino_stats_restart_handle():
 
 
 if __name__ == "__main__":
+    from wrapped_duco_functions import unwraptx, confirmunwraptx, protocol_wrap_wduco, protocol_unwrap_wduco
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
     threading.Thread(target=create_backup).start()
@@ -2457,9 +2416,9 @@ if __name__ == "__main__":
             (HOSTNAME, PORT),
             handle,
             backlog=1,
-            spawn=15000)
+            spawn=10000)
         admin_print("Master Server is listening on port", PORT)
-        server.serve_forever(1)
+        server.serve_forever()
     except Exception as e:
         admin_print("Unexpected exception: ", e)
     finally:
