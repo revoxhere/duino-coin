@@ -152,7 +152,8 @@ Gradient variations of the colors above are a welcome touch.
 
 ### Icons
 
-<img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco-alt.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/WebMiner.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/PCMiner.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/AVRMiner.png" width="128px">
+<img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco-alt.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco_square.png" width="128px">
+<img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/WebMiner.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/PCMiner.png" width="128px"> <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/AVRMiner.png" width="128px">
 <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png" width="512px">
 
 More resources available in the [Resources folder](https://github.com/revoxhere/duino-coin/tree/master/Resources)
