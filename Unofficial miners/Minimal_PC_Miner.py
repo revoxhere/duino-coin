@@ -16,10 +16,10 @@ soc.settimeout(10)
 username = input('Username?\n> ') 
 
 DiffChoice = input('User lower difficulty? (Y/N) [Leave empty for default of True]\n> ')
-if DiffChoice.lower == n:
+if DiffChoice.lower == "n":
     UseLowerDiff = False
 else:
-    UserLowerDiff = True
+    UseLowerDiff = True
 
 def retrieve_server_ip():
     print("> Retrieving Pool Address And Port")
