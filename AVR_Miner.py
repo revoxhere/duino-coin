@@ -26,13 +26,10 @@ from threading import Lock
 from time import ctime, sleep, strptime, time
 from statistics import mean
 import select
-
+import pip
 
 def install(package):
-    # Install pip package automatically
-    check_call([sys.executable, '-m', 'pip', 'install', package])
-    execl(sys.executable, sys.executable, *sys.argv)
-
+    pip.main(["install",  package])
 
 def now():
     # Return datetime object
