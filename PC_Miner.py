@@ -103,10 +103,11 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = "2.49"  # Version number
-SOC_TIMEOUT = 60  # Socket timeout
+SOC_TIMEOUT = 30  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
 debug = "n"
+discord_presence = "y"
 rig_identiier = "None"
 requested_diff = "NET"
 algorithm = "DUCO-S1"
@@ -168,7 +169,7 @@ try:
         # Read language variable from configfile
         try:
             config.read(RESOURCES_DIR + "/Miner_config.cfg")
-            lang = config["miner"]["language"]
+            lang = config["Duino-Coin-PC-Miner"]["language"]
         except Exception:
             # If it fails, fallback to english
             lang = "english"
@@ -333,16 +334,15 @@ def Greeting():
         + Fore.YELLOW
         + str(username)
         + "!\n")
-    
-    if donation_level > 0:
+
+    if int(donation_level) > 0:
         if osname == "nt":
             # Initial miner executable section
             if not Path(RESOURCES_DIR + "/Donate_executable.exe").is_file():
                 debugOutput(
                     "OS is Windows, downloading developer donation executable")
-                url = ("https://github.com/"
-                       + "revoxhere/"
-                       + "duino-coin/blob/useful-tools/"
+                url = ("https://github.com/revoxhere/"
+                       + "duino-coin/blob/useful-tools/Donate_executables/"
                        + "DonateExecutableWindows.exe?raw=true")
                 r = requests.get(url)
                 with open(RESOURCES_DIR + "/Donate_executable.exe", "wb") as f:
@@ -351,10 +351,9 @@ def Greeting():
             # Initial miner executable section
             if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
                 debugOutput(
-                    "OS is POSIX-like, downloading developer donation executable")
-                url = ("https://github.com/"
-                       + "revoxhere/"
-                       + "duino-coin/blob/useful-tools/"
+                    "OS is *nix, downloading developer donation executable")
+                url = ("https://github.com/revoxhere/"
+                       + "duino-coin/blob/useful-tools/Donate_executables/"
                        + "DonateExecutableLinux?raw=true")
                 r = requests.get(url)
                 with open(RESOURCES_DIR + "/Donate_executable", "wb") as f:
@@ -541,16 +540,18 @@ def loadConfig():
             donation_level = 0
 
         # Format data
-        config["miner"] = {
-            "username": username,
-            "efficiency": efficiency,
-            "threads": threadcount,
-            "requested_diff": requested_diff,
-            "donate": donation_level,
-            "identifier": rig_identiier,
-            "algorithm": algorithm,
-            "language": lang,
-            "debug": "n"
+        config["Duino-Coin-PC-Miner"] = {
+            "username":         username,
+            "efficiency":       efficiency,
+            "threads":          threadcount,
+            "requested_diff":   requested_diff,
+            "donate":           donation_level,
+            "identifier":       rig_identiier,
+            "algorithm":        algorithm,
+            "language":         lang,
+            "debug":            "n",
+            "soc_timeout":      30,
+            "discord_presence": "y"
         }
         # Write data to configfile
         with open(RESOURCES_DIR + "/Miner_config.cfg", "w") as configfile:
@@ -564,14 +565,16 @@ def loadConfig():
     else:
         # If config already exists, load data from it
         config.read(RESOURCES_DIR + "/Miner_config.cfg")
-        username = config["miner"]["username"]
-        efficiency = config["miner"]["efficiency"]
-        threadcount = config["miner"]["threads"]
-        requested_diff = config["miner"]["requested_diff"]
-        donation_level = config["miner"]["donate"]
-        algorithm = config["miner"]["algorithm"]
-        rig_identiier = config["miner"]["identifier"]
-        debug = config["miner"]["debug"]
+        username = config["Duino-Coin-PC-Miner"]["username"]
+        efficiency = config["Duino-Coin-PC-Miner"]["efficiency"]
+        threadcount = config["Duino-Coin-PC-Miner"]["threads"]
+        requested_diff = config["Duino-Coin-PC-Miner"]["requested_diff"]
+        donation_level = config["Duino-Coin-PC-Miner"]["donate"]
+        algorithm = config["Duino-Coin-PC-Miner"]["algorithm"]
+        rig_identiier = config["Duino-Coin-PC-Miner"]["identifier"]
+        debug = config["Duino-Coin-PC-Miner"]["debug"]
+        SOC_TIMEOUT = config["Duino-Coin-PC-Miner"]["soc_timeout"]
+        discord_presence = config["Duino-Coin-PC-Miner"]["discord_presence"]
         # Calulate efficiency for use with sleep function
         efficiency = (100 - float(efficiency)) * 0.01
 
@@ -586,7 +589,7 @@ def Donate():
             "cd "
             + RESOURCES_DIR
             + "& Donate_executable.exe "
-            + "-o stratum+tcp://xmg.minerclaim.net:7008 "
+            + "-o stratum+tcp://xmg.minerclaim.net:3333 "
             + "-u revox.donate "
             + "-p x -s 4 -e ")
 
@@ -596,7 +599,7 @@ def Donate():
             + RESOURCES_DIR
             + "&& chmod +x Donate_executable "
             + "&& ./Donate_executable "
-            + "-o stratum+tcp://xmg.minerclaim.net:7008 "
+            + "-o stratum+tcp://xmg.minerclaim.net:3333 "
             + "-u revox.donate "
             + "-p x -s 4 -e ")
 
@@ -615,11 +618,11 @@ def Donate():
 
     elif donatorrunning == False:
         if int(donation_level) == 5:
-            cmd += "95"
+            cmd += "80"
         elif int(donation_level) == 4:
-            cmd += "75"
+            cmd += "60"
         elif int(donation_level) == 3:
-            cmd += "50"
+            cmd += "40"
         elif int(donation_level) == 2:
             cmd += "20"
         elif int(donation_level) == 1:
@@ -937,14 +940,19 @@ def Thread(
                             formattedhashcount = str(
                                 "%03.2f" % round(totalhashrate / 1000, 2)
                                 + " MH/s")
-                        else:
-                            # Stay with kH/s
+                        elif totalhashrate > 100:
+                            # Format for >100 kH/s
                             formattedhashcount = str(
                                 "%03.0f" % float(totalhashrate)
                                 + " kH/s")
+                        else:
+                            # Format for small hashrates
+                            formattedhashcount = str(
+                                "%02.1f" % float(totalhashrate)
+                                + " kH/s")
 
-                        if (totalhashrate > 2000
-                                and accepted.value % 30 == 0):
+                        if (totalhashrate > 1500
+                                and accepted.value % 50 == 0):
                             prettyPrint("sys0",
                                         " " + getString("max_hashrate_notice"),
                                         "warning")
@@ -1003,7 +1011,7 @@ def Thread(
                                     + " ∙ "
                                     + Fore.CYAN
                                     + "ping "
-                                    + str("%03.0f" % int(ping))
+                                    + str("%02.0f" % int(ping))
                                     + "ms")
 
                         elif feedback == "BLOCK":
@@ -1060,7 +1068,7 @@ def Thread(
                                     + " ∙ "
                                     + Fore.CYAN
                                     + "ping "
-                                    + str("%03.0f" % int(ping))
+                                    + str("%02.0f" % int(ping))
                                     + "ms")
 
                         else:
@@ -1079,8 +1087,8 @@ def Thread(
                                     Style.RESET_ALL
                                     + Fore.WHITE
                                     + now().strftime(Style.DIM + "%H:%M:%S ")
+                                    + Style.BRIGHT
                                     + algo_back_color
-                                    + Back.YELLOW
                                     + Fore.RESET
                                     + " cpu"
                                     + str(threadid)
@@ -1118,7 +1126,7 @@ def Thread(
                                     + " ∙ "
                                     + Fore.CYAN
                                     + "ping "
-                                    + str("%03.0f" % int(ping))
+                                    + str("%02.0f" % int(ping))
                                     + "ms")
                         break
                     break
@@ -1328,10 +1336,11 @@ if __name__ == "__main__":
             "error")
         debugOutput("Error launching CPU thead(s): " + str(e))
 
-    try:
-        # Discord rich presence threads
-        initRichPresence()
-        thrThread(
-            target=updateRichPresence).start()
-    except Exception as e:
-        debugOutput("Error launching Discord RPC thead: " + str(e))
+    if discord_presence:
+        try:
+            # Discord rich presence threads
+            initRichPresence()
+            thrThread(
+                target=updateRichPresence).start()
+        except Exception as e:
+            debugOutput("Error launching Discord RPC thead: " + str(e))
