@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.46)
+# Duino-Coin Python PC Miner (v2.49)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -25,14 +25,13 @@ from subprocess import DEVNULL, Popen, check_call
 from threading import Thread as thrThread
 from time import ctime, sleep, strptime, time
 from multiprocessing import Lock
+import pip
 
 thread_lock = Lock()
 
 
 def install(package):
-    # Install pip package automatically
-    check_call([sys.executable, "-m", "pip", "install", package])
-    execl(sys.executable, sys.executable, * sys.argv)
+    pip.main(["install",  package])
 
 
 def now():
@@ -103,8 +102,8 @@ except ModuleNotFoundError:
 
 
 # Global variables
-MINER_VER = "2.46"  # Version number
-SOC_TIMEOUT = 30  # Socket timeout
+MINER_VER = "2.49"  # Version number
+SOC_TIMEOUT = 60  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
 debug = "n"
@@ -1251,9 +1250,9 @@ if __name__ == "__main__":
             "sys0",
             " Multiprocessing is not available. "
             + "Please check permissions and/or your python installation. "
-            + "Exiting in 15s.",
+            + "Exiting in 10s.",
             "error")
-        sleep(15)
+        sleep(10)
         _exit(1)
 
     try:
@@ -1317,7 +1316,6 @@ if __name__ == "__main__":
                     hashrates_list,
                     totalhashrate_mean))
             thread[x].start()
-            sleep(0.1)
     except Exception as e:
         prettyPrint(
             "sys0",
