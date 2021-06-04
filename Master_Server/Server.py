@@ -33,11 +33,6 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from collections import OrderedDict
 from operator import itemgetter
-# Duino-Coin server libraries
-import pool_functions as PF
-from kolka_module import *
-from server_functions import *
-from kolka_chip_module import *
 # python3 -m pip install bcrypt
 from bcrypt import checkpw, hashpw, gensalt
 # python3 -m pip install fastrand
@@ -56,7 +51,7 @@ import udatetime as utime
 # Global variables
 HOSTNAME = ""
 PORT = 2811
-DIFF_INCREASES_PER = 7500
+DIFF_INCREASES_PER = 12500
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 5
 DB_TIMEOUT = 10
@@ -65,13 +60,13 @@ READY_HASHES_NUM = 1000
 MOTD = """You are mining on the official Duino-Coin master server, have fun!"""
 BLOCK_PROBABILITY = 1000000
 BLOCK_REWARD = 28.11
-UPDATE_MINERAPI_EVERY = 3
-EXPECTED_SHARETIME = 20
+UPDATE_MINERAPI_EVERY = 5
+EXPECTED_SHARETIME = 15
 MAX_REJECTED_SHARES = 10
-BCRYPT_ROUNDS = 8
+BCRYPT_ROUNDS = 6
 MAX_WORKERS = 50
 PING_SLEEP_TIME = 0.5  # check protocol duco-s1 or xxhash
-MAX_NUMBER_OF_PINGS = 5
+MAX_NUMBER_OF_PINGS = 3
 # DB files
 DATABASE = 'crypto_database.db'
 BLOCKCHAIN = 'duino_blockchain.db'
@@ -126,27 +121,6 @@ jail = []
 workers = {}
 registrations = {}
 estimated_profits = {}
-# Read banned usernames
-with open(CONFIG_BANS, "r") as bannedusrfile:
-    bannedusr = bannedusrfile.read().splitlines()
-    for username in bannedusr:
-        banlist.append(username)
-    print("Loaded banned usernames file")
-
-# Read whitelisted IPs
-with open(CONFIG_WHITELIST, "r") as whitelistfile:
-    whitelisted = whitelistfile.read().splitlines()
-    for ip in whitelisted:
-        whitelisted_ips.append(socket.gethostbyname(str(ip)))
-    print("Loaded whitelisted IPs file")
-
-# Read whitelisted usernames
-with open(CONFIG_WHITELIST_USR, "r") as whitelistusrfile:
-    whitelistedusr = whitelistusrfile.read().splitlines()
-    for username in whitelistedusr:
-        whitelisted_usernames.append(username)
-    print("Loaded whitelisted usernames file")
-
 
 # Registration email - text version
 text = """\
@@ -343,93 +317,6 @@ def update_job_tiers():
         gevent.sleep(60)
 
 
-""" In-memory db for minerapi """
-memory = sqlconn(":memory:",
-                 check_same_thread=False)
-memory_datab = memory.cursor()
-
-memory_datab.execute(
-    """CREATE TABLE
-    IF NOT EXISTS
-    Miners(
-    threadid   TEXT,
-    username   TEXT,
-    hashrate   REAL,
-    sharetime  REAL,
-    accepted   INTEGER,
-    rejected   INTEGER,
-    diff       INTEGER,
-    software   TEXT,
-    identifier TEXT,
-    algorithm  TEXT)""")
-memory.commit()
-
-if not os.path.isfile(CONFIG_TRANSACTIONS):
-    with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
-        datab = conn.cursor()
-        datab.execute(
-            """CREATE TABLE
-            IF NOT EXISTS
-            Transactions(
-            timestamp TEXT,
-            username TEXT,
-            recipient TEXT,
-            amount REAL,
-            hash TEXT,
-            memo TEXT)""")
-        conn.commit()
-
-if not os.path.isfile(CONFIG_BLOCKS):
-    with sqlconn(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
-        datab = conn.cursor()
-        datab.execute(
-            """CREATE TABLE
-            IF NOT EXISTS
-            Blocks(
-            timestamp TEXT,
-            finder TEXT,
-            amount REAL,
-            hash TEXT)""")
-        conn.commit()
-
-if not ospath.isfile(DATABASE):
-    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-        datab = conn.cursor()
-        datab.execute(
-            """CREATE TABLE
-            IF NOT EXISTS
-            Users(username TEXT,
-            password TEXT,
-            email TEXT,
-            balance REAL)""")
-        conn.commit()
-
-if not ospath.isfile(BLOCKCHAIN):
-    # SHA1 of duino-coin
-    global_last_block_hash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
-    global_blocks = 1
-    with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
-        datab = conn.cursor()
-        datab.execute(
-            """CREATE TABLE
-            IF NOT EXISTS
-            Server(blocks REAL,
-            lastBlockHash TEXT)""")
-        datab.execute(
-            """INSERT
-            INTO Server(blocks,
-            lastBlockHash) VALUES(?, ?)""",
-            (global_blocks, global_last_block_hash))
-        conn.commit()
-else:
-    with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
-        datab = conn.cursor()
-        datab.execute("SELECT blocks FROM Server")
-        global_blocks = int(datab.fetchone()[0])
-        datab.execute("SELECT lastBlockHash FROM Server")
-        global_last_block_hash = str(datab.fetchone()[0])
-
-
 def create_jobs():
     """ Generate DUCO-S1A jobs for low-power devices """
     while True:
@@ -528,7 +415,6 @@ def database_updater():
         try:
             with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
-                datab.execute('PRAGMA journal_mode = WAL')
                 for user in balances_to_update.copy():
                     amount_to_update = balances_to_update[user] / 32
                     if amount_to_update > 0.2:
@@ -550,7 +436,20 @@ def database_updater():
                         (amount_to_update, user))
                     balances_to_update.pop(user)
                 conn.commit()
+        except Exception as e:
+            admin_print("Database error:", e)
+            db_err_counter += 1
+            if db_err_counter > 5:
+                admin_print("Restarting server - too many DB errs")
+                os.system("sudo iptables -F INPUT")
+                os.execl(sys.executable, sys.executable, *sys.argv)
+        gevent.sleep(SAVE_TIME)
 
+
+def chain_updater():
+    db_err_counter = 0
+    while True:
+        try:
             with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
                 datab.execute(
@@ -569,10 +468,11 @@ def database_updater():
                 admin_print("Restarting server - too many DB errs")
                 os.system("sudo iptables -F INPUT")
                 os.execl(sys.executable, sys.executable, *sys.argv)
-        gevent.sleep(SAVE_TIME)
+        gevent.sleep(SAVE_TIME*3)
 
 
 def input_management():
+    sleep(.2)
     while True:
         command = input("DUCO Console $ ")
         command = command.split(" ")
@@ -631,7 +531,8 @@ def input_management():
                 banlist.append(str(username))
                 admin_print("Added username to blocked usernames")
             except Exception as e:
-                admin_print("Error adding username to blocked usernames: " + str(e))
+                admin_print(
+                    "Error adding username to blocked usernames: " + str(e))
 
             try:
                 with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
@@ -655,7 +556,8 @@ def input_management():
                     message.attach(part2)
 
                     context = ssl.create_default_context()
-                    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtpserver:
+                    with smtplib.SMTP_SSL("smtp.gmail.com", 
+                        465, context=context) as smtpserver:
                         smtpserver.login(DUCO_EMAIL, DUCO_PASS)
                         smtpserver.sendmail(
                             DUCO_EMAIL, email, message.as_string())
@@ -719,7 +621,8 @@ def input_management():
                     conn.commit()
                 admin_print("Transferred balance to giveaways account")
             except Exception as e:
-                admin_print("Error transfering balance: " + traceback.format_exc())
+                admin_print("Error transfering balance: " +
+                            traceback.format_exc())
 
         elif command[0] == "exit":
             admin_print("Are you sure you want to exit DUCO server?")
@@ -896,6 +799,40 @@ def input_management():
             except Exception as e:
                 admin_print("Error: " + str(e))
 
+        elif command[0] == "changemail":
+            try:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+                    datab.execute(
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
+                        (command[1],))
+                    username = str(datab.fetchone()[0])
+
+                admin_print("Change "
+                            + command[1]
+                            + "'s email to "
+                            + str(command[2])
+                            + "?")
+
+                confirm = input("  Y/n")
+                if confirm == "Y" or confirm == "y" or confirm == "":
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                        datab = conn.cursor()
+                        datab.execute(
+                            """UPDATE Users
+                            set email = ?
+                            where username = ?""",
+                            (password, command[1]))
+                        conn.commit()
+                        admin_print("Changed email of user " +
+                                    str(command[1]))
+                else:
+                    admin_print("Canceled")
+            except Exception as e:
+                admin_print("Error: " + str(e))
+
         elif command[0] == "subtract":
             try:
                 with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
@@ -1042,7 +979,7 @@ def generate_block(username, reward, new_block_hash, connection, xxhash=False):
 def sleep_by_cpu_usage(upper_limit):
     """ Suspends execution depending on current cpu usage """
     sleeptime = floatmap(global_cpu_usage[-1], 0, 100, 0, upper_limit)
-    sleep(sleeptime)
+    gevent.sleep(sleeptime)
 
 
 def check_workers(ip_workers, usr_workers):
@@ -1065,10 +1002,17 @@ def create_share_ducos1(last_block_hash, difficulty):
             numeric_result = fastrandint(100 * difficulty)
         except:
             numeric_result = randint(0, 100 * difficulty)
+
         expected_hash_str = str(
             str(last_block_hash_cp)
             + str(numeric_result))
-        expected_hash = libducohash.hash(expected_hash_str)
+
+        try:
+            expected_hash = libducohash.hash(expected_hash_str)
+        except:
+            expected_hash = sha1(
+                bytes(expected_hash_str, encoding='ascii')).hexdigest()
+
         job = [last_block_hash_cp, expected_hash, numeric_result]
         return job
     except Exception as e:
@@ -1111,7 +1055,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
     thread_id = id(gevent.getcurrent())
     override_difficulty = ""
     reward = 0
-    connection.settimeout(EXPECTED_SHARETIME*2)
+    connection.settimeout(60*3)
 
     while True:
         global_last_block_hash_cp = global_last_block_hash
@@ -1194,10 +1138,12 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                     connection)
                 raise Exception("Too many workers")
 
-        if using_xxhash:
-            job = create_share_xxhash(global_last_block_hash_cp, difficulty)
-        else:
-            job = create_share_ducos1(global_last_block_hash_cp, difficulty)
+        if (job_tiers[req_difficulty]["difficulty"]
+                > job_tiers["ESP32"]["difficulty"]):
+            if using_xxhash:
+                job = create_share_xxhash(global_last_block_hash_cp, difficulty)
+            else:
+                job = libducohash.create_share(global_last_block_hash_cp, str(difficulty))
 
         # Sending job
         send_data(job[0] + "," + job[1] + "," + str(difficulty) + "\n",
@@ -1209,7 +1155,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         else:
             max_hashrate = job_tiers[req_difficulty]["max_hashrate"]
 
-        numeric_result = job[2]
+        numeric_result = int(job[2])
 
         # Receiving the result
         number_of_pings = 0
@@ -1320,19 +1266,19 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
             send_data("BAD\n", connection)
 
-        elif int(result[0]) == job[2]:
+        elif int(result[0]) == numeric_result:
             """ Correct result received """
             accepted_shares += 1
 
-            try:
-                if workers[ip_addr] < workers[username]:
-                    this_user_miners = workers[username]
-                else:
-                    this_user_miners = workers[ip_addr]
-            except:
-                this_user_miners = 1
+            if accepted_shares > UPDATE_MINERAPI_EVERY:
+                try:
+                    if workers[ip_addr] < workers[username]:
+                        this_user_miners = workers[username]
+                    else:
+                        this_user_miners = workers[ip_addr]
+                except:
+                    this_user_miners = 1
 
-            if accepted_shares > 3:
                 basereward = job_tiers[req_difficulty]["reward"]
                 reward = kolka_v1(basereward, sharetime,
                                   difficulty, this_user_miners)
@@ -1365,7 +1311,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 else:
                     reward = generate_block(
                         username, reward, job[1], connection)
-                send_data("BLOCK\n", connection)
 
         else:
             """ Incorrect result received """
@@ -1374,6 +1319,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             send_data("BAD\n", connection)
 
         is_first_share = False
+        gevent.sleep(.5)
 
 
 def admin_print(*message):
@@ -1396,7 +1342,7 @@ def get_sys_usage():
         ).stdout.decode().rstrip()
         global_cpu_usage.append(psutil.cpu_percent())
         global_ram_usage.append(psutil.virtual_memory()[2])
-        gevent.sleep(5)
+        gevent.sleep(SAVE_TIME)
 
 
 def hashrate_prefix(hashrate: int, accuracy: int):
@@ -1595,7 +1541,7 @@ def create_main_api_file():
                     elif "OPENCL" in minerapi[miner]["Software"].upper():
                         net_wattage += 50
                         miner_dict["GPU"] += 1
-                        
+
                     else:
                         net_wattage += 5
                         miner_dict["Other"] += 1
@@ -1661,7 +1607,7 @@ def create_main_api_file():
         except Exception:
             print("API err:", traceback.format_exc())
 
-        gevent.sleep(SAVE_TIME)
+        sleep(SAVE_TIME)
 
 
 def create_minerapi():
@@ -2143,15 +2089,16 @@ def handle(connection, address):
         connections_per_ip[ip_addr] = 1
 
     try:
-        """ Send server version """
-        send_data(SERVER_VER, connection)
 
         if (ip_addr == "51.15.127.80"
             or ip_addr == "wallet.duinocoin.com"
                 or ip_addr == "34.233.38.119"):
             connection.settimeout(60*30)
         else:
-            connection.settimeout(10)
+            connection.settimeout(30)
+
+        """ Send server version """
+        send_data(SERVER_VER, connection)
 
         while True:
             # Wait until client sends data
@@ -2317,7 +2264,8 @@ def handle(connection, address):
                 PF.PoolLoginRemove(connection=connection,
                                    data=data,
                                    PoolPassword=PoolPassword)
-            gevent.sleep(1)
+
+            sleep_by_cpu_usage(1)
     except Exception:
         pass
         # print(traceback.format_exc())
@@ -2385,11 +2333,124 @@ def duino_stats_restart_handle():
             os.system("sudo iptables -F INPUT")
             admin_print("Server restarted by Duino-Stats command")
             os.execl(sys.executable, sys.executable, *sys.argv)
-        sleep(1)
+        gevent.sleep(1)
 
 
 if __name__ == "__main__":
+    # Read banned usernames
+    with open(CONFIG_BANS, "r") as bannedusrfile:
+        bannedusr = bannedusrfile.read().splitlines()
+        for username in bannedusr:
+            banlist.append(username)
+        admin_print("Loaded banned usernames file")
+
+    # Read whitelisted IPs
+    with open(CONFIG_WHITELIST, "r") as whitelistfile:
+        whitelisted = whitelistfile.read().splitlines()
+        for ip in whitelisted:
+            whitelisted_ips.append(socket.gethostbyname(str(ip)))
+        admin_print("Loaded whitelisted IPs file")
+
+    # Read whitelisted usernames
+    with open(CONFIG_WHITELIST_USR, "r") as whitelistusrfile:
+        whitelistedusr = whitelistusrfile.read().splitlines()
+        for username in whitelistedusr:
+            whitelisted_usernames.append(username)
+        admin_print("Loaded whitelisted usernames file")
+
+    """ In-memory db for minerapi """
+    memory = sqlconn(":memory:",
+                     check_same_thread=False)
+    memory_datab = memory.cursor()
+
+    memory_datab.execute(
+        """CREATE TABLE
+        IF NOT EXISTS
+        Miners(
+        threadid   TEXT,
+        username   TEXT,
+        hashrate   REAL,
+        sharetime  REAL,
+        accepted   INTEGER,
+        rejected   INTEGER,
+        diff       INTEGER,
+        software   TEXT,
+        identifier TEXT,
+        algorithm  TEXT)""")
+    memory.commit()
+
+    if not os.path.isfile(CONFIG_TRANSACTIONS):
+        with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                """CREATE TABLE
+                IF NOT EXISTS
+                Transactions(
+                timestamp TEXT,
+                username TEXT,
+                recipient TEXT,
+                amount REAL,
+                hash TEXT,
+                memo TEXT)""")
+            conn.commit()
+
+    if not os.path.isfile(CONFIG_BLOCKS):
+        with sqlconn(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                """CREATE TABLE
+                IF NOT EXISTS
+                Blocks(
+                timestamp TEXT,
+                finder TEXT,
+                amount REAL,
+                hash TEXT)""")
+            conn.commit()
+
+    if not ospath.isfile(DATABASE):
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                """CREATE TABLE
+                IF NOT EXISTS
+                Users(username TEXT,
+                password TEXT,
+                email TEXT,
+                balance REAL)""")
+            conn.commit()
+
+    if not ospath.isfile(BLOCKCHAIN):
+        # SHA1 of duino-coin
+        global_last_block_hash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
+        global_blocks = 1
+        with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                """CREATE TABLE
+                IF NOT EXISTS
+                Server(blocks REAL,
+                lastBlockHash TEXT)""")
+            datab.execute(
+                """INSERT
+                INTO Server(blocks,
+                lastBlockHash) VALUES(?, ?)""",
+                (global_blocks, global_last_block_hash))
+            conn.commit()
+    else:
+        with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute("SELECT blocks FROM Server")
+            global_blocks = int(datab.fetchone()[0])
+            datab.execute("SELECT lastBlockHash FROM Server")
+            global_last_block_hash = str(datab.fetchone()[0])
+
+    # Duino-Coin server libraries
+    import pool_functions as PF
+    from kolka_module import *
+    from server_functions import *
+    from kolka_chip_module import *
     from wrapped_duco_functions import unwraptx, confirmunwraptx, protocol_wrap_wduco, protocol_unwrap_wduco
+
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
     threading.Thread(target=create_backup).start()
@@ -2418,7 +2479,7 @@ if __name__ == "__main__":
             backlog=1,
             spawn=10000)
         admin_print("Master Server is listening on port", PORT)
-        server.serve_forever()
+        server.serve_forever(1)
     except Exception as e:
         admin_print("Unexpected exception: ", e)
     finally:
