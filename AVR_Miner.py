@@ -199,6 +199,7 @@ def connect():
     # Server connection
     global server_ip
     global server_port
+    serverVersion = 0
     while True:
         try:
             try:
@@ -221,10 +222,10 @@ def connect():
             ready = select.select([soc], [], [], SOCKET_TIMEOUT)
             if ready[0]:
                 serverVersion = soc.recv(10).decode().rstrip('\n')
+                debug_output('Server version: ' + serverVersion)
             else:
                 raise Exception("No ver received")
 
-            debug_output('Server version: ' + serverVersion)
             if float(serverVersion) <= float(MINER_VER):
                 # If miner is up-to-date, display a message and continue
                 pretty_print(
