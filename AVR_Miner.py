@@ -29,7 +29,11 @@ import select
 import pip
 
 def install(package):
-    pip.main(["install",  package])
+    try:
+        pip.main(["install",  package])
+    except AttributeError:
+        check_call([sys.executable, '-m', 'pip', 'install', package])
+        execl(sys.executable, sys.executable, *sys.argv)
 
 def now():
     # Return datetime object
