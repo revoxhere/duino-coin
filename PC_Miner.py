@@ -21,7 +21,7 @@ from re import sub
 from signal import SIGINT, signal
 from socket import socket
 from statistics import mean
-from subprocess import DEVNULL, Popen, check_call
+from subprocess import DEVNULL, Popen, check_call, call
 from threading import Thread as thrThread
 from time import ctime, sleep, strptime, time
 from multiprocessing import Lock
@@ -31,7 +31,12 @@ thread_lock = Lock()
 
 
 def install(package):
-    pip.main(["install",  package])
+    try:
+        pip.main(["install",  package])
+    except AttributeError:
+        check_call([sys.executable, '-m', 'pip', 'install', package])
+
+    call([sys.executable, __file__])
 
 
 def now():
