@@ -259,7 +259,6 @@ while True:
                 + "\nRetrying in 15 seconds.")
         time.sleep(15)
         os.system("python " + __file__)
-        #, *sys.argv
 
     except:
         print(Style.RESET_ALL
