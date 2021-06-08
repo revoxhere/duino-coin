@@ -170,7 +170,7 @@ except:
 
 
 def get_string(string_name):
-    # Get string form language file
+    # Get string from language file
     if string_name in lang_file[lang]:
         return lang_file[lang][string_name]
     elif string_name in lang_file['english']:
