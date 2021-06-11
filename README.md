@@ -209,32 +209,25 @@ Some third-party included files may have different licenses - please check their
 3. Balances, transactions and mining-related data is publicly available in the public <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
 4. The privacy policy may be changed in the future with a prior notification.
 
-## Developers
+## Active project maintainers
 
-*   **Developers:**
-    *   [@revoxhere](https://github.com/revoxhere/) (Founder/lead dev) - robik123.345@gmail.com
-    *   [@Bilaboz](https://github.com/bilaboz/) (Lead dev)
-    *   [@connorhess](https://github.com/connorhess) (Lead dev)
-    *   [@JoyBed](https://github.com/JoyBed) (Lead dev)
-    *   [@HGEcode](https://github.com/HGEcode) (Dev)
-    *   [@LDarki](https://github.com/LDarki) (Web dev)
-    *   [@travelmode](https://github.com/colonelwatch) (Dev)
-    *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-    *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
-    *   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
+*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Lead Python dev, project founder)
+*   [@Bilaboz](https://github.com/bilaboz/) (Lead NodeJS dev)
+*   [@connorhess](https://github.com/connorhess) (Lead Python dev, Node-S owner)
+*   [@JoyBed](https://github.com/JoyBed) (Lead AVR dev)
+##
+*   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
+*   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
+*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
+*   [@DoctorEenot](https://github.com/DoctorEenot) (Dev)
+##
+*   [@HGEcode](https://github.com/HGEcode) (Python dev)
+*   [@LDarki](https://github.com/LDarki) (Web dev)
+*   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
+*   [@Pripun](https://github.com/Pripun) (Mobile apps dev)
+*   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
 
-*   **Contributors:**
-    *   [@5Q](https://github.com/its5Q)
-    *   [@kyngs](https://github.com/kyngs)
-    *   [@httsmvkcom](https://github.com/httsmvkcom)
-    *   [@Nosh-Ware](https://github.com/Nosh-Ware)
-    *   [@BastelPichi](https://github.com/BastelPichi)
-    *   [@suifengtec](https://github.com/suifengtec)
-    *   Thanks to [@Furim](https://github.com/Furim) for help in the early development stage
-    *   Thanks to [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg) for designing early logos
-    *   Thanks to [@Tech1k](https://github.com/Tech1k) for [Beyondcoin](https://beyondcoin.io) partnership and providing [duinocoin.com](https://duinocoin.com) domain
-    *   Thanks to [@MrKris7100](https://github.com/MrKris7100) for help with implementing SHA1 algorithm
-    *   Thanks to [@daknuett](https://github.com/daknuett) for help with Arduino SHA1 library
+Also big thanks to all [Contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped to develop the Duino-Coin project.
 
 <hr>
 
