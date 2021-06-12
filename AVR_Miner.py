@@ -423,7 +423,7 @@ def load_config():
         config.read(str(RESOURCES_DIR) + '/Miner_config.cfg')
         username = config['arduminer']['username']
         avrport = config['arduminer']['avrport']
-        avrport = avrport.split(',')
+        avrport = avrport.split(',').strip()
         donation_level = config['arduminer']['donate']
         debug = config['arduminer']['debug']
         rig_identifier = config['arduminer']['identifier']
