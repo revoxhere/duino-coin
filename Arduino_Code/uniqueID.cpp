@@ -170,6 +170,17 @@ ArduinoUniqueID::ArduinoUniqueID()
   id[15] = mac[5];
 #elif defined(ARDUINO_ARCH_MBED_RP2040)
   getUniqueSerialNumber(id);
+#elif defined(ARDUINO_ARCH_MEGAAVR)
+  id[0] = SIGROW.SERNUM0;
+  id[1] = SIGROW.SERNUM1;
+  id[2] = SIGROW.SERNUM2;
+  id[3] = SIGROW.SERNUM3;
+  id[4] = SIGROW.SERNUM4;
+  id[5] = SIGROW.SERNUM5;
+  id[6] = SIGROW.SERNUM6;
+  id[7] = SIGROW.SERNUM7;
+  id[8] = SIGROW.SERNUM8;
+  id[9] = SIGROW.SERNUM9;
 #endif
 }
 
