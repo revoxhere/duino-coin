@@ -128,7 +128,7 @@ void loop() {
     // Send result back to the program with share time
     Serial.print(String(ducos1result) + "," + String(elapsedTime) + "," + DUCOID + "\n");
     // Turn on built-in led
-    #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
+    #if defined(ARDUINO_ARCH_AVR)
     PORTB = PORTB | B00100000;
     #else
     digitalWrite(LED_BUILTIN, HIGH);
@@ -136,7 +136,7 @@ void loop() {
     // Wait a bit
     delay(25);
     // Turn off built-in led
-    #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
+    #if defined(ARDUINO_ARCH_AVR)
     PORTB = PORTB & B11011111;
     #else
     digitalWrite(LED_BUILTIN, LOW);
