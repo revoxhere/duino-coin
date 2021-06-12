@@ -18,8 +18,10 @@
 #elif defined(ARDUINO_ARCH_STM32)
 #elif defined(TEENSYDUINO)
 #elif defined(ARDUINO_ARCH_MBED_RP2040)
+//#include <pico/unique_id.h>
+#elif defined(ARDUINO_ARCH_MEGAAVR)
 #else
-#error "ArduinoUniqueID only works on AVR, SAM, SAMD, STM32, Teensy, Raspberry Pi Pico and ESP Architecture"
+#error "ArduinoUniqueID only works on AVR, SAM, SAMD, STM32, Teensy, megaAVR and ESP Architecture"
 #endif
 
 #if defined(ARDUINO_ARCH_AVR)
@@ -56,6 +58,9 @@
 #elif defined(ARDUINO_ARCH_MBED_RP2040)
 #define UniqueIDsize 32
 #define UniqueIDbuffer 32
+#elif defined(ARDUINO_ARCH_MEGAAVR)
+#define UniqueIDsize 10
+#define UniqueIDbuffer 10
 #endif
 
 #define UniqueID8 (_UniqueID.id + UniqueIDbuffer - 8)

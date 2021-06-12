@@ -31,7 +31,7 @@
 String lastblockhash = "";
 String newblockhash = "";
 String DUCOID = "";
-#ifdef ARDUINO_ARCH_AVR
+#if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
 uint16_t difficulty = 0;
 uint16_t ducos1result = 0;
 #else
@@ -54,7 +54,7 @@ void setup() {
 }
 
 // DUCO-S1A hasher
-#ifdef ARDUINO_ARCH_AVR
+#if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
 uint16_t ducos1a(String lastblockhash, String newblockhash, uint16_t difficulty)
 #else
 uint32_t ducos1a(String lastblockhash, String newblockhash, uint32_t difficulty)
@@ -68,7 +68,7 @@ uint32_t ducos1a(String lastblockhash, String newblockhash, uint32_t difficulty)
     job[j] = ((((c[i] & 0x1F) + 9) % 25) << 4) + ((c[i + 1] & 0x1F) + 9) % 25;
 
   // Difficulty loop
-  #ifdef ARDUINO_ARCH_AVR
+  #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
   // If the difficulty is too high for AVR architecture then return 0
   if (difficulty > 655)
     return 0;
@@ -128,7 +128,7 @@ void loop() {
     // Send result back to the program with share time
     Serial.print(String(ducos1result) + "," + String(elapsedTime) + "," + DUCOID + "\n");
     // Turn on built-in led
-    #ifdef ARDUINO_ARCH_AVR
+    #if defined(ARDUINO_ARCH_AVR)
     PORTB = PORTB | B00100000;
     #else
     digitalWrite(LED_BUILTIN, HIGH);
@@ -136,7 +136,7 @@ void loop() {
     // Wait a bit
     delay(25);
     // Turn off built-in led
-    #ifdef ARDUINO_ARCH_AVR
+    #if defined(ARDUINO_ARCH_AVR)
     PORTB = PORTB & B11011111;
     #else
     digitalWrite(LED_BUILTIN, LOW);
