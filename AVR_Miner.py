@@ -224,12 +224,8 @@ def connect():
                     int(server_port)))
 
             # Get server version
-            ready = select.select([soc], [], [], SOCKET_TIMEOUT)
-            if ready[0]:
-                serverVersion = soc.recv(10).decode().rstrip('\n')
-                debug_output('Server version: ' + serverVersion)
-            else:
-                raise Exception("No ver received")
+            serverVersion = soc.recv(10).decode().rstrip('\n')
+            debug_output('Server version: ' + serverVersion)
 
             if float(serverVersion) <= float(MINER_VER):
                 # If miner is up-to-date, display a message and continue
@@ -912,9 +908,9 @@ def mine_avr(com):
                             get_string('mining_avr_connection_error')
                             + Style.NORMAL
                             + Fore.RESET
-                            + ' (err splitting avr data: '
+                            + ' (error reading result from the board: '
                             + str(e)
-                            + ')',
+                            + ', please check connection and port setting)',
                             'warning')
                         debug_output(
                             com + ': error splitting data: ' + str(e))
