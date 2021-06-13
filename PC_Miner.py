@@ -21,7 +21,7 @@ from re import sub
 from signal import SIGINT, signal
 from socket import socket
 from statistics import mean
-from subprocess import DEVNULL, Popen, check_call, call
+from subprocess import DEVNULL, Popen, check_call
 from threading import Thread as thrThread
 from time import ctime, sleep, strptime, time
 from multiprocessing import Lock
@@ -31,12 +31,7 @@ thread_lock = Lock()
 
 
 def install(package):
-    try:
-        pip.main(["install",  package])
-    except AttributeError:
-        check_call([sys.executable, '-m', 'pip', 'install', package])
-
-    call([sys.executable, __file__])
+    pip.main(["install",  package])
 
 
 def now():
@@ -192,7 +187,7 @@ def getString(string_name):
         return "String not found: " + string_name
 
 
-def debugOutput(text):
+def debug_output(text):
     # Debug output
     if debug == "y":
         print(now().strftime(Style.DIM + "%H:%M:%S.%f ") + "DEBUG: " + text)
@@ -292,7 +287,7 @@ def Greeting():
             + "x "
             + str(cpu["brand_raw"]))
     except Exception as e:
-        debugOutput("Error displaying CPU message: " + str(e))
+        debug_output("Error displaying CPU message: " + str(e))
 
     if osname == "nt" or osname == "posix":
         print(
@@ -344,8 +339,6 @@ def Greeting():
         if osname == "nt":
             # Initial miner executable section
             if not Path(RESOURCES_DIR + "/Donate_executable.exe").is_file():
-                debugOutput(
-                    "OS is Windows, downloading developer donation executable")
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
                        + "DonateExecutableWindows.exe?raw=true")
@@ -355,8 +348,6 @@ def Greeting():
         elif osname == "posix":
             # Initial miner executable section
             if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
-                debugOutput(
-                    "OS is *nix, downloading developer donation executable")
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
                        + "DonateExecutableLinux?raw=true")
@@ -570,16 +561,16 @@ def loadConfig():
     else:
         # If config already exists, load data from it
         config.read(RESOURCES_DIR + "/Miner_config.cfg")
-        username = config["Duino-Coin-PC-Miner"]["username"]
-        efficiency = config["Duino-Coin-PC-Miner"]["efficiency"]
-        threadcount = config["Duino-Coin-PC-Miner"]["threads"]
-        requested_diff = config["Duino-Coin-PC-Miner"]["requested_diff"]
-        donation_level = config["Duino-Coin-PC-Miner"]["donate"]
-        algorithm = config["Duino-Coin-PC-Miner"]["algorithm"]
-        rig_identiier = config["Duino-Coin-PC-Miner"]["identifier"]
-        debug = config["Duino-Coin-PC-Miner"]["debug"]
-        SOC_TIMEOUT = config["Duino-Coin-PC-Miner"]["soc_timeout"]
-        discord_presence = config["Duino-Coin-PC-Miner"]["discord_presence"]
+        username =          config["Duino-Coin-PC-Miner"]["username"]
+        efficiency =        config["Duino-Coin-PC-Miner"]["efficiency"]
+        threadcount =       config["Duino-Coin-PC-Miner"]["threads"]
+        requested_diff =    config["Duino-Coin-PC-Miner"]["requested_diff"]
+        donation_level =    config["Duino-Coin-PC-Miner"]["donate"]
+        algorithm =         config["Duino-Coin-PC-Miner"]["algorithm"]
+        rig_identiier =     config["Duino-Coin-PC-Miner"]["identifier"]
+        debug =             config["Duino-Coin-PC-Miner"]["debug"]
+        SOC_TIMEOUT =       config["Duino-Coin-PC-Miner"]["soc_timeout"]
+        discord_presence =  config["Duino-Coin-PC-Miner"]["discord_presence"]
         # Calulate efficiency for use with sleep function
         efficiency = (100 - float(efficiency)) * 0.01
 
@@ -633,7 +624,7 @@ def Donate():
         elif int(donation_level) == 1:
             cmd += "10"
         if int(donation_level) > 0:
-            debugOutput(getString("starting_donation"))
+            debug_output(getString("starting_donation"))
             donatorrunning = True
             # Launch CMD as subprocess
             donateExecutable = Popen(
@@ -726,7 +717,7 @@ def Thread(
                     masterServer_address = content[0]
                     # Line 2 = port
                     masterServer_port = content[1]
-                    debugOutput(
+                    debug_output(
                         "Retrieved pool IP: "
                         + masterServer_address
                         + ":"
@@ -744,7 +735,7 @@ def Thread(
                     + str(e)
                     + ")",
                     "error")
-                debugOutput("GitHub error: " + str(e))
+                debug_output("GitHub error: " + str(e))
                 sleep(10)
 
         # Connect to the server
@@ -757,13 +748,13 @@ def Thread(
                 soc.settimeout(SOC_TIMEOUT)
                 serverVersion = soc.recv(3).decode().rstrip(
                     "\n")  # Get server version
-                debugOutput("Server version: " + serverVersion)
+                debug_output("Server version: " + serverVersion)
 
                 if threadid == 0:
                     soc.send(bytes("MOTD", encoding="utf8"))
                     motd = soc.recv(1024).decode().rstrip("\n")
                     prettyPrint("net" + str(threadid),
-                                " " + motd,
+                                " Server message: " + motd,
                                 "warning")
 
                 if (float(serverVersion) <= float(MINER_VER)
@@ -808,7 +799,7 @@ def Thread(
                     + str(e)
                     + ")",
                     "error")
-                debugOutput("Connection error: " + str(e))
+                debug_output("Connection error: " + str(e))
                 sleep(10)
 
         if algorithm == "XXHASH":
@@ -851,33 +842,24 @@ def Thread(
                             + str(requested_diff),
                             encoding="utf8"))
 
+                    # Retrieve work
                     job = soc.recv(128).decode().rstrip("\n")
-                    job = job.split(",")  # Get work from pool
-                    debugOutput("Received: " + str(job))
+                    job = job.split(",")
+                    debug_output("Received: " + str(job))
 
-                    if job[1] == "This user doesn't exist":
-                        prettyPrint(
-                            "cpu"
-                            + str(threadid),
-                            getString("mining_user")
-                            + str(username)
-                            + getString("mining_not_exist")
-                            + Style.NORMAL
-                            + Fore.RESET
-                            + getString("mining_not_exist_warning"),
-                            "error")
-                        sleep(10)
-
-                    elif job[0] and job[1] and job[2]:
+                    try:
                         diff = int(job[2])
-                        debugOutput(str(threadid) +
-                                    "Job received: "
-                                    + str(job))
-                        # If job received, continue to hashing algo
+                        debug_output(str(threadid) +
+                              "Correct job received")
                         break
+                    except:
+                        prettyPrint("cpu" + str(threadid),
+                                    " Server message: "
+                                    + job[1],
+                                    "warning")
+                        sleep(3)
 
                 while True:
-                    # Call DUCOS-1 hasher
                     computetimeStart = time()
                     if algorithm == "XXHASH":
                         algo_back_color = Back.CYAN
@@ -886,18 +868,14 @@ def Thread(
                         algo_back_color = Back.YELLOW
                         result = ducos1(job[0], job[1], diff, efficiency)
                     computetimeStop = time()
-                    # Measure compute time
                     computetime = computetimeStop - computetimeStart
-                    # Convert it to miliseconds
-                    computetime = computetime
-                    # Read result from ducos1 hasher
-                    ducos1res = result[0]
-                    debugOutput("Thread "
-                                + str(threadid)
-                                + ": result found: "
-                                + str(ducos1res))
 
-                    # Convert H/s to kH/s
+                    debug_output("Thread "
+                          + str(threadid)
+                          + ": result found: "
+                          + str(result[0]))
+
+                    # Convert to kH/s
                     threadhashcount = int(result[1] / 1000)
                     # Add this thread's hash counter
                     # to the global hashrate counter
@@ -913,9 +891,9 @@ def Thread(
                     while True:
                         # Send result of hashing algorithm to the server
                         soc.sendall(bytes(
-                            str(ducos1res)
+                            str(result[0])
                             + ","
-                            + str(threadhashcount * 1000)
+                            + str(result[1])
                             + ","
                             + "Official PC Miner ("
                             + str(algorithm)
@@ -926,19 +904,18 @@ def Thread(
                             encoding="utf8"))
 
                         responsetimetart = now()
-                        # Get feedback
-                        feedback = soc.recv(8).decode().rstrip("\n")
+                        feedback = soc.recv(64).decode().rstrip("\n")
                         responsetimestop = now()
-                        # Measure server ping
-                        ping = str(int(
-                            (responsetimestop - responsetimetart).microseconds
-                            / 1000))
-                        debugOutput("Thread "
-                                    + str(threadid)
-                                    + ": Feedback received: "
-                                    + str(feedback)
-                                    + " Ping: "
-                                    + str(ping))
+
+                        ping = int((responsetimestop - responsetimetart
+                            ).microseconds / 1000)
+
+                        debug_output("Thread "
+                              + str(threadid)
+                              + ": Feedback received: "
+                              + str(feedback)
+                              + " Ping: "
+                              + str(ping))
 
                         if totalhashrate > 800:
                             # Format hashcount to MH/s
@@ -1146,7 +1123,7 @@ def Thread(
                     + str(e)
                     + ")",
                     "error")
-                debugOutput("Error while mining: " + str(e))
+                debug_output("Error while mining: " + str(e))
                 sleep(5)
                 break
 
@@ -1192,10 +1169,10 @@ def initRichPresence():
     try:
         RPC = Presence(808045598447632384)
         RPC.connect()
-        debugOutput("Discord rich presence initialized")
+        debug_output("Discord rich presence initialized")
     except Exception as e:
         # Discord not launched
-        debugOutput("Error launching Discord RPC thead: " + str(e))
+        debug_output("Error launching Discord RPC thead: " + str(e))
 
 
 def updateRichPresence():
@@ -1226,10 +1203,10 @@ def updateRichPresence():
                      "url": "https://duinocoin.com"},
                     {"label": "Discord Server",
                      "url": "https://discord.gg/k48Ht5y"}])
-            debugOutput("Rich presence updated")
+            debug_output("Rich presence updated")
         except Exception as e:
             # Discord not launched
-            debugOutput("Error launching Discord RPC thead: " + str(e))
+            debug_output("Error launching Discord RPC thead: " + str(e))
         sleep(15)  # 15 seconds to respect Discord rate limit
 
 
@@ -1271,7 +1248,7 @@ if __name__ == "__main__":
     try:
         # Load config file or create new one
         loadConfig()
-        debugOutput("Config file loaded")
+        debug_output("Config file loaded")
     except Exception as e:
         prettyPrint(
             "sys0",
@@ -1284,14 +1261,14 @@ if __name__ == "__main__":
             + str(e)
             + ")",
             "error")
-        debugOutput("Error reading configfile: " + str(e))
+        debug_output("Error reading configfile: " + str(e))
         sleep(10)
         _exit(1)
 
     try:
         # Display greeting message
         Greeting()
-        debugOutput("Greeting displayed")
+        debug_output("Greeting displayed")
     except Exception as e:
         prettyPrint(
             "sys0",
@@ -1302,13 +1279,13 @@ if __name__ == "__main__":
             + str(e)
             + ")",
             "error")
-        debugOutput("Error displaying greeting message: " + str(e))
+        debug_output("Error displaying greeting message: " + str(e))
 
     try:
         # Start donation thread
         Donate()
     except Exception as e:
-        debugOutput("Error launching donation thread: " + str(e))
+        debug_output("Error launching donation thread: " + str(e))
 
     try:
         for x in range(int(threadcount)):
@@ -1339,7 +1316,7 @@ if __name__ == "__main__":
             + str(e)
             + ")",
             "error")
-        debugOutput("Error launching CPU thead(s): " + str(e))
+        debug_output("Error launching CPU thead(s): " + str(e))
 
     if discord_presence:
         try:
@@ -1348,4 +1325,4 @@ if __name__ == "__main__":
             thrThread(
                 target=updateRichPresence).start()
         except Exception as e:
-            debugOutput("Error launching Discord RPC thead: " + str(e))
+            debug_output("Error launching Discord RPC thead: " + str(e))
