@@ -55,7 +55,7 @@ void setup() {
 }
 
 // DUCO-S1A hasher
-uintDiff ducos1a(String lastblockhash, String newblockhash, uint16_t difficulty)
+uintDiff ducos1a(String lastblockhash, String newblockhash, uintDiff difficulty)
 {
   // DUCO-S1 algorithm implementation for AVR boards (DUCO-S1A)
   newblockhash.toUpperCase();
