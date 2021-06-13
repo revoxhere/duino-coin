@@ -25,8 +25,8 @@ from threading import Thread as thrThread
 from threading import Lock
 from time import ctime, sleep, strptime, time
 from statistics import mean
-import select
 import pip
+
 
 def install(package):
     try:
@@ -35,6 +35,7 @@ def install(package):
         check_call([sys.executable, '-m', 'pip', 'install', package])
 
     call([sys.executable, __file__])
+
 
 def now():
     # Return datetime object
@@ -92,8 +93,8 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = '2.49'  # Version number
-SOCKET_TIMEOUT = 15
-AVR_TIMEOUT = 3  # diff 5(*100) / 190 H/s = 2.6, rounded to nearest int
+SOC_TIMEOUT = 15
+AVR_TIMEOUT = 3.2  # diff 6(*100) / 196 H/s = 3.06, rounded
 BAUDRATE = 115200
 RESOURCES_DIR = 'AVRMiner_' + str(MINER_VER) + '_resources'
 shares = [0, 0]
@@ -102,6 +103,7 @@ diff = 0
 donator_running = False
 job = ''
 debug = 'n'
+discord_presence = 'y'
 rig_identifier = 'None'
 # Serverip file
 server_ip_file = ('https://raw.githubusercontent.com/'
@@ -161,7 +163,7 @@ try:
         try:
             # Read language from configfile
             config.read(RESOURCES_DIR + '/Miner_config.cfg')
-            lang = config['arduminer']['language']
+            lang = config['Duino-Coin-AVR-Miner']['language']
         except Exception:
             # If it fails, fallback to english
             lang = 'english'
@@ -216,7 +218,7 @@ def connect():
                          + str(':')
                          + str(server_port))
             soc = socket()
-            soc.settimeout(SOCKET_TIMEOUT)
+            soc.settimeout(SOC_TIMEOUT)
 
             # Establish socket connection to the server
             soc.connect(
@@ -399,13 +401,16 @@ def load_config():
             donation_level = 0
 
         # Format data
-        config['arduminer'] = {
-            'username': username,
-            'avrport': avrport,
-            'donate': donation_level,
-            'language': lang,
-            'identifier': rig_identifier,
-            'debug': 'n'}
+        config['Duino-Coin-AVR-Miner'] = {
+            'username':         username,
+            'avrport':          avrport,
+            'donate':           donation_level,
+            'language':         lang,
+            'identifier':       rig_identifier,
+            'debug':            'n',
+            "soc_timeout":      15,
+            "avr_timeout":      3,
+            "discord_presence": "y"}
 
         # Write data to file
         with open(str(RESOURCES_DIR)
@@ -417,12 +422,15 @@ def load_config():
 
     else:  # If config already exists, load from it
         config.read(str(RESOURCES_DIR) + '/Miner_config.cfg')
-        username = config['arduminer']['username']
-        avrport = config['arduminer']['avrport']
+        username = config['Duino-Coin-AVR-Miner']['username']
+        avrport = config['Duino-Coin-AVR-Miner']['avrport']
         avrport = avrport.replace(" ", "").split(',')
-        donation_level = config['arduminer']['donate']
-        debug = config['arduminer']['debug']
-        rig_identifier = config['arduminer']['identifier']
+        donation_level = config['Duino-Coin-AVR-Miner']['donate']
+        debug = config['Duino-Coin-AVR-Miner']['debug']
+        rig_identifier = config['Duino-Coin-AVR-Miner']['identifier']
+        SOC_TIMEOUT = config["Duino-Coin-AVR-Miner"]["soc_timeout"]
+        AVR_TIMEOUT = config["Duino-Coin-AVR-Miner"]["soc_timeout"]
+        discord_presence = config["Duino-Coin-AVR-Miner"]["discord_presence"]
 
 
 def greeting():
@@ -658,7 +666,7 @@ def pretty_print(message_type, message, state):
         background = Back.BLUE
     elif message_type.startswith('usb'):
         background = Back.MAGENTA
-    if message_type.startswith('sys'):
+    else:
         background = Back.GREEN
 
     # Text color
@@ -750,32 +758,23 @@ def mine_avr(com):
                             encoding='utf8'))
 
                     # Retrieve work
-                    ready = select.select([soc], [], [], SOCKET_TIMEOUT)
-                    if ready[0]:
-                        job = soc.recv(103).decode()
+                    job = soc.recv(128).decode().rstrip("\n")
+                    job = job.split(",")
+                    debug_output("Received: " + str(job))
 
-                    # Split received data
-                    job = job.rstrip('\n').split(',')
-
-                    # Check if username is correct
-                    if job[1] == 'This user doesn\'t exist':
-                        pretty_print(
-                            'net'
-                            + str(''.join(filter(str.isdigit, com))),
-                            get_string('mining_user')
-                            + str(username)
-                            + get_string('mining_not_exist')
-                            + Style.NORMAL
-                            + Fore.RESET
-                            + get_string('mining_not_exist_warning'),
-                            'error')
-                        sleep(10)
-
-                    # If job was received, continue
-                    elif job[0] and job[1] and job[2]:
+                    try:
                         diff = int(job[2])
-                        debug_output(com + ': job received: ' + ' '.join(job))
+                        debug_output(str(''.join(filter(str.isdigit, com)))
+                                     + "Correct job received")
                         break
+                    except:
+                        pretty_print("usb"
+                                     + str(''.join(filter(str.isdigit, com))),
+                                     " Server message: "
+                                     + job[1],
+                                     "warning")
+                        sleep(3)
+
                 except Exception as e:
                     pretty_print(
                         'net'
@@ -832,7 +831,6 @@ def mine_avr(com):
                                         + ',' + job[2]
                                         + ','), encoding='utf8'))
 
-
                             debug_output(com + ': reading result from AVR')
                             result = ser.read_until(b'\n').decode().strip()
                             ser.flush()
@@ -859,21 +857,22 @@ def mine_avr(com):
                             retry_counter += 1
 
                     try:
-                        ducos1result = result[0]
                         debug_output(
-                            com + ': received result (' + str(ducos1result) + ')')
-
+                            com + ': received result (' + str(result[0]) + ')')
                         debug_output(
                             com + ': received time (' + str(result[1]) + ')')
                         # Convert AVR time to seconds
                         computetime = round(int(result[1]) / 1000000, 3)
-
+                        if computetime < 1:
+                            computetime = str(int(computetime * 1000)) + "ms"
+                        else:
+                            computetime = str(round(computetime, 2)) + "s"
                         # Calculate hashrate
                         hashrate_t = round(
                             int(result[0]) * 1000000 / int(result[1]), 2)
                         hashrate_mean.append(hashrate_t)
                         # Get average from the last hashrate measurements
-                        hashrate = mean(hashrate_mean[-5:])
+                        hashrate = hashrate_t  # mean(hashrate_mean[-5:])
                         debug_output(
                             com +
                             ': calculated hashrate (' + str(hashrate_t) + ')'
@@ -882,11 +881,10 @@ def mine_avr(com):
                         try:
                             chipID = result[2]
                             debug_output(
-                                com + ': received chip ID (' + str(result[2]) + ')')
-                            """ Check if user is using the latest Arduino code
-                                    This is not used yet anywhere, but will soon be
-                                    added as yet another a security measure in the
-                                    Kolka security system for identifying AVR boards """
+                                com + ': chip ID: ' + str(result[2]))
+                            """ Check if chipID got received, this is 
+                                of course just a fraction of what's 
+                                happening on the server with it """
                             if not chipID.startswith('DUCOID'):
                                 raise Exception('Wrong chipID string')
                         except Exception:
@@ -920,7 +918,7 @@ def mine_avr(com):
                     # Send result to the server
                     soc.sendall(
                         bytes(
-                            str(ducos1result)
+                            str(result[0])
                             + ','
                             + str(hashrate)
                             + ',Official AVR Miner (DUCO-S1A) v'
@@ -948,17 +946,13 @@ def mine_avr(com):
                 while True:
                     try:
                         responsetimetart = now()
-                        # Get feedback
-                        ready = select.select(
-                            [soc], [], [], SOCKET_TIMEOUT)
-                        if ready[0]:
-                            feedback = soc.recv(48).decode().rstrip('\n')
+                        feedback = soc.recv(64).decode().rstrip('\n')
                         responsetimestop = now()
-                        # Measure server ping
+
                         time_delta = (responsetimestop -
                                       responsetimetart).microseconds
                         ping = round(time_delta / 1000)
-                        debug_output(com + ': successfully retrieved feedback: '
+                        debug_output(com + ': feedback: '
                                      + str(feedback)
                                      + ' with ping: '
                                      + str(ping))
@@ -1003,7 +997,7 @@ def mine_avr(com):
                             + ' '
                             + Back.RESET
                             + Fore.GREEN
-                            + ' ✓'
+                            + ' ⛏'
                             + get_string('accepted')
                             + Fore.RESET
                             + str(int(shares[0]))
@@ -1017,22 +1011,21 @@ def mine_avr(com):
                             + Style.NORMAL
                             + Fore.RESET
                             + ' ∙ '
-                            + str('%01.3f' % float(computetime))
-                            + 's'
-                            + Style.NORMAL
-                            + ' ∙ '
                             + Fore.BLUE
                             + Style.BRIGHT
                             + str(round(hashrate))
                             + ' H/s'
                             + Style.NORMAL
+                            + ' ('
+                            + computetime
+                            + ')'
                             + Fore.RESET
-                            + ' @ diff '
+                            + ' ⚙ diff '
                             + str(diff)
                             + ' ∙ '
                             + Fore.CYAN
                             + 'ping '
-                            + str('%03.0f' % int(ping))
+                            + str('%02.0f' % int(ping))
                             + 'ms')
 
                 elif feedback == 'BLOCK':
@@ -1059,7 +1052,7 @@ def mine_avr(com):
                             + ' '
                             + Back.RESET
                             + Fore.CYAN
-                            + ' ✓'
+                            + ' ⛏'
                             + get_string('block_found')
                             + Fore.RESET
                             + str(int(shares[0]))
@@ -1073,17 +1066,16 @@ def mine_avr(com):
                             + Style.NORMAL
                             + Fore.RESET
                             + ' ∙ '
-                            + str('%01.3f' % float(computetime))
-                            + 's'
-                            + Style.NORMAL
-                            + ' ∙ '
                             + Fore.BLUE
                             + Style.BRIGHT
-                            + str(int(hashrate))
+                            + str(round(hashrate))
                             + ' H/s'
                             + Style.NORMAL
+                            + ' ('
+                            + computetime
+                            + ')'
                             + Fore.RESET
-                            + ' @ diff '
+                            + ' ⚙ diff '
                             + str(diff)
                             + ' ∙ '
                             + Fore.CYAN
@@ -1115,7 +1107,7 @@ def mine_avr(com):
                             + ' '
                             + Back.RESET
                             + Fore.RED
-                            + ' ✗'
+                            + ' ⛏'
                             + get_string('rejected')
                             + Fore.RESET
                             + str(int(shares[0]))
@@ -1129,17 +1121,16 @@ def mine_avr(com):
                             + Style.NORMAL
                             + Fore.RESET
                             + ' ∙ '
-                            + str('%01.3f' % float(computetime))
-                            + 's'
-                            + Style.NORMAL
-                            + ' ∙ '
                             + Fore.BLUE
                             + Style.BRIGHT
-                            + str(int(hashrate))
+                            + str(round(hashrate))
                             + ' H/s'
                             + Style.NORMAL
+                            + ' ('
+                            + computetime
+                            + ')'
                             + Fore.RESET
-                            + ' @ diff '
+                            + ' ⚙ diff '
                             + str(diff)
                             + ' ∙ '
                             + Fore.CYAN
@@ -1150,6 +1141,9 @@ def mine_avr(com):
 
 
 if __name__ == '__main__':
+    # Unicode fix for windows
+    if osname == "nt":
+        ossystem("chcp 65001")
     # Colorama
     init(autoreset=True)
     # Window title
@@ -1197,10 +1191,11 @@ if __name__ == '__main__':
     except Exception as e:
         debug_output('Error launching AVR thead(s): ' + str(e))
 
-    try:
-        # Discord rich presence threads
-        init_rich_presence()
-        thrThread(
-            target=update_rich_presence).start()
-    except Exception as e:
-        debug_output('Error launching Discord RPC thead: ' + str(e))
+    if discord_presence:
+        try:
+            # Discord rich presence threads
+            init_rich_presence()
+            thrThread(
+                target=update_rich_presence).start()
+        except Exception as e:
+            debug_output('Error launching Discord RPC thead: ' + str(e))
