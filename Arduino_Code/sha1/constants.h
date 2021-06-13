@@ -23,21 +23,11 @@
 #define SHA1_BLOCK_LEN 64
 #define SHA1_HASH_LEN 20
 
-#ifdef __AVR__
-#include <avr/pgmspace.h>
-#endif
+#include "Arduino.h"
 
-#ifndef __AVR__
-extern const uint32_t sha1_init_state[SHA1_HASH_LEN / 4];
-#else
 extern const uint32_t sha1_init_state[SHA1_HASH_LEN / 4] PROGMEM;
-#endif
 
-#ifndef __AVR__
-extern const uint32_t sha1_constants[4];
-#else
 extern const uint32_t sha1_constants[4] PROGMEM;
-#endif
 
 
 // From RFC3174 (http://www.faqs.org/rfcs/rfc3174.html) 
@@ -56,11 +46,7 @@ extern const uint32_t sha1_constants[4] PROGMEM;
 // 
 // This can be achieved using an integer division by 20 and only 4 constants.
 
-#ifdef __AVR__
 #define sha1_k(i) pgm_read_dword(sha1_constants + (i / 20))
-#else
-#define sha1_k(i) sha1_constants[i / 20]
-#endif
 
 
 #ifdef SHA1_ENABLE_HMAC
