@@ -60,8 +60,8 @@ uintDiff ducos1a(String lastblockhash, String newblockhash, uint16_t difficulty)
   // DUCO-S1 algorithm implementation for AVR boards (DUCO-S1A)
   newblockhash.toUpperCase();
   const char *c = newblockhash.c_str();
-  size_t final_len = newblockhash.length() >> 1;
-  for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
+  uint8_t final_len = newblockhash.length() >> 1;
+  for (uint8_t i = 0, j = 0; j < final_len; i += 2, j++)
     job[j] = ((((c[i] & 0x1F) + 9) % 25) << 4) + ((c[i + 1] & 0x1F) + 9) % 25;
 
   // Difficulty loop
