@@ -42,9 +42,9 @@ using namespace experimental::crypto;
 #include <Ticker.h>
 
 namespace {
-const char* SSID          = "Dom";   // Change this to your WiFi name
-const char* PASSWORD      = "07251498";    // Change this to your WiFi password
-const char* USERNAME      = "revox";     // Change this to your Duino-Coin username
+const char* SSID          = "WIFI SSID";   // Change this to your WiFi name
+const char* PASSWORD      = "WIFI PASS";    // Change this to your WiFi password
+const char* USERNAME      = "DUCO USERNAME";     // Change this to your Duino-Coin username
 const char* RIG_IDENTIFIER = "None";       // Change this if you want a custom miner name
 
 const char * host = "51.15.127.80"; // Static server IP
@@ -268,7 +268,7 @@ void loop() {
       // If result is found
       unsigned long elapsed_time = micros() - start_time;
       float elapsed_time_s = elapsed_time * .000001f;
-      int hashrate = duco_numeric_result / elapsed_time_s;
+      float hashrate = duco_numeric_result / elapsed_time_s;
       share_count++;
 
       client.print(String(duco_numeric_result)
@@ -286,7 +286,7 @@ void loop() {
                      + String(share_count)
                      + " (" + String(duco_numeric_result) + ")"
                      + " hashrate: "
-                     + String(hashrate / 1000)
+                     + String(hashrate / 1000, 2)
                      + " kH/s ("
                      + String(elapsed_time_s)
                      + "s) Free RAM: "
