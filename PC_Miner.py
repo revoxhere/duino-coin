@@ -1318,7 +1318,7 @@ if __name__ == "__main__":
             "error")
         debug_output("Error launching CPU thead(s): " + str(e))
 
-    if discord_presence:
+    if discord_presence == "y":
         try:
             # Discord rich presence threads
             initRichPresence()
