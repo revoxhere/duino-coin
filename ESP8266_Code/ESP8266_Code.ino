@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards - V2.52
+//  Code for ESP8266 boards - V2.53
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -31,9 +31,9 @@
 // message to occur; it means that you do NOT have the
 // latest version of the ESP8266/Arduino Core library.
 //
-// To install/upgrade it, go to the below link and 
-// follow the instructions of the readme file: 
-// 
+// To install/upgrade it, go to the below link and
+// follow the instructions of the readme file:
+//
 //       https://github.com/esp8266/Arduino
 //////////////////////////////////////////////////////////
 #include <Crypto.h>  // experimental SHA1 crypto library
@@ -42,232 +42,260 @@ using namespace experimental::crypto;
 #include <Ticker.h>
 
 namespace {
-  const char* ssid          = "WiFi SSID";   // Change this to your WiFi SSID
-  const char* password      = "WiFi Pass";    // Change this to your WiFi password
-  const char* ducouser      = "DUCO Username";     // Change this to your Duino-Coin username
-  const char* rigIdentifier = "None";       // Change this if you want a custom miner name
-  
-  const char * host = "51.15.127.80"; // Static server IP
-  const int port = 2811;
-  unsigned int Shares = 0; // Share variable
+const char* SSID          = "Dom";   // Change this to your WiFi name
+const char* PASSWORD      = "07251498";    // Change this to your WiFi password
+const char* USERNAME      = "revox";     // Change this to your Duino-Coin username
+const char* RIG_IDENTIFIER = "None";       // Change this if you want a custom miner name
 
-  WiFiClient client;
-  String clientBuffer = "";
+const char * host = "51.15.127.80"; // Static server IP
+const int port = 2811;
+unsigned int share_count = 0; // Share variable
 
-  // Loop WDT... please don't feed me...
-  // See lwdtcb() and lwdtFeed() below
-  Ticker lwdTimer; 
-  #define LWD_TIMEOUT   60000
+WiFiClient client;
+String client_buffer = "";
+String chipID = "";
 
-  unsigned long lwdCurrentMillis = 0;
-  unsigned long lwdTimeOutMillis = LWD_TIMEOUT;
+// Loop WDT... please don't feed me...
+// See lwdtcb() and lwdtFeed() below
+Ticker lwdTimer;
+#define LWD_TIMEOUT   60000
 
-  #define END_TOKEN  '\n'
-  #define SEP_TOKEN  ','
+unsigned long lwdCurrentMillis = 0;
+unsigned long lwdTimeOutMillis = LWD_TIMEOUT;
 
-  #define LED_BUILTIN 2
+#define END_TOKEN  '\n'
+#define SEP_TOKEN  ','
 
-  #define BLINK_SHARE_FOUND    1
-  #define BLINK_SETUP_COMPLETE 2
-  #define BLINK_CLIENT_CONNECT 3
-  #define BLINK_RESET_DEVICE   5
+#define LED_BUILTIN 2
 
-  void SetupWifi() {
-    Serial.println("Connecting to: " + String(ssid));
-    WiFi.mode(WIFI_STA); // Setup ESP in client mode
-    WiFi.setSleepMode(WIFI_NONE_SLEEP);
-    WiFi.begin(ssid, password); // Connect to wifi
+#define BLINK_SHARE_FOUND    1
+#define BLINK_SETUP_COMPLETE 2
+#define BLINK_CLIENT_CONNECT 3
+#define BLINK_RESET_DEVICE   5
 
-    int wait_passes = 0;
-    while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-      delay(500);
-      Serial.print(".");
-      if (++wait_passes >= 10) {
-        WiFi.begin(ssid, password);
-        wait_passes = 0;
-      }
-    }
+void SetupWifi() {
+  Serial.println("Connecting to: " + String(SSID));
+  WiFi.mode(WIFI_STA); // Setup ESP in client mode
+  WiFi.setSleepMode(WIFI_NONE_SLEEP);
+  WiFi.begin(SSID, PASSWORD);
 
-    Serial.println("\nConnected to WiFi!");
-    Serial.println("Local IP address: " + WiFi.localIP().toString());
-  }
-
-  void SetupOTA() {
-    ArduinoOTA.onStart([]() { // Prepare OTA stuff
-      Serial.println("Start");
-    });
-    ArduinoOTA.onEnd([]() {
-      Serial.println("\nEnd");
-    });
-    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
-      Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-    });
-    ArduinoOTA.onError([](ota_error_t error) {
-      Serial.printf("Error[%u]: ", error);
-      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-      else if (error == OTA_END_ERROR) Serial.println("End Failed");
-    });
-
-    ArduinoOTA.setHostname(rigIdentifier); // Give port a name not just address
-    ArduinoOTA.begin();
-  }
-
-  void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
-    uint8_t state = HIGH;
-
-    for (int x=0; x<(count << 1); ++x) {
-      digitalWrite(pin, state ^= HIGH);
-      delay(50);
+  int wait_passes = 0;
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+    if (++wait_passes >= 10) {
+      WiFi.begin(SSID, PASSWORD);
+      wait_passes = 0;
     }
   }
 
-  void RestartESP(String msg) {
-    Serial.println(msg);
-    Serial.println("Resetting ESP...");
-    blink(BLINK_RESET_DEVICE); 
-    ESP.reset();
+  Serial.println("\nConnected to WiFi!");
+  Serial.println("Local IP address: " + WiFi.localIP().toString());
+}
+
+void SetupOTA() {
+  // Prepare OTA handler
+  ArduinoOTA.onStart([]() {
+    Serial.println("Start");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+
+  ArduinoOTA.setHostname(RIG_IDENTIFIER); // Give port a name not just address
+  ArduinoOTA.begin();
+}
+
+void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
+  uint8_t state = HIGH;
+
+  for (int x = 0; x < (count << 1); ++x) {
+    digitalWrite(pin, state ^= HIGH);
+    delay(50);
   }
+}
 
-  // Our new WDT to help prevent freezes
-  // code concept taken from https://sigmdel.ca/michel/program/esp8266/arduino/watchdogs2_en.html
-  void ICACHE_RAM_ATTR lwdtcb(void) 
-  {
-    if ((millis() - lwdCurrentMillis > LWD_TIMEOUT) || (lwdTimeOutMillis - lwdCurrentMillis != LWD_TIMEOUT))
-      RestartESP("Loop WDT Failed!");
-  }
+void RestartESP(String msg) {
+  Serial.println(msg);
+  Serial.println("Resetting ESP...");
+  blink(BLINK_RESET_DEVICE);
+  ESP.reset();
+}
 
-  void lwdtFeed(void) {
-    lwdCurrentMillis = millis();
-    lwdTimeOutMillis = lwdCurrentMillis + LWD_TIMEOUT;
-  }
+// Our new WDT to help prevent freezes
+// code concept taken from https://sigmdel.ca/michel/program/esp8266/arduino/watchdogs2_en.html
+void ICACHE_RAM_ATTR lwdtcb(void)
+{
+  if ((millis() - lwdCurrentMillis > LWD_TIMEOUT) || (lwdTimeOutMillis - lwdCurrentMillis != LWD_TIMEOUT))
+    RestartESP("Loop WDT Failed!");
+}
 
-  void VerifyWifi() {
-    while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0,0,0,0)) 
-      WiFi.reconnect();
-  }
+void lwdtFeed(void) {
+  lwdCurrentMillis = millis();
+  lwdTimeOutMillis = lwdCurrentMillis + LWD_TIMEOUT;
+}
 
-  void handleSystemEvents(void) {
-    VerifyWifi();
-    ArduinoOTA.handle();
-    yield();
-  }
+void VerifyWifi() {
+  while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0, 0, 0, 0))
+    WiFi.reconnect();
+}
 
-  // https://stackoverflow.com/questions/9072320/split-string-into-string-array
-  String getValue(String data, char separator, int index)
-  {
-    int found = 0;
-    int strIndex[] = {0, -1};
-    int maxIndex = data.length()-1;
+void handleSystemEvents(void) {
+  VerifyWifi();
+  ArduinoOTA.handle();
+  yield();
+}
 
-    for(int i=0; i<=maxIndex && found<=index; i++){
-      if(data.charAt(i)==separator || i==maxIndex){
-        found++;
-        strIndex[0] = strIndex[1]+1;
-        strIndex[1] = (i == maxIndex) ? i+1 : i;
-      }
+// https://stackoverflow.com/questions/9072320/split-string-into-string-array
+String getValue(String data, char separator, int index)
+{
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int max_index = data.length() - 1;
+
+  for (int i = 0; i <= max_index && found <= index; i++) {
+    if (data.charAt(i) == separator || i == max_index) {
+      found++;
+      strIndex[0] = strIndex[1] + 1;
+      strIndex[1] = (i == max_index) ? i + 1 : i;
     }
-
-    return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
   }
-  
-  void waitForClientData(void) {
-    clientBuffer = "";
-    
-    while (client.connected()) {
-      if (client.available()) {
-        clientBuffer = client.readStringUntil(END_TOKEN);
-        if (clientBuffer.length() == 1 && clientBuffer[0] == END_TOKEN)
-          clientBuffer = "???\n"; // NOTE: Should never happen...
+  return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
 
-        break;
-      }
-      handleSystemEvents();
+void waitForClientData(void) {
+  client_buffer = "";
+
+  while (client.connected()) {
+    if (client.available()) {
+      client_buffer = client.readStringUntil(END_TOKEN);
+      if (client_buffer.length() == 1 && client_buffer[0] == END_TOKEN)
+        client_buffer = "???\n"; // NOTE: Should never happen
+
+      break;
     }
+    handleSystemEvents();
   }
+}
 
-  void ConnectToServer() {
-    if (client.connected())
-      return;
+void ConnectToServer() {
+  if (client.connected())
+    return;
 
-    Serial.println("\nConnecting to Duino-Coin server...");
-    while (!client.connect(host, port));
-  
-    waitForClientData();
-    Serial.println("Connected to the server. Server version: " + clientBuffer );
-    blink(BLINK_CLIENT_CONNECT); // Blink 3 times - indicate sucessfull connection with the server
+  Serial.println("\nConnecting to Duino-Coin server...");
+  while (!client.connect(host, port));
+
+  waitForClientData();
+  Serial.println("Connected to the server. Server version: " + client_buffer );
+  blink(BLINK_CLIENT_CONNECT); // Sucessfull connection with the server
+}
+
+bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
+  static unsigned long _start = 0;
+
+  if ((current - _start) > max_elapsed) {
+    _start = current;
+    return true;
   }
-
-  bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
-    static unsigned long _start = 0;
-
-    if ((current - _start) > max_elapsed) {
-      _start = current;
-      return true;
-    }
-      
-    return false;
-  }
+  return false;
+}
 } // namespace
 
 void setup() {
-  Serial.begin(115200); // Start serial connection
+  // Start serial connection
+  Serial.begin(115200);
   Serial.println("\nDuino-Coin ESP8266 Miner v2.52");
 
-  pinMode(LED_BUILTIN, OUTPUT); // prepare for blink() function
+  // Prepare for blink() function
+  pinMode(LED_BUILTIN, OUTPUT);
 
   SetupWifi();
   SetupOTA();
-  
+
   lwdtFeed();
-  lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb); 
-  
-  blink(BLINK_SETUP_COMPLETE); // Blink 2 times - indicate sucessfull connection with wifi network
+  lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
+
+  // Sucessfull connection with wifi network
+  blink(BLINK_SETUP_COMPLETE);
+
+  chipID = String(ESP.getChipId(), HEX);
 }
 
 void loop() {
-  lwdtFeed(); // Feed the DOG! You now have 1-minute to feed me again or I cause Reboot...!
+  // 1 minute watchdog
+  lwdtFeed();
 
+  // OTA handlers
   VerifyWifi();
-  ArduinoOTA.handle(); // Enable OTA handler
+  ArduinoOTA.handle();
+
   ConnectToServer();
+  Serial.println("Asking for a new job for user: " + String(USERNAME));
+  client.print("JOB," + String(USERNAME) + ",ESP8266");
 
-  Serial.println("Asking for a new job for user: " + String(ducouser));
-
-  client.print("JOB," + String(ducouser) + ",ESP8266"); // Ask for new job
   waitForClientData();
+  String last_block_hash = getValue(client_buffer, SEP_TOKEN, 0);
+  String expected_hash = getValue(client_buffer, SEP_TOKEN, 1);
+  unsigned int difficulty = getValue(client_buffer, SEP_TOKEN, 2).toInt() * 100 + 1;
 
-  String hash = getValue(clientBuffer, SEP_TOKEN, 0); // Read data to the first peroid - last block hash
-  String job = getValue(clientBuffer, SEP_TOKEN, 1); // Read data to the next peroid - expected hash
-  unsigned int diff = getValue(clientBuffer, SEP_TOKEN, 2).toInt() * 100 + 1; // Read and calculate remaining data - difficulty
-  Serial.println("Job received: " + hash + " " + job + " " + String(diff));
+  Serial.println("Job received: "
+                 + last_block_hash
+                 + " "
+                 + expected_hash
+                 + " "
+                 + String(difficulty));
+  expected_hash.toUpperCase();
 
-  job.toUpperCase();
+  float start_time = micros();
+  max_micros_elapsed(start_time, 0);
 
-  float StartTime = micros(); // Start time measurement
-  max_micros_elapsed(StartTime, 0);
+  for (unsigned int duco_numeric_result = 0; duco_numeric_result < difficulty; duco_numeric_result++) {
+    // Difficulty loop
+    String result = SHA1::hash(last_block_hash + String(duco_numeric_result));
 
-  for (unsigned int iJob = 0; iJob < diff; iJob++) { // Difficulty loop
-    String result = SHA1::hash(hash + String(iJob));
+    if (result == expected_hash) {
+      // If result is found
+      unsigned long elapsed_time = micros() - start_time;
+      float elapsed_time_s = elapsed_time * .000001f;
+      int hashrate = duco_numeric_result / elapsed_time_s;
+      share_count++;
 
-    if (result == job) { // If result is found
-      unsigned long ElapsedTime = micros() - StartTime;  // Calculate elapsed time
-      float ElapsedTimeSeconds = ElapsedTime * .000001f; // Convert to seconds
-      float HashRate = iJob / ElapsedTimeSeconds;
+      client.print(String(duco_numeric_result)
+                   + ","
+                   + String(hashrate)
+                   + ",ESP8266 Miner v2.53"
+                   + ","
+                   + String(RIG_IDENTIFIER)
+                   + ","
+                   + String(chipID));
 
-      client.print(String(iJob) + "," + String(HashRate) + ",ESP8266 Miner v2.52" + "," + String(rigIdentifier)); // Send result to server
       waitForClientData();
+      Serial.println(client_buffer
+                     + " share #"
+                     + String(share_count)
+                     + " (" + String(duco_numeric_result) + ")"
+                     + " hashrate: "
+                     + String(hashrate / 1000)
+                     + " kH/s ("
+                     + String(elapsed_time_s)
+                     + "s) Free RAM: "
+                     + String(ESP.getFreeHeap()));
 
-      Shares++;
-      Serial.println(clientBuffer + " share #" + String(Shares) + " (" + String(iJob) + ")" + " Hashrate: " + String(HashRate) + " Free RAM: " + String(ESP.getFreeHeap()));
       blink(BLINK_SHARE_FOUND);
-      break; // Stop and ask for more work
+      break;
     }
-
-    if (max_micros_elapsed(micros(), 250000)) 
+    if (max_micros_elapsed(micros(), 250000))
       handleSystemEvents();
-      
   }
 }
