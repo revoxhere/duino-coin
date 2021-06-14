@@ -1191,7 +1191,7 @@ if __name__ == '__main__':
     except Exception as e:
         debug_output('Error launching AVR thead(s): ' + str(e))
 
-    if discord_presence:
+    if discord_presence == "y":
         try:
             # Discord rich presence threads
             init_rich_presence()
