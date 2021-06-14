@@ -24,7 +24,7 @@ import libducohash
 from statistics import mean
 from random import randint
 from hashlib import sha1
-from time import time, sleep
+from time import time
 from sys import exit
 from re import sub, match
 from sqlite3 import connect as sqlconn
@@ -39,6 +39,7 @@ from bcrypt import checkpw, hashpw, gensalt
 from fastrand import pcg32bounded as fastrandint
 # python3 -m pip install gevent
 import gevent
+from gevent import sleep
 from gevent.server import StreamServer
 from gevent.pool import Pool
 # python3 -m pip install xxhash
@@ -53,25 +54,27 @@ HOSTNAME = ""
 PORT = 2811
 MOTD = """\
 You are mining on the official Duino-Coin master server, have fun!
-Please keep in mind that PC mining is temporarily disabled.
+*** Please keep in mind that PC mining is temporarily disabled, 
+this includes Raspberry Pi, Web and GPU Mining too. 
+Please wait patiently for the pools to be released
 """
 DIFF_INCREASES_PER = 12500  # net difficulty
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 5  # in seconds
-DB_TIMEOUT = 10
+DB_TIMEOUT = 5
 SERVER_VER = 2.4  # announced to clients
 READY_HASHES_NUM = 1000  # in shares
 BLOCK_PROBABILITY = 1000000  # 1 in X
 BLOCK_REWARD = 28.11  # duco
-UPDATE_MINERAPI_EVERY = 5  # in shares
-EXPECTED_SHARETIME = 10  # in seconds
-MAX_REJECTED_SHARES = 10
+UPDATE_MINERAPI_EVERY = 6  # in shares
+EXPECTED_SHARETIME = 15  # in seconds
+MAX_REJECTED_SHARES = 5
 BCRYPT_ROUNDS = 6
 DECIMALS = 20  # max float precision
 MAX_WORKERS = 24
 PING_SLEEP_TIME = 0.5  # in seconds
 MAX_NUMBER_OF_PINGS = 3
-TEMP_BAN_TIME = 120  # in seconds
+TEMP_BAN_TIME = 10  # in minutes
 
 """ IO files location """
 DATABASE = 'crypto_database.db'
@@ -117,6 +120,7 @@ job_tiers = {}
 balances_to_update = {}
 pregenerated_jobs_avr = {}
 pregenerated_jobs_due = {}
+pregenerated_jobs_arm = {}
 pregenerated_jobs_esp32 = {}
 pregenerated_jobs_esp8266 = {}
 banlist = []
@@ -202,7 +206,6 @@ def create_backup():
     while True:
         if not ospath.isdir('backups/'):
             os.mkdir('backups/')
-            counter = 0
 
         today = datetime.date.today()
         if not ospath.isdir('backups/'+str(today)+'_'+str(counter)+'/'):
@@ -217,7 +220,7 @@ def create_backup():
                      '_'+str(counter)+"/transactions.db")
 
         if not ospath.isdir('backups/'+str(today)+'_0/'):
-            gevent.sleep(10)
+            sleep(10)
             with open("prices.txt", "a") as pricesfile:
                 pricesfile.write("," + str(duco_price).rstrip("\n"))
             with open("pricesNodeS.txt", "a") as pricesNodeSfile:
@@ -230,39 +233,31 @@ def create_backup():
 
         hours = 6
         counter += 1
-        gevent.sleep(60*60*hours)
+        sleep(60*60*hours)
 
 
 def permanent_ban(ip):
     """ Bans an IP """
-    if (ip == "51.15.127.80"
-        or ip == "wallet.duinocoin.com"
-            or ip == "34.233.38.119"):
-        pass
-    else:
-        os.system("sudo iptables -I INPUT -s "
-                  + str(ip)
-                  + " -j DROP &> /dev/null")
+    if not ip in whitelisted_ips:
+        subprocess.Popen("sudo iptables -I INPUT -s "
+                         + str(ip)
+                         + " -j DROP &> /dev/null", shell=True, stderr=DEVNULL)
 
 
 def unban(ip):
-    # Unban IP
-    os.system("sudo iptables -D INPUT -s "
-              + str(ip)
-              + " -j DROP &> /dev/null")
+    """ Unbans an IP """
+    subprocess.Popen("sudo iptables -D INPUT -s "
+                     + str(ip)
+                     + " -j DROP &> /dev/null", shell=True, stderr=DEVNULL)
 
 
 def temporary_ban(ip):
     """ Temporarily bans an IP """
-    if (ip == "51.15.127.80"
-        or ip == "wallet.duinocoin.com"
-            or ip == "34.233.38.119"):
-        pass
-    else:
-        os.system("sudo iptables -I INPUT -s "
-                  + str(ip)
-                  + " -j DROP &> /dev/null")
-        threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
+    if not ip in whitelisted_ips:
+        subprocess.Popen("sudo iptables -I INPUT -s "
+                         + str(ip)
+                         + " -j DROP &> /dev/null", shell=True, stderr=DEVNULL)
+        threading.Timer(TEMP_BAN_TIME*60, unban, [ip]).start()
 
 
 def update_job_tiers():
@@ -297,32 +292,32 @@ def update_job_tiers():
                 "max_hashrate": 200000
             },
             "ESP32": {
-                "difficulty": 2400,
+                "difficulty": int(1600 * DIFF_MULTIPLIER),
                 "reward": .00375,
                 "max_hashrate": 16000
             },
             "ESP8266": {
-                "difficulty": 1500,
+                "difficulty": int(1000 * DIFF_MULTIPLIER),
                 "reward": .0045,
                 "max_hashrate": 13000
             },
             "DUE": {
-                "difficulty": 1000,
+                "difficulty": int(700 * DIFF_MULTIPLIER),
                 "reward": .003,
                 "max_hashrate": 7000
             },
             "ARM": {
-                "difficulty": 500,
+                "difficulty": int(300 * DIFF_MULTIPLIER),
                 "reward": .003,
                 "max_hashrate": 5000
             },
             "AVR": {
                 "difficulty": 6,
                 "reward": .005,
-                "max_hashrate": 200
+                "max_hashrate": 210
             }
         }
-        gevent.sleep(60)
+        sleep(60)
 
 
 def create_jobs():
@@ -331,7 +326,7 @@ def create_jobs():
         global_last_block_hash_cp = global_last_block_hash
         base_hash = sha1(global_last_block_hash_cp.encode('ascii'))
         temp_hash = None
-        for i in range(READY_HASHES_NUM):
+        for i in range(int(READY_HASHES_NUM / 4)):
             temp_hash = base_hash.copy()
             avr_diff = job_tiers["AVR"]["difficulty"]
             rand = fastrandint(100 * avr_diff)
@@ -341,7 +336,7 @@ def create_jobs():
                 "expected_hash": temp_hash.hexdigest(),
                 "last_block_hash": str(global_last_block_hash_cp)}
 
-        for i in range(READY_HASHES_NUM):
+        for i in range(int(READY_HASHES_NUM / 4)):
             temp_hash = base_hash.copy()
             due_diff = job_tiers["DUE"]["difficulty"]
             rand = fastrandint(100 * due_diff)
@@ -351,7 +346,17 @@ def create_jobs():
                 "expected_hash": temp_hash.hexdigest(),
                 "last_block_hash": str(global_last_block_hash_cp)}
 
-        for i in range(READY_HASHES_NUM):
+        for i in range(int(READY_HASHES_NUM / 4)):
+            temp_hash = base_hash.copy()
+            due_diff = job_tiers["ARM"]["difficulty"]
+            rand = fastrandint(100 * due_diff)
+            temp_hash.update(str(rand).encode('ascii'))
+            pregenerated_jobs_arm[i] = {
+                "numeric_result": rand,
+                "expected_hash": temp_hash.hexdigest(),
+                "last_block_hash": str(global_last_block_hash_cp)}
+
+        for i in range(int(READY_HASHES_NUM / 4)):
             temp_hash = base_hash.copy()
             esp32_diff = job_tiers["ESP32"]["difficulty"]
             rand = fastrandint(100 * esp32_diff)
@@ -361,7 +366,7 @@ def create_jobs():
                 "expected_hash": temp_hash.hexdigest(),
                 "last_block_hash": str(global_last_block_hash_cp)}
 
-        for i in range(READY_HASHES_NUM):
+        for i in range(int(READY_HASHES_NUM / 4)):
             temp_hash = base_hash.copy()
             esp8266_diff = job_tiers["ESP8266"]["difficulty"]
             rand = fastrandint(100 * esp8266_diff)
@@ -370,7 +375,7 @@ def create_jobs():
                 "numeric_result": rand,
                 "expected_hash": temp_hash.hexdigest(),
                 "last_block_hash": str(global_last_block_hash_cp)}
-        gevent.sleep(60)
+        sleep(60)
 
 
 def get_pregenerated_job(req_difficulty):
@@ -378,21 +383,33 @@ def get_pregenerated_job(req_difficulty):
         difficulty tiers
         Takes:      req_difficulty
         Outputs:    job ready to send to client"""
-    if req_difficulty == "DUE":
+
+    if req_difficulty == "AVR":
+        # Arduino
+        difficulty = job_tiers["AVR"]["difficulty"]
+        rand = fastrandint(len(pregenerated_jobs_avr) - 1)
+        numeric_result = pregenerated_jobs_avr[rand]["numeric_result"]
+        expected_hash = pregenerated_jobs_avr[rand]["expected_hash"]
+        last_block_hash = pregenerated_jobs_avr[rand]["last_block_hash"]
+        return [last_block_hash, expected_hash, numeric_result, difficulty]
+
+    elif req_difficulty == "DUE":
         # Arduino Due
         difficulty = job_tiers["DUE"]["difficulty"]
         rand = fastrandint(len(pregenerated_jobs_due) - 1)
         numeric_result = pregenerated_jobs_due[rand]["numeric_result"]
         expected_hash = pregenerated_jobs_due[rand]["expected_hash"]
         last_block_hash = pregenerated_jobs_due[rand]["last_block_hash"]
+        return [last_block_hash, expected_hash, numeric_result, difficulty]
 
-    elif req_difficulty == "ESP32":
-        # ESP32
-        difficulty = job_tiers["ESP32"]["difficulty"]
-        rand = fastrandint(len(pregenerated_jobs_esp32) - 1)
-        numeric_result = pregenerated_jobs_esp32[rand]["numeric_result"]
-        expected_hash = pregenerated_jobs_esp32[rand]["expected_hash"]
-        last_block_hash = pregenerated_jobs_esp32[rand]["last_block_hash"]
+    elif req_difficulty == "ARM":
+        # Arduino Due
+        difficulty = job_tiers["ARM"]["difficulty"]
+        rand = fastrandint(len(pregenerated_jobs_arm) - 1)
+        numeric_result = pregenerated_jobs_arm[rand]["numeric_result"]
+        expected_hash = pregenerated_jobs_arm[rand]["expected_hash"]
+        last_block_hash = pregenerated_jobs_arm[rand]["last_block_hash"]
+        return [last_block_hash, expected_hash, numeric_result, difficulty]
 
     elif req_difficulty == "ESP8266":
         # New ESP8266
@@ -401,15 +418,16 @@ def get_pregenerated_job(req_difficulty):
         numeric_result = pregenerated_jobs_esp8266[rand]["numeric_result"]
         expected_hash = pregenerated_jobs_esp8266[rand]["expected_hash"]
         last_block_hash = pregenerated_jobs_esp8266[rand]["last_block_hash"]
+        return [last_block_hash, expected_hash, numeric_result, difficulty]
 
     else:
-        # Arduino
-        difficulty = job_tiers["AVR"]["difficulty"]
-        rand = fastrandint(len(pregenerated_jobs_avr) - 1)
-        numeric_result = pregenerated_jobs_avr[rand]["numeric_result"]
-        expected_hash = pregenerated_jobs_avr[rand]["expected_hash"]
-        last_block_hash = pregenerated_jobs_avr[rand]["last_block_hash"]
-    return [last_block_hash, expected_hash, numeric_result, difficulty]
+        # ESP32
+        difficulty = job_tiers["ESP32"]["difficulty"]
+        rand = fastrandint(len(pregenerated_jobs_esp32) - 1)
+        numeric_result = pregenerated_jobs_esp32[rand]["numeric_result"]
+        expected_hash = pregenerated_jobs_esp32[rand]["expected_hash"]
+        last_block_hash = pregenerated_jobs_esp32[rand]["last_block_hash"]
+        return [last_block_hash, expected_hash, numeric_result, difficulty]
 
 
 def floatmap(x, in_min, in_max, out_min, out_max):
@@ -450,9 +468,8 @@ def database_updater():
             db_err_counter += 1
             if db_err_counter >= 5:
                 admin_print("Restarting server - too many DB errs")
-                os.system("sudo iptables -F INPUT")
                 os.execl(sys.executable, sys.executable, *sys.argv)
-        gevent.sleep(SAVE_TIME)
+        sleep(SAVE_TIME)
 
 
 def chain_updater():
@@ -475,9 +492,8 @@ def chain_updater():
             db_err_counter += 1
             if db_err_counter > 5:
                 admin_print("Restarting server - too many DB errs")
-                os.system("sudo iptables -F INPUT")
                 os.execl(sys.executable, sys.executable, *sys.argv)
-        gevent.sleep(SAVE_TIME*3)
+        sleep(SAVE_TIME*3)
 
 
 def input_management():
@@ -502,7 +518,8 @@ def input_management():
             - ban <username> - bans username
             - jail <username> - jails username
             - chips <username> - shows chip ids
-            - profit <username> - shows estimated profit""")
+            - profit <username> - shows estimated profit
+            - pass <username> <password> - verify password of user""")
 
         elif command[0] == "chips":
             try:
@@ -654,8 +671,6 @@ def input_management():
             admin_print("Are you sure you want to restart DUCO server?")
             confirm = input("  Y/n")
             if confirm == "Y" or confirm == "y" or confirm == "":
-                os.system("sudo iptables -F INPUT")
-                os.system('clear')
                 os.execl(sys.executable, sys.executable, *sys.argv)
             else:
                 admin_print("Canceled")
@@ -817,6 +832,42 @@ def input_management():
             except Exception as e:
                 admin_print("Error: " + str(e))
 
+        elif command[0] == "pass":
+            try:
+                password = str(command[2]).encode('utf-8')
+                username = str(command[1])
+                if user_exists(username):
+                    try:
+                        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                            # User exists, read his password
+                            datab = conn.cursor()
+                            datab.execute(
+                                """SELECT *
+                                FROM Users
+                                WHERE username = ?""",
+                                (str(username),))
+                            stored_password = datab.fetchone()[1]
+                    except Exception as e:
+                        admin_print(
+                            "Error getting password of user "
+                            + username + ": "
+                            + str(e))
+
+                    try:
+                        if checkpw(password, stored_password):
+                            admin_print("Correct password")
+                        else:
+                            admin_print("Invalid password")
+                    except:
+                        if checkpw(password, stored_password.encode('utf-8')):
+                            admin_print("Correct password")
+                        else:
+                            admin_print("Invalid password")
+                else:
+                    admin_print("This account doesn\'t exist")
+            except Exception as e:
+                print(e)
+
         elif command[0] == "changemail":
             try:
                 with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
@@ -889,6 +940,23 @@ def input_management():
                             (command[1],))
                         balance = str(datab.fetchone()[3])
                     admin_print("User balance is now " + str(balance))
+
+                    global_last_block_hash_cp = global_last_block_hash
+                    with sqlconn(CONFIG_TRANSACTIONS,
+                                 timeout=DB_TIMEOUT) as conn:
+                        datab = conn.cursor()
+                        formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
+                        datab.execute(
+                            """INSERT INTO Transactions
+                            (timestamp, username, recipient, amount, hash, memo)
+                            VALUES(?, ?, ?, ?, ?, ?)""",
+                            (formatteddatetime,
+                                command[1],
+                                "coinexchange",
+                                command[2],
+                                global_last_block_hash_cp,
+                                "DUCO Exchange transaction"))
+                        conn.commit()
                 else:
                     admin_print("Canceled")
             except Exception:
@@ -933,6 +1001,23 @@ def input_management():
                             (command[1],))
                         balance = str(datab.fetchone()[3])
                     admin_print("User balance is now " + str(balance))
+
+                    global_last_block_hash_cp = global_last_block_hash
+                    with sqlconn(CONFIG_TRANSACTIONS,
+                                 timeout=DB_TIMEOUT) as conn:
+                        datab = conn.cursor()
+                        formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
+                        datab.execute(
+                            """INSERT INTO Transactions
+                            (timestamp, username, recipient, amount, hash, memo)
+                            VALUES(?, ?, ?, ?, ?, ?)""",
+                            (formatteddatetime,
+                                "coinexchange",
+                                command[1],
+                                command[2],
+                                global_last_block_hash_cp,
+                                "DUCO Exchange transaction"))
+                        conn.commit()
                 else:
                     admin_print("Canceled")
             except Exception:
@@ -997,7 +1082,16 @@ def generate_block(username, reward, new_block_hash, connection, xxhash=False):
 def sleep_by_cpu_usage(upper_limit):
     """ Suspends execution depending on current cpu usage """
     sleeptime = floatmap(global_cpu_usage[-1], 0, 100, 0, upper_limit)
-    gevent.sleep(sleeptime)
+    sleep(sleeptime)
+
+
+def get_change(current, previous):
+    if current == previous:
+        return 100.0
+    try:
+        return (abs(current - previous) / previous) * 100.0
+    except ZeroDivisionError:
+        return 0
 
 
 def check_workers(ip_workers, usr_workers):
@@ -1073,7 +1167,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
     thread_id = id(gevent.getcurrent())
     override_difficulty = ""
     reward = 0
-    connection.settimeout(60*3)
+    connection.settimeout(60)
 
     while True:
         global_last_block_hash_cp = global_last_block_hash
@@ -1115,7 +1209,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 except:
                     req_difficulty = "NET"
         else:
-            data = receive_data(connection)
+            data = receive_data(connection, limit=48)
 
             if override_difficulty != "":
                 req_difficulty = override_difficulty
@@ -1128,7 +1222,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             difficulty = job[3]
 
         elif is_first_share:
-            gevent.sleep(5)
+            sleep(5)
             send_data("BAD,PC mining is disabled\n", connection)
             break
 
@@ -1141,7 +1235,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                     difficulty = job_tiers["NET"]["difficulty"]
 
         else:
-            gevent.sleep(5)
+            sleep(5)
             send_data("BAD,PC mining is disabled\n", connection)
             break
 
@@ -1198,7 +1292,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 """ Avoiding dos attacks: check number_of_pings
                     to close connection with too many pings """
                 number_of_pings += 1
-                gevent.sleep(PING_SLEEP_TIME)
+                sleep(PING_SLEEP_TIME)
             else:
                 break
 
@@ -1216,7 +1310,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             reported_hashrate = hashrate
             hashrate_is_estimated = True
 
-        if abs(reported_hashrate - hashrate) > 10000:
+        if get_change(reported_hashrate, hashrate) > 10:
             reported_hashrate = hashrate
             hashrate_is_estimated = True
 
@@ -1282,7 +1376,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 permanent_ban(ip_addr)
                 raise Exception("User banned")
 
-            global_blocks += UPDATE_MINERAPI_EVERY*5
+            #global_blocks += UPDATE_MINERAPI_EVERY*5
             global_last_block_hash = job[1]
 
         if hashrate > max_hashrate:
@@ -1346,7 +1440,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             send_data("BAD\n", connection)
 
         is_first_share = False
-        # gevent.sleep(.5)
 
 
 def admin_print(*message):
@@ -1369,7 +1462,7 @@ def get_sys_usage():
         ).stdout.decode().rstrip()
         global_cpu_usage.append(psutil.cpu_percent())
         global_ram_usage.append(psutil.virtual_memory()[2])
-        gevent.sleep(SAVE_TIME)
+        sleep(SAVE_TIME*2)
 
 
 def hashrate_prefix(hashrate: int, accuracy: int):
@@ -1506,7 +1599,7 @@ def create_secondary_api_files():
                 outfile,
                 indent=1,
                 ensure_ascii=False)
-        gevent.sleep(60)
+        sleep(60)
 
 
 def create_main_api_file():
@@ -1674,7 +1767,7 @@ def create_minerapi():
             memory.backup(disk_conn)
             disk_conn.commit()
 
-        gevent.sleep(15)
+        sleep(SAVE_TIME*2)
 
 
 def protocol_login(data, connection):
@@ -1841,7 +1934,7 @@ def protocol_send_funds(data, connection, username):
     """ Transfer funds from one account to another """
     try:
         global_last_block_hash_cp = global_last_block_hash
-        memo = sub(r'[^A-Za-z0-9 .()-]+', ' ', str(data[1]))
+        memo = sub(r'[^A-Za-z0-9 .()-:/!#_+-]+', ' ', str(data[1]))
         recipient = str(data[2])
         amount = float(data[3])
 
@@ -1945,7 +2038,7 @@ def protocol_get_balance(data, connection, username):
                 WHERE username = ?""",
                           (username,))
             balance = str(datab.fetchone()[3])
-            send_data(round(float(recipientbal), DECIMALS), connection)
+            send_data(round(float(balance), DECIMALS), connection)
     except Exception as e:
         send_data("NO,Internal server error: "+str(e))
         raise Exception(e)
@@ -2057,7 +2150,7 @@ def get_duco_prices():
             )
         else:
             duco_price_justswap = 0
-        gevent.sleep(360)
+        sleep(360)
 
 
 def protocol_get_transactions(data, connection):
@@ -2340,34 +2433,23 @@ def countips():
                     permanent_ban(ip)
             except:
                 pass
-        gevent.sleep(5)
+        sleep(5)
 
 
 def resetips():
     """ Reset connections per IP values every n sec """
     while True:
-        gevent.sleep(30)
+        sleep(30)
         connections_per_ip.clear()
-
-
-def flush_iptables():
-    """ For some reason the vps is cursed and flushing
-        iptables brings back the cpu usage back to
-        low levels. Why? No idea """
-    while True:
-        os.system("sudo iptables -F INPUT")
-        # admin_print("Flushed iptables")
-        gevent.sleep(60*15)
 
 
 def duino_stats_restart_handle():
     while True:
         if ospath.isfile("config/restart_signal"):
             os.remove("config/restart_signal")
-            os.system("sudo iptables -F INPUT")
             admin_print("Server restarted by Duino-Stats command")
             os.execl(sys.executable, sys.executable, *sys.argv)
-        gevent.sleep(1)
+        sleep(1)
 
 
 if __name__ == "__main__":
@@ -2491,7 +2573,6 @@ if __name__ == "__main__":
 
     threading.Thread(target=countips).start()
     threading.Thread(target=resetips).start()
-    threading.Thread(target=flush_iptables).start()
 
     threading.Thread(target=duino_stats_restart_handle).start()
     threading.Thread(target=get_duco_prices).start()
@@ -2508,7 +2589,7 @@ if __name__ == "__main__":
     threading.Thread(target=input_management).start()
     try:
         server = StreamServer((HOSTNAME, PORT), handle,
-                              backlog=2, spawn=10000)  # creates a new server
+                              backlog=32, spawn=10000)
         server.serve_forever()  # start accepting new connections
     except Exception as e:
         admin_print("Unexpected exception: ", e)
