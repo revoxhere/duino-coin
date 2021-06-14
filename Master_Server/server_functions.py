@@ -22,10 +22,11 @@ def pool_info_parser(data, data2):
     return data
 
 
-def receive_data(connection):
+def receive_data(connection, limit=256):
     """ Returns received data from the connection,
         raises an exception on error """
-    data = connection.recv(1024)
+    data = connection.recv(limit)
+
     if not data:
         connection.close()
         raise Exception("Connection closed unexpectedly")
@@ -45,5 +46,6 @@ def send_data(data, connection):
     try:
         connection.sendall(bytes(str(data), encoding="utf8"))
     except Exception:
-        raise Exception("Connection closed unexpectedly")
         connection.close()
+        raise Exception("Connection closed unexpectedly")
+        
