@@ -9,7 +9,7 @@
 
 <h1>
   <a href="https://duinocoin.com">
-    <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" height="74px" />
+    <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" width="430px" />
   </a>
   <br>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/README.md">
@@ -71,6 +71,7 @@ python3 -m pip install -r requirements.txt # Install pip dependencies
 
 After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py`).
 
+
 #### Windows
 
 1. Download and install [Python 3](https://www.python.org/downloads/) (make sure you add Python and Pip to your PATH)
@@ -80,8 +81,6 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 
 After doing this, you are good to go with launching the software (just double click on desired `.py` files or type `py PC_Miner.py` in the command prompt).
 
-
-
 ## Community-made softwares
 
 <details>
@@ -90,6 +89,7 @@ After doing this, you are good to go with launching the software (just double cl
   </summary>
 
   ### Other miners known to work with Duino-Coin:
+  *   [ducopanel](https://github.com/ponsato/ducopanel) - a GUI app for controling your Duino-Coin miners by ponsato
   *   [Duino AVR Monitor](https://www.microsoft.com/store/apps/9NJ7HPFSR9V5) - GUI Windows App for monitoring AVR devices mining DUCO by niknak
   *   [hauchel's duco-related stuff repository](https://github.com/hauchel/duco/) - Collection of various codes for mining DUCO on other microcontrollers
   *   [duino-coin-php-miner](https://github.com/ricardofiorani/duino-coin-php-miner) Dockerized Miner in PHP by ricardofiorani
