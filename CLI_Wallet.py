@@ -345,7 +345,7 @@ while True:
                     if loginFeedback[0] == "OK":
                         print(Style.RESET_ALL
                               + Fore.YELLOW
-                              + "Successfull login")
+                              + "Successful login")
 
                         config['wallet'] = {
                             "username": username,
