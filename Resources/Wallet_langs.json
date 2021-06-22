@@ -104,7 +104,7 @@
 		"tray_show": "Show window",
 		"tray_exit": "Exit window"
 	},
-	"english": {
+	"italian": {
 		"translation_author": "Il mastro Stefanuzzo (no spaces on GitHub)",
 		"welcome_message": "Benvenuto nel\nDuino-Coin\nTkinter GUI Wallet",
 		"warning": "Avvertimento",
