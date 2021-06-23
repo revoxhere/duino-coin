@@ -77,6 +77,84 @@
     
         "recommended": "recommended"
     },
+    "italian": {
+        "translation_autor": "Il mastro Stefanuzzo (no spaces on GitHub)",
+        "sigint_detected": " SIGINT rilevato - Uscita dal programma.",
+        "goodbye": " A presto!",
+        "greeting_morning": "Passa una buona mattinata",
+        "greeting_noon": "Passa una buon mezzogiorno",
+        "greeting_afternoon": "Passa un traquillo pomeriggio",
+        "greeting_evening": "Buona serata",
+        "greeting_back": "Bentornato",
+
+        "banner": "Official Duino-Coin © Python Miner",
+        "donation_level": "Developer donation level: ",
+
+        "ask_algorithm": "Selezione l'algoritmo di mining che vuoi usare (1-2): ",
+        "ask_difficulty": "Seleziona la difficoltà di mining che vuoi usare (1-3): ",
+        "low_diff": "Difficoltà bassa (per Raspberry Pi e vecchi computer)",
+        "medium_diff": "Difficoltà media (per computer normali)",
+        "net_diff": "Difficoltà network (per computer potenti)",
+
+        "low_diff_short": "Diff bassa",
+        "medium_diff_short": "Diff media",
+        "net_diff_short": "Diff network",
+        "algorithm": "Algoritmo: ",
+        "rig_identifier": "Identificatore del rig: ",
+
+        "basic_config_tool": "\nStrumento base di configurazione Duino-Coin\nModifica ",
+        "edit_config_file_warning": "il file /Miner_config.cfg più tardi se vuoi cambiarlo.",
+        "dont_have_account": "Non hai ancora un account Duino-Coin? Usa ",
+        "wallet": "Portafoglio",
+        "register_warning": " per registrarti sul server.\n",
+        "ask_username": "Inserisci il tuo nome utente di Duino-Coin: ",
+        "ask_avrport": "Inserisci la porta seriale della tua scheda (es: COM1 (Windows) oppure /dev/ttyUSB1 (Unix)): ",
+        "ask_anotherport": "Vuoi usare un'altra scheda? (y/N): ",
+        "ask_higherdiff": "Vuoi utilizzare una difficoltà più alta? (solo su schede Arduino DUE) (y/N): ",
+        "ask_rig_identifier": "Vuoi aggiungere un identificatore (nome) a questo rig? (y/N) ",
+        "ask_rig_name": "Inserisci il nome desiderato per il rig: ",
+        "ask_donation_level": "Imposta il livello di donazione agli sviluppatori (0-5) (raccomandato: 1), ciò non ridurrà i tuoi guadagni: ",
+        "config_saved": "Configurazione salvata! Avvio del miner",
+        "load_config_error": " Error loading the configfile (",
+        "load_config_error_warning": "/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s",
+
+        "free_network_warning": " La rete du Duino-Coin è un servizio completamente gratuito e lo sarà per sempre",
+        "donate_warning": "\nNon prendiamo alcuna quota del tuo mining.\nPuoi aiutarci ampiamente a mantenere i server e le conversioni di valuta a basse tasse donando.\nVisita ",
+        "learn_more_donate": " per scoprire di più su come puoi aiutare :)",
+        "starting_donation": "Inizio del processo di donazione",
+        "thanks_donation": " Grazie di essere un fantastico donatore ❤️ La tua donazione ci aiuterà a mantenere i server e permetterà a continuare lo sviluppo",
+
+        "data_error": " Errore nell'ottenere dati da GitHub! Nuovo tentativo in 10s.",
+        "connected": " Connesso",
+        "connected_server": " al server master Duino-Coin (v",
+        "outdated_miner": " Il miner non è aggiornato (v",
+        "server_is_on_version": " il server è sulla versione v",
+        "update_warning": ", per favore scarica l'ultima versione da https://github.com/revoxhere/duino-coin/releases/",
+        "connecting_error": " Errore nella connessione al server. Nuovo tentativo in 10s",
+        "mining_thread": " Thread di mining #",
+        "mining_thread_starting": " si sta avviando",
+        "using_algo": " algoritmo DUCO-S1 in uso con ",
+        "using_algo_xxh": " algoritimo XXHASH in uso con ",
+        "efficiency": "efficienza",
+
+        "duco_python_miner": "Miner Duino-Coin Python (v",
+        "accepted_shares": " condivisioni accettate",
+        "accepted": " Accettato ",
+        "block_found": " Blocco trovato ",
+        "internal_server_error": " Errore interno del server.",
+        "retrying": " Nuovo tentativo in 10s",
+        "rejected": " Rifiutato ",
+        "error_while_mining": " Errore durante il mining - molto probabilmente un problema di connessione - riavvio in 5s.",
+
+        "mining_user": " Utente ",
+        "mining_not_exist": " non esiste.",
+        "mining_not_exist_warning": " Assicurati di aver inserito il nome utente correttamente. Per favore controlla il tuo file di configurazione. Nuovo tentativo in 10s",
+
+        "max_threads_notice": "Minare Duino-Coin con un sacco di thread causerà un peggioramento del profitto - thread di mining diminuiti a 8",
+        "max_hashrate_notice": "Minare Duino-Coin con un equipaggiamento potente potrebbe non essere molto profittevole per te - suggeriamo di provare Coin Magi (https://xmg.network) - la nostra moneta \"sorella\"",
+    
+        "recommended": "raccomandato"
+    },
     "polish": {
         "translation_autor": "revox",
         "sigint_detected": " SIGINT wykryty - Wyłączam koparkę.",
@@ -103,14 +181,14 @@
         "rig_identifier": "Identyfikator koparki: ",
 
         "basic_config_tool": "\nKreator pliku konfiguracyjnego Duino-Coin\nEdytuj plik ",
-        "edit_config_file_warning": "/Miner_config.cfg jeżeli chcesz coś poźniej zmienić.",
+        "edit_config_file_warning": "/Miner_config.cfg jeżeli chcesz coś poźniej zmienić.",
         "dont_have_account": "Nie posiadasz konta Duino-Coin? Użyj ",
         "wallet": "Wallet (Portfel)",
         "register_warning": " aby zarejestrować się na sieci.\n",
-        "ask_username": "Wprowadź swoją nazwę użytkownika Duino-Coin: ",
+        "ask_username": "Wprowadź swoją nazwę użytkownika Duino-Coin: ",
         "ask_intensity": "Wprowadź intensywność kopania (1-100)% (zalecane: 95): ",
-        "ask_threads": "Ile wątków chcesz użyć do kopania? (zalecane dla twojego systemu: ",
-        "ask_lower_difficulty": "Chcesz użyć zmniejszonej trudności kopania (dla wolniejszych komputerów)? (y/N): ",
+        "ask_threads": "Ile wątków chcesz użyć do kopania? (zalecane dla twojego systemu: ",
+        "ask_lower_difficulty": "Chcesz użyć zmniejszonej trudności kopania (dla wolniejszych komputerów)? (y/N): ",
         "ask_rig_identifier": "Chcesz dodać identyfikator (nazwę) dla tej koparki? (y/N): ",
         "ask_rig_name": "Wprowadź nazwę dla koparki: ",
         "ask_donation_level": "Ustaw poziom dotacji dla deweloperów (0-5) (zalecane: 1), nie zmniejszy to Twoich zysków: ",
@@ -118,11 +196,11 @@
         "load_config_error": " Problem z ładowaniem pliku konfiguracyjnego (",
         "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s",
 
-        "free_network_warning": " Sieć Duino-Coin jest w pełni darmową usługą i zawsze taka będzie",
+        "free_network_warning": " Sieć Duino-Coin jest w pełni darmową usługą i zawsze taka będzie",
         "donate_warning": "\nNie bierzemy żadnych prowizji z Twojego kopania, a utrzymanie serwera i opłacanie wymian jest kosztowne.\nMożesz nam bardzo pomóc w utrzymaniu odwiedzając ",
         "learn_more_donate": " aby złożyć dotację :)",
         "starting_donation": "Włączanie procesu dotacji",
-        "thanks_donation": " Bardzo dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
+        "thanks_donation": " Bardzo dziękujemy za posiadanie włączonej dotacji ❤️ \nPomoże nam to utrzymać główny serwer i pozwoli na dalszy rozwój",
 
         "data_error": " Problem pobierania danych z GitHuba! Ponowna próba za 10s.",
 
@@ -130,7 +208,7 @@
         "connected_server": " z głównym serwerem Duino-Coin (v",
         "outdated_miner": " Koparka jest nieaktualna (v",
         "server_is_on_version": " serwer jest na v",
-        "update_warning": ", proszę pobrać najnowszą wersję z https://github.com/revoxhere/duino-coin/releases/",
+        "update_warning": ", proszę pobrać najnowszą wersję z https://github.com/revoxhere/duino-coin/releases/",
         "connecting_error": " Problem podczas łączenia z serwerem. Ponowna próba za 10s",
         "mining_thread": " Wątek koparki #",
         "mining_thread_starting": " uruchamia się",
@@ -149,9 +227,9 @@
 
         "mining_user": " Użytkownik ",
         "mining_not_exist": " nie jest zarejestrowany.",
-        "mining_not_exist_warning": " Upewnij się że poprawnie wprowadziłeś nazwę użytkownika. Sprawdź swój plik konfiguracyjny. Ponowna próba za 10s",
+        "mining_not_exist_warning": " Upewnij się że poprawnie wprowadziłeś nazwę użytkownika. Sprawdź swój plik konfiguracyjny. Ponowna próba za 10s",
 
-        "max_threads_notice": "Kopanie Duino-Coin z wysoką ilością wątków spowoduje spadek w zyskach - zmniejszono liczbę wątków do 8",
+        "max_threads_notice": "Kopanie Duino-Coin z wysoką ilością wątków spowoduje spadek w zyskach - zmniejszono liczbę wątków do 8",
         "max_hashrate_notice": "Kopanie Duino-Coin używając mocnego komputera może nie być bardzo opłacalne - proponujemy wpróbować Coin Magi (https://xmg.network) - naszą 'siostrzaną' monetę",
     
         "recommended": "zalecany"
