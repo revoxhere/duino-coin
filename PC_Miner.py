@@ -1179,7 +1179,7 @@ def initRichPresence():
         debug_output("Discord rich presence initialized")
     except Exception as e:
         # Discord not launched
-        debug_output("Error launching Discord RPC thead: " + str(e))
+        debug_output("Error launching Discord RPC thread: " + str(e))
 
 
 def updateRichPresence():
@@ -1213,7 +1213,7 @@ def updateRichPresence():
             debug_output("Rich presence updated")
         except Exception as e:
             # Discord not launched
-            debug_output("Error launching Discord RPC thead: " + str(e))
+            debug_output("Error launching Discord RPC thread: " + str(e))
         sleep(15)  # 15 seconds to respect Discord rate limit
 
 
