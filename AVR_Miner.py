@@ -93,8 +93,8 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = '2.49'  # Version number
-SOC_TIMEOUT = 15
-AVR_TIMEOUT = 3.2  # diff 6(*100) / 196 H/s = 3.06, rounded
+SOC_TIMEOUT = 30
+AVR_TIMEOUT = 4  # diff 8(*100) / 196 H/s ~= 4
 BAUDRATE = 115200
 RESOURCES_DIR = 'AVRMiner_' + str(MINER_VER) + '_resources'
 shares = [0, 0]
@@ -154,9 +154,7 @@ try:
         elif locale.startswith('tr'):
             lang = 'turkish'
         elif locale.startswith('pt'):
-            lang = 'portuguese'
-        elif locale.startswith('it'):
-            lang = 'italian'
+            lang = 'portugese'
         elif locale.startswith('zh'):
             lang = 'chinese_simplified'
         else:
@@ -410,8 +408,8 @@ def load_config():
             'language':         lang,
             'identifier':       rig_identifier,
             'debug':            'n',
-            "soc_timeout":      15,
-            "avr_timeout":      3,
+            "soc_timeout":      30,
+            "avr_timeout":      4,
             "discord_presence": "y"}
 
         # Write data to file
@@ -1191,7 +1189,7 @@ if __name__ == '__main__':
                 target=mine_avr,
                 args=(port,)).start()
     except Exception as e:
-        debug_output('Error launching AVR thead(s): ' + str(e))
+        debug_output('Error launching AVR thread(s): ' + str(e))
 
     if discord_presence == "y":
         try:
@@ -1200,4 +1198,4 @@ if __name__ == '__main__':
             thrThread(
                 target=update_rich_presence).start()
         except Exception as e:
-            debug_output('Error launching Discord RPC thead: ' + str(e))
+            debug_output('Error launching Discord RPC thread: ' + str(e))
