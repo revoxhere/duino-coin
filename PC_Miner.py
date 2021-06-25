@@ -124,6 +124,7 @@ config = ConfigParser()
 donation_level = 0
 thread = []
 totalhashrate_mean = []
+start_time = time()
 
 # Create resources folder if it doesn't exist
 if not path.exists(RESOURCES_DIR):
@@ -223,11 +224,22 @@ def handler(signal_received, frame):
             "warning")
     try:
         # Close previous socket connection (if any)
-        socket.close()
+        socket.close() 
     except Exception:
         pass
     _exit(0)
+ 
 
+
+
+def calculate_uptime(start_time):
+    uptime = time() - start_time
+    if uptime <= 59:
+        return round(uptime), "seconds"
+    elif uptime >= 60:
+        return round(uptime // 60), "minutes"
+    elif uptime >= 3600:
+        return round(uptime // 3600), "hours"
 
 # Enable signal handler
 signal(SIGINT, handler)
@@ -945,7 +957,7 @@ def Thread(
                             prettyPrint("sys0",
                                         " " + getString("max_hashrate_notice"),
                                         "warning")
-
+                        uptime, uptime_type = calculate_uptime(start_time)
                         if feedback == "GOOD":
                             # If result was correct
                             accepted.value += 1
@@ -997,11 +1009,15 @@ def Thread(
                                     + Style.NORMAL
                                     + " @ diff "
                                     + str(diff)
-                                    + " ∙ "
+                                    + "∙ "
                                     + Fore.CYAN
                                     + "ping "
                                     + str("%02.0f" % int(ping))
-                                    + "ms")
+                                    + "ms. "
+                                    + "Uptime "
+                                    + str(uptime)
+                                    + " "
+                                    + uptime_type)
 
                         elif feedback == "BLOCK":
                             # If block was found
