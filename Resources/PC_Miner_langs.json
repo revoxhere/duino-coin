@@ -247,14 +247,14 @@
         "banner": "Oficial Duino-Coin © Python Miner",
         "donation_level": "Nivel de donación para los desarrolladores: ",
 
-        "ask_difficulty": "Seleccione la dificultad de excavación que desea utilizar (1-3):",
+        "ask_difficulty": "Seleccione la dificultad de minado que desea utilizar (1-3):",
         "low_diff": "Dificultad baja (para Raspberry Pis o computadoras más antiguas",
         "medium_diff": "Dificultad media (para computadoras normales)",
         "net_diff": "Dificultad controlada por la red (para equipos potentes)",
 
-        "low_diff_short": "Umbral bajo",
-        "medium_diff_short": "Peso medio",
-        "net_diff_short": "Umbral controlado por la red",
+        "low_diff_short": "Dificultad baja",
+        "medium_diff_short": "Dificultad media",
+        "net_diff_short": "Dificultad controlada por la red",
         "algorithm": "Algoritmo: ",
         "rig_identifier": "Identificador del rig: ",
 
