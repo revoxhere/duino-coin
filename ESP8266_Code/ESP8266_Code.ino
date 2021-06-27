@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards - V2.53
+//  Code for ESP8266 boards - V2.5
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -215,7 +215,7 @@ bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
 void setup() {
   // Start serial connection
   Serial.begin(115200);
-  Serial.println("\nDuino-Coin ESP8266 Miner v2.52");
+  Serial.println("\nDuino-Coin ESP8266 Miner v2.5");
 
   // Prepare for blink() function
   pinMode(LED_BUILTIN, OUTPUT);
@@ -274,7 +274,7 @@ void loop() {
       client.print(String(duco_numeric_result)
                    + ","
                    + String(hashrate)
-                   + ",ESP8266 Miner v2.53"
+                   + ",ESP8266 Miner v2.5"
                    + ","
                    + String(RIG_IDENTIFIER)
                    + ","
