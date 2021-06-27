@@ -33,8 +33,8 @@
   <img src="https://img.shields.io/badge/Video-Watch-e74c3c.svg?style=for-the-badge&logo=Youtube" /></a>
 <a href="https://discord.gg/kvBkccy">
   <img src="https://img.shields.io/discord/677615191793467402.svg?color=5539cc&label=Discord&logo=Discord&style=for-the-badge" /></a>
-<a href="https://github.com/revoxhere/duino-coin/releases/tag/2.4.9">
-  <img src="https://img.shields.io/badge/release-2.4.9-ff4112.svg?style=for-the-badge" /></a>
+<a href="https://github.com/revoxhere/duino-coin/releases/tag/2.5">
+  <img src="https://img.shields.io/badge/release-2.5-ff4112.svg?style=for-the-badge" /></a>
 <br>
 
 <h3>
