@@ -751,11 +751,11 @@
         "algorithm": "Algoritmu:",
         "rig_identifier": "ID tat-tħaffir:",
 
-        "basic_config_tool": "\ nWizard tal-Fajl tal-Konfigurazzjoni tad-Duino-Coin \ nEdit File",
+        "basic_config_tool": "\nWizard tal-Fajl tal-Konfigurazzjoni tad-Duino-Coin \nEdit File",
         "edit_config_file_warning": "/Miner_config.cfg jekk trid tibdel xi ħaġa aktar tard.",
         "dont_have_account": "M'għandekx kont Duino-Coin? Uża",
         "wallet": "Kartiera (Kartiera)",
-        "register_warning": "biex tirreġistra fuq il-web. \ n",
+        "register_warning": "biex tirreġistra fuq il-web. \n",
         "ask_username": "Daħħal l-username ta 'Duino-Coin tiegħek:",
         "ports_message": "Il-wizard tal-konfigurazzjoni sab il-portijiet li ġejjin:",
         "ports_notice": "Jekk ma tistax tara l-bord tiegħek hawn fuq, kun żgur li huwa mqabbad sewwa u l-programm għandu l-permessi meħtieġa għalih (eż. amministratur jew sudo)."
