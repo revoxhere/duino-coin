@@ -224,12 +224,10 @@ def handler(signal_received, frame):
             "warning")
     try:
         # Close previous socket connection (if any)
-        socket.close() 
+        socket.close()
     except Exception:
         pass
     _exit(0)
- 
-
 
 
 def calculate_uptime(start_time):
@@ -240,6 +238,7 @@ def calculate_uptime(start_time):
         return round(uptime // 60), "minutes"
     elif uptime >= 3600:
         return round(uptime // 3600), "hours"
+
 
 # Enable signal handler
 signal(SIGINT, handler)
@@ -580,16 +579,16 @@ def loadConfig():
     else:
         # If config already exists, load data from it
         config.read(RESOURCES_DIR + "/Miner_config.cfg")
-        username =          config["Duino-Coin-PC-Miner"]["username"]
-        efficiency =        config["Duino-Coin-PC-Miner"]["efficiency"]
-        threadcount =       config["Duino-Coin-PC-Miner"]["threads"]
-        requested_diff =    config["Duino-Coin-PC-Miner"]["requested_diff"]
-        donation_level =    config["Duino-Coin-PC-Miner"]["donate"]
-        algorithm =         config["Duino-Coin-PC-Miner"]["algorithm"]
-        rig_identiier =     config["Duino-Coin-PC-Miner"]["identifier"]
-        debug =             config["Duino-Coin-PC-Miner"]["debug"]
-        SOC_TIMEOUT =       config["Duino-Coin-PC-Miner"]["soc_timeout"]
-        discord_presence =  config["Duino-Coin-PC-Miner"]["discord_presence"]
+        username = config["Duino-Coin-PC-Miner"]["username"]
+        efficiency = config["Duino-Coin-PC-Miner"]["efficiency"]
+        threadcount = config["Duino-Coin-PC-Miner"]["threads"]
+        requested_diff = config["Duino-Coin-PC-Miner"]["requested_diff"]
+        donation_level = config["Duino-Coin-PC-Miner"]["donate"]
+        algorithm = config["Duino-Coin-PC-Miner"]["algorithm"]
+        rig_identiier = config["Duino-Coin-PC-Miner"]["identifier"]
+        debug = config["Duino-Coin-PC-Miner"]["debug"]
+        SOC_TIMEOUT = config["Duino-Coin-PC-Miner"]["soc_timeout"]
+        discord_presence = config["Duino-Coin-PC-Miner"]["discord_presence"]
         # Calulate efficiency for use with sleep function
         efficiency = (100 - float(efficiency)) * 0.01
 
@@ -735,7 +734,7 @@ def Thread(
                     # Line 1 = IP
                     masterServer_address = content[0]
                     # Line 2 = port
-                    masterServer_port = content[1]
+                    masterServer_port = 2813  # content[1]
                     debug_output(
                         "Retrieved pool IP: "
                         + masterServer_address
@@ -869,7 +868,7 @@ def Thread(
                     try:
                         diff = int(job[2])
                         debug_output(str(threadid) +
-                              "Correct job received")
+                                     "Correct job received")
                         break
                     except:
                         prettyPrint("cpu" + str(threadid),
@@ -890,9 +889,9 @@ def Thread(
                     computetime = computetimeStop - computetimeStart
 
                     debug_output("Thread "
-                          + str(threadid)
-                          + ": result found: "
-                          + str(result[0]))
+                                 + str(threadid)
+                                 + ": result found: "
+                                 + str(result[0]))
 
                     # Convert to kH/s
                     threadhashcount = int(result[1] / 1000)
@@ -927,14 +926,14 @@ def Thread(
                         responsetimestop = now()
 
                         ping = int((responsetimestop - responsetimetart
-                            ).microseconds / 1000)
+                                    ).microseconds / 1000)
 
                         debug_output("Thread "
-                              + str(threadid)
-                              + ": Feedback received: "
-                              + str(feedback)
-                              + " Ping: "
-                              + str(ping))
+                                     + str(threadid)
+                                     + ": Feedback received: "
+                                     + str(feedback)
+                                     + " Ping: "
+                                     + str(ping))
 
                         if totalhashrate > 800:
                             # Format hashcount to MH/s
