@@ -775,8 +775,7 @@ def Thread(
                                 " Server message: " + motd,
                                 "warning")
 
-                if (float(serverVersion) <= float(MINER_VER)
-                        and len(serverVersion) == 3):
+                if float(serverVersion) <= float(MINER_VER):
                     # If miner is up-to-date, display a message and continue
                     prettyPrint(
                         "net"
@@ -1012,8 +1011,8 @@ def Thread(
                                     + Fore.CYAN
                                     + "ping "
                                     + str("%02.0f" % int(ping))
-                                    + "ms. "
-                                    + "Uptime "
+                                    + "ms. ∙"
+                                    + " uptime "
                                     + str(uptime)
                                     + " "
                                     + uptime_type)
