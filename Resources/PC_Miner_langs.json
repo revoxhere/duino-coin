@@ -734,5 +734,74 @@
         "mining_user": " User ",
         "mining_not_exist": " não existe",
         "mining_not_exist_warning": " Usuario incorreto, confira-o. Tentando novamente em 10s"
+	    
+	    "Maltese": {
+        "translation_autor": "IdotMaster1/MattyInnit",
+        "sigint_detected": "SIGINT misjub - Itfi l-iskavatur.",
+        "goodbye": "Narawk dalwaqt!",
+        "greeting_morning": "Miłego ranka",
+        "greeting_noon": "Nizza fin-Nofsinhar",
+        "greeting_afternoon": "Miłego wara nofsinhar",
+        "greeting_evening": "Filgħaxija sabiħa",
+        "greeting_back": "Hello mill-ġdid",
+
+        "banner": "Skavatur uffiċjali Duino-Coin © għal madum AVR",
+        "donation_level": "Livell ta 'donazzjoni tal-iżviluppatur:",
+        "avr_on_port": "Bord (ijiet) AVR fuq il-port (ijiet):",
+        "algorithm": "Algoritmu:",
+        "rig_identifier": "ID tat-tħaffir:",
+
+        "basic_config_tool": "\ nWizard tal-Fajl tal-Konfigurazzjoni tad-Duino-Coin \ nEdit File",
+        "edit_config_file_warning": "/Miner_config.cfg jekk trid tibdel xi ħaġa aktar tard.",
+        "dont_have_account": "M'għandekx kont Duino-Coin? Uża",
+        "wallet": "Kartiera (Kartiera)",
+        "register_warning": "biex tirreġistra fuq il-web. \ n",
+        "ask_username": "Daħħal l-username ta 'Duino-Coin tiegħek:",
+        "ports_message": "Il-wizard tal-konfigurazzjoni sab il-portijiet li ġejjin:",
+        "ports_notice": "Jekk ma tistax tara l-bord tiegħek hawn fuq, kun żgur li huwa mqabbad sewwa u l-programm għandu l-permessi meħtieġa għalih (eż. amministratur jew sudo)."
+        "ask_avrport": "Daħħal l-isem tal-port tal-bord tiegħek (eż. COM1 (Windows) jew / dev / ttyUSB1 (Unix)):",
+        "ask_anotherport": "Trid iżżid maduma oħra? (y / N):",
+        "ask_higherdiff": "Trid tuża iktar diffikultà biex tħaffer? (għal bordijiet Arduino DUE biss) (y / N):",
+        "ask_rig_identifier": "Trid iżżid identifikatur (isem) għal dan l-iskavatur? (y / N)",
+        "ask_rig_name": "Daħħal isem għall-iskavatur:",
+        "ask_donation_level": "Issettja l-livell ta 'għotja għall-iżviluppatur (0-5) (rakkomandat: 1), mhux se jnaqqas il-profitti tiegħek:",
+        "config_saved": "Konfigurazzjoni ssejvjata! Tibda l-iskavatur",
+
+        "free_network_warning": "In-netwerk Duino-Coin huwa servizz kompletament b'xejn u dejjem ikun",
+        "donate_warning": "\ nMa nieħdu l-ebda kummissjoni mill-minjieri tiegħek, u ż-żamma tas-server u l-ħlas għall-iskambji jiswew ħafna. \ n Tista 'tgħinna ħafna billi żżur",
+        "learn_more_donate": "biex tagħmel donazzjoni :)",
+        "starting_donation": "Li tippermetti l-proċess tas-sussidju",
+        "thanks_donation": "Grazzi ħafna talli d-donazzjoni tinxtegħel ❤️ Se tgħinna nżommu s-server ewlieni u nippermettu żvilupp ulterjuri",
+
+        "data_error": "Problema tat-tniżżil tad-dejta GitHub! Erġa 'pprova f'10s.",
+        "connected": "Konness",
+        "connected_server": "mas-server ewlieni ta 'Duino-Coin (v",
+        "outdated_miner": "L-iskavatur huwa antikwat (v",
+        "server_is_on_version": "is-server huwa fuq v",
+        "update_warning": ", jekk jogħġbok niżżel l-aħħar verżjoni minn https://github.com/revoxhere/duino-coin/releases/",
+        "connection_error": "Problema fil-konnessjoni mas-server. Erġa 'pprova f'10s",
+
+        "duco_avr_miner": "AVR Duino-Coin excavator (v",
+        "acceptable_shares": "ishma aċċettati",
+        "block_found": "Blokk misjub",
+        "error_while_mining": "Żball waqt it-tħaffir - probabbilment problema ta 'konnessjoni - erġa' pprova f'5s.",
+
+        "board_on_port": "Bord AVR fuq il-port",
+        "board_is_connected": "huwa konness",
+        "board_connection_error": "Problema bil-bord AVR fil-port",
+        "board_connection_error2": ", kun żgur li huwa mqabbad sew",
+
+        "mining_start": "Il-ħajta AVR tal-iskavatur qed tibda",
+        "mining_algorithm": "billi tuża l-algoritmu DUCO-S1A (",
+        "mining_avr_connection_error": "Problema mal-bord AVR! Erġa 'pprova f'10s",
+        "mining_avr_not_responding": "Il-bord AVR ma jirrispondix, jibgħat xogħol ġdid",
+        "internal_server_error": "Żball tas-server intern.",
+        "retrying": "Ipprova mill-ġdid f'10s",
+        "mining_user": "Utent",
+        "mining_not_exist": "mhux irreġistrat.",
+        "mining_not_exist_warning": "Kun żgur li ddaħħal l-username sewwa. Iċċekkja l-fajl tal-konfigurazzjoni tiegħek. Erġa 'pprova f'10s",
+
+        "load_config_error": "Problema bit-tagħbija tal-fajl tal-konfigurazzjoni (",
+        "load_config_error_warning": "/Miner_config.cfg). Ipprova neħħih u erġa 'ibda l-iskavatur. Agħlaq f'10 sekondi" 
     }
 }
