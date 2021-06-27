@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.49)
+# Duino-Coin Python PC Miner (v2.5)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -107,8 +107,8 @@ except ModuleNotFoundError:
 
 
 # Global variables
-MINER_VER = "2.49"  # Version number
-SOC_TIMEOUT = 30  # Socket timeout
+MINER_VER = "2.5"  # Version number
+SOC_TIMEOUT = 60  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
 debug = "n"
@@ -564,7 +564,7 @@ def loadConfig():
             "algorithm":        algorithm,
             "language":         lang,
             "debug":            "n",
-            "soc_timeout":      30,
+            "soc_timeout":      60,
             "discord_presence": "y"
         }
         # Write data to configfile
