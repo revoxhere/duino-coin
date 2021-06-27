@@ -710,7 +710,7 @@ def mine_avr(com):
                     # Read content and split into lines
                     content = (res.content.decode().splitlines())
                     server_ip = content[0]  # Line 1 = pool address
-                    server_port = content[1]  # Line 2 = pool port
+                    server_port = 2814  # content[1]  # Line 2 = pool port
                     debug_output(
                         'Retrieved pool IP: '
                         + server_ip
