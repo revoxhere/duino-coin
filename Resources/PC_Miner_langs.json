@@ -103,9 +103,9 @@
         "rig_identifier": "Identificatore del rig: ",
 
         "basic_config_tool": "\nStrumento base di configurazione Duino-Coin\nModifica ",
-        "edit_config_file_warning": "il file /Miner_config.cfg più tardi se vuoi cambiarlo.",
+        "edit_config_file_warning": "/Miner_config.cfg più tardi se vuoi cambiarlo.",
         "dont_have_account": "Non hai ancora un account Duino-Coin? Usa ",
-        "wallet": "Portafoglio",
+        "wallet": "Portafoglio (Wallet)",
         "register_warning": " per registrarti sul server.\n",
         "ask_username": "Inserisci il tuo nome utente di Duino-Coin: ",
         "ask_avrport": "Inserisci la porta seriale della tua scheda (es: COM1 (Windows) oppure /dev/ttyUSB1 (Unix)): ",
@@ -122,7 +122,7 @@
         "donate_warning": "\nNon prendiamo alcuna quota del tuo mining.\nPuoi aiutarci ampiamente a mantenere i server e le conversioni di valuta a basse tasse donando.\nVisita ",
         "learn_more_donate": " per scoprire di più su come puoi aiutare :)",
         "starting_donation": "Inizio del processo di donazione",
-        "thanks_donation": " Grazie di essere un fantastico donatore ❤️ La tua donazione ci aiuterà a mantenere i server e permetterà a continuare lo sviluppo",
+        "thanks_donation": " Grazie di essere un fantastico donatore ❤️ La tua donazione ci aiuterà a mantenere i server e permetterà di continuare lo sviluppo",
 
         "data_error": " Errore nell'ottenere dati da GitHub! Nuovo tentativo in 10s.",
         "connected": " Connesso",
