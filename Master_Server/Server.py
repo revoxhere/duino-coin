@@ -51,16 +51,19 @@ import udatetime as utime
 
 """ Global variables """
 HOSTNAME = ""
-PORT = 2811
+LEGACY_PORT = 2811
+WALLET_PORT = 2812
+PC_PORT = 2813
+AVR_PORT = 2814
 MOTD = """\
 You are mining on the official Duino-Coin server.
 Mining should now work more or less fine. Have fun!
 """
-DIFF_INCREASES_PER = 12500  # net difficulty
+DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 5  # in seconds
-DB_TIMEOUT = 5
-BACKLOG = 8 # default for gevent is 128
+DB_TIMEOUT = 10
+BACKLOG = 16  # default for gevent is 128
 SERVER_VER = 2.5  # announced to clients
 READY_HASHES_NUM = 20  # in shares
 BLOCK_PROBABILITY = 1000000  # 1 in X
@@ -73,7 +76,7 @@ DECIMALS = 20  # max float precision
 MAX_WORKERS = 14
 PING_SLEEP_TIME = 0.5  # in seconds
 MAX_NUMBER_OF_PINGS = 3
-TEMP_BAN_TIME = 10  # in minutes
+TEMP_BAN_TIME = 60  # in seconds
 
 """ IO files location """
 DATABASE = 'crypto_database.db'
@@ -241,15 +244,14 @@ def permanent_ban(ip):
     if not ip in whitelisted_ips:
         os.system("sudo iptables -I INPUT -s "
                   + str(ip)
-                  + " -j REJECT &> /dev/null")
-        threading.Timer(TEMP_BAN_TIME*60*2, unban, [ip]).start()
+                  + " -j REJECT >/dev/null 2>&1")
 
 
 def unban(ip):
     """ Unbans an IP """
     os.system("sudo iptables -D INPUT -s "
               + str(ip)
-              + " -j REJECT &> /dev/null")
+              + " -j REJECT >/dev/null 2>&1")
 
 
 def temporary_ban(ip):
@@ -257,8 +259,8 @@ def temporary_ban(ip):
     if not ip in whitelisted_ips:
         os.system("sudo iptables -I INPUT -s "
                   + str(ip)
-                  + " -j REJECT &> /dev/null")
-        threading.Timer(TEMP_BAN_TIME*60, unban, [ip]).start()
+                  + " -j REJECT >/dev/null 2>&1")
+        threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
 
 
 def update_job_tiers():
@@ -293,12 +295,12 @@ def update_job_tiers():
                 "max_hashrate": 250000
             },
             "ESP32": {
-                "difficulty": int(1100 * DIFF_MULTIPLIER),
+                "difficulty": int(1200 * DIFF_MULTIPLIER),
                 "reward": .00175,  # 0.00375
                 "max_hashrate": 16000
             },
             "ESP8266": {
-                "difficulty": int(900 * DIFF_MULTIPLIER),
+                "difficulty": int(1000 * DIFF_MULTIPLIER),
                 "reward": .00015,  # 0.0045
                 "max_hashrate": 13000
             },
@@ -1120,7 +1122,7 @@ def get_change(current, previous):
 
 
 def check_workers(ip_workers, usr_workers):
-    if max(ip_workers, usr_workers) > MAX_WORKERS:
+    if max(ip_workers, usr_workers) >= MAX_WORKERS:
         return True
 
     return False
@@ -1195,17 +1197,27 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         if is_first_share:
             try:
                 username = str(data[1])
-                #if not user_exists(username):
-                    #send_data(
-                        #"BAD,This user doesn't exist\n",
-                        #connection)
-                    #raise Exception("Incorrect username")
+                if not user_exists(username):
+                    send_data(
+                        "BAD,This user doesn't exist\n",
+                        connection)
+                    break
+                if username in banlist:
+                    if not username in whitelisted_usernames:
+                        permanent_ban(ip_addr)
+                        sleep(5)
+                        break
+
             except:
                 send_data(
                     "BAD,Not enough data\n",
                     connection)
                 break
-                #raise Exception("Incorrect username")
+
+            try:
+                chip_ids[username] = []
+            except:
+                pass
 
             try:
                 workers[ip_addr] += 1
@@ -1213,13 +1225,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             except:
                 workers[ip_addr] = 1
                 workers[username] = 1
-
-            if username in banlist:
-                permanent_ban(ip_addr)
-                break
-                #raise Exception("User banned")
-
-            chip_ids[username] = []
 
             if using_xxhash:
                 req_difficulty = "XXHASH"
@@ -1267,9 +1272,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             usr_workers = 1
 
         if check_workers(ip_workers, usr_workers):
-            if max(ip_workers, usr_workers) > MAX_WORKERS*2:
-                permanent_ban(ip_addr)
-            elif not username in whitelisted_usernames:
+            if not username in whitelisted_usernames:
                 send_data(
                     "BAD,Too many workers\n",
                     connection)
@@ -1277,9 +1280,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
         if (job_tiers[req_difficulty]["difficulty"]
                 > job_tiers["ESP32"]["difficulty"]):
-            sleep(15)
-            send_data("BAD,PC Mining is temporarily disabled")
-            break
             if using_xxhash:
                 job = create_share_xxhash(
                     global_last_block_hash_cp, difficulty)
@@ -1291,7 +1291,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                   connection)
         job_sent_timestamp = utime.now()
 
-        connection.settimeout(120)
+        connection.settimeout(60)
 
         # Receiving the result
         number_of_pings = 0
@@ -1324,10 +1324,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         sharetime -= (number_of_pings*PING_SLEEP_TIME)+time_spent_on_sending
         hashrate = int(numeric_result / sharetime)
 
-        if hashrate > 1000000000:
-            send_data("BAD,Incorrect hashrate", connection)
-            break
-
         try:
             reported_hashrate = round(float(result[1]))
             hashrate_is_estimated = False
@@ -1351,19 +1347,35 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             chip_ids[username].append(chip_id)
 
         if rejected_shares > MAX_REJECTED_SHARES:
-            temporary_ban(ip_addr)
+            if not ip_addr in whitelisted_ips:
+                permanent_ban(ip_addr)
+            sleep(5)
             break
 
+        if username in banlist:
+            if not username in whitelisted_usernames:
+                if not ip_addr in whitelisted_ips:
+                    permanent_ban(ip_addr)
+                sleep(5)
+                break
+
         if (accepted_shares > 0
-                and accepted_shares % UPDATE_MINERAPI_EVERY == 0
-            or rejected_shares > 0
-                and rejected_shares % UPDATE_MINERAPI_EVERY == 0):
+                and accepted_shares % UPDATE_MINERAPI_EVERY == 0):
             """ These things don't need to run every share """
             try:
                 # Check miner software for unallowed characters
                 miner_name = sub(r'[^A-Za-z0-9 .()-]+', ' ', result[2])
+
+                if not "ESP" in miner_name:  # 2.5 temp fix TODO
+                    if not str(SERVER_VER) in miner_name:
+                        send_data("BAD,Please update your miner")
+                        break
             except:
                 miner_name = "Unknown miner"
+                if not username in whitelisted_usernames:
+                    permanent_ban(ip_addr)
+                sleep(5)
+                break
 
             try:
                 # Check rig identifier for unallowed characters
@@ -1388,6 +1400,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             }
 
             thread_miner_api["Hashrate"] = reported_hashrate
+            thread_miner_api["Hashrate_calc"] = hashrate
 
             if using_xxhash:
                 thread_miner_api["Algorithm"] = "XXHASH"
@@ -1397,26 +1410,28 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             minerapi[thread_id] = thread_miner_api
 
         if (accepted_shares > 0
-                and accepted_shares % UPDATE_MINERAPI_EVERY*3 == 0
-            or rejected_shares > 0
-                and rejected_shares % UPDATE_MINERAPI_EVERY*3 == 0):
+                and accepted_shares % UPDATE_MINERAPI_EVERY*3 == 0):
             """ These things don't need to run every share """
-            if username in banlist:
-                permanent_ban(ip_addr)
-                #raise Exception("User banned")
-                break
 
             global_blocks += UPDATE_MINERAPI_EVERY*3
             if req_difficulty == "AVR":
                 global_last_block_hash = job[1]
 
         if hashrate > max_hashrate:
+            if hashrate > max_hashrate*10:
+                if not ip_addr in whitelisted_ips:
+                    permanent_ban(ip_addr)
+                sleep(5)
+                break
+
             """ Kolka V2 hashrate check """
             rejected_shares += 1
+            accepted_shares -= 1
 
             if not using_xxhash:
                 override_difficulty = kolka_v2(req_difficulty, job_tiers)
 
+            sleep(3)
             send_data("BAD\n", connection)
 
         elif int(result[0]) == int(numeric_result):
@@ -1466,7 +1481,8 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         else:
             """ Incorrect result received """
             rejected_shares += 1
-
+            accepted_shares -= 1
+            sleep(3)
             send_data("BAD\n", connection)
 
         is_first_share = False
@@ -1485,12 +1501,22 @@ def get_sys_usage():
     global global_cpu_usage
     global global_ram_usage
     global global_connections
-    while True:
-        global_connections = subprocess.run(
-            'sudo netstat -anp | grep -w 2811 | grep ESTABLISHED | wc -l',
+
+    def _get_connections(port):
+        connections = subprocess.run(
+            'sudo netstat -anp | grep -w ' +
+            str(port) + ' | grep ESTABLISHED | wc -l',
             stdout=subprocess.PIPE,
             shell=True
         ).stdout.decode().rstrip()
+        return int(connections)
+
+    while True:
+        global_connections = _get_connections(2811)
+        global_connections += _get_connections(2812)
+        global_connections += _get_connections(2813)
+        global_connections += _get_connections(2814)
+
         global_cpu_usage.append(psutil.cpu_percent())
         global_ram_usage.append(psutil.virtual_memory()[2])
         sleep(SAVE_TIME)
@@ -1657,9 +1683,9 @@ def create_main_api_file():
                 try:
                     # Add miner hashrate to the server hashrate
                     if minerapi[miner]["Algorithm"] == "DUCO-S1":
-                        ducos1_hashrate += minerapi[miner]["Hashrate"]
+                        ducos1_hashrate += minerapi[miner]["Hashrate_calc"]
                     else:
-                        xxhash_hashrate += minerapi[miner]["Hashrate"]
+                        xxhash_hashrate += minerapi[miner]["Hashrate_calc"]
 
                     # Calculate power usage
                     software = minerapi[miner]["Software"]
@@ -1732,8 +1758,8 @@ def create_main_api_file():
                 "Server version":        SERVER_VER,
                 "Active connections":    global_connections,
                 "Open threads":          threading.activeCount(),
-                "Server CPU usage":      mean(global_cpu_usage[-3:]),
-                "Server RAM usage":      mean(global_ram_usage[-3:]),
+                "Server CPU usage":      round(mean(global_cpu_usage[-5:])),
+                "Server RAM usage":      round(mean(global_ram_usage[-5:])),
                 "Last update":           now().strftime(
                     "%d/%m/%Y %H:%M:%S (UTC)"),
                 "Net energy usage":      net_wattage,
@@ -2254,8 +2280,9 @@ def handle(connection, address):
                 if logged_in:
                     username = data[1]
                     if username in banlist:
-                        permanent_ban(ip_addr)
-                        raise Exception("User banned")
+                        if not username in whitelisted_usernames:
+                            permanent_ban(ip_addr)
+                            break
                 else:
                     break
 
@@ -2415,7 +2442,7 @@ def handle(connection, address):
 
     except Exception:
         pass
-        #print(traceback.format_exc())
+        # print(traceback.format_exc())
     finally:
         # print("Closing socket")
         try:
@@ -2451,17 +2478,16 @@ def countips():
             try:
                 if (connections_per_ip[ip] > 50
                         and not ip in whitelisted_ips):
-                    # admin_print("Banning DDoSing IP: " + ip)
                     permanent_ban(ip)
             except:
                 pass
-        sleep(10)
+        sleep(5)
 
 
 def resetips():
     """ Reset connections per IP values every n sec """
     while True:
-        sleep(60)
+        sleep(30)
         connections_per_ip.clear()
 
 
@@ -2610,30 +2636,35 @@ if __name__ == "__main__":
 
     threading.Thread(target=input_management).start()
     try:
-        # AVR : 2814
-        # PC : 2813
-        # WALL: 2812
-        # ESP : 2811 (OLD)
-
         def _server_w():
-            server_thread_wallet = StreamServer(("127.0.0.1", PORT+1), handle, backlog=BACKLOG)
+            server_thread_wallet = StreamServer(
+                (HOSTNAME, WALLET_PORT),
+                handle,
+                backlog=BACKLOG)
             admin_print("Wallet server is running")
             server_thread_wallet.serve_forever()
         threading.Thread(target=_server_w).start()
 
         def _server_p():
-            server_thread_wallet = StreamServer((HOSTNAME, PORT+2), handle, backlog=BACKLOG)
+            server_thread_pc = StreamServer(
+                (HOSTNAME, PC_PORT),
+                handle,
+                backlog=BACKLOG)
             admin_print("PC server is running")
-            server_thread_wallet.serve_forever()
+            server_thread_pc.serve_forever()
         threading.Thread(target=_server_p).start()
 
         def _server_a():
-            server_thread_wallet = StreamServer((HOSTNAME, PORT+3), handle, backlog=BACKLOG)
+            server_thread_arduino = StreamServer(
+                (HOSTNAME, AVR_PORT),
+                handle,
+                backlog=BACKLOG)
             admin_print("AVR server is running")
-            server_thread_wallet.serve_forever()
+            server_thread_arduino.serve_forever()
         threading.Thread(target=_server_a).start()
 
-        server_thread = StreamServer((HOSTNAME, PORT), handle, backlog=BACKLOG)
+        server_thread = StreamServer((HOSTNAME, LEGACY_PORT),
+                                     handle)
         admin_print("ESP/legacy server is running")
         server_thread.serve_forever()
 
