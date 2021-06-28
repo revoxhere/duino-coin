@@ -113,6 +113,7 @@ RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
 debug = "n"
 discord_presence = "y"
+auto_update = "y"
 rig_identiier = "None"
 requested_diff = "NET"
 algorithm = "DUCO-S1"
@@ -385,6 +386,8 @@ def loadConfig():
     global rig_identiier
     global lang
     global algorithm
+    global auto_update
+    global discord_presence
 
     # Initial configuration
     if not Path(RESOURCES_DIR + "/Miner_config.cfg").is_file():
@@ -565,7 +568,8 @@ def loadConfig():
             "language":         lang,
             "debug":            "n",
             "soc_timeout":      60,
-            "discord_presence": "y"
+            "discord_presence": "y",
+            "auto_update":      "y"
         }
         # Write data to configfile
         with open(RESOURCES_DIR + "/Miner_config.cfg", "w") as configfile:
@@ -589,6 +593,7 @@ def loadConfig():
         debug = config["Duino-Coin-PC-Miner"]["debug"]
         SOC_TIMEOUT = config["Duino-Coin-PC-Miner"]["soc_timeout"]
         discord_presence = config["Duino-Coin-PC-Miner"]["discord_presence"]
+        auto_update = config["Duino-Coin-PC-Miner"]["auto_update"]
         # Calulate efficiency for use with sleep function
         efficiency = (100 - float(efficiency)) * 0.01
 
@@ -651,6 +656,28 @@ def Donate():
                 "sys0",
                 getString("thanks_donation"),
                 "warning")
+
+
+def update():
+    if not Path("PC_Miner.py").is_file():
+        return
+
+    Miner_URL = "https://raw.githubusercontent.com/revoxhere/duino-coin/master/PC_Miner.py"
+    request = requests.get(Miner_URL)
+    miner_latest_ver = ""
+    if request.text[102] != ")":
+        miner_latest_ver = request.text[99]+request.text[100]+request.text[101]+request.text[102]
+    else:
+        miner_latest_ver = request.text[99]+request.text[100]+request.text[101]
+
+    if MINER_VER != miner_latest_ver:
+        print("Updating miner...")
+
+        with open("PC_Miner.py", "wb") as f1:
+            f1.write(request.content)
+
+        print("PC miner successfully updated.")
+        _exit(0)
 
 
 def ducos1(
@@ -1285,6 +1312,12 @@ if __name__ == "__main__":
         debug_output("Error reading configfile: " + str(e))
         sleep(10)
         _exit(1)
+
+    if auto_update == "y":
+        try:
+            update()
+        except Exception as e:
+            debug_output('Error updating miner: ' + str(e))
 
     try:
         # Display greeting message
