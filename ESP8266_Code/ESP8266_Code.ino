@@ -48,7 +48,7 @@ const char* USERNAME      = "DUCO USERNAME";     // Change this to your Duino-Co
 const char* RIG_IDENTIFIER = "None";       // Change this if you want a custom miner name
 
 const char * host = "51.15.127.80"; // Static server IP
-const int port = 2811;
+const int port = 2815;
 unsigned int share_count = 0; // Share variable
 
 WiFiClient client;
