@@ -104,6 +104,7 @@ donator_running = False
 job = ''
 debug = 'n'
 discord_presence = 'y'
+auto_update = 'y'
 rig_identifier = 'None'
 # Serverip file
 server_ip_file = ('https://raw.githubusercontent.com/'
@@ -297,6 +298,8 @@ def load_config():
     global avrport
     global debug
     global rig_identifier
+    global discord_presence
+    global auto_update
 
     # Initial configuration section
     if not Path(str(RESOURCES_DIR) + '/Miner_config.cfg').is_file():
@@ -410,7 +413,8 @@ def load_config():
             'debug':            'n',
             "soc_timeout":      60,
             "avr_timeout":      4,
-            "discord_presence": "y"}
+            "discord_presence": "y",
+            "auto_update":      "y"}
 
         # Write data to file
         with open(str(RESOURCES_DIR)
@@ -431,6 +435,7 @@ def load_config():
         SOC_TIMEOUT = config["Duino-Coin-AVR-Miner"]["soc_timeout"]
         AVR_TIMEOUT = config["Duino-Coin-AVR-Miner"]["soc_timeout"]
         discord_presence = config["Duino-Coin-AVR-Miner"]["discord_presence"]
+        auto_update = config["Duino-Coin-AVR-Miner"]["auto_update"]
 
 
 def greeting():
@@ -617,6 +622,28 @@ def donate():
                 'sys0',
                 get_string('thanks_donation'),
                 'warning')
+
+
+def update():
+    if not Path("AVR_Miner.py").is_file():
+        return
+
+    Miner_URL = "https://raw.githubusercontent.com/revoxhere/duino-coin/master/AVR_Miner.py"
+    request = requests.get(Miner_URL)
+    miner_latest_ver = ""
+    if request.text[101] != ")":
+        miner_latest_ver = request.text[98]+request.text[99]+request.text[100]+request.text[101]
+    else:
+        miner_latest_ver = request.text[98]+request.text[99]+request.text[100]
+
+    if MINER_VER != miner_latest_ver:
+        print("Updating AVR miner...")
+
+        with open("AVR_Miner.py", "wb") as f1:
+            f1.write(request.content)
+
+        print("AVR miner successfully updated.")
+        _exit(0)
 
 
 def init_rich_presence():
@@ -1168,6 +1195,12 @@ if __name__ == '__main__':
         debug_output('Error reading configfile: ' + str(e))
         sleep(10)
         _exit(1)
+
+    if auto_update == "y":
+        try:
+            update()
+        except Exception as e:
+            debug_output('Error updating miner: ' + str(e))
 
     try:
         # Display greeting message
