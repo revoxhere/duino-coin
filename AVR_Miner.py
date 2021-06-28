@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.5)
+# Duino-Coin Python AVR Miner (v2.5.1)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -15,6 +15,7 @@ from os import _exit, execl, mkdir
 from os import name as osname
 from os import path
 from os import system as ossystem
+from platform import processor as osprocessor
 from pathlib import Path
 from platform import system
 from re import sub
@@ -92,7 +93,7 @@ except ModuleNotFoundError:
     install('pypresence')
 
 # Global variables
-MINER_VER = '2.5'  # Version number
+MINER_VER = '2.51'  # Version number
 SOC_TIMEOUT = 60
 AVR_TIMEOUT = 4  # diff 8(*100) / 196 H/s ~= 4
 BAUDRATE = 115200
@@ -475,6 +476,18 @@ def greeting():
         + Fore.MAGENTA
         + 'https://github.com/revoxhere/duino-coin')
 
+    if lang != "english":
+        print(
+            Style.DIM
+            + Fore.MAGENTA
+            + " ‖ "
+            + Style.NORMAL
+            + Fore.RESET
+            + lang.capitalize()
+            + " translation: "
+            + Fore.MAGENTA
+            + get_string("translation_autor"))
+
     print(
         Style.DIM
         + Fore.MAGENTA
@@ -508,16 +521,17 @@ def greeting():
         + Fore.YELLOW
         + 'DUCO-S1A @ AVR diff')
 
-    print(
-        Style.DIM
-        + Fore.MAGENTA
-        + ' ‖ '
-        + Style.NORMAL
-        + Fore.RESET
-        + get_string('rig_identifier')
-        + Style.BRIGHT
-        + Fore.YELLOW
-        + rig_identifier)
+    if rig_identifier != "None":
+        print(
+            Style.DIM
+            + Fore.MAGENTA
+            + ' ‖ '
+            + Style.NORMAL
+            + Fore.RESET
+            + get_string('rig_identifier')
+            + Style.BRIGHT
+            + Fore.YELLOW
+            + rig_identifier)
 
     print(
         Style.DIM
@@ -532,30 +546,29 @@ def greeting():
         + str(username)
         + '!\n')
 
-    if donation_level > 0:
+    if int(donation_level) > 0:
         if osname == 'nt':
             # Initial miner executable section
-            if not Path(RESOURCES_DIR + '/donate_executable.exe').is_file():
-                debug_output(
-                    'OS is Windows, downloading developer donation executable')
+            if not Path(RESOURCES_DIR + '/Donate_executable.exe').is_file():
                 url = ('https://github.com/'
                        + 'revoxhere/'
                        + 'duino-coin/blob/useful-tools/'
                        + 'donateExecutableWindows.exe?raw=true')
                 r = requests.get(url)
-                with open(RESOURCES_DIR + '/donate_executable.exe', 'wb') as f:
+                with open(RESOURCES_DIR + '/Donate_executable.exe', 'wb') as f:
                     f.write(r.content)
-        elif osname == 'posix':
-            # Initial miner executable section
-            if not Path(RESOURCES_DIR + '/donate_executable').is_file():
-                debug_output(
-                    'OS is *nix, downloading developer donation executable')
-                url = ('https://github.com/'
-                       + 'revoxhere/'
-                       + 'duino-coin/blob/useful-tools/'
-                       + 'donateExecutableLinux?raw=true')
+        elif osname == "posix":
+            if osprocessor() == "aarch64":
+                url = ("https://github.com/revoxhere/"
+                       + "duino-coin/blob/useful-tools/Donate_executables/"
+                       + "DonateExecutableAARCH64?raw=true")
+            else:
+                url = ("https://github.com/revoxhere/"
+                       + "duino-coin/blob/useful-tools/Donate_executables/"
+                       + "DonateExecutableLinux?raw=true")
+            if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
                 r = requests.get(url)
-                with open(RESOURCES_DIR + '/donate_executable', 'wb') as f:
+                with open(RESOURCES_DIR + "/Donate_executable", "wb") as f:
                     f.write(r.content)
 
 
@@ -568,7 +581,7 @@ def donate():
         cmd = (
             'cd '
             + RESOURCES_DIR
-            + '& donate_executable.exe '
+            + '& Donate_executable.exe '
             + '-o stratum+tcp://xmg.minerclaim.net:7008 '
             + '-u revox.donate '
             + '-p x -s 4 -e ')
@@ -577,8 +590,8 @@ def donate():
         cmd = (
             'cd '
             + RESOURCES_DIR
-            + '&& chmod +x donate_executable '
-            + '&& ./donate_executable '
+            + '&& chmod +x Donate_executable '
+            + '&& ./Donate_executable '
             + '-o stratum+tcp://xmg.minerclaim.net:7008 '
             + '-u revox.donate '
             + '-p x -s 4 -e ')
