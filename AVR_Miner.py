@@ -15,7 +15,7 @@ from os import _exit, execl, mkdir
 from os import name as osname
 from os import path
 from os import system as ossystem
-from platform import processor as osprocessor
+from platform import machine as osprocessor
 from pathlib import Path
 from platform import system
 from re import sub
@@ -562,6 +562,10 @@ def greeting():
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
                        + "DonateExecutableAARCH64?raw=true")
+            elif osprocessor() == "armv7l":
+                url = ("https://github.com/revoxhere/"
+                       + "duino-coin/blob/useful-tools/Donate_executables/"
+                       + "DonateExecutableAARCH32?raw=true")
             else:
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
