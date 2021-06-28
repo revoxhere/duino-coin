@@ -735,7 +735,7 @@
         "mining_not_exist": " não existe",
         "mining_not_exist_warning": " Usuario incorreto, confira-o. Tentando novamente em 10s"
     },
-    "Maltese": {
+    "maltese": {
         "translation_autor": "IdotMaster1/MattyInnit",
         "sigint_detected": "SIGINT misjub - Itfi l-iskavatur.",
         "goodbye": "Narawk dalwaqt!",
@@ -758,7 +758,7 @@
         "register_warning": "biex tirreġistra fuq il-web. \n",
         "ask_username": "Daħħal l-username ta 'Duino-Coin tiegħek:",
         "ports_message": "Il-wizard tal-konfigurazzjoni sab il-portijiet li ġejjin:",
-        "ports_notice": "Jekk ma tistax tara l-bord tiegħek hawn fuq, kun żgur li huwa mqabbad sewwa u l-programm għandu l-permessi meħtieġa għalih (eż. amministratur jew sudo)."
+        "ports_notice": "Jekk ma tistax tara l-bord tiegħek hawn fuq, kun żgur li huwa mqabbad sewwa u l-programm għandu l-permessi meħtieġa għalih (eż. amministratur jew sudo).",
         "ask_avrport": "Daħħal l-isem tal-port tal-bord tiegħek (eż. COM1 (Windows) jew / dev / ttyUSB1 (Unix)):",
         "ask_anotherport": "Trid iżżid maduma oħra? (y / N):",
         "ask_higherdiff": "Trid tuża iktar diffikultà biex tħaffer? (għal bordijiet Arduino DUE biss) (y / N):",
