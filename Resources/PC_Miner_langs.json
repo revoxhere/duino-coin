@@ -734,8 +734,8 @@
         "mining_user": " User ",
         "mining_not_exist": " não existe",
         "mining_not_exist_warning": " Usuario incorreto, confira-o. Tentando novamente em 10s"
-	    
-	    "Maltese": {
+    },
+    "Maltese": {
         "translation_autor": "IdotMaster1/MattyInnit",
         "sigint_detected": "SIGINT misjub - Itfi l-iskavatur.",
         "goodbye": "Narawk dalwaqt!",
