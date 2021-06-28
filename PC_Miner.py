@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.5)
+# Duino-Coin Python PC Miner (v2.5.1)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -14,6 +14,7 @@ from json import load as jsonload
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 from os import _exit, execl, mkdir
 from os import name as osname
+from platform import machine as osprocessor
 from os import path, system
 from pathlib import Path
 from platform import system as plsystem
@@ -101,13 +102,13 @@ try:
 except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
-        + "Xxhash is not installed. "
-        + "Continuing without xxhash support.")
+        + "Xxhash is not installed - "
+        + "Xxhash support will be disabled")
     xxhash_enabled = False
 
 
 # Global variables
-MINER_VER = "2.5"  # Version number
+MINER_VER = "2.51"  # Version number
 SOC_TIMEOUT = 60  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
@@ -160,6 +161,8 @@ try:
             lang = "polish"
         elif locale.startswith("fr"):
             lang = "french"
+        elif locale.startswith("mt"):
+            lang = "maltese"
         elif locale.startswith("ru"):
             lang = "russian"
         elif locale.startswith("de"):
@@ -292,6 +295,18 @@ def Greeting():
         + Fore.YELLOW
         + "https://github.com/revoxhere/duino-coin")
 
+    if lang != "english":
+        print(
+            Style.DIM
+            + Fore.YELLOW
+            + " ‖ "
+            + Style.NORMAL
+            + Fore.RESET
+            + lang.capitalize()
+            + " translation: "
+            + Fore.YELLOW
+            + getString("translation_autor"))
+
     try:
         print(
             Style.DIM
@@ -319,6 +334,7 @@ def Greeting():
             + Style.BRIGHT
             + Fore.YELLOW
             + str(donation_level))
+
     print(
         Style.DIM
         + Fore.YELLOW
@@ -331,16 +347,19 @@ def Greeting():
         + algorithm
         + " @ "
         + diffName)
-    print(
-        Style.DIM
-        + Fore.YELLOW
-        + " ‖ "
-        + Style.NORMAL
-        + Fore.RESET
-        + getString("rig_identifier")
-        + Style.BRIGHT
-        + Fore.YELLOW
-        + rig_identiier)
+
+    if rig_identiier != "None":
+        print(
+            Style.DIM
+            + Fore.YELLOW
+            + " ‖ "
+            + Style.NORMAL
+            + Fore.RESET
+            + getString("rig_identifier")
+            + Style.BRIGHT
+            + Fore.YELLOW
+            + rig_identiier)
+
     print(
         Style.DIM
         + Fore.YELLOW
@@ -356,7 +375,6 @@ def Greeting():
 
     if int(donation_level) > 0:
         if osname == "nt":
-            # Initial miner executable section
             if not Path(RESOURCES_DIR + "/Donate_executable.exe").is_file():
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
@@ -365,11 +383,19 @@ def Greeting():
                 with open(RESOURCES_DIR + "/Donate_executable.exe", "wb") as f:
                     f.write(r.content)
         elif osname == "posix":
-            # Initial miner executable section
-            if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
+            if osprocessor() == "aarch64":
+                url = ("https://github.com/revoxhere/"
+                       + "duino-coin/blob/useful-tools/Donate_executables/"
+                       + "DonateExecutableAARCH64?raw=true")
+            elif osprocessor() == "armv7l":
+                url = ("https://github.com/revoxhere/"
+                       + "duino-coin/blob/useful-tools/Donate_executables/"
+                       + "DonateExecutableAARCH32?raw=true")
+            else:
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
                        + "DonateExecutableLinux?raw=true")
+            if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
                 r = requests.get(url)
                 with open(RESOURCES_DIR + "/Donate_executable", "wb") as f:
                     f.write(r.content)
