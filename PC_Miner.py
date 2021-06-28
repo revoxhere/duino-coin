@@ -160,7 +160,7 @@ try:
         elif locale.startswith("fr"):
             lang = "french"
         elif locale.startswith("mt"):
-            lang = "maltese
+            lang = "maltese"
         elif locale.startswith("ru"):
             lang = "russian"
         elif locale.startswith("de"):
