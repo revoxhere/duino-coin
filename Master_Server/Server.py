@@ -55,6 +55,7 @@ LEGACY_PORT = 2811
 WALLET_PORT = 2812
 PC_PORT = 2813
 AVR_PORT = 2814
+ESP_PORT = 2815
 MOTD = """\
 You are mining on the official Duino-Coin server.
 Mining should now work more or less fine. Have fun!
@@ -63,7 +64,7 @@ DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 5  # in seconds
 DB_TIMEOUT = 10
-BACKLOG = 16  # default for gevent is 128
+BACKLOG = 1  # default for gevent is 128
 SERVER_VER = 2.5  # announced to clients
 READY_HASHES_NUM = 20  # in shares
 BLOCK_PROBABILITY = 1000000  # 1 in X
@@ -76,7 +77,7 @@ DECIMALS = 20  # max float precision
 MAX_WORKERS = 14
 PING_SLEEP_TIME = 0.5  # in seconds
 MAX_NUMBER_OF_PINGS = 3
-TEMP_BAN_TIME = 60  # in seconds
+TEMP_BAN_TIME = 15  # in seconds
 
 """ IO files location """
 DATABASE = 'crypto_database.db'
@@ -244,14 +245,19 @@ def permanent_ban(ip):
     if not ip in whitelisted_ips:
         os.system("sudo iptables -I INPUT -s "
                   + str(ip)
-                  + " -j REJECT >/dev/null 2>&1")
+                  + " -j DROP >/dev/null 2>&1")
+        #threading.Timer(TEMP_BAN_TIME*2, unban, [ip]).start()
+        sleep(TEMP_BAN_TIME*2)
+        os.system("sudo iptables -D INPUT -s "
+                  + str(ip)
+                  + " -j DROP >/dev/null 2>&1")
 
 
 def unban(ip):
     """ Unbans an IP """
     os.system("sudo iptables -D INPUT -s "
               + str(ip)
-              + " -j REJECT >/dev/null 2>&1")
+              + " -j DROP >/dev/null 2>&1")
 
 
 def temporary_ban(ip):
@@ -259,8 +265,12 @@ def temporary_ban(ip):
     if not ip in whitelisted_ips:
         os.system("sudo iptables -I INPUT -s "
                   + str(ip)
-                  + " -j REJECT >/dev/null 2>&1")
-        threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
+                  + " -j DROP >/dev/null 2>&1")
+        #threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
+        sleep(TEMP_BAN_TIME)
+        os.system("sudo iptables -D INPUT -s "
+                  + str(ip)
+                  + " -j DROP >/dev/null 2>&1")
 
 
 def update_job_tiers():
@@ -322,10 +332,10 @@ def update_job_tiers():
             "AVR": {
                 "difficulty": 6,
                 "reward": .005,
-                "max_hashrate": 210
+                "max_hashrate": 240
             }
         }
-        sleep(60*10)
+        sleep(60)
 
 
 def create_jobs():
@@ -1122,7 +1132,7 @@ def get_change(current, previous):
 
 
 def check_workers(ip_workers, usr_workers):
-    if max(ip_workers, usr_workers) >= MAX_WORKERS:
+    if usr_workers > MAX_WORKERS:
         return True
 
     return False
@@ -1205,8 +1215,8 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 if username in banlist:
                     if not username in whitelisted_usernames:
                         permanent_ban(ip_addr)
-                        sleep(5)
-                        break
+                    sleep(5)
+                    break
 
             except:
                 send_data(
@@ -1273,6 +1283,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
         if check_workers(ip_workers, usr_workers):
             if not username in whitelisted_usernames:
+                #print(username, "too many workers, IP:", ip_workers, "usr:", usr_workers)
                 send_data(
                     "BAD,Too many workers\n",
                     connection)
@@ -1291,7 +1302,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                   connection)
         job_sent_timestamp = utime.now()
 
-        connection.settimeout(60)
+        connection.settimeout(120)
 
         # Receiving the result
         number_of_pings = 0
@@ -1372,10 +1383,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                         break
             except:
                 miner_name = "Unknown miner"
-                if not username in whitelisted_usernames:
-                    permanent_ban(ip_addr)
-                sleep(5)
-                break
 
             try:
                 # Check rig identifier for unallowed characters
@@ -1516,6 +1523,7 @@ def get_sys_usage():
         global_connections += _get_connections(2812)
         global_connections += _get_connections(2813)
         global_connections += _get_connections(2814)
+        global_connections += _get_connections(2815)
 
         global_cpu_usage.append(psutil.cpu_percent())
         global_ram_usage.append(psutil.virtual_memory()[2])
@@ -2243,6 +2251,14 @@ def protocol_get_transactions(data, connection):
         send_data("NO,Internal server error: "+str(e), connection)
         raise Exception("Error getting transactions")
 
+def handle_trap(connection, address):
+    try:
+        sleep(15)
+        send_data(SERVER_VER, connection)
+        sleep(15)
+    except:
+        pass
+    return
 
 def handle(connection, address):
     """ Handler for every client """
@@ -2496,6 +2512,7 @@ def duino_stats_restart_handle():
         if ospath.isfile("config/restart_signal"):
             os.remove("config/restart_signal")
             admin_print("Server restarted by Duino-Stats command")
+            os.system('sudo iptables -F INPUT')
             os.execl(sys.executable, sys.executable, *sys.argv)
         sleep(3)
 
@@ -2663,9 +2680,18 @@ if __name__ == "__main__":
             server_thread_arduino.serve_forever()
         threading.Thread(target=_server_a).start()
 
+        def _server_e():
+            server_thread_esp = StreamServer(
+                (HOSTNAME, ESP_PORT),
+                handle,
+                backlog=BACKLOG)
+            admin_print("ESP server is running")
+            server_thread_esp.serve_forever()
+        threading.Thread(target=_server_e).start()
+
         server_thread = StreamServer((HOSTNAME, LEGACY_PORT),
-                                     handle)
-        admin_print("ESP/legacy server is running")
+                                     handle, backlog=BACKLOG)
+        admin_print("Legacy server is running")
         server_thread.serve_forever()
 
     except Exception as e:
