@@ -14,6 +14,7 @@ from json import load as jsonload
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 from os import _exit, execl, mkdir
 from os import name as osname
+from platform import processor as osprocessor
 from os import path, system
 from pathlib import Path
 from platform import system as plsystem
@@ -357,7 +358,6 @@ def Greeting():
 
     if int(donation_level) > 0:
         if osname == "nt":
-            # Initial miner executable section
             if not Path(RESOURCES_DIR + "/Donate_executable.exe").is_file():
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
@@ -366,11 +366,15 @@ def Greeting():
                 with open(RESOURCES_DIR + "/Donate_executable.exe", "wb") as f:
                     f.write(r.content)
         elif osname == "posix":
-            # Initial miner executable section
-            if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
+            if osprocessor == "aarch64":
+                url = ("https://github.com/revoxhere/"
+                       + "duino-coin/blob/useful-tools/Donate_executables/"
+                       + "DonateExecutableAARCH64?raw=true")
+            else:
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
                        + "DonateExecutableLinux?raw=true")
+            if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
                 r = requests.get(url)
                 with open(RESOURCES_DIR + "/Donate_executable", "wb") as f:
                     f.write(r.content)
