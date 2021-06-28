@@ -14,7 +14,7 @@ from json import load as jsonload
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 from os import _exit, execl, mkdir
 from os import name as osname
-from platform import processor as osprocessor
+from platform import machine as osprocessor
 from os import path, system
 from pathlib import Path
 from platform import system as plsystem
@@ -386,6 +386,10 @@ def Greeting():
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
                        + "DonateExecutableAARCH64?raw=true")
+            elif osprocessor() == "armv7l":
+                url = ("https://github.com/revoxhere/"
+                       + "duino-coin/blob/useful-tools/Donate_executables/"
+                       + "DonateExecutableAARCH32?raw=true")
             else:
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
