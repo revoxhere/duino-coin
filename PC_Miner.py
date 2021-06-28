@@ -159,6 +159,8 @@ try:
             lang = "polish"
         elif locale.startswith("fr"):
             lang = "french"
+        elif locale.startswith("mt"):
+            lang = "maltese
         elif locale.startswith("ru"):
             lang = "russian"
         elif locale.startswith("de"):
