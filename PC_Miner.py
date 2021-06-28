@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.5)
+# Duino-Coin Python PC Miner (v2.5.1)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -102,13 +102,13 @@ try:
 except ModuleNotFoundError:
     print(
         now().strftime("%H:%M:%S ")
-        + "Xxhash is not installed. "
-        + "Continuing without xxhash support.")
+        + "Xxhash is not installed - "
+        + "Xxhash support will be disabled")
     xxhash_enabled = False
 
 
 # Global variables
-MINER_VER = "2.5"  # Version number
+MINER_VER = "2.51"  # Version number
 SOC_TIMEOUT = 60  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
@@ -294,6 +294,18 @@ def Greeting():
         + Fore.YELLOW
         + "https://github.com/revoxhere/duino-coin")
 
+    if lang != "english":
+        print(
+            Style.DIM
+            + Fore.YELLOW
+            + " ‖ "
+            + Style.NORMAL
+            + Fore.RESET
+            + lang.capitalize()
+            + " translation: "
+            + Fore.YELLOW
+            + getString("translation_autor"))
+
     try:
         print(
             Style.DIM
@@ -321,6 +333,7 @@ def Greeting():
             + Style.BRIGHT
             + Fore.YELLOW
             + str(donation_level))
+
     print(
         Style.DIM
         + Fore.YELLOW
@@ -333,16 +346,19 @@ def Greeting():
         + algorithm
         + " @ "
         + diffName)
-    print(
-        Style.DIM
-        + Fore.YELLOW
-        + " ‖ "
-        + Style.NORMAL
-        + Fore.RESET
-        + getString("rig_identifier")
-        + Style.BRIGHT
-        + Fore.YELLOW
-        + rig_identiier)
+
+    if rig_identiier != "None":
+        print(
+            Style.DIM
+            + Fore.YELLOW
+            + " ‖ "
+            + Style.NORMAL
+            + Fore.RESET
+            + getString("rig_identifier")
+            + Style.BRIGHT
+            + Fore.YELLOW
+            + rig_identiier)
+
     print(
         Style.DIM
         + Fore.YELLOW
@@ -366,7 +382,7 @@ def Greeting():
                 with open(RESOURCES_DIR + "/Donate_executable.exe", "wb") as f:
                     f.write(r.content)
         elif osname == "posix":
-            if osprocessor == "aarch64":
+            if osprocessor() == "aarch64":
                 url = ("https://github.com/revoxhere/"
                        + "duino-coin/blob/useful-tools/Donate_executables/"
                        + "DonateExecutableAARCH64?raw=true")
