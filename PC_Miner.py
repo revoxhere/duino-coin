@@ -12,7 +12,7 @@ from datetime import datetime
 from hashlib import sha1
 from json import load as jsonload
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
-from os import _exit, execl, mkdir
+from os import _exit, execl, mkdir, remove
 from os import name as osname
 from platform import machine as osprocessor
 from os import path, system
@@ -27,6 +27,7 @@ from threading import Thread as thrThread
 from time import ctime, sleep, strptime, time
 from multiprocessing import Lock
 import pip
+from zipfile import ZipFile
 
 thread_lock = Lock()
 
@@ -685,16 +686,23 @@ def Donate():
 
 
 def update():
-    if not Path("PC_Miner.py").is_file():
-        return
-
     Miner_URL = "https://raw.githubusercontent.com/revoxhere/duino-coin/master/PC_Miner.py"
     request = requests.get(Miner_URL)
     miner_latest_ver = ""
     if request.text[102] != ")":
-        miner_latest_ver = request.text[99]+request.text[100]+request.text[101]+request.text[102]
+        if request.text[102] == ".":
+            miner_latest_ver = request.text[99]+request.text[100]+request.text[101]+request.text[102]+request.text[103]
+        else:
+            miner_latest_ver = request.text[99]+request.text[100]+request.text[101]+request.text[102]
+
     else:
         miner_latest_ver = request.text[99]+request.text[100]+request.text[101]
+
+    if not Path("PC_Miner.py").is_file():
+        if Path("PC_Miner.exe").is_file():
+            updateEXE(miner_latest_ver)
+        else:
+            return
 
     if MINER_VER != miner_latest_ver:
         print("Updating miner...")
@@ -704,6 +712,37 @@ def update():
 
         print("PC miner successfully updated.")
         _exit(0)
+
+
+def updateEXE(ver):
+    if Path("PC_Miner.exe").is_file():
+        if ver[3] == ".":
+            ver2 = ver[0]+"."+ver[2]+ver[4]  # converts 2.5.1 to 2.51 if needed
+        else:
+            ver2 = ver
+
+        if ver2 == MINER_VER:
+            return
+
+        newest_release_windows = ("https://github.com/"
+                                  + "revoxhere/"
+                                  + "duino-coin/releases/download/"+ver+"/Duino-Coin_"+ver+"_windows.zip")
+        request2 = requests.get(newest_release_windows)
+        if request2.text == "Not Found":
+            return
+
+        with open('duino-zip.zip', 'wb') as f2:
+            f2.write(request2.content)  # download zip file
+
+        remove("PC_Miner.exe")
+        with ZipFile('duino-zip.zip', 'r') as zip_file:
+            zip_file.extract('PC_Miner.exe')  # extract PC miner from zip file
+
+        remove("duino-zip.zip")
+        print("Miner successfully updated.")
+        _exit(0)
+    else:
+        return
 
 
 def ducos1(
@@ -856,6 +895,7 @@ def Thread(
                         + Fore.RESET
                         + getString("update_warning"),
                         "warning")
+                    update()
                     break
             except Exception as e:
                 # Socket connection error
