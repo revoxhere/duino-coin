@@ -221,6 +221,40 @@ def connect():
     global server_port
     serverVersion = 0
     while True:
+        # Grab server IP and port
+        while True:
+            try:
+                # Use request to grab data from raw github file
+                res = requests.get(server_ip_file, data=None)
+                if res.status_code == 200:
+                    # Read content and split into lines
+                    content = (res.content.decode().splitlines())
+                    server_ip = content[0]
+                    if shuffle_ports == "y":
+                        portlist = [2811, 2812, 2813, 2814, 2815, 2816]
+                        server_port = choice(portlist)
+                    else:
+                        server_port = 2813
+                    debug_output(
+                        'Retrieved pool IP: '
+                        + server_ip
+                        + ':'
+                        + str(server_port))
+                    break
+            except Exception as e:
+                # If there was an error with grabbing data from GitHub
+                pretty_print(
+                    'net'
+                    + str(''.join(filter(str.isdigit, com))),
+                    get_string('data_error')
+                    + Style.NORMAL
+                    + Fore.RESET
+                    + ' (git err: '
+                    + str(e)
+                    + ')',
+                    'error')
+                debug_output('GitHub error: ' + str(e))
+                sleep(10)
         try:
             try:
                 socket.close()
@@ -277,7 +311,9 @@ def connect():
                 + Style.NORMAL
                 + ' ('
                 + str(e)
-                + ')',
+                + ", port "
+                + str(server_port)
+                +')',
                 'error')
             debug_output('Connection error: ' + str(e))
             sleep(10)
@@ -735,42 +771,7 @@ def mine_avr(com):
     global server_port
     errorCounter = 0
     while True:
-        # Grab server IP and port
-        while True:
-            try:
-                # Use request to grab data from raw github file
-                res = requests.get(server_ip_file, data=None)
-                if res.status_code == 200:
-                    # Read content and split into lines
-                    content = (res.content.decode().splitlines())
-                    server_ip = content[0]
-                    if shuffle_ports == "y":
-                        portlist = [2811, 2812, 2813, 2814, 2815, 2816]
-                        server_port = choice(portlist)
-                    else:
-                        server_port = 2813
-                    debug_output(
-                        'Retrieved pool IP: '
-                        + server_ip
-                        + ':'
-                        + str(server_port))
-                    # Connect to the server
-                    soc = connect()
-                    break
-            except Exception as e:
-                # If there was an error with grabbing data from GitHub
-                pretty_print(
-                    'net'
-                    + str(''.join(filter(str.isdigit, com))),
-                    get_string('data_error')
-                    + Style.NORMAL
-                    + Fore.RESET
-                    + ' (git err: '
-                    + str(e)
-                    + ')',
-                    'error')
-                debug_output('GitHub error: ' + str(e))
-                sleep(10)
+        soc = connect()
 
         pretty_print(
             'sys'
