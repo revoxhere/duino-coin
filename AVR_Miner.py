@@ -95,13 +95,14 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = '2.52'  # Version number
-SOC_TIMEOUT = 60
+SOC_TIMEOUT = 45
 AVR_TIMEOUT = 4  # diff 8(*100) / 196 H/s ~= 4
 BAUDRATE = 115200
 RESOURCES_DIR = 'AVRMiner_' + str(MINER_VER) + '_resources'
 shares = [0, 0]
 hashrate_mean = []
 diff = 0
+shuffle_ports = "y"
 donator_running = False
 job = ''
 debug = 'n'
@@ -420,9 +421,11 @@ def load_config():
             'language':         lang,
             'identifier':       rig_identifier,
             'debug':            'n',
-            "soc_timeout":      60,
+            "soc_timeout":      45,
             "avr_timeout":      4,
-            "discord_presence": "y"}
+            "discord_presence": "y",
+            "shuffle_ports":    "y"
+        }
 
         # Write data to file
         with open(str(RESOURCES_DIR)
@@ -443,6 +446,7 @@ def load_config():
         SOC_TIMEOUT = config["Duino-Coin-AVR-Miner"]["soc_timeout"]
         AVR_TIMEOUT = config["Duino-Coin-AVR-Miner"]["soc_timeout"]
         discord_presence = config["Duino-Coin-AVR-Miner"]["discord_presence"]
+        shuffle_ports = config["Duino-Coin-AVR-Miner"]["shuffle_ports"]
 
 
 def greeting():
@@ -738,8 +742,11 @@ def mine_avr(com):
                     # Read content and split into lines
                     content = (res.content.decode().splitlines())
                     server_ip = content[0]
-                    portlist = [2811, 2812, 2813, 2814, 2815]
-                    server_port = choice(portlist)
+                    if shuffle_ports == "y":
+                        portlist = [2811, 2812, 2813, 2814, 2815]
+                        server_port = choice(portlist)
+                    else:
+                        server_port = 2813
                     debug_output(
                         'Retrieved pool IP: '
                         + server_ip
