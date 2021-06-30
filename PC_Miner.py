@@ -58,6 +58,20 @@ except ModuleNotFoundError:
         + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("py-cpuinfo")
 
+
+try:
+    # Check if requests is installed
+    import requests
+except ModuleNotFoundError:
+    print(
+        now().strftime('%H:%M:%S ')
+        + 'Requests is not installed. '
+        + 'Miner will try to install it. '
+        + 'If it fails, please manually install "requests" python3 package.'
+        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
+    install('requests')
+
+
 try:
     # Check if colorama is installed
     from colorama import Back, Fore, Style, init
@@ -743,7 +757,7 @@ def Thread(
         while True:
             node_address = "server.duinocoin.com"
             if shuffle_ports == "y":
-                portlist = [2811, 2812, 2813, 2814, 2815, 2816]
+                portlist = [2811, 2812, 2813, 2814, 2816]
                 node_port = choice(portlist)
             else:
                 # Default PC mining port
