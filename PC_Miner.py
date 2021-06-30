@@ -808,6 +808,8 @@ def Thread(
                             + Style.NORMAL
                             + getString("connected_server")
                             + str(serverVersion)
+                            + ", port "
+                            + str(masterServer_port)
                             + ")",
                             "success")
                         break
