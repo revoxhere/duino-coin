@@ -739,7 +739,7 @@ def mine_avr(com):
                     content = (res.content.decode().splitlines())
                     server_ip = content[0]
                     portlist = [2811, 2812, 2813, 2814, 2815]
-                    masterServer_port = choice(portlist)
+                    server_port = choice(portlist)
                     debug_output(
                         'Retrieved pool IP: '
                         + server_ip
