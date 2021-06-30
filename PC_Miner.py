@@ -58,7 +58,6 @@ except ModuleNotFoundError:
         + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("py-cpuinfo")
 
-
 try:
     # Check if colorama is installed
     from colorama import Back, Fore, Style, init
@@ -70,19 +69,6 @@ except ModuleNotFoundError:
         + "If it fails, please manually install \"colorama\"."
         + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
     install("colorama")
-
-
-try:
-    # Check if requests is installed
-    import requests
-except ModuleNotFoundError:
-    print(
-        now().strftime("%H:%M:%S ")
-        + "Requests is not installed. "
-        + "Miner will try to install it. "
-        + "If it fails, please manually install \"requests\"."
-        + "\nIf you can\'t install it, use the Minimal-PC_Miner.")
-    install("requests")
 
 try:
     # Check if pypresence is installed
@@ -119,10 +105,6 @@ discord_presence = "y"
 rig_identiier = "None"
 requested_diff = "NET"
 algorithm = "DUCO-S1"
-server_ip_file = ("https://raw.githubusercontent.com/"
-                  + "revoxhere/"
-                  + "duino-coin/gh-pages/"
-                  + "serverip.txt")  # Serverip file
 config = ConfigParser()
 donation_level = 0
 thread = []
@@ -758,106 +740,77 @@ def Thread(
         totalhashrate_mean):
     # Mining section for every thread
     while True:
-        # Grab server IP and port
         while True:
+            node_address = "server.duinocoin.com"
+            if shuffle_ports == "y":
+                portlist = [2811, 2812, 2813, 2814, 2815, 2816]
+                node_port = choice(portlist)
+            else:
+                # Default PC mining port
+                node_port = 2814 
+
             try:
-                # Use request to grab data from raw github file
-                res = requests.get(server_ip_file, data=None)
-                if res.status_code == 200:
-                    # Read content and split into lines
-                    content = (res.content.decode().splitlines())
-                    # Line 1 = IP
-                    masterServer_address = content[0]
-                    # Line 2 = port
-                    if shuffle_ports == "y":
-                        portlist = [2811, 2812, 2813, 2814, 2815, 2816]
-                        masterServer_port = choice(portlist)
-                    else:
-                        masterServer_port = 2814
-                    debug_output(
-                        "Retrieved pool IP: "
-                        + masterServer_address
-                        + ":"
-                        + str(masterServer_port))
+                soc = socket()
+                soc.connect((str(node_address),
+                             int(node_port)))
+                soc.settimeout(SOC_TIMEOUT)
+                serverVersion = soc.recv(3).decode().rstrip("\n")
+                debug_output("Server version: " + serverVersion)
 
-                    # Connect to the server
-                try:
-                    soc = socket()
-                    # Establish socket connection to the server
-                    soc.connect((str(masterServer_address),
-                                 int(masterServer_port)))
-                    soc.settimeout(SOC_TIMEOUT)
-                    serverVersion = soc.recv(3).decode().rstrip(
-                        "\n")  # Get server version
-                    debug_output("Server version: " + serverVersion)
+                if threadid == 0:
+                    soc.send(bytes("MOTD", encoding="utf8"))
+                    motd = soc.recv(1024).decode().rstrip("\n")
+                    prettyPrint("net" + str(threadid),
+                                " Server message: " + motd,
+                                "warning")
 
-                    if threadid == 0:
-                        soc.send(bytes("MOTD", encoding="utf8"))
-                        motd = soc.recv(1024).decode().rstrip("\n")
-                        prettyPrint("net" + str(threadid),
-                                    " Server message: " + motd,
-                                    "warning")
-
-                    if float(serverVersion) <= float(MINER_VER):
-                        # Miner is up-to-date
-                        prettyPrint(
-                            "net"
-                            + str(threadid),
-                            getString("connected")
-                            + Fore.RESET
-                            + Style.NORMAL
-                            + getString("connected_server")
-                            + str(serverVersion)
-                            + ", port "
-                            + str(masterServer_port)
-                            + ")",
-                            "success")
-                        break
-
-                    else:
-                        # Miner is outdated
-                        prettyPrint(
-                            "sys"
-                            + str(threadid),
-                            getString("outdated_miner")
-                            + MINER_VER
-                            + ") -"
-                            + getString("server_is_on_version")
-                            + serverVersion
-                            + Style.NORMAL
-                            + Fore.RESET
-                            + getString("update_warning"),
-                            "warning")
-                        break
-
-                except Exception as e:
-                    # Socket connection error
+                if float(serverVersion) <= float(MINER_VER):
+                    # Miner is up-to-date
                     prettyPrint(
                         "net"
                         + str(threadid),
-                        getString("connecting_error")
+                        getString("connected")
+                        + Fore.RESET
+                        + Style.NORMAL
+                        + getString("connected_server")
+                        + str(serverVersion)
+                        + ", port "
+                        + str(node_port)
+                        + ")",
+                        "success")
+                    break
+
+                else:
+                    # Miner is outdated
+                    prettyPrint(
+                        "sys"
+                        + str(threadid),
+                        getString("outdated_miner")
+                        + MINER_VER
+                        + ") -"
+                        + getString("server_is_on_version")
+                        + serverVersion
                         + Style.NORMAL
                         + Fore.RESET
-                        + " (net err: "
-                        + str(e)
-                        + ")",
-                        "error")
-                    debug_output("Connection error: " + str(e))
-                    sleep(10)
+                        + getString("update_warning"),
+                        "warning")
+                    break
 
             except Exception as e:
-                # If there was an error with grabbing data from GitHub
+                # Socket connection error
                 prettyPrint(
                     "net"
                     + str(threadid),
-                    getString("data_error")
+                    getString("connecting_error")
                     + Style.NORMAL
                     + Fore.RESET
-                    + " (git err: "
+                    + " (net err: "
                     + str(e)
+                    + ", port "
+                    + str(node_port)
                     + ")",
                     "error")
-                debug_output("GitHub error: " + str(e))
+                debug_output("Connection error: " + str(e))
                 sleep(10)
 
         if algorithm == "XXHASH":
