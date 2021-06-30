@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.5.1)
+# Duino-Coin Python PC Miner (v2.5.2)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -26,6 +26,7 @@ from subprocess import DEVNULL, Popen, check_call
 from threading import Thread as thrThread
 from time import ctime, sleep, strptime, time
 from multiprocessing import Lock
+from random import choice
 import pip
 
 thread_lock = Lock()
@@ -108,7 +109,7 @@ except ModuleNotFoundError:
 
 
 # Global variables
-MINER_VER = "2.51"  # Version number
+MINER_VER = "2.52"  # Version number
 SOC_TIMEOUT = 60  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 donatorrunning = False
@@ -241,6 +242,16 @@ def calculate_uptime(start_time):
         return round(uptime // 60), "minutes"
     elif uptime >= 3600:
         return round(uptime // 3600), "hours"
+
+
+def get_prefix(diff: int):
+    if diff >= 1000000000:
+        diff = str(round(diff / 1000000000)) + "G"
+    elif diff >= 1000000:
+        diff = str(round(diff / 1000000)) + "M"
+    elif diff >= 1000:
+        diff = str(round(diff / 1000)) + "k"
+    return str(diff)
 
 
 # Enable signal handler
@@ -760,7 +771,8 @@ def Thread(
                     # Line 1 = IP
                     masterServer_address = content[0]
                     # Line 2 = port
-                    masterServer_port = 2813  # content[1]
+                    portlist = [2811, 2812, 2813, 2814, 2815]
+                    masterServer_port = choice(portlist)
                     debug_output(
                         "Retrieved pool IP: "
                         + masterServer_address
@@ -982,6 +994,7 @@ def Thread(
                                         " " + getString("max_hashrate_notice"),
                                         "warning")
                         uptime, uptime_type = calculate_uptime(start_time)
+                        diff = get_prefix(diff)
                         if feedback == "GOOD":
                             # If result was correct
                             accepted.value += 1
@@ -1033,12 +1046,12 @@ def Thread(
                                     + Style.NORMAL
                                     + " @ diff "
                                     + str(diff)
-                                    + "∙ "
+                                    + " ∙ "
                                     + Fore.CYAN
                                     + "ping "
                                     + str("%02.0f" % int(ping))
-                                    + "ms. ∙"
-                                    + " uptime "
+                                    + "ms, "
+                                    + "uptime "
                                     + str(uptime)
                                     + " "
                                     + uptime_type)
