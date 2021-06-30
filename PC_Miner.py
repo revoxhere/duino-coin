@@ -110,8 +110,9 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = "2.52"  # Version number
-SOC_TIMEOUT = 60  # Socket timeout
+SOC_TIMEOUT = 45  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
+shuffle_ports = "y"
 donatorrunning = False
 debug = "n"
 discord_presence = "y"
@@ -601,18 +602,14 @@ def loadConfig():
             "algorithm":        algorithm,
             "language":         lang,
             "debug":            "n",
-            "soc_timeout":      60,
-            "discord_presence": "y"
+            "soc_timeout":      45,
+            "discord_presence": "y",
+            "shuffle_ports":    "y"
         }
-        # Write data to configfile
+
         with open(RESOURCES_DIR + "/Miner_config.cfg", "w") as configfile:
             config.write(configfile)
-
-        # Calulate efficiency for later use with sleep function
-        efficiency = (100 - float(efficiency)) * 0.01
-
-        print(Style.RESET_ALL + getString("config_saved"))
-
+            print(Style.RESET_ALL + getString("config_saved"))
     else:
         # If config already exists, load data from it
         config.read(RESOURCES_DIR + "/Miner_config.cfg")
@@ -626,8 +623,9 @@ def loadConfig():
         debug = config["Duino-Coin-PC-Miner"]["debug"]
         SOC_TIMEOUT = config["Duino-Coin-PC-Miner"]["soc_timeout"]
         discord_presence = config["Duino-Coin-PC-Miner"]["discord_presence"]
-        # Calulate efficiency for use with sleep function
-        efficiency = (100 - float(efficiency)) * 0.01
+        shuffle_ports = config["Duino-Coin-PC-Miner"]["shuffle_ports"]
+        
+    efficiency = (100 - float(efficiency)) * 0.01
 
 
 def Donate():
@@ -771,8 +769,11 @@ def Thread(
                     # Line 1 = IP
                     masterServer_address = content[0]
                     # Line 2 = port
-                    portlist = [2811, 2812, 2813, 2814, 2815]
-                    masterServer_port = choice(portlist)
+                    if shuffle_ports == "y":
+                        portlist = [2811, 2812, 2813, 2814, 2815]
+                        masterServer_port = choice(portlist)
+                    else:
+                        masterServer_port = 2814
                     debug_output(
                         "Retrieved pool IP: "
                         + masterServer_address
