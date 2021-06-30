@@ -11,7 +11,7 @@ from configparser import ConfigParser
 from datetime import datetime
 from json import load as jsonload
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
-from os import _exit, execl, mkdir
+from os import _exit, execl, mkdir, remove
 from os import name as osname
 from os import path
 from os import system as ossystem
@@ -27,6 +27,7 @@ from threading import Lock
 from time import ctime, sleep, strptime, time
 from statistics import mean
 import pip
+from zipfile import ZipFile
 
 
 def install(package):
@@ -104,8 +105,8 @@ diff = 0
 donator_running = False
 job = ''
 debug = 'n'
+auto_update = 'n'
 discord_presence = 'y'
-auto_update = 'y'
 rig_identifier = 'None'
 # Serverip file
 server_ip_file = ('https://raw.githubusercontent.com/'
@@ -156,7 +157,7 @@ try:
         elif locale.startswith('tr'):
             lang = 'turkish'
         elif locale.startswith('pt'):
-            lang = 'portugese'
+            lang = 'portuguese'
         elif locale.startswith('zh'):
             lang = 'chinese_simplified'
         else:
@@ -415,7 +416,7 @@ def load_config():
             "soc_timeout":      60,
             "avr_timeout":      4,
             "discord_presence": "y",
-            "auto_update":      "y"}
+            "auto_update":      "n"}
 
         # Write data to file
         with open(str(RESOURCES_DIR)
@@ -642,16 +643,23 @@ def donate():
 
 
 def update():
-    if not Path("AVR_Miner.py").is_file():
-        return
-
     Miner_URL = "https://raw.githubusercontent.com/revoxhere/duino-coin/master/AVR_Miner.py"
     request = requests.get(Miner_URL)
     miner_latest_ver = ""
     if request.text[101] != ")":
-        miner_latest_ver = request.text[98]+request.text[99]+request.text[100]+request.text[101]
+        if request.text[101] == ".":
+            miner_latest_ver = request.text[98]+request.text[99]+request.text[100]+request.text[101]+request.text[102]
+        else:
+            miner_latest_ver = request.text[98]+request.text[99]+request.text[100]+request.text[101]
+
     else:
         miner_latest_ver = request.text[98]+request.text[99]+request.text[100]
+
+    if not Path("AVR_Miner.py").is_file():
+        if Path("AVR_Miner.exe").is_file():
+            updateEXE(miner_latest_ver)
+        else:
+            return
 
     if MINER_VER != miner_latest_ver:
         print("Updating AVR miner...")
@@ -661,6 +669,36 @@ def update():
 
         print("AVR miner successfully updated.")
         _exit(0)
+
+
+def updateEXE(ver):
+    if Path("AVR_Miner.exe").is_file():
+        if ver[3] == ".":
+            ver2 = ver[0]+"."+ver[2]+ver[4]  # convert 2.5.1 to 2.51
+        else:
+            ver2 = ver
+
+        if ver2 == MINER_VER:
+            return
+
+        newest_release_windows = ("https://github.com/"
+                                  + "revoxhere/"
+                                  + "duino-coin/releases/download/"+ver+"/Duino-Coin_"+ver+"_windows.zip")
+        request2 = requests.get(newest_release_windows)
+        if request2.text == "Not Found":
+            return
+
+        with open('duino-zip.zip', 'wb') as f2:
+            f2.write(request2.content)  # download zip file
+
+        with ZipFile('duino-zip.zip', 'r') as zip_file:
+            zip_file.extract('AVR_Miner.exe')  # extract AVR miner from zip file
+
+        remove("duino-zip.zip")
+        print("Miner successfully updated.")
+        _exit(0)
+    else:
+        return
 
 
 def init_rich_presence():
