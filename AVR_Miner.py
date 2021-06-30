@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.5.1)
+# Duino-Coin Python AVR Miner (v2.5.2)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -26,6 +26,7 @@ from threading import Thread as thrThread
 from threading import Lock
 from time import ctime, sleep, strptime, time
 from statistics import mean
+from random import choice
 import pip
 
 
@@ -93,7 +94,7 @@ except ModuleNotFoundError:
     install('pypresence')
 
 # Global variables
-MINER_VER = '2.51'  # Version number
+MINER_VER = '2.52'  # Version number
 SOC_TIMEOUT = 60
 AVR_TIMEOUT = 4  # diff 8(*100) / 196 H/s ~= 4
 BAUDRATE = 115200
@@ -172,7 +173,7 @@ except:
     lang = 'english'
 
 
-def get_string(string_name):
+def get_string(string_name: str):
     # Get string from language file
     if string_name in lang_file[lang]:
         return lang_file[lang][string_name]
@@ -182,7 +183,17 @@ def get_string(string_name):
         return 'String not found: ' + string_name
 
 
-def debug_output(text):
+def get_prefix(diff: int):
+    if diff >= 1000000000:
+        diff = str(round(diff / 1000000000)) + "G"
+    elif diff >= 1000000:
+        diff = str(round(diff / 1000000)) + "M"
+    elif diff >= 1000:
+        diff = str(round(diff / 1000)) + "k"
+    return str(diff)
+
+
+def debug_output(text: str):
     # Debug output
     if debug == 'y':
         print(
@@ -192,7 +203,7 @@ def debug_output(text):
             + str(text))
 
 
-def title(title):
+def title(title: str):
     # Window title
     if osname == 'nt':
         # Windows systems
@@ -726,8 +737,9 @@ def mine_avr(com):
                 if res.status_code == 200:
                     # Read content and split into lines
                     content = (res.content.decode().splitlines())
-                    server_ip = content[0]  # Line 1 = pool address
-                    server_port = 2814  # content[1]  # Line 2 = pool port
+                    server_ip = content[0]
+                    portlist = [2811, 2812, 2813, 2814, 2815]
+                    masterServer_port = choice(portlist)
                     debug_output(
                         'Retrieved pool IP: '
                         + server_ip
@@ -990,6 +1002,7 @@ def mine_avr(com):
                         sleep(5)
                         soc = connect()
 
+                diff = get_prefix(diff)
                 if feedback == 'GOOD':
                     # If result was correct
                     shares[0] += 1
