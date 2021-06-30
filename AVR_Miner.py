@@ -108,10 +108,6 @@ job = ''
 debug = 'n'
 discord_presence = 'y'
 rig_identifier = 'None'
-# Serverip file
-server_ip_file = ('https://raw.githubusercontent.com/'
-                  + 'revoxhere/'
-                  + 'duino-coin/gh-pages/serverip.txt')
 donation_level = 0
 hashrate = 0
 config = ConfigParser()
@@ -217,60 +213,34 @@ def title(title: str):
 
 def connect():
     # Server connection
-    global server_ip
-    global server_port
+    global node_address
+    global node_port
     serverVersion = 0
     while True:
-        # Grab server IP and port
-        while True:
-            try:
-                # Use request to grab data from raw github file
-                res = requests.get(server_ip_file, data=None)
-                if res.status_code == 200:
-                    # Read content and split into lines
-                    content = (res.content.decode().splitlines())
-                    server_ip = content[0]
-                    if shuffle_ports == "y":
-                        portlist = [2811, 2812, 2813, 2814, 2815, 2816]
-                        server_port = choice(portlist)
-                    else:
-                        server_port = 2813
-                    debug_output(
-                        'Retrieved pool IP: '
-                        + server_ip
-                        + ':'
-                        + str(server_port))
-                    break
-            except Exception as e:
-                # If there was an error with grabbing data from GitHub
-                pretty_print(
-                    'net'
-                    + str(''.join(filter(str.isdigit, com))),
-                    get_string('data_error')
-                    + Style.NORMAL
-                    + Fore.RESET
-                    + ' (git err: '
-                    + str(e)
-                    + ')',
-                    'error')
-                debug_output('GitHub error: ' + str(e))
-                sleep(10)
+        node_address = "server.duinocoin.com"
+        if shuffle_ports == "y":
+            portlist = [2811, 2812, 2813, 2814, 2815, 2816]
+            node_port = choice(portlist)
+        else:
+            # Default AVR mining port
+            node_port = 2813
+
         try:
             try:
                 socket.close()
             except Exception:
                 pass
             debug_output('Connecting to '
-                         + str(server_ip)
+                         + str(node_address)
                          + str(':')
-                         + str(server_port))
+                         + str(node_port))
             soc = socket()
             soc.settimeout(SOC_TIMEOUT)
 
             # Establish socket connection to the server
             soc.connect(
-                (str(server_ip),
-                    int(server_port)))
+                (str(node_address),
+                    int(node_port)))
 
             # Get server version
             serverVersion = soc.recv(10).decode().rstrip('\n')
@@ -286,7 +256,7 @@ def connect():
                     + get_string('connected_server')
                     + str(serverVersion)
                     + ", port "
-                    + str(server_port)
+                    + str(node_port)
                     + ")",
                     'success')
                 break
@@ -312,7 +282,7 @@ def connect():
                 + ' ('
                 + str(e)
                 + ", port "
-                + str(server_port)
+                + str(node_port)
                 +')',
                 'error')
             debug_output('Connection error: ' + str(e))
@@ -767,8 +737,8 @@ def pretty_print(message_type, message, state):
 def mine_avr(com):
     # Mining section
     global hashrate
-    global server_ip
-    global server_port
+    global node_address
+    global node_port
     errorCounter = 0
     while True:
         soc = connect()
