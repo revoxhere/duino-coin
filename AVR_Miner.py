@@ -743,7 +743,7 @@ def mine_avr(com):
                     content = (res.content.decode().splitlines())
                     server_ip = content[0]
                     if shuffle_ports == "y":
-                        portlist = [2811, 2812, 2813, 2814, 2815]
+                        portlist = [2811, 2812, 2813, 2814, 2815, 2816]
                         server_port = choice(portlist)
                     else:
                         server_port = 2813
@@ -1144,7 +1144,7 @@ def mine_avr(com):
                             + ' '
                             + Back.RESET
                             + Fore.RED
-                            + ' ⛏'
+                            + ' ✗'
                             + get_string('rejected')
                             + Fore.RESET
                             + str(int(shares[0]))
