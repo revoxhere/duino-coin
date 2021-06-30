@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Master Server (v2.5)
+# Duino-Coin Master Server (v2.5.2)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -51,11 +51,7 @@ import udatetime as utime
 
 """ Global variables """
 HOSTNAME = ""
-LEGACY_PORT = 2811
-WALLET_PORT = 2812
-PC_PORT = 2813
-AVR_PORT = 2814
-ESP_PORT = 2815
+PORTS = [2811, 2812, 2813, 2814, 2815, 2816]
 MOTD = """\
 You are connected to the official Duino-Coin server.
 Please make sure you're using release 2.5 or 2.5.1 to get good stability.
@@ -65,8 +61,8 @@ DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 5  # in seconds
 DB_TIMEOUT = 5
-BACKLOG = None  # default for gevent is 128
-POOL_SIZE = 10000
+BACKLOG = None  # spawn connection instantly
+POOL_SIZE = None  # None kills outstanding requests
 SERVER_VER = 2.5  # announced to clients
 READY_HASHES_NUM = 5000  # in shares
 BLOCK_PROBABILITY = 500000  # 1 in X
@@ -244,9 +240,8 @@ def create_backup():
 
 def perm_ban(ip):
     """ Bans an IP """
-    pass
-    # if not ip in whitelisted_ips:
-    #os.system("sudo ipset add banned-hosts "+str(ip)+" >/dev/null 2>&1")
+    if not ip in whitelisted_ips:
+        os.system("sudo ipset add banned-hosts "+str(ip)+" >/dev/null 2>&1")
 
 
 def unban(ip):
@@ -256,10 +251,9 @@ def unban(ip):
 
 def temporary_ban(ip):
     """ Temporarily bans an IP """
-    pass
-    # if not ip in whitelisted_ips:
-    #os.system("sudo ipset add banned-hosts "+str(ip)+" >/dev/null 2>&1")
-    #threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
+    if not ip in whitelisted_ips:
+        os.system("sudo ipset add banned-hosts "+str(ip)+" >/dev/null 2>&1")
+        threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
 
 
 def update_job_tiers():
@@ -1493,22 +1487,19 @@ def get_sys_usage():
     global global_ram_usage
     global global_connections
 
-    global_connections = 0
-
-    def _get_connections(port):
+    def _get_connections():
         connections = subprocess.run(
-            'sudo netstat -anp | grep -w ' +
-            str(port) + ' | grep ESTABLISHED | wc -l',
+            'sudo netstat -anp | grep ESTABLISHED | wc -l',
             stdout=subprocess.PIPE,
             shell=True
         ).stdout.decode().rstrip()
         return int(connections)
 
     while True:
-        ports = [LEGACY_PORT, WALLET_PORT, PC_PORT, AVR_PORT, ESP_PORT]
+        ports = [LEGACY_PORT, WALLET_PORT,
+                 PC_PORT, AVR_PORT, ESP_PORT, PC2_PORT]
 
-        for port in ports:
-            global_connections += _get_connections(port)
+        global_connections = _get_connections()
 
         global_cpu_usage.append(psutil.cpu_percent())
         global_ram_usage.append(psutil.virtual_memory()[2])
@@ -2701,10 +2692,9 @@ if __name__ == "__main__":
         server_thread.serve_forever()
 
     try:
-        ports = [LEGACY_PORT, WALLET_PORT, PC_PORT, AVR_PORT, ESP_PORT]
-
-        for port in ports:
-            threading.Thread(target=_server_handler, args=[int(port),]).start()
+        for port in PORTS:
+            threading.Thread(target=_server_handler,
+                             args=[int(port), ]).start()
 
         input_management()
     except Exception as e:
@@ -2712,3 +2702,4 @@ if __name__ == "__main__":
     finally:
         admin_print("Master Server is exiting")
         os.execl(sys.executable, sys.executable, *sys.argv)
+
