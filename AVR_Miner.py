@@ -251,7 +251,9 @@ def connect():
                     + Fore.RESET
                     + get_string('connected_server')
                     + str(serverVersion)
-                    + ')',
+                    + ", port "
+                    + str(server_port)
+                    + ")",
                     'success')
                 break
             else:
