@@ -54,7 +54,7 @@ import udatetime as utime
 HOSTNAME = ""
 WALLET_PORT = 2817
 SAVE_TIME = 5  # in seconds
-DB_TIMEOUT = 5
+DB_TIMEOUT = 10
 BACKLOG = None  # default for gevent is 128
 POOL_SIZE = 5000
 SERVER_VER = 2.5  # announced to clients
@@ -250,265 +250,9 @@ def temporary_ban(ip):
         threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
 
 
-def update_job_tiers():
-    global job_tiers
-    while True:
-        job_tiers = {
-            "EXTREME": {
-                "difficulty": 1500000,
-                "reward": 0,
-                "max_hashrate": 999999999
-            },
-            "XXHASH": {
-                "difficulty": 750000,
-                "reward": .0006,
-                "max_hashrate": 900000
-            },
-            "NET": {
-                "difficulty": int(global_blocks
-                                  / DIFF_INCREASES_PER
-                                  * DIFF_MULTIPLIER) + 1,
-                "reward": .0015811,
-                "max_hashrate": 1000000
-            },
-            "MEDIUM": {
-                "difficulty": int(75000 * DIFF_MULTIPLIER),
-                "reward": .0012811,
-                "max_hashrate": 500000
-            },
-            "LOW": {
-                "difficulty": int(7500 * DIFF_MULTIPLIER),
-                "reward": .0022811,
-                "max_hashrate": 250000
-            },
-            "ESP32": {
-                "difficulty": int(1200 * DIFF_MULTIPLIER),
-                "reward": .00175,  # 0.00375
-                "max_hashrate": 16000
-            },
-            "ESP8266": {
-                "difficulty": int(1000 * DIFF_MULTIPLIER),
-                "reward": .00015,  # 0.0045
-                "max_hashrate": 13000
-            },
-            "DUE": {
-                "difficulty": int(300 * DIFF_MULTIPLIER),
-                "reward": .003,
-                "max_hashrate": 7000
-            },
-            "ARM": {
-                "difficulty": int(100 * DIFF_MULTIPLIER),
-                "reward": .003,
-                "max_hashrate": 5000
-            },
-            "MEGA": {
-                "difficulty": int(16 * DIFF_MULTIPLIER),
-                "reward": .004,
-                "max_hashrate": 400
-            },
-            "AVR": {
-                "difficulty": 6,
-                "reward": .005,
-                "max_hashrate": 240
-            }
-        }
-        sleep(60)
-
-
-def create_jobs():
-    """ Generate DUCO-S1A jobs for low-power devices """
-    while True:
-        global_last_block_hash_cp = global_last_block_hash
-        base_hash = sha1(global_last_block_hash_cp.encode('ascii'))
-        temp_hash = None
-        for i in range(int(READY_HASHES_NUM)):
-            temp_hash = base_hash.copy()
-            avr_diff = job_tiers["AVR"]["difficulty"]
-            rand = fastrandint(100 * avr_diff)
-            temp_hash.update(str(rand).encode('ascii'))
-            pregenerated_jobs_avr[i] = {
-                "numeric_result": rand,
-                "expected_hash": temp_hash.hexdigest(),
-                "last_block_hash": str(global_last_block_hash_cp)}
-
-        for i in range(int(READY_HASHES_NUM)):
-            temp_hash = base_hash.copy()
-            due_diff = job_tiers["DUE"]["difficulty"]
-            rand = fastrandint(100 * due_diff)
-            temp_hash.update(str(rand).encode('ascii'))
-            pregenerated_jobs_due[i] = {
-                "numeric_result": rand,
-                "expected_hash": temp_hash.hexdigest(),
-                "last_block_hash": str(global_last_block_hash_cp)}
-
-        for i in range(int(READY_HASHES_NUM)):
-            temp_hash = base_hash.copy()
-            arm_diff = job_tiers["ARM"]["difficulty"]
-            rand = fastrandint(100 * arm_diff)
-            temp_hash.update(str(rand).encode('ascii'))
-            pregenerated_jobs_arm[i] = {
-                "numeric_result": rand,
-                "expected_hash": temp_hash.hexdigest(),
-                "last_block_hash": str(global_last_block_hash_cp)}
-
-        for i in range(int(READY_HASHES_NUM)):
-            temp_hash = base_hash.copy()
-            mega_diff = job_tiers["MEGA"]["difficulty"]
-            rand = fastrandint(100 * mega_diff)
-            temp_hash.update(str(rand).encode('ascii'))
-            pregenerated_jobs_mega[i] = {
-                "numeric_result": rand,
-                "expected_hash": temp_hash.hexdigest(),
-                "last_block_hash": str(global_last_block_hash_cp)}
-
-        for i in range(int(READY_HASHES_NUM)):
-            temp_hash = base_hash.copy()
-            esp32_diff = job_tiers["ESP32"]["difficulty"]
-            rand = fastrandint(100 * esp32_diff)
-            temp_hash.update(str(rand).encode('ascii'))
-            pregenerated_jobs_esp32[i] = {
-                "numeric_result": rand,
-                "expected_hash": temp_hash.hexdigest(),
-                "last_block_hash": str(global_last_block_hash_cp)}
-
-        for i in range(int(READY_HASHES_NUM)):
-            temp_hash = base_hash.copy()
-            esp8266_diff = job_tiers["ESP8266"]["difficulty"]
-            rand = fastrandint(100 * esp8266_diff)
-            temp_hash.update(str(rand).encode('ascii'))
-            pregenerated_jobs_esp8266[i] = {
-                "numeric_result": rand,
-                "expected_hash": temp_hash.hexdigest(),
-                "last_block_hash": str(global_last_block_hash_cp)}
-        sleep(60)
-
-
-def get_pregenerated_job(req_difficulty):
-    """ Get pregenerated job from pregenerated
-        difficulty tiers
-        Takes:      req_difficulty
-        Outputs:    job ready to send to client"""
-
-    if req_difficulty == "AVR":
-        # Arduino
-        difficulty = job_tiers["AVR"]["difficulty"]
-        rand = fastrandint(len(pregenerated_jobs_avr) - 1)
-        numeric_result = pregenerated_jobs_avr[rand]["numeric_result"]
-        expected_hash = pregenerated_jobs_avr[rand]["expected_hash"]
-        last_block_hash = pregenerated_jobs_avr[rand]["last_block_hash"]
-        return [last_block_hash, expected_hash, numeric_result, difficulty]
-
-    elif req_difficulty == "DUE":
-        # Arduino Due
-        difficulty = job_tiers["DUE"]["difficulty"]
-        rand = fastrandint(len(pregenerated_jobs_due) - 1)
-        numeric_result = pregenerated_jobs_due[rand]["numeric_result"]
-        expected_hash = pregenerated_jobs_due[rand]["expected_hash"]
-        last_block_hash = pregenerated_jobs_due[rand]["last_block_hash"]
-        return [last_block_hash, expected_hash, numeric_result, difficulty]
-
-    elif req_difficulty == "ARM":
-        # ARM boards
-        difficulty = job_tiers["ARM"]["difficulty"]
-        rand = fastrandint(len(pregenerated_jobs_arm) - 1)
-        numeric_result = pregenerated_jobs_arm[rand]["numeric_result"]
-        expected_hash = pregenerated_jobs_arm[rand]["expected_hash"]
-        last_block_hash = pregenerated_jobs_arm[rand]["last_block_hash"]
-        return [last_block_hash, expected_hash, numeric_result, difficulty]
-
-    elif req_difficulty == "MEGA":
-        # megaAVR boards
-        difficulty = job_tiers["MEGA"]["difficulty"]
-        rand = fastrandint(len(pregenerated_jobs_mega) - 1)
-        numeric_result = pregenerated_jobs_mega[rand]["numeric_result"]
-        expected_hash = pregenerated_jobs_mega[rand]["expected_hash"]
-        last_block_hash = pregenerated_jobs_mega[rand]["last_block_hash"]
-        return [last_block_hash, expected_hash, numeric_result, difficulty]
-
-    elif req_difficulty == "ESP8266":
-        # ESP8266
-        difficulty = job_tiers["ESP8266"]["difficulty"]
-        rand = fastrandint(len(pregenerated_jobs_esp32) - 1)
-        numeric_result = pregenerated_jobs_esp8266[rand]["numeric_result"]
-        expected_hash = pregenerated_jobs_esp8266[rand]["expected_hash"]
-        last_block_hash = pregenerated_jobs_esp8266[rand]["last_block_hash"]
-        return [last_block_hash, expected_hash, numeric_result, difficulty]
-
-    else:
-        # ESP32
-        difficulty = job_tiers["ESP32"]["difficulty"]
-        rand = fastrandint(len(pregenerated_jobs_esp32) - 1)
-        numeric_result = pregenerated_jobs_esp32[rand]["numeric_result"]
-        expected_hash = pregenerated_jobs_esp32[rand]["expected_hash"]
-        last_block_hash = pregenerated_jobs_esp32[rand]["last_block_hash"]
-        return [last_block_hash, expected_hash, numeric_result, difficulty]
-
-
 def floatmap(x, in_min, in_max, out_min, out_max):
     # Arduino's built in map function remade in python
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-
-
-def database_updater():
-    db_err_counter = 0
-    while True:
-        try:
-            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                datab = conn.cursor()
-                for user in balances_to_update.copy():
-                    amount_to_update = balances_to_update[user]
-
-                    if amount_to_update > 0.2:
-                        amount_to_update = amount_to_update / 100
-                    if amount_to_update > 0.02:
-                        amount_to_update = floatmap(
-                            amount_to_update, 0.02, 0.5, 0.02, 0.025)
-
-                    try:
-                        estimated_profits[user].append(amount_to_update)
-                    except:
-                        estimated_profits[user] = []
-                        estimated_profits[user].append(amount_to_update)
-
-                    datab.execute(
-                        """UPDATE Users
-                        SET balance = balance + ?
-                        WHERE username = ?""",
-                        (amount_to_update, user))
-                    balances_to_update.pop(user)
-                conn.commit()
-        except Exception as e:
-            admin_print("Database error:", e)
-            db_err_counter += 1
-            if db_err_counter >= 5:
-                admin_print("Restarting server - too many DB errs")
-                os.execl(sys.executable, sys.executable, *sys.argv)
-        sleep(SAVE_TIME)
-
-
-def chain_updater():
-    db_err_counter = 0
-    while True:
-        try:
-            with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
-                datab = conn.cursor()
-                datab.execute(
-                    """UPDATE Server
-                    SET blocks = ?""",
-                    (global_blocks,))
-                datab.execute(
-                    """UPDATE Server
-                    SET lastBlockHash = ?""",
-                    (global_last_block_hash,))
-                conn.commit()
-        except Exception as e:
-            admin_print("Database error:", e)
-            db_err_counter += 1
-            if db_err_counter > 5:
-                admin_print("Restarting server - too many DB errs")
-                os.execl(sys.executable, sys.executable, *sys.argv)
-        sleep(SAVE_TIME*3)
-
 
 def input_management():
     sleep(.2)
@@ -616,7 +360,8 @@ def input_management():
 
             try:
                 recipient = "giveaways"
-                global_last_block_hash_cp = global_last_block_hash
+                random = fastrandint(1000)
+                global_last_block_hash_cp = sha1(bytes(global_last_block_hash+str(random), encoding='ascii')).hexdigest()
                 memo = "Kolka ban"
 
                 with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
@@ -955,7 +700,8 @@ def input_management():
                         balance = str(datab.fetchone()[3])
                     admin_print("User balance is now " + str(balance))
 
-                    global_last_block_hash_cp = global_last_block_hash
+                    random = fastrandint(1000)
+                    global_last_block_hash_cp = sha1(bytes(global_last_block_hash+str(random), encoding='ascii')).hexdigest()
                     with sqlconn(CONFIG_TRANSACTIONS,
                                  timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
@@ -1016,7 +762,8 @@ def input_management():
                         balance = str(datab.fetchone()[3])
                     admin_print("User balance is now " + str(balance))
 
-                    global_last_block_hash_cp = global_last_block_hash
+                    random = fastrandint(1000)
+                    global_last_block_hash_cp = sha1(bytes(global_last_block_hash+str(random), encoding='ascii')).hexdigest()
                     with sqlconn(CONFIG_TRANSACTIONS,
                                  timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
@@ -1359,7 +1106,8 @@ def protocol_register(data, connection, address):
 def protocol_send_funds(data, connection, username):
     """ Transfer funds from one account to another """
     try:
-        global_last_block_hash_cp = global_last_block_hash
+        random = fastrandint(1000)
+        global_last_block_hash_cp = sha1(bytes(global_last_block_hash+str(random), encoding='ascii')).hexdigest()
         memo = sub(r'[^A-Za-z0-9 .()-:/!#_+-]+', ' ', str(data[1]))
         recipient = str(data[2])
         amount = float(data[3])
@@ -1404,61 +1152,51 @@ def protocol_send_funds(data, connection, username):
             return
 
         if float(balance) >= float(amount):
-            while True:
-                try:
-                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                        datab = conn.cursor()
+            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                datab = conn.cursor()
 
-                        balance -= float(amount)
-                        datab.execute(
-                            """UPDATE Users
-                            set balance = ?
-                            where username = ?""",
-                            (balance, username))
+                balance -= float(amount)
+                datab.execute(
+                    """UPDATE Users
+                    set balance = ?
+                    where username = ?""",
+                    (balance, username))
 
-                        datab.execute(
-                            """SELECT *
-                            FROM Users
-                            WHERE username = ?""",
-                            (recipient,))
-                        recipientbal = float(datab.fetchone()[3])
+                datab.execute(
+                    """SELECT *
+                    FROM Users
+                    WHERE username = ?""",
+                    (recipient,))
+                recipientbal = float(datab.fetchone()[3])
 
-                        recipientbal += float(amount)
-                        datab.execute(
-                            """UPDATE Users
-                            set balance = ?
-                            where username = ?""",
-                            (round(float(recipientbal), DECIMALS), recipient))
-                        conn.commit()
-                        break
-                except:
-                    pass
+                recipientbal += float(amount)
+                datab.execute(
+                    """UPDATE Users
+                    set balance = ?
+                    where username = ?""",
+                    (round(float(recipientbal), DECIMALS), recipient))
+                conn.commit()
 
-            while True:
-                try:
-                    with sqlconn(CONFIG_TRANSACTIONS,
-                                 timeout=DB_TIMEOUT) as conn:
-                        datab = conn.cursor()
-                        formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
-                        datab.execute(
-                            """INSERT INTO Transactions
-                            (timestamp, username, recipient, amount, hash, memo)
-                            VALUES(?, ?, ?, ?, ?, ?)""",
-                            (formatteddatetime,
-                                username,
-                                recipient,
-                                amount,
-                                global_last_block_hash_cp,
-                                memo))
-                        conn.commit()
-                        send_data(
-                            "OK,Successfully transferred funds,"
-                            + str(global_last_block_hash_cp),
-                            connection)
-                        break
-                except:
-                    pass
-            return
+            with sqlconn(CONFIG_TRANSACTIONS,
+                         timeout=DB_TIMEOUT) as conn:
+                datab = conn.cursor()
+                formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
+                datab.execute(
+                    """INSERT INTO Transactions
+                    (timestamp, username, recipient, amount, hash, memo)
+                    VALUES(?, ?, ?, ?, ?, ?)""",
+                    (formatteddatetime,
+                        username,
+                        recipient,
+                        amount,
+                        global_last_block_hash_cp,
+                        memo))
+                conn.commit()
+                send_data(
+                    "OK,Successfully transferred funds,"
+                    + str(global_last_block_hash_cp),
+                    connection)
+        return
     except Exception as e:
         admin_print("Error sending funds from " + username
                     + " to " + recipient + ": " + str(e))
@@ -1811,8 +1549,8 @@ def handle(connection, address):
             sleep(0)
 
     except Exception:
-        pass
-        # print(traceback.format_exc())
+        #pass
+        print(traceback.format_exc())
     finally:
         connection.close()
         return
@@ -1842,13 +1580,15 @@ if __name__ == "__main__":
 
     from server_functions import *
 
+    threading.Thread(target=input_management).start()
+
     try:
         def _server_w_s():
             server_thread_wallet = StreamServer(
                 (HOSTNAME, WALLET_PORT),
                 handle,
-                spawn=Pool(5000),
-                backlog=None)
+                spawn=Pool(POOL_SIZE),
+                backlog=BACKLOG)
             admin_print("Wallet server for webservices is running")
             server_thread_wallet.serve_forever()
         _server_w_s()
@@ -1856,4 +1596,5 @@ if __name__ == "__main__":
         admin_print("Unexpected exception", e)
     finally:
         admin_print("Master Server is exiting")
+        sleep(1)
         os.execl(sys.executable, sys.executable, *sys.argv)
