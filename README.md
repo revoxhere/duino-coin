@@ -4,7 +4,7 @@
 -->
 
 <a href="https://duinocoin.com">
-  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco_200x200.png?raw=true" width="215px" align="right" />
+  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" width="215px" align="right" />
 </a>
 
 <h1>
