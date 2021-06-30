@@ -624,7 +624,7 @@ def loadConfig():
         SOC_TIMEOUT = config["Duino-Coin-PC-Miner"]["soc_timeout"]
         discord_presence = config["Duino-Coin-PC-Miner"]["discord_presence"]
         shuffle_ports = config["Duino-Coin-PC-Miner"]["shuffle_ports"]
-        
+
     efficiency = (100 - float(efficiency)) * 0.01
 
 
@@ -770,7 +770,7 @@ def Thread(
                     masterServer_address = content[0]
                     # Line 2 = port
                     if shuffle_ports == "y":
-                        portlist = [2811, 2812, 2813, 2814, 2815]
+                        portlist = [2811, 2812, 2813, 2814, 2815, 2816]
                         masterServer_port = choice(portlist)
                     else:
                         masterServer_port = 2814
@@ -779,7 +779,70 @@ def Thread(
                         + masterServer_address
                         + ":"
                         + str(masterServer_port))
-                    break
+
+                    # Connect to the server
+                try:
+                    soc = socket()
+                    # Establish socket connection to the server
+                    soc.connect((str(masterServer_address),
+                                 int(masterServer_port)))
+                    soc.settimeout(SOC_TIMEOUT)
+                    serverVersion = soc.recv(3).decode().rstrip(
+                        "\n")  # Get server version
+                    debug_output("Server version: " + serverVersion)
+
+                    if threadid == 0:
+                        soc.send(bytes("MOTD", encoding="utf8"))
+                        motd = soc.recv(1024).decode().rstrip("\n")
+                        prettyPrint("net" + str(threadid),
+                                    " Server message: " + motd,
+                                    "warning")
+
+                    if float(serverVersion) <= float(MINER_VER):
+                        # Miner is up-to-date
+                        prettyPrint(
+                            "net"
+                            + str(threadid),
+                            getString("connected")
+                            + Fore.RESET
+                            + Style.NORMAL
+                            + getString("connected_server")
+                            + str(serverVersion)
+                            + ")",
+                            "success")
+                        break
+
+                    else:
+                        # Miner is outdated
+                        prettyPrint(
+                            "sys"
+                            + str(threadid),
+                            getString("outdated_miner")
+                            + MINER_VER
+                            + ") -"
+                            + getString("server_is_on_version")
+                            + serverVersion
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + getString("update_warning"),
+                            "warning")
+                        break
+
+                except Exception as e:
+                    # Socket connection error
+                    prettyPrint(
+                        "net"
+                        + str(threadid),
+                        getString("connecting_error")
+                        + Style.NORMAL
+                        + Fore.RESET
+                        + " (net err: "
+                        + str(e)
+                        + ")",
+                        "error")
+                    debug_output("Connection error: " + str(e))
+                    sleep(10)
+
             except Exception as e:
                 # If there was an error with grabbing data from GitHub
                 prettyPrint(
@@ -793,69 +856,6 @@ def Thread(
                     + ")",
                     "error")
                 debug_output("GitHub error: " + str(e))
-                sleep(10)
-
-        # Connect to the server
-        while True:
-            try:
-                soc = socket()
-                # Establish socket connection to the server
-                soc.connect((str(masterServer_address),
-                             int(masterServer_port)))
-                soc.settimeout(SOC_TIMEOUT)
-                serverVersion = soc.recv(3).decode().rstrip(
-                    "\n")  # Get server version
-                debug_output("Server version: " + serverVersion)
-
-                if threadid == 0:
-                    soc.send(bytes("MOTD", encoding="utf8"))
-                    motd = soc.recv(1024).decode().rstrip("\n")
-                    prettyPrint("net" + str(threadid),
-                                " Server message: " + motd,
-                                "warning")
-
-                if float(serverVersion) <= float(MINER_VER):
-                    # If miner is up-to-date, display a message and continue
-                    prettyPrint(
-                        "net"
-                        + str(threadid),
-                        getString("connected")
-                        + Fore.RESET
-                        + Style.NORMAL
-                        + getString("connected_server")
-                        + str(serverVersion)
-                        + ")",
-                        "success")
-                    break
-
-                else:
-                    # Miner is outdated
-                    prettyPrint(
-                        "sys"
-                        + str(threadid),
-                        getString("outdated_miner")
-                        + MINER_VER
-                        + ") -"
-                        + getString("server_is_on_version")
-                        + serverVersion
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + getString("update_warning"),
-                        "warning")
-                    break
-            except Exception as e:
-                # Socket connection error
-                prettyPrint(
-                    "net"
-                    + str(threadid),
-                    getString("connecting_error")
-                    + Style.NORMAL
-                    + Fore.RESET
-                    + " (net err: "
-                    + str(e)
-                    + ")",
-                    "error")
-                debug_output("Connection error: " + str(e))
                 sleep(10)
 
         if algorithm == "XXHASH":
