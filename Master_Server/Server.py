@@ -66,10 +66,10 @@ DIFF_MULTIPLIER = 1
 SAVE_TIME = 5  # in seconds
 DB_TIMEOUT = 5
 BACKLOG = None  # default for gevent is 128
-POOL_SIZE = 5000
+POOL_SIZE = 10000
 SERVER_VER = 2.5  # announced to clients
 READY_HASHES_NUM = 5000  # in shares
-BLOCK_PROBABILITY = 1000000  # 1 in X
+BLOCK_PROBABILITY = 500000  # 1 in X
 BLOCK_REWARD = 28.11  # duco
 UPDATE_MINERAPI_EVERY = 3  # in shares
 EXPECTED_SHARETIME = 10  # in seconds
@@ -79,7 +79,7 @@ DECIMALS = 20  # max float precision
 MAX_WORKERS = 24
 PING_SLEEP_TIME = 0.5  # in seconds
 MAX_NUMBER_OF_PINGS = 3
-TEMP_BAN_TIME = 120  # in seconds
+TEMP_BAN_TIME = 30  # in seconds
 
 """ IO files location """
 DATABASE = 'crypto_database.db'
@@ -244,8 +244,9 @@ def create_backup():
 
 def perm_ban(ip):
     """ Bans an IP """
-    if not ip in whitelisted_ips:
-        os.system("sudo ipset add banned-hosts "+str(ip)+" >/dev/null 2>&1")
+    pass
+    # if not ip in whitelisted_ips:
+    #os.system("sudo ipset add banned-hosts "+str(ip)+" >/dev/null 2>&1")
 
 
 def unban(ip):
@@ -255,9 +256,10 @@ def unban(ip):
 
 def temporary_ban(ip):
     """ Temporarily bans an IP """
-    if not ip in whitelisted_ips:
-        os.system("sudo ipset add banned-hosts "+str(ip)+" >/dev/null 2>&1")
-        threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
+    pass
+    # if not ip in whitelisted_ips:
+    #os.system("sudo ipset add banned-hosts "+str(ip)+" >/dev/null 2>&1")
+    #threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
 
 
 def update_job_tiers():
@@ -265,12 +267,12 @@ def update_job_tiers():
     while True:
         job_tiers = {
             "EXTREME": {
-                "difficulty": 1500000,
+                "difficulty": int(1500000 * DIFF_MULTIPLIER),
                 "reward": 0,
                 "max_hashrate": 999999999
             },
             "XXHASH": {
-                "difficulty": 750000,
+                "difficulty": int(750000 * DIFF_MULTIPLIER),
                 "reward": .0006,
                 "max_hashrate": 900000
             },
@@ -292,22 +294,22 @@ def update_job_tiers():
                 "max_hashrate": 250000
             },
             "ESP32": {
-                "difficulty": int(1200 * DIFF_MULTIPLIER),
+                "difficulty": int(1500 * DIFF_MULTIPLIER),
                 "reward": .00175,  # 0.00375
                 "max_hashrate": 16000
             },
             "ESP8266": {
-                "difficulty": int(1000 * DIFF_MULTIPLIER),
+                "difficulty": int(920 * DIFF_MULTIPLIER),
                 "reward": .00015,  # 0.0045
                 "max_hashrate": 13000
             },
             "DUE": {
-                "difficulty": int(300 * DIFF_MULTIPLIER),
+                "difficulty": int(330 * DIFF_MULTIPLIER),
                 "reward": .003,
                 "max_hashrate": 7000
             },
             "ARM": {
-                "difficulty": int(100 * DIFF_MULTIPLIER),
+                "difficulty": int(120 * DIFF_MULTIPLIER),
                 "reward": .003,
                 "max_hashrate": 5000
             },
@@ -317,7 +319,7 @@ def update_job_tiers():
                 "max_hashrate": 400
             },
             "AVR": {
-                "difficulty": 6,
+                "difficulty": int(6 * DIFF_MULTIPLIER),
                 "reward": .005,
                 "max_hashrate": 240
             }
@@ -1226,7 +1228,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 except:
                     req_difficulty = "NET"
         else:
-            data = receive_data(connection, limit=48)
+            data = receive_data(connection, limit=64)
 
             if override_difficulty != "":
                 req_difficulty = override_difficulty
@@ -1265,8 +1267,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 send_data(
                     "BAD,Too many workers\n",
                     connection)
-                temporary_ban(ip_addr)
-                break
+                return thread_id
 
         if (job_tiers[req_difficulty]["difficulty"]
                 > job_tiers["ESP32"]["difficulty"]):
@@ -1303,7 +1304,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         difference = utime.now() - job_sent_timestamp
         sharetime = difference.total_seconds()
 
-        connection.settimeout(15)
+        connection.settimeout(30)
 
         if using_xxhash:
             max_hashrate = job_tiers["XXHASH"]["max_hashrate"]
@@ -1341,18 +1342,17 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             if not ip_addr in whitelisted_ips:
                 temporary_ban(ip_addr)
             sleep(5)
-            break
+            return thread_id
 
         if username in banlist:
             if not username in whitelisted_usernames:
                 if not ip_addr in whitelisted_ips:
                     perm_ban(ip_addr)
                 sleep(5)
-                break
+                return thread_id
 
         if (accepted_shares > 0
-                and accepted_shares % UPDATE_MINERAPI_EVERY == 0
-                and hashrate < 1000000):
+                and accepted_shares % UPDATE_MINERAPI_EVERY == 0):
             """ These things don't need to run every share """
             if is_first_share:
                 try:
@@ -1376,7 +1376,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             except:
                 rig_identifier = "None"
 
-            if abs(reported_hashrate-hashrate) > 10000:
+            if abs(reported_hashrate-hashrate) > 20000:
                 reported_hashrate = hashrate
                 hashrate_is_estimated = True
 
@@ -1407,11 +1407,12 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             global_last_block_hash = job[1]
 
         if hashrate > max_hashrate:
-            if hashrate > max_hashrate*10:
-                if not ip_addr in whitelisted_ips:
-                    temporary_ban(ip_addr)
-                sleep(5)
-                break
+            if req_difficulty == "AVR" or req_difficulty == "ARM":
+                if hashrate > max_hashrate*10:
+                    if not ip_addr in whitelisted_ips:
+                        temporary_ban(ip_addr)
+                    sleep(5)
+                    return thread_id
 
             """ Kolka V2 hashrate check """
             rejected_shares += 1
@@ -1420,7 +1421,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             if not using_xxhash:
                 override_difficulty = kolka_v2(req_difficulty, job_tiers)
 
-            sleep(3)
+            sleep(1)
             send_data("BAD\n", connection)
 
         elif int(result[0]) == int(numeric_result):
@@ -1475,7 +1476,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             send_data("BAD\n", connection)
 
         is_first_share = False
-        sleep(hashrate/200000)
+        sleep(hashrate / 500000)
     return thread_id
 
 
@@ -1492,6 +1493,8 @@ def get_sys_usage():
     global global_ram_usage
     global global_connections
 
+    global_connections = 0
+
     def _get_connections(port):
         connections = subprocess.run(
             'sudo netstat -anp | grep -w ' +
@@ -1502,15 +1505,14 @@ def get_sys_usage():
         return int(connections)
 
     while True:
-        global_connections = _get_connections(2811)
-        global_connections += _get_connections(2812)
-        global_connections += _get_connections(2813)
-        global_connections += _get_connections(2814)
-        global_connections += _get_connections(2815)
+        ports = [LEGACY_PORT, WALLET_PORT, PC_PORT, AVR_PORT, ESP_PORT]
+
+        for port in ports:
+            global_connections += _get_connections(port)
 
         global_cpu_usage.append(psutil.cpu_percent())
         global_ram_usage.append(psutil.virtual_memory()[2])
-        sleep(SAVE_TIME)
+        sleep(SAVE_TIME/2)
 
 
 def hashrate_prefix(hashrate: int, accuracy: int):
@@ -2547,6 +2549,12 @@ def duino_stats_restart_handle():
         sleep(3)
 
 
+def reset_ipset():
+    while True:
+        os.system("sudo ipset flush banned-hosts")
+        sleep(60)
+
+
 if __name__ == "__main__":
     # Read banned usernames
     with open(CONFIG_BANS, "r") as bannedusrfile:
@@ -2666,8 +2674,9 @@ if __name__ == "__main__":
     admin_print("Launching background threads")
     threading.Thread(target=create_backup).start()
 
-    # threading.Thread(target=countips).start()
-    # threading.Thread(target=resetips).start()
+    threading.Thread(target=countips).start()
+    threading.Thread(target=resetips).start()
+    threading.Thread(target=reset_ipset).start()
 
     threading.Thread(target=duino_stats_restart_handle).start()
     threading.Thread(target=get_duco_prices).start()
@@ -2681,55 +2690,21 @@ if __name__ == "__main__":
     threading.Thread(target=create_minerapi).start()
     threading.Thread(target=create_secondary_api_files).start()
 
+    def _server_handler(port):
+        server_thread = StreamServer(
+            (HOSTNAME, port),
+            handle,
+            backlog=BACKLOG,
+            spawn=Pool(POOL_SIZE)
+        )
+        admin_print("Server is running on port " + str(port))
+        server_thread.serve_forever()
+
     try:
-        def _server_w():
-            server_thread_wallet = StreamServer(
-                (HOSTNAME, WALLET_PORT),
-                handle,
-                backlog=BACKLOG,
-                spawn=Pool(POOL_SIZE))
-            admin_print("Wallet server is running")
-            server_thread_wallet.serve_forever()
-        threading.Thread(target=_server_w).start()
+        ports = [LEGACY_PORT, WALLET_PORT, PC_PORT, AVR_PORT, ESP_PORT]
 
-        def _server_p():
-            server_thread_pc = StreamServer(
-                (HOSTNAME, PC_PORT),
-                handle,
-                backlog=BACKLOG,
-                spawn=Pool(POOL_SIZE))
-            admin_print("PC server is running")
-            server_thread_pc.serve_forever()
-        threading.Thread(target=_server_p).start()
-
-        def _server_a():
-            server_thread_arduino = StreamServer(
-                (HOSTNAME, AVR_PORT),
-                handle,
-                backlog=BACKLOG,
-                spawn=Pool(POOL_SIZE))
-            admin_print("AVR server is running")
-            server_thread_arduino.serve_forever()
-        threading.Thread(target=_server_a).start()
-
-        def _server_e():
-            server_thread_esp = StreamServer(
-                (HOSTNAME, ESP_PORT),
-                handle,
-                backlog=BACKLOG,
-                spawn=Pool(POOL_SIZE))
-            admin_print("ESP server is running")
-            server_thread_esp.serve_forever()
-        threading.Thread(target=_server_e).start()
-
-        def _server_l():
-            server_thread = StreamServer((HOSTNAME, LEGACY_PORT),
-                                         handle,
-                                         backlog=BACKLOG,
-                                         spawn=Pool(POOL_SIZE))
-            admin_print("Legacy server is running")
-            server_thread.serve_forever()
-        threading.Thread(target=_server_l).start()
+        for port in ports:
+            threading.Thread(target=_server_handler, args=[int(port),]).start()
 
         input_management()
     except Exception as e:
