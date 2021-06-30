@@ -1020,7 +1020,7 @@ def Thread(
                                     + " "
                                     + Back.RESET
                                     + Fore.GREEN
-                                    + " ✓"
+                                    + " ⛏"
                                     + getString("accepted")
                                     + Fore.RESET
                                     + str(int(accepted.value))
@@ -1045,7 +1045,7 @@ def Thread(
                                     + str(formattedhashcount)
                                     + Fore.RESET
                                     + Style.NORMAL
-                                    + " @ diff "
+                                    + " ⚙ diff "
                                     + str(diff)
                                     + " ∙ "
                                     + Fore.CYAN
@@ -1081,7 +1081,7 @@ def Thread(
                                     + " "
                                     + Back.RESET
                                     + Fore.CYAN
-                                    + " ✓"
+                                    + " ⛏"
                                     + getString("block_found")
                                     + Fore.RESET
                                     + str(accepted.value)
@@ -1106,7 +1106,7 @@ def Thread(
                                     + str(formattedhashcount)
                                     + Fore.RESET
                                     + Style.NORMAL
-                                    + " @ diff "
+                                    + " ⚙ diff "
                                     + str(diff)
                                     + " ∙ "
                                     + Fore.CYAN
@@ -1164,7 +1164,7 @@ def Thread(
                                     + str(formattedhashcount)
                                     + Fore.RESET
                                     + Style.NORMAL
-                                    + " @ diff "
+                                    + " ⚙ diff "
                                     + str(diff)
                                     + " ∙ "
                                     + Fore.CYAN
