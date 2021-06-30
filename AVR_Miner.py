@@ -70,18 +70,6 @@ except ModuleNotFoundError:
     install('colorama')
 
 try:
-    # Check if requests is installed
-    import requests
-except ModuleNotFoundError:
-    print(
-        now().strftime('%H:%M:%S ')
-        + 'Requests is not installed. '
-        + 'Miner will try to install it. '
-        + 'If it fails, please manually install "requests" python3 package.'
-        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
-    install('requests')
-
-try:
     # Check if pypresence is installed
     from pypresence import Presence
 except ModuleNotFoundError:
