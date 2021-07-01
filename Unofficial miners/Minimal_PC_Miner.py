@@ -9,17 +9,55 @@ import sys  # Only python3 included libraries
 import time
 import urllib.request
 import ssl
+import select
 
-soc = socket.socket()
-soc.settimeout(10)
+soc = None
+# soc = socket.socket()
+# soc.settimeout(10)
 
 username = input('Username?\n> ') 
 
-DiffChoice = input('User lower difficulty? (Y/N) [Leave empty for default of True]\n> ')
+DiffChoice = input('Use lower difficulty? (Y/N) [Leave empty for default of True]\n> ')
 if DiffChoice.lower == "n":
     UseLowerDiff = False
 else:
     UseLowerDiff = True
+
+AVAILABLE_PORTS = [2812,2813,2814,2815,2816]
+def get_fastest_connection(server_ip:str):
+    connection_pool = []
+    available_connections = []
+    for i in range(len(AVAILABLE_PORTS)):
+        connection_pool.append(socket.socket())
+        connection_pool[i].setblocking(0)
+        try:
+            connection_pool[i].connect((server_ip, 
+                                        AVAILABLE_PORTS[i]))
+        except BlockingIOError as e:
+            pass
+    
+    ready_connections,_,__ = select.select(connection_pool,[],[])
+    
+    while True:
+        for connection in ready_connections:
+            try:
+                server_version = connection.recv(100)
+            except:
+                continue
+            if server_version == b'':
+                continue
+               
+            available_connections.append(connection)
+            connection.send(b'PING')
+         
+        ready_connections,_,__ = select.select(available_connections,[],[])
+        ready_connections[0].recv(100)
+        # python is smart enough to close all other connections
+        # I hope
+        ready_connections[0].settimeout(10)
+        return ready_connections[0]
+            
+    
 
 def retrieve_server_ip():
     print("> Retrieving Pool Address And Port")
@@ -49,10 +87,14 @@ def retrieve_server_ip():
 retrieve_server_ip()
 while True:
     try:
+        print('Searching for fastest connection to the server')
+        soc = get_fastest_connection(str(pool_address))
+        print('Fastest connection found')
+        
         # This section connects and logs user to the server
-        soc.connect((str(pool_address), int(pool_port)))
-        server_version = soc.recv(3).decode()  # Get server version
-        print("Server is on version", server_version)
+        # soc.connect((str(pool_address), int(pool_port)))
+        # server_version = soc.recv(3).decode()  # Get server version
+        #print("Server is on version", server_version)
 
         # Mining section
         while True:
