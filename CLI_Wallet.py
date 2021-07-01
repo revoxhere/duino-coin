@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v2.46)
+# Duino-Coin CLI Wallet (v2.52)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
@@ -116,7 +116,7 @@ wrong_passphrase = False
 backend = default_backend()
 iterations = 100_000
 timeout = 30  # Socket timeout
-VER = 2.46
+VER = 2.52
 RESOURCES_DIR = 'CLI_Wallet_' + str(VER) + '_resources'
 use_wrapper = False
 WS_URI = "wss://server.duinocoin.com:15808"
@@ -325,7 +325,7 @@ while True:
 
             password = getpass.getpass(prompt=Style.RESET_ALL
                                        + Fore.YELLOW
-                                       + "Enter your password: "
+                                       + "Enter your password (not shown for privacy): "
                                        + Style.BRIGHT,
                                        stream=None)
 
@@ -382,13 +382,13 @@ while True:
 
             password = getpass.getpass(prompt=Style.RESET_ALL
                                        + Fore.YELLOW
-                                       + "Enter your password: "
+                                       + "Enter your password (not shown for privacy): "
                                        + Style.BRIGHT,
                                        stream=None)
 
             pconfirm = getpass.getpass(prompt=Style.RESET_ALL
                                        + Fore.YELLOW
-                                       + "Confirm your password: "
+                                       + "Confirm your password (not shown for privacy): "
                                        + Style.BRIGHT,
                                        stream=None)
 
