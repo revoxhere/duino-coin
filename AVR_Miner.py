@@ -563,7 +563,7 @@ def greeting():
         + get_string('algorithm')
         + Style.BRIGHT
         + Fore.YELLOW
-        + 'DUCO-S1A @ AVR diff')
+        + 'DUCO-S1A ⚙ AVR diff')
 
     if rig_identifier != "None":
         print(
@@ -761,6 +761,7 @@ def mine_avr(com):
     global node_address
     global node_port
     errorCounter = 0
+    result = None
     while True:
         soc = connect()
 
@@ -1172,11 +1173,13 @@ def mine_avr(com):
 
 
 if __name__ == '__main__':
-    # Unicode fix for windows
     if osname == "nt":
+        # Unicode fix for windows
         ossystem("chcp 65001")
-    # Colorama
-    init(autoreset=True)
+        # Colorama
+        init(autoreset=True, convert=True)
+    else:
+        init(autoreset=True)
     # Window title
     title(get_string('duco_avr_miner') + str(MINER_VER) + ')')
 
