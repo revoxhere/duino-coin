@@ -16,8 +16,8 @@ To start communication however, firstly you need to connect to the server. For n
 *   TCP connection
     * `tcp://51.15.127.80:2811` - Legacy port
     * `tcp://51.15.127.80:2812` - Port preferred for wallets
-    * `tcp://51.15.127.80:2813` - Port preferred for PC mining
-    * `tcp://51.15.127.80:2814` - Port preferred for AVR mining
+    * `tcp://51.15.127.80:2813` - Port preferred for AVR mining
+    * `tcp://51.15.127.80:2814` - Port preferred for PC mining
     * `tcp://51.15.127.80:2815` - Port preferred for ESP mining
     * `tcp://51.15.127.80:2816` - Port preferred for webservices
     * Note: you can also use `server.duinocoin.com` instead of `51.15.127.80`
