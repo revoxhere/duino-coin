@@ -1,50 +1,62 @@
 #!/usr/bin/env python3
-# Minimal version of Duino-Coin PC Miner
-# Using the XXHASH algorithm
+# Minimal version of Duino-Coin PC Miner, useful for developing own apps.
+# XXHASH version
 # Created by revox 2020-2021
+# Modifications made by Robert Furr (robtech21) and YeahNotSewerSide
+
 import os
 import socket
 import sys  # Only python3 included libraries
 import time
-import urllib.request
+import select
 
 import xxhash  # use python3 -m pip install xxhash to install xxhash
 
-soc = socket.socket()
-soc.settimeout(10)
+soc = None
 
-username = "revox"  # Edit this to your username, mind the quotes
+AVAILABLE_PORTS = [2812, 2813, 2814, 2815, 2816]
+soc = None
+
+username = input('Username?\n> ')
 
 
-def retrieve_server_ip():
-    print("> Retrieving Pool Address and Port")
-    pool_obtained = False
-    while not pool_obtained:
+def get_fastest_connection(server_ip: str):
+    connection_pool = []
+    available_connections = []
+    for i in range(len(AVAILABLE_PORTS)):
+        connection_pool.append(socket.socket())
+        connection_pool[i].setblocking(0)
         try:
-            serverip = ("https://raw.githubusercontent.com/"
-                            + "revoxhere/"
-                            + "duino-coin/gh-pages/"
-                            + "serverip.txt")
-            with urllib.request.urlopen(serverip) as content:
-                # Read content and split into lines
-                content = content.read().decode().splitlines()
-            global pool_address, pool_port
-            # Line 1 = IP
-            pool_address = content[0]
-            # Line 2 = port
-            pool_port = content[1]
-            pool_obtained =  True
-        except:
-            print("> Failed to retrieve Pool Address and Port, Retrying.")
-            continue
+            connection_pool[i].connect((server_ip,
+                                        AVAILABLE_PORTS[i]))
+        except BlockingIOError as e:
+            pass
 
-retrieve_server_ip()
+    ready_connections, _, __ = select.select(connection_pool, [], [])
+
+    while True:
+        for connection in ready_connections:
+            try:
+                server_version = connection.recv(100)
+            except:
+                continue
+            if server_version == b'':
+                continue
+
+            available_connections.append(connection)
+            connection.send(b'PING')
+
+        ready_connections, _, __ = select.select(available_connections, [], [])
+        ready_connections[0].recv(100)
+        ready_connections[0].settimeout(10)
+        return ready_connections[0]
+
+
 while True:
     try:
-        # This section connects and logs user to the server
-        soc.connect((str(pool_address), int(pool_port)))
-        server_version = soc.recv(3).decode()  # Get server version
-        print("Server is on version", server_version)
+        print('Searching for fastest connection to the server')
+        soc = get_fastest_connection(str("server.duinocoin.com"))
+        print('Fastest connection found')
 
         # Mining section
         while True:
@@ -107,6 +119,5 @@ while True:
 
     except Exception as e:
         print("Error occured: " + str(e) + ", restarting in 5s.")
-        retrieve_server_ip()
         time.sleep(5)
         os.execv(sys.argv[0], sys.argv)
