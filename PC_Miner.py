@@ -14,6 +14,7 @@ from json import load as jsonload
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 from os import _exit, execl, mkdir
 from os import name as osname
+from os import system as ossystem
 from platform import machine as osprocessor
 from os import path, system
 from pathlib import Path
