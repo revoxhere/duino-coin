@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Tkinter GUI Wallet (v2.45)
+# Duino-Coin Tkinter GUI Wallet (v2.52)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -31,7 +31,7 @@ from webbrowser import open_new_tab
 from requests import get
 
 # Version number
-VERSION = 2.45
+VERSION = 2.52
 # Colors
 BACKGROUND_COLOR = "#121212"
 FONT_COLOR = "#fffdee"
@@ -267,7 +267,7 @@ class LoginFrame(Frame):
 
         self.configure(background=BACKGROUND_COLOR)
         self.master.bind(
-            "<Return>", 
+            "<Return>",
             self._login_btn_clicked_bind)
         self.pack()
 
@@ -677,7 +677,6 @@ def currency_converter_window(handler):
     calculatorWindow.transient([root])
     calculatorWindow.configure(background=BACKGROUND_COLOR)
 
-
     TEXT_FONT_BOLD = Font(
         calculatorWindow,
         size=12,
@@ -1013,7 +1012,7 @@ def statistics_window(handler):
            pady=5)
     Label(
         statsWindow,
-        text=get_string("difficulty") 
+        text=get_string("difficulty")
         + ": "
         + str(statsApi["Current difficulty"]),
         font=TEXT_FONT,
@@ -1025,7 +1024,7 @@ def statistics_window(handler):
            padx=5)
     Label(
         statsWindow,
-        text=get_string("mined_blocks") 
+        text=get_string("mined_blocks")
         + ": "
         + str(statsApi["Mined blocks"]),
         font=TEXT_FONT,
@@ -1049,7 +1048,7 @@ def statistics_window(handler):
            padx=5)
     Label(
         statsWindow,
-        text=get_string("active_miners") 
+        text=get_string("active_miners")
         + ": "
         + str(len(statsApi["Miners"])),
         font=TEXT_FONT,
@@ -1062,7 +1061,7 @@ def statistics_window(handler):
     Label(
         statsWindow,
         text="1 DUCO "
-        + get_string("estimated_price") 
+        + get_string("estimated_price")
         + ": $"
         + str(statsApi["Duco price"]),
         font=TEXT_FONT,
@@ -1074,7 +1073,7 @@ def statistics_window(handler):
            padx=5)
     Label(
         statsWindow,
-        text=get_string("registered_users") 
+        text=get_string("registered_users")
         + ": "
         + str(statsApi["Registered users"]),
         font=TEXT_FONT,
@@ -1654,8 +1653,8 @@ def settings_window(handler):
 
     Label(
         settingsWindow,
-        text=get_string("logged_in_as") 
-        + ": " 
+        text=get_string("logged_in_as")
+        + ": "
         + str(username),
         font=TEXT_FONT,
         background=BACKGROUND_COLOR,
@@ -1669,7 +1668,7 @@ def settings_window(handler):
     Label(
         settingsWindow,
         text=get_string("wallet_version")
-        + ": " 
+        + ": "
         + str(VERSION),
         font=TEXT_FONT,
         background=BACKGROUND_COLOR,
@@ -1783,7 +1782,6 @@ def settings_window(handler):
     discordLabel.bind("<Button-1>", openDiscord)
 
 
-
 def get_balance():
     global oldbalance
     global balance
@@ -1823,7 +1821,7 @@ def get_balance():
                 float(balance) - float(oldbalance)) + unpaid_balance
             if float(balance) != float(difference):
                 if (dif_with_unpaid >= MIN_TRANSACTION_VALUE
-                        or dif_with_unpaid < 0
+                    or dif_with_unpaid < 0
                     ):
                     now = datetime.now()
                     difference = round(dif_with_unpaid, 8)
@@ -1872,7 +1870,6 @@ def get_wbalance():
         return 0.0
 
 
-
 def update_balance_labels():
     global profit_array, profitCheck
     try:
@@ -1887,7 +1884,8 @@ def update_balance_labels():
             Transactions = cur.fetchall()
         transactionstext_format = ""
         for i, row in enumerate(Transactions, start=1):
-            transactionstext_format += str(row[1]) + " " + str(row[2]) + " DUCO\n"
+            transactionstext_format += str(row[1]) + \
+                " " + str(row[2]) + " DUCO\n"
             if i == 6:
                 transactionstext_format = transactionstext_format.rstrip("\n")
                 break
@@ -1923,7 +1921,6 @@ def update_balance_labels():
     Timer(1, update_balance_labels).start()
 
 
-
 def profit_calculator(start_bal):
     try:  # Thanks Bilaboz for the code!
         global curr_bal, profit_array
@@ -1954,11 +1951,13 @@ def send_funds_protocol(handler):
     MsgBox = messagebox.askquestion(
         get_string("warning"),
         get_string("send_funds_warning")
+        + " "
         + str(amountStr)
         + " DUCO "
         + get_string("send_funds_to")
         + " "
-        + str(recipientStr),
+        + str(recipientStr)
+        + "?",
         icon="warning",)
     if MsgBox == "yes":
         soc = websocket.create_connection(WS_URI)
@@ -2066,7 +2065,7 @@ class Wallet:
 
         Label(
             master,
-            text=get_string("uppercase_duino_coin_wallet") 
+            text=get_string("uppercase_duino_coin_wallet")
             + ": "
             + str(username),
             font=TEXT_FONT_BOLD_LARGE,
