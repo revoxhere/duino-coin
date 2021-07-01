@@ -27,6 +27,7 @@ from threading import Lock
 from time import ctime, sleep, strptime, time
 from statistics import mean
 from random import choice
+import select
 import pip
 
 
@@ -95,6 +96,7 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = '2.52'  # Version number
+AVAILABLE_PORTS = [2813, 2814, 2816, 2812]
 SOC_TIMEOUT = 45
 AVR_TIMEOUT = 4  # diff 8(*100) / 196 H/s ~= 4
 BAUDRATE = 115200
@@ -211,42 +213,61 @@ def title(title: str):
         sys.stdout.flush()
 
 
+def get_fastest_connection(server_ip: str):
+    connection_pool = []
+    available_connections = []
+
+    for i in range(len(AVAILABLE_PORTS)):
+        connection_pool.append(socket())
+        connection_pool[i].setblocking(0)
+        try:
+            connection_pool[i].connect((server_ip,
+                                        AVAILABLE_PORTS[i]))
+        except BlockingIOError as e:
+            pass
+
+    ready_connections, _, __ = select.select(connection_pool, [], [])
+
+    while True:
+        for connection in ready_connections:
+            try:
+                server_version = connection.recv(100).decode()
+            except:
+                continue
+            if server_version == b'':
+                continue
+
+            available_connections.append(connection)
+            connection.send(b'PING')
+
+        ready_connections, _, __ = select.select(available_connections, [], [])
+        ready_connections[0].recv(100)
+        ready_connections[0].settimeout(SOC_TIMEOUT)
+        return ready_connections[0], server_version
+
+
 def connect():
     # Server connection
     global node_address
     global node_port
-    serverVersion = 0
+    server_version = 0
     while True:
-        node_address = "server.duinocoin.com"
-        if shuffle_ports == "y":
-            portlist = [2812, 2814, 2816]
-            node_port = choice(portlist)
-        else:
-            # Default AVR mining port
-            node_port = 2814
-
         try:
-            try:
-                socket.close()
-            except Exception:
-                pass
-            debug_output('Connecting to '
-                         + str(node_address)
-                         + str(':')
-                         + str(node_port))
-            soc = socket()
-            soc.settimeout(SOC_TIMEOUT)
+            node_address = "server.duinocoin.com"
+            if shuffle_ports == "y":
+                debug_output('Searching for fastest connection to the server')
+                soc, server_version = get_fastest_connection(
+                    str("server.duinocoin.com"))
+                debug_output('Fastest connection found')
+            else:
+                # Default AVR mining port
+                debug_output('Connecting to default AVR port')
+                soc = socket()
+                soc.connect((str(node_address), AVAILABLE_PORTS[0]))
+                soc.settimeout(SOC_TIMEOUT)
+                server_version = soc.recv(100).decode()
 
-            # Establish socket connection to the server
-            soc.connect(
-                (str(node_address),
-                    int(node_port)))
-
-            # Get server version
-            serverVersion = soc.recv(10).decode().rstrip('\n')
-            debug_output('Server version: ' + serverVersion)
-
-            if float(serverVersion) <= float(MINER_VER):
+            if float(server_version) <= float(MINER_VER):
                 # If miner is up-to-date, display a message and continue
                 pretty_print(
                     'net0',
@@ -254,9 +275,7 @@ def connect():
                     + Style.NORMAL
                     + Fore.RESET
                     + get_string('connected_server')
-                    + str(serverVersion)
-                    + ", port "
-                    + str(node_port)
+                    + str(server_version)
                     + ")",
                     'success')
                 break
@@ -267,7 +286,7 @@ def connect():
                     + MINER_VER
                     + ') -'
                     + get_string('server_is_on_version')
-                    + serverVersion
+                    + server_version
                     + Style.NORMAL
                     + Fore.RESET
                     + get_string('update_warning'),
@@ -281,9 +300,7 @@ def connect():
                 + Style.NORMAL
                 + ' ('
                 + str(e)
-                + ", port "
-                + str(node_port)
-                +')',
+                + ')',
                 'error')
             debug_output('Connection error: ' + str(e))
             sleep(10)
@@ -318,6 +335,10 @@ def load_config():
     global avrport
     global debug
     global rig_identifier
+    global discord_presence
+    global shuffle_ports
+    global SOC_TIMEOUT
+    global AVR_TIMEOUT
 
     # Initial configuration section
     if not Path(str(RESOURCES_DIR) + '/Miner_config.cfg').is_file():
@@ -451,8 +472,8 @@ def load_config():
         donation_level = config['Duino-Coin-AVR-Miner']['donate']
         debug = config['Duino-Coin-AVR-Miner']['debug']
         rig_identifier = config['Duino-Coin-AVR-Miner']['identifier']
-        SOC_TIMEOUT = config["Duino-Coin-AVR-Miner"]["soc_timeout"]
-        AVR_TIMEOUT = config["Duino-Coin-AVR-Miner"]["soc_timeout"]
+        SOC_TIMEOUT = int(config["Duino-Coin-AVR-Miner"]["soc_timeout"])
+        AVR_TIMEOUT = float(config["Duino-Coin-AVR-Miner"]["soc_timeout"])
         discord_presence = config["Duino-Coin-AVR-Miner"]["discord_presence"]
         shuffle_ports = config["Duino-Coin-AVR-Miner"]["shuffle_ports"]
 
