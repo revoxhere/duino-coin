@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v2.45)
+# Duino-Coin CLI Wallet (v2.46)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2020
+# © Duino-Coin Community 2021
 ##########################################
 import configparser
 import datetime
 import getpass
 import json
 import os
+from os import _exit, execl, mkdir
+from os import path
 import platform
 import socket
 import sys
@@ -108,26 +110,31 @@ except:
     print(now.strftime("%H:%M:%S ")
           + "Tronpy is not installed. "
           + "Please install it using: python3 -m pip install tronpy."
-          + "\nWrapper is disabled because of tronpy is not installed.")
+          + "\nWrapper is disabled because tronpy is not installed.")
 
 wrong_passphrase = False
 backend = default_backend()
 iterations = 100_000
 timeout = 30  # Socket timeout
-VER = 2.45
+VER = 2.46
+RESOURCES_DIR = 'CLI_Wallet_' + str(VER) + '_resources'
 use_wrapper = False
 WS_URI = "wss://server.duinocoin.com:15808"
 # Serverip file
 config = configparser.ConfigParser()
 
+# Check if the resources folder exists, and makes one if not
+if not path.exists(RESOURCES_DIR):
+    mkdir(RESOURCES_DIR)
+
 # Check if commands file exists
-if not Path("cli_wallet_commands.json").is_file():
+if not Path(RESOURCES_DIR + "/cli_wallet_commands.json").is_file():
     url = ("https://raw.githubusercontent.com/"
            + "revoxhere/"
            + "duino-coin/master/Resources/"
            + "cli_wallet_commands.json")
     r = requests.get(url)
-    with open("cli_wallet_commands.json", "wb") as f:
+    with open(RESOURCES_DIR + "/cli_wallet_commands.json", "wb") as f:
         f.write(r.content)
 
 
@@ -165,7 +172,7 @@ def print_command(name, desc):
 
 # Print the command names and description using a json file
 def print_commands_norm():
-    with open('cli_wallet_commands.json') as f:
+    with open(RESOURCES_DIR + '/cli_wallet_commands.json') as f:
         data = json.load(f)
         for key, value in data.items():
             if key == "wrapper_commands":
@@ -174,7 +181,7 @@ def print_commands_norm():
 
 
 def print_commands_wrapper():
-    with open('cli_wallet_commands.json') as f:
+    with open(RESOURCES_DIR + '/cli_wallet_commands.json') as f:
         data = json.load(f)
         for key in data["wrapper_commands"]:
             print_command(key, data["wrapper_commands"][key])
@@ -251,7 +258,7 @@ while True:
                 + "It is probably under maintenance or temporarily down."
                 + "\nRetrying in 15 seconds.")
         time.sleep(15)
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        os.system("python " + __file__)
 
     except:
         print(Style.RESET_ALL
@@ -288,14 +295,14 @@ def reconnect():
                     + "It is probably under maintenance or temporarily down."
                     + "\nRetrying in 15 seconds.")
             time.sleep(15)
-            os.execl(sys.executable, sys.executable, *sys.argv)
+            os.system("python " + __file__)
         else:
             return s
 
 
 while True:
     title("Duino-Coin CLI Wallet")
-    if not Path("CLIWallet_config.cfg").is_file():
+    if not Path(RESOURCES_DIR + "/CLIWallet_config.cfg").is_file():
         # Initial configuration section
         print(Style.RESET_ALL
               + Style.BRIGHT
@@ -338,14 +345,14 @@ while True:
                     if loginFeedback[0] == "OK":
                         print(Style.RESET_ALL
                               + Fore.YELLOW
-                              + "Successfull login")
+                              + "Successful login")
 
                         config['wallet'] = {
                             "username": username,
                             "password": b64encode(bytes(password, encoding="utf8")).decode("utf-8")}
                         config['wrapper'] = {"use_wrapper": "false"}
 
-                        with open("CLIWallet_config.cfg", "w") as configfile:  # Write data to file
+                        with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:  # Write data to file
                             config.write(configfile)
                     else:
                         print(Style.RESET_ALL
@@ -424,7 +431,7 @@ while True:
             os._exit(0)
 
     else:
-        config.read("CLIWallet_config.cfg")
+        config.read(RESOURCES_DIR + "/CLIWallet_config.cfg")
         if config["wrapper"]["use_wrapper"] == "true" and tronpy_installed:
             use_wrapper = True
             if config["wrapper"]["use_custom_passphrase"] == "true":
@@ -460,7 +467,7 @@ while True:
                 trx_balance = 0
 
         while True:
-            config.read("CLIWallet_config.cfg")
+            config.read(RESOURCES_DIR + "/CLIWallet_config.cfg")
             username = config["wallet"]["username"]
             password = b64decode(config["wallet"]["password"]).decode("utf8")
             s.send(bytes(
@@ -648,7 +655,7 @@ while True:
                 os._exit(0)
 
             elif command == "wrapperconf":  # wrapper config
-                config.read("CLIWallet_config.cfg")
+                config.read(RESOURCES_DIR + "/CLIWallet_config.cfg")
                 if not config["wrapper"]["use_wrapper"] == "true" and tronpy_installed:
                     print(Style.RESET_ALL
                           + Fore.WHITE
@@ -686,7 +693,7 @@ while True:
                                         "use_custom_passphrase": "false"}
 
                                     # Write data to file
-                                    with open("CLIWallet_config.cfg", "w") as configfile:
+                                    with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
                                         config.write(configfile)
                                         print("Success!")
 
@@ -703,7 +710,7 @@ while True:
                                         "use_custom_passphrase": "true"}
 
                                     # Write data to file
-                                    with open("CLIWallet_config.cfg", "w") as configfile:
+                                    with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
                                         config.write(configfile)
                                         print("Success !")
 
@@ -737,7 +744,7 @@ while True:
                                             "use_custom_passphrase": "false"}
 
                                         # Write data to file
-                                        with open("CLIWallet_config.cfg", "w") as configfile:
+                                        with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
                                             config.write(configfile)
                                             print("Success!")
 
@@ -753,7 +760,7 @@ while True:
                                             "use_custom_passphrase": "true"}
 
                                         # Write data to file
-                                        with open("CLIWallet_config.cfg", "w") as configfile:
+                                        with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
                                             config.write(configfile)
                                             print("Success !")
                             except ValueError:
@@ -961,7 +968,7 @@ while True:
                       + "https://duinocoin.com")
                 print(Style.RESET_ALL
                       + Fore.WHITE
-                      + "Server version :"
+                      + "Server version: "
                       + Style.BRIGHT
                       + str(SERVER_VER)
                       + Style.RESET_ALL)
@@ -987,8 +994,8 @@ while True:
                           + "Client is up-to-date")
 
             elif command == "logout":
-                os.remove("CLIWallet_config.cfg")
-                os.execl(sys.executable, sys.executable, *sys.argv)
+                os.remove(RESOURCES_DIR + "/CLIWallet_config.cfg")
+                os.system("python " + __file__)
 
             elif command == "donate":
                 print(Style.RESET_ALL

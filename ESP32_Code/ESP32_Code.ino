@@ -70,7 +70,7 @@ TaskHandle_t Task2;
 SemaphoreHandle_t xMutex;
 
 const char * host = "51.15.127.80"; // Static server IP
-const int port = 2811;
+const int port = 2815;
 
 volatile int wifiStatus = 0;
 volatile int wifiPrev = WL_CONNECTED;

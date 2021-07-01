@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # Minimal version of Duino-Coin PC Miner, useful for developing own apps. Created by revox 2020-2021
+# Modifications made by Robert Furr (robtech21)
+
 import hashlib
 import os
 import socket
@@ -11,9 +13,13 @@ import ssl
 soc = socket.socket()
 soc.settimeout(10)
 
-username = "revox"  # Edit this to your username, mind the quotes
-UseLowerDiff = True  # Set it to True to mine with lower difficulty
+username = input('Username?\n> ') 
 
+DiffChoice = input('User lower difficulty? (Y/N) [Leave empty for default of True]\n> ')
+if DiffChoice.lower == "n":
+    UseLowerDiff = False
+else:
+    UseLowerDiff = True
 
 def retrieve_server_ip():
     print("> Retrieving Pool Address And Port")
