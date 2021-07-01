@@ -354,7 +354,7 @@ def Greeting():
         + Style.BRIGHT
         + Fore.YELLOW
         + algorithm
-        + " @ "
+        + " ⚙ "
         + diffName)
 
     if rig_identiier != "None":
@@ -802,7 +802,7 @@ def Thread(
                         str("server.duinocoin.com"))
                     debug_output('Fastest connection found')
                 else:
-                    # Default AVR mining port
+                    # Default PC mining port
                     debug_output('Connecting to default PC port')
                     soc = socket()
                     soc.connect((str(node_address), AVAILABLE_PORTS[0]))
@@ -1278,12 +1278,17 @@ def updateRichPresence():
 if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
-    # Processor info
     cpu = cpuinfo.get_cpu_info()
-    # Colorama
-    init(autoreset=True)
     title(getString("duco_python_miner") + str(MINER_VER) + ")")
 
+    if osname == "nt":
+        # Unicode fix for windows
+        ossystem("chcp 65001")
+        # Colorama
+        init(autoreset=True, convert=True)
+    else:
+        init(autoreset=True)
+        
     try:
         from multiprocessing import (
             Manager,
