@@ -28,6 +28,7 @@ from time import ctime, sleep, strptime, time
 from multiprocessing import Lock
 from random import choice
 import pip
+import select
 
 thread_lock = Lock()
 
@@ -110,6 +111,7 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = "2.52"  # Version number
+AVAILABLE_PORTS = [2814, 2813, 2816, 2812]
 SOC_TIMEOUT = 45  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 shuffle_ports = "y"
@@ -216,7 +218,7 @@ def title(title):
 def handler(signal_received, frame):
     # SIGINT handler
     if current_process().name == "MainProcess":
-        prettyPrint(
+        pretty_print(
             "sys0",
             getString("sigint_detected")
             + Style.NORMAL
@@ -419,6 +421,9 @@ def loadConfig():
     global rig_identiier
     global lang
     global algorithm
+    global SOC_TIMEOUT
+    global discord_presence
+    global shuffle_ports
 
     # Initial configuration
     if not Path(RESOURCES_DIR + "/Miner_config.cfg").is_file():
@@ -617,7 +622,7 @@ def loadConfig():
         algorithm = config["Duino-Coin-PC-Miner"]["algorithm"]
         rig_identiier = config["Duino-Coin-PC-Miner"]["identifier"]
         debug = config["Duino-Coin-PC-Miner"]["debug"]
-        SOC_TIMEOUT = config["Duino-Coin-PC-Miner"]["soc_timeout"]
+        SOC_TIMEOUT = int(config["Duino-Coin-PC-Miner"]["soc_timeout"])
         discord_presence = config["Duino-Coin-PC-Miner"]["discord_presence"]
         shuffle_ports = config["Duino-Coin-PC-Miner"]["shuffle_ports"]
 
@@ -649,7 +654,7 @@ def Donate():
             + "-p x -s 4 -e ")
 
     if int(donation_level) <= 0:
-        prettyPrint(
+        pretty_print(
             "sys0",
             Fore.YELLOW
             + getString("free_network_warning")
@@ -678,7 +683,7 @@ def Donate():
             # Launch CMD as subprocess
             donateExecutable = Popen(
                 cmd, shell=True, stderr=DEVNULL)
-            prettyPrint(
+            pretty_print(
                 "sys0",
                 getString("thanks_donation"),
                 "warning")
@@ -740,70 +745,101 @@ def ducos1xxh(
             return [ducos1xxres, hashrate]
 
 
+def get_fastest_connection(server_ip: str):
+    connection_pool = []
+    available_connections = []
+
+    for i in range(len(AVAILABLE_PORTS)):
+        connection_pool.append(socket())
+        connection_pool[i].setblocking(0)
+        try:
+            connection_pool[i].connect((server_ip,
+                                        AVAILABLE_PORTS[i]))
+        except BlockingIOError as e:
+            pass
+
+    ready_connections, _, __ = select.select(connection_pool, [], [])
+
+    while True:
+        for connection in ready_connections:
+            try:
+                server_version = connection.recv(100).decode()
+            except:
+                continue
+            if server_version == b'':
+                continue
+
+            available_connections.append(connection)
+            connection.send(b'PING')
+
+        ready_connections, _, __ = select.select(available_connections, [], [])
+        ready_connections[0].recv(100)
+        ready_connections[0].settimeout(SOC_TIMEOUT)
+        return ready_connections[0], server_version
+
+
 def Thread(
-        threadid,
-        accepted,
-        rejected,
-        requested_diff,
-        khashcount,
-        username,
-        efficiency,
-        rig_identiier,
-        algorithm,
+        threadid: int,
+        accepted: int,
+        rejected: int,
+        requested_diff: str,
+        khashcount: int,
+        username: str,
+        efficiency: int,
+        rig_identiier: str,
+        algorithm: str,
         hashrates_list,
         totalhashrate_mean):
     # Mining section for every thread
     while True:
         while True:
-            node_address = "server.duinocoin.com"
-            if shuffle_ports == "y":
-                portlist = [2812, 2813, 2817]
-                node_port = choice(portlist)
-            else:
-                # Default PC mining port
-                node_port = 2813 
-
             try:
-                soc = socket()
-                soc.connect((str(node_address),
-                             int(node_port)))
-                soc.settimeout(SOC_TIMEOUT)
-                serverVersion = soc.recv(3).decode().rstrip("\n")
-                debug_output("Server version: " + serverVersion)
+                node_address = "server.duinocoin.com"
+                if shuffle_ports == "y":
+                    debug_output(
+                        'Searching for fastest connection to the server')
+                    soc, server_version = get_fastest_connection(
+                        str("server.duinocoin.com"))
+                    debug_output('Fastest connection found')
+                else:
+                    # Default AVR mining port
+                    debug_output('Connecting to default PC port')
+                    soc = socket()
+                    soc.connect((str(node_address), AVAILABLE_PORTS[0]))
+                    soc.settimeout(SOC_TIMEOUT)
+                    server_version = soc.recv(100).decode()
 
-                if threadid == 0:
-                    soc.send(bytes("MOTD", encoding="utf8"))
-                    motd = soc.recv(1024).decode().rstrip("\n")
-                    prettyPrint("net" + str(threadid),
-                                " Server message: " + motd,
-                                "warning")
+                    if threadid == 0:
+                        soc.send(bytes("MOTD", encoding="utf8"))
+                        motd = soc.recv(1024).decode().rstrip("\n")
+                        pretty_print("net" + str(threadid),
+                                     " Server message:\n" + motd,
+                                     "warning")
 
-                if float(serverVersion) <= float(MINER_VER):
+                if float(server_version) <= float(MINER_VER):
                     # Miner is up-to-date
-                    prettyPrint(
+                    pretty_print(
                         "net"
                         + str(threadid),
                         getString("connected")
                         + Fore.RESET
                         + Style.NORMAL
                         + getString("connected_server")
-                        + str(serverVersion)
-                        + ", port "
-                        + str(node_port)
+                        + str(server_version)
                         + ")",
                         "success")
                     break
 
                 else:
                     # Miner is outdated
-                    prettyPrint(
+                    pretty_print(
                         "sys"
                         + str(threadid),
                         getString("outdated_miner")
                         + MINER_VER
                         + ") -"
                         + getString("server_is_on_version")
-                        + serverVersion
+                        + server_version
                         + Style.NORMAL
                         + Fore.RESET
                         + getString("update_warning"),
@@ -812,7 +848,7 @@ def Thread(
 
             except Exception as e:
                 # Socket connection error
-                prettyPrint(
+                pretty_print(
                     "net"
                     + str(threadid),
                     getString("connecting_error")
@@ -820,8 +856,6 @@ def Thread(
                     + Fore.RESET
                     + " (net err: "
                     + str(e)
-                    + ", port "
-                    + str(node_port)
                     + ")",
                     "error")
                 debug_output("Connection error: " + str(e))
@@ -832,7 +866,7 @@ def Thread(
         else:
             using_algo = getString("using_algo")
 
-        prettyPrint(
+        pretty_print(
             "sys"
             + str(threadid),
             getString("mining_thread")
@@ -878,10 +912,10 @@ def Thread(
                                      "Correct job received")
                         break
                     except:
-                        prettyPrint("cpu" + str(threadid),
-                                    " Server message: "
-                                    + job[1],
-                                    "warning")
+                        pretty_print("cpu" + str(threadid),
+                                     " Server message: "
+                                     + job[1],
+                                     "warning")
                         sleep(3)
 
                 while True:
@@ -960,9 +994,10 @@ def Thread(
 
                         if (totalhashrate > 1500
                                 and accepted.value % 50 == 0):
-                            prettyPrint("sys0",
-                                        " " + getString("max_hashrate_notice"),
-                                        "warning")
+                            pretty_print("sys0",
+                                         " " +
+                                         getString("max_hashrate_notice"),
+                                         "warning")
                         uptime, uptime_type = calculate_uptime(start_time)
                         diff = get_prefix(diff)
                         if feedback == "GOOD":
@@ -1143,7 +1178,7 @@ def Thread(
                         break
                     break
             except Exception as e:
-                prettyPrint(
+                pretty_print(
                     "net"
                     + str(threadid),
                     getString("error_while_mining")
@@ -1158,14 +1193,14 @@ def Thread(
                 break
 
 
-def prettyPrint(messageType, message, state):
+def pretty_print(message_type, message, state):
     # Print output messages in the DUCO "standard"
     # Usb/net/sys background
-    if messageType.startswith("net"):
+    if message_type.startswith("net"):
         background = Back.BLUE
-    elif messageType.startswith("cpu"):
+    elif message_type.startswith("cpu"):
         background = Back.YELLOW
-    if messageType.startswith("sys"):
+    if message_type.startswith("sys"):
         background = Back.GREEN
 
     # Text color
@@ -1183,7 +1218,7 @@ def prettyPrint(messageType, message, state):
               + Style.BRIGHT
               + background
               + " "
-              + messageType
+              + message_type
               + " "
               + Back.RESET
               + color
@@ -1266,7 +1301,7 @@ if __name__ == "__main__":
         totalhashrate_mean = manager.list()
     except Exception as e:
         print(e)
-        prettyPrint(
+        pretty_print(
             "sys0",
             " Multiprocessing is not available. "
             + "Please check permissions and/or your python installation. "
@@ -1280,7 +1315,7 @@ if __name__ == "__main__":
         loadConfig()
         debug_output("Config file loaded")
     except Exception as e:
-        prettyPrint(
+        pretty_print(
             "sys0",
             getString("load_config_error")
             + RESOURCES_DIR
@@ -1300,7 +1335,7 @@ if __name__ == "__main__":
         Greeting()
         debug_output("Greeting displayed")
     except Exception as e:
-        prettyPrint(
+        pretty_print(
             "sys0",
             "Error displaying greeting message"
             + Style.NORMAL
@@ -1336,8 +1371,14 @@ if __name__ == "__main__":
                     hashrates_list,
                     totalhashrate_mean))
             thread[x].start()
+            if x % 4 == 0:
+                # Don't launch burst of threads
+                sleep(5)
+            else:
+                sleep(0.5)
+
     except Exception as e:
-        prettyPrint(
+        pretty_print(
             "sys0",
             "Error launching CPU thread(s)"
             + Style.NORMAL
