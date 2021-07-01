@@ -757,11 +757,11 @@ def Thread(
         while True:
             node_address = "server.duinocoin.com"
             if shuffle_ports == "y":
-                portlist = [2811, 2812, 2813, 2814, 2816]
+                portlist = [2812, 2813, 2817]
                 node_port = choice(portlist)
             else:
                 # Default PC mining port
-                node_port = 2814 
+                node_port = 2813 
 
             try:
                 soc = socket()
