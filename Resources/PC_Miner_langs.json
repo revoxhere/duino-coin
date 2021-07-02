@@ -94,7 +94,7 @@
         "ask_difficulty": "Seleziona la difficoltà di mining che vuoi usare (1-3): ",
         "low_diff": "Difficoltà bassa (per Raspberry Pi e vecchi computer)",
         "medium_diff": "Difficoltà media (per computer normali)",
-        "net_diff": " network (per computer potenti)",
+        "net_diff": "Difficoltà network (per computer potenti)",
 
         "low_diff_short": "Dif. bassa",
         "medium_diff_short": "Dif. media",
