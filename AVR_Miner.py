@@ -96,7 +96,13 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = '2.52'  # Version number
-AVAILABLE_PORTS = [2813, 2814, 2816, 2812]
+NODE_ADDRESS = "server.duinocoin.com"
+AVAILABLE_PORTS = [
+    2816,  # AVR (1)
+    2817,  # AVR (2)
+    2812,  # Wallets, other miners
+    2811   # Legacy
+]
 SOC_TIMEOUT = 45
 AVR_TIMEOUT = 4  # diff 8(*100) / 196 H/s ~= 4
 BAUDRATE = 115200
@@ -248,22 +254,19 @@ def get_fastest_connection(server_ip: str):
 
 def connect():
     # Server connection
-    global node_address
-    global node_port
     server_version = 0
     while True:
         try:
-            node_address = "server.duinocoin.com"
             if shuffle_ports == "y":
                 debug_output('Searching for fastest connection to the server')
                 soc, server_version = get_fastest_connection(
-                    str("server.duinocoin.com"))
+                    str(NODE_ADDRESS))
                 debug_output('Fastest connection found')
             else:
                 # Default AVR mining port
                 debug_output('Connecting to default AVR port')
                 soc = socket()
-                soc.connect((str(node_address), AVAILABLE_PORTS[0]))
+                soc.connect((str(NODE_ADDRESS), AVAILABLE_PORTS[0]))
                 soc.settimeout(SOC_TIMEOUT)
                 server_version = soc.recv(100).decode()
 
@@ -758,8 +761,6 @@ def pretty_print(message_type, message, state):
 def mine_avr(com):
     # Mining section
     global hashrate
-    global node_address
-    global node_port
     errorCounter = 0
     result = None
     while True:
@@ -830,8 +831,8 @@ def mine_avr(com):
 
                     try:
                         ser = Serial(com,
-                                     baudrate=BAUDRATE,
-                                     timeout=AVR_TIMEOUT)
+                                     baudrate=int(BAUDRATE),
+                                     timeout=float(AVR_TIMEOUT))
                         break
                     except Exception as e:
                         pretty_print(
