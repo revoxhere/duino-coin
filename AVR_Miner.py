@@ -105,8 +105,8 @@ diff = 0
 donator_running = False
 job = ''
 debug = 'n'
-auto_update = 'n'
 discord_presence = 'y'
+auto_update = 'n'
 rig_identifier = 'None'
 # Serverip file
 server_ip_file = ('https://raw.githubusercontent.com/'
@@ -301,6 +301,9 @@ def load_config():
     global debug
     global rig_identifier
     global discord_presence
+    global shuffle_ports
+    global SOC_TIMEOUT
+    global AVR_TIMEOUT
     global auto_update
 
     # Initial configuration section
@@ -416,7 +419,9 @@ def load_config():
             "soc_timeout":      60,
             "avr_timeout":      4,
             "discord_presence": "y",
-            "auto_update":      "n"}
+            "shuffle_ports":    "y",
+            "auto_update":      "n"
+        }
 
         # Write data to file
         with open(str(RESOURCES_DIR)
@@ -437,6 +442,7 @@ def load_config():
         SOC_TIMEOUT = config["Duino-Coin-AVR-Miner"]["soc_timeout"]
         AVR_TIMEOUT = config["Duino-Coin-AVR-Miner"]["soc_timeout"]
         discord_presence = config["Duino-Coin-AVR-Miner"]["discord_presence"]
+        shuffle_ports = config["Duino-Coin-AVR-Miner"]["shuffle_ports"]
         auto_update = config["Duino-Coin-AVR-Miner"]["auto_update"]
 
 
@@ -651,54 +657,48 @@ def update():
             miner_latest_ver = request.text[98]+request.text[99]+request.text[100]+request.text[101]+request.text[102]
         else:
             miner_latest_ver = request.text[98]+request.text[99]+request.text[100]+request.text[101]
-
     else:
         miner_latest_ver = request.text[98]+request.text[99]+request.text[100]
 
-    if not Path("AVR_Miner.py").is_file():
-        if Path("AVR_Miner.exe").is_file():
-            updateEXE(miner_latest_ver)
-        else:
-            return
+    if miner_latest_ver[3] == ".":
+        ver2 = miner_latest_ver[0]+"."+miner_latest_ver[2]+miner_latest_ver[4]  # convert 2.5.2 to 2.52
+    else:
+        ver2 = miner_latest_ver
 
-    if MINER_VER != miner_latest_ver:
-        print("Updating AVR miner...")
+    if MINER_VER != ver2:
+        if not Path("AVR_Miner.py").is_file():
+            if Path("AVR_Miner.exe").is_file():
+                updateEXE(miner_latest_ver)
+            else:
+                return
+
+        print("Updating AVR miner... Please wait.")
 
         with open("AVR_Miner.py", "wb") as f1:
             f1.write(request.content)
 
         print("AVR miner successfully updated.")
-        _exit(0)
+        _exit(1)
 
 
 def updateEXE(ver):
-    if Path("AVR_Miner.exe").is_file():
-        if ver[3] == ".":
-            ver2 = ver[0]+"."+ver[2]+ver[4]  # convert 2.5.1 to 2.51
-        else:
-            ver2 = ver
-
-        if ver2 == MINER_VER:
-            return
-
-        newest_release_windows = ("https://github.com/"
-                                  + "revoxhere/"
-                                  + "duino-coin/releases/download/"+ver+"/Duino-Coin_"+ver+"_windows.zip")
-        request2 = requests.get(newest_release_windows)
-        if request2.text == "Not Found":
-            return
-
-        with open('duino-zip.zip', 'wb') as f2:
-            f2.write(request2.content)  # download zip file
-
-        with ZipFile('duino-zip.zip', 'r') as zip_file:
-            zip_file.extract('AVR_Miner.exe')  # extract AVR miner from zip file
-
-        remove("duino-zip.zip")
-        print("Miner successfully updated.")
-        _exit(0)
-    else:
+    print("Updating AVR miner... Please wait.")
+    newest_release_windows = ("https://github.com/"
+                              + "revoxhere/"
+                              + "duino-coin/releases/download/"+ver+"/Duino-Coin_"+ver+"_windows.zip")
+    request2 = requests.get(newest_release_windows)
+    if str(request2.content) == "b'Not Found'":
         return
+
+    with open('duino-zip.zip', 'wb') as f2:
+        f2.write(request2.content)  # download zip file
+
+    with ZipFile('duino-zip.zip', 'r') as zip_file:
+        zip_file.extract('AVR_Miner.exe')  # extract AVR miner from zip file
+
+    remove("duino-zip.zip")
+    print("AVR miner successfully updated.")
+    _exit(1)
 
 
 def init_rich_presence():
