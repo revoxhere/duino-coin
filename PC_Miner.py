@@ -14,9 +14,9 @@ from json import load as jsonload
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 from os import _exit, execl, mkdir
 from os import name as osname
-from os import system as ossystem
 from platform import machine as osprocessor
 from os import path, system
+from os import system as ossystem
 from pathlib import Path
 from platform import system as plsystem
 from re import sub
@@ -112,7 +112,14 @@ except ModuleNotFoundError:
 
 # Global variables
 MINER_VER = "2.52"  # Version number
-AVAILABLE_PORTS = [2814, 2813, 2816, 2812]
+NODE_ADDRESS = "server.duinocoin.com"
+AVAILABLE_PORTS = [
+    2813,  # PC (1)
+    2814,  # PC (2)
+    2815   # PC (3)
+    2812,  # Wallets, other miners
+    2811,  # Legacy
+]
 SOC_TIMEOUT = 45  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
 shuffle_ports = "y"
@@ -795,18 +802,17 @@ def Thread(
     while True:
         while True:
             try:
-                node_address = "server.duinocoin.com"
                 if shuffle_ports == "y":
                     debug_output(
                         'Searching for fastest connection to the server')
                     soc, server_version = get_fastest_connection(
-                        str("server.duinocoin.com"))
+                        str(NODE_ADDRESS))
                     debug_output('Fastest connection found')
                 else:
                     # Default PC mining port
                     debug_output('Connecting to default PC port')
                     soc = socket()
-                    soc.connect((str(node_address), AVAILABLE_PORTS[0]))
+                    soc.connect((str(NODE_ADDRESS), AVAILABLE_PORTS[0]))
                     soc.settimeout(SOC_TIMEOUT)
                     server_version = soc.recv(100).decode()
 
