@@ -116,9 +116,9 @@ NODE_ADDRESS = "server.duinocoin.com"
 AVAILABLE_PORTS = [
     2813,  # PC (1)
     2814,  # PC (2)
-    2815   # PC (3)
+    2815,   # PC (3)
     2812,  # Wallets, other miners
-    2811,  # Legacy
+    2811  # Legacy
 ]
 SOC_TIMEOUT = 45  # Socket timeout
 RESOURCES_DIR = "PCMiner_" + str(MINER_VER) + "_resources"
