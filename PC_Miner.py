@@ -753,39 +753,6 @@ def ducos1xxh(
             return [ducos1xxres, hashrate]
 
 
-def get_fastest_connection(server_ip: str):
-    connection_pool = []
-    available_connections = []
-
-    for i in range(len(AVAILABLE_PORTS)):
-        connection_pool.append(socket())
-        connection_pool[i].setblocking(0)
-        try:
-            connection_pool[i].connect((server_ip,
-                                        AVAILABLE_PORTS[i]))
-        except BlockingIOError as e:
-            pass
-
-    ready_connections, _, __ = select.select(connection_pool, [], [])
-
-    while True:
-        for connection in ready_connections:
-            try:
-                server_version = connection.recv(100).decode()
-            except:
-                continue
-            if server_version == b'':
-                continue
-
-            available_connections.append(connection)
-            connection.send(b'PING')
-
-        ready_connections, _, __ = select.select(available_connections, [], [])
-        ready_connections[0].recv(100)
-        ready_connections[0].settimeout(SOC_TIMEOUT)
-        return ready_connections[0], server_version
-
-
 def Thread(
         threadid: int,
         accepted: int,
@@ -797,17 +764,18 @@ def Thread(
         rig_identiier: str,
         algorithm: str,
         hashrates_list,
-        totalhashrate_mean):
+        totalhashrate_mean,
+        NODE_PORT: int):
     # Mining section for every thread
     while True:
         while True:
             try:
                 if shuffle_ports == "y":
-                    debug_output(
-                        'Searching for fastest connection to the server')
-                    soc, server_version = get_fastest_connection(
-                        str(NODE_ADDRESS))
-                    debug_output('Fastest connection found')
+                    debug_output('Connecting to fastest PC port')
+                    soc = socket()
+                    soc.connect((str(NODE_ADDRESS), NODE_PORT))
+                    soc.settimeout(SOC_TIMEOUT)
+                    server_version = soc.recv(100).decode()
                 else:
                     # Default PC mining port
                     debug_output('Connecting to default PC port')
@@ -816,12 +784,12 @@ def Thread(
                     soc.settimeout(SOC_TIMEOUT)
                     server_version = soc.recv(100).decode()
 
-                    if threadid == 0:
-                        soc.send(bytes("MOTD", encoding="utf8"))
-                        motd = soc.recv(1024).decode().rstrip("\n")
-                        pretty_print("net" + str(threadid),
-                                     " Server message:\n" + motd,
-                                     "warning")
+                if threadid == 0:
+                    soc.send(bytes("MOTD", encoding="utf8"))
+                    motd = soc.recv(1024).decode().rstrip("\n")
+                    pretty_print("net" + str(threadid),
+                                 " Server message:\n" + motd,
+                                 "warning")
 
                 if float(server_version) <= float(MINER_VER):
                     # Miner is up-to-date
@@ -1282,6 +1250,40 @@ def updateRichPresence():
         sleep(15)  # 15 seconds to respect Discord rate limit
 
 
+def get_fastest_connection(server_ip: str):
+    connection_pool = []
+    available_connections = []
+
+    for i in range(len(AVAILABLE_PORTS)):
+        connection_pool.append(socket())
+        connection_pool[i].setblocking(0)
+        try:
+            connection_pool[i].connect((server_ip,
+                                        AVAILABLE_PORTS[i]))
+            connection_pool[i].settimeout(SOC_TIMEOUT)
+        except BlockingIOError as e:
+            pass
+
+    ready_connections, _, __ = select.select(connection_pool, [], [])
+
+    while True:
+        for connection in ready_connections:
+            try:
+                server_version = connection.recv(5).decode()
+            except:
+                continue
+            if server_version == b'':
+                continue
+
+            available_connections.append(connection)
+            connection.send(b'PING')
+
+        ready_connections, _, __ = select.select(available_connections, [], [])
+        ready_connections[0].recv(4)
+
+        return ready_connections[0].getpeername()[1]
+
+
 if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
@@ -1295,7 +1297,7 @@ if __name__ == "__main__":
         init(autoreset=True, convert=True)
     else:
         init(autoreset=True)
-        
+
     try:
         from multiprocessing import (
             Manager,
@@ -1365,6 +1367,12 @@ if __name__ == "__main__":
         debug_output("Error launching donation thread: " + str(e))
 
     try:
+        NODE_PORT = get_fastest_connection(NODE_ADDRESS)
+    except Exception as e:
+        debug_output("Error fetching fastest connection")
+        NODE_PORT = 2811
+
+    try:
         for x in range(int(threadcount)):
             # Launch duco mining threads
             thread.append(x)
@@ -1381,7 +1389,8 @@ if __name__ == "__main__":
                     rig_identiier,
                     algorithm,
                     hashrates_list,
-                    totalhashrate_mean))
+                    totalhashrate_mean,
+                    NODE_PORT))
             thread[x].start()
             if x % 4 == 0:
                 # Don't launch burst of threads
