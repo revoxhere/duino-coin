@@ -115,7 +115,7 @@ You can use one of the following links to get some data from Duino-Coin Server:
           }
         ```
         
-*   Found blocks API refreshed every 2m
+*   Found blocks API refreshed every 15s
     *   HTTPS: `https://server.duinocoin.com/foundBlocks.json`
     *   HTTP: `http://51.15.127.80/foundBlocks.json`
     *   Small part of the response:
@@ -130,8 +130,8 @@ You can use one of the following links to get some data from Duino-Coin Server:
         
 ### REST JSON API
 
-Documentation for DUCO REST api is available here: [duco-rest-api](https://github.com/dansinclair25/duco-rest-api).
-To access these functions, add port 5000 to the URL: `https://server.duinocoin.com:5000/query`.
+Documentation for DUCO REST api is available here: [duco-rest-api](https://github.com/revoxhere/duco-rest-api).
+To access these functions, just add the query URL after the server address: `https://server.duinocoin.com/<query>`.
 
 ## C DUCO library
 
