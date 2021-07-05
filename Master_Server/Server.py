@@ -2286,6 +2286,7 @@ def protocol_get_transactions(data, connection):
 def handle(connection, address):
     """ Handler for every client """
     global global_blocks
+    global global_connections
     global global_last_block_hash
     logged_in = False
 
@@ -2458,10 +2459,16 @@ def handle(connection, address):
 
             elif data[0] == "PoolPreSync":
                 sync_data = Pool.pre_sync(connection)
-                blocks_to_add, poolConnections, poolWorkers = Pool.sync(sync_data, global_blocks)
+                blocks_to_add, poolConnections, poolWorkers, rewards = Pool.sync(sync_data, global_blocks)
                 global_blocks += blocks_to_add
+                global_connections = int(global_connections)
                 global_connections += poolConnections
                 minerapi.update(poolWorkers)
+                for user in rewards.keys():
+                    try:
+                        balances_to_update[user] += rewards[user]
+                    except:
+                        balances_to_update[user] = rewards[user]
 
             elif data[0] == "PoolLogout":
                 Pool = PF.Pool(connection=connection)
