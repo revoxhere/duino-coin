@@ -765,24 +765,37 @@ def Thread(
         algorithm: str,
         hashrates_list,
         totalhashrate_mean,
+        NODE_ADDRESS: str,
         NODE_PORT: int):
     # Mining section for every thread
     while True:
         while True:
             try:
-                if shuffle_ports == "y":
-                    debug_output('Connecting to fastest PC port')
-                    soc = socket()
-                    soc.connect((str(NODE_ADDRESS), NODE_PORT))
-                    soc.settimeout(SOC_TIMEOUT)
-                    server_version = soc.recv(100).decode()
-                else:
-                    # Default PC mining port
-                    debug_output('Connecting to default PC port')
-                    soc = socket()
-                    soc.connect((str(NODE_ADDRESS), AVAILABLE_PORTS[0]))
-                    soc.settimeout(SOC_TIMEOUT)
-                    server_version = soc.recv(100).decode()
+                retry_counter = 0
+                while True:
+                    try:
+                        if retry_counter >= 3:
+                            debug_output(
+                                'Error connecting after 3 retries, '
+                                + 'fetching new node IP')
+                            NODE_ADDRESS, NODE_PORT = fetch_pools()
+
+                        debug_output('Connecting to node ' + str(NODE_ADDRESS))
+                        soc = socket()
+                        soc.connect((str(NODE_ADDRESS), int(NODE_PORT)))
+                        soc.settimeout(SOC_TIMEOUT)
+
+                        server_version = soc.recv(100).decode()
+                        if server_version:
+                            break
+                    except Exception as e:
+                        retry_counter += 1
+                        pretty_print("net0",
+                                     " Error connecting to mining node: "
+                                     + str(e)
+                                     + ", retrying in 5s",
+                                     "error")
+                        sleep(5)
 
                 if threadid == 0:
                     soc.send(bytes("MOTD", encoding="utf8"))
@@ -1284,6 +1297,31 @@ def get_fastest_connection(server_ip: str):
         return ready_connections[0].getpeername()[1]
 
 
+def fetch_pools():
+    while True:
+        try:
+            response = requests.get(
+                "https://server.duinocoin.com/getPool"
+            ).json()
+
+            pretty_print("net0",
+                         " Retrieved mining node: "
+                         + str(response["name"]),
+                         "success")
+
+            NODE_ADDRESS = response["ip"]
+            NODE_PORT = response["port"]
+
+            return NODE_ADDRESS, NODE_PORT
+        except Exception as e:
+            pretty_print("net0",
+                         " Error retrieving mining node: "
+                         + str(e)
+                         + ", retrying in 15s",
+                         "error")
+            sleep(15)
+
+
 if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
@@ -1366,11 +1404,7 @@ if __name__ == "__main__":
     except Exception as e:
         debug_output("Error launching donation thread: " + str(e))
 
-    try:
-        NODE_PORT = get_fastest_connection(NODE_ADDRESS)
-    except Exception as e:
-        debug_output("Error fetching fastest connection")
-        NODE_PORT = 2811
+    NODE_ADDRESS, NODE_PORT = fetch_pools()
 
     try:
         for x in range(int(threadcount)):
@@ -1390,6 +1424,7 @@ if __name__ == "__main__":
                     algorithm,
                     hashrates_list,
                     totalhashrate_mean,
+                    NODE_ADDRESS,
                     NODE_PORT))
             thread[x].start()
             if x % 4 == 0:
