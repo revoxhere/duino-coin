@@ -2446,32 +2446,34 @@ def handle(connection, address):
             # POOL FUNCTIONS
 
             elif data[0] == "POOLList":
-                PF.PoolList(connection=connection)
+                PF.pool_list(connection=connection)
 
             elif data[0] == "PoolLogin":
-                POOLCLASS = PF.Pool_Function_class(connection=connection)
-                POOLCLASS.login(data=data)
+                Pool = PF.Pool(connection=connection)
+                Pool.login(data=data)
 
             elif data[0] == "PoolSync":
-                blocks_to_add = POOLCLASS.sync(data, global_blocks)
+                blocks_to_add = Pool.sync(data, global_blocks)
                 global_blocks += blocks_to_add
 
             elif data[0] == "PoolPreSync":
-                sync_data = POOLCLASS.pre_sync(connection)
-                blocks_to_add = POOLCLASS.sync(sync_data, global_blocks)
+                sync_data = Pool.pre_sync(connection)
+                blocks_to_add, poolConnections, poolWorkers = Pool.sync(sync_data, global_blocks)
                 global_blocks += blocks_to_add
+                global_connections += poolConnections
+                minerapi.update(poolWorkers)
 
             elif data[0] == "PoolLogout":
-                POOLCLASS = PF.Pool_Function_class(connection=connection)
-                POOLCLASS.logout(data=data)
+                Pool = PF.Pool(connection=connection)
+                Pool.logout(data=data)
 
             elif data[0] == "PoolLoginAdd":
-                PF.PoolLoginAdd(connection=connection,
+                PF.pool_login_add(connection=connection,
                                 data=data,
                                 PoolPassword=PoolPassword)
 
             elif data[0] == "PoolLoginRemove":
-                PF.PoolLoginRemove(connection=connection,
+                PF.pool_login_remove(connection=connection,
                                    data=data,
                                    PoolPassword=PoolPassword)
             else:
