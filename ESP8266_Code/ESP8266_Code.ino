@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards - V2.53
+//  Code for ESP8266 boards - V2.55
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -47,8 +47,12 @@ const char* PASSWORD      = "WIFI PASS";    // Change this to your WiFi password
 const char* USERNAME      = "DUCO USERNAME";     // Change this to your Duino-Coin username
 const char* RIG_IDENTIFIER = "None";       // Change this if you want a custom miner name
 
-const char * host = "51.15.127.80"; // Static server IP
-const int port = 2825; // ESP8266 (1)
+// Since 2.5.5 additional mining nodes available - you can change it manually to one of these:
+// Official Master Server: 51.15.127.80 port 2820
+// Official Kolka Pool: 149.91.88.18 port 6000
+// This will be replaced with an automatic picker in the future version
+const char * host = "149.91.88.18"; // Static server IP
+const int port = 6000;
 unsigned int share_count = 0; // Share variable
 
 WiFiClient client;
@@ -214,8 +218,8 @@ bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
 
 void setup() {
   // Start serial connection
-  Serial.begin(115200);
-  Serial.println("\nDuino-Coin ESP8266 Miner v2.53");
+  Serial.begin(500000);
+  Serial.println("\nDuino-Coin ESP8266 Miner v2.55");
 
   // Prepare for blink() function
   pinMode(LED_BUILTIN, OUTPUT);
@@ -274,7 +278,7 @@ void loop() {
       client.print(String(duco_numeric_result)
                    + ","
                    + String(hashrate)
-                   + ",ESP8266 Miner v2.53"
+                   + ",ESP8266 Miner v2.55"
                    + ","
                    + String(RIG_IDENTIFIER)
                    + ","
