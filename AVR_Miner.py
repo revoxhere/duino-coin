@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.5.2)
+# Duino-Coin Python AVR Miner (v2.5.5)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -95,7 +95,7 @@ except ModuleNotFoundError:
     install('pypresence')
 
 # Global variables
-MINER_VER = '2.52'  # Version number
+MINER_VER = '2.55'  # Version number
 NODE_ADDRESS = "server.duinocoin.com"
 AVAILABLE_PORTS = [
     2816,  # AVR (1)
