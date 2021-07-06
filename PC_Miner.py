@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.5.2)
+# Duino-Coin Python PC Miner (v2.5.5)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -111,7 +111,7 @@ except ModuleNotFoundError:
 
 
 # Global variables
-MINER_VER = "2.52"  # Version number
+MINER_VER = "2.55"  # Version number
 NODE_ADDRESS = "server.duinocoin.com"
 AVAILABLE_PORTS = [
     2813,  # PC (1)
@@ -244,11 +244,11 @@ def handler(signal_received, frame):
 def calculate_uptime(start_time):
     uptime = time() - start_time
     if uptime <= 59:
-        return round(uptime), "seconds"
+        return round(uptime), "s"
     elif uptime >= 60:
-        return round(uptime // 60), "minutes"
+        return round(uptime // 60), "min"
     elif uptime >= 3600:
-        return round(uptime // 3600), "hours"
+        return round(uptime // 3600), "h"
 
 
 def get_prefix(diff: int):
@@ -780,7 +780,8 @@ def Thread(
                                 + 'fetching new node IP')
                             NODE_ADDRESS, NODE_PORT = fetch_pools()
 
-                        debug_output('Connecting to node ' + str(NODE_ADDRESS))
+                        debug_output('Connecting to node ' +
+                                     str(NODE_ADDRESS) + ":" + str(NODE_PORT))
                         soc = socket()
                         soc.connect((str(NODE_ADDRESS), int(NODE_PORT)))
                         soc.settimeout(SOC_TIMEOUT)
@@ -801,38 +802,47 @@ def Thread(
                     soc.send(bytes("MOTD", encoding="utf8"))
                     motd = soc.recv(1024).decode().rstrip("\n")
                     pretty_print("net" + str(threadid),
-                                 " Server message:\n" + motd,
-                                 "warning")
+                                 " MOTD: "
+                                 + Fore.RESET
+                                 + Style.NORMAL
+                                 + str(motd),
+                                 "success")
 
-                if float(server_version) <= float(MINER_VER):
-                    # Miner is up-to-date
-                    pretty_print(
-                        "net"
-                        + str(threadid),
-                        getString("connected")
-                        + Fore.RESET
-                        + Style.NORMAL
-                        + getString("connected_server")
-                        + str(server_version)
-                        + ")",
-                        "success")
-                    break
+                if threadid == 0:
+                    if float(server_version) <= float(MINER_VER):
+                        # Miner is up-to-date
+                        pretty_print(
+                            "net"
+                            + str(threadid),
+                            getString("connected")
+                            + Fore.RESET
+                            + Style.NORMAL
+                            + getString("connected_server")
+                            + str(server_version)
+                            + ", node: "
+                            + str(NODE_ADDRESS)
+                            + ":"
+                            + str(NODE_PORT)
+                            + ")",
+                            "success")
+                    else:
+                        # Miner is outdated
+                        pretty_print(
+                            "sys"
+                            + str(threadid),
+                            getString("outdated_miner")
+                            + MINER_VER
+                            + ") -"
+                            + getString("server_is_on_version")
+                            + server_version
+                            + Style.NORMAL
+                            + Fore.RESET
+                            + getString("update_warning"),
+                            "warning")
+                        sleep(5)
+                break
 
-                else:
-                    # Miner is outdated
-                    pretty_print(
-                        "sys"
-                        + str(threadid),
-                        getString("outdated_miner")
-                        + MINER_VER
-                        + ") -"
-                        + getString("server_is_on_version")
-                        + server_version
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + getString("update_warning"),
-                        "warning")
-                    break
+                
 
             except Exception as e:
                 # Socket connection error
@@ -901,7 +911,7 @@ def Thread(
                         break
                     except:
                         pretty_print("cpu" + str(threadid),
-                                     " Server message: "
+                                     " Node message: "
                                      + job[1],
                                      "warning")
                         sleep(3)
@@ -1043,11 +1053,12 @@ def Thread(
                                     + Fore.CYAN
                                     + "ping "
                                     + str("%02.0f" % int(ping))
-                                    + "ms, "
-                                    + "uptime "
+                                    + "ms"
+                                    + Fore.MAGENTA
+                                    + " ("
                                     + str(uptime)
-                                    + " "
-                                    + uptime_type)
+                                    + uptime_type
+                                    + " elapsed)")
 
                         elif feedback == "BLOCK":
                             # If block was found
@@ -1306,6 +1317,8 @@ def fetch_pools():
 
             pretty_print("net0",
                          " Retrieved mining node: "
+                         + Fore.RESET
+                         + Style.NORMAL
                          + str(response["name"]),
                          "success")
 
@@ -1427,11 +1440,12 @@ if __name__ == "__main__":
                     NODE_ADDRESS,
                     NODE_PORT))
             thread[x].start()
-            if x % 4 == 0:
+            if x > 4 and x % 4 == 0:
                 # Don't launch burst of threads
+                # to not get banned
                 sleep(5)
             else:
-                sleep(0.5)
+                sleep(0.1)
 
     except Exception as e:
         pretty_print(
