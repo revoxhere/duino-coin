@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP32 boards v2.52
+//  Code for ESP32 boards v2.55
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -69,8 +69,12 @@ TaskHandle_t Task1;
 TaskHandle_t Task2;
 SemaphoreHandle_t xMutex;
 
-const char * host = "51.15.127.80"; // Static server IP
-const int port = 2820; // ESP32 (1)
+// Since 2.5.5 additional mining nodes available - you can change it manually to one of these:
+// Official Master Server: 51.15.127.80 port 2820
+// Official Kolka Pool: 149.91.88.18 port 6000
+// This will be replaced with an automatic picker in the future version
+const char * host = "149.91.88.18"; // Static server IP
+const int port = 6000;
 
 volatile int wifiStatus = 0;
 volatile int wifiPrev = WL_CONNECTED;
@@ -268,7 +272,7 @@ void Task1code( void * pvParameters ) {
             Serial.println(F("CORE1 Reconnection successful."));
           }
           client1.flush();
-          client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.52," + String(rigname) + "," + String((char*)ID)); // Send result to server
+          client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.55," + String(rigname) + "," + String((char*)ID)); // Send result to server
           Serial.println(F("CORE1 Posting result and waiting for feedback."));
           while(!client1.available()){
             if (!client1.connected()) {
@@ -422,7 +426,7 @@ void Task2code( void * pvParameters ) {
             Serial.println(F("CORE2 Reconnection successful."));
           }
           client.flush();
-          client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.52," + String(rigname) + "," + String((char*)ID)); // Send result to server
+          client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.55," + String(rigname) + "," + String((char*)ID)); // Send result to server
           Serial.println(F("CORE2 Posting result and waiting for feedback."));
           while(!client.available()){
             if (!client.connected()) {
@@ -458,7 +462,7 @@ void setup() {
   //disableCore0WDT();
   //disableCore1WDT();
   Serial.begin(500000); // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP32 Miner v2.52");
+  Serial.println("\n\nDuino-Coin ESP32 Miner v2.55");
   
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
   btStop();
