@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.5.5)
+# Duino-Coin Python AVR Miner (v2.5.6)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -95,16 +95,19 @@ except ModuleNotFoundError:
     install('pypresence')
 
 # Global variables
-MINER_VER = '2.55'  # Version number
+MINER_VER = '2.56'  # Version number
 NODE_ADDRESS = "server.duinocoin.com"
 AVAILABLE_PORTS = [
-    2816,  # AVR (1)
-    2817,  # AVR (2)
-    2812,  # Wallets, other miners
-    2811   # Legacy
+    2811,
+    2812,
+    2813,
+    2814,
+    2815,
+    2816,
+    2817
 ]
 SOC_TIMEOUT = 45
-AVR_TIMEOUT = 2
+AVR_TIMEOUT = 3.1  # diff 6 * 100 / 196 h/s = 3.06
 BAUDRATE = 115200
 RESOURCES_DIR = 'AVRMiner_' + str(MINER_VER) + '_resources'
 shares = [0, 0]
@@ -230,6 +233,7 @@ def get_fastest_connection(server_ip: str):
         try:
             connection_pool[i].connect((server_ip,
                                         AVAILABLE_PORTS[i]))
+            connection_pool[i].settimeout(SOC_TIMEOUT)
         except BlockingIOError as e:
             pass
 
@@ -250,69 +254,7 @@ def get_fastest_connection(server_ip: str):
         ready_connections, _, __ = select.select(available_connections, [], [])
         ready_connections[0].recv(100)
         ready_connections[0].settimeout(SOC_TIMEOUT)
-        return ready_connections[0], server_version
-
-
-def connect(threadid):
-    # Server connection
-    server_version = 0
-    while True:
-        try:
-            soc.close()
-        except:
-            pass
-        try:
-            if shuffle_ports == "y":
-                debug_output('Searching for fastest connection to the server')
-                soc, server_version = get_fastest_connection(
-                    str(NODE_ADDRESS))
-                debug_output('Fastest connection found')
-            else:
-                # Default AVR mining port
-                debug_output('Connecting to default AVR port')
-                soc = socket()
-                soc.connect((str(NODE_ADDRESS), AVAILABLE_PORTS[0]))
-                soc.settimeout(SOC_TIMEOUT)
-                server_version = soc.recv(100).decode()
-
-            if threadid == 0:
-                if float(server_version) <= float(MINER_VER):
-                    # If miner is up-to-date, display a message and continue
-                    pretty_print(
-                        'net0',
-                        get_string('connected')
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + get_string('connected_server')
-                        + str(server_version)
-                        + ")",
-                        'success')
-                else:
-                    pretty_print(
-                        'sys0',
-                        ' Miner is outdated (v'
-                        + MINER_VER
-                        + ') -'
-                        + get_string('server_is_on_version')
-                        + server_version
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + get_string('update_warning'),
-                        'warning')
-                    sleep(10)
-            break
-        except Exception as e:
-            pretty_print(
-                'net0',
-                get_string('connecting_error')
-                + Style.NORMAL
-                + ' ('
-                + str(e)
-                + ')',
-                'error')
-            debug_output('Connection error: ' + str(e))
-            sleep(10)
-    return soc
+        return ready_connections[0].getpeername()[1]
 
 
 def handler(signal_received, frame):
@@ -459,7 +401,7 @@ def load_config():
             'identifier':       rig_identifier,
             'debug':            'n',
             "soc_timeout":      45,
-            "avr_timeout":      2,
+            "avr_timeout":      3.1,
             "discord_presence": "y",
             "shuffle_ports":    "y"
         }
@@ -481,7 +423,7 @@ def load_config():
         debug = config['Duino-Coin-AVR-Miner']['debug']
         rig_identifier = config['Duino-Coin-AVR-Miner']['identifier']
         SOC_TIMEOUT = int(config["Duino-Coin-AVR-Miner"]["soc_timeout"])
-        AVR_TIMEOUT = int(config["Duino-Coin-AVR-Miner"]["soc_timeout"])
+        AVR_TIMEOUT = float(config["Duino-Coin-AVR-Miner"]["soc_timeout"])
         discord_presence = config["Duino-Coin-AVR-Miner"]["discord_presence"]
         shuffle_ports = config["Duino-Coin-AVR-Miner"]["shuffle_ports"]
 
@@ -765,248 +707,263 @@ def pretty_print(message_type, message, state):
 
 def mine_avr(com, threadid):
     # Mining section
-    global hashrate
-    errorCounter = 0
-    result = None
+    if shuffle_ports == "y":
+        debug_output(
+            'Searching for fastest connection to the server')
+        NODE_PORT = get_fastest_connection(str(NODE_ADDRESS))
+        debug_output('Fastest connection found')
+    else:
+        NODE_PORT = AVAILABLE_PORTS[0]
+
     while True:
-        soc = connect(threadid)
-
-        if threadid == 0:
-            soc.send(bytes("MOTD", encoding="utf8"))
-            motd = soc.recv(1024).decode().rstrip("\n")
-            pretty_print("net" + str(threadid),
-                         " MOTD: "
-                         + Fore.RESET
-                         + Style.NORMAL
-                         + str(motd),
-                         "success")
-
-        pretty_print(
-            'sys'
-            + str(''.join(filter(str.isdigit, com))),
-            get_string('mining_start')
-            + Style.NORMAL
-            + Fore.RESET
-            + get_string('mining_algorithm')
-            + str(com)
-            + ')',
-            'success')
-
-        while True:
+        try:
             while True:
                 try:
-                    # Send job request
-                    debug_output(com + ': requested job from the server')
-                    soc.sendall(
-                        bytes(
-                            'JOB,'
-                            + str(username)
-                            + ',AVR',
-                            encoding='utf8'))
+                    # Default AVR mining port
+                    debug_output('Connecting to ' +
+                                 str(NODE_ADDRESS + ":" + str(NODE_PORT)))
+                    soc = socket()
+                    soc.connect((str(NODE_ADDRESS), int(NODE_PORT)))
+                    soc.settimeout(SOC_TIMEOUT)
+                    server_version = soc.recv(100).decode()
 
-                    # Retrieve work
-                    job = soc.recv(128).decode().rstrip("\n")
-                    job = job.split(",")
-                    debug_output("Received: " + str(job))
-
-                    try:
-                        diff = int(job[2])
-                        debug_output(str(''.join(filter(str.isdigit, com)))
-                                     + "Correct job received")
-                        break
-                    except:
-                        pretty_print("usb"
-                                     + str(''.join(filter(str.isdigit, com))),
-                                     " Node message: "
-                                     + job[1],
-                                     "warning")
-                        sleep(3)
-
-                except Exception as e:
-                    pretty_print(
-                        'net'
-                        + str(''.join(filter(str.isdigit, com))),
-                        get_string('connecting_error')
-                        + Style.NORMAL
-                        + Fore.RESET
-                        + ' (net err: '
-                        + str(e)
-                        + ')',
-                        'error')
-                    debug_output('Connection error: ' + str(e))
-                    sleep(5)
-                    soc = connect(threadid)
-                    break
-
-            while True:
-                while True:
-                    try:
-                        ser.close()
-                    except:
-                        pass
-
-                    try:
-                        ser = Serial(com,
-                                     baudrate=int(BAUDRATE),
-                                     timeout=int(AVR_TIMEOUT))
-                        break
-                    except Exception as e:
-                        pretty_print(
-                            'usb'
-                            + str(''.join(filter(str.isdigit, com))),
-                            get_string('board_connection_error')
-                            + str(com)
-                            + get_string('board_connection_error2')
-                            + Style.NORMAL
-                            + Fore.RESET
-                            + ' (port connection err: '
-                            + str(e)
-                            + ')',
-                            'error')
-                    sleep(10)
-                while True:
-                    retry_counter = 0
-                    while True:
-                        if retry_counter >= 3:
-                            break
-                        try:
-                            debug_output(com + ': sending job to AVR')
-                            ser.write(
-                                bytes(
-                                    str(
-                                        job[0]
-                                        + ',' + job[1]
-                                        + ',' + job[2]
-                                        + ','), encoding='utf8'))
-
-                            debug_output(com + ': reading result from AVR')
-                            result = ser.read_until(b'\n').decode().strip()
-                            ser.flush()
-
-                            if "\x00" in result or not result:
-                                raise Exception("Empty data received")
-
-                            debug_output(com + ': retrieved result: '
-                                         + str(result)
-                                         + ' len: '
-                                         + str(len(result)))
-                            result = result.split(',')
-
-                            try:
-                                if result[0] and result[1]:
-                                    break
-                            except Exception as e:
-                                debug_output(
-                                    com + ': retrying reading data: ' + str(e))
-                                retry_counter += 1
-                        except Exception as e:
-                            debug_output(
-                                com + ': retrying sending data: ' + str(e))
-                            retry_counter += 1
-
-                    try:
-                        debug_output(
-                            com + ': received result (' + str(result[0]) + ')')
-                        debug_output(
-                            com + ': received time (' + str(result[1]) + ')')
-                        # Convert AVR time to seconds
-                        computetime = round(int(result[1]) / 1000000, 3)
-                        if computetime < 1:
-                            computetime = str(int(computetime * 1000)) + "ms"
-                        else:
-                            computetime = str(round(computetime, 2)) + "s"
-                        # Calculate hashrate
-                        hashrate_t = round(
-                            int(result[0]) * 1000000 / int(result[1]), 2)
-                        hashrate_mean.append(hashrate_t)
-                        # Get average from the last hashrate measurements
-                        hashrate = mean(hashrate_mean[-5:])
-                        debug_output(
-                            com +
-                            ': calculated hashrate (' + str(hashrate_t) + ')'
-                            + ' (avg:' + str(hashrate) + ')')
-
-                        try:
-                            chipID = result[2]
-                            debug_output(
-                                com + ': chip ID: ' + str(result[2]))
-                            """ Check if chipID got received, this is 
-                                of course just a fraction of what's 
-                                happening on the server with it """
-                            if not chipID.startswith('DUCOID'):
-                                raise Exception('Wrong chipID string')
-                        except Exception:
+                    if threadid == 0:
+                        if float(server_version) <= float(MINER_VER):
                             pretty_print(
-                                'usb'
-                                + str(''.join(filter(str.isdigit, com))),
-                                ' Possible incorrect chip ID!'
+                                'net0',
+                                get_string('connected')
                                 + Style.NORMAL
                                 + Fore.RESET
-                                + ' This will cause problems with the future'
-                                + ' release of Kolka security system',
+                                + get_string('connected_server')
+                                + str(server_version)
+                                + ")",
+                                'success')
+                        else:
+                            pretty_print(
+                                'sys0',
+                                ' Miner is outdated (v'
+                                + MINER_VER
+                                + ') -'
+                                + get_string('server_is_on_version')
+                                + server_version
+                                + Style.NORMAL
+                                + Fore.RESET
+                                + get_string('update_warning'),
                                 'warning')
-                            chipID = 'None'
-                        break
-                    except Exception as e:
-                        pretty_print(
-                            'usb'
-                            + str(''.join(filter(str.isdigit, com))),
-                            get_string('mining_avr_connection_error')
-                            + Style.NORMAL
-                            + Fore.RESET
-                            + ' (error reading result from the board: '
-                            + str(e)
-                            + ', please check connection and port setting)',
-                            'warning')
-                        debug_output(
-                            com + ': error splitting data: ' + str(e))
-                        sleep(1)
+                            sleep(10)
 
-                try:
-                    # Send result to the server
-                    soc.sendall(
-                        bytes(
-                            str(result[0])
-                            + ','
-                            + str(hashrate)
-                            + ',Official AVR Miner (DUCO-S1A) v'
-                            + str(MINER_VER)
-                            + ','
-                            + str(rig_identifier)
-                            + ','
-                            + str(chipID),
-                            encoding='utf8'))
+                        soc.send(bytes("MOTD", encoding="utf8"))
+                        motd = soc.recv(1024).decode().rstrip("\n")
+                        pretty_print("net" + str(threadid),
+                                     " MOTD: "
+                                     + Fore.RESET
+                                     + Style.NORMAL
+                                     + str(motd),
+                                     "success")
+                    break
                 except Exception as e:
                     pretty_print(
-                        'net'
-                        + str(''.join(filter(str.isdigit, com))),
+                        'net0',
                         get_string('connecting_error')
                         + Style.NORMAL
-                        + Fore.RESET
                         + ' ('
                         + str(e)
                         + ')',
                         'error')
-                    debug_output(com + ': connection error: ' + str(e))
-                    sleep(5)
-                    soc = connect(threadid)
-                    break
+                    debug_output('Connection error: ' + str(e))
+                    sleep(10)
+
+            pretty_print(
+                'sys'
+                + str(''.join(filter(str.isdigit, com))),
+                get_string('mining_start')
+                + Style.NORMAL
+                + Fore.RESET
+                + get_string('mining_algorithm')
+                + str(com)
+                + ')',
+                'success')
+
+            while True:
+                # Send job request
+                debug_output(com + ': requested job from the server')
+                soc.sendall(
+                    bytes(
+                        'JOB,'
+                        + str(username)
+                        + ',AVR',
+                        encoding='utf8'))
+
+                # Retrieve work
+                job = soc.recv(128).decode().rstrip("\n")
+                job = job.split(",")
+                debug_output("Received: " + str(job))
+
+                try:
+                    diff = int(job[2])
+                    debug_output(str(''.join(filter(str.isdigit, com)))
+                                 + "Correct job received")
+                except:
+                    pretty_print("usb"
+                                 + str(''.join(filter(str.isdigit, com))),
+                                 " Node message: "
+                                 + job[1],
+                                 "warning")
+                    sleep(3)
 
                 while True:
-                    try:
-                        responsetimetart = now()
-                        feedback = soc.recv(64).decode().rstrip('\n')
-                        responsetimestop = now()
+                    while True:
+                        try:
+                            ser.close()
+                        except:
+                            pass
 
-                        time_delta = (responsetimestop -
-                                      responsetimetart).microseconds
-                        ping_mean.append(round(time_delta / 1000))
-                        ping = mean(ping_mean[-10:])
-                        debug_output(com + ': feedback: '
-                                     + str(feedback)
-                                     + ' with ping: '
-                                     + str(ping))
-                        break
+                        try:
+                            ser = Serial(com,
+                                         baudrate=int(BAUDRATE),
+                                         timeout=float(AVR_TIMEOUT))
+                            break
+                        except Exception as e:
+                            pretty_print(
+                                'usb'
+                                + str(''.join(filter(str.isdigit, com))),
+                                get_string('board_connection_error')
+                                + str(com)
+                                + get_string('board_connection_error2')
+                                + Style.NORMAL
+                                + Fore.RESET
+                                + ' (port connection err: '
+                                + str(e)
+                                + ')',
+                                'error')
+                            sleep(10)
+
+                    while True:
+                        retry_counter = 0
+                        while True:
+                            if retry_counter >= 3:
+                                break
+
+                            try:
+                                debug_output(com + ': sending job to AVR')
+                                ser.write(
+                                    bytes(
+                                        str(
+                                            job[0]
+                                            + ',' + job[1]
+                                            + ',' + job[2]
+                                            + ','), encoding='utf8'))
+
+                                debug_output(com + ': reading result from AVR')
+                                result = ser.read_until(b'\n').decode().strip()
+                                ser.flush()
+
+                                if "\x00" in result or not result:
+                                    raise Exception("Empty data received")
+
+                                debug_output(com + ': retrieved result: '
+                                             + str(result)
+                                             + ' len: '
+                                             + str(len(result)))
+                                result = result.split(',')
+
+                                try:
+                                    if result[0] and result[1]:
+                                        break
+                                except Exception as e:
+                                    debug_output(
+                                        com
+                                        + ': retrying reading data: '
+                                        + str(e))
+                                    retry_counter += 1
+                            except Exception as e:
+                                debug_output(
+                                    com
+                                    + ': retrying sending data: '
+                                    + str(e))
+                                retry_counter += 1
+
+                        try:
+                            debug_output(
+                                com
+                                + ': received result ('
+                                + str(result[0])
+                                + ')')
+                            debug_output(
+                                com
+                                + ': received time ('
+                                + str(result[1])
+                                + ')')
+                            # Convert AVR time to seconds
+                            computetime = round(int(result[1]) / 1000000, 3)
+                            if computetime < 1:
+                                computetime = str(
+                                    int(computetime * 1000)) + "ms"
+                            else:
+                                computetime = str(round(computetime, 2)) + "s"
+                            # Calculate hashrate
+                            hashrate_t = round(
+                                int(result[0]) * 1000000 / int(result[1]), 2)
+                            hashrate_mean.append(hashrate_t)
+                            # Get average from the last hashrate measurements
+                            hashrate = mean(hashrate_mean[-5:])
+                            debug_output(
+                                com +
+                                ': calculated hashrate (' +
+                                str(hashrate_t) + ')'
+                                + ' (avg:' + str(hashrate) + ')')
+
+                            try:
+                                chipID = result[2]
+                                debug_output(
+                                    com + ': chip ID: ' + str(result[2]))
+                                """ Check if chipID got received, this is 
+                                    of course just a fraction of what's 
+                                    happening on the server with it """
+                                if not chipID.startswith('DUCOID'):
+                                    raise Exception('Wrong chipID string')
+                            except Exception:
+                                pretty_print(
+                                    'usb'
+                                    + str(''.join(filter(str.isdigit, com))),
+                                    ' Possible incorrect chip ID!'
+                                    + Style.NORMAL
+                                    + Fore.RESET
+                                    + ' This can cause problems with the'
+                                    + ' Kolka system',
+                                    'warning')
+                                chipID = 'None'
+                            break
+                        except Exception as e:
+                            pretty_print(
+                                'usb'
+                                + str(''.join(filter(str.isdigit, com))),
+                                get_string('mining_avr_connection_error')
+                                + Style.NORMAL
+                                + Fore.RESET
+                                + ' (error reading result from the board: '
+                                + str(e)
+                                + ', please check connection '
+                                + 'and port setting)',
+                                'warning')
+                            debug_output(
+                                com + ': error splitting data: ' + str(e))
+                            sleep(1)
+
+                    try:
+                        # Send result to the server
+                        soc.sendall(
+                            bytes(
+                                str(result[0])
+                                + ','
+                                + str(hashrate)
+                                + ',Official AVR Miner (DUCO-S1A) v'
+                                + str(MINER_VER)
+                                + ','
+                                + str(rig_identifier)
+                                + ','
+                                + str(chipID),
+                                encoding='utf8'))
                     except Exception as e:
                         pretty_print(
                             'net'
@@ -1014,181 +971,222 @@ def mine_avr(com, threadid):
                             get_string('connecting_error')
                             + Style.NORMAL
                             + Fore.RESET
-                            + ' (err parsing response: '
+                            + ' ('
                             + str(e)
                             + ')',
                             'error')
-                        debug_output(com + ': error parsing response: '
-                                     + str(e))
+                        debug_output(com + ': connection error: ' + str(e))
                         sleep(5)
-                        soc = connect(threadid)
+                        break
 
-                diff = get_prefix(diff)
-                if feedback == 'GOOD':
-                    # If result was correct
-                    shares[0] += 1
-                    title(
-                        get_string('duco_avr_miner')
-                        + str(MINER_VER)
-                        + ') - '
-                        + str(shares[0])
-                        + '/'
-                        + str(shares[0] + shares[1])
-                        + get_string('accepted_shares'))
-                    with thread_lock:
-                        print(
-                            Style.RESET_ALL
-                            + Fore.WHITE
-                            + now().strftime(Style.DIM + '%H:%M:%S ')
-                            + Style.BRIGHT
-                            + Back.MAGENTA
-                            + Fore.RESET
-                            + ' usb'
-                            + str(''.join(filter(str.isdigit, com)))
-                            + ' '
-                            + Back.RESET
-                            + Fore.GREEN
-                            + ' ⛏'
-                            + get_string('accepted')
-                            + Fore.RESET
-                            + str(int(shares[0]))
-                            + '/'
-                            + str(int(shares[0] + shares[1]))
-                            + Fore.YELLOW
-                            + ' ('
-                            + str(int((shares[0]
-                                       / (shares[0] + shares[1]) * 100)))
-                            + '%)'
-                            + Style.NORMAL
-                            + Fore.RESET
-                            + ' ∙ '
-                            + Fore.BLUE
-                            + Style.BRIGHT
-                            + str(round(hashrate))
-                            + ' H/s'
-                            + Style.NORMAL
-                            + ' ('
-                            + computetime
-                            + ')'
-                            + Fore.RESET
-                            + ' ⚙ diff '
-                            + str(diff)
-                            + ' ∙ '
-                            + Fore.CYAN
-                            + 'ping '
-                            + str('%02.0f' % int(ping))
-                            + 'ms')
+                    while True:
+                        try:
+                            responsetimetart = now()
+                            feedback = soc.recv(64).decode().rstrip('\n')
+                            responsetimestop = now()
 
-                elif feedback == 'BLOCK':
-                    # If block was found
-                    shares[0] += 1
-                    title(
-                        get_string('duco_avr_miner')
-                        + str(MINER_VER)
-                        + ') - '
-                        + str(shares[0])
-                        + '/'
-                        + str(shares[0] + shares[1])
-                        + get_string('accepted_shares'))
-                    with thread_lock:
-                        print(
-                            Style.RESET_ALL
-                            + Fore.WHITE
-                            + now().strftime(Style.DIM + '%H:%M:%S ')
-                            + Style.BRIGHT
-                            + Back.MAGENTA
-                            + Fore.RESET
-                            + ' usb'
-                            + str(''.join(filter(str.isdigit, com)))
-                            + ' '
-                            + Back.RESET
-                            + Fore.CYAN
-                            + ' ⛏'
-                            + get_string('block_found')
-                            + Fore.RESET
-                            + str(int(shares[0]))
-                            + '/'
-                            + str(int(shares[0] + shares[1]))
-                            + Fore.YELLOW
-                            + ' ('
-                            + str(int((shares[0]
-                                       / (shares[0] + shares[1]) * 100)))
-                            + '%)'
-                            + Style.NORMAL
-                            + Fore.RESET
-                            + ' ∙ '
-                            + Fore.BLUE
-                            + Style.BRIGHT
-                            + str(round(hashrate))
-                            + ' H/s'
-                            + Style.NORMAL
-                            + ' ('
-                            + computetime
-                            + ')'
-                            + Fore.RESET
-                            + ' ⚙ diff '
-                            + str(diff)
-                            + ' ∙ '
-                            + Fore.CYAN
-                            + 'ping '
-                            + str('%02.0f' % int(ping))
-                            + 'ms')
+                            time_delta = (responsetimestop -
+                                          responsetimetart).microseconds
+                            ping_mean.append(round(time_delta / 1000))
+                            ping = mean(ping_mean[-10:])
+                            debug_output(com + ': feedback: '
+                                         + str(feedback)
+                                         + ' with ping: '
+                                         + str(ping))
+                            break
+                        except Exception as e:
+                            pretty_print(
+                                'net'
+                                + str(''.join(filter(str.isdigit, com))),
+                                get_string('connecting_error')
+                                + Style.NORMAL
+                                + Fore.RESET
+                                + ' (err parsing response: '
+                                + str(e)
+                                + ')',
+                                'error')
+                            debug_output(com + ': error parsing response: '
+                                         + str(e))
+                            sleep(5)
+                            break
 
-                else:
-                    # If result was incorrect
-                    shares[1] += 1
-                    title(
-                        get_string('duco_avr_miner')
-                        + str(MINER_VER)
-                        + ') - '
-                        + str(shares[0])
-                        + '/'
-                        + str(shares[0] + shares[1])
-                        + get_string('accepted_shares'))
-                    with thread_lock:
-                        print(
-                            Style.RESET_ALL
-                            + Fore.WHITE
-                            + now().strftime(Style.DIM + '%H:%M:%S ')
-                            + Style.BRIGHT
-                            + Back.MAGENTA
-                            + Fore.RESET
-                            + ' usb'
-                            + str(''.join(filter(str.isdigit, com)))
-                            + ' '
-                            + Back.RESET
-                            + Fore.RED
-                            + ' ✗'
-                            + get_string('rejected')
-                            + Fore.RESET
-                            + str(int(shares[0]))
+                    diff = get_prefix(diff)
+                    if feedback == 'GOOD':
+                        # If result was correct
+                        shares[0] += 1
+                        title(
+                            get_string('duco_avr_miner')
+                            + str(MINER_VER)
+                            + ') - '
+                            + str(shares[0])
                             + '/'
-                            + str(int(shares[0] + shares[1]))
-                            + Fore.YELLOW
-                            + ' ('
-                            + str(int((shares[0]
-                                       / (shares[0] + shares[1]) * 100)))
-                            + '%)'
-                            + Style.NORMAL
-                            + Fore.RESET
-                            + ' ∙ '
-                            + Fore.BLUE
-                            + Style.BRIGHT
-                            + str(round(hashrate))
-                            + ' H/s'
-                            + Style.NORMAL
-                            + ' ('
-                            + computetime
-                            + ')'
-                            + Fore.RESET
-                            + ' ⚙ diff '
-                            + str(diff)
-                            + ' ∙ '
-                            + Fore.CYAN
-                            + 'ping '
-                            + str('%02.0f' % int(ping))
-                            + 'ms')
-                break
+                            + str(shares[0] + shares[1])
+                            + get_string('accepted_shares'))
+                        with thread_lock:
+                            print(
+                                Style.RESET_ALL
+                                + Fore.WHITE
+                                + now().strftime(Style.DIM + '%H:%M:%S ')
+                                + Style.BRIGHT
+                                + Back.MAGENTA
+                                + Fore.RESET
+                                + ' usb'
+                                + str(''.join(filter(str.isdigit, com)))
+                                + ' '
+                                + Back.RESET
+                                + Fore.GREEN
+                                + ' ⛏'
+                                + get_string('accepted')
+                                + Fore.RESET
+                                + str(int(shares[0]))
+                                + '/'
+                                + str(int(shares[0] + shares[1]))
+                                + Fore.YELLOW
+                                + ' ('
+                                + str(int((shares[0]
+                                           / (shares[0] + shares[1]) * 100)))
+                                + '%)'
+                                + Style.NORMAL
+                                + Fore.RESET
+                                + ' ∙ '
+                                + Fore.BLUE
+                                + Style.BRIGHT
+                                + str(round(hashrate))
+                                + ' H/s'
+                                + Style.NORMAL
+                                + ' ('
+                                + computetime
+                                + ')'
+                                + Fore.RESET
+                                + ' ⚙ diff '
+                                + str(diff)
+                                + ' ∙ '
+                                + Fore.CYAN
+                                + 'ping '
+                                + str('%02.0f' % int(ping))
+                                + 'ms')
+
+                    elif feedback == 'BLOCK':
+                        # If block was found
+                        shares[0] += 1
+                        title(
+                            get_string('duco_avr_miner')
+                            + str(MINER_VER)
+                            + ') - '
+                            + str(shares[0])
+                            + '/'
+                            + str(shares[0] + shares[1])
+                            + get_string('accepted_shares'))
+                        with thread_lock:
+                            print(
+                                Style.RESET_ALL
+                                + Fore.WHITE
+                                + now().strftime(Style.DIM + '%H:%M:%S ')
+                                + Style.BRIGHT
+                                + Back.MAGENTA
+                                + Fore.RESET
+                                + ' usb'
+                                + str(''.join(filter(str.isdigit, com)))
+                                + ' '
+                                + Back.RESET
+                                + Fore.CYAN
+                                + ' ⛏'
+                                + get_string('block_found')
+                                + Fore.RESET
+                                + str(int(shares[0]))
+                                + '/'
+                                + str(int(shares[0] + shares[1]))
+                                + Fore.YELLOW
+                                + ' ('
+                                + str(int((shares[0]
+                                           / (shares[0] + shares[1]) * 100)))
+                                + '%)'
+                                + Style.NORMAL
+                                + Fore.RESET
+                                + ' ∙ '
+                                + Fore.BLUE
+                                + Style.BRIGHT
+                                + str(round(hashrate))
+                                + ' H/s'
+                                + Style.NORMAL
+                                + ' ('
+                                + computetime
+                                + ')'
+                                + Fore.RESET
+                                + ' ⚙ diff '
+                                + str(diff)
+                                + ' ∙ '
+                                + Fore.CYAN
+                                + 'ping '
+                                + str('%02.0f' % int(ping))
+                                + 'ms')
+
+                    else:
+                        # If result was incorrect
+                        shares[1] += 1
+                        title(
+                            get_string('duco_avr_miner')
+                            + str(MINER_VER)
+                            + ') - '
+                            + str(shares[0])
+                            + '/'
+                            + str(shares[0] + shares[1])
+                            + get_string('accepted_shares'))
+                        with thread_lock:
+                            print(
+                                Style.RESET_ALL
+                                + Fore.WHITE
+                                + now().strftime(Style.DIM + '%H:%M:%S ')
+                                + Style.BRIGHT
+                                + Back.MAGENTA
+                                + Fore.RESET
+                                + ' usb'
+                                + str(''.join(filter(str.isdigit, com)))
+                                + ' '
+                                + Back.RESET
+                                + Fore.RED
+                                + ' ✗'
+                                + get_string('rejected')
+                                + Fore.RESET
+                                + str(int(shares[0]))
+                                + '/'
+                                + str(int(shares[0] + shares[1]))
+                                + Fore.YELLOW
+                                + ' ('
+                                + str(int((shares[0]
+                                           / (shares[0] + shares[1]) * 100)))
+                                + '%)'
+                                + Style.NORMAL
+                                + Fore.RESET
+                                + ' ∙ '
+                                + Fore.BLUE
+                                + Style.BRIGHT
+                                + str(round(hashrate))
+                                + ' H/s'
+                                + Style.NORMAL
+                                + ' ('
+                                + computetime
+                                + ')'
+                                + Fore.RESET
+                                + ' ⚙ diff '
+                                + str(diff)
+                                + ' ∙ '
+                                + Fore.CYAN
+                                + 'ping '
+                                + str('%02.0f' % int(ping))
+                                + 'ms')
+                    break
+
+        except Exception as e:
+            pretty_print(
+                'net0',
+                get_string('connecting_error')
+                + Style.NORMAL
+                + ' (main loop err: '
+                + str(e)
+                + ')',
+                'error')
+            debug_output('Main loop error: ' + str(e))
 
 
 if __name__ == '__main__':
