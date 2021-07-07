@@ -131,24 +131,24 @@ Bunu yaptıktan sonra istediğiniz yazılımı çalıştırabilirsiniz (istediğ
 
 ## DUCO & wDUCO
 
-Duino-Coin is a hybrid currency, meaning that it can be converted to wDUCO which is DUCO wrapped on the [Tron](https://tron.network) network (as a token). Currently there aren't many uses for it, other than just storing funds in external wallet or exchanging wDUCO to another token on JustSwap. Tutorial on using wDUCO is available in the [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
+Duino-Coin bir hibrit coin'dir, bunun anlamı DUCO'lar wDUCO'ya çevirilebilir' bunu [Tron](https://tron.network) ağını kullanarak yapabilir (bir token olarak). Şu anda harici bir cüzdana aktarmak veya wDUCO'yu Tron blok-zincirindeki başka bir token ile takas yapmak dışında çok kullanımı yok. wDUCO'yu kullanma kılavuzu [wDUCO wikisinde](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial) mevcut.
 
-## Development
+## Katkıda bulunma
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create.<br>
-Any contributions you make to the Duino-Coin project are greatly appreciated.
+Katkılar açık kaynaklı toplulukları öğrenmek, ilham vermek ve üretmek için harika bir yer yapar.<br>
+Duino-Coin'e yaptığınız her bir katkı için size minnetkarız.
 
-How to help?
+Nasıl katkıda bulunabilirim?
 
-*   Fork the Project
-*   Create your feature branch
-*   Commit your changes
-*   Make sure everything works as intended
-*   Open a pull request
+*   Bu projeyi fork'layın
+*   Kendi özellik dalınızı oluşturun
+*   Katkılarınızı işleyin
+*   Her şeyin doğru çalıştığından emin olun
+*   Bir pull request açın
 
 Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch.
 
-## Benchmarks of officially tested devices and boards
+## Resmi olarak kıyaslanmış kartlar ve cihazların listesi
 
 <details>
   <summary>
