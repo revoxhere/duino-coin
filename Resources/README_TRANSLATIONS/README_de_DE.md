@@ -47,13 +47,13 @@
   <tr>
     <td>
       💻 Von vielen Plattformen unterstützt<br>
-      👥 A friendly & growing community<br>
-      💱 Easy to use & exchange<br>
-      🌎 Available everywhere<br>
-      :new: Fully original project<br>
-      :blush: Beginner-friendly<br>
-      💰 Cost-effective<br>
-      ⛏️ Easy to mine<br>
+      👥 Eine freundliche & wachsende community<br>
+      💱 Einfach zu nutzten & in andere Währungen umzutauschen<br>
+      🌎 Überall verfügbar<br>
+      :new: Komplett originales Projekt<br>
+      :blush: Anfänger freundlich <br>
+      💰 Kosten-effektiv<br>
+      ⛏️ Einfach zu minen<br>
       📚 Open-source<br>
     </td>
     <td>
