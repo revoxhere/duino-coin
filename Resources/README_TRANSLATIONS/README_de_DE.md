@@ -57,13 +57,13 @@
       📚 Open-source<br>
     </td>
     <td>
-      ♾️ Coin supply: Infinite (before December 2020: 350k coins)<br>
-      😎 Premine: <5k blocks (<500 coins)<br>
-      ⚡ Transaction time: Instant<br>
-      🔢 Decimals: up to 20<br>
+      ♾️ Coin supply: Unendlich (vor Dezember 2020: 350k coins) <br>
+      😎 Prämie: <5k blöcke(<500 coins)<br>
+      ⚡ Transaktionszeit: sofort<br>
+      🔢 Dezimalstellen: bis zu 20<br>
       🔤 Ticker: DUCO (ᕲ)<br>
-      ⚒️ Algorithms: DUCO-S1, DUCO-S1A, XXHASH +more planned<br>
-      ♐ Rewards: supported by "Kolka system" helping to reward miners fairly<br>
+      ⚒️ Algorithmen: DUCO-S1, DUCO-S1A, XXHASH +mehr geplannt<br>
+      ♐ Rewards: unterstützt durch das "Kolka System", welches hilft miner fair zu belohnen<br>
     </td>
   </tr>
 </table>
