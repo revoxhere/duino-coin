@@ -270,15 +270,27 @@ class Pool:
             except Exception as e:
                 print("Error fetching JSON data:", e)
 
-            r_rewards = requests.get(f"http://{self.poolIP}:6001/rewards")
-            rewards = r_rewards.json()
+            while True:
+                r_rewards = requests.get(f"http://{self.poolIP}:6001/rewards")
+                try:
+                    rewards = r_rewards.json()
+                    break
+                except:
+                    pass
+                    #print(r_rewards)
 
         except Exception as e:
             send_data(data=f"NO,Error: {e}", connection=self.connection)
             return 0, 0, {}, {}, 1
 
-        r_workers = requests.get(f"http://{self.poolIP}:6001/workers")
-        poolWorkers = r_workers.json()
+        while True:
+            r_workers = requests.get(f"http://{self.poolIP}:6001/workers")
+            try:
+                poolWorkers = r_workers.json()
+                break
+            except:
+                pass
+                #print(r_workers)
 
         with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
