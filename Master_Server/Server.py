@@ -54,6 +54,7 @@ resource.setrlimit(resource.RLIMIT_NOFILE, (65536, 65536))
 """ Global variables """
 HOSTNAME = ""
 WALLET_PORTS = [
+    2809,
     2810
 ]
 PORTS = [
@@ -76,7 +77,7 @@ You are connected to the Duino-Coin master server.
 DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 5  # in seconds
-DB_TIMEOUT = 5
+DB_TIMEOUT = 2.5
 BACKLOG = None  # spawn connection instantly
 SERVER_VER = 2.5  # announced to clients
 READY_HASHES_NUM = 5000  # in shares
@@ -2109,20 +2110,21 @@ def protocol_register(data, connection, address):
         """ Register a new account if  the registration
             e-mail was sent sucessfully """
         registrations[ip] = 1
-        try:
-            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                datab = conn.cursor()
-                datab.execute(
-                    """INSERT INTO Users
-                    (username, password, email, balance)
-                    VALUES(?, ?, ?, ?)""",
-                    (username, password, email, .0))
-                conn.commit()
-                send_data("OK", connection)
-                return
-        except Exception as e:
-            send_data("NO,Database error: " + str(e), connection)
-            return
+        while True:
+            try:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+                    datab.execute(
+                        """INSERT INTO Users
+                        (username, password, email, balance)
+                        VALUES(?, ?, ?, ?)""",
+                        (username, password, email, .0))
+                    conn.commit()
+                    break
+            except:
+                pass
+        send_data("OK", connection)
+        return
     else:
         send_data("NO,Error sending verification e-mail", connection)
         return
@@ -2480,10 +2482,10 @@ def handle(connection, address):
 
     ip_addr = address[0].replace("::ffff:", "")
 
-    if ip_addr == "127.0.0.1":
+    if ip_addr == "127.0.0.1" or ip_addr == "149.91.88.18":
         connection.settimeout(60*5)
     else:
-        connection.settimeout(15)
+        connection.settimeout(35)
 
     try:
         """ Send server version """
@@ -2651,21 +2653,22 @@ def handle(connection, address):
                         global_connections = int(global_connections)
                         global_connections += poolConnections
 
-                        for threadid in minerapi.copy():
-                            if len(str(threadid)) < 11:
-                                minerapi.pop(threadid)
+                        if len(poolWorkers) >= 1:
+                            for threadid in minerapi.copy():
+                                if len(str(threadid)) < 11:
+                                    minerapi.pop(threadid)
 
-                        for worker in poolWorkers:
-                            try:
-                                minerapi[worker] = poolWorkers[worker]
-                            except:
-                                pass
-
-                        for user in rewards:
-                            try:
-                                balances_to_update[user] += rewards[user]
-                            except:
-                                balances_to_update[user] = rewards[user]
+                            for worker in poolWorkers:
+                                try:
+                                    minerapi[worker] = poolWorkers[worker]
+                                except:
+                                    pass
+                        if len(rewards) >= 1:
+                            for user in rewards:
+                                try:
+                                    balances_to_update[user] += rewards[user]
+                                except:
+                                    balances_to_update[user] = rewards[user]
                 except Exception as e:
                     admin_print("Error syncing pool: " + str(e))
 
@@ -2876,7 +2879,10 @@ if __name__ == "__main__":
     from kolka_module import *
     from server_functions import *
     from kolka_chip_module import *
-    #from wrapped_duco_functions import *
+    try:
+        from wrapped_duco_functions import *
+    except:
+        pass
 
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
