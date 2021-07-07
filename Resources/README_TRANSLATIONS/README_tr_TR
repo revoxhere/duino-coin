@@ -72,62 +72,61 @@ cd duino-coin
 python3 -m pip install -r requirements.txt # Install pip dependencies
 ````
 
-After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py`).
 Bunu yaptıktan sonra yazılımı Python Yorumlayıcısı ile çalıştırabilirsiniz (`python3 PC_Miner.py` gibi).
 
 #### Windows
 
-1. Download and install [Python 3](https://www.python.org/downloads/) (make sure you add Python and Pip to your PATH)
-2. Download [the Duino-Coin repository](https://github.com/revoxhere/duino-coin/archive/master.zip)
-3. Extract the zip archive you've downloaded and open the folder in command prompt
-4. In command prompt type `py -m pip install -r requirements.txt` to install required pip dependencies
+1. [Python 3](https://www.python.org/downloads/)'ü indirin ve kurun (Python'u ve Pip'i PATH'e eklediğinizden emin olun)
+2. [Duino-Coin deposunu](https://github.com/revoxhere/duino-coin/archive/master.zip) indirin
+3. İndirdiğiniz zip arşivini bir klasöre çıkarın ve komut istemini o klasörde başlatın
+4. Komut isteminde gerekli kütüphaneleri indirmek için ´py -m pip install -r requirements.txt´ komutunu çalıştırın
 
-After doing this, you are good to go with launching the software (just double click on desired `.py` files or type `py PC_Miner.py` in the command prompt).
+Bunu yaptıktan sonra istediğiniz yazılımı çalıştırabilirsiniz (istediğiniz ´.py´ dosyasına çift tıklayın veya komut isteminde ´py PC_miner.py´ vb. ile çalıştırın).
 
-## Community-made softwares
+## Topluluk tarafından geliştirilen yazılımlar
 
 <details>
   <summary>
-    Since that list is getting really long, it's collapsed by default. Click this text to expand it!
+    Bu liste çok uzadığı için, varsayılan olarak kapalı. Bu yazıya tıklayarak listeyi gösterin!
   </summary>
 
-  ### Other miners known to work with Duino-Coin:
-  *   [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - a JavaScript miner which you can easily implement in your site by Hoiboy19
-  *   [Mineuino](https://github.com/VatsaDev/Mineuino) - website monetizer by VatsaDev
-  *   [hauchel's duco-related stuff repository](https://github.com/hauchel/duco/) - Collection of various codes for mining DUCO on other microcontrollers
-  *   [duino-coin-php-miner](https://github.com/ricardofiorani/duino-coin-php-miner) Dockerized Miner in PHP by ricardofiorani
-  *   [duino-coin-kodi](https://github.com/SandUhrGucker/duino-coin-kodi) - Mining addon for Kodi Media Center by SandUhrGucker
-  *   [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - Python script to mine Duino-Coin on routers by BastelPichi
-  *   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - mine with less connections on multiple devices by DoctorEenot
-  *   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - MicroPython miner for ESP boards by fabiopolancoe
-  *   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Python miner for Nintendo 3DS by PhereloHD & HGEpro
-  *   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Miner in Docker by Alicia426
-  *   [nonceMiner](https://github.com/colonelwatch/nonceMiner) - Fastest Duino-Coin miner available by colonelwatch
-  *   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) - simple NodeJS miner by DarkThinking
-  *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - pure C miner by phantom32 & revoxhere
-  *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
-  *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
-  *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
-      *   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) by revoxhere
-      *   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) by revoxhere
-      *   [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) by revoxhere
-      *   [Minimal Python Miner (XXHASH)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner_XXHASH.py) by revoxhere
-      *   [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) by joaquinbvw
+  ### Duino-Coin ile çalışan diğer madenci yazılımları:
+  *   [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - Hoiboy19 tarafından websitenize kolayca ekleyebileceğiniz bir madenci
+  *   [Mineuino](https://github.com/VatsaDev/Mineuino) - VatsaDev tarafınan websitelerinizden para kazanmanızı sağlayan bir yalızım
+  *   [hauchel's duco-related stuff repository](https://github.com/hauchel/duco/) - farklı mikronetleyicilerde DUCO kazan yazılımların bir koleksiyonu
+  *   [duino-coin-php-miner](https://github.com/ricardofiorani/duino-coin-php-miner) ricardofiorani tarafından Docker'da çalışan bir madenci
+  *   [duino-coin-kodi](https://github.com/SandUhrGucker/duino-coin-kodi) - SandUhrGucker tarafından  Kodi Media Center Eklentisi olarak çalışan bir madenci
+  *   [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - BastelPichi tarafından Wifi Yönlendiricilerinde madencilik yapmak için bir python scripti
+  *   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - DoctorEenot tarafından  az bağlantı ile çoklu cihazlanrda madencilik yapmanızı sağlayan bir yazılım
+  *   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - fabiopolancoe tarafından ESP kartları için MicroPython'da yazılmmış madenci
+  *   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - PhereloHD & HGEpro tarafından Nintendo 3DS için madenci yazılımı
+  *   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Alicia426 tarafından Docker içinde çalışan madenci
+  *   [nonceMiner](https://github.com/colonelwatch/nonceMiner) - colonelwatch tarafından şu ana kadar ki en hızlı madenci yazılımı
+  *   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) - DarkThinking tarafından basit bir NodeJS'de yazılmış madenci
+  *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - phantom32 & revoxhere tarafından saf C içinde yazılmış madenci
+  *   [Go Miner](https://github.com/yippiez/go-miner) yippiez tarafından Go'da yazılmış madenci
+  *   [ducominer](https://github.com/its5Q/ducominer) its5Q tarafından
+  *   [Resmi Olmayan Madenciler Dizini](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
+      *   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) revoxhere tarafından
+      *   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) revoxhere tarafından
+      *   [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) revoxhere tarafından
+      *   [Minimal Python Miner (XXHASH)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner_XXHASH.py) revoxhere tarafından
+      *   [Arduino IDE için Teensy 4.1 code](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) joaquinbvw tarafından
 
-  ### Other tools:
-  *   [ducopanel](https://github.com/ponsato/ducopanel) - a GUI app for controling your Duino-Coin miners by ponsato
-  *   [Duino AVR Monitor](https://www.microsoft.com/store/apps/9NJ7HPFSR9V5) - GUI Windows App for monitoring AVR devices mining DUCO by niknak
-  *   [Duino-Coin Arduino library](https://github.com/ricaun/arduino-DuinoCoin) by ricaun
-  *   [DuinoCoinI2C](https://github.com/ricaun/DuinoCoinI2C) - Use ESP8266 as a master for Arduinos by ricaun
-  *   [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) and troubleshooting helper by Lulaschkas
-  *   [duco-miners](https://github.com/dansinclair25/duco-miners) CLI mining dashboard made by dansinclair25
-  *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
-  *   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) for Chrome and derivatives by LDarki
-  *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) account statistics website by siunus
-  *   [duino-tools](https://github.com/kyngs/duino-tools) written in Java by kyngs
-  *   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
+  ### Diğer araçlar:
+  *   [ducopanel](https://github.com/ponsato/ducopanel) - ponsato tarafından Duino-Coin madencilerinizi kontrol etmek için bir GUI uygulaması
+  *   [Duino AVR Monitör](https://www.microsoft.com/store/apps/9NJ7HPFSR9V5) - niknak tarafından AVR madencileri kontrol etmek için GUI Windows uygulaması 
+  *   [Duino-Coin Arduino kütüphanesi](https://github.com/ricaun/arduino-DuinoCoin) ricaun tarafından
+  *   [DuinoCoinI2C](https://github.com/ricaun/DuinoCoinI2C) - ricaun tarafından ESP8266'yı Arduinolara master olarak kullanın
+  *   [Duino-Coin Madenci Paneli](https://lulaschkas.github.io/duco-mining-dashboard/) Lulaschkas tarafından madencileri monitörlemeye yardımcı
+  *   [duco-miners](https://github.com/dansinclair25/duco-miners) dansinclair25 tarafından komut istemi madencilik paneli
+  *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) SandUhrGucker tarafından
+  *   [DUCO Tarayıcı Eklentisi](https://github.com/LDarki/DucoExtension) LDarki tarafından Google Chrome ve türevleri için
+  *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) siunus tarafından hesap statistikleri
+  *   [duino-tools](https://github.com/kyngs/duino-tools) kyngs tarafından Java'da yazılmış araçlar
+  *   [Duino Stats](https://github.com/Bilaboz/duino-stats) Bilaboz tarafından resmi Discord Bot'u
 
-  This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
+  Bu liste aktif olarak güncelleniyor. Eğer bu listeye ekleme yapmak isterseniz, bir PR sunun veya geliştiricilerin biri ile iletişime geçin.
 </details>
 
 ## DUCO & wDUCO
