@@ -104,11 +104,12 @@ AVAILABLE_PORTS = [
     2811   # Legacy
 ]
 SOC_TIMEOUT = 45
-AVR_TIMEOUT = 4  # diff 8(*100) / 196 H/s ~= 4
+AVR_TIMEOUT = 2
 BAUDRATE = 115200
 RESOURCES_DIR = 'AVRMiner_' + str(MINER_VER) + '_resources'
 shares = [0, 0]
 hashrate_mean = []
+ping_mean = []
 diff = 0
 shuffle_ports = "y"
 donator_running = False
@@ -189,11 +190,11 @@ def get_string(string_name: str):
 
 
 def get_prefix(diff: int):
-    if diff >= 1000000000:
+    if int(diff) >= 1000000000:
         diff = str(round(diff / 1000000000)) + "G"
-    elif diff >= 1000000:
+    elif int(diff) >= 1000000:
         diff = str(round(diff / 1000000)) + "M"
-    elif diff >= 1000:
+    elif int(diff) >= 1000:
         diff = str(round(diff / 1000)) + "k"
     return str(diff)
 
@@ -252,10 +253,14 @@ def get_fastest_connection(server_ip: str):
         return ready_connections[0], server_version
 
 
-def connect():
+def connect(threadid):
     # Server connection
     server_version = 0
     while True:
+        try:
+            soc.close()
+        except:
+            pass
         try:
             if shuffle_ports == "y":
                 debug_output('Searching for fastest connection to the server')
@@ -270,32 +275,32 @@ def connect():
                 soc.settimeout(SOC_TIMEOUT)
                 server_version = soc.recv(100).decode()
 
-            if float(server_version) <= float(MINER_VER):
-                # If miner is up-to-date, display a message and continue
-                pretty_print(
-                    'net0',
-                    get_string('connected')
-                    + Style.NORMAL
-                    + Fore.RESET
-                    + get_string('connected_server')
-                    + str(server_version)
-                    + ")",
-                    'success')
-                break
-            else:
-                pretty_print(
-                    'sys0',
-                    ' Miner is outdated (v'
-                    + MINER_VER
-                    + ') -'
-                    + get_string('server_is_on_version')
-                    + server_version
-                    + Style.NORMAL
-                    + Fore.RESET
-                    + get_string('update_warning'),
-                    'warning')
-                sleep(10)
-                break
+            if threadid == 0:
+                if float(server_version) <= float(MINER_VER):
+                    # If miner is up-to-date, display a message and continue
+                    pretty_print(
+                        'net0',
+                        get_string('connected')
+                        + Style.NORMAL
+                        + Fore.RESET
+                        + get_string('connected_server')
+                        + str(server_version)
+                        + ")",
+                        'success')
+                else:
+                    pretty_print(
+                        'sys0',
+                        ' Miner is outdated (v'
+                        + MINER_VER
+                        + ') -'
+                        + get_string('server_is_on_version')
+                        + server_version
+                        + Style.NORMAL
+                        + Fore.RESET
+                        + get_string('update_warning'),
+                        'warning')
+                    sleep(10)
+            break
         except Exception as e:
             pretty_print(
                 'net0',
@@ -454,7 +459,7 @@ def load_config():
             'identifier':       rig_identifier,
             'debug':            'n',
             "soc_timeout":      45,
-            "avr_timeout":      4,
+            "avr_timeout":      2,
             "discord_presence": "y",
             "shuffle_ports":    "y"
         }
@@ -476,7 +481,7 @@ def load_config():
         debug = config['Duino-Coin-AVR-Miner']['debug']
         rig_identifier = config['Duino-Coin-AVR-Miner']['identifier']
         SOC_TIMEOUT = int(config["Duino-Coin-AVR-Miner"]["soc_timeout"])
-        AVR_TIMEOUT = float(config["Duino-Coin-AVR-Miner"]["soc_timeout"])
+        AVR_TIMEOUT = int(config["Duino-Coin-AVR-Miner"]["soc_timeout"])
         discord_presence = config["Duino-Coin-AVR-Miner"]["discord_presence"]
         shuffle_ports = config["Duino-Coin-AVR-Miner"]["shuffle_ports"]
 
@@ -758,13 +763,23 @@ def pretty_print(message_type, message, state):
               + Fore.RESET)
 
 
-def mine_avr(com):
+def mine_avr(com, threadid):
     # Mining section
     global hashrate
     errorCounter = 0
     result = None
     while True:
-        soc = connect()
+        soc = connect(threadid)
+
+        if threadid == 0:
+            soc.send(bytes("MOTD", encoding="utf8"))
+            motd = soc.recv(1024).decode().rstrip("\n")
+            pretty_print("net" + str(threadid),
+                         " MOTD: "
+                         + Fore.RESET
+                         + Style.NORMAL
+                         + str(motd),
+                         "success")
 
         pretty_print(
             'sys'
@@ -802,7 +817,7 @@ def mine_avr(com):
                     except:
                         pretty_print("usb"
                                      + str(''.join(filter(str.isdigit, com))),
-                                     " Server message: "
+                                     " Node message: "
                                      + job[1],
                                      "warning")
                         sleep(3)
@@ -820,7 +835,8 @@ def mine_avr(com):
                         'error')
                     debug_output('Connection error: ' + str(e))
                     sleep(5)
-                    soc = connect()
+                    soc = connect(threadid)
+                    break
 
             while True:
                 while True:
@@ -832,7 +848,7 @@ def mine_avr(com):
                     try:
                         ser = Serial(com,
                                      baudrate=int(BAUDRATE),
-                                     timeout=float(AVR_TIMEOUT))
+                                     timeout=int(AVR_TIMEOUT))
                         break
                     except Exception as e:
                         pretty_print(
@@ -904,7 +920,7 @@ def mine_avr(com):
                             int(result[0]) * 1000000 / int(result[1]), 2)
                         hashrate_mean.append(hashrate_t)
                         # Get average from the last hashrate measurements
-                        hashrate = hashrate_t  # mean(hashrate_mean[-5:])
+                        hashrate = mean(hashrate_mean[-5:])
                         debug_output(
                             com +
                             ': calculated hashrate (' + str(hashrate_t) + ')'
@@ -973,7 +989,8 @@ def mine_avr(com):
                         'error')
                     debug_output(com + ': connection error: ' + str(e))
                     sleep(5)
-                    soc = connect()
+                    soc = connect(threadid)
+                    break
 
                 while True:
                     try:
@@ -983,7 +1000,8 @@ def mine_avr(com):
 
                         time_delta = (responsetimestop -
                                       responsetimetart).microseconds
-                        ping = round(time_delta / 1000)
+                        ping_mean.append(round(time_delta / 1000))
+                        ping = mean(ping_mean[-10:])
                         debug_output(com + ': feedback: '
                                      + str(feedback)
                                      + ' with ping: '
@@ -1003,7 +1021,7 @@ def mine_avr(com):
                         debug_output(com + ': error parsing response: '
                                      + str(e))
                         sleep(5)
-                        soc = connect()
+                        soc = connect(threadid)
 
                 diff = get_prefix(diff)
                 if feedback == 'GOOD':
@@ -1219,10 +1237,12 @@ if __name__ == '__main__':
 
     try:
         # Launch avr duco mining threads
+        threadid = 0
         for port in avrport:
             thrThread(
                 target=mine_avr,
-                args=(port,)).start()
+                args=(port, threadid)).start()
+            threadid += 1
     except Exception as e:
         debug_output('Error launching AVR thread(s): ' + str(e))
 
