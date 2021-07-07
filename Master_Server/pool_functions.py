@@ -246,23 +246,7 @@ class Pool:
         else:
             send_data(data="LoginFailed", connection=self.connection)
 
-    def pre_sync(self, connection):
-        if self.poolID == None:
-            send_data(data="No PoolID provided", connection=self.connection)
-
-        send_data("OK", connection)
-        data = connection.recv(1048576)
-
-        data_pre_split = data
-        data = data.decode("utf8").replace("\n", "").split(",")
-
-        length_of_base = 0
-        new_data = (data_pre_split[length_of_base:])
-        data = ['PoolSync', new_data]
-
-        return data
-
-    def sync(self, data, global_blocks):
+    def sync(self, data):
         blocks_to_add = 0
         poolConnections = 0
         poolWorkers = {}
@@ -278,20 +262,23 @@ class Pool:
             info = json.loads(info)
 
             try:
-                rewards = info['rewards']
                 blocks_to_add = int(info['blocks']['blockIncrease'])
                 big_blocks_to_add = info['blocks']['bigBlocks']
                 poolCpu = float(info['cpu'])
                 poolRam = float(info['ram'])
-                poolConnections = int(info['stats']['connections'])
+                poolConnections = int(info['connections'])
             except Exception as e:
                 print("Error fetching JSON data:", e)
 
-            r = requests.get(f"http://{self.poolIP}:6001/workers")
-            poolWorkers = r.json()
+            r_rewards = requests.get(f"http://{self.poolIP}:6001/rewards")
+            rewards = r_rewards.json()
 
         except Exception as e:
             send_data(data=f"NO,Error: {e}", connection=self.connection)
+            return 0, 0, {}, {}, 1
+
+        r_workers = requests.get(f"http://{self.poolIP}:6001/workers")
+        poolWorkers = r_workers.json()
 
         with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
@@ -306,14 +293,9 @@ class Pool:
                            self.poolID))
             conn.commit()
 
-        data_send = {"totalBlocks": global_blocks,
-                     "diffIncrease": DIFF_INCREASES_PER}
+        send_data(data="SyncOK", connection=self.connection)
 
-        data_send = (str(data_send)).replace("\'", "\"")
-
-        send_data(data=f"SyncOK,{data_send}", connection=self.connection)
-
-        return blocks_to_add, poolConnections, poolWorkers, rewards
+        return blocks_to_add, poolConnections, poolWorkers, rewards, 0
 
     def logout(self, data):
         try:
