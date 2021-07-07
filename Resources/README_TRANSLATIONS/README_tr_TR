@@ -38,26 +38,29 @@
 <br>
 
 <h3>
-  Duino-Coin is a coin that can be mined with Arduinos, ESP8266/32 boards, Raspberry Pis, computers, and many more<br>
-  (including Wi-Fi routers, smart TVs, smartphones, smartwatches, SBCs, MCUs or even GPUs)
+  Duino-Coin, Arduinolarla, ESP8266/32 kartlarıyla, Raspberry pi'larla, bilgisayarla ve çok daha fazlası ile kazılabilen bir coindir.<br>
+  (Wi-Fi yönlendiricileri, akıllı TV'ler, akıllı telefonlar, akıllı saatler, Tek Kart Bilgisayarları(SBC'ler), mikrodenetleyiciler hatta ekran kartları dahil)
 </h3>
 
 
-| Key features | Technical specifications | (Some of many) supported boards |
+| Ana özellikleri | Teknik Ayrıntıları | Desteklenen kartlar(dan bazıları) |
 |-|-|-|
-| 💻 Supported by a large number of platforms<br>👥 A friendly & growing community<br>💱 Easy to use & exchange<br>(on DUCO Exchange, Node-S, JustSwap)<br>🌎 Available everywhere<br>:new: Fully original & open-source project<br>🌳 Beginner & eco-friendly<br>💰 Cost-effective & easy to mine | ⚒️ Algorithms: DUCO-S1, XXHASH,<br>more planned (including PoS)<br>♐ Rewards: supported by "Kolka system"<br>helping to reward miners fairly<br>⚡ Transaction time: Instant<br>🪙 Coin supply: Infinite<br>(before December 2020: 350k coins)<br>(new limits planned for the future)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Decimals: up to 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Teensy 4.1 boards |
+| 💻 Çoğu platform tarafından destekleniyor<br>👥 Arkadaş canlısı ve büyüyen bir topluluk<br>💱 Kullanması & Takas etmesi kolay<br>(DUCO Exchange, Node-S, JustSwap'da)<br>🌎 Heryerde mevcut<br>:new: Tamamen orijinal & açık kaynaklı proje<br>🌳 Acemi & Çevre Dostu<br>💰 Uygun maliyetli & madenciliği kolay | ⚒️ Algoritmalar: DUCO-S1, XXHASH,<br>dahası planlanıyor(PoS dahil)<br>♐ Ödüller: "Kolka sistemi" tarafından destekleinyor<br>Madencilerin adil bir şekilde ödüllendirilmesine yardımcı<br>⚡ Aktarım hızı: Anlık<br>🪙 Maksimum Arz: Sonsuz<br>(Aralık 2020'den önce: 350 bin)<br>(gelecekte yeni limitler berirlenmesi planlandı)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Ondalıkları: 20'ye kadar | ♾️ Arduinolar<br>(Uno, Nano, Mega, Due, Pro Mini, vb.)<br>📶 ESP8266'lar<br>(NodeMCU, Wemos, vb.)<br>📶 ESP32'ler<br>(ESP-WROOM, ESP32-CAM, vb.)<br>🍓 Raspberry Pi'lar<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pi'lar<br>(Zero, Zero 2, PC, Plus, vb.)<br>⚡ Teensy 4.1 kartları |
 
-## Get started
+## Duino-Coin'i kullanmaya başlamak
 
-#### The easiest way to get started with Duino-Coin is to download [the latest release](https://github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
+#### Duino-Coin'i kullanmaya başlamanın en kolay yolu sizin işletim sisteminize uygun [son sürümü indirmek](https://github.com/revoxhere/duino-coin/releases/latest)<br>
 After downloading the release, unzip it and launch the desired program.<br>
-There are no dependencies required.
+İndirmeden sonra, zip paketini açıp istenilen programı başlatın.<br>
+Hiçbir bağımlı kütüphane indirmenize gerek yoktur.
 
 If you need help, you can take a look at the official getting started guides located <a href="https://duinocoin.com/getting-started">on the official website</a>.<br>
 FAQ and troubleshooting help can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
 
+Yardıma ihtiyacınız varsa, resmi Duino-Coin'i kullanmaya başlama kılavuzunu <a href="https://duinocoin.com/getting-started">burada</a> bulabilirsiniz.<br>
+Sıkça Sorulan Sorular ve hata giderme yolları [burada](https://github.com/revoxhere/duino-coin/wiki).<br>
 
-### Manual installation
+### Manuel Yükleme
 
 #### Linux
 
@@ -70,7 +73,7 @@ python3 -m pip install -r requirements.txt # Install pip dependencies
 ````
 
 After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py`).
-
+Bunu yaptıktan sonra yazılımı Python Yorumlayıcısı ile çalıştırabilirsiniz (`python3 PC_Miner.py` gibi).
 
 #### Windows
 
