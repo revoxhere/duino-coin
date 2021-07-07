@@ -257,11 +257,10 @@ class Pool:
             send_data(data="No PoolID provided", connection=self.connection)
 
         try:
-            info = str(data[1])
-            info = ast.literal_eval(info)
-            info = json.loads(info)
-
             try:
+                info = str(data[1].decode())
+                info = ast.literal_eval(info)
+
                 blocks_to_add = int(info['blocks']['blockIncrease'])
                 big_blocks_to_add = info['blocks']['bigBlocks']
                 poolCpu = float(info['cpu'])
@@ -270,27 +269,21 @@ class Pool:
             except Exception as e:
                 print("Error fetching JSON data:", e)
 
-            while True:
+            try:
                 r_rewards = requests.get(f"http://{self.poolIP}:6001/rewards")
-                try:
-                    rewards = r_rewards.json()
-                    break
-                except:
-                    pass
-                    #print(r_rewards)
+                rewards = r_rewards.json()
+            except:
+                pass
 
         except Exception as e:
             send_data(data=f"NO,Error: {e}", connection=self.connection)
             return 0, 0, {}, {}, 1
 
-        while True:
+        try:
             r_workers = requests.get(f"http://{self.poolIP}:6001/workers")
-            try:
-                poolWorkers = r_workers.json()
-                break
-            except:
-                pass
-                #print(r_workers)
+            poolWorkers = r_workers.json()
+        except:
+            pass
 
         with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
