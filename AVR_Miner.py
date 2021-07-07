@@ -605,7 +605,7 @@ def greeting():
                 url = ('https://github.com/'
                        + 'revoxhere/'
                        + 'duino-coin/blob/useful-tools/'
-                       + 'donateExecutableWindows.exe?raw=true')
+                       + 'DonateExecutableWindows.exe?raw=true')
                 r = requests.get(url)
                 with open(RESOURCES_DIR + '/Donate_executable.exe', 'wb') as f:
                     f.write(r.content)
