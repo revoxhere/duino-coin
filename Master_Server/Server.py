@@ -2634,46 +2634,38 @@ def handle(connection, address):
 
             # POOL FUNCTIONS
 
-            elif data[0] == "POOLList":
-                PF.pool_list(connection=connection)
-
             elif data[0] == "PoolLogin":
                 Pool = PF.Pool(connection=connection)
                 Pool.login(data=data)
 
             elif data[0] == "PoolSync":
-                blocks_to_add = Pool.sync(data, global_blocks)
-                global_blocks += blocks_to_add
-
-            elif data[0] == "PoolPreSync":
                 try:
-                    sync_data = Pool.pre_sync(connection)
                     blocks_to_add,\
                         poolConnections,\
                         poolWorkers,\
-                        rewards = Pool.sync(
-                            sync_data,
-                            global_blocks
-                        )
-                    global_blocks += blocks_to_add
-                    global_connections = int(global_connections)
-                    global_connections += poolConnections
+                        rewards,\
+                        error = Pool.sync(data)
 
-                    for threadid in minerapi.copy():
-                        if len(str(threadid)) < 11:
-                            minerapi.pop(threadid)
+                    if not error:
+                        global_blocks += blocks_to_add
+                        global_connections = int(global_connections)
+                        global_connections += poolConnections
 
-                    for worker in poolWorkers:
-                        try:
-                            minerapi[worker] = poolWorkers[worker]
-                        except:
-                            pass
+                        for threadid in minerapi.copy():
+                            if len(str(threadid)) < 11:
+                                minerapi.pop(threadid)
 
-                    for user in rewards:
-                        try:
-                            balances_to_update[user] += rewards[user]
-                        except:
-                            balances_to_update[user] = rewards[user]
+                        for worker in poolWorkers:
+                            try:
+                                minerapi[worker] = poolWorkers[worker]
+                            except:
+                                pass
+
+                        for user in rewards:
+                            try:
+                                balances_to_update[user] += rewards[user]
+                            except:
+                                balances_to_update[user] = rewards[user]
                 except Exception as e:
                     admin_print("Error syncing pool: " + str(e))
 
