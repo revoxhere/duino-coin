@@ -10,13 +10,13 @@
 #include <Id.h>
 
 // features
-#define LOG // comment to disable debug logs to Serial1
+#define LOG           // comment to disable debug logs to Serial1
 #define RESET_NO_JOBS // comment to not reset board if no jobs
 
 #define SHA1_HASH_LEN 20
 #define JOB_MAX_SIZE 104 // 40 + 40 + 20 + 3
 #define LED_BUILTIN PC13
-#define NO_JOBS_RESET_S 60  // reset board if no jobs for longer than 60s
+#define NO_JOBS_RESET_S 60 // reset board if no jobs for longer than 60s
 
 String clientId;
 uint8_t job[JOB_MAX_SIZE];
@@ -31,10 +31,10 @@ void log(String msg)
 String getClientId()
 {
   uint32_t id[3];
-  GetSTM32MCUID(id, MCUTypedef::STM32F1_);
+  GetSTM32MCUID(id);
 
   char buf[22];
-  sprintf(buf, "%08X%08X%08X", id[0], id[1], id[2]); // 12 byte  
+  sprintf(buf, "%08X%08X%08X", id[0], id[1], id[2]); // 12 byte
   return "DUCOID" + String(buf);
 }
 
@@ -57,7 +57,7 @@ void setup()
 #ifdef LOG
   Serial1.begin(115200);
 #endif
-  log(clientId);  
+  log(clientId);
 
   Serial.begin(115200);
   Serial.setTimeout(3000);
