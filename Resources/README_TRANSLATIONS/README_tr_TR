@@ -152,13 +152,13 @@ Server source code, documentation for API calls and official libraries for devel
 
 <details>
   <summary>
-    Since that table is getting really long, it's collapsed by default. Click this text to expand it!
+    Bu liste çok uzadığı için, varsayılan olarak kapalı. Bu yazıya tıklayarak listeyi gösterin!
   </summary>
 
-  | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
+  | Cihaz/İşlemci/SBC/MCU/çip                                 | Ortalama hashrate<br>(tüm çekirdekler) | Madenci İşlemleri | Güç<br>kullanımı | Ortalama DUCO/gün |
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
-  | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 196 H/s                           | 1                 | 0.2 W          | 9-10                |
-  | Teensy 4.1 (soft cryptography)                            | 80 kH/s                           | 1                 | 0.5 W          | -                   |
+  | Arduino Pro Mini, Uno, Nano vb.<br>(Atmega 328p/pb/16u2)  | 196 H/s                           | 1                 | 0.2 W          | 9-10                |
+  | Teensy 4.1 (yazılım kriptografi)                          | 80 kH/s                           | 1                 | 0.5 W          | -                   |
   | NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 9.3 kH/s (160MHz) 4.6 kH/s (80Mhz)| 1                 | 0.6 W          | 6-7                 |
   | ESP32                                                     | 23 kH/s                           | 2                 | 1 W            | 8-9                 |
   | Raspberry Pi Zero                                         | 17 kH/s                           | 1                 | 1.1 W          | -                   |
@@ -180,26 +180,26 @@ Server source code, documentation for API calls and official libraries for devel
   | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | -                   |
   | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 67 W           | 15.44               |
 
-  All tests were performed using the DUCO-S1 algorithm. This table will be actively updated.
+  Tüm testler DUCO-S1 algoritması ile yapıldı. Bu tablo aktif olarak güncelleniyor.
 </details>
 
 
-## License
+## Lisans
 
-Duino-Coin is mostly distributed under the MIT License. See `LICENSE` file for more information.
-Some third-party included files may have different licenses - please check their `LICENSE` statements (usually at the top of the source code files).
+Duino-Coin çoğunlukla MIT Lisansı altında dağıtılıyor. Daha fazla bilgi için `LICENCE` dosyasına göz atın.
+Bazı üçüncü-parti dosyalar farklı lisanslar kullanıyor olabilir - lütfen lisanslarına göz atın (çoğunlukla kaynak kodlarının başında yer alır).
 
-## Terms of service
-1. Duino-Coins ("DUCOs") are earned by miners with a process called mining.<br/>
-2. Mining is described as using DUCO-S1 (and XXHASH) algorithm (as explained in the <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
-3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README).<br/>
-4. Mining on GPUs, FPGAs and other high-efficiency hardware is allowed, but using only the `EXTREME` mining difficulty.<br/>
-5. Any users using miners on difficulty not suited for their hardware (see the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">difficulty list</a>) will be automatically throttled by being moved to correct difficulty tier.<br/>
-6. Any user that keeps trying to use lower difficulty than it's suited for may get temporarily blocked.<br/>
-7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
-8. Only coins earned legally are eligible for the exchange.<br/>
-9. Users spotted using a VPN (or similar) with malicious intents (e.g. bypassing limits) may be banned without prior notice.<br/>
-10. Multiple accounts used to bypass limits may be banned without prior notice.<br/>
+## Kullanım Şartları
+1. Duino-Coin'ler ("DUCO'lar") madenciler tarafından madencilik ("mining") adı verilen bir işlem sonucunda kazanılır.<br/>
+2. Madencilik, DUCO-S1 (veya XXHASH) algoritmasını kullanarak (burada açıklandığı gibi <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>) bir matematik problemine doğru çözümü bulma işine denir.<br/>
+3. Madencilik resmi olarak işlemciler(CPU'lar), AVR mikrodenetleyicili kartlar (Arduino kartları gibi), Tek Kart Bilgisayarları (Raspberry Pi kartları gibi), resmi madenci yazılımını kullanarak (diğer resmi olarak izin verilen madenci yazılımları bu README dosyasının üst kısında) ESP8266/32 mikrodenetleyicili kartlar.<br/>
+4. Ekran kartları , FPGA veya başka yüksek verimlilikte olan madencileri kullanmak mümkündür ama sadece `EXTREME` madencilik zorluğunda.<br/>
+5. Kendi donanımına uygun olmayan zorlukta madencilik yapan kullanıcılar (buraya göz atın <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">zorluk listesi</a>) otomatik olarak uygun zorluk seviyesine geçirilecektir.<br/>
+6. Herhangi kullanıcı sürekli olarak düşük zorluk seviyesini kullanmaya çalışacak olursa geçici olarak bloklanabilir.<br/>
+7. Bir kullanıcıyı yasaklamak, kullanıcının coinlerine erişimini devre dışı bırakmak ve hesabını silmek olarak tanımlanmıştır.<br/>
+8. Sadece yasal olarak elde edilmiş coinler DUCO Exchange'i kullanmaya uygundur.<br/>
+9. VPN yada benzeri araçları kötü amaçlı kullanan (mesela limitleri geçmek için) kullanıcılar ihbar verilmeden yasaklanabilir.<br/>
+10. Limitleri geçmek için kullanılan çoklu hesaplar ihbar verilmeden yasaklanabilir.<br/>
 11. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
 12. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
 13. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
