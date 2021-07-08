@@ -77,14 +77,14 @@ You are connected to the Duino-Coin master server.
 DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 5  # in seconds
-DB_TIMEOUT = 2.5
+DB_TIMEOUT = 2*SAVE_TIME
 BACKLOG = None  # spawn connection instantly
 SERVER_VER = 2.5  # announced to clients
 READY_HASHES_NUM = 5000  # in shares
 BLOCK_PROBABILITY = 500000  # 1 in X
 BLOCK_PROBABILITY_XXH = 50000  # 1 in X
 BLOCK_REWARD = 28.11  # duco
-UPDATE_MINERAPI_EVERY = 2  # in shares
+UPDATE_MINERAPI_EVERY = 1  # in shares
 EXPECTED_SHARETIME = 10  # in seconds
 MAX_REJECTED_SHARES = 5
 BCRYPT_ROUNDS = 6
@@ -476,44 +476,55 @@ def floatmap(x, in_min, in_max, out_min, out_max):
 def database_updater():
     db_err_counter = 0
     while True:
+        sleep(SAVE_TIME)
         try:
-            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                datab = conn.cursor()
-                for user in balances_to_update.copy():
-                    amount_to_update = balances_to_update[user]
+            to_execute = []
+            for user in balances_to_update.copy():
+                amount_to_update = balances_to_update[user]
+                if amount_to_update and user:
+                    if amount_to_update > 0.2:
+                        amount_to_update = amount_to_update / 100
+                    if amount_to_update > 0.02:
+                        amount_to_update = floatmap(
+                            amount_to_update, 0.02, 0.5, 0.02, 0.025)
+                    try:
+                        estimated_profits[user].append(amount_to_update)
+                    except:
+                        estimated_profits[user] = []
+                        estimated_profits[user].append(amount_to_update)
 
-                    if amount_to_update:
-                        if amount_to_update > 0.2:
-                            amount_to_update = amount_to_update / 100
-                        if amount_to_update > 0.02:
-                            amount_to_update = floatmap(
-                                amount_to_update, 0.02, 0.5, 0.02, 0.025)
+                    to_execute.append([amount_to_update, user])
 
-                        try:
-                            estimated_profits[user].append(amount_to_update)
-                        except:
-                            estimated_profits[user] = []
-                            estimated_profits[user].append(amount_to_update)
-
-                        datab.execute(
+                #timeS = time()
+                with lock:
+                    with sqlconn(DATABASE,
+                                 timeout=DB_TIMEOUT) as conn:
+                        datab = conn.cursor()
+                        datab.execute('PRAGMA journal_mode=WAL')
+                        datab.executemany(
                             """UPDATE Users
                             SET balance = balance + ?
                             WHERE username = ?""",
-                            (amount_to_update, user))
-                    balances_to_update.pop(user)
-                conn.commit()
+                            (to_execute))
+                        conn.commit()
+                #timeT = time()
+                # print("Updating",
+                #       len(balances_to_update),
+                #       "users took",
+                #       timeT-timeS,
+                #       "seconds")
         except Exception as e:
-            admin_print("Database error:", e)
+            admin_print("Database error:", traceback.format_exc())
             db_err_counter += 1
             if db_err_counter >= 5:
                 admin_print("Restarting server - too many DB errs")
                 os.execl(sys.executable, sys.executable, *sys.argv)
-        sleep(SAVE_TIME)
 
 
 def chain_updater():
     db_err_counter = 0
     while True:
+        sleep(SAVE_TIME*300)
         try:
             with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
@@ -532,7 +543,6 @@ def chain_updater():
             if db_err_counter > 5:
                 admin_print("Restarting server - too many DB errs")
                 os.execl(sys.executable, sys.executable, *sys.argv)
-        sleep(SAVE_TIME*3)
 
 
 def input_management():
@@ -583,120 +593,7 @@ def input_management():
             os.system('clear')
 
         elif command[0] == "ban":
-            try:
-                username = command[1]
-                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                    datab = conn.cursor()
-                    datab.execute(
-                        """UPDATE Users
-                            set password = ?
-                            where username = ?""",
-                        (DUCO_PASS, username))
-                    conn.commit()
-                admin_print("Changed password")
-            except Exception as e:
-                admin_print("Error changing password: " + str(e))
-
-            with open(CONFIG_BANS, 'a') as bansfile:
-                bansfile.write(str(username) + "\n")
-                admin_print("Added username to banlist")
-
-            try:
-                banlist.append(str(username))
-                admin_print("Added username to blocked usernames")
-            except Exception as e:
-                admin_print(
-                    "Error adding username to blocked usernames: " + str(e))
-
-            try:
-                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                    datab = conn.cursor()
-                    datab.execute(
-                        """SELECT *
-                    FROM Users
-                    WHERE username = ?""",
-                        (username,))
-                    email = str(datab.fetchone()[2])
-
-                    message = MIMEMultipart("alternative")
-                    message["Subject"] = "ToS violation on account " + \
-                        str(username)
-                    message["From"] = DUCO_EMAIL
-                    message["To"] = email
-
-                    part1 = MIMEText(textBan, "plain")
-                    part2 = MIMEText(htmlBan, "html")
-                    message.attach(part1)
-                    message.attach(part2)
-
-                    context = ssl.create_default_context()
-                    with smtplib.SMTP_SSL("smtp.gmail.com",
-                                          465, context=context) as smtpserver:
-                        smtpserver.login(DUCO_EMAIL, DUCO_PASS)
-                        smtpserver.sendmail(
-                            DUCO_EMAIL, email, message.as_string())
-                    admin_print("Sent email to", str(email))
-            except Exception as e:
-                admin_print("Error sending email: " + str(e))
-
-            try:
-                recipient = "giveaways"
-                global_last_block_hash_cp = global_last_block_hash
-                memo = "Kolka ban"
-
-                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                    datab = conn.cursor()
-                    datab.execute(
-                        """SELECT *
-                        FROM Users
-                        WHERE username = ?""",
-                        (username,))
-                    balance = float(datab.fetchone()[3])
-                    amount = balance
-
-                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                    datab = conn.cursor()
-
-                    balance -= float(amount)
-                    datab.execute(
-                        """UPDATE Users
-                        set balance = ?
-                        where username = ?""",
-                        (balance, username))
-
-                    datab.execute(
-                        """SELECT *
-                        FROM Users
-                        WHERE username = ?""",
-                        (recipient,))
-                    recipientbal = float(datab.fetchone()[3])
-
-                    recipientbal += float(amount)
-                    datab.execute(
-                        """UPDATE Users
-                        set balance = ?
-                        where username = ?""",
-                        (round(float(recipientbal), DECIMALS), recipient))
-                    conn.commit()
-
-                with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
-                    datab = conn.cursor()
-                    formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
-                    datab.execute(
-                        """INSERT INTO Transactions
-                        (timestamp, username, recipient, amount, hash, memo)
-                        VALUES(?, ?, ?, ?, ?, ?)""",
-                        (formatteddatetime,
-                            username,
-                            recipient,
-                            amount,
-                            global_last_block_hash_cp,
-                            memo))
-                    conn.commit()
-                admin_print("Transferred balance to giveaways account")
-            except Exception as e:
-                admin_print("Error transfering balance: " +
-                            traceback.format_exc())
+            protocol_ban(command[1])
 
         elif command[0] == "exit":
             admin_print("Are you sure you want to exit DUCO server?")
@@ -1131,6 +1028,109 @@ def email_exists(email):
             return False
         else:
             return True
+
+
+def protocol_ban(username: str):
+    with open(CONFIG_BANS, 'a') as bansfile:
+        bansfile.write(str(username) + "\n")
+        admin_print("Added username to banlist")
+
+    try:
+        banlist.append(str(username))
+        admin_print("Added username to blocked usernames")
+    except Exception as e:
+        admin_print(
+            "Error adding username to blocked usernames: " + str(e))
+
+    try:
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                """SELECT *
+            FROM Users
+            WHERE username = ?""",
+                (username,))
+            email = str(datab.fetchone()[2])
+
+            message = MIMEMultipart("alternative")
+            message["Subject"] = "ToS violation on account " + \
+                str(username)
+            message["From"] = DUCO_EMAIL
+            message["To"] = email
+
+            part1 = MIMEText(textBan, "plain")
+            part2 = MIMEText(htmlBan, "html")
+            message.attach(part1)
+            message.attach(part2)
+
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL("smtp.gmail.com",
+                                  465, context=context) as smtpserver:
+                smtpserver.login(DUCO_EMAIL, DUCO_PASS)
+                smtpserver.sendmail(
+                    DUCO_EMAIL, email, message.as_string())
+            admin_print("Sent email to", str(email))
+    except Exception as e:
+        admin_print("Error sending email: " + str(e))
+
+    try:
+        recipient = "giveaways"
+        global_last_block_hash_cp = global_last_block_hash
+        memo = "Kolka ban"
+
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                """SELECT *
+                FROM Users
+                WHERE username = ?""",
+                (username,))
+            balance = float(datab.fetchone()[3])
+            amount = balance
+
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+
+            balance -= float(amount)
+            datab.execute(
+                """UPDATE Users
+                set balance = ?
+                where username = ?""",
+                (balance, username))
+
+            datab.execute(
+                """SELECT *
+                FROM Users
+                WHERE username = ?""",
+                (recipient,))
+            recipientbal = float(datab.fetchone()[3])
+
+            recipientbal += float(amount)
+            datab.execute(
+                """UPDATE Users
+                set balance = ?
+                where username = ?""",
+                (round(float(recipientbal), DECIMALS), recipient))
+            conn.commit()
+
+        with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
+            datab.execute(
+                """INSERT INTO Transactions
+                (timestamp, username, recipient, amount, hash, memo)
+                VALUES(?, ?, ?, ?, ?, ?)""",
+                (formatteddatetime,
+                    username,
+                    recipient,
+                    amount,
+                    global_last_block_hash_cp,
+                    memo))
+            conn.commit()
+        admin_print("Transferred balance to giveaways account")
+    except Exception as e:
+        admin_print("Error transfering balance: " +
+                    traceback.format_exc())
 
 
 def generate_block(username, reward, new_block_hash, connection, xxhash=False):
@@ -1984,7 +1984,7 @@ def protocol_login(data, connection):
                       connection)
             return False
 
-    if user_exists(username):
+    elif user_exists(username):
         if match(r"^[A-Za-z0-9_-]*$", username):
             try:
                 with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
@@ -2076,7 +2076,6 @@ def protocol_register(data, connection, address):
     username = str(data[1])
     unhashed_pass = str(data[2]).encode('utf-8')
     email = str(data[3]).replace("REGI", "")
-
     ip = address[0].replace("::ffff:", "")
 
     """ Do some basic checks """
@@ -2165,9 +2164,9 @@ def protocol_send_funds(data, connection, username):
             return
 
         with sqlconn(DATABASE,
-                     timeout=DB_TIMEOUT,
-                     isolation_level=None) as conn:
+                     timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
+            datab.execute('PRAGMA journal_mode=wal')
             datab.execute(
                 """SELECT *
                         FROM Users
@@ -2180,9 +2179,9 @@ def protocol_send_funds(data, connection, username):
             return
 
         with sqlconn(DATABASE,
-                     timeout=DB_TIMEOUT,
-                     isolation_level=None) as conn:
+                     timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
+            datab.execute('PRAGMA journal_mode=wal')
             datab.execute(
                 """SELECT *
                     FROM Users
@@ -2197,9 +2196,9 @@ def protocol_send_funds(data, connection, username):
             while True:
                 try:
                     with sqlconn(DATABASE,
-                                 timeout=DB_TIMEOUT,
-                                 isolation_level=None) as conn:
+                                 timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
+                        datab.execute('PRAGMA journal_mode=wal')
                         datab.execute(
                             """UPDATE Users
                             set balance = ?
@@ -2215,11 +2214,11 @@ def protocol_send_funds(data, connection, username):
                 except:
                     pass
 
+            formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
             with sqlconn(CONFIG_TRANSACTIONS,
-                         timeout=DB_TIMEOUT,
-                         isolation_level=None) as conn:
+                         timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
-                formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
+                datab.execute('PRAGMA journal_mode=wal')
                 datab.execute(
                     """INSERT INTO Transactions
                     (timestamp, username, recipient, amount, hash, memo)
@@ -2435,16 +2434,18 @@ def protocol_get_transactions(data, connection):
         with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
             datab.execute("SELECT * FROM Transactions")
-            for row in datab.fetchall():
-                transactiondata[str(row[4])] = {
-                    "Date":      str(row[0].split(" ")[0]),
-                    "Time":      str(row[0].split(" ")[1]),
-                    "Sender":    str(row[1]),
-                    "Recipient": str(row[2]),
-                    "Amount":    float(row[3]),
-                    "Hash":      str(row[4]),
-                    "Memo":      str(row[5])
-                }
+            rows = datab.fetchall()
+
+        for row in rows:
+            transactiondata[str(row[4])] = {
+                "Date":      str(row[0].split(" ")[0]),
+                "Time":      str(row[0].split(" ")[1]),
+                "Sender":    str(row[1]),
+                "Recipient": str(row[2]),
+                "Amount":    float(row[3]),
+                "Hash":      str(row[4]),
+                "Memo":      str(row[5])
+            }
         transactiondata = OrderedDict(
             reversed(
                 list(transactiondata.items())
