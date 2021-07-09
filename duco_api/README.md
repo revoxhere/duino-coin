@@ -1,3 +1,5 @@
+# **NOTICE:** For now, this documentation is useless. Do not use this.
+
 ## Official DUCO module for Python 3
 
 To build your own Duino-Coin apps we've created Duino-Coin API for Python 3.
