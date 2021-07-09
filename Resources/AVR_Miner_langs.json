@@ -68,7 +68,8 @@
         "mining_not_exist_warning": " Upewnij się że poprawnie wprowadziłeś nazwę użytkownika. Sprawdź swój plik konfiguracyjny. Ponowna próba za 10s",
 
         "load_config_error": " Problem z ładowaniem pliku konfiguracyjnego (",
-        "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s"
+        "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s",
+        "connection_search": "Szukanie najszybszego serwera"
     },
     "russian": {
         "translation_autor": "5Q",
@@ -281,7 +282,8 @@
         "mining_not_exist": " existiert nicht.",
         "mining_not_exist_warning": " Stelle sicher, dass der Benutzername korrekt geschrieben wurde. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s",
         "load_config_error": " Fehler beim Laden der Konfigurationsdatei (",
-        "load_config_error_warning": "/Miner_config.cfg). Versuche sie zu entfernen und neu zu konfigurieren. Miner schließt in 10s"
+        "load_config_error_warning": "/Miner_config.cfg). Versuche sie zu entfernen und neu zu konfigurieren. Miner schließt in 10s",
+        "connection_search": "Suche nach der schnellsten Verbindung zu dem Server"
     },
     "french": {
         "translation_autor": "Bilaboz",
@@ -352,7 +354,8 @@
         "mining_not_exist_warning": " Vérifiez que vous avez correctement entré votre nom d'utilisateur dans le fichier de configuration. Nouvel essai dans 10s",
 
         "load_config_error": " Erreur durant le chargement du fichier de configuration (",
-        "load_config_error_warning": "/Miner_config.cfg). Essayer de le supprimer et relancer le mineur. Fermeture du programme dans 10s"
+        "load_config_error_warning": "/Miner_config.cfg). Essayer de le supprimer et relancer le mineur. Fermeture du programme dans 10s",
+        "connection_search": "Recherche du serveur le plus rapide"
     },
     "slovak": {
         "translation_autor": "JoyBed",
@@ -487,8 +490,7 @@
         "mining_not_exist_warning": " Make sure you've entered the username correctly. Please check your config file. Retrying in 10s",
         "load_config_error": " Error loading the configfile (",
         "load_config_error_warning": "/Miner_config.cfg). Try removing it and re-running configuration. Exiting in 10s",
-        "local_transactions_list": "Local Transactions List",
-        "local_transactions_list_warning": "Local Transactions List Warning"
+        "connection_search": "Searching for the fastest node to connect to"
     },
     "italian": {
         "translation_autor": "Il mastro Stefanuzzo (no spaces on GitHub)",
@@ -753,7 +755,8 @@
         "load_config_error": " Ayar dosyasını yüklerken hata meydana geldi (",
         "load_config_error_warning": "/Miner_config.cfg). Dosyayı kaldırmayı ve yapılandırıcıyı tekrar çalıştırmayı deneyin. 10 saniye içerisinde çıkış yapılıyor",
         "local_transactions_list": "Lokal Aktarımlar",
-        "local_transactions_list_warning": "Lokal Aktarımlar Listesi Uyarısı"
+        "local_transactions_list_warning": "Lokal Aktarımlar Listesi Uyarısı",
+        "connection_search": "Sunuculara bağlanmak için en hızlı bağlantı aranıyor"
     },
     "azerbaijani": {
         "translation_autor": "Muhabbet Kuşu",
@@ -817,7 +820,6 @@
         "mining_not_exist_warning": " İstifadəçi adını düzgün daxil etdiyinizə əmin olun. Zəhmət olmasa ayarlar faylını yoxlayın. 10 saniyədə yenidən cəhd ediliyor.",
         "load_config_error": " Ayarlar faylı yüklənərkən xəta baş verdi (",
         "load_config_error_warning": "/Miner_config.cfg). Faylın silinmesini və yenidən konfiquratorun işləməsini sınayın. 10 saniyədə yenidən cəhd ediliyor",
-        "local_transactions_list": "Lokal Transferlər",
-        "local_transactions_list_warning": "Lokal Aktarımlar Listesi Uyarısı"
+        "connection_search": "Serverlərə ən sürətli bağlantı axtarılıyor"
     }
 }
