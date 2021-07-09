@@ -200,39 +200,41 @@ Bazı üçüncü-parti dosyalar farklı lisanslar kullanıyor olabilir - lütfen
 8. Sadece yasal olarak elde edilmiş coinler DUCO Exchange'i kullanmaya uygundur.<br/>
 9. VPN yada benzeri araçları kötü amaçlı kullanan (mesela limitleri geçmek için) kullanıcılar ihbar verilmeden yasaklanabilir.<br/>
 10. Limitleri geçmek için kullanılan çoklu hesaplar ihbar verilmeden yasaklanabilir.<br/>
-11. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
-12. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
+11. Hesaplar geçici olarak Kullanım Şartları'nın ihlalinin araştırılması için yasaklanabilir.<br/>
+12. DUCO Exchange'e yapılan exchange işlemleri ihlal araştırması yapılırken gecikebilir. <br/>
 13. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
-14. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed.<br />
-15. A user's DUCOs may be burnt if a violation can be proven.<br/>
-16. These terms of service can change at any time without prior notice.<br/>
-17. Every user using Duino-Coin agrees to comply with the above rules.<br/>
-## Privacy policy
-1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
-2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
-3. Balances, transactions and mining-related data is publicly available in the public <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
-4. The privacy policy may be changed in the future with a prior notification.
+14. Bedava hosting servisleri ile madencilik(bedava VPS'ler, Repl.it veya Github Actions gibi) yasaktır.<br />
+15. Bir kullanıcının DUCO'ları bir ihlal kanıtlanabilirse yok edilebilir.<br/>
+16. Bu Kullanım Şartları haber verilmeden herhangi bir an değişebilir.<br/>
+17. Duino-Coin'i kullanan her kullanıcı bu şartları kabül etmiş sayılır.<br/>
+## Gizlilik Politikası
+1. Ana sunucuda kullanıcıların sadece kullanıcı adları, şifreleri(bcrypt ile hashlenmiş halde) ve e-postaları saklanır<br/>
+2. E-postalar kullanıcılara açık değildir ve sadece kullanıcı ile gerektiğinde iletişim kurmak, <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a>'de exchange isteklerini doğrulamak ve haber e-postası almak için (gelecekte planlanıyor) kullanılır.<br/>
+3. Bakiyeler, aktarımlar ve madencilik ile ilgili bilgiler açık <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON API</a>'lerinde açık olarak mevcuttur.<br/>
+4. Bu Gizlilik Politikası gelecekte önceden haber verilerek değiştirilebilir.
 
-## Active project maintainers
+## Aktif Proje Sorumluları
 
-*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Lead Python dev, project founder)
-*   [@Bilaboz](https://github.com/bilaboz/) (Lead NodeJS dev)
-*   [@connorhess](https://github.com/connorhess) (Lead Python dev, Node-S owner)
-*   [@JoyBed](https://github.com/JoyBed) (Lead AVR dev)
+*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Ana Python geliştiricisi, proje kurucusu)
+*   [@Bilaboz](https://github.com/bilaboz/) (Ana NodeJS geliştiricisi)
+*   [@connorhess](https://github.com/connorhess) (Ana Python geliştiricisi, Node-S sahibi)
+*   [@JoyBed](https://github.com/JoyBed) (Ana AVR geliştiricisi)
 ##
-*   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
-*   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
+*   [@EinWildesPanda](https://github.com/EinWildesPanda) (Geliştirici)
+*   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) geliştiricisi)
 *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
-*   [@DoctorEenot](https://github.com/DoctorEenot) (Dev)
+*   [@DoctorEenot](https://github.com/DoctorEenot) (Geliştirici)
 ##
-*   [@HGEcode](https://github.com/HGEcode) (Python dev)
-*   [@LDarki](https://github.com/LDarki) (Web dev)
-*   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
-*   [@Pripun](https://github.com/Pripun) (Mobile apps dev)
-*   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
+*   [@HGEcode](https://github.com/HGEcode) (Python geliştiricisi)
+*   [@LDarki](https://github.com/LDarki) (Web geliştiricisi)
+*   [@Lulaschkas](https://github.com/Lulaschkas) (Geliştirici)
+*   [@Pripun](https://github.com/Pripun) (Mobil uygulama geliştiricisi)
+*   [@joaquinbvw](https://github.com/joaquinbvw) (AVR geliştiricisi)
 
-Also big thanks to all [Contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped to develop the Duino-Coin project.
+Bu arada Duino-Coin'i geliştirmeye yardımcı olan tüm [Katkıcılara](https://github.com/revoxhere/duino-coin/graphs/contributors) çok teşekkürler.
 
 <hr>
 
-Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
+Proje Linki: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
+
+## Not: Bu README'nin çevirisi tamamen topluluk tarafından yapılmıştır ve tamamen doğru çevrilmiş veya güncel olmayabilir.
