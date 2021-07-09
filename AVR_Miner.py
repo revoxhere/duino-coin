@@ -227,6 +227,12 @@ def get_fastest_connection(server_ip: str):
     connection_pool = []
     available_connections = []
 
+    pretty_print("net0",
+                " "
+                + get_string("connection_search")
+                + "...",
+                "warning")
+
     for i in range(len(AVAILABLE_PORTS)):
         connection_pool.append(socket())
         connection_pool[i].setblocking(0)
@@ -956,7 +962,7 @@ def mine_avr(com, threadid):
                             bytes(
                                 str(result[0])
                                 + ','
-                                + str(hashrate)
+                                + str(hashrate_t)
                                 + ',Official AVR Miner (DUCO-S1A) v'
                                 + str(MINER_VER)
                                 + ','
