@@ -14,14 +14,6 @@
   <br>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/README.md">
     <img src="https://img.shields.io/badge/English-f39c12.svg?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_es_LATAM.md">
-    <img src="https://img.shields.io/badge/-Espa%C3%B1ol-EE5A24?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_zh_CN.md">
-    <img src="https://img.shields.io/badge/简体中文-e74c3c.svg?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_pl_PL.md">
-    <img src="https://img.shields.io/badge/Polski-ED4C67.svg?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_ru_RU.md">
-    <img src="https://img.shields.io/badge/русский-be2edd.svg?style=for-the-badge" /></a>
 </h1>
 <a href="https://wallet.duinocoin.com">
   <img src="https://img.shields.io/badge/Online Wallet-8e44ad.svg?style=for-the-badge&logo=Web" /></a>
