@@ -829,7 +829,7 @@
         "algorithm": "อัลกอริทึม: ",
         "rig_identifier": "ชื่อริก: ",
 
-        "basic_config_tool": "\nDuino-Coin เครื่องมือการตั้งค่าพื้นฐาน\แก้ไข ",
+        "basic_config_tool": "\nDuino-Coin เครื่องมือการตั้งค่าพื้นฐาน\nแก้ไข ",
         "edit_config_file_warning": "ไฟล์ /Miner_config.cfg ภายหลังหากคุณต้องการเปลี่ยนแปลง",
         "dont_have_account": "ยังไม่มีบัญชี Duino-Coin? ใช้ ",
         "wallet": "วอลเล็ท",
