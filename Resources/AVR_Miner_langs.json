@@ -876,14 +876,14 @@
         "mining_start": " เธรดการชุดเอวีอาร์กำลังเริ่ม",
         "mining_algorithm": " ใช้อัลกอริทึม DUCO-S1A (",
         "mining_avr_connection_error": " การเชื่อมต่อเอวีอาร์ผิดพลาด! ลองใหม่ใน 10วิ",
-        "mining_avr_not_responding": " Arduino is taking longer than expected, sending it a new job ",
+        "mining_avr_not_responding": " อาดุยโนใช้เวลานานกว่าที่คาด กำลังส่งงานใหม่ให้ ",
         "internal_server_error": " ความผิดพลาดภายในเซิร์ฟเวอร์",
         "retrying": " ลองใหม่ใน 10วิ",
         "mining_user": " ผู้ใช้ ",
         "mining_not_exist": " ไม่มีอยู่",
         "mining_not_exist_warning": " ตรวจสอบความถูกต้องของชื่อผู้ใช้งาน กรุณาตรวจสอบไฟล์การตั้งค่า ลองใหม่ใน 10วิ",
         "load_config_error": " การโอนถ่ายข้อมูลไฟล์ตั้งค่าผิดพลาด (",
-        "load_config_error_warning": "/Miner_config.cfg) ลองเอามันออกและเริ่มการตั้งค่าใหม่ ออกใน 10วิ",
+        "load_config_error_warning": "/Miner_config.cfg) ลองเอามันออกและเริ่มการตั้งค่าใหม่ จะออกใน 10วิ",
         "connection_search": "ค้นหาโนดที่เร็วที่สุดเพื่อเชื่อมต่อ"
     }
 }
