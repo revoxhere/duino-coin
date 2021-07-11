@@ -760,6 +760,10 @@ def mine_avr(com, threadid):
 
                         soc.send(bytes("MOTD", encoding="ascii"))
                         motd = soc.recv(1024).decode().rstrip("\n")
+
+                        if "\n" in motd:
+                            motd = motd.replace("\n", "\n\t\t")
+
                         pretty_print("net" + str(threadid),
                                      " MOTD: "
                                      + Fore.RESET
