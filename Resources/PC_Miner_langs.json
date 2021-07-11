@@ -75,7 +75,8 @@
         "max_threads_notice": "Mining Duino-Coin with a lot of threads will cause decrease in profit - mining threads decreased to 8",
         "max_hashrate_notice": "Mining Duino-Coin with powerful equipment may not be very profitable for you - we suggest trying Coin Magi (https://xmg.network) - our 'sister' coin",
     
-        "recommended": "recommended"
+        "recommended": "recommended",
+        "connection_search": "Searching for the fastest node to connect to"
     },
     "italian": {
         "translation_autor": "Il mastro Stefanuzzo (no spaces on GitHub)",
@@ -232,7 +233,8 @@
         "max_threads_notice": "Kopanie Duino-Coin z wysoką ilością wątków spowoduje spadek w zyskach - zmniejszono liczbę wątków do 8",
         "max_hashrate_notice": "Kopanie Duino-Coin używając mocnego komputera może nie być bardzo opłacalne - proponujemy wpróbować Coin Magi (https://xmg.network) - naszą 'siostrzaną' monetę",
     
-        "recommended": "zalecany"
+        "recommended": "zalecana opcja",
+        "connection_search": "Szukanie najszybszego serwera"
     },
     "spanish": {
         "translation_autor": "HGEpro",
@@ -378,7 +380,9 @@
 
         "mining_user": " L'utilisateur ",
         "mining_not_exist": " n'existe pas.",
-        "mining_not_exist_warning": " Vérifiez que vous avez correctement entré votre nom d'utilisateur dans le fichier de configuration. Nouvel essai dans 10s"
+        "mining_not_exist_warning": " Vérifiez que vous avez correctement entré votre nom d'utilisateur dans le fichier de configuration. Nouvel essai dans 10s",
+
+        "connection_search": "Recherche du serveur le plus rapide"
     },
     "russian": {
         "translation_autor": "5Q",
@@ -522,7 +526,9 @@
 
         "mining_user": " Benutzer ",
         "mining_not_exist": " existiert nicht.",
-        "mining_not_exist_warning": " Stelle sicher, dass du den Nutzernamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s"
+        "mining_not_exist_warning": " Stelle sicher, dass du den Nutzernamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s",
+
+        "connection_search": "Suche nach der schnellsten Verbindung zu dem Server"
     },
     "chinese_simplified": {
         "translation_autor": "suifengtec",
@@ -660,7 +666,9 @@
 
         "mining_user": " Kullanıcı ",   
         "mining_not_exist": " mevcut değil.",   
-        "mining_not_exist_warning": " Kullanıcı adınızı doğru girdiğinizden emin olun. Lütfen ayar dosyanızı kontrol edin. 10 saniye içerisinde yeniden deneniyor"
+        "mining_not_exist_warning": " Kullanıcı adınızı doğru girdiğinizden emin olun. Lütfen ayar dosyanızı kontrol edin. 10 saniye içerisinde yeniden deneniyor",
+        
+        "connection_search": "Sunuculara bağlanmak için en hızlı bağlantı aranıyor"
     },
     "portuguese": {
         "translation_autor": "bonsai",
