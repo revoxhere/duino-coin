@@ -258,7 +258,7 @@ while True:
                 + "It is probably under maintenance or temporarily down."
                 + "\nRetrying in 15 seconds.")
         time.sleep(15)
-        os.system("python " + __file__)
+        os.system("python3 " + __file__)
 
     except:
         print(Style.RESET_ALL
@@ -295,7 +295,7 @@ def reconnect():
                     + "It is probably under maintenance or temporarily down."
                     + "\nRetrying in 15 seconds.")
             time.sleep(15)
-            os.system("python " + __file__)
+            os.system("python3 " + __file__)
         else:
             return s
 
@@ -995,7 +995,7 @@ while True:
 
             elif command == "logout":
                 os.remove(RESOURCES_DIR + "/CLIWallet_config.cfg")
-                os.system("python " + __file__)
+                os.system("python3 " + __file__)
 
             elif command == "donate":
                 print(Style.RESET_ALL
