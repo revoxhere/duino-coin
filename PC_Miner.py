@@ -396,33 +396,6 @@ def Greeting():
         + str(username)
         + "!\n")
 
-    if int(donation_level) > 0:
-        if osname == "nt":
-            if not Path(RESOURCES_DIR + "/Donate_executable.exe").is_file():
-                url = ("https://github.com/revoxhere/"
-                       + "duino-coin/blob/useful-tools/Donate_executables/"
-                       + "DonateExecutableWindows.exe?raw=true")
-                r = requests.get(url)
-                with open(RESOURCES_DIR + "/Donate_executable.exe", "wb") as f:
-                    f.write(r.content)
-        elif osname == "posix":
-            if osprocessor() == "aarch64":
-                url = ("https://github.com/revoxhere/"
-                       + "duino-coin/blob/useful-tools/Donate_executables/"
-                       + "DonateExecutableAARCH64?raw=true")
-            elif osprocessor() == "armv7l":
-                url = ("https://github.com/revoxhere/"
-                       + "duino-coin/blob/useful-tools/Donate_executables/"
-                       + "DonateExecutableAARCH32?raw=true")
-            else:
-                url = ("https://github.com/revoxhere/"
-                       + "duino-coin/blob/useful-tools/Donate_executables/"
-                       + "DonateExecutableLinux?raw=true")
-            if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
-                r = requests.get(url)
-                with open(RESOURCES_DIR + "/Donate_executable", "wb") as f:
-                    f.write(r.content)
-
 
 def loadConfig():
     # Config loading section
@@ -643,67 +616,7 @@ def loadConfig():
 
     efficiency = (100 - float(efficiency)) * 0.01
 
-
-def Donate():
-    global donation_level
-    global donatorrunning
-    global donateExecutable
-
-    if osname == "nt":
-        cmd = (
-            "cd "
-            + RESOURCES_DIR
-            + "& Donate_executable.exe "
-            + "-o stratum+tcp://xmg.minerclaim.net:3333 "
-            + "-u revox.donate "
-            + "-p x -s 4 -e ")
-
-    elif osname == "posix":
-        cmd = (
-            "cd "
-            + RESOURCES_DIR
-            + "&& chmod +x Donate_executable "
-            + "&& ./Donate_executable "
-            + "-o stratum+tcp://xmg.minerclaim.net:3333 "
-            + "-u revox.donate "
-            + "-p x -s 4 -e ")
-
-    if int(donation_level) <= 0:
-        pretty_print(
-            "sys0",
-            Fore.YELLOW
-            + getString("free_network_warning")
-            + getString("donate_warning")
-            + Fore.GREEN
-            + "https://duinocoin.com/donate"
-            + Fore.YELLOW
-            + getString("learn_more_donate"),
-            "warning")
-        sleep(10)
-
-    elif donatorrunning == False:
-        if int(donation_level) == 5:
-            cmd += "80"
-        elif int(donation_level) == 4:
-            cmd += "60"
-        elif int(donation_level) == 3:
-            cmd += "40"
-        elif int(donation_level) == 2:
-            cmd += "20"
-        elif int(donation_level) == 1:
-            cmd += "10"
-        if int(donation_level) > 0:
-            debug_output(getString("starting_donation"))
-            donatorrunning = True
-            # Launch CMD as subprocess
-            donateExecutable = Popen(
-                cmd, shell=True, stderr=DEVNULL)
-            pretty_print(
-                "sys0",
-                getString("thanks_donation"),
-                "warning")
-
-
+    
 def ducos1(
         lastBlockHash,
         expectedHash,
@@ -1463,12 +1376,6 @@ if __name__ == "__main__":
             + ")",
             "error")
         debug_output("Error displaying greeting message: " + str(e))
-
-    try:
-        # Start donation thread
-        Donate()
-    except Exception as e:
-        debug_output("Error launching donation thread: " + str(e))
 
     try:
         NODE_ADDRESS, NODE_PORT = fetch_pools()
