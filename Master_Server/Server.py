@@ -56,10 +56,10 @@ Global variables
 """
 HOSTNAME = ""
 WALLET_PORTS = [
-    2809
+    2809,
+    2810
 ]
 PORTS = [
-    2810,
     2811,  # Legacy
     2812,  # Wallets, other miners
     ####
@@ -75,23 +75,25 @@ PORTS = [
 ]
 MOTD = """\
 You are connected to the Duino-Coin master server.
+Have fun!
 """
 DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
-SAVE_TIME = 5  # in seconds
-DB_TIMEOUT = 15
+SAVE_TIME = 10  # in seconds
+DB_TIMEOUT = 35
+SOCKET_TIMEOUT = 15
 BACKLOG = None  # spawn connection instantly
 SERVER_VER = 2.5  # announced to clients
 READY_HASHES_NUM = 5000  # in shares
 BLOCK_PROBABILITY = 500000  # 1 in X
 BLOCK_PROBABILITY_XXH = 10000  # 1 in X
 BLOCK_REWARD = 28.11  # duco
-UPDATE_MINERAPI_EVERY = 1  # in shares
+UPDATE_MINERAPI_EVERY = 2  # in shares
 EXPECTED_SHARETIME = 10  # in seconds
 MAX_REJECTED_SHARES = 5
 BCRYPT_ROUNDS = 6
 DECIMALS = 20  # max float precision
-MAX_WORKERS = 24
+MAX_WORKERS = 50
 PING_SLEEP_TIME = 0.5  # in seconds
 MAX_NUMBER_OF_PINGS = 3
 TEMP_BAN_TIME = 60  # in seconds
@@ -135,7 +137,7 @@ except Exception as e:
 global_blocks = 1
 duco_price, duco_price_justswap, duco_price_nodes = 0, 0, 0
 global_last_block_hash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
-global_cpu_usage, global_ram_usage = [50], [50]
+global_cpu_usage, global_ram_usage = 50, 50
 global_connections = 1
 minerapi = {}
 job_tiers = {}
@@ -319,24 +321,24 @@ def update_job_tiers():
                 "max_hashrate": 13000
             },
             "DUE": {
-                "difficulty": int(500 * DIFF_MULTIPLIER),
+                "difficulty": int(444 * DIFF_MULTIPLIER),
                 "reward": .003,
-                "max_hashrate": 5000
+                "max_hashrate": 6500
             },
             "ARM": {
-                "difficulty": int(100 * DIFF_MULTIPLIER),
+                "difficulty": int(128 * DIFF_MULTIPLIER),
                 "reward": .003,
-                "max_hashrate": 1000
+                "max_hashrate": 1280
             },
             "MEGA": {
                 "difficulty": int(16 * DIFF_MULTIPLIER),
                 "reward": .004,
-                "max_hashrate": 400
+                "max_hashrate": 500
             },
             "AVR": {
                 "difficulty": int(6 * DIFF_MULTIPLIER),
                 "reward": .005,
-                "max_hashrate": 240
+                "max_hashrate": 250
             }
         }
         sleep(60)
@@ -390,25 +392,25 @@ def create_jobs():
                 "expected_hash": temp_hash.hexdigest(),
                 "last_block_hash": str(global_last_block_hash_cp)}
 
-        # for i in range(int(READY_HASHES_NUM)):
-        #     temp_hash = base_hash.copy()
-        #     esp32_diff = job_tiers["ESP32"]["difficulty"]
-        #     rand = fastrandint(100 * esp32_diff)
-        #     temp_hash.update(str(rand).encode('ascii'))
-        #     pregenerated_jobs_esp32[i] = {
-        #         "numeric_result": rand,
-        #         "expected_hash": temp_hash.hexdigest(),
-        #         "last_block_hash": str(global_last_block_hash_cp)}
+        for i in range(int(READY_HASHES_NUM)):
+            temp_hash = base_hash.copy()
+            esp32_diff = job_tiers["ESP32"]["difficulty"]
+            rand = fastrandint(100 * esp32_diff)
+            temp_hash.update(str(rand).encode('ascii'))
+            pregenerated_jobs_esp32[i] = {
+                "numeric_result": rand,
+                "expected_hash": temp_hash.hexdigest(),
+                "last_block_hash": str(global_last_block_hash_cp)}
 
-        # for i in range(int(READY_HASHES_NUM)):
-        #     temp_hash = base_hash.copy()
-        #     esp8266_diff = job_tiers["ESP8266"]["difficulty"]
-        #     rand = fastrandint(100 * esp8266_diff)
-        #     temp_hash.update(str(rand).encode('ascii'))
-        #     pregenerated_jobs_esp8266[i] = {
-        #         "numeric_result": rand,
-        #         "expected_hash": temp_hash.hexdigest(),
-        #         "last_block_hash": str(global_last_block_hash_cp)}
+        for i in range(int(READY_HASHES_NUM)):
+            temp_hash = base_hash.copy()
+            esp8266_diff = job_tiers["ESP8266"]["difficulty"]
+            rand = fastrandint(100 * esp8266_diff)
+            temp_hash.update(str(rand).encode('ascii'))
+            pregenerated_jobs_esp8266[i] = {
+                "numeric_result": rand,
+                "expected_hash": temp_hash.hexdigest(),
+                "last_block_hash": str(global_last_block_hash_cp)}
         sleep(60)
 
 
@@ -480,8 +482,32 @@ def floatmap(x, in_min, in_max, out_min, out_max):
 
 def database_updater():
     db_err_counter = 0
+
+    def _execute(to_execute):
+        try:
+            timeS = time()
+            with sqlconn(DATABASE,
+                         timeout=DB_TIMEOUT) as conn:
+                conn.executemany(
+                    """
+                    UPDATE Users
+                    SET balance = balance + ?
+                    WHERE username = ?
+                    """,
+                    (to_execute))
+                conn.commit()
+            timeT = time()
+            timezz = timeT-timeS
+            print("Updating",
+                  len(to_execute),
+                  "users took",
+                  round(timezz, 3),
+                  "seconds")
+        except Exception as e:
+            print(e)
+            # pass
+
     while True:
-        sleep(SAVE_TIME)
         try:
             to_execute = []
             for user in balances_to_update.copy():
@@ -497,21 +523,10 @@ def database_updater():
                     balances_to_update.pop(user)
 
             if to_execute:
-                timeS = time()
-                with sqlconn(DATABASE) as conn:
-                    conn.executemany(
-                        """UPDATE Users
-                            SET balance = balance + ?
-                            WHERE username = ?""",
-                        (to_execute))
-                    conn.commit()
-                timeT = time()
-                timezz = timeT-timeS
-                print("Updating",
-                      len(balances_to_update),
-                      "users took",
-                      round(timezz, 3),
-                      "seconds")
+                _execute(to_execute)
+                #threading.Thread(target=_execute, args=[to_execute, ]).start()
+
+            sleep(SAVE_TIME)
         except Exception as e:
             admin_print("Database error:", traceback.format_exc())
             db_err_counter += 1
@@ -1162,7 +1177,7 @@ def generate_block(username, reward, new_block_hash, connection, xxhash=False):
 
 def sleep_by_cpu_usage(upper_limit):
     """ Suspends execution depending on current cpu usage """
-    sleeptime = floatmap(global_cpu_usage[-1], 0, 100, 0, upper_limit)
+    sleeptime = floatmap(global_cpu_usage, 0, 100, 0, upper_limit)
     sleep(sleeptime)
 
 
@@ -1245,12 +1260,11 @@ def protocol_mine(data, connection, address, using_xxhash=False):
     global PING_SLEEP_TIME
 
     ip_addr = address[0].replace("::ffff:", "")
-    accepted_shares, rejected_shares = 0, 0
+    thread_id = id(gevent.getcurrent())
+    accepted_shares, rejected_shares, reward = 0, 0, 0
     thread_miner_api = {}
     is_first_share = True
-    thread_id = id(gevent.getcurrent())
     override_difficulty = ""
-    reward = 0
 
     while True:
         global_last_block_hash_cp = global_last_block_hash
@@ -1290,6 +1304,11 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 try:
                     # Parse starting difficulty from the client
                     req_difficulty = str(data[2])
+
+                    if "JOB" in req_difficulty:
+                        # Very bad error correction from esps
+                        req_difficulty.rstrip("JOB")
+
                     if not req_difficulty in job_tiers:
                         req_difficulty = "NET"
                 except:
@@ -1304,6 +1323,13 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 req_difficulty = override_difficulty
             else:
                 req_difficulty = data[2]
+
+                if "JOB" in req_difficulty:
+                    # Error correction from some esps
+                    req_difficulty.replace("JOB", "")
+
+                if not req_difficulty in job_tiers:
+                    req_difficulty = "NET"
 
         try:
             if (job_tiers[req_difficulty]["difficulty"]
@@ -1326,15 +1352,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         except:
             difficulty = job_tiers["NET"]["difficulty"]
 
-        if difficulty >= job_tiers["ESP8266"]["difficulty"]:
-            sleep(10)
-            send_data(
-                "BAD,"
-                + "PC and ESP mining is disabled on the Master server."
-                + " Please switch node",
-                connection)
-            return thread_id
-
         try:
             ip_workers = workers[ip_addr]
         except:
@@ -1349,6 +1366,8 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 send_data(
                     "BAD,Too many workers\n",
                     connection)
+                if not ip_addr in whitelisted_ips:
+                    perm_ban(ip_addr)
                 return thread_id
 
         try:
@@ -1363,11 +1382,12 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         except:
             job = libducohash.create_share(
                 global_last_block_hash_cp, str(difficulty))
+
         # Sending job
         send_data(job[0] + "," + job[1] + "," + str(difficulty) + "\n",
                   connection)
         job_sent_timestamp = utime.now()
-        connection.settimeout(15)
+        connection.settimeout(SOCKET_TIMEOUT*2)
 
         # Receiving the result
         number_of_pings = 0
@@ -1396,7 +1416,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         difference = utime.now() - job_sent_timestamp
         sharetime = difference.total_seconds()
 
-        connection.settimeout(15)
+        connection.settimeout(SOCKET_TIMEOUT)
 
         if using_xxhash:
             max_hashrate = job_tiers["XXHASH"]["max_hashrate"]
@@ -1500,34 +1520,13 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             global_blocks += UPDATE_MINERAPI_EVERY
             global_last_block_hash = job[1]
 
-            if accepted_shares > UPDATE_MINERAPI_EVERY:
-
-                if username in jail:
-                    try:
-                        balances_to_update[username] += reward * -3
-                    except:
-                        balances_to_update[username] = reward * -3
-                    try:
-                        balances_to_update["giveaways"] += reward * \
-                            UPDATE_MINERAPI_EVERY
-                    except:
-                        balances_to_update["giveaways"] = reward * \
-                            UPDATE_MINERAPI_EVERY
-                else:
-                    try:
-                        balances_to_update[username] += reward * \
-                            UPDATE_MINERAPI_EVERY
-                    except:
-                        balances_to_update[username] = reward * \
-                            UPDATE_MINERAPI_EVERY
-
         if (hashrate > max_hashrate
                 or reported_hashrate > max_hashrate):
             if req_difficulty == "AVR" or req_difficulty == "ARM":
                 if (hashrate > max_hashrate*50
                         or reported_hashrate > max_hashrate*50):
                     if not ip_addr in whitelisted_ips:
-                        temporary_ban(ip_addr)
+                        perm_ban(ip_addr)
                     sleep(5)
                     return thread_id
 
@@ -1540,7 +1539,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             if not using_xxhash:
                 override_difficulty = kolka_v2(req_difficulty, job_tiers)
 
-            sleep(1)
             send_data("BAD\n", connection)
 
         elif int(result[0]) == int(numeric_result):
@@ -1550,10 +1548,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             accepted_shares += 1
 
             try:
-                if workers[ip_addr] < workers[username]:
-                    this_user_miners = workers[username]
-                else:
-                    this_user_miners = workers[ip_addr]
+                this_user_miners = max(workers[ip_addr], workers[username])
             except:
                 this_user_miners = 1
 
@@ -1579,6 +1574,22 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                         reward = reward / 10
                         # TODO
                     send_data("GOOD\n", connection)
+
+            if accepted_shares > UPDATE_MINERAPI_EVERY:
+                if username in jail:
+                    try:
+                        balances_to_update[username] += reward * -3
+                    except:
+                        balances_to_update[username] = reward * -3
+                    try:
+                        balances_to_update["giveaways"] += reward
+                    except:
+                        balances_to_update["giveaways"] = reward
+                else:
+                    try:
+                        balances_to_update[username] += reward
+                    except:
+                        balances_to_update[username] = reward
         else:
             """ 
             Incorrect result received 
@@ -1589,7 +1600,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             send_data("BAD\n", connection)
 
         is_first_share = False
-        sleep(hashrate / 500000)
+        #sleep(hashrate / 500000)
     return thread_id
 
 
@@ -1617,10 +1628,13 @@ def get_sys_usage():
     while True:
         global_connections = _get_connections()
 
-        cpu = floatmap(psutil.cpu_percent(), 0, 100, 0, 95)
+        cpu = floatmap(psutil.cpu_percent(), 0, 100, 0, 98)
 
-        global_cpu_usage.append(cpu)
-        global_ram_usage.append(psutil.virtual_memory()[2])
+        # global_cpu_usage.append(cpu)
+        global_cpu_usage = cpu
+        # global_ram_usage.append(psutil.virtual_memory()[2])
+        global_ram_usage = psutil.virtual_memory()[2]
+
         sleep(SAVE_TIME)
 
 
@@ -1774,14 +1788,14 @@ def create_secondary_api_files():
             json.dump(
                 get_balance_list(),
                 outfile,
-                indent=1,
+                indent=2,
                 ensure_ascii=False
             )
         with open('transactions.json', 'w') as outfile:
             json.dump(
                 get_transaction_list(),
                 outfile,
-                indent=1,
+                indent=2,
                 ensure_ascii=False
             )
         sleep(SAVE_TIME)
@@ -1797,6 +1811,7 @@ def create_main_api_file():
 
     while True:
         sleep(SAVE_TIME)
+
         total_hashrate, net_wattage = 0, 0
         ducos1_hashrate, xxhash_hashrate = 0, 0
         minerapi_public, miners_per_user = {}, {}
@@ -1810,8 +1825,8 @@ def create_main_api_file():
             "Arduino": 0,
             "Other": 0
         }
-        try:
 
+        try:
             for miner in minerapi.copy():
                 try:
                     # Add miner hashrate to the server hashrate
@@ -1827,28 +1842,28 @@ def create_main_api_file():
                             xxhash_hashrate += minerapi[miner]["Hashrate"]
 
                     # Calculate power usage
-                    software = minerapi[miner]["Software"]
-                    identifier = minerapi[miner]["Identifier"]
+                    software = minerapi[miner]["Software"].upper()
+                    identifier = minerapi[miner]["Identifier"].upper()
 
-                    if "ESP32" in software.upper():
-                        # 1,4W (but 2 cores) for ESP32 @ peak 480mA/3,3V
-                        net_wattage += 0.7
-                        miner_dict["ESP32"] += 1
-
-                    elif "ESP8266" in software.upper():
-                        # 1,3W for ESP8266 @ peak 400mA/3,3V
-                        net_wattage += 1.3
-                        miner_dict["ESP8266"] += 1
-
-                    elif "AVR" in software.upper():
+                    if "AVR" in software:
                         # 0,2W for Arduino @ peak 40mA/5V
                         net_wattage += 0.2
                         miner_dict["Arduino"] += 1
 
-                    elif ("PC" in software.upper()
-                          or "WEB" in software.upper()):
-                        if ("RASPBERRY" in identifier.upper()
-                                or "PI" in identifier.upper()):
+                    elif "ESP32" in software:
+                        # 1,4W (but 2 cores) for ESP32 @ peak 480mA/3,3V
+                        net_wattage += 0.7
+                        miner_dict["ESP32"] += 1
+
+                    elif "ESP8266" in software:
+                        # 1,3W for ESP8266 @ peak 400mA/3,3V
+                        net_wattage += 1.3
+                        miner_dict["ESP8266"] += 1
+
+                    elif ("PC" in software
+                          or "WEB" in software):
+                        if ("RASPBERRY" in identifier
+                                or "PI" in identifier):
                             # 3,875 for one Pi4 core - Pi4 max 15,8W
                             net_wattage += 3.875
                             miner_dict["RPi"] += 1
@@ -1859,8 +1874,8 @@ def create_main_api_file():
                             net_wattage += 9
                             miner_dict["CPU"] += 1
 
-                    elif ("OPENCL" in software.upper()
-                          or "GPU" in software.upper()):
+                    elif ("OPENCL" in software
+                          or "GPU" in software):
                         net_wattage += 50
                         miner_dict["GPU"] += 1
 
@@ -1868,7 +1883,12 @@ def create_main_api_file():
                         net_wattage += 5
                         miner_dict["Other"] += 1
 
-                    miner_list.append(minerapi[miner]["User"])
+                    username = minerapi[miner]["User"]
+                    try:
+                        miners_per_user[username] += 1
+                    except:
+                        miners_per_user[username] = 1
+
                 except Exception as e:
                     # print(e)
                     pass
@@ -1878,9 +1898,6 @@ def create_main_api_file():
                 int(xxhash_hashrate + ducos1_hashrate), 4)
             xxhash_hashrate = hashrate_prefix(int(xxhash_hashrate), 1)
             ducos1_hashrate = hashrate_prefix(int(ducos1_hashrate), 1)
-
-            for user in miner_list:
-                miners_per_user[user] = miner_list.count(user)
 
             miners_per_user = OrderedDict(
                 sorted(
@@ -1900,8 +1917,8 @@ def create_main_api_file():
                 "Server version":        SERVER_VER,
                 "Active connections":    global_connections,
                 "Open threads":          threading.activeCount(),
-                "Server CPU usage":      round(mean(global_cpu_usage[-5:])),
-                "Server RAM usage":      round(mean(global_ram_usage[-5:])),
+                "Server CPU usage":      round(global_cpu_usage),
+                "Server RAM usage":      round(global_ram_usage),
                 "Last update":           now().strftime(
                     "%d/%m/%Y %H:%M:%S (UTC)"),
                 "Net energy usage":      net_wattage,
@@ -1926,8 +1943,9 @@ def create_main_api_file():
                 json.dump(
                     server_api,
                     outfile,
-                    indent=1,
+                    indent=2,
                     ensure_ascii=False)
+
         except Exception:
             print("API err:", traceback.format_exc())
 
@@ -1948,11 +1966,12 @@ def create_minerapi():
             json.dump(
                 get_blocks_list(),
                 outfile,
-                indent=1,
+                indent=2,
                 ensure_ascii=False
             )
 
         for threadid in minerapi.copy():
+            sleep(0.0001)
             try:
                 memory_datab.execute(
                     """INSERT INTO Miners
@@ -1985,7 +2004,7 @@ def create_minerapi():
                 json.dump(
                     minerapi.copy(),
                     outfile,
-                    indent=1,
+                    indent=2,
                     ensure_ascii=False
                 )
         except:
@@ -2114,30 +2133,44 @@ def protocol_register(data, connection, address):
     """ 
     Do some basic checks 
     """
-    if not match(r"^[A-Za-z0-9_-]*$", username):
-        send_data("NO,Unallowed characters used", connection)
+    if (not match(r"^[A-Za-z0-9_-]*$", username)
+            or not match(r"^[A-Za-z0-9_-]*$", unhashed_pass.decode())):
+        send_data(
+            "NO,You have used unallowed characters",
+            connection)
         return
 
     if len(username) > 64 or len(unhashed_pass) > 128 or len(email) > 64:
-        send_data("NO,Data too long", connection)
+        send_data(
+            "NO,Submited data is too long",
+            connection)
         return
 
     if user_exists(username):
-        send_data("NO,This username is already registered", connection)
+        send_data(
+            "NO,This username is already registered",
+            connection)
         return
 
     if not "@" in email or not "." in email:
-        send_data("NO,Incorrect e-mail address", connection)
+        send_data(
+            "NO,You have provided an invalid e-mail address",
+            connection)
         return
 
     if email_exists(email):
-        send_data("NO,This e-mail address was already used", connection)
+        send_data(
+            "NO,This e-mail address was already used",
+            connection)
         return
 
     try:
         password = hashpw(unhashed_pass, gensalt(rounds=BCRYPT_ROUNDS))
     except Exception as e:
-        send_data("NO,Bcrypt error: " + str(e), connection)
+        send_data(
+            "NO,Bcrypt error: " +
+            str(e) + ", plase try using a different password",
+            connection)
         return
 
     if send_registration_email(username, email):
@@ -2540,9 +2573,9 @@ def handle(connection, address):
     ip_addr = address[0].replace("::ffff:", "")
 
     if ip_addr == "127.0.0.1" or ip_addr == "149.91.88.18":
-        connection.settimeout(60*5)
+        connection.settimeout(60*10)
     else:
-        connection.settimeout(35)
+        connection.settimeout(SOCKET_TIMEOUT)
 
     try:
         """ 
@@ -2761,11 +2794,9 @@ def handle(connection, address):
             else:
                 break
 
-            sleep(0)
-
     except Exception:
-        pass
-        # print(traceback.format_exc())
+        # pass
+        print(traceback.format_exc())
     finally:
         # print("Closing socket")
         try:
@@ -3004,7 +3035,7 @@ if __name__ == "__main__":
 
     try:
         for port in WALLET_PORTS:
-            multiprocessing.Process(target=_wallet_server,
+            threading.Thread(target=_wallet_server,
                              args=[int(port), ]).start()
 
         for port in PORTS:
