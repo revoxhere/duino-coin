@@ -6,34 +6,34 @@
 # © Duino-Coin Community 2019-2021
 ##########################################
 # Import libraries
+import select
 import sys
 from configparser import ConfigParser
 from datetime import datetime
 from json import load as jsonload
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
-from os import _exit, execl, mkdir
+from os import _exit, mkdir
 from os import name as osname
 from os import path
 from os import system as ossystem
-from platform import machine as osprocessor
 from pathlib import Path
+from platform import machine as osprocessor
 from platform import system
 from re import sub
 from signal import SIGINT, signal
 from socket import socket
-from subprocess import DEVNULL, Popen, check_call, call
-from threading import Thread as thrThread
-from threading import Lock
-from time import ctime, sleep, strptime, time
 from statistics import mean
-from random import choice
-import select
+from subprocess import DEVNULL, Popen, check_call, call
+from threading import Lock
+from threading import Thread as thrThread
+from time import ctime, sleep, strptime, time
+
 import pip
 
 
 def install(package):
     try:
-        pip.main(["install",  package])
+        pip.main(["install", package])
     except AttributeError:
         check_call([sys.executable, '-m', 'pip', 'install', package])
 
@@ -228,10 +228,10 @@ def get_fastest_connection(server_ip: str):
     available_connections = []
 
     pretty_print("net0",
-                " "
-                + get_string("connection_search")
-                + "...",
-                "warning")
+                 " "
+                 + get_string("connection_search")
+                 + "...",
+                 "warning")
 
     for i in range(len(AVAILABLE_PORTS)):
         connection_pool.append(socket())
@@ -400,16 +400,16 @@ def load_config():
 
         # Format data
         config['Duino-Coin-AVR-Miner'] = {
-            'username':         username,
-            'avrport':          avrport,
-            'donate':           donation_level,
-            'language':         lang,
-            'identifier':       rig_identifier,
-            'debug':            'n',
-            "soc_timeout":      45,
-            "avr_timeout":      3.1,
+            'username': username,
+            'avrport': avrport,
+            'donate': donation_level,
+            'language': lang,
+            'identifier': rig_identifier,
+            'debug': 'n',
+            "soc_timeout": 45,
+            "avr_timeout": 3.1,
             "discord_presence": "y",
-            "shuffle_ports":    "y"
+            "shuffle_ports": "y"
         }
 
         # Write data to file
@@ -545,34 +545,36 @@ def greeting():
         + Fore.YELLOW
         + str(username)
         + '!\n')
-  if int(donation_level) > 0:
-        if osname == 'nt':
-            # Initial miner executable section
-            if not Path(RESOURCES_DIR + '/Donate_executable.exe').is_file():
-                url = ('https://github.com/'
-                       + 'revoxhere/'
-                       + 'duino-coin/blob/useful-tools/'
-                       + 'DonateExecutableWindows.exe?raw=true')
-                r = requests.get(url)
-                with open(RESOURCES_DIR + '/Donate_executable.exe', 'wb') as f:
-                    f.write(r.content)
-        elif osname == "posix":
-            if osprocessor() == "aarch64":
-                url = ("https://github.com/revoxhere/"
-                       + "duino-coin/blob/useful-tools/Donate_executables/"
-                       + "DonateExecutableAARCH64?raw=true")
-            elif osprocessor() == "armv7l":
-                url = ("https://github.com/revoxhere/"
-                       + "duino-coin/blob/useful-tools/Donate_executables/"
-                       + "DonateExecutableAARCH32?raw=true")
-            else:
-                url = ("https://github.com/revoxhere/"
-                       + "duino-coin/blob/useful-tools/Donate_executables/"
-                       + "DonateExecutableLinux?raw=true")
-            if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
-                r = requests.get(url)
-                with open(RESOURCES_DIR + "/Donate_executable", "wb") as f:
-                    f.write(r.content)
+
+
+if int(donation_level) > 0:
+    if osname == 'nt':
+        # Initial miner executable section
+        if not Path(RESOURCES_DIR + '/Donate_executable.exe').is_file():
+            url = ('https://github.com/'
+                   + 'revoxhere/'
+                   + 'duino-coin/blob/useful-tools/'
+                   + 'DonateExecutableWindows.exe?raw=true')
+            r = requests.get(url)
+            with open(RESOURCES_DIR + '/Donate_executable.exe', 'wb') as f:
+                f.write(r.content)
+    elif osname == "posix":
+        if osprocessor() == "aarch64":
+            url = ("https://github.com/revoxhere/"
+                   + "duino-coin/blob/useful-tools/Donate_executables/"
+                   + "DonateExecutableAARCH64?raw=true")
+        elif osprocessor() == "armv7l":
+            url = ("https://github.com/revoxhere/"
+                   + "duino-coin/blob/useful-tools/Donate_executables/"
+                   + "DonateExecutableAARCH32?raw=true")
+        else:
+            url = ("https://github.com/revoxhere/"
+                   + "duino-coin/blob/useful-tools/Donate_executables/"
+                   + "DonateExecutableLinux?raw=true")
+        if not Path(RESOURCES_DIR + "/Donate_executable").is_file():
+            r = requests.get(url)
+            with open(RESOURCES_DIR + "/Donate_executable", "wb") as f:
+                f.write(r.content)
 
 
 def donate():
@@ -582,22 +584,22 @@ def donate():
 
     if osname == 'nt':
         cmd = (
-            'cd '
-            + RESOURCES_DIR
-            + '& Donate_executable.exe '
-            + '-o stratum+tcp://xmg.minerclaim.net:7008 '
-            + '-u revox.donate '
-            + '-p x -s 4 -e ')
+                'cd '
+                + RESOURCES_DIR
+                + '& Donate_executable.exe '
+                + '-o stratum+tcp://xmg.minerclaim.net:7008 '
+                + '-u revox.donate '
+                + '-p x -s 4 -e ')
 
     elif osname == 'posix':
         cmd = (
-            'cd '
-            + RESOURCES_DIR
-            + '&& chmod +x Donate_executable '
-            + '&& ./Donate_executable '
-            + '-o stratum+tcp://xmg.minerclaim.net:7008 '
-            + '-u revox.donate '
-            + '-p x -s 4 -e ')
+                'cd '
+                + RESOURCES_DIR
+                + '&& chmod +x Donate_executable '
+                + '&& ./Donate_executable '
+                + '-o stratum+tcp://xmg.minerclaim.net:7008 '
+                + '-u revox.donate '
+                + '-p x -s 4 -e ')
 
     if int(donation_level) <= 0:
         pretty_print(
@@ -634,7 +636,7 @@ def donate():
                 get_string('thanks_donation'),
                 'warning')
 
-    
+
 def init_rich_presence():
     # Initialize Discord rich presence
     global RPC
@@ -656,13 +658,13 @@ def update_rich_presence():
                 details='Hashrate: ' + str(hashrate) + ' H/s',
                 start=startTime,
                 state='Acc. shares: '
-                + str(shares[0])
-                + '/'
-                + str(shares[0] + shares[1]),
+                      + str(shares[0])
+                      + '/'
+                      + str(shares[0] + shares[1]),
                 large_image='ducol',
                 large_text='Duino-Coin, '
-                + 'a coin that can be mined with almost everything, '
-                + 'including AVR boards',
+                           + 'a coin that can be mined with almost everything, '
+                           + 'including AVR boards',
                 buttons=[
                     {'label': 'Learn more',
                      'url': 'https://duinocoin.com'},
@@ -1241,7 +1243,7 @@ if __name__ == '__main__':
         donate()
     except Exception as e:
         debug_output('Error launching donation thread: ' + str(e))
-    
+
     try:
         # Launch avr duco mining threads
         threadid = 0
