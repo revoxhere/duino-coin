@@ -42,17 +42,13 @@
 ## Duino-Coin'i kullanmaya başlamak
 
 #### Duino-Coin'i kullanmaya başlamanın en kolay yolu sizin işletim sisteminize uygun [son sürümü indirmek](https://github.com/revoxhere/duino-coin/releases/latest)<br>
-After downloading the release, unzip it and launch the desired program.<br>
 İndirmeden sonra, zip paketini açıp istenilen programı başlatın.<br>
 Hiçbir bağımlı kütüphane indirmenize gerek yoktur.
-
-If you need help, you can take a look at the official getting started guides located <a href="https://duinocoin.com/getting-started">on the official website</a>.<br>
-FAQ and troubleshooting help can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
 
 Yardıma ihtiyacınız varsa, resmi Duino-Coin'i kullanmaya başlama kılavuzunu <a href="https://duinocoin.com/getting-started">burada</a> bulabilirsiniz.<br>
 Sıkça Sorulan Sorular ve hata giderme yolları [burada](https://github.com/revoxhere/duino-coin/wiki).<br>
 
-### Manuel Yükleme
+### Manuel Kurulum
 
 #### Linux
 
@@ -133,12 +129,12 @@ Duino-Coin'e yaptığınız her bir katkı için size minnetkarız.
 Nasıl katkıda bulunabilirim?
 
 *   Bu projeyi fork'layın
-*   Kendi özellik dalınızı oluşturun
+*   Kendi özellik branch'inizi oluşturun
 *   Katkılarınızı işleyin
 *   Her şeyin doğru çalıştığından emin olun
 *   Bir pull request açın
 
-Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch.
+Sunucu kaynak kodu, API çağrıları için dokümentasyon ve Duino-Coin'i kendi uygulamalırınızda kullanmak için resmi kütüphaneler [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch'inde mevcuttur.
 
 ## Resmi olarak kıyaslanmış kartlar ve cihazların listesi
 
