@@ -443,7 +443,7 @@ while True:
 
                 try:
                     priv_key = str(password_decrypt(
-                        config["wrapper"]["priv_key"],
+                        b64decode(config["wallet"]["password"]).decode("utf8"),
                         passphrase))[2:66]
 
                 except InvalidToken:
