@@ -2609,6 +2609,8 @@ try:
         lang = "italian"
     elif locale.startswith("zh"):
         lang = "chinese_simplified"
+    elif locale.startswith("th"):
+        lang = "th"
     else:
         lang = "english"
 except IndexError:
