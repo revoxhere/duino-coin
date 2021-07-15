@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v2.52)
+# Duino-Coin CLI Wallet (v2.55)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
@@ -19,104 +19,22 @@ import time
 from pathlib import Path
 from signal import SIGINT, signal
 from base64 import b64decode, b64encode
-
-try:
-    from base64 import urlsafe_b64decode as b64d
-    from base64 import urlsafe_b64encode as b64e
-except ModuleNotFoundError:
-    print("Base64 is not installed. "
-          + "Please manually install \"base64\""
-          + "\nExiting in 15s.")
-    sleep(15)
-    _exit(1)
-
-try:
-    from cryptography.fernet import Fernet, InvalidToken
-    from cryptography.hazmat.backends import default_backend
-    from cryptography.hazmat.primitives import hashes
-    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-except:
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ")
-          + "Cryptography is not installed. "
-          + "Please install it using: python3 -m pip install cryptography."
-          + "\nExiting in 15s.")
-    time.sleep(15)
-    os._exit(1)
-
-try:
-    import secrets
-except:
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ")
-          + "Secrets is not installed. "
-          + "Please install it using: python3 -m pip install secrets."
-          + "\nExiting in 15s.")
-    time.sleep(15)
-    os._exit(1)
-
-try:
-    import websocket
-except:
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ")
-          + "Websocket-client is not installed. "
-          + "Please install it using: python3 -m pip install websocket-client."
-          + "\nExiting in 15s.")
-    time.sleep(15)
-    os._exit(1)
-
-try:
-    from base64 import urlsafe_b64decode as b64d
-    from base64 import urlsafe_b64encode as b64e
-except:
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ")
-          + "Base64 is not installed. "
-          + "Please install it using: python3 -m pip install base64."
-          + "\nExiting in 15s.")
-    time.sleep(15)
-    os._exit(1)
+from platform import system as plsystem
+from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
+from json import load as jsonload
 
 try:  # Check if requests is installed
     import requests
 except:
     now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ")
-          + "Requests is not installed. "
-          + "Please install it using: python3 -m pip install requests."
-          + "\nExiting in 15s.")
+    print(now.strftime("%H:%M:%S ") + "Requests is not installed. Please install it using: python3 -m pip install requests.\nExiting in 15s.")
     time.sleep(15)
     os._exit(1)
-
-try:  # Check if colorama is installed
-    from colorama import Back, Fore, Style, init
-except:
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ")
-          + "Colorama is not installed. "
-          + "Please install it using: python3 -m pip install colorama."
-          + "\nExiting in 15s.")
-    time.sleep(15)
-    os._exit(1)
-
-try:
-    import tronpy
-    from tronpy.keys import PrivateKey
-    tronpy_installed = True
-except:
-    tronpy_installed = False
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ")
-          + "Tronpy is not installed. "
-          + "Please install it using: python3 -m pip install tronpy."
-          + "\nWrapper is disabled because tronpy is not installed.")
 
 wrong_passphrase = False
-backend = default_backend()
 iterations = 100_000
 timeout = 30  # Socket timeout
-VER = 2.52
+VER = 2.55
 RESOURCES_DIR = 'CLI_Wallet_' + str(VER) + '_resources'
 use_wrapper = False
 WS_URI = "wss://server.duinocoin.com:15808"
@@ -137,6 +55,106 @@ if not Path(RESOURCES_DIR + "/cli_wallet_commands.json").is_file():
     with open(RESOURCES_DIR + "/cli_wallet_commands.json", "wb") as f:
         f.write(r.content)
 
+# Check if languages file exists
+if not Path(RESOURCES_DIR + "/langs.json").is_file():
+    url = ("https://raw.githubusercontent.com/"
+           + "revoxhere/"
+           + "duino-coin/master/Resources/"
+           + "CLI_Wallet_langs.json")
+    r = requests.get(url)
+    with open(RESOURCES_DIR + "/langs.json", "wb") as f:
+        f.write(r.content)
+
+# Load language file
+with open(RESOURCES_DIR + "/langs.json", "r", encoding="utf8") as lang_file:
+    lang_file = jsonload(lang_file)
+
+# OS X invalid locale hack
+if plsystem() == "Darwin":
+    if getlocale()[0] is None:
+        setlocale(LC_ALL, "en_US.UTF-8")
+
+# Check if wallet is configured, if it isn't, autodetect language
+try:
+    if not Path(RESOURCES_DIR + "/CLIWallet_config.cfg").is_file():
+        locale = getdefaultlocale()[0]
+        if locale.startswith("nl"):
+            lang = "dutch"
+        else:
+            lang = "english"
+    else:
+        # Read language variable from configfile
+        try:
+            config.read(RESOURCES_DIR + "/CLIWallet_config.cfg")
+            lang = config["wallet"]["language"]
+        except Exception:
+            # If it fails, fallback to english
+            lang = "english"
+except Exception as error:
+    lang = "english"
+
+def getString(string_name):
+    # Get string form language file
+    if string_name in lang_file[lang]:
+        return lang_file[lang][string_name]
+    elif string_name in lang_file["english"]:
+        return lang_file["english"][string_name]
+    else:
+        return "String not found: " + string_name
+
+try:
+    from base64 import urlsafe_b64decode as b64d
+    from base64 import urlsafe_b64encode as b64e
+except ModuleNotFoundError:
+    print(getString("base64_not_installed"))
+    time.sleep(15)
+    _exit(1)
+
+try:
+    from cryptography.fernet import Fernet, InvalidToken
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+except:
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ") + getString("cryptography_not_installed"))
+    time.sleep(15)
+    os._exit(1)
+
+try:
+    import secrets
+except:
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ") + getString("secrets_not_installed"))
+    time.sleep(15)
+    os._exit(1)
+
+try:
+    import websocket
+except:
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ") + getString("websocket_not_installed"))
+    time.sleep(15)
+    os._exit(1)
+
+try:  # Check if colorama is installed
+    from colorama import Back, Fore, Style, init
+except:
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ") + getString("colorama_not_installed"))
+    time.sleep(15)
+    os._exit(1)
+
+try:
+    import tronpy
+    from tronpy.keys import PrivateKey
+    tronpy_installed = True
+except:
+    tronpy_installed = False
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ") + getString("tronpy_not_installed"))
+
+backend = default_backend()
 
 def title(title):
     if os.name == 'nt':
@@ -219,7 +237,7 @@ def handler(signal_received, frame):
     print(Style.RESET_ALL
           + Style.BRIGHT
           + Fore.YELLOW
-          + "See you soon!")
+          + getString("see_you_soon"))
     try:
         s.send(bytes("CLOSE", encoding="utf8"))
     except:
@@ -254,17 +272,14 @@ while True:
         print(e)
         print(Style.RESET_ALL
                 + Fore.RED
-                + "Cannot connect to the server. "
-                + "It is probably under maintenance or temporarily down."
-                + "\nRetrying in 15 seconds.")
+                + getString("cant_connect_to_server"))
         time.sleep(15)
         os.system("python " + __file__)
 
     except:
         print(Style.RESET_ALL
-              + Fore.RED +
-              " Cannot receive pool address and IP."
-              + "\nExiting in 15 seconds.")
+              + Fore.RED
+              + getString("cant_recieve_pool_ip_and_port"))
         time.sleep(15)
         os._exit(1)
 
@@ -291,9 +306,7 @@ def reconnect():
 
         except:  # If it wasn't, display a message
             print(Style.RESET_ALL + Fore.RED
-                    + "Cannot connect to the server. "
-                    + "It is probably under maintenance or temporarily down."
-                    + "\nRetrying in 15 seconds.")
+                    + getString("cant_connect_to_server"))
             time.sleep(15)
             os.system("python " + __file__)
         else:
@@ -307,25 +320,25 @@ while True:
         print(Style.RESET_ALL
               + Style.BRIGHT
               + Fore.YELLOW
-              + "Duino-Coin CLI Wallet first-run\n")
-        print(Style.RESET_ALL + "Select an option")
+              + getString("first_run"))
+        print(Style.RESET_ALL + getString("select_option"))
 
-        choice = input("  1 - Login\n  2 - Register\n  3 - Exit\n")
+        choice = input(getString("choice_input"))
         try:
             int(choice)
         except ValueError:
-            print("Error, value must be numeric")
+            print(getString("value_not_numeric"))
 
         if int(choice) <= 1:
             username = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
-                + "Enter your username: "
+                + getString("enter_username")
                 + Style.BRIGHT)
 
             password = getpass.getpass(prompt=Style.RESET_ALL
                                        + Fore.YELLOW
-                                       + "Enter your password (not shown for privacy): "
+                                       + getString("enter_password")
                                        + Style.BRIGHT,
                                        stream=None)
 
@@ -345,11 +358,12 @@ while True:
                     if loginFeedback[0] == "OK":
                         print(Style.RESET_ALL
                               + Fore.YELLOW
-                              + "Successful login")
+                              + getString("login_success"))
 
                         config['wallet'] = {
                             "username": username,
-                            "password": b64encode(bytes(password, encoding="utf8")).decode("utf-8")}
+                            "password": b64encode(bytes(password, encoding="utf8")).decode("utf-8"),
+                            "language": lang}
                         config['wrapper'] = {"use_wrapper": "false"}
 
                         with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:  # Write data to file
@@ -357,7 +371,7 @@ while True:
                     else:
                         print(Style.RESET_ALL
                               + Fore.RED
-                              + "Couldn't login, reason: "
+                              + getString("login_failed")
                               + Style.BRIGHT
                               + str(loginFeedback[1]))
                         time.sleep(15)
@@ -368,8 +382,7 @@ while True:
         if int(choice) == 2:
             print(Style.RESET_ALL
                   + Fore.YELLOW
-                  + "By registering a new account you agree to the"
-                  + " terms of service and privacy policy available at "
+                  + getString("agree_requirments")
                   + Fore.WHITE
                   + "https://github.com/revoxhere/duino-coin#terms-of-usage"
                   + Fore.YELLOW)
@@ -377,25 +390,25 @@ while True:
             username = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
-                + "Enter your username: "
+                + getString("enter_username")
                 + Style.BRIGHT)
 
             password = getpass.getpass(prompt=Style.RESET_ALL
                                        + Fore.YELLOW
-                                       + "Enter your password (not shown for privacy): "
+                                       + getString("enter_password")
                                        + Style.BRIGHT,
                                        stream=None)
 
             pconfirm = getpass.getpass(prompt=Style.RESET_ALL
                                        + Fore.YELLOW
-                                       + "Confirm your password (not shown for privacy): "
+                                       + getString("confirm_password")
                                        + Style.BRIGHT,
                                        stream=None)
 
             email = input(
                 Style.RESET_ALL
                 + Fore.YELLOW
-                + "Enter your e-mail address: "
+                + getString("enter_email")
                 + Style.BRIGHT)
 
             if password == pconfirm:
@@ -415,13 +428,13 @@ while True:
                         print(Style.RESET_ALL
                               + Fore.YELLOW
                               + Style.BRIGHT
-                              + "Successfully registered new account")
+                              + getString("register_success"))
                         break
 
                     elif regiFeedback[0] == "NO":
                         print(Style.RESET_ALL
                               + Fore.RED
-                              + "Couldn't register new user, reason: "
+                              + getString("register_failed")
                               + Style.BRIGHT
                               + str(regiFeedback[1]))
                         time.sleep(15)
@@ -437,7 +450,7 @@ while True:
             if config["wrapper"]["use_custom_passphrase"] == "true":
                 passphrase = getpass.getpass(prompt=Style.RESET_ALL
                                              + Fore.YELLOW
-                                             + "Passphrase for decrypting private key: "
+                                             + getString("decrypt_private_key")
                                              + Style.BRIGHT,
                                              stream=None)
 
@@ -447,7 +460,7 @@ while True:
                         passphrase))[2:66]
 
                 except InvalidToken:
-                    print("Invalid passphrase, disabling wrapper for this session")
+                    print(getString("invalid_passphrase_wrapper"))
                     use_wrapper = False
                     wrong_passphrase = True
             else:
@@ -484,7 +497,7 @@ while True:
             else:
                 print(Style.RESET_ALL
                       + Fore.RED
-                      + "Couldn't login, reason: "
+                      + getString("login_failed")
                       + Style.BRIGHT
                       + str(loginFeedback[1]))
                 time.sleep(15)
@@ -513,25 +526,25 @@ while True:
             print(Style.RESET_ALL
                   + Style.BRIGHT
                   + Fore.YELLOW
-                  + "\nDuino-Coin CLI Wallet")
+                  + getString("cli_wallet_text"))
 
             print(Style.RESET_ALL
                   + Fore.YELLOW
-                  + "You have "
+                  + getString("you_have")
                   + Style.BRIGHT
                   + str(balance)
                   + " DUCO")
 
             print(Style.RESET_ALL
                   + Fore.YELLOW
-                  + "Which is about "
+                  + getString("which_is_about")
                   + Style.BRIGHT
                   + str(balanceusd)
                   + " USD")
 
             print(Style.RESET_ALL
                   + Fore.YELLOW
-                  + "DUCO price: "
+                  + getString("duco_price")
                   + Style.BRIGHT
                   + str(ducofiat)
                   + " USD")
@@ -539,7 +552,7 @@ while True:
             if use_wrapper:
                 print(Style.RESET_ALL
                       + Fore.YELLOW
-                      + "You have "
+                      + getString("you_have")
                       + Style.BRIGHT
                       + str(wbalance)
                       + " wDUCO")
@@ -552,48 +565,56 @@ while True:
                 if pendingbalance > 0:
                     print(Style.RESET_ALL
                           + Fore.YELLOW
-                          + "Pending unwraps "
+                          + getString("pending_unwraps")
                           + Style.BRIGHT
                           + str(pendingbalance)
                           + " wDUCO")
 
                 print(Style.RESET_ALL
                       + Fore.YELLOW
-                      + "Tron address for receiving: "
+                      + getString("tron_address")
                       + Style.BRIGHT
                       + str(pub_key))
 
                 print(Style.RESET_ALL
                       + Fore.YELLOW
-                      + "TRX balance (useful for fees): "
+                      + getString("trx_balance")
                       + Style.BRIGHT
                       + str(trx_balance))
 
             print(Style.RESET_ALL
                   + Fore.YELLOW
-                  + "Type `help` to list available commands")
+                  + getString("help_list_command"))
 
             command = input(Style.RESET_ALL
                             + Fore.WHITE
-                            + "DUCO Console ᕲ "
+                            + getString("duco_console")
                             + Style.BRIGHT)
 
             if command == "refresh":
                 continue
+
+            elif command == "clear":
+                if os.name == "nt":
+                    os.system("cls")
+                    continue
+                else:
+                    os.system("clear")
+                    continue
   
             elif command == "send":
                 recipient = input(Style.RESET_ALL
                                   + Fore.WHITE
-                                  + "Enter recipients' username: "
+                                  + getString("enter_recipients_name")
                                   + Style.BRIGHT)
                 try:
                     amount = float(input(
                         Style.RESET_ALL
                         + Fore.WHITE
-                        + "Enter amount to transfer: "
+                        + getString("enter_amount_transfer")
                         + Style.BRIGHT))
                 except ValueError:
-                    print("Amount should be numeric... aborting")
+                    print(getString("amount_numeric"))
                     continue
 
                 s.send(bytes(
@@ -606,7 +627,7 @@ while True:
                     message = s.recv().rstrip("\n")
                     print(Style.RESET_ALL
                           + Fore.BLUE
-                          + "Server message: "
+                          + getString("server_message")
                           + Style.BRIGHT
                           + str(message))
                     break
@@ -615,13 +636,13 @@ while True:
                 oldpassword = input(
                     Style.RESET_ALL
                     + Fore.WHITE
-                    + "Enter your current password: "
+                    + getString("enter_current_password")
                     + Style.BRIGHT)
 
                 newpassword = input(
                     Style.RESET_ALL
                     + Fore.WHITE
-                    + "Enter new password: "
+                    + getString("enter_new_password")
                     + Style.BRIGHT)
 
                 s.send(bytes(
@@ -635,7 +656,7 @@ while True:
                     message = s.recv().rstrip("\n")
                     print(Style.RESET_ALL
                           + Fore.BLUE
-                          + "Server message: "
+                          + getString("server_message")
                           + Style.BRIGHT
                           + str(message))
                     break
@@ -644,9 +665,9 @@ while True:
                 print(Style.RESET_ALL
                       + Style.BRIGHT
                       + Fore.YELLOW
-                      + "\nSIGINT detected - Exiting gracefully."
+                      + getString("sigint_detected")
                       + Style.NORMAL
-                      + " See you soon!" 
+                      + getString("see_you_soon") 
                       + Style.RESET_ALL)
                 try:
                     s.send(bytes("CLOSE", encoding="utf8"))
@@ -659,28 +680,24 @@ while True:
                 if not config["wrapper"]["use_wrapper"] == "true" and tronpy_installed:
                     print(Style.RESET_ALL
                           + Fore.WHITE
-                          + "Select an option")
+                          + getString("select_option"))
                     try:
                         choice = int(
-                            input("1 - Generate a new key\n2 - Import a key \n3 - Cancel\n"))
+                            input(getString("choice_input_wrapper")))
 
                         if choice <= 1:
                             priv_key = str(PrivateKey.random())
                             pub_key = PrivateKey(bytes.fromhex(
                                 priv_key)).public_key.to_base58check_address()
-                            print(
-                                "How do you want to encrypt private key"
-                                + " within the config file?")
+                            print(getString("how_encrypt_private_key"))
 
                             incorrect_value = True
                             while incorrect_value:
                                 try:
-                                    encryption_choice = int(input(
-                                        "1 - encrypt it using DUCO password"
-                                        + "\n2 - use your custom passphrase (more secure)"))
+                                    encryption_choice = int(input(getString("encryption_choice")))
                                     incorrect_value = False
                                 except ValueError:
-                                    print("Error, value should be numeric")
+                                    print(getString("value_not_numeric"))
                                     incorrect_value = True
 
                                 if encryption_choice <= 1:
@@ -695,12 +712,10 @@ while True:
                                     # Write data to file
                                     with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
                                         config.write(configfile)
-                                        print("Success!")
+                                        print(getString("success"))
 
                                 elif encryption_choice >= 2:
-                                    passphrase = input(
-                                        "Input your passphrase "
-                                        + "for encrypting private key: ")
+                                    passphrase = input(getString("encrypt_private_key"))
                                     config['wrapper'] = {
                                         "use_wrapper": "true",
                                         "priv_key": str(password_encrypt(
@@ -712,26 +727,22 @@ while True:
                                     # Write data to file
                                     with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
                                         config.write(configfile)
-                                        print("Success !")
+                                        print(getString("success"))
 
                         elif choice == 2:
-                            priv_key = input("Input your own private key: ")
+                            priv_key = input(getString("input_private_key"))
                             try:
                                 pub_key = PrivateKey(bytes.fromhex(
                                     priv_key)).public_key.to_base58check_address()
-                                print(
-                                    "How do you want to encrypt private key "
-                                    + "within config file?")
+                                print(getString("how_encrypt_private_key"))
 
                                 incorrect_value = True
                                 while incorrect_value:
                                     try:
-                                        encryption_choice = int(input(
-                                            "1 - encrypt it using DUCO password"
-                                            + "\n2 - use your custom passphrase (more secure)\n"))
+                                        encryption_choice = int(input(getString("encryption_choice")))
                                         incorrect_value = False
                                     except ValueError:
-                                        print("Error, should be numeric")
+                                        print(getString("value_not_numeric"))
                                         incorrect_value = True
 
                                     if encryption_choice <= 1:
@@ -746,11 +757,10 @@ while True:
                                         # Write data to file
                                         with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
                                             config.write(configfile)
-                                            print("Success!")
+                                            print(getString("success"))
 
                                     elif encryption_choice >= 2:
-                                        passphrase = input("Input your passphrase "
-                                                           + "for encrypting private key: ")
+                                        passphrase = input(getString("encrypt_private_key"))
                                         config['wrapper'] = {
                                             "use_wrapper": "true",
                                             "priv_key": str(password_encrypt(
@@ -762,23 +772,22 @@ while True:
                                         # Write data to file
                                         with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
                                             config.write(configfile)
-                                            print("Success !")
+                                            print(getString("success"))
                             except ValueError:
-                                print("Incorrect key was provided")
+                                print(getString("incorrect_key"))
                         else:
-                            print("Cancelled...")
+                            print(getString("cancelled"))
 
                     except ValueError:
                         print(Style.RESET_ALL
                               + Fore.WHITE
-                              + "Incorrect value was provided"
+                              + getString("incorrect_value")
                               + Style.BRIGHT)
 
                 elif not tronpy_installed:
                     print(now.strftime(
                         "%H:%M:%S ")
-                        + "Tronpy is not installed. "
-                        + "Please install it using: python3 -m pip install tronpy.")
+                        + getString("tronpy_not_installed_2"))
 
             elif command == "wrap":
                 if use_wrapper:
@@ -786,10 +795,10 @@ while True:
                         amount = float(input(
                             Style.RESET_ALL
                             + Fore.WHITE
-                            + "Enter amount to wrap (minimum is 10): "
+                            + getString("amount_to_wrap")
                             + Style.BRIGHT))
                     except ValueError:
-                        print("NO, Amount should be numeric... aborting")
+                        print(getString("no_amount_numeric"))
                         continue
 
                     try:
@@ -801,7 +810,7 @@ while True:
                         tron_address = input(
                             Style.RESET_ALL
                             + Fore.WHITE
-                            + "Enter tron address or leave blank to choose local wallet: "
+                            + getString("enter_tron_address_or_local")
                             + Style.BRIGHT)
                         if tron_address == "":
                             tron_address = pub_key
@@ -814,13 +823,13 @@ while True:
                             encoding='utf8'))
 
                     elif float(amount) < 10 and not float(amount) > balance:
-                        print("Error, minimum amount is 10 DUCO")
+                        print(getString("error_min_10_duco"))
                     else:
-                        print("Error, unsufficient balance")
+                        print(getString("error_unsufficient_balance"))
                 elif wrong_passphrase:
-                    print("Wrapper disabled, you entered a wrong passphrase")
+                    print(getString("error_wrong_passphrase"))
                 else:
-                    print("Wrapper disabled, configure it using `wrapperconf`")
+                    print(getString("error_configure_wrapperconf"))
 
             elif command == "unwrap":
                 if use_wrapper:
@@ -831,10 +840,10 @@ while True:
                         amount = float(
                             input(Style.RESET_ALL
                                   + Fore.WHITE
-                                  + "Enter amount to unwrap: "
+                                  + getString("enter_amount_unwrap")
                                   + Style.BRIGHT))
                     except ValueError:
-                        print("Value should be numeric... aborting")
+                        print(getString("value_not_numeric"))
                         continue
                     if int(float(amount)*10**6) >= pendingvalues:
                         toInit = int(float(amount)*10**6)-pendingvalues
@@ -842,7 +851,7 @@ while True:
                         toInit = amount*10**6
                     if toInit > 0:
                         txn = wduco.functions.initiateWithdraw(username, toInit).with_owner(pub_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(priv_key)))
-                        print("Initiating unwrap...\nTXid :", txn.txid)
+                        print(getString("initiating_unwrap"), txn.txid)
                         txn = txn.broadcast()
                         txnfeedback = txn.result()
                         if txnfeedback:
@@ -851,8 +860,7 @@ while True:
                             txn_success = False
 
                     if amount <= pendingvalues:
-                        print("Amount is over pending values, "
-                              + "using pending values to save txn fees")
+                        print(getString("amount_over_pending_values"))
 
                     if txn_success or amount <= pendingvalues:
                         s.send(bytes(
@@ -862,30 +870,26 @@ while True:
                             + str(pub_key),
                             encoding='utf8'))
                     else:
-                        print("There was an error while initiating unwrap, aborting")
-
-                    if amount <= pendingvalues:
-                        print(
-                            "Amount is over pending values, using pending values in order to save txn fees")
+                        print(getString("error_initiating_unwrap"))
 
                 elif wrong_passphrase:
-                    print("Wrapper disabled, you entered a wrong passphrase")
+                    print(getString("error_wrong_passphrase"))
                 else:
-                    print("Wrapper disabled, configure it using `wrapperconf`")
+                    print(getString("error_configure_wrapperconf"))
 
             elif command == "cancelunwraps":
                 if use_wrapper:
                     txn = wduco.functions.cancelWithdrawals(pub_key, username).with_owner(pub_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(priv_key)))
-                    print("Transaction sent, txid :", txn.txid)
+                    print(getString("transaction_send_txid"), txn.txid)
                     txn = txn.broadcast()
                     if txn.result():
-                        print("Success")
+                        print(getString("success"))
                     else:
-                        print("Failed, you should have enough energy or trx")
+                        print(getString("error_not_enough_energy_or_trx"))
                 elif wrong_passphrase:
-                    print("Wrapper disabled, you entered a wrong passphrase")
+                    print(getString("error_wrong_passphrase"))
                 else:
-                    print("Wrapper disabled, configure it using `wrapperconf`")
+                    print(getString("error_configure_wrapperconf"))
 
             elif command == "finishunwraps":
                 if use_wrapper:
@@ -899,99 +903,96 @@ while True:
                         + ","
                         + str(pub_key),
                         encoding='utf8'))
-                    print("Finished unwrapping", str(pendingvalues), "DUCO")
+                    print(getString("finished_unwrapping"), str(pendingvalues), "DUCO")
                 elif wrong_passphrase:
-                    print("Wrapper disabled, you entered a wrong passphrase")
+                    print(getString("error_wrong_passphrase"))
                 else:
-                    print("Wrapper disabled, configure it using `wrapperconf`")
+                    print(getString("error_configure_wrapperconf"))
 
             elif command == "exportwrapkey":
                 if use_wrapper:
-                    confirmation = input(
-                        "Type YES for confirming export of private key : ")
+                    confirmation = input(getString("confirm_export_private_key"))
                     if confirmation == "YES":
-                        print("Private key:", priv_key)
+                        print(getString("private_key"), priv_key)
                     else:
-                        print("Cancelled, invalid confirmation")
+                        print(getString("cancelled_invalid_confirmation"))
                 elif wrong_passphrase:
-                    print("Wrapper disabled, you entered a wrong passphrase")
+                    print(getString("error_wrong_passphrase"))
                 else:
-                    print("Wrapper disabled, configure it using `wrapperconf`")
+                    print(getString("error_configure_wrapperconf"))
 
             elif command == "wsend":
                 if use_wrapper:
                     recipient = input(
                         Style.RESET_ALL
                         + Fore.WHITE
-                        + "Enter recipients' TRON address: "
+                        + getString("enter_tron_recipients_name")
                         + Style.BRIGHT)
                     try:
                         amount = float(input(
                             Style.RESET_ALL
                             + Fore.WHITE
-                            + "Enter amount to transfer: "
+                            + getString("enter_amount_transfer")
                             + Style.BRIGHT))
                     except ValueError:
-                        print("Amount should be numeric... aborting")
+                        print(getString("amount_numeric"))
                         continue
                     wbalance = float(wduco.functions.balanceOf(pub_key))/10**6
                     if float(amount) <= wbalance:
                         txn = wduco.functions.transfer(recipient, int(float(amount)*10**6)).with_owner(pub_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(priv_key)))
                         txn = txn.broadcast()
-                        print("Transaction submitted to TRON network"
-                              + "\nTXID:", txn.txid)
+                        print(getString("tron_transaction_submitted"), txn.txid)
                         trontxresult = txn.wait()
                         if trontxresult:
-                            print("Successful transaction")
+                            print(getString("tron_successful_transaction"))
                         else:
-                            print("Error while confirming transaction")
+                            print(getString("tron_error_transaction"))
                 elif wrong_passphrase:
-                    print("Wrapper disabled, you entered a wrong passphrase")
+                    print(getString("error_wrong_passphrase"))
                 else:
-                    print("Wrapper disabled, configure it using `wrapperconf`")
+                    print(getString("error_configure_wrapperconf"))
 
             elif command == "about":
                 print(Style.RESET_ALL
                       + Fore.WHITE
-                      + "Duino-Coin CLI Wallet is made with <3 "
-                      + "by Duino-Coin community")
+                      + getString("about_1"))
                 print(Style.RESET_ALL
                       + Fore.WHITE
-                      + "This is version "
+                      + getString("about_2")
                       + str(VER))
                 print(Style.RESET_ALL
                       + Fore.WHITE
-                      + "And is distributed under MIT license")
+                      + getString("about_3"))
                 print(Style.RESET_ALL
                       + Fore.WHITE
                       + Style.BRIGHT
                       + "https://duinocoin.com")
                 print(Style.RESET_ALL
                       + Fore.WHITE
-                      + "Server version: "
+                      + getString("about_4")
                       + Style.BRIGHT
                       + str(SERVER_VER)
                       + Style.RESET_ALL)
                 if float(SERVER_VER) > VER:
                     print(Style.RESET_ALL
                           + Fore.YELLOW
-                          + "Server is on version "
+                          + getString("about_5")
                           + Fore.WHITE
                           + Style.BRIGHT
                           + SERVER_VER
                           + Fore.YELLOW
                           + Style.RESET_ALL
-                          + ", but client is on version "
+                          + getString("about_6")
                           + Style.BRIGHT
                           + Fore.WHITE
                           + str(VER)
                           + Style.RESET_ALL
                           + Fore.YELLOW
-                          + ", you should consider downloading last release")
+                          + getString("about_7"))
                 else:
                     print(Style.RESET_ALL
                           + Fore.WHITE
-                          + "Client is up-to-date")
+                          + getString("about_8"))
 
             elif command == "logout":
                 os.remove(RESOURCES_DIR + "/CLIWallet_config.cfg")
@@ -1001,18 +1002,17 @@ while True:
                 print(Style.RESET_ALL
                       + Fore.BLUE
                       + Style.BRIGHT
-                      + "Feel free of donating for helping to maintain DUCO and wDUCO "
-                      + "(wrapping/unwrapping involves fees for maintainers)")
+                      + getString("donate_1"))
                 print(Style.RESET_ALL
                       + Fore.YELLOW
-                      + "TRON and tokens: "
+                      + getString("donate_2")
                       + Style.RESET_ALL
                       + Fore.WHITE
                       + Style.BRIGHT
                       + "TY5wfM6JsYKEEMfQR3RBQBPKfetTpf7nyM"
                       + Style.RESET_ALL
                       + Fore.YELLOW
-                      + " (wrapper's address)")
+                      + getString("donate_3"))
                 print("Duino-Coin: "
                       + Style.RESET_ALL
                       + Fore.WHITE
@@ -1020,7 +1020,7 @@ while True:
                       + "revox"
                       + Style.RESET_ALL
                       + Fore.YELLOW
-                      + " (revox, DUCO lead developer)")
+                      + getString("donate_4"))
                 print("Duino-Coin: "
                       + Style.RESET_ALL
                       + Fore.WHITE
@@ -1028,15 +1028,15 @@ while True:
                       + "Yanis"
                       + Style.RESET_ALL
                       + Fore.YELLOW
-                      + " (wDUCO developer)")
+                      + getString("donate_5"))
 
             else:
                 print(Style.RESET_ALL
                       + Fore.YELLOW
-                      + " DUCO commands:")
+                      + getString("duco_commands"))
                 print_commands_norm()
 
                 print(Style.RESET_ALL
                       + Fore.YELLOW
-                      + " Wrapper-related commands:")
+                      + getString("wrapper_commands"))
                 print_commands_wrapper()
