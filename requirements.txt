@@ -5,3 +5,4 @@ pyserial
 pypresence
 tronpy
 cryptography
+websocket-client
