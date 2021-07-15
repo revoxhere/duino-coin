@@ -58,7 +58,7 @@ if not Path(RESOURCES_DIR + "/cli_wallet_commands.json").is_file():
 # Check if languages file exists
 if not Path(RESOURCES_DIR + "/langs.json").is_file():
     url = ("https://raw.githubusercontent.com/"
-           + "sys-256/"
+           + "revoxhere/"
            + "duino-coin/master/Resources/"
            + "CLI_Wallet_langs.json")
     r = requests.get(url)
@@ -78,28 +78,20 @@ if plsystem() == "Darwin":
 try:
     if not Path(RESOURCES_DIR + "/CLIWallet_config.cfg").is_file():
         locale = getdefaultlocale()[0]
-        print("line 81"+locale)
         if locale.startswith("nl"):
             lang = "dutch"
         else:
             lang = "english"
-        print("line 86: "+lang)
     else:
         # Read language variable from configfile
         try:
             config.read(RESOURCES_DIR + "/CLIWallet_config.cfg")
             lang = config["wallet"]["language"]
-            print("line 91"+lang)
-        except Exception as error:
-            print("line 94: error: " + error)
+        except Exception:
             # If it fails, fallback to english
             lang = "english"
 except Exception as error:
-    print("line 98: error: " + error)
     lang = "english"
-
-print("line 100"+lang)
-
 
 def getString(string_name):
     # Get string form language file
