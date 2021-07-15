@@ -14,6 +14,7 @@ from json import load as jsonload
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 from os import _exit, execl, mkdir
 from os import name as osname
+from os import environ as osenviron
 from platform import machine as osprocessor
 from os import path, system
 from os import system as ossystem
@@ -217,14 +218,16 @@ def debug_output(text):
 
 
 def title(title):
-    # Set window title
-    if osname == "nt":
-        # Windows systems
-        system("title " + title)
-    else:
-        # Most standard terminals
-        print("\33]0;" + title + "\a", end="")
-        sys.stdout.flush()
+    # disable window title setter when running with nohup
+    if osenviron.get('_') != '/usr/bin/nohup':
+        # Set window title
+        if osname == "nt":
+            # Windows systems
+            system("title " + title)
+        else:
+            # Most standard terminals
+            print("\33]0;" + title + "\a", end="")
+            sys.stdout.flush()
 
 
 def handler(signal_received, frame):
