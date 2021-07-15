@@ -1,0 +1,223 @@
+{
+    "english": {
+        "translation_autor": "Duino-Coin developers",
+        "cant_connect_to_server": "Cannot connect to the server. It is probably under maintenance or temporarily down.\nRetrying in 15 seconds.",
+        "cant_recieve_pool_ip_and_port": " Cannot receive pool address and IP.\nExiting in 15 seconds.",
+        "server_message": "Server message: ",
+        "success": "Success!",
+        "cancelled": "Cancelled...",
+        "duco_commands": " DUCO commands:",
+        "wrapper_commands": " Wrapper-related commands:",
+
+        "base64_not_installed": "Base64 is not installed. Please manually install \"base64\"\nExiting in 15s.",
+        "tronpy_not_installed": "Tronpy is not installed. Please install it using: python3 -m pip install tronpy.\nWrapper is disabled because tronpy is not installed.",
+        "tronpy_not_installed_2": "Tronpy is not installed. Please install it using: python3 -m pip install tronpy.",
+        "cryptography_not_installed": "Cryptography is not installed. Please install it using: python3 -m pip install cryptography.\nExiting in 15s.",
+        "secrets_not_installed": "Secrets is not installed. Please install it using: python3 -m pip install secrets.\nExiting in 15s.",
+        "websocket_not_installed": "Websocket-client is not installed. Please install it using: python3 -m pip install websocket-client.\nExiting in 15s.",
+        "colorama_not_installed": "Colorama is not installed. Please install it using: python3 -m pip install colorama.\nExiting in 15s.",
+
+        "first_run": "Duino-Coin CLI Wallet first-run\n",
+        "select_option": "Select an option",
+        "choice_input": "  1 - Login\n  2 - Register\n  3 - Exit\n",
+        "choice_input_wrapper": "1 - Generate a new key\n2 - Import a key \n3 - Cancel\n",
+        "value_not_numeric": "Error, value must be numeric",
+
+        "enter_username": "Enter your username: ",
+        "enter_email": "Enter your e-mail address: ",
+        "enter_password": "Enter your password (not shown for privacy): ",
+        "confirm_password": "Confirm your password (not shown for privacy): ",
+        "enter_current_password": "Enter your current password: ",
+        "enter_new_password": "Enter new password: ",
+
+        "agree_requirments": "By registering a new account you agree to the terms of service and privacy policy available at ",
+
+        "register_success": "Successfully registered new account",
+        "register_failed": "Couldn't register new user, reason: ",
+
+        "login_success": "Successful login",
+        "login_failed": "Couldn't login, reason: ",
+
+        "decrypt_private_key": "Passphrase for decrypting private key: ",
+        "encrypt_private_key": "Input your passphrase for encrypting private key: ",
+        "invalid_passphrase_wrapper": "Invalid passphrase, disabling wrapper for this session",
+        "input_private_key": "Input your own private key: ",
+        "incorrect_key": "Incorrect key was provided",
+        "incorrect_value": "Incorrect value was provided",
+
+        "cli_wallet_text": "\nDuino-Coin CLI Wallet",
+        "you_have": "You have ",
+        "which_is_about": "Which is about ",
+        "duco_price": "DUCO price: ",
+
+        "pending_unwraps": "Pending unwraps ",
+        "tron_address": "Tron address for receiving: ",
+        "trx_balance": "TRX balance (useful for fees): ",
+
+        "how_encrypt_private_key": "How do you want to encrypt private key within the config file?",
+        "encryption_choice": "1 - encrypt it using DUCO password\n2 - use your custom passphrase (more secure)",
+
+        "amount_to_wrap": "Enter amount to wrap (minimum is 10): ",
+        "no_amount_numeric": "NO, Amount should be numeric... aborting",
+        "enter_tron_address_or_local": "Enter tron address or leave blank to choose local wallet: ",
+
+        "error_min_10_duco": "Error, minimum amount is 10 DUCO",
+        "error_unsufficient_balance": "Error, unsufficient balance",
+        "error_wrong_passphrase": "Wrapper disabled, you entered a wrong passphrase",
+        "error_configure_wrapperconf": "Wrapper disabled, configure it using `wrapperconf`",
+        "error_not_enough_energy_or_trx": "Failed, you should have enough energy or trx",
+
+        "enter_amount_unwrap": "Enter amount to unwrap: ",
+        "initiating_unwrap": "Initiating unwrap...\nTXid :",
+        "error_initiating_unwrap": "There was an error while initiating unwrap, aborting",
+        "amount_over_pending_values": "Amount is over pending values, using pending values to save txn fees",
+        "transaction_send_txid": "Transaction sent, txid :",
+        "finished_unwrapping": "Finished unwrapping",
+
+        "confirm_export_private_key": "Type YES for confirming export of private key : ",
+        "private_key": "Private key: ",
+        "cancelled_invalid_confirmation": "Cancelled, invalid confirmation",
+
+        "help_list_command": "Type `help` to list available commands",
+        "duco_console": "DUCO Console ᕲ ",
+
+        "enter_recipients_name": "Enter recipients' username: ",
+        "enter_amount_transfer": "Enter amount to transfer: ",
+        "enter_tron_recipients_name": "Enter recipients' TRON address: ",
+        "enter_tron_amount_transfer": "Enter amount to transfer: ",
+        "amount_numeric": "Amount should be numeric... aborting",
+
+        "tron_transaction_submitted": "Transaction submitted to TRON network\nTXID:",
+        "tron_successful_transaction": "Successful transaction",
+        "tron_error_transaction": "Error while confirming transaction",
+
+        "see_you_soon": " See you soon!",
+        "sigint_detected": "\nSIGINT detected - Exiting gracefully.",
+
+        "about_1": "Duino-Coin CLI Wallet is made with <3 by the Duino-Coin community",
+        "about_2": "This is version ",
+        "about_3": "And is distributed under MIT license",
+        "about_4": "Server version: ",
+        "about_5": "Server is on version ",
+        "about_6": ", but client is on version ",
+        "about_7": ", you should consider downloading last release",
+        "about_8": "Client is up-to-date",
+
+        "donate_1": "Feel free of donating for helping to maintain DUCO and wDUCO (wrapping/unwrapping involves fees for maintainers)",
+        "donate_2": "TRON and tokens: ",
+        "donate_3": " (wrapper's address)",
+        "donate_4": " (revox, DUCO lead developer)",
+        "donate_5": " (wDUCO developer)"
+    },
+
+    "dutch": {
+        "translation_autor": "Bram (or sys-256 or Hoiboy19)",
+        "cant_connect_to_server": "Kan geen verbinding maken met de server. Hij is waarschijnlijk in onderhoud of tijdelijk down.\nWe proberen het opnieuw over 15 seconden.",
+        "cant_recieve_pool_ip_and_port": " Kan het IP address en port van de pool niet ontvangen.\nWe sluiten de wallet in 15 seconden af.",
+        "server_message": "Server bericht: ",
+        "success": "Succes!",
+        "cancelled": "Gestopt...",
+        "duco_commands": " DUCO opdrachten:",
+        "wrapper_commands": " Wrapper-gerelateerde opdrachten:",
+
+        "base64_not_installed": "Base64 is niet geinstalleerd. Installeer \"base64\" zelf aub\nWe sluiten de wallet in 15 seconden af.",
+        "tronpy_not_installed": "Tronpy is niet geinstalleerd. Installeer het met: python3 -m pip install tronpy.\nDe wrapper is uitgeschakeld omdat tronpy niet is geinstalleerd.",
+        "tronpy_not_installed_2": "Tronpy is niet getinstalleerd. Installeer het met: python3 -m pip install tronpy.",
+        "cryptography_not_installed": "Cryptography is niet getinstalleerd. Installeer het met: python3 -m pip install cryptography.\nWe sluiten de wallet in 15 seconden af.",
+        "secrets_not_installed": "Secrets is niet geinstalleeerd. Installeer het met: python3 -m pip install secrets.\nWe sluiten de wallet in 15 seconden af.",
+        "websocket_not_installed": "Websocket-client is niet geinstalleerd. Installeer het met: python3 -m pip install websocket-client.\nWe sluiten de wallet in 15 seconden af.",
+        "requests_not_installed": "Requests is niet geinstalleerd. Installeer het met: python3 -m pip install requests.\nWe sluiten de wallet in 15 seconden af.",
+        "colorama_not_installed": "Colorama is niet geinstalleerd. Installeer het met: python3 -m pip install colorama.\nWe sluiten de wallet in 15 seconden af.",
+
+        "first_run": "Duino-Coin CLI Wallet eerste-keer\n",
+        "select_option": "Selecteer een optie",
+        "choice_input": "  1 - Inloggen\n  2 - Registreren\n  3 - Afsluiten\n",
+        "choice_input_wrapper": "1 - Genereer een nieuwe key\n2 - Importeer een key \n3 - Afzeggen\n",
+        "value_not_numeric": "Error, keuze moet een getal zijn",
+
+        "enter_username": "Vul je gebruikersnaam in: ",
+        "enter_email": "Vul je e-mail adres in: ",
+        "enter_password": "Vul je wachtwoord in (die laten we niet zien voor privacy): ",
+        "confirm_password": "Confirm your password (die laten we niet zien voor privacy): ",
+        "enter_current_password": "Vul je huidige wachtwoord in: ",
+        "enter_new_password": "Vul je nieuwe wachtwoord in: ",
+
+        "agree_requirments": "Als je een nieuw account registreerd ga je akkoord met de terms of service en privacy policy beschikbaar op ",
+
+        "register_success": "Succesvol een nieuw account geregisteerd",
+        "register_failed": "Kon geen nieuwe gebruiken registeren, reden: ",
+
+        "login_success": "Succesvol ingelogd",
+        "login_failed": "Kon niet inloggen, reden: ",
+
+        "decrypt_private_key": "Wachtwoord zin om de private key te decrypten: ",
+        "encrypt_private_key": "Wachtwoord zin om de private key te encrypten: ",
+        "invalid_passphrase_wrapper": "Ongeldige wachtwoordzin, we zetten de wrapper uit voor deze sessie",
+        "input_private_key": "Vul je eigen private key in: ",
+        "incorrect_key": "Onjuiste key is ingevuld",
+        "incorrect_value": "Onjuiste waarde is ingevuld",
+
+        "cli_wallet_text": "\nDuino-Coin CLI Wallet",
+        "you_have": "U heeft ",
+        "which_is_about": "Dat is ongeveer ",
+        "duco_price": "DUCO prijs: ",
+
+        "pending_unwraps": "Openstaande unwraps ",
+        "tron_address": "Tron address voor ontvangen: ",
+        "trx_balance": "TRX balans (handig voor fees): ",
+
+        "how_encrypt_private_key": "Hoe will je je private key encrypten in het config bestand?",
+        "encryption_choice": "1 - encrypt het met je DUCO wachtwoord\n2 - gebruik een andere wachtzin (veiliger)",
+
+        "amount_to_wrap": "Vul een waarde in om te wrappen (minimaal 10): ",
+        "no_amount_numeric": "NEE, Waarde moet een nummer zijn... Aan het afbreken...",
+        "enter_tron_address_or_local": "Vul een tron adres in of laat het leeg door de locale wallet te kiezen: ",
+
+        "error_min_10_duco": "Error, de minimale waarde is 10 DUCO",
+        "error_unsufficient_balance": "Error, je hebt niet genoeg DUCO",
+        "error_wrong_passphrase": "De wrapper is uitgeschakeld, je hebt de verkeerde wachtzin opgegeven",
+        "error_configure_wrapperconf": "De wrapper is uitgeschakeld, configureer het met `wrapperconf`",
+        "error_not_enough_energy_or_trx": "Gefaald, je moet genoeg energy or trx hebben",
+
+        "enter_amount_unwrap": "Vul een aantal in om te unwrappen: ",
+        "initiating_unwrap": "Starten met unwrappen...\nTXid :",
+        "error_initiating_unwrap": "Er was een error tijdens het starten van de unwrap, Aan het afbreken...",
+        "amount_over_pending_values": "Het bedrag is hoger dan openstaande waardes, we gebruiken de openstaande waardes om txn fees te bewaren",
+        "transaction_send_txid": "Transactie verstuurd, txid :",
+        "finished_unwrapping": "Klaar met unwrappen",
+
+        "confirm_export_private_key": "Type YES om de export van de private key te bevestigen: ",
+        "private_key": "Private key: ",
+        "cancelled_invalid_confirmation": "Gestopt, ongeldige bevestiging",
+
+        "help_list_command": "Type `help` om beschikbare opdrachten te zien",
+        "duco_console": "DUCO Console ᕲ ",
+
+        "enter_recipients_name": "Vul de ontvangers naam in: ",
+        "enter_amount_transfer": "Vul de waarde in om te versturen: ",
+        "enter_tron_recipients_name": "Vul de ontvangers TRON adres in: ",
+        "amount_numeric": "Waarde moet een nummber zijn... Aan het afbreken...",
+
+        "tron_transaction_submitted": "Transactie verstuurd naar het TRON netwerk\nTXID:",
+        "tron_successful_transaction": "Succesvolle transactie",
+        "tron_error_transaction": "Error tijdens het bevestingen van de transactie",
+
+        "see_you_soon": " Tot ziens!",
+        "sigint_detected": "\nSIGINT gedetecteerd - We sluiten de wallet af.",
+
+        "about_1": "Duino-Coin CLI Wallet is gemaakt met <3 door de Duino-Coin community",
+        "about_2": "Dit is versie ",
+        "about_3": "En is gedistribueerd onder de MIT licensie",
+        "about_4": "Server versie: ",
+        "about_5": "De server is op versie ",
+        "about_6": ", maar de wallet bent op versie ",
+        "about_7": ", u zou moeten overwegen om de laatste versie te downloaden",
+        "about_8": "De wallet is up-to-date",
+
+        "donate_1": "Voel je vrij om te doneren voor het helpen in stand houden van DUCO en wDUCO (wrapping/unwrapping brengt kosten met zich mee voor beheerders)",
+        "donate_2": "TRON and tokens: ",
+        "donate_3": " (wrapper's adres)",
+        "donate_4": " (revox, DUCO leidende ontwikkelaar)",
+        "donate_5": " (wDUCO ontwikkelaar)"
+    }
+}
