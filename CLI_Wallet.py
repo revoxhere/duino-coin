@@ -74,7 +74,7 @@ if plsystem() == "Darwin":
     if getlocale()[0] is None:
         setlocale(LC_ALL, "en_US.UTF-8")
 
-# Check if miner is configured, if it isn't, autodetect language
+# Check if wallet is configured, if it isn't, autodetect language
 try:
     if not Path(RESOURCES_DIR + "/CLIWallet_config.cfg").is_file():
         locale = getdefaultlocale()[0]
