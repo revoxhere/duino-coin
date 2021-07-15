@@ -548,7 +548,7 @@ def greeting():
         + str(username)
         + '!\n')
 
-    
+
 def init_rich_presence():
     # Initialize Discord rich presence
     global RPC
@@ -567,7 +567,7 @@ def update_rich_presence():
     while True:
         try:
             RPC.update(
-                details='Hashrate: ' + str(hashrate) + ' H/s',
+                details='Hashrate: ' + str(round(hashrate)) + ' H/s',
                 start=startTime,
                 state='Acc. shares: '
                 + str(shares[0])
@@ -625,7 +625,8 @@ def pretty_print(message_type, message, state):
 
 
 def mine_avr(com, threadid):
-    # Mining section
+    global hashrate
+
     if shuffle_ports == "y":
         debug_output(
             'Searching for fastest connection to the server')
@@ -1150,7 +1151,6 @@ if __name__ == '__main__':
     except Exception as e:
         debug_output('Error displaying greeting message: ' + str(e))
 
-    
     try:
         # Launch avr duco mining threads
         threadid = 0
