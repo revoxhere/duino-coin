@@ -146,7 +146,6 @@ def protocol_wrap_wduco(username, tron_address, amount):
                             set balance = ? 
                             where username = ?""",
                             (balancebackup, username))
-                        return "NO,Unknown error, transaction reverted"
                     except Exception:
                         pass
             except Exception as e:
