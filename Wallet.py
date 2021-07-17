@@ -1125,8 +1125,7 @@ def wrapper_window(handler):
                     + str(amount)
                     + ","
                     + str(pub_key)
-                    + str(",placeholders")
-                    ,
+                    + str(",placeholder"),
                     encoding="utf8"))
             soc.close()
             sleep(2)
@@ -1238,8 +1237,8 @@ def unwrapper_window(handler):
                                 "UNWRAP,"
                                 + str(amount)
                                 + ","
-                                + str(pub_key),
-                                + str(",placeholder")
+                                + str(pub_key)
+                                + str(",placeholder"),
                                 encoding="utf8"))
 
                 soc.close()
