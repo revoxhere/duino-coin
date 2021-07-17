@@ -819,7 +819,8 @@ while True:
                             "WRAP,"
                             + str(amount)
                             + ","
-                            + str(tron_address),
+                            + str(tron_address)
+                            + str(",placeholder"),
                             encoding='utf8'))
 
                     elif float(amount) < 10 and not float(amount) > balance:
@@ -901,7 +902,8 @@ while True:
                         "UNWRAP,"
                         + str(pendingvalues)
                         + ","
-                        + str(pub_key),
+                        + str(pub_key)
+                        + str(",placeholder"),
                         encoding='utf8'))
                     print(getString("finished_unwrapping"), str(pendingvalues), "DUCO")
                 elif wrong_passphrase:
