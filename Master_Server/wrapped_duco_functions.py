@@ -150,6 +150,14 @@ def protocol_wrap_wduco(username, tron_address, amount):
                     except Exception:
                         pass
             except Exception as e:
+                try:
+                    datab.execute(
+                        """UPDATE Users 
+                        set balance = ? 
+                        where username = ?""",
+                        (balancebackup, username))
+                except Exception:
+                    pass
                 print("Error with Tron blockchain:")
                 print(traceback.format_exc())
                 return "NO,error with Tron blockchain"+str(e)
@@ -261,6 +269,19 @@ def protocol_unwrap_wduco(username, tron_address, amount):
                             except Exception:
                                 pass
                 except Exception as e:
+                    while True:
+                        try:
+                            with sqlite3.connect(database) as conn:
+                                datab = conn.cursor()
+                                datab.execute(
+                                    """UPDATE Users 
+                                        set balance = ? 
+                                        where username = ?""",
+                                    (balancebackup, username))
+                                conn.commit()
+                                break
+                        except Exception:
+                            pass
                     print("Error with Tron blockchain:")
                     print(traceback.format_exc())
                     return "NO,error with Tron blockchain"+str(e)
