@@ -155,14 +155,15 @@ class Wallet:
         serverinfo = requests.get(Endpoints.server).text.splitlines()
         self.pool_address = serverinfo[0]
         self.pool_port = int(serverinfo[1])
-
-        socket.setdefaulttimeout(10)
         self._connect_socket()
 
     def _connect_socket(self):
         self.sock = socket.socket()
         self.sock.connect((self.pool_address, self.pool_port))
-        self.sock.recv(3)
+        try:
+            self.sock.recv(3)
+        except:
+            pass
 
         if self.username and self.password:
             self.login(self.username, self.password)
@@ -230,7 +231,10 @@ class Wallet:
         self._connect_socket()
 
         self.sock.send(f'SEND,-,{recipient_username},{amount}'.encode())
-        transfer_response = self.sock.recv(128).decode()
+        try:
+            transfer_response = self.sock.recv(128).decode()
+        except socket.timeout:
+            transfer_response = "IDK,Timeout while retrieving response"
         return transfer_response
 
     def get_transactions(self):
