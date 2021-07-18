@@ -870,13 +870,13 @@
         "mining_thread_starting": " กำลังเริ่มต้น",
         "using_algo": " ใช้อัลกอริทึม DUCO-S1 กับ ",
         "using_algo_xxh": " ใช้อัลกอริทึม XXHASH กับ ",
-        "efficiency": "efficiency",
+        "efficiency": "ประสิทธิภาพ",
 
         "duco_python_miner": "Duino-Coin ไพธอน มายเนอร์ (v",
         "accepted_shares": " ยอมรับส่วนแบ่ง",
         "accepted": " ยอมรับแล้ว ",
         "block_found": " ค้นพบบล็อกแล้ว ",
-        "internal_server_error": " คว่ามผิดพลาดภายในเซิร์ฟเวอร์",
+        "internal_server_error": " ความผิดพลาดภายในเซิร์ฟเวอร์",
         "retrying": " ลองใหม่ใน 10วิ",
         "rejected": " ปฏิเสธ ",
         "error_while_mining": " ความผิดพลาดระหว่างขุด - เหมือนจะเป็นความผิดพลาดในการเชื่อมต่อ - เริ่มใหม่ใน 5วิ",
@@ -888,6 +888,7 @@
         "max_threads_notice": "การขุด Duino-Coin ด้วยเธรดจำนวนมากจะทำให้กำไรลดลง - เธรดการขุดลดเหลือ 8",
         "max_hashrate_notice": "การขุด Duino-Coin ด้วยอุปกรณ์ที่มีพลังสูงอาจจะไม่ได้ทำให้คุณได้กำไรสูงสุด- เราแนะนำให้ลอง Magi (https://xmg.network) - เหรียญ 'พี่น้อง' ของเรา",
 
-        "recommended": "แนะนำ"
+        "recommended": "แนะนำ",
+        "connection_search": "กำลังค้นหาโนดที่เร็วที่สุดเพื่อเชื่อมต่อ"
     }
 }
