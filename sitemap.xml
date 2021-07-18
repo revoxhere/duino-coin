@@ -16,6 +16,11 @@
   <priority>0.80</priority>
 </url>
 <url>
+  <loc>https://duinocoin.com/apps</loc>
+  <changefreq>daily</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
   <loc>https://duinocoin.com/getting-started</loc>
   <changefreq>daily</changefreq>
   <priority>0.80</priority>
