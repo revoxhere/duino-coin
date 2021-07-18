@@ -56,7 +56,7 @@ Global variables
 """
 HOSTNAME = ""
 WALLET_PORTS = [
-    #2809,
+    # 2809,
 ]
 PORTS = [
     2810,  # Non-public port for pools
@@ -79,7 +79,7 @@ Have fun!
 """
 DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
-SAVE_TIME = 5  # in seconds
+SAVE_TIME = 10  # in seconds
 DB_TIMEOUT = 35
 SOCKET_TIMEOUT = 15
 BACKLOG = None  # spawn connection instantly
@@ -480,56 +480,68 @@ def floatmap(x, in_min, in_max, out_min, out_max):
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 
+class Break(Exception):
+    pass
+
+
+def handle(queue):
+    with sqlconn(DATABASE) as database:
+        database.execute('PRAGMA journal_mode=wal')
+        counter = 0
+        while True:
+            try:
+                #timeS = time()
+                command = queue.get()
+                # print(command)
+                counter += 1
+                database.execute(command)
+                if counter >= 500:
+                    database.commit()
+                queue.task_done()
+                #print("task done")
+                #timeE = time()
+                #print(timeE-timeS)
+
+            except Break:
+                queue.task_done()
+                break
+
+            except Exception as e:
+                print(traceback.format_exc())
+        
+
+
+if __name__ == "__main__":
+    queue = multiprocessing.JoinableQueue()
+
+    multiprocessing.Process(target=handle, args=(queue,), daemon=True).start()
+
+
 def database_updater():
     db_err_counter = 0
 
-    def _execute(to_execute):
-        try:
-            sys.setswitchinterval(30)
-            timeS = time()
-            with sqlconn(DATABASE,
-                         timeout=DB_TIMEOUT) as conn:
-                conn.executemany(
-                    """
-                    UPDATE Users
-                    SET balance = balance + ?
-                    WHERE username = ?
-                    """,
-                    (to_execute))
-                conn.commit()
-            timeT = time()
-            timezz = timeT-timeS
-            print("Updating",
-                  len(to_execute),
-                  "users took",
-                  round(timezz, 3),
-                  "seconds")
-            sys.setswitchinterval(0.0005)
-        except Exception as e:
-            print(e)
-            # pass
-
     while True:
+        sleep((queue.qsize()*0.0075)+1)
         try:
-            to_execute = []
+            print("Queue size:", queue.qsize())
             for user in balances_to_update.copy():
                 amount_to_update = balances_to_update[user]
                 if amount_to_update and user:
-                    amount_to_update = amount_to_update  / 3.5
+                    amount_to_update = amount_to_update / 3.5
 
                     if amount_to_update / 30 > 0.2:
                         amount_to_update = amount_to_update / 100
                         amount_to_update = floatmap(
                             amount_to_update / 30, 0.02, 0.5, 0.02, 0.025)
 
-                    to_execute.append([amount_to_update, user])
+                    sql_str = ("UPDATE Users SET balance = balance + "
+                               + str(amount_to_update)
+                               + " WHERE username = '"
+                               + str(user) + "'")
+                    queue.put(sql_str)
+
                     balances_to_update.pop(user)
-
-            if to_execute:
-                _execute(to_execute)
-                #threading.Thread(target=_execute, args=[to_execute, ]).start()
-
-            sleep(SAVE_TIME)
+            
         except Exception as e:
             admin_print("Database error:", traceback.format_exc())
             db_err_counter += 1
@@ -2777,11 +2789,10 @@ def handle(connection, address):
                                     pass
                         if rewards:
                             for user in rewards:
-                                if rewards[user]:
-                                    try:
-                                        balances_to_update[user] += rewards[user]
-                                    except:
-                                        balances_to_update[user] = rewards[user]
+                                try:
+                                    balances_to_update[user] += rewards[user]
+                                except:
+                                    balances_to_update[user] = rewards[user]
                         admin_print("Pool synced", len(rewards),
                                     "rewards", len(poolWorkers), "workers")
                 except Exception as e:
@@ -3004,8 +3015,8 @@ if __name__ == "__main__":
     from kolka_chip_module import *
     try:
         from wrapped_duco_functions import *
-    except Exception as e:
-        print(f"Error importing wduco functions : {e}")
+    except:
+        pass
 
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
@@ -3024,7 +3035,7 @@ if __name__ == "__main__":
 
     threading.Thread(target=create_main_api_file).start()
     threading.Thread(target=create_minerapi).start()
-    #threading.Thread(target=create_secondary_api_files).start()
+    # threading.Thread(target=create_secondary_api_files).start()
 
     def _wallet_server(port):
         server_thread = StreamServer(
