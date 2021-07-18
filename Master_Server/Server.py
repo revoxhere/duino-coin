@@ -56,10 +56,10 @@ Global variables
 """
 HOSTNAME = ""
 WALLET_PORTS = [
-    2809,
-    2810
+    #2809,
 ]
 PORTS = [
+    2810,  # Non-public port for pools
     2811,  # Legacy
     2812,  # Wallets, other miners
     ####
@@ -79,7 +79,7 @@ Have fun!
 """
 DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
-SAVE_TIME = 10  # in seconds
+SAVE_TIME = 5  # in seconds
 DB_TIMEOUT = 35
 SOCKET_TIMEOUT = 15
 BACKLOG = None  # spawn connection instantly
@@ -338,7 +338,7 @@ def update_job_tiers():
             "AVR": {
                 "difficulty": int(6 * DIFF_MULTIPLIER),
                 "reward": .005,
-                "max_hashrate": 250
+                "max_hashrate": 210
             }
         }
         sleep(60)
@@ -485,6 +485,7 @@ def database_updater():
 
     def _execute(to_execute):
         try:
+            sys.setswitchinterval(30)
             timeS = time()
             with sqlconn(DATABASE,
                          timeout=DB_TIMEOUT) as conn:
@@ -503,6 +504,7 @@ def database_updater():
                   "users took",
                   round(timezz, 3),
                   "seconds")
+            sys.setswitchinterval(0.0005)
         except Exception as e:
             print(e)
             # pass
@@ -513,11 +515,12 @@ def database_updater():
             for user in balances_to_update.copy():
                 amount_to_update = balances_to_update[user]
                 if amount_to_update and user:
-                    if amount_to_update > 0.2:
+                    amount_to_update = amount_to_update  / 3.5
+
+                    if amount_to_update / 30 > 0.2:
                         amount_to_update = amount_to_update / 100
-                    if amount_to_update > 0.02:
                         amount_to_update = floatmap(
-                            amount_to_update, 0.02, 0.5, 0.02, 0.025)
+                            amount_to_update / 30, 0.02, 0.5, 0.02, 0.025)
 
                     to_execute.append([amount_to_update, user])
                     balances_to_update.pop(user)
@@ -615,6 +618,8 @@ def input_management():
             admin_print("Are you sure you want to exit DUCO server?")
             confirm = input("  Y/n")
             if confirm == "Y" or confirm == "y" or confirm == "":
+                for proc in mpproc:
+                    proc.terminate()
                 os._exit(0)
             else:
                 admin_print("Canceled")
@@ -623,6 +628,8 @@ def input_management():
             admin_print("Are you sure you want to restart DUCO server?")
             confirm = input("  Y/n")
             if confirm == "Y" or confirm == "y" or confirm == "":
+                for proc in mpproc:
+                    proc.terminate()
                 os.execl(sys.executable, sys.executable, *sys.argv)
             else:
                 admin_print("Canceled")
@@ -1298,6 +1305,11 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             except:
                 pass
 
+            try:
+                this_user_miners = max(workers[ip_addr], workers[username])
+            except:
+                this_user_miners = 1
+
             if using_xxhash:
                 req_difficulty = "XXHASH"
             else:
@@ -1518,7 +1530,11 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             minerapi[thread_id] = thread_miner_api
 
             global_blocks += UPDATE_MINERAPI_EVERY
-            global_last_block_hash = job[1]
+            if using_xxhash:
+                global_last_block_hash = job[1]
+            else:
+                if fastrandint(100) == 77:
+                    global_last_block_hash = job[1]
 
         if (hashrate > max_hashrate
                 or reported_hashrate > max_hashrate):
@@ -1539,18 +1555,15 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             if not using_xxhash:
                 override_difficulty = kolka_v2(req_difficulty, job_tiers)
 
-            send_data("BAD\n", connection)
+            send_data(
+                "You have been moved to a higher difficulty tier\n",
+                connection)
 
         elif int(result[0]) == int(numeric_result):
             """ 
             Correct result received 
             """
             accepted_shares += 1
-
-            try:
-                this_user_miners = max(workers[ip_addr], workers[username])
-            except:
-                this_user_miners = 1
 
             if using_xxhash:
                 if (fastrandint(BLOCK_PROBABILITY_XXH) == 1):
@@ -1600,7 +1613,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             send_data("BAD\n", connection)
 
         is_first_share = False
-        #sleep(hashrate / 500000)
+
     return thread_id
 
 
@@ -1628,7 +1641,7 @@ def get_sys_usage():
     while True:
         global_connections = _get_connections()
 
-        cpu = floatmap(psutil.cpu_percent(), 0, 100, 0, 98)
+        cpu = floatmap(psutil.cpu_percent(), 0, 100, 0, 90)
 
         # global_cpu_usage.append(cpu)
         global_cpu_usage = cpu
@@ -1917,8 +1930,8 @@ def create_main_api_file():
                 "Server version":        SERVER_VER,
                 "Active connections":    global_connections,
                 "Open threads":          threading.activeCount(),
-                "Server CPU usage":      round(global_cpu_usage),
-                "Server RAM usage":      round(global_ram_usage),
+                "Server CPU usage":      round(global_cpu_usage, 1),
+                "Server RAM usage":      round(global_ram_usage, 1),
                 "Last update":           now().strftime(
                     "%d/%m/%Y %H:%M:%S (UTC)"),
                 "Net energy usage":      net_wattage,
@@ -1971,7 +1984,6 @@ def create_minerapi():
             )
 
         for threadid in minerapi.copy():
-            sleep(0.0001)
             try:
                 memory_datab.execute(
                     """INSERT INTO Miners
@@ -1996,8 +2008,6 @@ def create_minerapi():
         with sqlconn(CONFIG_MINERAPI) as disk_conn:
             memory.backup(disk_conn)
             disk_conn.commit()
-
-        sleep(SAVE_TIME)
 
         try:
             with open("miners.json", 'w') as outfile:
@@ -2204,10 +2214,7 @@ def protocol_send_funds(data, connection, username):
     Transfers funds from one account to another 
     """
     try:
-        random = fastrandint(1000)
-        global_last_block_hash_cp = sha1(
-            bytes(global_last_block_hash+str(random),
-                  encoding='ascii')).hexdigest()
+        global_last_block_hash_cp = global_last_block_hash
         memo = sub(r'[^A-Za-z0-9 .()-:/!#_+-]+', ' ', str(data[1]))
         recipient = str(data[2])
         amount = float(data[3])
@@ -2446,7 +2453,7 @@ def get_duco_prices():
                 Calculate DUCO price by the guaranteed 0.25x exchange rate
                 in the DUCO Exchange 
                 """
-                duco_price = round(xmg_usd * 0.25, 8)
+                duco_price = round(xmg_usd * 0.3, 8)
             except:
                 duco_price = 0.0065
 
@@ -2497,9 +2504,9 @@ def get_duco_prices():
                     else:
                         trx_price = 0.03
 
-                    duco_price_justswap = round(
-                        float(exchange_rate) * float(trx_price), 8
-                    )
+                    duco_price_justswap = 0.0101  # round(
+                    #float(exchange_rate) * float(trx_price), 8
+                    # )
             except:
                 duco_price_justswap = 0
         except Exception as e:
@@ -2607,7 +2614,6 @@ def handle(connection, address):
                     if username in banlist:
                         if not username in whitelisted_usernames:
                             perm_ban(ip_addr)
-                        sleep(5)
                         break
                 else:
                     break
@@ -2759,7 +2765,7 @@ def handle(connection, address):
                         global_connections = int(global_connections)
                         global_connections += poolConnections
 
-                        if len(poolWorkers) >= 1:
+                        if poolWorkers:
                             for threadid in minerapi.copy():
                                 if len(str(threadid)) < 11:
                                     minerapi.pop(threadid)
@@ -2769,12 +2775,15 @@ def handle(connection, address):
                                     minerapi[worker] = poolWorkers[worker]
                                 except:
                                     pass
-                        if len(rewards) >= 1:
+                        if rewards:
                             for user in rewards:
-                                try:
-                                    balances_to_update[user] += rewards[user]
-                                except:
-                                    balances_to_update[user] = rewards[user]
+                                if rewards[user]:
+                                    try:
+                                        balances_to_update[user] += rewards[user]
+                                    except:
+                                        balances_to_update[user] = rewards[user]
+                        admin_print("Pool synced", len(rewards),
+                                    "rewards", len(poolWorkers), "workers")
                 except Exception as e:
                     admin_print("Error syncing pool: " + str(e))
 
@@ -2794,9 +2803,11 @@ def handle(connection, address):
             else:
                 break
 
+            sleep(PING_SLEEP_TIME)
+
     except Exception:
-        # pass
-        print(traceback.format_exc())
+        pass
+        # print(traceback.format_exc())
     finally:
         # print("Closing socket")
         try:
@@ -3013,7 +3024,7 @@ if __name__ == "__main__":
 
     threading.Thread(target=create_main_api_file).start()
     threading.Thread(target=create_minerapi).start()
-    threading.Thread(target=create_secondary_api_files).start()
+    #threading.Thread(target=create_secondary_api_files).start()
 
     def _wallet_server(port):
         server_thread = StreamServer(
@@ -3034,9 +3045,12 @@ if __name__ == "__main__":
         server_thread.serve_forever()
 
     try:
+        mpproc = []
         for port in WALLET_PORTS:
-            threading.Thread(target=_wallet_server,
-                             args=[int(port), ]).start()
+            proc = threading.Thread(target=_wallet_server,
+                                    args=[int(port), ])
+            # mpproc.append(proc)
+            proc.start()
 
         for port in PORTS:
             threading.Thread(target=_server_handler,
@@ -3047,4 +3061,6 @@ if __name__ == "__main__":
         admin_print("Unexpected exception", e)
     finally:
         admin_print("Master Server is exiting")
+        for proc in mpproc:
+            proc.terminate()
         os.execl(sys.executable, sys.executable, *sys.argv)
