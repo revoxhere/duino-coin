@@ -3004,8 +3004,8 @@ if __name__ == "__main__":
     from kolka_chip_module import *
     try:
         from wrapped_duco_functions import *
-    except:
-        pass
+    except Exception as e:
+        print(f"Error importing wduco functions : {e}")
 
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
