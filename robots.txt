@@ -1,6 +1,9 @@
 User-agent: *
 
 Disallow: /archive/
+Disallow: /sent
+Disallow: /blacklisted
+Disallow: /submit
 Disallow: /serverip.txt
 
 Sitemap: https://duinocoin.com/sitemap.xml
