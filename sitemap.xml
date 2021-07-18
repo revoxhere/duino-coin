@@ -25,4 +25,9 @@
   <changefreq>daily</changefreq>
   <priority>0.80</priority>
 </url>
+<url>
+  <loc>https://duinocoin.com/message</loc>
+  <changefreq>daily</changefreq>
+  <priority>0.80</priority>
+</url>
 </urlset>
