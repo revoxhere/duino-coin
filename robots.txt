@@ -4,5 +4,6 @@ Disallow: /archive/
 Disallow: /sent
 Disallow: /submit
 Disallow: /serverip.txt
+Disallow: /error/
 
 Sitemap: https://duinocoin.com/sitemap.xml

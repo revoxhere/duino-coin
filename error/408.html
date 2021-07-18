@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#5254B5">
+    <title>408 - Request Timeout</title>
+    <link rel="shortcut icon" href="../favicon.png" />
+  </head>
+  <body>
+    <div id="main">
+      <div class="main">
+        <span>
+        <h1>408 - Request Timeout</h1>
+        <br />
+        <h2 id="subheader">Our servers are either undergoing a lot of requests or have encountered an error.<br/><br/>We are sorry for the inconvenience, we are fixing this, and should be back up shortly!</h2>
+        </span>
+        <style>
+          *{
+              transition: all 0.6s;
+          }
+        
+          body {
+            padding: 0px 10px 0px 10px;
+          }
+
+          html {
+              height: 100%;
+              background-color: lightgrey;
+          }
+
+          body{
+              font-family: 'Lato', sans-serif;
+              color: #888;
+              margin: 0;
+          }
+
+          #main{
+              display: table;
+              width: 100%;
+              height: 100vh;
+              text-align: center;
+          }
+
+          .main{
+              display: table-cell;
+              vertical-align: middle;
+          }
+
+          .main h1{
+              font-size: 50px;
+              display: inline-block;
+              padding-right: 12px;
+              animation: type .5s alternate infinite;
+          }
+
+          #subheader {
+              position: relative;
+              top: -35px;
+          }
+
+          #return {
+              position: relative;
+              top: -35px;
+          }
+
+          #link {
+              text-decoration: none;
+              color: darkgrey;
+          }
+
+          .button {
+              position: relative;
+              border-radius: 4px;
+              background-color: #A9A9A9;
+              border: none;
+              color: #FFFFFF;
+              text-align: center;
+              font-size: 28px;
+              padding: 20px;
+              width: 350px;
+              transition: all 0.5s;
+              cursor: pointer;
+              margin: 5px;
+              top: -25px;
+          }
+
+          .button span {
+              cursor: pointer;
+              display: inline-block;
+              position: relative;
+              transition: 0.5s;
+          }
+
+          .button span:after {
+              content: '\00bb';
+              position: absolute;
+              opacity: 0;
+              top: 0;
+              right: -20px;
+              transition: 0.5s;
+          }
+
+          .button:hover span {
+              padding-right: 25px;
+          }
+
+          .button:hover span:after {
+              opacity: 1;
+              right: 0;
+          }
+
+          @keyframes type{
+              from{box-shadow: inset -3px 0px 0px #888;}
+              to{box-shadow: inset -3px 0px 0px transparent;}
+          }
+        </style>
+      </div>
+    </div>
+  </body>
+<html>
+
