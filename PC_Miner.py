@@ -198,8 +198,6 @@ try:
 except:
     lang = "english"
 
-lang = "english"
-
 
 def getString(string_name):
     # Get string form language file
