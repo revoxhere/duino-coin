@@ -23,15 +23,71 @@ from platform import system as plsystem
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 from json import load as jsonload
 
-try:  # Check if requests is installed
+try:
     import requests
 except:
     now = datetime.datetime.now()
     print(now.strftime("%H:%M:%S ") +
-          "Requests is not installed. Please install it using: python3 -m pip install requests.\nExiting in 15s.")
+          "Requests is not installed. "
+          + "Please install it using: python3 -m pip install requests."
+          + "\nExiting in 15s.")
     time.sleep(15)
     os._exit(1)
 
+
+try:
+    from base64 import urlsafe_b64decode as b64d
+    from base64 import urlsafe_b64encode as b64e
+except ModuleNotFoundError:
+    print(getString("base64_not_installed"))
+    time.sleep(15)
+    _exit(1)
+
+try:
+    from cryptography.fernet import Fernet, InvalidToken
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+except:
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ") + getString("cryptography_not_installed"))
+    time.sleep(15)
+    os._exit(1)
+
+try:
+    import secrets
+except:
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ") + getString("secrets_not_installed"))
+    time.sleep(15)
+    os._exit(1)
+
+try:
+    import websocket
+except:
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ") + getString("websocket_not_installed"))
+    time.sleep(15)
+    os._exit(1)
+
+try:  # Check if colorama is installed
+    from colorama import Back, Fore, Style, init
+except:
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ") + getString("colorama_not_installed"))
+    time.sleep(15)
+    os._exit(1)
+
+try:
+    import tronpy
+    from tronpy.keys import PrivateKey
+    tronpy_installed = True
+except:
+    tronpy_installed = False
+    now = datetime.datetime.now()
+    print(now.strftime("%H:%M:%S ") + getString("tronpy_not_installed"))
+
+backend = default_backend()
 wrong_passphrase = False
 iterations = 100_000
 timeout = 30  # Socket timeout
@@ -39,7 +95,6 @@ VER = 2.56
 RESOURCES_DIR = 'CLI_Wallet_' + str(VER) + '_resources'
 use_wrapper = False
 WS_URI = "wss://server.duinocoin.com:15808"
-# Serverip file
 config = configparser.ConfigParser()
 
 # Check if the resources folder exists, and makes one if not
@@ -105,61 +160,6 @@ def getString(string_name):
         return lang_file["english"][string_name]
     else:
         return "String not found: " + string_name
-
-
-try:
-    from base64 import urlsafe_b64decode as b64d
-    from base64 import urlsafe_b64encode as b64e
-except ModuleNotFoundError:
-    print(getString("base64_not_installed"))
-    time.sleep(15)
-    _exit(1)
-
-try:
-    from cryptography.fernet import Fernet, InvalidToken
-    from cryptography.hazmat.backends import default_backend
-    from cryptography.hazmat.primitives import hashes
-    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-except:
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ") + getString("cryptography_not_installed"))
-    time.sleep(15)
-    os._exit(1)
-
-try:
-    import secrets
-except:
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ") + getString("secrets_not_installed"))
-    time.sleep(15)
-    os._exit(1)
-
-try:
-    import websocket
-except:
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ") + getString("websocket_not_installed"))
-    time.sleep(15)
-    os._exit(1)
-
-try:  # Check if colorama is installed
-    from colorama import Back, Fore, Style, init
-except:
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ") + getString("colorama_not_installed"))
-    time.sleep(15)
-    os._exit(1)
-
-try:
-    import tronpy
-    from tronpy.keys import PrivateKey
-    tronpy_installed = True
-except:
-    tronpy_installed = False
-    now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ") + getString("tronpy_not_installed"))
-
-backend = default_backend()
 
 
 def title(title):
@@ -239,8 +239,6 @@ def password_decrypt(
         iterations)
     return Fernet(key).decrypt(token)
 
-# If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
-
 
 def handler(signal_received, frame):
     print(Style.RESET_ALL
@@ -248,7 +246,7 @@ def handler(signal_received, frame):
           + Fore.YELLOW
           + getString("see_you_soon"))
     try:
-        s.send(bytes("CLOSE", encoding="utf8"))
+        wss_conn.send(bytes("CLOSE", encoding="utf8"))
     except:
         pass
     os._exit(0)
@@ -258,32 +256,31 @@ signal(SIGINT, handler)  # Enable signal handler
 
 
 while True:
-    try:  # Try to connect
-        s = websocket.create_connection(WS_URI)
-        s.settimeout(timeout)
-        SERVER_VER = s.recv().rstrip("\n")
+    try:
+        wss_conn = websocket.create_connection(WS_URI)
+        wss_conn.settimeout(timeout)
+        SERVER_VER = wss_conn.recv().rstrip("\n")
 
-        # Use request to grab data from raw github file
         jsonapi = requests.get(
             "https://raw.githubusercontent.com/"
             + "revoxhere/"
             + "duco-statistics/master/api.json",
             data=None)
-        if jsonapi.status_code == 200:  # Check for reponse
-            content = jsonapi.content.decode()  # Read content and split into lines
+        if jsonapi.status_code == 200:
+            content = jsonapi.content.decode()
             contentjson = json.loads(content)
             ducofiat = float(contentjson["Duco price"])
         else:
-            ducofiat = 0.0025  # If json api request fails, wallet will use this value
-        break  # If connection was established, continue
+            ducofiat = 0.0025
+        break
 
-    except Exception as e:  # If it wasn't, display a message
+    except Exception as e:
         print(e)
         print(Style.RESET_ALL
               + Fore.RED
               + getString("cant_connect_to_server"))
         time.sleep(15)
-        os.system("python " + __file__)
+        os._exit(1)
 
     except:
         print(Style.RESET_ALL
@@ -295,31 +292,31 @@ while True:
 
 def reconnect():
     while True:
-        try:  # Try to connect
-            s = websocket.create_connection(WS_URI)
-            s.settimeout(timeout)
-            SERVER_VER = s.recv().rstrip("\n")
+        try:
+            # Try to connect
+            wss_conn = websocket.create_connection(WS_URI)
+            wss_conn.settimeout(timeout)
+            SERVER_VER = wss_conn.recv().rstrip("\n")
 
-            # Use request to grab data from raw github file
             jsonapi = requests.get(
                 "https://raw.githubusercontent.com/"
                 + "revoxhere/"
                 + "duco-statistics/master/api.json",
                 data=None)
-            if jsonapi.status_code == 200:  # Check for reponse
-                content = jsonapi.content.decode()  # Read content and split into lines
+            if jsonapi.status_code == 200:
+                content = jsonapi.content.decode()
                 contentjson = json.loads(content)
                 ducofiat = float(contentjson["Duco price"])
             else:
-                ducofiat = 0.0025  # If json api request fails, wallet will use this value
+                ducofiat = 0.0025
 
-        except:  # If it wasn't, display a message
+        except:
             print(Style.RESET_ALL + Fore.RED
                   + getString("cant_connect_to_server"))
             time.sleep(15)
             os.system("python " + __file__)
         else:
-            return s
+            return wss_conn
 
 
 while True:
@@ -354,14 +351,14 @@ while True:
             server_timeout = True
             while server_timeout:
                 try:
-                    s.send(bytes(
+                    wss_conn.send(bytes(
                         "LOGI,"
                         + str(username)
                         + ","
                         + str(password)
                         + str(",placeholder"),
                         encoding="utf8"))
-                    loginFeedback = s.recv().rstrip("\n").split(",")
+                    loginFeedback = wss_conn.recv().rstrip("\n").split(",")
                     server_timeout = False
 
                     if loginFeedback[0] == "OK":
@@ -371,12 +368,16 @@ while True:
 
                         config['wallet'] = {
                             "username": username,
-                            "password": b64encode(bytes(password, encoding="utf8")).decode("utf-8"),
+                            "password": b64encode(
+                                bytes(password, encoding="utf8")
+                            ).decode("utf-8"),
                             "language": lang}
                         config['wrapper'] = {"use_wrapper": "false"}
 
                         # Write data to file
-                        with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
+                        with open(RESOURCES_DIR
+                                  + "/CLIWallet_config.cfg",
+                                  "w") as configfile:
                             config.write(configfile)
                     else:
                         print(Style.RESET_ALL
@@ -423,7 +424,7 @@ while True:
 
             if password == pconfirm:
                 while True:
-                    s.send(bytes(
+                    wss_conn.send(bytes(
                         "REGI,"
                         + str(username)
                         + ","
@@ -432,7 +433,7 @@ while True:
                         + str(email),
                         encoding="utf8"))
 
-                    regiFeedback = s.recv().rstrip("\n").split(",")
+                    regiFeedback = wss_conn.recv().rstrip("\n").split(",")
 
                     if regiFeedback[0] == "OK":
                         print(Style.RESET_ALL
@@ -457,34 +458,59 @@ while True:
         config.read(RESOURCES_DIR + "/CLIWallet_config.cfg")
         if config["wrapper"]["use_wrapper"] == "true" and tronpy_installed:
             use_wrapper = True
+
             if config["wrapper"]["use_custom_passphrase"] == "true":
-                passphrase = getpass.getpass(prompt=Style.RESET_ALL
-                                             + Fore.YELLOW
-                                             + getString("decrypt_private_key")
-                                             + Style.BRIGHT,
-                                             stream=None)
+                passphrase = getpass.getpass(
+                    prompt=Style.RESET_ALL
+                    + Fore.YELLOW
+                    + getString("decrypt_private_key")
+                    + Style.BRIGHT,
+                    stream=None)
+
                 try:
                     priv_key = str(password_decrypt(
                         config["wrapper"]["priv_key"],
                         passphrase))
-
                 except InvalidToken:
                     print(getString("invalid_passphrase_wrapper"))
                     use_wrapper = False
                     wrong_passphrase = True
             else:
-                priv_key = str(password_decrypt(
-                    config["wrapper"]["priv_key"],
-                    config["wallet"]["password"]))
+                try:
+                    priv_key = str(password_decrypt(
+                        config["wrapper"]["priv_key"],
+                        b64decode(config["wallet"]["password"]).decode("utf8")))
+                except InvalidToken:
+                    print(getString("invalid_passphrase_wrapper"))
+                    use_wrapper = False
+                    wrong_passphrase = True
 
             pub_key = config["wrapper"]["pub_key"]
-            tron = tronpy.Tron()
-            wduco = tron.get_contract(
-                "TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U")  # wDUCO contract
-            wbalance = wduco.functions.balanceOf(config["wrapper"]["pub_key"])
+
+            while True:
+                try:
+                    tron = tronpy.Tron()
+                    # wDUCO contract
+                    wduco = tron.get_contract(
+                        "TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U"
+                    )
+                    break
+                except:
+                    print("Retrying wDUCO contract fetch")
+                    pass
+
+            while True:
+                try:
+                    wbalance = wduco.functions.balanceOf(
+                        config["wrapper"]["pub_key"])
+                    break
+                except:
+                    print("Retrying wDUCO balance fetch")
+
             try:
                 trx_balance = tron.get_account_balance(
-                    config["wrapper"]["pub_key"])
+                    config["wrapper"]["pub_key"]
+                )
             except:
                 trx_balance = 0
 
@@ -492,7 +518,9 @@ while True:
             config.read(RESOURCES_DIR + "/CLIWallet_config.cfg")
             username = config["wallet"]["username"]
             password = b64decode(config["wallet"]["password"]).decode("utf8")
-            s.send(bytes(
+
+            print("Authenticating...")
+            wss_conn.send(bytes(
                 "LOGI,"
                 + str(username)
                 + ","
@@ -500,7 +528,7 @@ while True:
                 + str(",placeholder"),
                 encoding="utf8"))
 
-            loginFeedback = s.recv().rstrip("\n").split(",")
+            loginFeedback = wss_conn.recv().rstrip("\n").split(",")
             if loginFeedback[0] == "OK":
                 break
             else:
@@ -515,23 +543,35 @@ while True:
         while True:
             while True:
                 try:
-                    s.send(bytes(
+                    wss_conn.send(bytes(
                         "BALA",
                         encoding="utf8"))
                 except:
-                    s = reconnect()
-                if use_wrapper:
-                    wbalance = float(wduco.functions.balanceOf(pub_key))/10**6
-                    try:
-                        trx_balance = tron.get_account_balance(pub_key)
-                    except:
-                        trx_balance = 0
+                    wss_conn = reconnect()
                 try:
-                    balance = round(float(s.recv().rstrip("\n")), 8)
-                    balanceusd = round(float(balance) * float(ducofiat), 6)
+                    balance = round(
+                        float(wss_conn.recv().rstrip("\n")), 8)
+                    balanceusd = round(
+                        float(balance) * float(ducofiat), 6)
                     break
                 except:
                     pass
+
+            if use_wrapper:
+                while True:
+                    try:
+                        wbalance = float(
+                            wduco.functions.balanceOf(pub_key)
+                        )/10**6
+                        break
+                    except:
+                        pass
+
+                try:
+                    trx_balance = tron.get_account_balance(pub_key)
+                except:
+                    trx_balance = 0
+
             print(Style.RESET_ALL
                   + Style.BRIGHT
                   + Fore.YELLOW
@@ -566,10 +606,16 @@ while True:
                       + str(wbalance)
                       + " wDUCO")
 
-                pendingbalance = float(
-                    wduco.functions.pendingWithdrawals(
-                        pub_key,
-                        username))/(10**6)
+                while True:
+                    try:
+                        pendingbalance = float(
+                            wduco.functions.pendingWithdrawals(
+                                pub_key,
+                                username)
+                        )/(10**6)
+                        break
+                    except:
+                        pass
 
                 if pendingbalance > 0:
                     print(Style.RESET_ALL
@@ -626,14 +672,14 @@ while True:
                     print(getString("amount_numeric"))
                     continue
 
-                s.send(bytes(
+                wss_conn.send(bytes(
                     "SEND,-,"
                     + str(recipient)
                     + ","
                     + str(amount),
                     encoding="utf8"))
                 while True:
-                    message = s.recv().rstrip("\n")
+                    message = wss_conn.recv().rstrip("\n")
                     print(Style.RESET_ALL
                           + Fore.BLUE
                           + getString("server_message")
@@ -654,7 +700,7 @@ while True:
                     + getString("enter_new_password")
                     + Style.BRIGHT)
 
-                s.send(bytes(
+                wss_conn.send(bytes(
                     "CHGP,"
                     + str(oldpassword)
                     + ","
@@ -662,7 +708,7 @@ while True:
                     encoding="utf8"))
 
                 while True:
-                    message = s.recv().rstrip("\n")
+                    message = wss_conn.recv().rstrip("\n")
                     print(Style.RESET_ALL
                           + Fore.BLUE
                           + getString("server_message")
@@ -679,14 +725,15 @@ while True:
                       + getString("see_you_soon")
                       + Style.RESET_ALL)
                 try:
-                    s.send(bytes("CLOSE", encoding="utf8"))
+                    wss_conn.send(bytes("CLOSE", encoding="utf8"))
                 except:
                     pass
                 os._exit(0)
 
             elif command == "wrapperconf":  # wrapper config
                 config.read(RESOURCES_DIR + "/CLIWallet_config.cfg")
-                if not config["wrapper"]["use_wrapper"] == "true" and tronpy_installed:
+                if (not config["wrapper"]["use_wrapper"] == "true"
+                        and tronpy_installed):
                     print(Style.RESET_ALL
                           + Fore.WHITE
                           + getString("select_option"))
@@ -720,7 +767,9 @@ while True:
                                         "use_custom_passphrase": "false"}
 
                                     # Write data to file
-                                    with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
+                                    with open(RESOURCES_DIR
+                                              + "/CLIWallet_config.cfg",
+                                              "w") as configfile:
                                         config.write(configfile)
                                         print(getString("success"))
 
@@ -736,22 +785,31 @@ while True:
                                         "use_custom_passphrase": "true"}
 
                                     # Write data to file
-                                    with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
+                                    with open(RESOURCES_DIR
+                                              + "/CLIWallet_config.cfg",
+                                              "w") as configfile:
                                         config.write(configfile)
                                         print(getString("success"))
+
+                                print("Restart the wallet to use the wrapper")
 
                         elif choice == 2:
                             priv_key = input(getString("input_private_key"))
                             try:
-                                pub_key = PrivateKey(bytes.fromhex(
-                                    priv_key)).public_key.to_base58check_address()
+                                pub_key = PrivateKey(
+                                    bytes.fromhex(
+                                        priv_key)
+                                ).public_key.to_base58check_address()
                                 print(getString("how_encrypt_private_key"))
 
                                 incorrect_value = True
                                 while incorrect_value:
                                     try:
                                         encryption_choice = int(
-                                            input(getString("encryption_choice")))
+                                            input(
+                                                getString("encryption_choice")
+                                            )
+                                        )
                                         incorrect_value = False
                                     except ValueError:
                                         print(getString("value_not_numeric"))
@@ -767,7 +825,9 @@ while True:
                                             "use_custom_passphrase": "false"}
 
                                         # Write data to file
-                                        with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
+                                        with open(RESOURCES_DIR
+                                                  + "/CLIWallet_config.cfg",
+                                                  "w") as configfile:
                                             config.write(configfile)
                                             print(getString("success"))
 
@@ -783,7 +843,9 @@ while True:
                                             "use_custom_passphrase": "true"}
 
                                         # Write data to file
-                                        with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
+                                        with open(RESOURCES_DIR
+                                                  + "/CLIWallet_config.cfg",
+                                                  "w") as configfile:
                                             config.write(configfile)
                                             print(getString("success"))
                             except ValueError:
@@ -815,10 +877,10 @@ while True:
                         continue
 
                     try:
-                        s.send(bytes("BALA", encoding="utf8"))
-                        balance = round(float(s.recv().rstrip("\n")), 8)
+                        wss_conn.send(bytes("BALA", encoding="utf8"))
+                        balance = round(float(wss_conn.recv().rstrip("\n")), 8)
                     except:
-                        s = reconnect()
+                        wss_conn = reconnect()
                     if float(amount) >= 10 and float(amount) <= balance:
                         tron_address = input(
                             Style.RESET_ALL
@@ -828,7 +890,7 @@ while True:
                         if tron_address == "":
                             tron_address = pub_key
 
-                        s.send(bytes(
+                        wss_conn.send(bytes(
                             "WRAP,"
                             + str(amount)
                             + ","
@@ -848,8 +910,11 @@ while True:
             elif command == "unwrap":
                 if use_wrapper:
                     pendingvalues = wduco.functions.pendingWithdrawals(
-                        pub_key, username)
-                    txn_success = False  # transaction wasn't initiated, but variable should be declared
+                        pub_key, username
+                    )
+                    # Transaction wasn't initiated
+                    # but variable should be declared
+                    txn_success = False
                     try:
                         amount = float(
                             input(Style.RESET_ALL
@@ -864,7 +929,17 @@ while True:
                     else:
                         toInit = amount*10**6
                     if toInit > 0:
-                        txn = wduco.functions.initiateWithdraw(username, toInit).with_owner(pub_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(priv_key)))
+                        txn = wduco.functions.initiateWithdraw(
+                            username, toInit
+                        ).with_owner(
+                            pub_key
+                        ).fee_limit(
+                            5_000_000
+                        ).build().sign(
+                            PrivateKey(
+                                bytes.fromhex(priv_key)
+                            )
+                        )
                         print(getString("initiating_unwrap"), txn.txid)
                         txn = txn.broadcast()
                         txnfeedback = txn.result()
@@ -877,7 +952,7 @@ while True:
                         print(getString("amount_over_pending_values"))
 
                     if txn_success or amount <= pendingvalues:
-                        s.send(bytes(
+                        wss_conn.send(bytes(
                             "UNWRAP,"
                             + str(amount)
                             + ","
@@ -893,7 +968,17 @@ while True:
 
             elif command == "cancelunwraps":
                 if use_wrapper:
-                    txn = wduco.functions.cancelWithdrawals(pub_key, username).with_owner(pub_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(priv_key)))
+                    txn = wduco.functions.cancelWithdrawals(
+                        pub_key, username
+                    ).with_owner(
+                        pub_key
+                    ).fee_limit(
+                        5_000_000
+                    ).build().sign(
+                        PrivateKey(
+                            bytes.fromhex(priv_key)
+                        )
+                    )
                     print(getString("transaction_send_txid"), txn.txid)
                     txn = txn.broadcast()
                     if txn.result():
@@ -911,7 +996,7 @@ while True:
                         wduco.functions.pendingWithdrawals(
                             pub_key,
                             username))/(10**6)
-                    s.send(bytes(
+                    wss_conn.send(bytes(
                         "UNWRAP,"
                         + str(pendingvalues)
                         + ","
@@ -956,9 +1041,21 @@ while True:
                         continue
                     wbalance = float(wduco.functions.balanceOf(pub_key))/10**6
                     if float(amount) <= wbalance:
-                        txn = wduco.functions.transfer(recipient, int(float(amount)*10**6)).with_owner(pub_key).fee_limit(5_000_000).build().sign(PrivateKey(bytes.fromhex(priv_key)))
+                        txn = wduco.functions.transfer(
+                            recipient,
+                            int(float(amount)*10**6)
+                        ).with_owner(
+                            pub_key
+                        ).fee_limit(
+                            5_000_000
+                        ).build().sign(
+                            PrivateKey(
+                                bytes.fromhex(priv_key)
+                            )
+                        )
                         txn = txn.broadcast()
-                        print(getString("tron_transaction_submitted"), txn.txid)
+                        print(getString("tron_transaction_submitted"),
+                              txn.txid)
                         trontxresult = txn.wait()
                         if trontxresult:
                             print(getString("tron_successful_transaction"))
