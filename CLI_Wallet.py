@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v2.55)
+# Duino-Coin CLI Wallet (v2.5.6)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
@@ -27,14 +27,15 @@ try:  # Check if requests is installed
     import requests
 except:
     now = datetime.datetime.now()
-    print(now.strftime("%H:%M:%S ") + "Requests is not installed. Please install it using: python3 -m pip install requests.\nExiting in 15s.")
+    print(now.strftime("%H:%M:%S ") +
+          "Requests is not installed. Please install it using: python3 -m pip install requests.\nExiting in 15s.")
     time.sleep(15)
     os._exit(1)
 
 wrong_passphrase = False
 iterations = 100_000
 timeout = 30  # Socket timeout
-VER = 2.55
+VER = 2.56
 RESOURCES_DIR = 'CLI_Wallet_' + str(VER) + '_resources'
 use_wrapper = False
 WS_URI = "wss://server.duinocoin.com:15808"
@@ -81,7 +82,7 @@ try:
         if locale.startswith("nl"):
             lang = "dutch"
         elif locale.startswith("th"):
-            lang = "thai"    
+            lang = "thai"
         else:
             lang = "english"
     else:
@@ -95,6 +96,7 @@ try:
 except Exception as error:
     lang = "english"
 
+
 def getString(string_name):
     # Get string form language file
     if string_name in lang_file[lang]:
@@ -103,6 +105,7 @@ def getString(string_name):
         return lang_file["english"][string_name]
     else:
         return "String not found: " + string_name
+
 
 try:
     from base64 import urlsafe_b64decode as b64d
@@ -157,6 +160,7 @@ except:
     print(now.strftime("%H:%M:%S ") + getString("tronpy_not_installed"))
 
 backend = default_backend()
+
 
 def title(title):
     if os.name == 'nt':
@@ -222,6 +226,7 @@ def password_encrypt(
             iterations.to_bytes(4, 'big'),
             b64d(Fernet(key).encrypt(message))))
 
+
 def password_decrypt(
         token: bytes,
         password: str) -> bytes:
@@ -235,6 +240,8 @@ def password_decrypt(
     return Fernet(key).decrypt(token)
 
 # If CTRL+C or SIGINT received, send CLOSE request to server in order to exit gracefully.
+
+
 def handler(signal_received, frame):
     print(Style.RESET_ALL
           + Style.BRIGHT
@@ -273,8 +280,8 @@ while True:
     except Exception as e:  # If it wasn't, display a message
         print(e)
         print(Style.RESET_ALL
-                + Fore.RED
-                + getString("cant_connect_to_server"))
+              + Fore.RED
+              + getString("cant_connect_to_server"))
         time.sleep(15)
         os.system("python " + __file__)
 
@@ -308,7 +315,7 @@ def reconnect():
 
         except:  # If it wasn't, display a message
             print(Style.RESET_ALL + Fore.RED
-                    + getString("cant_connect_to_server"))
+                  + getString("cant_connect_to_server"))
             time.sleep(15)
             os.system("python " + __file__)
         else:
@@ -368,7 +375,8 @@ while True:
                             "language": lang}
                         config['wrapper'] = {"use_wrapper": "false"}
 
-                        with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:  # Write data to file
+                        # Write data to file
+                        with open(RESOURCES_DIR + "/CLIWallet_config.cfg", "w") as configfile:
                             config.write(configfile)
                     else:
                         print(Style.RESET_ALL
@@ -603,7 +611,7 @@ while True:
                 else:
                     os.system("clear")
                     continue
-  
+
             elif command == "send":
                 recipient = input(Style.RESET_ALL
                                   + Fore.WHITE
@@ -669,7 +677,7 @@ while True:
                       + Fore.YELLOW
                       + getString("sigint_detected")
                       + Style.NORMAL
-                      + getString("see_you_soon") 
+                      + getString("see_you_soon")
                       + Style.RESET_ALL)
                 try:
                     s.send(bytes("CLOSE", encoding="utf8"))
@@ -696,7 +704,8 @@ while True:
                             incorrect_value = True
                             while incorrect_value:
                                 try:
-                                    encryption_choice = int(input(getString("encryption_choice")))
+                                    encryption_choice = int(
+                                        input(getString("encryption_choice")))
                                     incorrect_value = False
                                 except ValueError:
                                     print(getString("value_not_numeric"))
@@ -717,7 +726,8 @@ while True:
                                         print(getString("success"))
 
                                 elif encryption_choice >= 2:
-                                    passphrase = input(getString("encrypt_private_key"))
+                                    passphrase = input(
+                                        getString("encrypt_private_key"))
                                     config['wrapper'] = {
                                         "use_wrapper": "true",
                                         "priv_key": str(password_encrypt(
@@ -741,7 +751,8 @@ while True:
                                 incorrect_value = True
                                 while incorrect_value:
                                     try:
-                                        encryption_choice = int(input(getString("encryption_choice")))
+                                        encryption_choice = int(
+                                            input(getString("encryption_choice")))
                                         incorrect_value = False
                                     except ValueError:
                                         print(getString("value_not_numeric"))
@@ -762,7 +773,8 @@ while True:
                                             print(getString("success"))
 
                                     elif encryption_choice >= 2:
-                                        passphrase = input(getString("encrypt_private_key"))
+                                        passphrase = input(
+                                            getString("encrypt_private_key"))
                                         config['wrapper'] = {
                                             "use_wrapper": "true",
                                             "priv_key": str(password_encrypt(
@@ -907,7 +919,8 @@ while True:
                         + str(pub_key)
                         + str(",placeholder"),
                         encoding='utf8'))
-                    print(getString("finished_unwrapping"), str(pendingvalues), "DUCO")
+                    print(getString("finished_unwrapping"),
+                          str(pendingvalues), "DUCO")
                 elif wrong_passphrase:
                     print(getString("error_wrong_passphrase"))
                 else:
@@ -915,7 +928,8 @@ while True:
 
             elif command == "exportwrapkey":
                 if use_wrapper:
-                    confirmation = input(getString("confirm_export_private_key"))
+                    confirmation = input(
+                        getString("confirm_export_private_key"))
                     if confirmation == "YES":
                         print(getString("private_key"), priv_key)
                     else:
