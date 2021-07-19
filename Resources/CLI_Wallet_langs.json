@@ -219,5 +219,115 @@
         "donate_3": " (wrapper's adres)",
         "donate_4": " (revox, DUCO leidende ontwikkelaar)",
         "donate_5": " (wDUCO ontwikkelaar)"
+    },
+    "thai": {
+        "translation_autor": "naphob",
+        "cant_connect_to_server": "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ อาจจะเพราะอยู่ในระหว่างปรับปรุงหรือล่มขั่วคราว\nกำลังลองใหม่ใน 15 วินาที",
+        "cant_recieve_pool_ip_and_port": " ไม่ได้รับที่อยู่และไอพีของพูล\nกำลังออกใน 15 วินาที",
+        "server_message": "ข้อความเซิร์ฟเวอร์: ",
+        "success": "สำเร็จ!",
+        "cancelled": "ยกเลิกแล้ว...",
+        "duco_commands": " คำสั่ง DUCO:",
+        "wrapper_commands": " คำสั่งเกี่ยวกับแรปเปอร์:",
+
+        "base64_not_installed": "Base64 ไม่ถูกติดตั้ง กรุณาติดตั้งเอง \"base64\"\nกำลังออกใน 15วิ",
+        "tronpy_not_installed": "Tronpy ไม่ถูกติดตั้ง กรุณาติดตั้งโดยใช้: python3 -m pip install tronpy.\nแรปเปอร์ถูกปิดเพราะ tronpy ไม่ถูกติดตั้ง",
+        "tronpy_not_installed_2": "Tronpy ไม่ถูกติดตั้ง กรุณาติดตั้งโดยใช้: python3 -m pip install tronpy",
+        "cryptography_not_installed": "Cryptography ไม่ถูกติดตั้ง กรุณาติดตั้งโดยใช้: python3 -m pip install cryptography\nกำลังออกใน 15วิ",
+        "secrets_not_installed": "Secrets ไม่ถูกติดตั้ง กรุณาติดตั้งโดยใช้: python3 -m pip install secrets\nกำลังออกใน 15วิ",
+        "websocket_not_installed": "Websocket-client ไม่ถูกติดตั้ง กรุณาติดตั้งโดยใช้: python3 -m pip install websocket-client\nกำลังออกใน 15วิ",
+        "colorama_not_installed": "Colorama ไม่ถูกติดตั้ง กรุณาติดตั้งโดยใช้: python3 -m pip install colorama\nกำลังออกใน 15วิ",
+
+        "first_run": "กระเป๋า Duino-Coin CLI ทำงานครั้งแรก\n",
+        "select_option": "เลือกตัวเลือก",
+        "choice_input": "  1 - เข้าระบบ\n  2 - ลงทะเบียน\n  3 - ออก\n",
+        "choice_input_wrapper": "1 - สร้างกุญแจใหม่\n2 - นำเข้ากุญแจ \n3 - ยกเลิก\n",
+        "value_not_numeric": "ผิดพลาด, ค่าต้องเป็นตัวเลข",
+
+        "enter_username": "ใส่ชื่อผู้ใช้งานของคุณ: ",
+        "enter_email": "ใส่ที่อยู่อีเมลของคุณ: ",
+        "enter_password": "ใส่รหัสผ่านของคุณ (ไม่แสดงเพื่อความเป็นส่วนตัว): ",
+        "confirm_password": "ยืนยันรหัสผ่านของคุณ (ไม่แสดงเพื่อความเป็นส่วนตัว): ",
+        "enter_current_password": "ใส่รหัสผ่านปัจจุบันของคุณ: ",
+        "enter_new_password": "ใส่รหัสผ่านใหม่: ",
+
+        "agree_requirments": "เพื่อลงทะเบียนบัญชีใหม่ คุณยินยอมกับเงื่อนไขการให้บริการและนโยบายความเป็นส่วนตัวที่ ",
+
+        "register_success": "ลงทะเบียนใหม่สำเร็จ",
+        "register_failed": "ไม่สามารถลงทะเบียนผู้ใช้ใหม่, เหตุผล: ",
+
+        "login_success": "เข้าระบบสำเร็จ",
+        "login_failed": "เข้าระบบไม่ได้, เหตุผล: ",
+
+        "decrypt_private_key": "ข้อความรหัสผ่านเพื่อถอดรหัสกุญแจส่วนตัว: ",
+        "encrypt_private_key": "ใส่ข้อความรหัสผ่านสำหรับเข้ารหัสกุญแจส่วนตัว: ",
+        "invalid_passphrase_wrapper": "ข้อความรหัสผ่านไม่ถูกต้อง ยกเลิกแรปเปอร์สำหรับเซสชั่นนี้",
+        "input_private_key": "ใส่กุญแจส่วนตัวของคุณ: ",
+        "incorrect_key": "ได้รับกุญแจไม่ถูกต้อง",
+        "incorrect_value": "ได้รับค่าไม่ถูกต้อง",
+
+        "cli_wallet_text": "\nกระเป๋า Duino-Coin CLI",
+        "you_have": "คุณมี ",
+        "which_is_about": "ประมาณ ",
+        "duco_price": "ราคา DUCO: ",
+
+        "pending_unwraps": "Pending unwraps ",
+        "tron_address": "ที่อยู่ Tron สำหรับรับ: ",
+        "trx_balance": "TRX ยอดคงเหลือ (ใช้สำหรับค่าธรรมเนียม): ",
+
+        "how_encrypt_private_key": "คุณต้องการเข้ารหัสกุญแจส่วนตัวอย่างไรภายในไฟล์ตั้งค่า?",
+        "encryption_choice": "1 - เข้ารหัสโดยใช้รหัสผ่าน DUCO \n2 - ใช้ข้อความรหัสผ่านที่คุณตั้งเอง (ปลอดภัยกว่า)",
+
+        "amount_to_wrap": "ใส่จำนวนที่ต้องการแรป (อย่างน้่อย 10): ",
+        "no_amount_numeric": "ไม่, จำนวนต้องเป็นหมายเลข... กำลังออก",
+        "enter_tron_address_or_local": "ใส่ที่อยู่ tron หรือปล่อยว่างไว้เพื่อเลือกกระเป๋าโลคอล: ",
+
+        "error_min_10_duco": "ผิดพลาด, จำนวนขั้นต่ำคือ 10 DUCO",
+        "error_unsufficient_balance": "ผิดพลาด, ยอดคงเหลือไม่เพียงพอ",
+        "error_wrong_passphrase": "แรปเปอร์ไม่ทำงาน, คุณใส่ข้อความรหัสผ่านผิด",
+        "error_configure_wrapperconf": "แรปเปอร์ไม่ทำงาน, ตั้งค่าโดยใช้ `wrapperconf`",
+        "error_not_enough_energy_or_trx": "ล้มเหลว, คุณต้องมีพลังงานหรือ trx ให้เพียงพอ",
+
+        "enter_amount_unwrap": "ใส่จำนวนที่จะอันแรป: ",
+        "initiating_unwrap": "เริ่มต้นอันแรป...\nTXid :",
+        "error_initiating_unwrap": "มีความผิดพลาดขณะเริ่มต้นอันแรป, กำลังยกเลิก",
+        "amount_over_pending_values": "จำนวนมากกว่าค่าที่ค้างอยู่ ใช้ค่าที่ค้างอยู่เพื่อเป็นค่าธรรมเนียม txn",
+        "transaction_send_txid": "ธุรกรรมถูกส่งแล้ว, txid :",
+        "finished_unwrapping": "อันแรปสำเร็จ",
+
+        "confirm_export_private_key": "พิมพ์ YES เพื่อยืนยัีนการส่งออกกุญแจส่วนตัว : ",
+        "private_key": "กุญแจส่วนตัว: ",
+        "cancelled_invalid_confirmation": "ยกเลิกแล้ว, คำยืนยันไม่ถูกต้อง",
+
+        "help_list_command": "พิมพ์ `help` เพื่อดูรายการคำสั่งที่มีอยู่",
+        "duco_console": "DUCO คอนโซล ᕲ ",
+
+        "enter_recipients_name": "ใส่ชื่อผู้ใช้งานผู้รับ: ",
+        "enter_amount_transfer": "ใส่จำนวนที่จะส่ง: ",
+        "enter_tron_recipients_name": "ใส่ที่อยู่ TRON ของผู้รับ: ",
+        "enter_tron_amount_transfer": "ใส่จำนวนที่จะส่ง: ",
+        "amount_numeric": "จำนวนต้องเป็นหมายเลข... กำลังยกเลิก",
+
+        "tron_transaction_submitted": "ธุรกรรมถูกส่งไปยังเครือข่าย TRON\nTXID:",
+        "tron_successful_transaction": "ธุรกรรมสำเร็จ",
+        "tron_error_transaction": "ผิดพลาดระหว่างการยืนยันธุรกรรม",
+
+        "see_you_soon": " แล้วเจอกัน!",
+        "sigint_detected": "\nพบ SIGINT - กำลังออกอย่างปลอดภัย",
+
+        "about_1": "กระเป๋า Duino-Coin CLI ถูกสร้าง <3 โดยชุมชม Duino-Coin",
+        "about_2": "นี่คือเวอร์ชั่น ",
+        "about_3": "และถูกเผยแพร่ภายใต้สัญญาอนุญาต MIT",
+        "about_4": "เวอร์ชั่นเซิร์ฟเวอร์: ",
+        "about_5": "เวอร์ขั่นอยู่บนเวอร์ชั่น ",
+        "about_6": ", แต่ไคลเอนท์อยู่บนเวอร์ชั่น ",
+        "about_7": ", คุณควรดาวน์โหลดเวอร์ชั่นล่าสุด",
+        "about_8": "ไคลเอนท์เป็นเวอร์ชั่นล่าสุดแล้ว",
+
+        "donate_1": "เชิญบริจาคเพื่อกันดูแล DUCO และ wDUCO กันตามสบาย (การแรป/การอันแรป ความถึงค่าธรรมเนียมในการดูแลรักษา)",
+        "donate_2": "TRON และ tokens: ",
+        "donate_3": " (ที่อยู่ของแรปเปอร์)",
+        "donate_4": " (revox, หัวหน้านักพัฒนา DUCO)",
+        "donate_5": " (นักพัฒนา wDUCO)"
     }
 }
