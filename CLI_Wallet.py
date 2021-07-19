@@ -80,6 +80,8 @@ try:
         locale = getdefaultlocale()[0]
         if locale.startswith("nl"):
             lang = "dutch"
+        elif locale.startswith("th"):
+            lang = "thai"    
         else:
             lang = "english"
     else:
