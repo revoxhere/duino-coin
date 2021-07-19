@@ -34,6 +34,8 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from collections import OrderedDict
 from operator import itemgetter
+# python3 -m pip install colorama
+from colorama import Back, Fore, Style, init
 # python3 -m pip install bcrypt
 from bcrypt import checkpw, hashpw, gensalt
 # python3 -m pip install fastrand
@@ -50,14 +52,11 @@ from shutil import copyfile
 # python3 -m pip install udatetime
 import udatetime as utime
 import resource
-resource.setrlimit(resource.RLIMIT_NOFILE, (65536, 65536))
+
 """ 
 Global variables 
 """
 HOSTNAME = ""
-WALLET_PORTS = [
-    # 2809,
-]
 PORTS = [
     2810,  # Non-public port for pools
     2811,  # Legacy
@@ -80,7 +79,7 @@ Have fun!
 DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 10  # in seconds
-DB_TIMEOUT = 35
+DB_TIMEOUT = 5
 SOCKET_TIMEOUT = 15
 BACKLOG = None  # spawn connection instantly
 SERVER_VER = 2.5  # announced to clients
@@ -159,6 +158,8 @@ workers = {}
 registrations = {}
 estimated_profits = {}
 last_block = "DUCO-S1"
+cached_balances = {}
+cached_logins = {}
 mpproc = []
 
 # Registration email - text version
@@ -416,10 +417,12 @@ def create_jobs():
 
 
 def get_pregenerated_job(req_difficulty):
-    """ Get pregenerated job from pregenerated
-        difficulty tiers
-        Takes:      req_difficulty
-        Outputs:    job ready to send to client"""
+    """ 
+    Get pregenerated job from pregenerated
+    difficulty tiers
+    Takes:   req_difficulty
+    Outputs: job ready to send to client
+    """
 
     if req_difficulty == "AVR":
         # Arduino
@@ -481,30 +484,23 @@ def floatmap(x, in_min, in_max, out_min, out_max):
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 
-class Break(Exception):
-    pass
-
-
-def queue_handler(queue):
-    admin_print("Database queue thread started")
+def transaction_queue_handle(queue):
+    admin_print("Sucessfully started database transaction queue")
     while True:
-        with sqlconn(DATABASE) as database:
-            database.execute('PRAGMA journal_mode=wal')
+        with sqlconn(DATABASE,
+                     timeout=DB_TIMEOUT) as datab:
+            datab.execute('PRAGMA journal_mode=wal')
             counter = 0
             while True:
                 try:
                     counter += 1
                     command = queue.get()
-                    database.execute(command)
+                    datab.execute(command)
                     if counter >= 500:
                         # Save every x updates
-                        database.commit()
+                        datab.commit()
                         counter = 0
                     queue.task_done()
-
-                except Break:
-                    queue.task_done()
-                    break
 
                 except Exception as e:
                     print(traceback.format_exc())
@@ -526,14 +522,10 @@ def database_updater():
                     if amount_to_update / 30 > 0.2:
                         amount_to_update = amount_to_update / 100
                         amount_to_update = floatmap(
-                            amount_to_update / 30, 0.02, 0.5, 0.02, 0.025)
+                            amount_to_update / 30, 0.02, 0.5, 0.02, 0.025
+                        )
 
-                    sql_str = ("UPDATE Users SET balance = balance + "
-                               + str(amount_to_update)
-                               + " WHERE username = '"
-                               + str(user) + "'")
-                    queue.put(sql_str)
-
+                    increment_balance(user, amount_to_update)
                     balances_to_update.pop(user)
 
         except Exception as e:
@@ -549,7 +541,8 @@ def chain_updater():
     while True:
         sleep(SAVE_TIME*3)
         try:
-            with sqlconn(BLOCKCHAIN, timeout=DB_TIMEOUT) as conn:
+            with sqlconn(BLOCKCHAIN,
+                         timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
                 datab.execute(
                     """UPDATE Server
@@ -561,22 +554,70 @@ def chain_updater():
                     (global_last_block_hash,))
                 conn.commit()
         except Exception as e:
-            admin_print("Database error:", e)
-            db_err_counter += 1
-            if db_err_counter > 5:
-                admin_print("Restarting server - too many DB errs")
-                os.execl(sys.executable, sys.executable, *sys.argv)
+            admin_print("Chain database error:", e)
+
+
+def get_balance(user: str):
+    try:
+        with sqlconn(DATABASE,
+                     timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
+                (user,))
+            return float(datab.fetchone()[3])
+    except Exception as e:
+        admin_print("Error returning balance: " + str(e))
+        return None
+
+
+def increment_balance(user: str, amount: float):
+    try:
+        sql_str = ("UPDATE Users SET balance = balance + "
+                   + str(amount)
+                   + " WHERE username = \'"
+                   + str(user) + "\'")
+        queue.put(sql_str)
+    except Exception as e:
+        admin_print("Error adding user to the queue: " + str(e))
+
+
+def create_transaction(sender: str,
+                       recipient: str,
+                       amount: float,
+                       block_hash: str,
+                       memo="None"):
+    try:
+        timestamp = now().strftime("%d/%m/%Y %H:%M:%S")
+        with sqlconn(CONFIG_TRANSACTIONS,
+                     timeout=DB_TIMEOUT) as datab:
+            datab.execute(
+                """INSERT INTO Transactions
+                (timestamp, username, recipient, amount, hash, memo)
+                VALUES(?, ?, ?, ?, ?, ?)""",
+                (timestamp,
+                    sender,
+                    recipient,
+                    amount,
+                    block_hash,
+                    memo))
+            datab.commit()
+    except Exception as e:
+        admin_print("Error saving transaction: " + str(e))
 
 
 def input_management():
-    sleep(.2)
     while True:
-        command = input("DUCO Console $ ")
-        command = command.split(" ")
+        command = input(Fore.YELLOW
+                        + Style.BRIGHT
+                        + "DUCO > "
+                        + Style.RESET_ALL).split(" ")
 
         if command[0] == "help":
             admin_print("""
-                Available commands:
+            Available commands:
             - help - shows this help menu
             - balance <user> - prints user balance
             - set <user> <number> - sets user balance to number
@@ -590,25 +631,8 @@ def input_management():
             - remove <username> - removes user
             - ban <username> - bans username
             - jail <username> - jails username
-            - chips <username> - shows chip ids
-            - profit <username> - shows estimated profit
             - pass <username> <password> - verify password of user
             """)
-
-        elif command[0] == "chips":
-            try:
-                username = command[1]
-                print(" ".join(chip_ids[username]))
-            except Exception as e:
-                print(e)
-
-        elif command[0] == "profit":
-            try:
-                admin_print("Estimated daily profit: " +
-                            str(mean(
-                                estimated_profits[command[1]][-1000:])*17280))
-            except Exception as e:
-                print(e)
 
         elif command[0] == "jail":
             jail.append(str(command[1]))
@@ -870,20 +894,7 @@ def input_management():
 
         elif command[0] == "subtract":
             try:
-                while True:
-                    try:
-                        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                            datab = conn.cursor()
-                            datab.execute(
-                                """SELECT *
-                                FROM Users
-                                WHERE username = ?""",
-                                (command[1],))
-                            balance = str(datab.fetchone()[3])
-                            break
-                    except:
-                        pass
-
+                balance = get_balance(command[1])
                 admin_print(command[1]
                             + "'s balance is "
                             + str(balance)
@@ -893,54 +904,18 @@ def input_management():
 
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
-                    while True:
-                        try:
-                            with sqlconn(DATABASE,
-                                         timeout=DB_TIMEOUT) as conn:
-                                datab = conn.cursor()
-                                datab.execute(
-                                    """UPDATE Users
-                                    set balance = ?
-                                    where username = ?""",
-                                    (float(balance)-float(command[2]),
-                                        command[1]))
-                                conn.commit()
-                                break
-                        except:
-                            pass
+                    increment_balance(str(command[1]), -float(command[2]))
+                    admin_print(
+                        "Successfully added balance change to the queue")
 
-                    while True:
-                        try:
-                            with sqlconn(DATABASE,
-                                         timeout=DB_TIMEOUT) as conn:
-                                datab = conn.cursor()
-                                datab.execute(
-                                    """SELECT *
-                                    FROM Users
-                                    WHERE username = ?""",
-                                    (command[1],))
-                                balance = str(datab.fetchone()[3])
-                                break
-                        except:
-                            pass
-                    admin_print("User balance is now " + str(balance))
-
-                    global_last_block_hash_cp = global_last_block_hash
-                    with sqlconn(CONFIG_TRANSACTIONS,
-                                 timeout=DB_TIMEOUT) as conn:
-                        datab = conn.cursor()
-                        formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
-                        datab.execute(
-                            """INSERT INTO Transactions
-                            (timestamp, username, recipient, amount, hash, memo)
-                            VALUES(?, ?, ?, ?, ?, ?)""",
-                            (formatteddatetime,
-                                command[1],
-                                "coinexchange",
-                                command[2],
-                                global_last_block_hash_cp,
-                                "DUCO Exchange transaction"))
-                        conn.commit()
+                    lobal_last_block_hash_cp = global_last_block_hash
+                    create_transaction(command[1],
+                                       "coinexchange",
+                                       command[2],
+                                       global_last_block_hash_cp,
+                                       "DUCO Exchange transaction")
+                    admin_print("Successfully generated transaction: " +
+                                global_last_block_hash_cp)
                 else:
                     admin_print("Canceled")
             except Exception:
@@ -949,21 +924,7 @@ def input_management():
 
         elif command[0] == "add":
             try:
-                while True:
-                    try:
-                        with sqlconn(DATABASE,
-                                     timeout=DB_TIMEOUT) as conn:
-                            datab = conn.cursor()
-                            datab.execute(
-                                """SELECT *
-                                FROM Users
-                                WHERE username = ?""",
-                                (command[1],))
-                            balance = str(datab.fetchone()[3])
-                            break
-                    except:
-                        pass
-
+                balance = get_balance(command[1])
                 admin_print(command[1]
                             + "'s balance is "
                             + str(balance)
@@ -973,54 +934,18 @@ def input_management():
 
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
-                    while True:
-                        try:
-                            with sqlconn(DATABASE,
-                                         timeout=DB_TIMEOUT) as conn:
-                                datab = conn.cursor()
-                                datab.execute(
-                                    """UPDATE Users
-                                    set balance = ?
-                                    where username = ?""",
-                                    (float(balance)+float(command[2]),
-                                        command[1]))
-                                conn.commit()
-                                break
-                        except:
-                            pass
-
-                    while True:
-                        try:
-                            with sqlconn(DATABASE,
-                                         timeout=DB_TIMEOUT) as conn:
-                                datab = conn.cursor()
-                                datab.execute(
-                                    """SELECT *
-                                    FROM Users
-                                    WHERE username = ?""",
-                                    (command[1],))
-                                balance = str(datab.fetchone()[3])
-                                break
-                        except:
-                            pass
-                    admin_print("User balance is now " + str(balance))
+                    increment_balance(str(command[1]), float(command[2]))
+                    admin_print(
+                        "Successfully added balance change to the queue")
 
                     global_last_block_hash_cp = global_last_block_hash
-                    with sqlconn(CONFIG_TRANSACTIONS,
-                                 timeout=DB_TIMEOUT) as conn:
-                        datab = conn.cursor()
-                        formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
-                        datab.execute(
-                            """INSERT INTO Transactions
-                            (timestamp, username, recipient, amount, hash, memo)
-                            VALUES(?, ?, ?, ?, ?, ?)""",
-                            (formatteddatetime,
-                                "coinexchange",
-                                command[1],
-                                command[2],
-                                global_last_block_hash_cp,
-                                "DUCO Exchange transaction"))
-                        conn.commit()
+                    create_transaction("coinexchange",
+                                       command[1],
+                                       command[2],
+                                       global_last_block_hash_cp,
+                                       "DUCO Exchange transaction")
+                    admin_print("Successfully generated transaction: " +
+                                global_last_block_hash_cp)
                 else:
                     admin_print("Canceled")
             except Exception:
@@ -1028,7 +953,7 @@ def input_management():
                     "User doesn't exist or you've entered wrong number")
 
 
-def user_exists(username):
+def user_exists(username: str):
     with sqlconn(DATABASE,
                  timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
@@ -1043,7 +968,7 @@ def user_exists(username):
             return True
 
 
-def email_exists(email):
+def email_exists(email: str):
     with sqlconn(DATABASE,
                  timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
@@ -1210,7 +1135,7 @@ def check_workers(ip_workers, usr_workers):
         return False
 
 
-def create_share_ducos1(last_block_hash, difficulty):
+def create_share(last_block_hash, difficulty, xxhash=False):
     """ Creates and returns a job for DUCO-S1 algo """
     last_block_hash_cp = last_block_hash
     try:
@@ -1222,38 +1147,22 @@ def create_share_ducos1(last_block_hash, difficulty):
         expected_hash_str = str(
             str(last_block_hash_cp)
             + str(numeric_result))
-
-        try:
-            expected_hash = libducohash.hash(expected_hash_str)
-        except:
-            expected_hash = sha1(
-                bytes(expected_hash_str, encoding='ascii')).hexdigest()
+        if xxhash:
+            expected_hash = xxh64(
+                bytes(expected_hash_str, encoding='ascii'), seed=2811
+            ).hexdigest()
+        else:
+            try:
+                expected_hash = libducohash.hash(expected_hash_str)
+            except:
+                expected_hash = sha1(
+                    bytes(expected_hash_str, encoding='ascii')
+                ).hexdigest()
 
         job = [last_block_hash_cp, expected_hash, numeric_result]
         return job
     except Exception as e:
-        print("DUCOS1 ERR:", e)
-
-
-def create_share_xxhash(last_block_hash, difficulty):
-    """ 
-    Creates and returns a job for XXHASH algo 
-    """
-    last_block_hash_cp = last_block_hash
-    try:
-        try:
-            numeric_result = fastrandint(100 * difficulty)
-        except:
-            numeric_result = randint(0, 100 * difficulty)
-        expected_hash_str = bytes(
-            str(last_block_hash_cp)
-            + str(numeric_result
-                  ), encoding="utf-8")
-        expected_hash = xxh64(expected_hash_str, seed=2811)
-        job = [last_block_hash_cp, expected_hash.hexdigest(), numeric_result]
-        return job
-    except Exception as e:
-        print("XXHASH ERR:", e)
+        admin_print("Error creating share: " + str(e))
 
 
 def protocol_mine(data, connection, address, using_xxhash=False):
@@ -1291,7 +1200,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                     return thread_id
             except:
                 send_data(
-                    "BAD,Not enough data\n",
+                    "BAD,No username supplied\n",
                     connection)
                 return thread_id
 
@@ -1388,18 +1297,21 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                     perm_ban(ip_addr)
                 return thread_id
 
-        try:
-            if (job_tiers[req_difficulty]["difficulty"]
-                    > job_tiers["ESP32"]["difficulty"]):
-                if using_xxhash:
-                    job = create_share_xxhash(
-                        global_last_block_hash_cp, difficulty)
-                else:
+        if (job_tiers[req_difficulty]["difficulty"]
+                > job_tiers["ESP32"]["difficulty"]):
+            if using_xxhash:
+                job = create_share(
+                    global_last_block_hash_cp, difficulty, xxhash=True
+                )
+            else:
+                try:
                     job = libducohash.create_share(
-                        global_last_block_hash_cp, str(difficulty))
-        except:
-            job = libducohash.create_share(
-                global_last_block_hash_cp, str(difficulty))
+                        global_last_block_hash_cp, str(difficulty)
+                    )
+                except:
+                    job = create_share(
+                        global_last_block_hash_cp, difficulty
+                    )
 
         # Sending job
         send_data(job[0] + "," + job[1] + "," + str(difficulty) + "\n",
@@ -1521,7 +1433,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 "Diff":         difficulty,
                 "Software":     str(miner_name),
                 "Identifier":   str(rig_identifier),
-                # "Last share":   now(),
                 "Earnings":     reward
             }
 
@@ -1539,8 +1450,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             if using_xxhash:
                 global_last_block_hash = job[1]
             else:
-                if fastrandint(100) == 77:
-                    global_last_block_hash = job[1]
+                global_last_block_hash = job[1]
 
         if (hashrate > max_hashrate
                 or reported_hashrate > max_hashrate):
@@ -1623,8 +1533,33 @@ def protocol_mine(data, connection, address, using_xxhash=False):
     return thread_id
 
 
-def admin_print(*message):
-    print(now().strftime("%H:%M:%S.%f:"), *message)
+def admin_print(message: str):
+    # print(repr(message))
+    if "Error" in message:
+        print(now().strftime(
+            Style.DIM
+            + Fore.WHITE
+            + "%H:%M:%S.%f:"),
+            Style.BRIGHT
+            + Fore.RED
+            + message)
+
+    elif "Success" in message:
+        print(now().strftime(
+            Style.DIM
+            + Fore.WHITE
+            + "%H:%M:%S.%f:"),
+            Style.BRIGHT
+            + Fore.GREEN
+            + message)
+
+    else:
+        print(now().strftime(
+            Style.DIM
+            + Fore.WHITE
+            + "%H:%M:%S.%f:"),
+            Style.BRIGHT
+            + message)
 
 
 def now():
@@ -1966,7 +1901,8 @@ def create_main_api_file():
                     ensure_ascii=False)
 
         except Exception:
-            print("API err:", traceback.format_exc())
+            admin_print("Error creating main api.json file:"
+                        + str(traceback.format_exc()))
 
 
 def create_minerapi():
@@ -2027,9 +1963,6 @@ def create_minerapi():
             pass
 
         sleep(SAVE_TIME)
-
-
-cached_logins = {}
 
 
 def protocol_login(data, connection):
@@ -2225,8 +2158,16 @@ def protocol_send_funds(data, connection, username):
         recipient = str(data[2])
         amount = float(data[3])
 
+        balance = get_balance(username)
+        recipientbal = get_balance(recipient)
+
         if memo == "-" or memo == "":
             memo = "None"
+
+        if (not match(r"^[A-Za-z0-9_-]*$", recipient)
+                or not match(r"^[A-Za-z0-9_-]*$", username)):
+            send_data("NO,Invalid characters in usernames", connection)
+            return
 
         if str(recipient) in jail:
             send_data("NO,Can\'t send funds to that user", connection)
@@ -2248,73 +2189,22 @@ def protocol_send_funds(data, connection, username):
             send_data("NO,Incorrect amount", connection)
             return
 
-        with sqlconn(DATABASE,
-                     timeout=DB_TIMEOUT) as conn:
-            datab = conn.cursor()
-            datab.execute('PRAGMA journal_mode=wal')
-            datab.execute(
-                """SELECT *
-                        FROM Users
-                        WHERE username = ?""",
-                (username,))
-            balance = float(datab.fetchone()[3])
-
         if (float(balance) <= float(amount)):
             send_data("NO,Incorrect amount", connection)
             return
 
-        with sqlconn(DATABASE,
-                     timeout=DB_TIMEOUT) as conn:
-            datab = conn.cursor()
-            datab.execute('PRAGMA journal_mode=wal')
-            datab.execute(
-                """SELECT *
-                    FROM Users
-                    WHERE username = ?""",
-                (recipient,))
-            recipientbal = float(datab.fetchone()[3])
-
         if float(balance) >= float(amount):
-            balance -= float(amount)
-            recipientbal += float(amount)
+            #balance -= float(amount)
+            #recipientbal += float(amount)
 
-            while True:
-                try:
-                    with sqlconn(DATABASE,
-                                 timeout=DB_TIMEOUT) as conn:
-                        datab = conn.cursor()
-                        datab.execute('PRAGMA journal_mode=wal')
-                        datab.execute(
-                            """UPDATE Users
-                            set balance = ?
-                            where username = ?""",
-                            (balance, username))
-                        datab.execute(
-                            """UPDATE Users
-                            set balance = ?
-                            where username = ?""",
-                            (round(float(recipientbal), DECIMALS), recipient))
-                        conn.commit()
-                        break
-                except:
-                    pass
+            increment_balance(username, -amount)
+            increment_balance(recipient, amount)
 
-            formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
-            with sqlconn(CONFIG_TRANSACTIONS,
-                         timeout=DB_TIMEOUT) as conn:
-                datab = conn.cursor()
-                datab.execute('PRAGMA journal_mode=wal')
-                datab.execute(
-                    """INSERT INTO Transactions
-                    (timestamp, username, recipient, amount, hash, memo)
-                    VALUES(?, ?, ?, ?, ?, ?)""",
-                    (formatteddatetime,
-                        username,
-                        recipient,
-                        amount,
-                        global_last_block_hash_cp,
-                        memo))
-                conn.commit()
+            create_transaction(username,
+                               recipient,
+                               amount,
+                               global_last_block_hash_cp,
+                               memo)
 
             send_data(
                 "OK,Successfully transferred funds,"
@@ -2329,9 +2219,6 @@ def protocol_send_funds(data, connection, username):
             + str(e),
             connection)
         return
-
-
-cached_balances = {}
 
 
 def protocol_get_balance(data, connection, username):
@@ -2430,7 +2317,7 @@ def protocol_change_pass(data, connection, username):
             admin_print("Passwords of user " + username + " don't match")
             send_data("NO,Your old password doesn't match!", connection)
     except Exception as e:
-        admin_print("Error changing password:", e)
+        admin_print("Error changing password: " + str(e))
         send_data("NO,Internal server error: " + str(e), connection)
 
 
@@ -2566,7 +2453,7 @@ def protocol_get_transactions(data, connection):
         send_data(transactionsToReturnStr, connection)
     except Exception as e:
         # admin_print("Error getting transactions: " + str(e))
-        send_data("NO,Internal server error: "+str(e), connection)
+        send_data("NO,Internal server error: " + str(e), connection)
         raise Exception("Error getting transactions")
 
 
@@ -2881,36 +2768,11 @@ def duino_stats_restart_handle():
         sleep(3)
 
 
-def reset_ipset():
-    sleep(60*30)
-    admin_print("Master Server is restarting")
-    os.execl(sys.executable, sys.executable, *sys.argv)
-
-
-if __name__ == "__main__":
-    # Read banned usernames
-    with open(CONFIG_BANS, "r") as bannedusrfile:
-        bannedusr = bannedusrfile.read().splitlines()
-        for username in bannedusr:
-            banlist.append(username)
-        admin_print("Loaded banned usernames file")
-
-    # Read whitelisted IPs
-    with open(CONFIG_WHITELIST, "r") as whitelistfile:
-        whitelisted = whitelistfile.read().splitlines()
-        for ip in whitelisted:
-            try:
-                whitelisted_ips.append(socket.gethostbyname(str(ip)))
-            except:
-                pass
-        admin_print("Loaded whitelisted IPs file")
-
-    # Read whitelisted usernames
-    with open(CONFIG_WHITELIST_USR, "r") as whitelistusrfile:
-        whitelistedusr = whitelistusrfile.read().splitlines()
-        for username in whitelistedusr:
-            whitelisted_usernames.append(username)
-        admin_print("Loaded whitelisted usernames file")
+def create_databases():
+    global global_last_block_hash
+    global global_blocks
+    global memory_datab
+    global memory
 
     """ 
     In-memory db for minerapi,
@@ -3002,7 +2864,45 @@ if __name__ == "__main__":
             datab.execute("SELECT lastBlockHash FROM Server")
             global_last_block_hash = str(datab.fetchone()[0])
 
-    # Duino-Coin server libraries
+
+def load_configfiles():
+    global banlist
+    global whitelisted
+    global whitelistedusr
+
+    with open(CONFIG_BANS, "r") as bannedusrfile:
+        bannedusr = bannedusrfile.read().splitlines()
+        for username in bannedusr:
+            banlist.append(username)
+        admin_print("Sucessfully loaded banned usernames file")
+
+    with open(CONFIG_WHITELIST, "r") as whitelistfile:
+        whitelisted = whitelistfile.read().splitlines()
+        for ip in whitelisted:
+            try:
+                whitelisted_ips.append(socket.gethostbyname(str(ip)))
+            except:
+                pass
+        admin_print("Sucessfully loaded whitelisted IPs file")
+
+    with open(CONFIG_WHITELIST_USR, "r") as whitelistusrfile:
+        whitelistedusr = whitelistusrfile.read().splitlines()
+        for username in whitelistedusr:
+            whitelisted_usernames.append(username)
+        admin_print("Sucessfully loaded whitelisted usernames file")
+
+
+if __name__ == "__main__":
+    init(autoreset=True)
+    resource.setrlimit(resource.RLIMIT_NOFILE, (65536, 65536))
+    queue = multiprocessing.JoinableQueue()
+    load_configfiles()
+    create_databases()
+    
+    admin_print(Style.BRIGHT
+                + Fore.YELLOW
+                + "Duino-Coin Master Server is starting")
+
     import pool_functions as PF
     from kolka_module import *
     from server_functions import *
@@ -3012,9 +2912,6 @@ if __name__ == "__main__":
     except:
         pass
 
-    queue = multiprocessing.JoinableQueue()
-
-    admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
     threading.Thread(target=create_backup).start()
 
@@ -3028,23 +2925,16 @@ if __name__ == "__main__":
     threading.Thread(target=update_job_tiers).start()
     threading.Thread(target=create_jobs).start()
 
+    threading.Thread(target=chain_updater).start()
     threading.Thread(target=database_updater).start()
-    updater_queue = multiprocessing.Process(target=queue_handler, args=(queue,), daemon=True)
-    updater_queue.start()
-    mpproc.append(updater_queue)
+    transaction_queue = multiprocessing.Process(
+        target=transaction_queue_handle, args=(queue,), daemon=True)
+    transaction_queue.start()
+    mpproc.append(transaction_queue)
 
     threading.Thread(target=create_main_api_file).start()
     threading.Thread(target=create_minerapi).start()
     # threading.Thread(target=create_secondary_api_files).start()
-
-    def _wallet_server(port):
-        server_thread = StreamServer(
-            (HOSTNAME, port),
-            handle=handle,
-            backlog=BACKLOG
-        )
-        admin_print("Wallet server is running on port " + str(port))
-        server_thread.serve_forever()
 
     def _server_handler(port):
         server_thread = StreamServer(
@@ -3052,23 +2942,12 @@ if __name__ == "__main__":
             handle=handle,
             backlog=BACKLOG
         )
-        admin_print("Server is running on port " + str(port))
+        admin_print("Successfully started TCP server on port " + str(port))
         server_thread.serve_forever()
 
-    try:
-        for port in WALLET_PORTS:
-            threading.Thread(target=_wallet_server,
-                                    args=[int(port), ]).start()
+    for port in PORTS:
+        threading.Thread(target=_server_handler,
+                         args=[int(port), ]).start()
+        sleep(0.01)
 
-        for port in PORTS:
-            threading.Thread(target=_server_handler,
-                             args=[int(port), ]).start()
-
-        input_management()
-    except Exception as e:
-        admin_print("Unexpected exception", e)
-    finally:
-        admin_print("Master Server is exiting")
-        for proc in mpproc:
-            proc.terminate()
-        os.execl(sys.executable, sys.executable, *sys.argv)
+    input_management()
