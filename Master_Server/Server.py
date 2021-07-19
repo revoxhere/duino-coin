@@ -158,7 +158,8 @@ jail = []
 workers = {}
 registrations = {}
 estimated_profits = {}
-last_block = "XXHASH"
+last_block = "DUCO-S1"
+mpproc = []
 
 # Registration email - text version
 text = """\
@@ -484,46 +485,39 @@ class Break(Exception):
     pass
 
 
-def handle(queue):
-    with sqlconn(DATABASE) as database:
-        database.execute('PRAGMA journal_mode=wal')
-        counter = 0
-        while True:
-            try:
-                #timeS = time()
-                command = queue.get()
-                # print(command)
-                counter += 1
-                database.execute(command)
-                if counter >= 500:
-                    database.commit()
-                queue.task_done()
-                #print("task done")
-                #timeE = time()
-                #print(timeE-timeS)
+def queue_handler(queue):
+    admin_print("Database queue thread started")
+    while True:
+        with sqlconn(DATABASE) as database:
+            database.execute('PRAGMA journal_mode=wal')
+            counter = 0
+            while True:
+                try:
+                    counter += 1
+                    command = queue.get()
+                    database.execute(command)
+                    if counter >= 500:
+                        # Save every x updates
+                        database.commit()
+                        counter = 0
+                    queue.task_done()
 
-            except Break:
-                queue.task_done()
-                break
+                except Break:
+                    queue.task_done()
+                    break
 
-            except Exception as e:
-                print(traceback.format_exc())
-        
-
-
-if __name__ == "__main__":
-    queue = multiprocessing.JoinableQueue()
-
-    multiprocessing.Process(target=handle, args=(queue,), daemon=True).start()
+                except Exception as e:
+                    print(traceback.format_exc())
+                    break
 
 
 def database_updater():
     db_err_counter = 0
 
     while True:
-        sleep((queue.qsize()*0.0075)+1)
+        sleep((queue.qsize()*0.004)+1)
         try:
-            print("Queue size:", queue.qsize())
+            #print("Queue size:", queue.qsize())
             for user in balances_to_update.copy():
                 amount_to_update = balances_to_update[user]
                 if amount_to_update and user:
@@ -541,7 +535,7 @@ def database_updater():
                     queue.put(sql_str)
 
                     balances_to_update.pop(user)
-            
+
         except Exception as e:
             admin_print("Database error:", traceback.format_exc())
             db_err_counter += 1
@@ -2793,8 +2787,8 @@ def handle(connection, address):
                                     balances_to_update[user] += rewards[user]
                                 except:
                                     balances_to_update[user] = rewards[user]
-                        admin_print("Pool synced", len(rewards),
-                                    "rewards", len(poolWorkers), "workers")
+                        # admin_print("Pool synced", len(rewards),
+                        #            "rewards", len(poolWorkers), "workers")
                 except Exception as e:
                     admin_print("Error syncing pool: " + str(e))
 
@@ -3018,6 +3012,8 @@ if __name__ == "__main__":
     except:
         pass
 
+    queue = multiprocessing.JoinableQueue()
+
     admin_print("Duino-Coin Master Server is starting")
     admin_print("Launching background threads")
     threading.Thread(target=create_backup).start()
@@ -3031,7 +3027,11 @@ if __name__ == "__main__":
 
     threading.Thread(target=update_job_tiers).start()
     threading.Thread(target=create_jobs).start()
+
     threading.Thread(target=database_updater).start()
+    updater_queue = multiprocessing.Process(target=queue_handler, args=(queue,), daemon=True)
+    updater_queue.start()
+    mpproc.append(updater_queue)
 
     threading.Thread(target=create_main_api_file).start()
     threading.Thread(target=create_minerapi).start()
@@ -3056,12 +3056,9 @@ if __name__ == "__main__":
         server_thread.serve_forever()
 
     try:
-        mpproc = []
         for port in WALLET_PORTS:
-            proc = threading.Thread(target=_wallet_server,
-                                    args=[int(port), ])
-            # mpproc.append(proc)
-            proc.start()
+            threading.Thread(target=_wallet_server,
+                                    args=[int(port), ]).start()
 
         for port in PORTS:
             threading.Thread(target=_server_handler,
