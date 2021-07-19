@@ -291,7 +291,7 @@
         "enter_amount_unwrap": "ใส่จำนวนที่จะอันแรป: ",
         "initiating_unwrap": "เริ่มต้นอันแรป...\nTXid :",
         "error_initiating_unwrap": "มีความผิดพลาดขณะเริ่มต้นอันแรป, กำลังยกเลิก",
-        "amount_over_pending_values": "Amount is over pending values, using pending values to save txn fees",
+        "amount_over_pending_values": "จำนวนมากกว่าค่าที่ค้างอยู่ ใช้ค่าที่ค้างอยู่เพื่อเป็นค่าธรรมเนียม txn",
         "transaction_send_txid": "ธุรกรรมถูกส่งแล้ว, txid :",
         "finished_unwrapping": "อันแรปสำเร็จ",
 
