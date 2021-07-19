@@ -463,11 +463,10 @@ while True:
                                              + getString("decrypt_private_key")
                                              + Style.BRIGHT,
                                              stream=None)
-
                 try:
                     priv_key = str(password_decrypt(
-                        b64decode(config["wallet"]["password"]).decode("utf8"),
-                        passphrase))[2:66]
+                        config["wrapper"]["priv_key"],
+                        passphrase))
 
                 except InvalidToken:
                     print(getString("invalid_passphrase_wrapper"))
@@ -476,7 +475,7 @@ while True:
             else:
                 priv_key = str(password_decrypt(
                     config["wrapper"]["priv_key"],
-                    config["wallet"]["password"]))[2:66]
+                    config["wallet"]["password"]))
 
             pub_key = config["wrapper"]["pub_key"]
             tron = tronpy.Tron()
