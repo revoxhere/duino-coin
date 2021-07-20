@@ -161,6 +161,7 @@ last_block = "DUCO-S1"
 cached_balances = {}
 cached_logins = {}
 mpproc = []
+lock = threading.Lock()
 
 # Registration email - text version
 text = """\
@@ -485,7 +486,7 @@ def floatmap(x, in_min, in_max, out_min, out_max):
 
 
 def transaction_queue_handle(queue):
-    admin_print("Sucessfully started database transaction queue")
+    admin_print("Successfully started database transaction queue")
     while True:
         with sqlconn(DATABASE,
                      timeout=DB_TIMEOUT) as datab:
@@ -499,6 +500,7 @@ def transaction_queue_handle(queue):
                     if counter >= 500:
                         # Save every x updates
                         datab.commit()
+                        sleep(3)
                         counter = 0
                     queue.task_done()
 
@@ -610,14 +612,19 @@ def create_transaction(sender: str,
 
 def input_management():
     while True:
-        command = input(Fore.YELLOW
-                        + Style.BRIGHT
-                        + "DUCO > "
-                        + Style.RESET_ALL).split(" ")
+        command = input(
+            now().strftime(
+                Style.DIM
+                + Fore.WHITE
+                + "%H:%M:%S.%f:")
+            + Fore.YELLOW
+            + Style.BRIGHT
+            + " DUCO Server $ "
+            + Style.RESET_ALL
+        ).split(" ")
 
         if command[0] == "help":
-            admin_print("""
-            Available commands:
+            admin_print("""Available commands:
             - help - shows this help menu
             - balance <user> - prints user balance
             - set <user> <number> - sets user balance to number
@@ -908,7 +915,7 @@ def input_management():
                     admin_print(
                         "Successfully added balance change to the queue")
 
-                    lobal_last_block_hash_cp = global_last_block_hash
+                    global_last_block_hash_cp = global_last_block_hash
                     create_transaction(command[1],
                                        "coinexchange",
                                        command[2],
@@ -1023,7 +1030,7 @@ def protocol_ban(username: str):
                 smtpserver.login(DUCO_EMAIL, DUCO_PASS)
                 smtpserver.sendmail(
                     DUCO_EMAIL, email, message.as_string())
-            admin_print("Sent email to", str(email))
+            admin_print("Sent email to " + str(email))
     except Exception as e:
         admin_print("Error sending email: " + str(e))
 
@@ -1447,10 +1454,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             minerapi[thread_id] = thread_miner_api
 
             global_blocks += UPDATE_MINERAPI_EVERY
-            if using_xxhash:
-                global_last_block_hash = job[1]
-            else:
-                global_last_block_hash = job[1]
+            global_last_block_hash = job[1]
 
         if (hashrate > max_hashrate
                 or reported_hashrate > max_hashrate):
@@ -1534,32 +1538,32 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
 
 def admin_print(message: str):
-    # print(repr(message))
-    if "Error" in message:
-        print(now().strftime(
-            Style.DIM
-            + Fore.WHITE
-            + "%H:%M:%S.%f:"),
-            Style.BRIGHT
-            + Fore.RED
-            + message)
+    with lock:
+        if "Error" in message:
+            print(now().strftime(
+                Style.DIM
+                + Fore.WHITE
+                + "%H:%M:%S.%f:"),
+                Style.BRIGHT
+                + Fore.RED
+                + message)
 
-    elif "Success" in message:
-        print(now().strftime(
-            Style.DIM
-            + Fore.WHITE
-            + "%H:%M:%S.%f:"),
-            Style.BRIGHT
-            + Fore.GREEN
-            + message)
+        elif "Success" in message:
+            print(now().strftime(
+                Style.DIM
+                + Fore.WHITE
+                + "%H:%M:%S.%f:"),
+                Style.BRIGHT
+                + Fore.GREEN
+                + message)
 
-    else:
-        print(now().strftime(
-            Style.DIM
-            + Fore.WHITE
-            + "%H:%M:%S.%f:"),
-            Style.BRIGHT
-            + message)
+        else:
+            print(now().strftime(
+                Style.DIM
+                + Fore.WHITE
+                + "%H:%M:%S.%f:"),
+                Style.BRIGHT
+                + message)
 
 
 def now():
@@ -2125,7 +2129,7 @@ def protocol_register(data, connection, address):
     if send_registration_email(username, email):
         """ 
         Register a new account if  the registration
-        e-mail was sent sucessfully 
+        e-mail was sent successfully 
         """
         registrations[ip] = 1
         while True:
@@ -2457,6 +2461,30 @@ def protocol_get_transactions(data, connection):
         raise Exception("Error getting transactions")
 
 
+def protocol_node(data, connection):
+    """
+    BIG TODO!
+    Send sync data containing
+    last block hash and difficulty
+    that the node will generate jobs for
+    """
+    try:
+        diff_level = "AVR"
+        sync_data = (global_last_block_hash
+                     + ","
+                     + str(job_tiers[diff_level]["difficulty"])
+                     + "\n")
+
+        send_data(sync_data, connection)
+
+        output = receive_data(connection, limit=8096)
+
+        if output:
+            send_data("OK", connection)
+    except Exception as e:
+        print(traceback.format_exc())
+
+
 def handle(connection, address):
     """ 
     Handler for every connected client 
@@ -2540,6 +2568,12 @@ def handle(connection, address):
                     protocol_get_balance(data, connection, username)
                 else:
                     send_data("NO,Not logged in", connection)
+
+            elif data[0] == "NODE":
+                """ 
+                Client is a node
+                """
+                protocol_node(data, connection)
 
             elif data[0] == "UEXI":
                 """ 
@@ -2655,8 +2689,8 @@ def handle(connection, address):
 
                     if not error:
                         global_blocks += blocks_to_add
-                        global_connections = int(global_connections)
-                        global_connections += poolConnections
+                        #global_connections = int(global_connections)
+                        #global_connections += poolConnections
 
                         if poolWorkers:
                             for threadid in minerapi.copy():
@@ -2874,7 +2908,7 @@ def load_configfiles():
         bannedusr = bannedusrfile.read().splitlines()
         for username in bannedusr:
             banlist.append(username)
-        admin_print("Sucessfully loaded banned usernames file")
+        admin_print("Successfully loaded banned usernames file")
 
     with open(CONFIG_WHITELIST, "r") as whitelistfile:
         whitelisted = whitelistfile.read().splitlines()
@@ -2883,13 +2917,13 @@ def load_configfiles():
                 whitelisted_ips.append(socket.gethostbyname(str(ip)))
             except:
                 pass
-        admin_print("Sucessfully loaded whitelisted IPs file")
+        admin_print("Successfully loaded whitelisted IPs file")
 
     with open(CONFIG_WHITELIST_USR, "r") as whitelistusrfile:
         whitelistedusr = whitelistusrfile.read().splitlines()
         for username in whitelistedusr:
             whitelisted_usernames.append(username)
-        admin_print("Sucessfully loaded whitelisted usernames file")
+        admin_print("Successfully loaded whitelisted usernames file")
 
 
 if __name__ == "__main__":
@@ -2898,7 +2932,7 @@ if __name__ == "__main__":
     queue = multiprocessing.JoinableQueue()
     load_configfiles()
     create_databases()
-    
+
     admin_print(Style.BRIGHT
                 + Fore.YELLOW
                 + "Duino-Coin Master Server is starting")
