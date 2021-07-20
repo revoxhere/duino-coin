@@ -107,6 +107,7 @@ def getString(string_name):
     else:
         return "String not found: " + string_name
 
+
 try:
     from base64 import urlsafe_b64decode as b64d
     from base64 import urlsafe_b64encode as b64e
@@ -477,9 +478,14 @@ while True:
                     wrong_passphrase = True
             else:
                 try:
-                    priv_key = str(password_decrypt(
-                        config["wrapper"]["priv_key"],
-                        b64decode(config["wallet"]["password"]).decode("utf8")))
+                    priv_key = str(
+                        password_decrypt(
+                            config["wrapper"]["priv_key"],
+                            b64decode(
+                                config["wallet"]["password"]
+                            ).decode("utf8")
+                        )
+                    )
                 except InvalidToken:
                     print(getString("invalid_passphrase_wrapper"))
                     use_wrapper = False
