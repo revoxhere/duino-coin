@@ -2,22 +2,40 @@
 # Created in 2019, put through many modifications through 2020 and 2021
 # revox from the Duino team
 
-import json
-import requests
-import os
-import sys
-import github
-import threading
-import time
-from pathlib import Path
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-import numpy as np
-import datetime as dt
-import base64
+import matplotlib
+import datetime
 from scipy.interpolate import make_interp_spline, BSpline
 from scipy.interpolate import interp1d
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import numpy as np
 import traceback
+import github
+import os
+import time
+from pathlib import Path
+import json
+
+base_dir = ""
+pricefile = base_dir+"prices.txt"
+pricefile_bch = base_dir+"prices_bch.txt"
+pricefile_trx = base_dir+"prices_trx.txt"
+pricefile_nodes = base_dir+"pricesNodeS.txt"
+pricefile_justswap = base_dir+"pricesJustSwap.txt"
+pricefile_otc = base_dir+"pricesotc-trading.txt"
+
+dayinterval = 3
+length = 20
+outputfile = "/home/debian/websites/duino-coin-websocket-proxy/prices.png"
+chartColors = [
+    "#1dd1a1",  # DE - XMG - greenish
+    "#F97F51",  # NS - USD - orange
+    "#3c40c6",  # JS - TRX - purple
+    "#0fbcf9",  # OT - USD - blue
+    "#feca57",  # DE - BCH - yellow
+    "#ff3f34",  # DE - TRX - red
+]
 
 
 def splitData(pricefile):
@@ -167,7 +185,8 @@ def createGraph(y_ducoe,
                  patchOTC],
         labelcolor="#777777",
         framealpha=0,
-        prop={'size': 6})
+        prop={'size': 8},
+        loc='upper left')
 
     plt.savefig(
         outputfile,
@@ -176,35 +195,7 @@ def createGraph(y_ducoe,
     plt.show()
 
 
-try:
-    import matplotlib
-    import datetime
-    from scipy.interpolate import make_interp_spline, BSpline
-    from scipy.interpolate import interp1d
-    import matplotlib.dates as mdates
-    import matplotlib.pyplot as plt
-    import matplotlib.patches as mpatches
-    import numpy as np
-
-    pricefile = "prices.txt"
-    pricefile_bch = "prices_bch.txt"
-    pricefile_trx = "prices_trx.txt"
-    pricefile_nodes = "pricesNodeS.txt"
-    pricefile_justswap = "pricesJustSwap.txt"
-    pricefile_otc = "pricesotc-trading.txt"
-
-    dayinterval = 3
-    length = 20
-    outputfile = "/home/debian/websites/duino-coin-websocket-proxy/prices.png"
-    chartColors = [
-        "#1dd1a1",  # DE - XMG - greenish
-        "#F97F51",  # NS - USD - orange
-        "#3c40c6",  # JS - TRX - purple
-        "#0fbcf9",  # OT - USD - blue
-        "#feca57",  # DE - BCH - yellow
-        "#ff3f34",  # DE - TRX - red
-    ]
-
+if __name__ == "__main__":
     y_ducoe = splitData(pricefile)[-length:]
     y_ducoe_bch = splitData(pricefile_bch)[-length:]
     y_ducoe_trx = splitData(pricefile_trx)[-length:]
@@ -215,6 +206,4 @@ try:
         y_ducoe, y_ducoe_bch, y_ducoe_trx, y_nodes, y_justswap, y_otc,
         dayinterval, length, outputfile, chartColors)
 
-    print("Successfully updated the plot")
-except Exception as e:
-    print("Error creating price plot:", traceback.format_exc())
+    print("Successfully updated the price plot")
