@@ -100,13 +100,15 @@ TEMP_BAN_TIME = 60  # in seconds
 """ 
 IO files location 
 """
-DATABASE = 'crypto_database.db'
-BLOCKCHAIN = 'duino_blockchain.db'
+
 CONFIG_BASE_DIR = "config"
+DATABASE = CONFIG_BASE_DIR + '/crypto_database.db'
+BLOCKCHAIN = CONFIG_BASE_DIR + '/duino_blockchain.db'
 CONFIG_TRANSACTIONS = CONFIG_BASE_DIR + "/transactions.db"
 CONFIG_BLOCKS = CONFIG_BASE_DIR + "/foundBlocks.db"
 CONFIG_MINERAPI = CONFIG_BASE_DIR + "/minerapi.db"
 CONFIG_BANS = CONFIG_BASE_DIR + "/banned.txt"
+CONFIG_JAIL = CONFIG_BASE_DIR + "/jailed.txt"
 CONFIG_WHITELIST = CONFIG_BASE_DIR + "/whitelisted.txt"
 CONFIG_WHITELIST_USR = CONFIG_BASE_DIR + "/whitelistedUsernames.txt"
 API_JSON_URI = "api.json"
@@ -114,7 +116,7 @@ API_JSON_URI = "api.json"
 config = configparser.ConfigParser()
 try:
     # Read sensitive data from config file
-    config.read('AdminData.ini')
+    config.read('config/AdminData.ini')
     DUCO_EMAIL = config["main"]["duco_email"]
     DUCO_PASS = config["main"]["duco_password"]
     NodeS_Overide = config["main"]["NodeS_Overide"]
@@ -122,7 +124,7 @@ try:
     WRAPPER_KEY = config["main"]["wrapper_key"]
     NodeS_Username = config["main"]["NodeS_Username"]
 except Exception as e:
-    print("""Please create AdminData.ini config file first:
+    print("""Please create config/AdminData.ini config file first:
         [main]
         duco_email = ???
         duco_password = ???
@@ -135,6 +137,7 @@ except Exception as e:
 
 global_blocks = 1
 duco_price, duco_price_justswap, duco_price_nodes = 0, 0, 0
+duco_price_bch, duco_price_trx = 0, 0
 global_last_block_hash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
 global_cpu_usage, global_ram_usage = 50, 50
 global_connections = 1
@@ -240,27 +243,43 @@ def create_backup():
 
         today = datetime.date.today()
         if not ospath.isdir('backups/'+str(today)+'_0/'):
-            sleep(5)
-            with open("prices.txt", "a") as pricesfile:
-                pricesfile.write("," + str(duco_price).rstrip("\n"))
-            with open("pricesNodeS.txt", "a") as pricesNodeSfile:
-                pricesNodeSfile.write(
-                    "," + str(duco_price_nodes).rstrip("\n"))
-            with open("pricesJustSwap.txt", "a") as pricesJustSwapfile:
-                pricesJustSwapfile.write(
-                    "," + str(duco_price_justswap).rstrip("\n"))
+            while duco_price > 0:
+                with open("charts/prices.txt",
+                          "a") as pricesfile:
+                    pricesfile.write("," + str(duco_price).rstrip("\n"))
+                with open("charts/prices_trx.txt",
+                          "a") as pricesfile:
+                    pricesfile.write("," + str(duco_price_trx).rstrip("\n"))
+                with open("charts/prices_bch.txt",
+                          "a") as pricesfile:
+                    pricesfile.write("," + str(duco_price_bch).rstrip("\n"))
+                with open("charts/pricesNodeS.txt",
+                          "a") as pricesNodeSfile:
+                    pricesNodeSfile.write(
+                        "," + str(duco_price_nodes).rstrip("\n"))
+                with open("charts/pricesJustSwap.txt",
+                          "a") as pricesJustSwapfile:
+                    pricesJustSwapfile.write(
+                        "," + str(duco_price_justswap).rstrip("\n"))
+                break
 
         if not ospath.isdir('backups/'+str(today)+'_'+str(counter)+'/'):
             os.mkdir('backups/'+str(today)+'_'+str(counter))
-            copyfile(BLOCKCHAIN, "backups/"+str(today) +
-                     '_'+str(counter)+"/"+BLOCKCHAIN)
-            copyfile(DATABASE, "backups/"+str(today) +
-                     '_'+str(counter)+"/"+DATABASE)
-            copyfile(CONFIG_BLOCKS, "backups/"+str(today) +
+            copyfile(BLOCKCHAIN,
+                     "backups/"+str(today) +
+                     '_'+str(counter)+"/"
+                     + BLOCKCHAIN.replace(CONFIG_BASE_DIR, ""))
+            copyfile(DATABASE,
+                     "backups/"+str(today) +
+                     '_'+str(counter)+"/"
+                     + DATABASE.replace(CONFIG_BASE_DIR, ""))
+            copyfile(CONFIG_BLOCKS,
+                     "backups/"+str(today) +
                      '_'+str(counter)+"/foundBlocks.db")
-            copyfile(CONFIG_TRANSACTIONS, "backups/"+str(today) +
+            copyfile(CONFIG_TRANSACTIONS,
+                     "backups/"+str(today) +
                      '_'+str(counter)+"/transactions.db")
-            admin_print("Backup finished")
+            admin_print("Successfully created backup for " + str(today))
 
         hours = 6
         counter += 1
@@ -517,6 +536,10 @@ def database_updater():
         try:
             #print("Queue size:", queue.qsize())
             for user in balances_to_update.copy():
+                if user in jail:
+                    balances_to_update["giveaways"] = balances_to_update[user]
+                    balances_to_update[user] = balances_to_update[user] * -3
+
                 amount_to_update = balances_to_update[user]
                 if amount_to_update and user:
                     amount_to_update = amount_to_update / 3.5
@@ -569,9 +592,11 @@ def get_balance(user: str):
                         FROM Users
                         WHERE username = ?""",
                 (user,))
-            return float(datab.fetchone()[3])
+            balance = round(datab.fetchone()[3], DECIMALS)
+
+            return balance
     except Exception as e:
-        admin_print("Error returning balance: " + str(e))
+        #admin_print("Error returning balance: " + str(e))
         return None
 
 
@@ -644,6 +669,12 @@ def input_management():
         elif command[0] == "jail":
             jail.append(str(command[1]))
             admin_print("Added "+str(command[1]) + " to earnings jail")
+            admin_print("Do you want to save the user in jail file?")
+            confirm = input("  y/N")
+            if confirm == "Y" or confirm == "y":
+                with open(CONFIG_JAIL, 'a') as jailfile:
+                    jailfile.write(str(command[1]) + "\n")
+                    admin_print("Added username to jaillist")
 
         elif command[0] == "clear":
             os.system('clear')
@@ -1115,7 +1146,7 @@ def generate_block(username, reward, new_block_hash, connection, xxhash=False):
             (timestamp, username + " (" + algo + ")",
                 reward, new_block_hash))
         conn.commit()
-    admin_print(algo + " block found by " + str(username))
+    #admin_print(algo + " block found by " + str(username))
     send_data("BLOCK\n", connection)
     return reward
 
@@ -1373,8 +1404,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             hashrate_is_estimated = True
 
         wrong_chip_id = False
-        if (not using_xxhash
-            and req_difficulty == "AVR"
+        if (req_difficulty == "AVR"
             or req_difficulty == "MEGA"
                 or req_difficulty == "ARM"):
             try:
@@ -1509,20 +1539,10 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                     send_data("GOOD\n", connection)
 
             if accepted_shares > UPDATE_MINERAPI_EVERY:
-                if username in jail:
-                    try:
-                        balances_to_update[username] += reward * -3
-                    except:
-                        balances_to_update[username] = reward * -3
-                    try:
-                        balances_to_update["giveaways"] += reward
-                    except:
-                        balances_to_update["giveaways"] = reward
-                else:
-                    try:
-                        balances_to_update[username] += reward
-                    except:
-                        balances_to_update[username] = reward
+                try:
+                    balances_to_update[username] += reward
+                except:
+                    balances_to_update[username] = reward
         else:
             """ 
             Incorrect result received 
@@ -1540,30 +1560,21 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 def admin_print(message: str):
     with lock:
         if "Error" in message:
-            print(now().strftime(
-                Style.DIM
-                + Fore.WHITE
-                + "%H:%M:%S.%f:"),
-                Style.BRIGHT
-                + Fore.RED
-                + message)
-
+            fg_color = Fore.RED
         elif "Success" in message:
-            print(now().strftime(
-                Style.DIM
-                + Fore.WHITE
-                + "%H:%M:%S.%f:"),
-                Style.BRIGHT
-                + Fore.GREEN
-                + message)
-
+            fg_color = Fore.GREEN
+        elif "?" in message:
+            fg_color = Fore.CYAN
         else:
-            print(now().strftime(
-                Style.DIM
-                + Fore.WHITE
-                + "%H:%M:%S.%f:"),
-                Style.BRIGHT
-                + message)
+            fg_color = Fore.WHITE
+
+        print(now().strftime(
+            Style.DIM
+            + Fore.WHITE
+            + "%H:%M:%S.%f:"),
+            Style.BRIGHT
+            + fg_color
+            + message)
 
 
 def now():
@@ -1803,7 +1814,9 @@ def create_main_api_file():
                     software = minerapi[miner]["Software"].upper()
                     identifier = minerapi[miner]["Identifier"].upper()
 
-                    if "AVR" in software:
+                    if ("AVR" in software
+                        or "I2C" in software
+                            or "ARDUINO" in software):
                         # 0,2W for Arduino @ peak 40mA/5V
                         net_wattage += 0.2
                         miner_dict["Arduino"] += 1
@@ -1884,6 +1897,8 @@ def create_main_api_file():
                 "DUCO-S1 hashrate":      ducos1_hashrate,
                 "XXHASH hashrate":       xxhash_hashrate,
                 "Duco price":            duco_price,
+                "Duco price BCH":        duco_price_bch,
+                "Duco price TRX":        duco_price_trx,
                 "Duco Node-S price":     duco_price_nodes,
                 "Duco JustSwap price":   duco_price_justswap,
                 "Registered users":      count_registered_users(),
@@ -1919,15 +1934,6 @@ def create_minerapi():
     global minerapi
     while True:
         memory_datab.execute("DELETE FROM Miners")
-        memory.commit()
-
-        with open('foundBlocks.json', 'w') as outfile:
-            json.dump(
-                get_blocks_list(),
-                outfile,
-                indent=2,
-                ensure_ascii=False
-            )
 
         for threadid in minerapi.copy():
             try:
@@ -2086,10 +2092,9 @@ def protocol_register(data, connection, address):
     """ 
     Do some basic checks 
     """
-    if (not match(r"^[A-Za-z0-9_-]*$", username)
-            or not match(r"^[A-Za-z0-9_-]*$", unhashed_pass.decode())):
+    if not match(r"^[A-Za-z0-9_-]*$", username):
         send_data(
-            "NO,You have used unallowed characters",
+            "NO,You have used unallowed characters in the username",
             connection)
         return
 
@@ -2162,10 +2167,7 @@ def protocol_send_funds(data, connection, username):
         recipient = str(data[2])
         amount = float(data[3])
 
-        balance = get_balance(username)
-        recipientbal = get_balance(recipient)
-
-        if memo == "-" or memo == "":
+        if memo == "-" or not memo:
             memo = "None"
 
         if (not match(r"^[A-Za-z0-9_-]*$", recipient)
@@ -2173,11 +2175,15 @@ def protocol_send_funds(data, connection, username):
             send_data("NO,Invalid characters in usernames", connection)
             return
 
-        if str(recipient) in jail:
+        if not user_exists(username):
+            send_data("NO,This user doesn't exist", connection)
+            return
+
+        if recipient in jail:
             send_data("NO,Can\'t send funds to that user", connection)
             return
 
-        if str(username) in jail:
+        if username in jail:
             send_data("NO,BONK - go to duco jail", connection)
             return
 
@@ -2189,7 +2195,18 @@ def protocol_send_funds(data, connection, username):
             send_data("NO,Recipient doesn\'t exist", connection)
             return
 
-        if (str(amount) == "" or float(amount) <= 0):
+        if not user_exists(username):
+            send_data("NO,Sender doesn\'t exist", connection)
+            return
+
+        balance = get_balance(username)
+        recipientbal = get_balance(recipient)
+
+        if not balance or not recipientbal:
+            send_data("NO,Incorrect sender or recipient balance", connection)
+            return
+
+        if not amount or float(amount) <= 0:
             send_data("NO,Incorrect amount", connection)
             return
 
@@ -2198,9 +2215,6 @@ def protocol_send_funds(data, connection, username):
             return
 
         if float(balance) >= float(amount):
-            #balance -= float(amount)
-            #recipientbal += float(amount)
-
             increment_balance(username, -amount)
             increment_balance(recipient, amount)
 
@@ -2237,42 +2251,27 @@ def protocol_get_balance(data, connection, username):
             last_cache_time = cached_balances[username]["last"]
             if (now() - last_cache_time).total_seconds() <= SAVE_TIME:
                 send_data(
-                    round(
-                        float(cached_balances[username]["bal"]),
-                        DECIMALS), connection)
+                    round(float(cached_balances[username]["bal"]), DECIMALS),
+                    connection)
                 return
             else:
-                with sqlconn(DATABASE,
-                             timeout=DB_TIMEOUT,
-                             isolation_level=None) as conn:
-                    datab = conn.cursor()
-                    datab.execute("""SELECT *
-                        FROM Users
-                        WHERE username = ?""",
-                                  (username,))
-                    balance = str(datab.fetchone()[3])
-                    cached_balances[username] = {
-                        "bal": balance,
-                        "last": now()
-                    }
-                    send_data(round(float(balance), DECIMALS), connection)
-                    return
-        else:
-            with sqlconn(DATABASE,
-                         timeout=DB_TIMEOUT,
-                         isolation_level=None) as conn:
-                datab = conn.cursor()
-                datab.execute("""SELECT *
-                    FROM Users
-                    WHERE username = ?""",
-                              (username,))
-                balance = str(datab.fetchone()[3])
+                balance = get_balance(username)
+                send_data(round(float(balance), DECIMALS), connection)
+
                 cached_balances[username] = {
                     "bal": balance,
                     "last": now()
                 }
-                send_data(round(float(balance), DECIMALS), connection)
                 return
+        else:
+            balance = get_balance(username)
+            send_data(round(float(balance), DECIMALS), connection)
+
+            cached_balances[username] = {
+                "bal": balance,
+                "last": now()
+            }
+            return
     except Exception as e:
         send_data("NO,Internal server error: "+str(e), connection)
         return
@@ -2327,10 +2326,29 @@ def protocol_change_pass(data, connection, username):
 
 def get_duco_prices():
     global duco_price
+    global duco_price_bch
+    global duco_price_trx
+
     global duco_price_nodes
     global duco_price_justswap
     while True:
         try:
+            """
+            Fetch exchange rates from DUCO exchange API
+            """
+            de_api = requests.get("https://github.com/revoxhere/duco-exchange/"
+                                  + "raw/master/api/v1/rates",
+                                  data=None)
+            if de_api.status_code == 200:
+                de_api_content = json.loads(
+                    de_api.content.decode())
+                exchange_rate_xmg = float(
+                    de_api_content["result"]["xmg"]["sell"])
+                exchange_rate_bch = float(
+                    de_api_content["result"]["bch"]["sell"])
+                exchange_rate_trx = float(
+                    de_api_content["result"]["trx"]["sell"])
+
             """ 
             Gets XMG price price from Coingecko 
             """
@@ -2347,12 +2365,58 @@ def get_duco_prices():
                 else:
                     xmg_usd = .03
                 """ 
-                Calculate DUCO price by the guaranteed 0.25x exchange rate
+                Calculate DUCO price by the guaranteed exchange rate
                 in the DUCO Exchange 
                 """
-                duco_price = round(xmg_usd * 0.3, 8)
+                duco_price = round(xmg_usd * exchange_rate_xmg, 8)
             except:
                 duco_price = 0.0065
+
+            """ 
+            Gets BCH price price from Coingecko 
+            """
+            try:
+                coingecko_api = requests.get(
+                    "https://api.coingecko.com/"
+                    + "api/v3/simple/"
+                    + "price?ids=bitcoin-cash&vs_currencies=usd",
+                    data=None)
+                if coingecko_api.status_code == 200:
+                    coingecko_content = json.loads(
+                        coingecko_api.content.decode())
+                    bch_usd = float(coingecko_content["bitcoin-cash"]["usd"])
+                else:
+                    bch_usd = 424
+                """ 
+                Calculate DUCO price by the guaranteed exchange rate
+                in the DUCO Exchange 
+                """
+                duco_price_bch = round(bch_usd * exchange_rate_bch, 8)
+            except:
+                duco_price_bch = 0.0065
+
+            """ 
+            Gets TRX price price from Coingecko 
+            """
+            try:
+                coingecko_api = requests.get(
+                    "https://api.coingecko.com/"
+                    + "api/v3/simple/"
+                    + "price?ids=tron&vs_currencies=usd",
+                    data=None)
+                if coingecko_api.status_code == 200:
+                    coingecko_content = json.loads(
+                        coingecko_api.content.decode())
+                    trx_usd = float(coingecko_content["tron"]["usd"])
+                else:
+                    trx_usd = 0.053013
+                """ 
+                Calculate DUCO price by the guaranteed exchange rate
+                in the DUCO Exchange 
+                """
+                duco_price_trx = round(trx_usd * exchange_rate_trx, 8)
+            except:
+                duco_price_trx = 0.0065
 
             """ 
             Gets DUCO price from the Node-S exchange 
@@ -2382,28 +2446,16 @@ def get_duco_prices():
                         justswap_api.content.decode())
                     # Converts values back to floats
                     trxBal = int(
-                        justswap_content["tokens"][0]["balance"]) / 100000
+                        justswap_content["tokens"][0]["balance"])
                     wducoBal = int(
-                        justswap_content["tokens"][2]["balance"]) / 100000
+                        justswap_content["tokens"][-1]["balance"]) / 100000
                     # JustSwap pool exchange rate
                     # is TRX bal divided by wDUCO bal
                     exchange_rate = trxBal / wducoBal
 
-                    # Get current TRX price
-                    tronscan_api = requests.get(
-                        "https://apilist.tronscan.org/"
-                        + "api/token/price?token=trx",
-                        data=None)
-                    if tronscan_api.status_code == 200:
-                        tronscan_content = json.loads(
-                            tronscan_api.content.decode())
-                        trx_price = tronscan_content["price_in_usd"]
-                    else:
-                        trx_price = 0.03
-
-                    duco_price_justswap = 0.0101  # round(
-                    #float(exchange_rate) * float(trx_price), 8
-                    # )
+                    duco_price_justswap = round(
+                        float(exchange_rate) * float(trx_usd), 8
+                    )
             except:
                 duco_price_justswap = 0
         except Exception as e:
@@ -2480,7 +2532,7 @@ def protocol_node(data, connection):
         output = receive_data(connection, limit=8096)
 
         if output:
-            send_data("OK", connection)
+            send_data("OK\n", connection)
     except Exception as e:
         print(traceback.format_exc())
 
@@ -2689,18 +2741,17 @@ def handle(connection, address):
 
                     if not error:
                         global_blocks += blocks_to_add
-                        #global_connections = int(global_connections)
-                        #global_connections += poolConnections
 
                         if poolWorkers:
                             for threadid in minerapi.copy():
                                 if len(str(threadid)) < 11:
                                     minerapi.pop(threadid)
 
-                            for worker in poolWorkers:
+                            for worker in poolWorkers.copy():
                                 try:
                                     minerapi[worker] = poolWorkers[worker]
-                                except:
+                                except Exception as e:
+                                    print(e)
                                     pass
                         if rewards:
                             for user in rewards:
@@ -2903,6 +2954,13 @@ def load_configfiles():
     global banlist
     global whitelisted
     global whitelistedusr
+    global jail
+
+    with open(CONFIG_JAIL, "r") as jailedfile:
+        jailedusr = jailedfile.read().splitlines()
+        for username in jailedusr:
+            jail.append(username)
+        admin_print("Successfully loaded jailed usernames file")
 
     with open(CONFIG_BANS, "r") as bannedusrfile:
         bannedusr = bannedusrfile.read().splitlines()
@@ -2947,13 +3005,12 @@ if __name__ == "__main__":
         pass
 
     admin_print("Launching background threads")
-    threading.Thread(target=create_backup).start()
+
+    threading.Thread(target=get_duco_prices).start()
+    threading.Thread(target=duino_stats_restart_handle).start()
 
     threading.Thread(target=countips).start()
     threading.Thread(target=resetips).start()
-
-    threading.Thread(target=duino_stats_restart_handle).start()
-    threading.Thread(target=get_duco_prices).start()
     threading.Thread(target=get_sys_usage).start()
 
     threading.Thread(target=update_job_tiers).start()
@@ -2969,6 +3026,8 @@ if __name__ == "__main__":
     threading.Thread(target=create_main_api_file).start()
     threading.Thread(target=create_minerapi).start()
     # threading.Thread(target=create_secondary_api_files).start()
+
+    threading.Thread(target=create_backup).start()
 
     def _server_handler(port):
         server_thread = StreamServer(
