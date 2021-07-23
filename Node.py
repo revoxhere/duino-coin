@@ -17,8 +17,8 @@ from datetime import datetime
 from traceback import format_exc
 
 
-SOCKET_TIMEOUT = 25
-NODE_PORT = 2810
+SOCKET_TIMEOUT = 100
+NODE_PORT = 2817
 DOCSTRING = """
          Please keep in mind that this 
          an early work in progress version to test the
