@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.5.6)
+# Duino-Coin Python PC Miner (v2.5.7)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -112,7 +112,7 @@ except ModuleNotFoundError:
 
 
 # Global variables
-MINER_VER = "2.56"  # Version number
+MINER_VER = "2.57"  # Version number
 NODE_ADDRESS = "server.duinocoin.com"
 AVAILABLE_PORTS = [
     2813,  # PC (1)
@@ -1150,7 +1150,7 @@ def periodic_report(start_time,
                  + "\n\t\t‖ With the hashrate of "
                  + str(int(hashrate)) + " kH/s"
                  + "\n\t\t‖ In this time period, you've solved "
-                 + str(int(hashrate*seconds))
+                 + str(int(hashrate*seconds*1000)) # kH
                  + " hashes"
                  + "\n\t\t‖ Total miner uptime: "
                  + str(uptime), "success")
