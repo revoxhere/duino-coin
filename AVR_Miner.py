@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.5.6)
+# Duino-Coin Python AVR Miner (v2.5.7)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -95,7 +95,7 @@ except ModuleNotFoundError:
     install('pypresence')
 
 # Global variables
-MINER_VER = '2.56'  # Version number
+MINER_VER = '2.57'  # Version number
 NODE_ADDRESS = "server.duinocoin.com"
 AVAILABLE_PORTS = [
     2811,
@@ -107,6 +107,7 @@ AVAILABLE_PORTS = [
     2817
 ]
 SOC_TIMEOUT = 45
+PERIODIC_REPORT_TIME = 60
 AVR_TIMEOUT = 3.1  # diff 6 * 100 / 196 h/s = 3.06
 BAUDRATE = 115200
 RESOURCES_DIR = 'AVRMiner_' + str(MINER_VER) + '_resources'
@@ -124,6 +125,7 @@ donation_level = 0
 hashrate = 0
 config = ConfigParser()
 thread_lock = Lock()
+mining_start_time = time()
 
 # Create resources folder if it doesn't exist
 if not path.exists(RESOURCES_DIR):
@@ -230,10 +232,10 @@ def get_fastest_connection(server_ip: str):
     available_connections = []
 
     pretty_print("net0",
-                " "
-                + get_string("connection_search")
-                + "...",
-                "warning")
+                 " "
+                 + get_string("connection_search")
+                 + "...",
+                 "warning")
 
     for i in range(len(AVAILABLE_PORTS)):
         connection_pool.append(socket())
@@ -297,6 +299,7 @@ def load_config():
     global shuffle_ports
     global SOC_TIMEOUT
     global AVR_TIMEOUT
+    global PERIODIC_REPORT_TIME
 
     # Initial configuration section
     if not Path(str(RESOURCES_DIR) + '/Miner_config.cfg').is_file():
@@ -411,6 +414,7 @@ def load_config():
             "soc_timeout":      45,
             "avr_timeout":      3.1,
             "discord_presence": "y",
+            "periodic_report":  60,
             "shuffle_ports":    "y"
         }
 
@@ -434,6 +438,8 @@ def load_config():
         AVR_TIMEOUT = float(config["Duino-Coin-AVR-Miner"]["avr_timeout"])
         discord_presence = config["Duino-Coin-AVR-Miner"]["discord_presence"]
         shuffle_ports = config["Duino-Coin-AVR-Miner"]["shuffle_ports"]
+        PERIODIC_REPORT_TIME = int(
+            config["Duino-Coin-AVR-Miner"]["periodic_report"])
 
 
 def greeting():
@@ -635,6 +641,8 @@ def mine_avr(com, threadid):
     else:
         NODE_PORT = AVAILABLE_PORTS[0]
 
+    start_time = time()
+    report_shares = 0
     while True:
         try:
             while True:
@@ -1099,6 +1107,20 @@ def mine_avr(com, threadid):
                                 + 'ping '
                                 + str('%02.0f' % int(ping))
                                 + 'ms')
+
+                    end_time = time()
+                    elapsed_time = end_time - start_time
+                    if (threadid == 0
+                            and elapsed_time >= PERIODIC_REPORT_TIME):
+                        report_shares = shares[0] - report_shares
+                        uptime = calculate_uptime(mining_start_time)
+
+                        periodic_report(start_time,
+                                        end_time,
+                                        report_shares,
+                                        hashrate,
+                                        uptime)
+                        start_time = time()
                     break
 
         except Exception as e:
@@ -1111,6 +1133,47 @@ def mine_avr(com, threadid):
                 + ')',
                 'error')
             debug_output('Main loop error: ' + str(e))
+
+
+def periodic_report(start_time,
+                    end_time,
+                    shares,
+                    hashrate,
+                    uptime):
+    seconds = round(end_time - start_time)
+    pretty_print("sys0",
+                 " Periodic mining report (BETA): "
+                 + Fore.RESET
+                 + Style.NORMAL
+                 + "\n\t\t‖ During the last "
+                 + str(seconds)
+                 + " seconds"
+                 + "\n\t\t‖ You've mined "
+                 + str(shares)
+                 + " shares ("
+                 + str(round(shares/seconds, 1))
+                 + " shares/s)"
+                 + "\n\t\t‖ With the hashrate of "
+                 + str(int(hashrate)) + " H/s"
+                 + "\n\t\t‖ In this time period, you've solved "
+                 + str(int(hashrate*seconds))
+                 + " hashes"
+                 + "\n\t\t‖ Total miner uptime: "
+                 + str(uptime), "success")
+
+
+def calculate_uptime(start_time):
+    uptime = time() - start_time
+    if uptime <= 59:
+        return str(round(uptime)) + " seconds"
+    elif uptime == 60:
+        return str(round(uptime // 60)) + " minute"
+    elif uptime >= 60:
+        return str(round(uptime // 60)) + " minutes"
+    elif uptime == 3600:
+        return str(round(uptime // 3600)) + " hour"
+    elif uptime >= 3600:
+        return str(round(uptime // 3600)) + " hours"
 
 
 if __name__ == '__main__':
