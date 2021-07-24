@@ -249,15 +249,15 @@ def handler(signal_received, frame):
 def calculate_uptime(start_time):
     uptime = time() - start_time
     if uptime <= 59:
-        return str(round(uptime)) + " seconds"
+        return str(round(uptime)) + getString("uptime_seconds")
     elif uptime == 60:
-        return str(round(uptime // 60)) + " minute"
+        return str(round(uptime // 60)) + getString("uptime_minute")
     elif uptime >= 60:
-        return str(round(uptime // 60)) + " minutes"
+        return str(round(uptime // 60)) + getString("uptime_minutes")
     elif uptime == 3600:
-        return str(round(uptime // 3600)) + " hour"
+        return str(round(uptime // 3600)) + getString("uptime_hour")
     elif uptime >= 3600:
-        return str(round(uptime // 3600)) + " hours"
+        return str(round(uptime // 3600)) + getString("uptime_hours")
 
 
 def get_prefix(diff: int):
@@ -1136,23 +1136,23 @@ def periodic_report(start_time,
                     uptime):
     seconds = round(end_time - start_time)
     pretty_print("sys0",
-                 " Periodic mining report (BETA): "
+                 getString('periodic_mining_report')
                  + Fore.RESET
                  + Style.NORMAL
-                 + "\n\t\t‖ During the last "
+                 + getString('report_period')
                  + str(seconds)
-                 + " seconds"
-                 + "\n\t\t‖ You've mined "
+                 + getString('report_time')
+                 + getString('report_body1')
                  + str(shares)
-                 + " shares ("
+                 + getString('report_body2')
                  + str(round(shares/seconds, 1))
-                 + " shares/s)"
-                 + "\n\t\t‖ With the hashrate of "
-                 + str(int(hashrate)) + " kH/s"
-                 + "\n\t\t‖ In this time period, you've solved "
-                 + str(int(hashrate*seconds*1000)) # kH
-                 + " hashes"
-                 + "\n\t\t‖ Total miner uptime: "
+                 + getString('report_body3')
+                 + getString('report_body4')
+                 + str(int(hashrate)) + " H/s"
+                 + getString('report_body5')
+                 + str(int(hashrate*seconds))
+                 + getString('report_body6')
+                 + getString('total_mining_time')
                  + str(uptime), "success")
 
 
@@ -1286,7 +1286,7 @@ def fetch_pools():
             ).json()
 
             pretty_print("net0",
-                         " Retrieved mining node: "
+                         getString('connecting_node')
                          + Fore.RESET
                          + Style.NORMAL
                          + str(response["name"]),

@@ -76,7 +76,27 @@
         "max_hashrate_notice": "Mining Duino-Coin with powerful equipment may not be very profitable for you - we suggest trying Coin Magi (https://xmg.network) - our 'sister' coin",
     
         "recommended": "recommended",
-        "connection_search": "Searching for the fastest node to connect to"
+        "connection_search": "Searching for the fastest node to connect to",
+
+        "connecting_node": " Retrieved mining node: ",
+
+        "uptime_seconds": " seconds",
+        "uptime_minute": " minute",
+        "uptime_minutes": " minutes",
+        "uptime_hour": " hour",
+        "uptime_hours": " hours",
+
+
+        "periodic_mining_report": "Periodic mining report (BETA): ",
+        "report_period": "\n\t\t‖ During the last ",
+        "report_time": " seconds",
+        "report_body1": "\n\t\t‖ You've mined ",
+        "report_body2": " shares (",
+        "report_body3": " shares/s)",
+        "report_body4": "\n\t\t‖ With the hashrate of ",
+        "report_body5": "\n\t\t‖ In this time period, you've solved ",
+        "report_body6": " hashes",
+        "total_mining_time": "\n\t\t‖ Total miner uptime: "
     },
     "italian": {
         "translation_autor": "Il mastro Stefanuzzo (no spaces on GitHub)",
@@ -889,6 +909,25 @@
         "max_hashrate_notice": "การขุด Duino-Coin ด้วยอุปกรณ์ที่มีพลังสูงอาจจะไม่ได้ทำให้คุณได้กำไรสูงสุด- เราแนะนำให้ลอง Magi (https://xmg.network) - เหรียญ 'พี่น้อง' ของเรา",
 
         "recommended": "แนะนำ",
-        "connection_search": "กำลังค้นหาโนดที่เร็วที่สุดเพื่อเชื่อมต่อ"
+        "connection_search": "กำลังค้นหาโนดที่เร็วที่สุดเพื่อเชื่อมต่อ",
+
+        "connecting_node": " โนดการขุดที่เชื่อมต่อ: ",
+
+        "uptime_seconds": "วินาที",
+        "uptime_minute": " นาที",
+        "uptime_minutes": " นาที",
+        "uptime_hour": " ชั่วโมง",
+        "uptime_hours": " ชั่วโมง",
+
+        "periodic_mining_report": "รายงานการขุดเป็นระยะ (เบต้า): ",
+        "report_period": "\n\t\t‖ ในช่วง ",
+        "report_time": " วินาทีที่ผ่านมา",
+        "report_body1": "\n\t\t‖ คุณขุดไป ",
+        "report_body2": " ส่วนแบ่ง (",
+        "report_body3": " ส่วนแบ่ง/วิ)",
+        "report_body4": "\n\t\t‖ ด้วยแฮชเรท ",
+        "report_body5": "\n\t\t‖ ในช่วงเวลานี้, คุณได้แก้ไป ",
+        "report_body6": " แฮช",
+        "total_mining_time": "\n\t\t‖ เวลาที่ตัวขุดทำงานทั้งหมด: "
     }
 }

@@ -1142,38 +1142,38 @@ def periodic_report(start_time,
                     uptime):
     seconds = round(end_time - start_time)
     pretty_print("sys0",
-                 " Periodic mining report (BETA): "
+                 get_string('periodic_mining_report')
                  + Fore.RESET
                  + Style.NORMAL
-                 + "\n\t\t‖ During the last "
+                 + get_string('report_period')
                  + str(seconds)
-                 + " seconds"
-                 + "\n\t\t‖ You've mined "
+                 + get_string('report_time')
+                 + get_string('report_body1')
                  + str(shares)
-                 + " shares ("
+                 + get_string('report_body2')
                  + str(round(shares/seconds, 1))
-                 + " shares/s)"
-                 + "\n\t\t‖ With the hashrate of "
+                 + get_string('report_body3')
+                 + get_string('report_body4')
                  + str(int(hashrate)) + " H/s"
-                 + "\n\t\t‖ In this time period, you've solved "
+                 + get_string('report_body5')
                  + str(int(hashrate*seconds))
-                 + " hashes"
-                 + "\n\t\t‖ Total miner uptime: "
+                 + get_string('report_body6')
+                 + get_string('total_mining_time')
                  + str(uptime), "success")
 
 
 def calculate_uptime(start_time):
     uptime = time() - start_time
     if uptime <= 59:
-        return str(round(uptime)) + " seconds"
+        return str(round(uptime)) + get_string('uptime_seconds')
     elif uptime == 60:
-        return str(round(uptime // 60)) + " minute"
+        return str(round(uptime // 60)) + get_string('uptime_minute')
     elif uptime >= 60:
-        return str(round(uptime // 60)) + " minutes"
+        return str(round(uptime // 60)) + get_string('uptime_minutes')
     elif uptime == 3600:
-        return str(round(uptime // 3600)) + " hour"
+        return str(round(uptime // 3600)) + get_string('uptime_hour')
     elif uptime >= 3600:
-        return str(round(uptime // 3600)) + " hours"
+        return str(round(uptime // 3600)) + get_string('uptime_hours')
 
 
 if __name__ == '__main__':
