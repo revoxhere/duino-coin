@@ -1,0 +1,41 @@
+{
+    "english": {
+        "colorama_not_installed": "Colorama is not installed. Please install it using: python3 -m pip install colorama.\nExiting in 15s.",
+
+        "duco_public_node": "Duino-Coin Public Node",
+        "DOCSTRING": "\t Please keep in mind that this\n\t an early work in progress version to test the\n\t concepts. This piece of software will have more\n\t functionality in the not so far future.\n\n\t This node client will connect to one of the master\n\t ones, request a task, and receive sync data that\n\t consists of last chain hashes, helping to maintain\n\t the network.",
+        "searching_fastest_connection": "Searching for the fastest connection...",
+        "sigint_detected": "SIGINT detected, see you soon!",
+        "enter_username": "Enter your Duino-Coin wallet/username\n> ",
+
+        "imported_username_1": "Imported username ",
+        "imported_username_2": " out of the config file",
+        
+        "port_responded_1": "Port",
+        "port_responded_2": "responded!",
+
+        "connection_timed_out_1": "The connection on port",
+        "connection_timed_out_2": "timed out. Trying the next port.",
+
+        "error_sending_data": "Error sending data: ",
+        "error_receiving_data_1": "Error receiving data: ",
+        "error_receiving_data_2": "An error has occured while recieving the server data (or connecting to the server)",
+
+        "connecting_master_node": "Connecting to the master node on port",
+        "node_on_version": "Node is on version",
+        "requesting_task": "Requesting a task...",
+
+        "task_create_jobs": "Current task: create new jobs for miners",
+        "create_shares_1": "Creating ",
+        "create_shares_2": " share(s) for hash ",
+        "finished_creating_jobs": "Finished creating jobs",
+        "send_created_jobs": "Sending created jobs",
+        "node_accepted_jobs": "Node accepted new jobs",
+        "node_rejected_jobs": "Node rejected new jobs",
+
+        "syncing_jobs": "Syncing jobs",
+        "successful_sync": "Successfully synced",
+        "error_while_sync": "An error has occured while syncing with the server",
+        "no_tasks": "There are currently no tasks to be done. Checking again in 10 seconds"
+    }
+}
