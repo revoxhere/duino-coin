@@ -518,6 +518,7 @@ void setup() {
       esp_restart();
     });
   
+  ArduinoOTA.setHostname(rigname);
   ArduinoOTA.begin();
   #endif
   
