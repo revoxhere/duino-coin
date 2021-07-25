@@ -1,25 +1,26 @@
-// Duino-coin miner for STM32 chip family
+// Duino-coin miner for STM32 and AVR chip family
 // https://duinocoin.com/
 
 // by: pankleks 2021
+// v: 1.1
 // https://github.com/pankleks
 // MIT License
 
 #include <Arduino.h>
-#include <Hash.h>
-#include <Id.h>
+#include <sha1.h>
+#include <ArduinoUniqueID.h>
 
 // features
-#define LOG           // comment to disable debug logs to Serial1
 #define RESET_NO_JOBS // comment to not reset board if no jobs
 
-#define SHA1_HASH_LEN 20
-#define JOB_MAX_SIZE 104 // 40 + 40 + 20 + 3
+#ifdef ARDUINO_ARCH_STM32
+#define LOG // comment to disable debug logs to Serial1
 #define LED_BUILTIN PC13
+#endif
+
 #define NO_JOBS_RESET_S 60 // reset board if no jobs for longer than 60s
 
 String clientId;
-uint8_t job[JOB_MAX_SIZE];
 
 void log(String msg)
 {
@@ -30,12 +31,12 @@ void log(String msg)
 
 String getClientId()
 {
-  uint32_t id[3];
-  GetSTM32MCUID(id);
+  String temp = "DUCOID";
 
-  char buf[22];
-  sprintf(buf, "%08X%08X%08X", id[0], id[1], id[2]); // 12 byte
-  return "DUCOID" + String(buf);
+  for (int i = 0; i < UniqueIDsize; i++)
+    temp += String(UniqueID[i], HEX);
+
+  return temp;
 }
 
 void ledOn()
@@ -78,26 +79,48 @@ void clearSerial()
     Serial.read();
 }
 
-uint32_t ducos1a(String lastHash, String expHash, uint32_t difficulty)
+int ducos1a(String lastHash, String expHash, int difficulty)
 {
   const char *c = expHash.c_str();
   uint8_t length = expHash.length() / 2;
+  uint8_t job[104];
 
-  memset(job, 0, JOB_MAX_SIZE);
   for (size_t i = 0, j = 0; j < length; i += 2, j++)
     job[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
 
-  uint8_t hashBuf[SHA1_HASH_LEN];
+  SHA1_CTX baseCtx;
+  SHA1Init(&baseCtx);
+  SHA1Update(&baseCtx, (uint8_t *)lastHash.c_str(), lastHash.length());
 
-  for (uint32_t result = 0; result < difficulty * 100 + 1; result++)
+  uint8_t buf[20];
+
+  for (int result = 0; result < difficulty * 100 + 1; result++)
   {
-    sha1(lastHash + String(result), hashBuf);
+    SHA1_CTX ctx = SHA1Copy(baseCtx);
+    itoa(result, (char *)buf, 10);
 
-    if (memcmp(hashBuf, job, SHA1_HASH_LEN * sizeof(char)) == 0) // if found hash = expected hash -> result
+    SHA1Update(&ctx, buf, strlen((char *)buf));
+    SHA1Final(buf, &ctx);
+
+    if (memcmp(buf, job, 20) == 0) // if found hash = expected hash -> result
       return result;
   }
 
-  return 0; // not found
+  return -1; // not found
+}
+
+#ifdef ARDUINO_ARCH_AVR
+void (*resetFn)(void) = 0;
+#endif
+
+void reset()
+{
+#ifdef ARDUINO_ARCH_AVR
+  resetFn();
+#endif
+#ifdef ARDUINO_ARCH_STM32
+  NVIC_SystemReset();
+#endif
 }
 
 String lastHash;
@@ -128,6 +151,7 @@ void loop()
 
     expHash.toUpperCase();
     int result = ducos1a(lastHash, expHash, difficulty);
+
     long elapsedT = micros() - startT;
 
     ledOff();
@@ -135,7 +159,7 @@ void loop()
 
     Serial.print(String(result) + "," + String(elapsedT) + "," + clientId + "\n");
 
-    log("R: " + String(result) + ", " + String((float)elapsedT / 1000000) + " s.");
+    log("R: " + String(result) + ", " + String((float)elapsedT / 1000000) + " s");
 
     lastOkJobT = millis();
   }
@@ -148,10 +172,9 @@ void loop()
     log("last ok job " + String(n) + " ms ago");
 
 #ifdef RESET_NO_JOBS
-    if (n > NO_JOBS_RESET_S * 1000)
+    if (n > NO_JOBS_RESET_S * 1000L)
     {
       log(F("no jobs, reset"));
-      NVIC_SystemReset();
     }
 #endif
   }
