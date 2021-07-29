@@ -691,7 +691,7 @@
         "connection_search": "Sunuculara bağlanmak için en hızlı bağlantı aranıyor"
     },
     "portuguese": {
-        "translation_autor": "bonsai",
+        "translation_autor": "bonsai e gsrbr",
         "sigint_detected": " SIGINT detectado - Saindo corretamente.",
         "goodbye": " Até!",
         "greeting_morning": "Bom dia",
@@ -761,7 +761,33 @@
 
         "mining_user": " User ",
         "mining_not_exist": " não existe",
-        "mining_not_exist_warning": " Usuario incorreto, confira-o. Tentando novamente em 10s"
+        "mining_not_exist_warning": " Usuario incorreto, confira-o. Tentando novamente em 10s",
+
+        "max_threads_notice": "Minerar Duino-Coin com muitos núcleos(threads) causará queda na produtividade(lucro) - núcleos de mineração reduzido para 8",
+        "max_hashrate_notice": "Minerar Duino-Coin com equipamentos poderosos pode não ser muito lucrativo para você - sugerimos tentar a Coin Magi (https://xmg.network) - ou 'sister' coin",
+    
+        "recommended": "recomendado",
+        "connection_search": "Procurando o servidor/nó mais rápido para se conectar",
+
+        "connecting_node": " Conectando ao servidor/nó de mineração: ",
+
+        "uptime_seconds": " segundos",
+        "uptime_minute": " minuto",
+        "uptime_minutes": " minutos",
+        "uptime_hour": " hora",
+        "uptime_hours": " horas",
+
+
+        "periodic_mining_report": "Relatório de mineração periódica (BETA): ",
+        "report_period": "\n\t\t‖ Durante os últimos ",
+        "report_time": " segundos",
+        "report_body1": "\n\t\t‖ Você minerou ",
+        "report_body2": " shares (",
+        "report_body3": " shares/s)",
+        "report_body4": "\n\t\t‖ Com o hashrate de ",
+        "report_body5": "\n\t\t‖ Neste período de tempo, você resolveu ",
+        "report_body6": " hashes",
+        "total_mining_time": "\n\t\t‖ Tempo de atividade total do minerador: "
     },
     "maltese": {
         "translation_autor": "IdotMaster1/MattyInnit",
