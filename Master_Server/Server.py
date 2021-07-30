@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Master Server (v2.5.5)
+# Duino-Coin Master Server (v2.5.7)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -58,6 +58,7 @@ Global variables
 """
 HOSTNAME = ""
 PORTS = [
+    # 2809,
     2810,  # Non-public port for pools
     2811,  # Legacy
     2812,  # Wallets, other miners
@@ -79,7 +80,7 @@ Have fun!
 DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 10  # in seconds
-DB_TIMEOUT = 5
+DB_TIMEOUT = 10
 SOCKET_TIMEOUT = 15
 BACKLOG = None  # spawn connection instantly
 SERVER_VER = 2.5  # announced to clients
@@ -92,7 +93,7 @@ EXPECTED_SHARETIME = 10  # in seconds
 MAX_REJECTED_SHARES = 5
 BCRYPT_ROUNDS = 6
 DECIMALS = 20  # max float precision
-MAX_WORKERS = 50
+MAX_WORKERS = 25
 PING_SLEEP_TIME = 0.5  # in seconds
 MAX_NUMBER_OF_PINGS = 3
 TEMP_BAN_TIME = 60  # in seconds
@@ -360,7 +361,7 @@ def update_job_tiers():
             "AVR": {
                 "difficulty": int(6 * DIFF_MULTIPLIER),
                 "reward": .005,
-                "max_hashrate": 210
+                "max_hashrate": 225
             }
         }
         sleep(60)
@@ -516,25 +517,28 @@ def transaction_queue_handle(queue):
                     counter += 1
                     command = queue.get()
                     datab.execute(command)
-                    if counter >= 500:
+                    if counter >= 3000:
                         # Save every x updates
                         datab.commit()
-                        sleep(3)
+                        sleep(1)
                         counter = 0
                     queue.task_done()
 
                 except Exception as e:
                     print(traceback.format_exc())
-                    break
 
 
 def database_updater():
     db_err_counter = 0
 
     while True:
-        sleep((queue.qsize()*0.004)+1)
+        qsize = queue.qsize()
+        print("Queue size:", qsize)
+        if qsize < 10:
+            sleep(5)
+        else:
+            sleep((qsize*0.01)+1)
         try:
-            #print("Queue size:", queue.qsize())
             for user in balances_to_update.copy():
                 if user in jail:
                     balances_to_update["giveaways"] = balances_to_update[user]
@@ -542,12 +546,11 @@ def database_updater():
 
                 amount_to_update = balances_to_update[user]
                 if amount_to_update and user:
-                    amount_to_update = amount_to_update / 3.5
+                    amount_to_update = amount_to_update / 5
 
                     if amount_to_update / 30 > 0.2:
-                        amount_to_update = amount_to_update / 100
                         amount_to_update = floatmap(
-                            amount_to_update / 30, 0.02, 0.5, 0.02, 0.025
+                            amount_to_update / 30, 0.02, 1, 0.0002, 0.0025
                         )
 
                     increment_balance(user, amount_to_update)
@@ -592,12 +595,14 @@ def get_balance(user: str):
                         FROM Users
                         WHERE username = ?""",
                 (user,))
-            balance = round(datab.fetchone()[3], DECIMALS)
-
-            return balance
+            try:
+                balance = round(datab.fetchone()[3], DECIMALS)
+                return balance
+            except:
+                raise Exception("User doesn't exist")
     except Exception as e:
         #admin_print("Error returning balance: " + str(e))
-        return None
+        raise Exception("User doesn't exist")
 
 
 def increment_balance(user: str, amount: float):
@@ -1335,6 +1340,12 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                     perm_ban(ip_addr)
                 return thread_id
 
+        if req_difficulty != "AVR":
+            send_data(
+                "BAD,Only AVR mining is enabled on the server",
+                connection)
+            return thread_id
+
         if (job_tiers[req_difficulty]["difficulty"]
                 > job_tiers["ESP32"]["difficulty"]):
             if using_xxhash:
@@ -1597,7 +1608,7 @@ def get_sys_usage():
     while True:
         global_connections = _get_connections()
 
-        cpu = floatmap(psutil.cpu_percent(), 0, 100, 0, 90)
+        cpu = floatmap(psutil.cpu_percent(), 0, 100, 0, 100)
 
         # global_cpu_usage.append(cpu)
         global_cpu_usage = cpu
@@ -1933,6 +1944,8 @@ def create_minerapi():
     """
     global minerapi
     while True:
+        sleep(3)
+
         memory_datab.execute("DELETE FROM Miners")
 
         for threadid in minerapi.copy():
@@ -1960,19 +1973,6 @@ def create_minerapi():
         with sqlconn(CONFIG_MINERAPI) as disk_conn:
             memory.backup(disk_conn)
             disk_conn.commit()
-
-        try:
-            with open("miners.json", 'w') as outfile:
-                json.dump(
-                    minerapi.copy(),
-                    outfile,
-                    indent=2,
-                    ensure_ascii=False
-                )
-        except:
-            pass
-
-        sleep(SAVE_TIME)
 
 
 def protocol_login(data, connection):
@@ -2165,7 +2165,12 @@ def protocol_send_funds(data, connection, username):
         global_last_block_hash_cp = global_last_block_hash
         memo = sub(r'[^A-Za-z0-9 .()-:/!#_+-]+', ' ', str(data[1]))
         recipient = str(data[2])
-        amount = float(data[3])
+
+        try:
+            amount = float(data[3])
+        except:
+            send_data("NO,Incorrect amount", connection)
+            return
 
         if memo == "-" or not memo:
             memo = "None"
@@ -2215,8 +2220,29 @@ def protocol_send_funds(data, connection, username):
             return
 
         if float(balance) >= float(amount):
-            increment_balance(username, -amount)
-            increment_balance(recipient, amount)
+            balance -= float(amount)
+            recipientbal += float(amount)
+
+            while True:
+                try:
+                    with sqlconn(DATABASE,
+                                 timeout=DB_TIMEOUT) as conn:
+                        datab = conn.cursor()
+                        datab.execute('PRAGMA journal_mode=wal')
+                        datab.execute(
+                            """UPDATE Users
+                            set balance = ?
+                            where username = ?""",
+                            (balance, username))
+                        datab.execute(
+                            """UPDATE Users
+                            set balance = ?
+                            where username = ?""",
+                            (round(float(recipientbal), DECIMALS), recipient))
+                        conn.commit()
+                        break
+                except:
+                    pass
 
             create_transaction(username,
                                recipient,
@@ -2333,6 +2359,7 @@ def get_duco_prices():
     global duco_price_justswap
     while True:
         try:
+            random_multiplier = randint(99, 101) / 100
             """
             Fetch exchange rates from DUCO exchange API
             """
@@ -2361,7 +2388,8 @@ def get_duco_prices():
                 if coingecko_api.status_code == 200:
                     coingecko_content = json.loads(
                         coingecko_api.content.decode())
-                    xmg_usd = float(coingecko_content["magi"]["usd"])
+                    xmg_usd = float(
+                        coingecko_content["magi"]["usd"]) * random_multiplier
                 else:
                     xmg_usd = .03
                 """ 
@@ -2391,7 +2419,8 @@ def get_duco_prices():
                 Calculate DUCO price by the guaranteed exchange rate
                 in the DUCO Exchange 
                 """
-                duco_price_bch = round(bch_usd * exchange_rate_bch, 8)
+                duco_price_bch = round(
+                    bch_usd * exchange_rate_bch, 8) * random_multiplier
             except:
                 duco_price_bch = 0.0065
 
@@ -2414,7 +2443,8 @@ def get_duco_prices():
                 Calculate DUCO price by the guaranteed exchange rate
                 in the DUCO Exchange 
                 """
-                duco_price_trx = round(trx_usd * exchange_rate_trx, 8)
+                duco_price_trx = round(
+                    trx_usd * exchange_rate_trx, 8) * random_multiplier
             except:
                 duco_price_trx = 0.0065
 
@@ -2428,7 +2458,8 @@ def get_duco_prices():
                     data=None)
                 if node_api.status_code == 200:
                     node_content = json.loads(node_api.content.decode())
-                    duco_price_nodes = round(float(node_content["value"]), 8)
+                    duco_price_nodes = round(
+                        float(node_content["value"]), 8) * random_multiplier
             except:
                 duco_price_nodes = 0
 
@@ -2446,16 +2477,18 @@ def get_duco_prices():
                         justswap_api.content.decode())
                     # Converts values back to floats
                     trxBal = int(
-                        justswap_content["tokens"][0]["balance"])
+                        justswap_content["tokens"][0]["balance"]) / 100000
                     wducoBal = int(
                         justswap_content["tokens"][-1]["balance"]) / 100000
                     # JustSwap pool exchange rate
                     # is TRX bal divided by wDUCO bal
                     exchange_rate = trxBal / wducoBal
 
+                    #print(exchange_rate, trxBal, wducoBal)
+
                     duco_price_justswap = round(
                         float(exchange_rate) * float(trx_usd), 8
-                    )
+                    ) * random_multiplier
             except:
                 duco_price_justswap = 0
         except Exception as e:
@@ -2520,19 +2553,64 @@ def protocol_node(data, connection):
     last block hash and difficulty
     that the node will generate jobs for
     """
+    global pregenerated_jobs_avr
+    thread_id = id(gevent.getcurrent())
+    accepted = 0
     try:
-        diff_level = "AVR"
-        sync_data = (global_last_block_hash
-                     + ","
-                     + str(job_tiers[diff_level]["difficulty"])
-                     + "\n")
+        if fastrandint(10) > 3:
+            task = "CREATE_JOBS"
+            diff_level = "AVR"
+            global_last_block_hash_cp = global_last_block_hash
 
-        send_data(sync_data, connection)
+            sync_data = (task
+                         + ","
+                         + global_last_block_hash_cp
+                         + ","
+                         + str(job_tiers[diff_level]["difficulty"])
+                         + "\n")
 
-        output = receive_data(connection, limit=8096)
+            sleep_by_cpu_usage(3)
+            send_data(sync_data, connection)
+            output = connection.recv(8096).decode()
+            sleep_by_cpu_usage(5)
 
-        if output:
-            send_data("OK\n", connection)
+            if output:
+                output_js = eval(output)
+                username = output_js["user"]
+                accepted += 1
+
+                pregenerated_jobs_avr = output_js["jobs"]
+
+                thread_miner_api = {
+                    "User":         str(username),
+                    "Is estimated": str(0),
+                    "Sharetime":    0,
+                    "Accepted":     accepted,
+                    "Rejected":     0,
+                    "Diff":         0,
+                    "Software":     str("NODE"),
+                    "Identifier":   str("Public Duino-Coin node (BETA)")
+                }
+
+                thread_miner_api["Hashrate"] = 0
+                thread_miner_api["Hashrate_calc"] = 0
+                thread_miner_api["Algorithm"] = "NODE"
+                minerapi[thread_id] = thread_miner_api
+
+                send_data("OK\n", connection)
+                sleep_by_cpu_usage(3)
+        else:
+            task = "NO_TASK"
+
+            sync_data = (task
+                         + ","
+                         + ""
+                         + ","
+                         + str(0)
+                         + "\n")
+            send_data(sync_data, connection)
+            sleep_by_cpu_usage(5)
+
     except Exception as e:
         print(traceback.format_exc())
 
@@ -2601,6 +2679,7 @@ def handle(connection, address):
                 """
                 thread_id = protocol_mine(data, connection, address)
                 username = data[1]
+                break
 
             elif data[0] == "JOBXX":
                 """ 
@@ -2609,6 +2688,7 @@ def handle(connection, address):
                 thread_id = protocol_mine(
                     data, connection, address, using_xxhash=True)
                 username = data[1]
+                break
 
             # USER FUNCTIONS
 
@@ -2620,12 +2700,13 @@ def handle(connection, address):
                     protocol_get_balance(data, connection, username)
                 else:
                     send_data("NO,Not logged in", connection)
+                    break
 
-            elif data[0] == "NODE":
+           # elif data[0] == "NODE":
                 """ 
                 Client is a node
                 """
-                protocol_node(data, connection)
+                #protocol_node(data, connection)
 
             elif data[0] == "UEXI":
                 """ 
@@ -2641,6 +2722,7 @@ def handle(connection, address):
                 Client requested registation 
                 """
                 protocol_register(data, connection, address)
+                break
 
             elif data[0] == "CHGP":
                 """ 
@@ -2743,24 +2825,25 @@ def handle(connection, address):
                         global_blocks += blocks_to_add
 
                         if poolWorkers:
-                            for threadid in minerapi.copy():
+                            new_minerapi = minerapi
+                            for threadid in new_minerapi.copy():
                                 if len(str(threadid)) < 11:
-                                    minerapi.pop(threadid)
+                                    new_minerapi.pop(threadid)
 
                             for worker in poolWorkers.copy():
                                 try:
-                                    minerapi[worker] = poolWorkers[worker]
+                                    new_minerapi[worker] = poolWorkers[worker]
                                 except Exception as e:
                                     print(e)
-                                    pass
+                            minerapi = new_minerapi
                         if rewards:
                             for user in rewards:
                                 try:
                                     balances_to_update[user] += rewards[user]
                                 except:
                                     balances_to_update[user] = rewards[user]
-                        # admin_print("Pool synced", len(rewards),
-                        #            "rewards", len(poolWorkers), "workers")
+                        #print("Pool synced ", len(rewards),
+                        #      " rewards ", len(poolWorkers), " workers")
                 except Exception as e:
                     admin_print("Error syncing pool: " + str(e))
 
