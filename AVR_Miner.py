@@ -831,7 +831,7 @@ def mine_avr(com, threadid):
                                 str(result[0])
                                 + ','
                                 + str(hashrate_t)
-                                + ',Official AVR Miner (DUCO-S1A) v'
+                                + ',Official AVR Miner v'
                                 + str(MINER_VER)
                                 + ','
                                 + str(rig_identifier)
