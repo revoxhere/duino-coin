@@ -86,7 +86,6 @@
         "uptime_hour": " hour",
         "uptime_hours": " hours",
 
-
         "periodic_mining_report": "Periodic mining report (BETA): ",
         "report_period": "\n\t\t‖ During the last ",
         "report_time": " seconds",
@@ -254,7 +253,23 @@
         "max_hashrate_notice": "Kopanie Duino-Coin używając mocnego komputera może nie być bardzo opłacalne - proponujemy wpróbować Coin Magi (https://xmg.network) - naszą 'siostrzaną' monetę",
     
         "recommended": "zalecana opcja",
-        "connection_search": "Szukanie najszybszego serwera"
+        "connection_search": "Szukanie najszybszego serwera",
+
+        "uptime_seconds": " sekund",
+        "uptime_minute": " minutę",
+        "uptime_minutes": " minuty",
+        "uptime_hour": " godziny",
+        "uptime_hours": " godzin",
+        "periodic_mining_report": "Statystyki kopania (BETA): ",
+        "report_period": "\n\t\t‖ W czasie ",
+        "report_time": " sekund",
+        "report_body1": "\n\t\t‖ Wykopałeś ",
+        "report_body2": " share'ów (",
+        "report_body3": " share'ów/s)",
+        "report_body4": "\n\t\t‖ Z szybkością ",
+        "report_body5": "\n\t\t‖ Podczas tego czasu rozwiązałeś ",
+        "report_body6": " hashy",
+        "total_mining_time": "\n\t\t‖ Koparka działa przez: "
     },
     "spanish": {
         "translation_autor": "HGEpro",
@@ -765,7 +780,7 @@
 
         "max_threads_notice": "Minerar Duino-Coin com muitos núcleos(threads) causará queda na produtividade(lucro) - núcleos de mineração reduzido para 8",
         "max_hashrate_notice": "Minerar Duino-Coin com equipamentos poderosos pode não ser muito lucrativo para você - sugerimos tentar a Coin Magi (https://xmg.network) - ou 'sister' coin",
-    
+
         "recommended": "recomendado",
         "connection_search": "Procurando o servidor/nó mais rápido para se conectar",
 
