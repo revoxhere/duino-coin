@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.5.7)
+# Duino-Coin Python AVR Miner (v2.5.8)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -95,17 +95,7 @@ except ModuleNotFoundError:
     install('pypresence')
 
 # Global variables
-MINER_VER = '2.57'  # Version number
-NODE_ADDRESS = "server.duinocoin.com"
-AVAILABLE_PORTS = [
-    2811,
-    2812,
-    2813,
-    2814,
-    2815,
-    2816,
-    2817
-]
+MINER_VER = '2.58'  # Version number
 SOC_TIMEOUT = 45
 PERIODIC_REPORT_TIME = 60
 AVR_TIMEOUT = 3.1  # diff 6 * 100 / 196 h/s = 3.06
@@ -225,46 +215,6 @@ def title(title: str):
         # Most standard terminals
         print('\33]0;' + title + '\a', end='')
         sys.stdout.flush()
-
-
-def get_fastest_connection(server_ip: str):
-    connection_pool = []
-    available_connections = []
-
-    pretty_print("net0",
-                 " "
-                 + get_string("connection_search")
-                 + "...",
-                 "warning")
-
-    for i in range(len(AVAILABLE_PORTS)):
-        connection_pool.append(socket())
-        connection_pool[i].setblocking(0)
-        try:
-            connection_pool[i].connect((server_ip,
-                                        AVAILABLE_PORTS[i]))
-            connection_pool[i].settimeout(SOC_TIMEOUT)
-        except BlockingIOError as e:
-            pass
-
-    ready_connections, _, __ = select.select(connection_pool, [], [])
-
-    while True:
-        for connection in ready_connections:
-            try:
-                server_version = connection.recv(100).decode()
-            except:
-                continue
-            if server_version == b'':
-                continue
-
-            available_connections.append(connection)
-            connection.send(b'PING')
-
-        ready_connections, _, __ = select.select(available_connections, [], [])
-        ready_connections[0].recv(100)
-        ready_connections[0].settimeout(SOC_TIMEOUT)
-        return ready_connections[0].getpeername()[1]
 
 
 def handler(signal_received, frame):
@@ -632,14 +582,6 @@ def pretty_print(message_type, message, state):
 
 def mine_avr(com, threadid):
     global hashrate
-
-    if shuffle_ports == "y":
-        debug_output(
-            'Searching for fastest connection to the server')
-        NODE_PORT = get_fastest_connection(str(NODE_ADDRESS))
-        debug_output('Fastest connection found')
-    else:
-        NODE_PORT = AVAILABLE_PORTS[0]
 
     start_time = time()
     report_shares = 0
@@ -1176,6 +1118,32 @@ def calculate_uptime(start_time):
         return str(round(uptime // 3600)) + get_string('uptime_hours')
 
 
+def fetch_pools():
+    while True:
+        pretty_print("net0",
+                     " "
+                     + get_string("connection_search")
+                     + "...",
+                     "warning")
+
+        try:
+            response = requests.get(
+                "https://server.duinocoin.com/getPool"
+            ).json()
+
+            NODE_ADDRESS = response["ip"]
+            NODE_PORT = response["port"]
+
+            return NODE_ADDRESS, NODE_PORT
+        except Exception as e:
+            pretty_print("net0",
+                         " Error retrieving mining node: "
+                         + str(e)
+                         + ", retrying in 15s",
+                         "error")
+            sleep(15)
+
+
 if __name__ == '__main__':
     if osname == "nt":
         # Unicode fix for windows
@@ -1213,6 +1181,14 @@ if __name__ == '__main__':
         debug_output('greeting displayed')
     except Exception as e:
         debug_output('Error displaying greeting message: ' + str(e))
+
+    try:
+        NODE_ADDRESS, NODE_PORT = fetch_pools()
+    except Exception as e:
+        print(e)
+        NODE_ADDRESS = "server.duinocoin.com"
+        NODE_PORT = 2813
+        debug_output("Using default server port and address")
 
     try:
         # Launch avr duco mining threads
