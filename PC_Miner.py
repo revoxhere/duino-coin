@@ -619,7 +619,7 @@ def loadConfig():
 
     efficiency = (100 - float(efficiency)) * 0.01
 
-    
+
 def ducos1(
         lastBlockHash,
         expectedHash,
@@ -1275,10 +1275,10 @@ def get_fastest_connection(server_ip: str):
 def fetch_pools():
     while True:
         pretty_print("net0",
-            " "
-            + getString("connection_search")
-            + "...",
-            "warning")
+                     " "
+                     + getString("connection_search")
+                     + "...",
+                     "warning")
 
         try:
             response = requests.get(
