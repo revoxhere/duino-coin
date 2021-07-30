@@ -69,7 +69,23 @@
 
         "load_config_error": " Problem z ładowaniem pliku konfiguracyjnego (",
         "load_config_error_warning": "/Miner_config.cfg). Spróbuj go usunąć i włącz koparkę ponownie. Wyłączanie za 10s",
-        "connection_search": "Szukanie najszybszego serwera"
+        "connection_search": "Szukanie najszybszego serwera",
+
+        "uptime_seconds": " sekundy",
+        "uptime_minute": " minuty",
+        "uptime_minutes": " minut",
+        "uptime_hour": " godziny",
+        "uptime_hours": " godzin",
+        "periodic_mining_report": "Statystyki kopania (BETA): ",
+        "report_period": "\n\t\t‖ W czasie ",
+        "report_time": " seconds",
+        "report_body1": "\n\t\t‖ Wykopałeś ",
+        "report_body2": " share'ów (",
+        "report_body3": " share'ów/s)",
+        "report_body4": "\n\t\t‖ Z szybkością ",
+        "report_body5": "\n\t\t‖ Podczas tego czasu rozwiązałeś ",
+        "report_body6": " hashy",
+        "total_mining_time": "\n\t\t‖ Koparka działa przez: "
     },
     "russian": {
         "translation_autor": "5Q",
