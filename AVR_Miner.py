@@ -1084,7 +1084,8 @@ def periodic_report(start_time,
                     uptime):
     seconds = round(end_time - start_time)
     pretty_print("sys0",
-                 get_string('periodic_mining_report')
+                 " " 
+                 + get_string('periodic_mining_report')
                  + Fore.RESET
                  + Style.NORMAL
                  + get_string('report_period')
