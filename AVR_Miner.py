@@ -183,7 +183,7 @@ def get_string(string_name: str):
     elif string_name in lang_file['english']:
         return lang_file['english'][string_name]
     else:
-        return 'String not found: ' + string_name
+        return ' String not found: ' + string_name
 
 
 def get_prefix(diff: int):
