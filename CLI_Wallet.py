@@ -29,11 +29,10 @@ except:
     now = datetime.datetime.now()
     print(now.strftime("%H:%M:%S ") +
           "Requests is not installed. "
-          + "Please install it using: python3 -m pip install requests."
-          + "\nExiting in 15s.")
-    time.sleep(15)
-    os._exit(1)
-
+          + "Wallet will try to install it. "
+          + "If it fails, please manually install \"requests\"
+    install("requests")
+          
 wrong_passphrase = False
 iterations = 100_000
 timeout = 30  # Socket timeout
@@ -113,8 +112,9 @@ try:
     from base64 import urlsafe_b64encode as b64e
 except ModuleNotFoundError:
     print(getString("base64_not_installed"))
-    time.sleep(15)
-    _exit(1)
+    print(getString("Wallet will try to install it"))
+    print(getstring("If it fails, please manually install "base64".))       
+          install("base64")
 
 try:
     from cryptography.fernet import Fernet, InvalidToken
@@ -124,32 +124,37 @@ try:
 except:
     now = datetime.datetime.now()
     print(now.strftime("%H:%M:%S ") + getString("cryptography_not_installed"))
-    time.sleep(15)
-    os._exit(1)
-
+    print(getString("Wallet will try to install it."))
+    print(getstring("If it fails, please manually install "cryptography".))         
+          install("cryptography")
+          
+          
 try:
     import secrets
 except:
     now = datetime.datetime.now()
     print(now.strftime("%H:%M:%S ") + getString("secrets_not_installed"))
-    time.sleep(15)
-    os._exit(1)
+    print(getString("Wallet will try to install it."))
+    print(getstring("If it fails, please manually install "secrets".))         
+          install("secrets")
 
 try:
     import websocket
 except:
     now = datetime.datetime.now()
     print(now.strftime("%H:%M:%S ") + getString("websocket_not_installed"))
-    time.sleep(15)
-    os._exit(1)
+    print(getString("Wallet will try to install it."))
+    print(getstring("If it fails, please manually install "websocket".))         
+          install("websocket")
 
 try:  # Check if colorama is installed
     from colorama import Back, Fore, Style, init
 except:
     now = datetime.datetime.now()
     print(now.strftime("%H:%M:%S ") + getString("colorama_not_installed"))
-    time.sleep(15)
-    os._exit(1)
+    print(getString("Wallet will try to install it."))
+    print(getstring("If it fails, please manually install "colorama".))         
+          install("colorama")
 
 try:
     import tronpy
@@ -159,6 +164,9 @@ except:
     tronpy_installed = False
     now = datetime.datetime.now()
     print(now.strftime("%H:%M:%S ") + getString("tronpy_not_installed"))
+    print(getString("Wallet will try to install it."))
+    print(getstring("If it fails, please manually install "tronpy".))         
+          install("tronpy")
 
 backend = default_backend()
 
