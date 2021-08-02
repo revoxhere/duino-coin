@@ -131,6 +131,7 @@ After doing this, you are good to go with launching the software (just double cl
   *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) account statistics website by siunus
   *   [duino-tools](https://github.com/kyngs/duino-tools) written in Java by kyngs
   *   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
+  *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI Wallet by viktor02
 
   This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
 </details>
