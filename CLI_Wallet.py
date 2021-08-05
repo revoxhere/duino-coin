@@ -484,7 +484,6 @@ while True:
                                 config["wallet"]["password"]
                             ).decode("utf8")
                         ).decode(utf8)
-                    )
                 except InvalidToken:
                     print(getString("invalid_passphrase_wrapper"))
                     use_wrapper = False
