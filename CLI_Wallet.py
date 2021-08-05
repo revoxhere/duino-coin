@@ -469,23 +469,21 @@ while True:
                     stream=None)
 
                 try:
-                    priv_key = str(password_decrypt(
+                    priv_key = password_decrypt(
                         config["wrapper"]["priv_key"],
-                        passphrase))
+                        passphrase).decode("utf8")
                 except InvalidToken:
                     print(getString("invalid_passphrase_wrapper"))
                     use_wrapper = False
                     wrong_passphrase = True
             else:
                 try:
-                    priv_key = str(
-                        password_decrypt(
+                    priv_key = password_decrypt(
                             config["wrapper"]["priv_key"],
                             b64decode(
                                 config["wallet"]["password"]
                             ).decode("utf8")
-                        )
-                    )
+                        ).decode(utf8)
                 except InvalidToken:
                     print(getString("invalid_passphrase_wrapper"))
                     use_wrapper = False
