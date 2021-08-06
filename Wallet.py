@@ -1183,7 +1183,7 @@ def unwrapper_window(handler):
         privkeyfile.close()
 
         try:
-            priv_key = password_decrypt(privKeyEnc, passphrase)).decode()
+            priv_key = password_decrypt(privKeyEnc, passphrase).decode()
             use_wrapper = True
         except InvalidToken:
             print(get_string("invalid_passphrase"))
