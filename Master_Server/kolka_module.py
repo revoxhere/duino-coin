@@ -1,41 +1,61 @@
 # Duino-Coin Kolka algorithms and formulas
 # 2019-2021 Duino-Coin community
 from fastrand import pcg32bounded as fastrandint
-from math import floor
+from math import floor, log
 MULTIPLIER = 1
+DECIMALS = 20
 
 
-def kolka_v1(basereward, sharetime, difficulty, workers, penalty=False):
+def kolka_v1(hashrate, difficulty, workers):
     """ Kolka V1 reward system - to be extended in the future
         Authors: revox """
-    pc_mining_perc = .80
-    avr_mining_perc = .96
-    highest_avr_diff = 2400
-    highest_pc_diff = 350000
+    pc_mining_perc = 0.80
+    avr_mining_perc = 0.96
 
-    if penalty:
-        output = float(int(int(sharetime) ** 2) / 1000000) * -1
-    else:
-        output = (MULTIPLIER * basereward
-                  + float(sharetime) / 10000
-                  + float(difficulty) / 100000000)
+    highest_avr_diff = 1500
+    highest_pc_diff = 150000
+
+    MAX_AVR_HASHRATE = 210
+    MAX_MEGAAVR_HASHRATE = 700
+    MAX_ESP_HASHRATE = 11000
+
+    try:
+        if hashrate <= MAX_AVR_HASHRATE:
+            output = log(hashrate) / 6006
+        elif hashrate <= MAX_MEGAAVR_HASHRATE:
+            output = log(hashrate) / 6226
+        elif hashrate <= MAX_ESP_HASHRATE:
+            output = log(hashrate) / 8558
+        else:
+            output = log(hashrate) / 20002
+    except:
+        output = 0
+
     if difficulty > highest_pc_diff:
-        output = output * (pc_mining_perc ** (workers-1)) / 177
+        output = output + output * \
+            (pc_mining_perc ** (workers-1)) / (28110 ** workers)
     elif difficulty > highest_avr_diff:
-        output = output * (pc_mining_perc ** (workers-1))
+        output = output + output * (pc_mining_perc ** (workers-1))
     else:
-        output = output * (avr_mining_perc ** (workers-1))
+        output = output + output * (avr_mining_perc ** (workers-1))
 
-    return float(2*output)
+    if workers > 24:
+        return 0
+
+    return round(output, DECIMALS)
 
 
 def kolka_v2(current_difficulty, difficulty_list):
     """ Part of Kolka V2 system - move miner to the next diff tier
         Authors: revox """
-        
+
     if current_difficulty == "AVR":
+        return "MEGA"
+    if current_difficulty == "MEGA":
         return "ARM"
     if current_difficulty == "ARM":
+        return "DUE"
+    if current_difficulty == "DUE":
         return "ESP8266"
     if current_difficulty == "ESP8266":
         return "ESP32"
@@ -45,7 +65,7 @@ def kolka_v2(current_difficulty, difficulty_list):
         return "MEDIUM"
     if current_difficulty == "MEDIUM":
         return "NET"
-    if current_difficulty == "NET":
+    else:
         return "EXTREME"
 
 
