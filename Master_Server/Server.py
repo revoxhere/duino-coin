@@ -71,8 +71,8 @@ Have fun!
 DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
 SAVE_TIME = 10  # in seconds
-DB_TIMEOUT = 60
-SOCKET_TIMEOUT = 10
+DB_TIMEOUT = 10
+SOCKET_TIMEOUT = 15
 BACKLOG = None  # spawn connection instantly
 SERVER_VER = 2.6  # announced to clients
 READY_HASHES_NUM = 500  # in shares
@@ -533,11 +533,11 @@ def transaction_queue_handle(queue):
 
             timeEnd = time()
             timeElapsed = round(timeEnd - timeStart, 2)
-            #admin_print("Internal db commited - " + str(timeElapsed) + "s\n")
+            #admin_print("Internal db commited - " + str(s) + " updates " + str(timeElapsed) + "s\n")
 
-            if timeElapsed < 10:
-                sleep(10-timeElapsed)
-        sleep(1)
+            if timeElapsed < SAVE_TIME:
+                sleep(SAVE_TIME-timeElapsed)
+        sleep(3)
 
 
 def database_updater():
@@ -1631,16 +1631,17 @@ def get_sys_usage():
         ).stdout.decode().rstrip()
         return int(connections)
 
+    cpu_list = []
+    counter = 0
     while True:
-        global_connections = _get_connections()
-
-        cpu = floatmap(psutil.cpu_percent(), 0, 100, 0, 75)
-
-        # global_cpu_usage.append(cpu)
-        global_cpu_usage = cpu
-        # global_ram_usage.append(psutil.virtual_memory()[2])
+        counter += 1
+        if counter >= 5:
+            global_connections = _get_connections()
+            counter = 0
+        cpu_list.append(
+            floatmap(psutil.cpu_percent(interval=1), 0, 100, 0, 75))
+        global_cpu_usage = mean(cpu_list[-50:])
         global_ram_usage = psutil.virtual_memory()[2]
-
         sleep(SAVE_TIME)
 
 
@@ -1828,7 +1829,7 @@ def create_main_api_file():
     global miners_per_user
 
     while True:
-        sleep(SAVE_TIME)
+        sleep(SAVE_TIME/2)
 
         total_hashrate, net_wattage = 0, 0
         ducos1_hashrate, xxhash_hashrate = 0, 0
@@ -1931,6 +1932,8 @@ def create_main_api_file():
                 "Banned": len(banlist)
             }
 
+            duco_prices["pancake"] = 0.00511504
+
             server_api = {
                 "Duino-Coin Server API": "github.com/revoxhere/duino-coin",
                 "Server version":        SERVER_VER,
@@ -1953,6 +1956,7 @@ def create_main_api_file():
                 "Duco price DGB":        duco_prices["dgb"],
                 "Duco Node-S price":     duco_prices["nodes"],
                 "Duco JustSwap price":   duco_prices["justswap"],
+                "Duco PancakeSwap price": duco_prices["pancake"],
                 "Registered users":      count_registered_users(),
                 "All-time mined DUCO":   count_total_duco(),
                 "Current difficulty":    job_tiers["NET"]["difficulty"],
@@ -1984,7 +1988,7 @@ def create_minerapi():
     """
     global minerapi
     while True:
-        sleep(SAVE_TIME)
+        sleep(SAVE_TIME*2)
 
         memory_datab.execute("DELETE FROM Miners")
 
@@ -2421,7 +2425,7 @@ def get_duco_prices():
                     ).json()
                     break
                 except:
-                    pass
+                    sleep(1)
 
             """
             Calculate prices from exchange rates
@@ -2874,8 +2878,8 @@ def handle(connection, address):
                 PF.pool_login_remove(connection=connection,
                                      data=data,
                                      PoolPassword=PoolPassword)
-            else:
-                break
+
+            sleep(PING_SLEEP_TIME)
 
     except Exception:
         pass
@@ -2920,7 +2924,7 @@ def countips():
                     temporary_ban(ip)
             except:
                 pass
-        sleep(5)
+        sleep(10)
 
 
 def resetips():
@@ -3134,7 +3138,7 @@ if __name__ == "__main__":
         pass
 
     admin_print("Launching background threads")
-    threading.Thread(target=autorestarter).start()
+    # threading.Thread(target=autorestarter).start()
 
     threading.Thread(target=get_duco_prices).start()
     threading.Thread(target=duino_stats_restart_handle).start()
@@ -3165,7 +3169,8 @@ if __name__ == "__main__":
         server_thread = StreamServer(
             (HOSTNAME, port),
             handle=handle,
-            backlog=BACKLOG
+            backlog=BACKLOG,
+            spawn=Pool(5000)
         )
         admin_print("Successfully started TCP server on port " + str(port))
         server_thread.serve_forever()
