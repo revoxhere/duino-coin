@@ -1,4 +1,4 @@
-## wDUCO 2.0 functions by yanis (@ygboucherk), 2020-2021
+# wDUCO 2.0 functions by yanis (@ygboucherk), 2020-2021
 import sqlite3
 import traceback
 import datetime
@@ -81,14 +81,21 @@ def protocol_wrap_wduco(username, tron_address, amount):
                 balance -= float(amount)
                 print("DUCO removed from pending balance")
 
-                with sqlite3.connect(database) as conn:
-                    datab = conn.cursor()
-                    datab.execute(
-                        """UPDATE Users
-                        set balance = ?
-                        where username = ?""",
-                        (balance, username))
-                    conn.commit()
+                while True:
+                    try:
+                        with sqlite3.connect(database,
+                                             timeout=database_timeout) as conn:
+                            datab = conn.cursor()
+                            datab.execute(
+                                """UPDATE Users
+                                set balance = ?
+                                where username = ?""",
+                                (balance, username))
+                            conn.commit()
+                        break
+                    except:
+                        print("Retrying")
+                        pass
                 print("DUCO balance sent to DB, sending tron transaction")
 
                 print("Tron wrapper called")
@@ -113,13 +120,16 @@ def protocol_wrap_wduco(username, tron_address, amount):
 
                 if trontxfeedback:
                     print("Successful wrapping")
+                    now = datetime.datetime.now()
+                    lastBlockHash = sha1(bytes(
+                        str(tron_address)+str(amount), encoding='utf8')
+                    ).hexdigest()
                     try:
                         with sqlite3.connect(config_db_transactions,
-                                             timeout=database_timeout) as tranconn:
+                                             timeout=database_timeout
+                                             ) as tranconn:
                             datab = tranconn.cursor()
-                            now = datetime.datetime.now()
-                            lastBlockHash = sha1(
-                                tron_address+str(amount)).hexdigest()
+
                             formatteddatetime = now.strftime(
                                 "%d/%m/%Y %H:%M:%S")
                             datab.execute("""INSERT INTO 
@@ -132,7 +142,8 @@ def protocol_wrap_wduco(username, tron_address, amount):
                                 VALUES(?, ?, ?, ?, ?)""",
                                           (formatteddatetime,
                                            username,
-                                           str("wrapper - ")+str(tron_address),
+                                           "wDUCO Wrap (" +
+                                           str(tron_address)+")",
                                               amount,
                                               lastBlockHash))
                             tranconn.commit()
@@ -180,8 +191,16 @@ def protocol_unwrap_wduco(username, tron_address, amount):
                 pass
 
         print("Balance retrieved")
-        wbalance = float(
-            int(wduco.functions.pendingWithdrawals(tron_address, username)))/10**6
+        while True:
+            try:
+                wbalance = float(
+                    int(wduco.functions.pendingWithdrawals(
+                        tron_address, username)
+                        )
+                )/10**6
+                break
+            except:
+                print("Retrying wDUCO balance fetch")
 
         if float(amount) <= float(wbalance) and float(amount) > 0:
 
@@ -229,13 +248,16 @@ def protocol_unwrap_wduco(username, tron_address, amount):
                         print("Successful unwrapping")
                         try:
                             with sqlite3.connect(config_db_transactions,
-                                                 timeout=database_timeout) as tranconn:
+                                                 timeout=database_timeout
+                                                 ) as tranconn:
                                 datab = tranconn.cursor()
                                 now = datetime.datetime.now()
                                 formatteddatetime = now.strftime(
                                     "%d/%m/%Y %H:%M:%S")
                                 lastBlockHash = sha1(
-                                    tron_address+str(amount)).hexdigest()
+                                    bytes(str(tron_address)+str(amount),
+                                          encoding='utf8')
+                                ).hexdigest()
                                 datab.execute("""INSERT INTO 
                                         Transactions(
                                         timestamp, 
@@ -245,7 +267,8 @@ def protocol_unwrap_wduco(username, tron_address, amount):
                                         hash) 
                                         VALUES(?, ?, ?, ?, ?)""",
                                               (formatteddatetime,
-                                               str("Wrapper - ")+str(tron_address),
+                                               "wDUCO Unwrap (" +
+                                               str(tron_address) + ")",
                                                   username,
                                                   amount,
                                                   lastBlockHash))
