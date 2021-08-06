@@ -39,9 +39,6 @@ def kolka_v1(hashrate, difficulty, workers):
     else:
         output = output + output * (avr_mining_perc ** (workers-1))
 
-    if workers > 24:
-        return 0
-
     return round(output, DECIMALS)
 
 
