@@ -6,7 +6,7 @@ import json
 import datetime
 import requests
 
-POOL_DATABASE = 'pools_database.db'
+POOL_DATABASE = 'config/pools_database.db'
 POOL_VER = 0.1
 
 
@@ -268,22 +268,9 @@ class Pool:
                 poolConnections = int(info['connections'])
             except Exception as e:
                 print("Error fetching JSON data:", e)
-
-            try:
-                r_rewards = requests.get(f"http://{self.poolIP}:6001/rewards")
-                rewards = r_rewards.json()
-            except:
-                pass
-
         except Exception as e:
             send_data(data=f"NO,Error: {e}", connection=self.connection)
             return 0, 0, {}, {}, 1
-
-        try:
-            r_workers = requests.get(f"http://{self.poolIP}:6001/workers")
-            poolWorkers = r_workers.json()
-        except:
-            pass
 
         with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
@@ -299,6 +286,20 @@ class Pool:
             conn.commit()
 
         send_data(data="SyncOK", connection=self.connection)
+
+        try:
+            r_rewards = requests.get(f"http://{self.poolIP}/rewards.json")
+            rewards = r_rewards.json()
+            #print("Synced rewards")
+        except:
+            pass
+
+        try:
+            r_workers = requests.get(f"http://{self.poolIP}/workers.json")
+            poolWorkers = r_workers.json()
+            #print("Synced workers")
+        except:
+            pass
 
         return blocks_to_add, poolConnections, poolWorkers, rewards, 0
 
