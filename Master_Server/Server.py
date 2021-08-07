@@ -316,7 +316,7 @@ def update_job_tiers():
             "EXTREME": {
                 "difficulty": int(1500000 * DIFF_MULTIPLIER),
                 "reward": 0,
-                "max_hashrate": 999999999
+                "max_hashrate": float("inf")
             },
             "XXHASH": {
                 "difficulty": int(100000 * DIFF_MULTIPLIER),
