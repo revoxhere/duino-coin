@@ -14,19 +14,13 @@
 To build your own Duino-Coin apps, here's a list of of commands the master server accepts.
 To start communication however, firstly you need to connect to the server. For now you have two options:
 *   TCP connection
-    * `tcp://51.15.127.80:2811` - Legacy port
-    * `tcp://51.15.127.80:2812` - General mining port
-    * `tcp://51.15.127.80:2813` - General mining port
-    * `tcp://51.15.127.80:2814` - General mining port
-    * `tcp://51.15.127.80:2815` - General mining port
-    * `tcp://51.15.127.80:2816` - General mining port
-    * `tcp://51.15.127.80:2817` - General mining port
-    * `tcp://51.15.127.90:2820` - ESP32 mining port
-    * `tcp://51.15.127.90:2825` - ESP8266 mining port
+    * `tcp://51.15.127.80:2811` - General purpose port
+    * `tcp://51.15.127.80:2812` - General purpose port
+    * `tcp://51.15.127.80:2813` - General purpose port
     * Note: you can also use `server.duinocoin.com` instead of `51.15.127.80`
 *   Secure Websocket sonnection (SSL required)
-    *  `wss://server.duinocoin.com:14808` - All commands available (proxied to one of the TCP ports)
-    *  `wss://server.duinocoin.com:15808` - Only wallet functions available (proxied to separate Wallet node)
+    *  `wss://server.duinocoin.com:14808` - Proxied to **pulsepool** for webmining
+    *  `wss://server.duinocoin.com:15808` - General purpose port used for wallets
 
 **Make sure you don't create more more than 50 connections in time shorter than 30 seconds.**
 If you do that, the server may ban your IP for creating too much traffic and being a potential DDoS attacker.
