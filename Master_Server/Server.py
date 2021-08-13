@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Master Server (v2.6.1)
+# Duino-Coin Master Server (v2.6.2)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -52,6 +52,7 @@ from shutil import copyfile
 # python3 -m pip install udatetime
 import udatetime as utime
 import resource
+import ast
 
 """
 Server
@@ -62,7 +63,9 @@ PORTS = [
     2810,  # Pools
     2811,  # General purpose
     2812,  # General purpose
-    2813   # General purpose
+    2813,  # General purpose
+    2814,  # General purpose
+    2815,  # General purpose
 ]
 SERVER_VER = 2.6  # announced to clients
 SAVE_TIME = 10  # in seconds
@@ -162,7 +165,7 @@ disconnect_list, banlist = [], []
 whitelisted_usernames, whitelisted_ips = [], []
 connections_per_ip, miners_per_user = {}, {}
 chip_ids, workers, registrations = {}, {}, {}
-jail, mpproc = [], []
+jail, mpproc, pool_infos = [], [], []
 cached_balances, cached_logins = {}, {}
 lock = threading.Lock()
 last_block = "DUCO-S1"
@@ -179,7 +182,8 @@ You can also join our Discord server:
 https://discord.gg/duinocoin to chat, take part in
 giveaways, trade and get help from other Duino-Coin users.
 Happy mining!
-Sincerely, the Duino-Coin Team"""
+Sincerely, the Duino-Coin Team
+"""
 
 # Registration email - HTML version
 html = """\
@@ -212,7 +216,8 @@ We have noticed behavior on your account that
 does not comply with our terms of service.
 As a result, your account has been
 permanently banned.
-Sincerely, hte Duino-Coin Team"""
+Sincerely, hte Duino-Coin Team
+"""
 
 # Ban email - HTML version
 htmlBan = """\
@@ -296,7 +301,7 @@ def perm_ban(ip, perm=False):
         os.system("sudo iptables -A INPUT -s " +
                   str(ip)+" -j DROP >/dev/null 2>&1")
         if not perm:
-            threading.Timer(60*60, unban, [ip]).start()
+            threading.Timer(60*10, unban, [ip]).start()
 
 
 def unban(ip):
@@ -557,10 +562,8 @@ def database_updater():
 
                 amount_to_update = balances_to_update[user] / 2
 
-                if amount_to_update / 30 > 0.2:
-                    amount_to_update = floatmap(
-                        amount_to_update / 30, 0.02, 1, 0.0002, 0.0025
-                    )
+                if amount_to_update > 0.05:
+                    amount_to_update = 0.05
 
                 if amount_to_update > 0:
                     increment_balance(user, amount_to_update)
@@ -676,7 +679,13 @@ def input_management():
             - ban <username> - bans username
             - jail <username> - jails username
             - pass <username> <password> - verify password of user
+            - pools - returns info about last pool updates
             """)
+
+        elif command[0] == "pools":
+            admin_print("Last infos about pool updates:")
+            for info in pool_infos[-15:]:
+                admin_print("  " + info)
 
         elif command[0] == "jail":
             jail.append(str(command[1]))
@@ -1647,42 +1656,27 @@ def get_sys_usage():
         sleep(SAVE_TIME)
 
 
-def hashrate_prefix(hashrate: int, accuracy: int):
+def scientific_prefix(symbol: str, value: float, accuracy: int):
     """
-    Input: hashrate as int
-    Output rounded hashrate with scientific prefix as string
+    Input: symbol to add, value 
+    Output rounded value with scientific prefix as string
     """
-    if hashrate >= 900000000:
-        prefix = " GH/s"
-        hashrate = hashrate / 1000000000
-    elif hashrate >= 900000:
-        prefix = " MH/s"
-        hashrate = hashrate / 1000000
-    elif hashrate >= 900:
-        prefix = " kH/s"
-        hashrate = hashrate / 1000
+    if value >= 900000000:
+        prefix = " G"
+        value = value / 1000000000
+    elif value >= 900000:
+        prefix = " M"
+        value = value / 1000000
+    elif value >= 900:
+        prefix = " k"
+        value = value / 1000
     else:
-        prefix = " H/s"
-    return str(round(hashrate, accuracy)) + str(prefix)
-
-
-def power_prefix(wattage: int, accuracy: int):
-    """
-    Input: hattage as int
-    Output rounded wattage with scientific prefix as string
-    """
-    if wattage >= 1000000000:
-        prefix = " GW"
-        wattage = wattage / 1000000000
-    elif wattage >= 1000000:
-        prefix = " MW"
-        wattage = wattage / 1000000
-    elif wattage >= 1000:
-        prefix = " kW"
-        wattage = wattage / 1000
-    else:
-        prefix = " W"
-    return str(round(wattage, accuracy)) + str(prefix)
+        prefix = " "
+    return (
+        str(round(value, accuracy))
+        + str(prefix)
+        + str(symbol)
+    )
 
 
 def count_registered_users():
@@ -1713,9 +1707,9 @@ def count_total_duco():
         return 0
 
 
-def get_richest_users(num):
+def get_richest_users(limit):
     """
-    Return a list of num richest users
+    Return a list of n richest users
     """
     leaders = []
     with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
@@ -1723,14 +1717,19 @@ def get_richest_users(num):
         datab.execute("""SELECT *
             FROM Users
             ORDER BY balance DESC
-            LIMIT """ + str(num))
-        for row in datab.fetchall():
-            leaders.append(
-                str(round((float(row[3])), 4)) + " DUCO - " + row[0])
-    return(leaders)
+            LIMIT """ + str(limit))
+        rows = datab.fetchall()
+
+    for row in rows:
+        leaders.append(
+            str(round((float(row[3])), DECIMALS))
+            + " DUCO - "
+            + row[0]
+        )
+    return leaders
 
 
-def get_balance_list():
+def get_balances(min_bal=0):
     """
     Returns a dictionary of balances of all users
     """
@@ -1741,72 +1740,87 @@ def get_balance_list():
             """SELECT *
             FROM Users
             ORDER BY balance DESC""")
-        for row in datab.fetchall():
-            if float(row[3]) > 0:
-                balances[str(row[0])] = str(float(row[3])) + " DUCO"
-            else:
-                """
-                Stop when rest of the balances are just empty accounts
-                """
-                break
-    return(balances)
+        rows = datab.fetchall()
+
+    for row in datab.fetchall():
+        if float(row[3]) > min_bal:
+            balances[str(row[0])] = str(float(row[3])) + " DUCO"
+        else:
+            """
+            Stop when rest of the balances are just empty accounts
+            """
+            break
+    return balances
 
 
-def get_transaction_list():
+def get_last_transactions(limit=1000):
     """
-    Returns a dictionary of all transactions
+    Returns a dictionary with last n transactions
     """
-    transactions = {}
+    transactions = []
+    transactions_dict = {}
     with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
         datab.execute("SELECT * FROM Transactions")
-        for row in datab.fetchall():
-            transactions[str(row[4])] = {
-                "Date":      str(row[0].split(" ")[0]),
-                "Time":      str(row[0].split(" ")[1]),
-                "Sender":    str(row[1]),
-                "Recipient": str(row[2]),
-                "Amount":    float(row[3]),
-                "Hash":      str(row[4]),
-                "Memo":      str(row[5])
-            }
-    return transactions
+        rows = datab.fetchall()
+
+    for row in rows:
+        transactions.append({
+            "Date":      str(row[0].split(" ")[0]),
+            "Time":      str(row[0].split(" ")[1]),
+            "Sender":    str(row[1]),
+            "Recipient": str(row[2]),
+            "Amount":    float(row[3]),
+            "Hash":      str(row[4]),
+            "Memo":      str(row[5])
+        })
+
+    for transaction in transactions[-limit:]:
+        transactions_dict[transaction["Hash"]] = transaction
+
+    return transactions_dict
 
 
-def get_blocks_list():
+def get_last_blocks(limit=1000):
     """
-    Returns a dictionary with all mined blocks
+    Returns a dictionary with last n mined blocks
     """
-    blocks = {}
+    blocks = []
+    blocks_dict = {}
     with sqlconn(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
-        datab.execute("SELECT * FROM Blocks")
-        for row in datab.fetchall():
-            blocks[row[3]] = {
-                "Date": str(row[0].split(" ")[0]),
-                "Time": str(row[0].split(" ")[1]),
-                "Finder": str(row[1]),
-                "Amount generated": float(row[2])
-            }
-    return blocks
+        datab.execute("SELECT * FROM Blocks ORDER BY hash DESC")
+        rows = datab.fetchall()
+
+    for row in rows:
+        blocks.append({
+            "Date":             str(row[0].split(" ")[0]),
+            "Time":             str(row[0].split(" ")[1]),
+            "Finder":           str(row[1]),
+            "Amount generated": float(row[2]),
+            "Hash":             str(row[3])
+        })
+
+    for block in blocks[-limit:]:
+        blocks_dict[block["Hash"]] = block
+
+    return blocks_dict
 
 
 def create_secondary_api_files():
     while True:
         with open('foundBlocks.json', 'w') as outfile:
             json.dump(
-                get_blocks_list(),
+                get_last_blocks(),
                 outfile,
-                indent=2,
                 ensure_ascii=False
             )
         sleep(SAVE_TIME)
 
         with open('balances.json', 'w') as outfile:
             json.dump(
-                get_balance_list(),
+                get_balances(),
                 outfile,
-                indent=2,
                 ensure_ascii=False
             )
 
@@ -1814,9 +1828,8 @@ def create_secondary_api_files():
 
         with open('transactions.json', 'w') as outfile:
             json.dump(
-                get_transaction_list(),
+                get_last_transactions(),
                 outfile,
-                indent=2,
                 ensure_ascii=False
             )
         sleep(SAVE_TIME)
@@ -1831,7 +1844,7 @@ def create_main_api_file():
     global miners_per_user
 
     while True:
-        sleep(SAVE_TIME/2)
+        sleep(SAVE_TIME)
 
         total_hashrate, net_wattage = 0, 0
         ducos1_hashrate, xxhash_hashrate = 0, 0
@@ -1851,10 +1864,12 @@ def create_main_api_file():
             for miner in minerapi.copy():
                 try:
                     if "Timestamp" in minerapi[miner]:
-                        d1 = datetime.datetime.fromtimestamp(minerapi[miner]["Timestamp"])
+                        d1 = datetime.datetime.fromtimestamp(
+                            minerapi[miner]["Timestamp"])
                         d2 = datetime.datetime.now()
                         rd = d2-d1
-                        if rd.total_seconds() > SOCKET_TIMEOUT*4:
+                        # Pop inactive miners from the API
+                        if rd.total_seconds() > 45:
                             minerapi.pop(miner)
                             continue
                 except:
@@ -1926,11 +1941,13 @@ def create_main_api_file():
                 except Exception as e:
                     pass
 
-            net_wattage = power_prefix(float(net_wattage), 2)
-            total_hashrate = hashrate_prefix(
-                int(xxhash_hashrate + ducos1_hashrate), 4)
-            xxhash_hashrate = hashrate_prefix(int(xxhash_hashrate), 1)
-            ducos1_hashrate = hashrate_prefix(int(ducos1_hashrate), 1)
+            net_wattage = scientific_prefix("W", net_wattage, 2)
+
+            total_hashrate = xxhash_hashrate + ducos1_hashrate
+            total_hashrate = scientific_prefix("H/s", total_hashrate, 4)
+
+            xxhash_hashrate = scientific_prefix("H/s", xxhash_hashrate, 1)
+            ducos1_hashrate = scientific_prefix("H/s", ducos1_hashrate, 1)
 
             miners_per_user = OrderedDict(
                 sorted(
@@ -1945,6 +1962,9 @@ def create_main_api_file():
                 "Banned": len(banlist)
             }
 
+            current_time = now().strftime("%d/%m/%Y %H:%M:%S (UTC)")
+            max_price = duco_prices[max(duco_prices, key=duco_prices.get)]
+
             duco_prices["pancake"] = 0.00420784
 
             server_api = {
@@ -1954,14 +1974,12 @@ def create_main_api_file():
                 "Open threads":          threading.activeCount(),
                 "Server CPU usage":      round(global_cpu_usage, 1),
                 "Server RAM usage":      round(global_ram_usage, 1),
-                "Last update":           now().strftime(
-                    "%d/%m/%Y %H:%M:%S (UTC)"),
+                "Last update":           current_time,
                 "Net energy usage":      net_wattage,
                 "Pool hashrate":         total_hashrate,
                 "DUCO-S1 hashrate":      ducos1_hashrate,
                 "XXHASH hashrate":       xxhash_hashrate,
-                "Duco price":            duco_prices[max(duco_prices,
-                                                         key=duco_prices.get)],
+                "Duco price":            max_price,
                 "Duco price XMG":        duco_prices["xmg"],
                 "Duco price BCH":        duco_prices["bch"],
                 "Duco price TRX":        duco_prices["trx"],
@@ -1978,14 +1996,15 @@ def create_main_api_file():
                 "Kolka":                 kolka_dict,
                 "Miner distribution":    miner_dict,
                 "Top 10 richest miners": get_richest_users(10),
-                "Active workers":        miners_per_user
+                # "Active workers":        miners_per_user
             }
 
             with open(API_JSON_URI, 'w') as outfile:
                 json.dump(
                     server_api,
                     outfile,
-                    ensure_ascii=False)
+                    ensure_ascii=False
+                )
 
         except Exception:
             admin_print("Error creating main api.json file:"
@@ -1994,14 +2013,13 @@ def create_main_api_file():
 
 def create_minerapi():
     """
-    Creates miners.json file
-    containing detailed information about
-    every miner and also saves them to
-    the minerapi database
+    Creates a database with the miners
+    that is later used to provide user info
+    in the REST API
     """
     global minerapi
     while True:
-        sleep(SAVE_TIME*2)
+        sleep(15)
 
         memory_datab.execute("DELETE FROM Miners")
 
@@ -2646,6 +2664,7 @@ def handle(connection, address):
     global balances_to_update
     global global_connections
     global disconnect_list
+    global pool_infos
 
     logged_in = False
 
@@ -2842,12 +2861,21 @@ def handle(connection, address):
             # POOL FUNCTIONS
 
             elif data[0] == "PoolLogin":
-                # print("Pool logging in")
-                Pool = PF.Pool(connection=connection)
-                Pool.login(data=data)
+                try:
+                    timestamp = str(now().strftime("%H:%M:%S"))
+                    info = str(data[1])
+                    info = ast.literal_eval(info)
+                    info = json.loads(info)
+                    pool_infos.append(timestamp
+                                      + " - Pool "
+                                        + info['identifier']
+                                        + " logged in")
+                    Pool = PF.Pool(connection=connection)
+                    Pool.login(data=data)
+                except Exception:
+                    print(traceback.format_exc())
 
             elif data[0] == "PoolSync":
-                #print("Pool syncing")
                 try:
                     blocks_to_add,\
                         poolConnections,\
@@ -2863,17 +2891,24 @@ def handle(connection, address):
                             if (amount_to_update
                                     and match(r"^[A-Za-z0-9_-]*$", user)):
                                 try:
-                                    balances_to_update[user] += float(amount_to_update)
+                                    balances_to_update[user] += float(
+                                        amount_to_update)
                                 except:
-                                    balances_to_update[user] = float(amount_to_update)
+                                    balances_to_update[user] = float(
+                                        amount_to_update)
 
                     if poolWorkers:
                         for worker in poolWorkers.copy():
                             try:
                                 minerapi[worker] = poolWorkers[worker]
-                            except Exception as e:
-                                print(e)
-                    #print("Pool synced", len(rewards))
+                            except Exception:
+                                continue
+
+                    timestamp = str(now().strftime("%H:%M:%S"))
+                    pool_infos.append(timestamp
+                                      + " - Pool synced "
+                                      + str(len(rewards))
+                                      + " rewards")
                 except Exception:
                     print(traceback.format_exc())
 
@@ -3167,7 +3202,8 @@ if __name__ == "__main__":
     transaction_queue = multiprocessing.Process(
         target=transaction_queue_handle,
         args=[queue, ],
-        daemon=True)
+        daemon=True
+    )
     transaction_queue.start()
     mpproc.append(transaction_queue)
 
