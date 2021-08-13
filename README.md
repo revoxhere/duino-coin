@@ -205,15 +205,13 @@ Some third-party included files may have different licenses - please check their
 6. Any user that keeps trying to use lower difficulty than it's suited for may get temporarily blocked.<br/>
 7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
 8. Only coins earned legally are eligible for the exchange.<br/>
-9. Users spotted using a VPN (or similar) with malicious intents (e.g. bypassing limits) may be banned without prior notice.<br/>
-10. Multiple accounts used to bypass limits may be banned without prior notice.<br/>
-11. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
-12. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
-13. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
-14. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed.<br />
-15. A user's DUCOs may be burnt if a violation can be proven.<br/>
-16. These terms of service can change at any time without prior notice.<br/>
-17. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+9. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
+10. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
+11. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
+12. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed as it's unfair for others.<br />
+13. A user's DUCOs may be burnt if a violation can be proven.<br/>
+14. These terms of service can change at any time without prior notice.<br/>
+15. Every user using Duino-Coin agrees to comply with the above rules.<br/>
 ## Privacy policy
 1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
 2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
