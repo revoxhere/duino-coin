@@ -54,7 +54,7 @@ import udatetime as utime
 import resource
 
 """
-Global variables
+Server
 """
 HOSTNAME = ""
 PORTS = [
@@ -64,35 +64,44 @@ PORTS = [
     2812,  # General purpose
     2813   # General purpose
 ]
+SERVER_VER = 2.6  # announced to clients
+SAVE_TIME = 10  # in seconds
+MAX_WORKERS = 150
+BCRYPT_ROUNDS = 6
+DECIMALS = 20  # max float precision
+PING_SLEEP_TIME = 0.5  # in seconds
+MAX_NUMBER_OF_PINGS = 3
+TEMP_BAN_TIME = 60  # in seconds
+MAX_REJECTED_SHARES = 5
 MOTD = """\
 You are connected to the Duino-Coin master server.
 Have fun!
 """
+
+"""
+Mining
+"""
 DIFF_INCREASES_PER = 24000  # net difficulty
 DIFF_MULTIPLIER = 1
-SAVE_TIME = 10  # in seconds
-DB_TIMEOUT = 10
-SOCKET_TIMEOUT = 15
-BACKLOG = None  # spawn connection instantly
-SERVER_VER = 2.6  # announced to clients
-READY_HASHES_NUM = 500  # in shares
+READY_HASHES_NUM = 5000  # in shares
 BLOCK_PROBABILITY = 500000  # 1 in X
 BLOCK_PROBABILITY_XXH = 10000  # 1 in X
 BLOCK_REWARD = 28.11  # duco
-UPDATE_MINERAPI_EVERY = 2  # in shares
+UPDATE_MINERAPI_EVERY = 2  # shares
 EXPECTED_SHARETIME = 15  # in seconds
-MAX_REJECTED_SHARES = 5
-BCRYPT_ROUNDS = 6
-DECIMALS = 10  # max float precision
-MAX_WORKERS = 25
-PING_SLEEP_TIME = 0.5  # in seconds
-MAX_NUMBER_OF_PINGS = 3
-TEMP_BAN_TIME = 60  # in seconds
+
+"""
+Gevent
+"""
+BACKLOG = None  # spawn connection instantly
+POOL_SIZE = None
+SOCKET_TIMEOUT = 15
+DB_TIMEOUT = 10
+
 
 """
 IO files location
 """
-
 CONFIG_BASE_DIR = "config"
 DATABASE = CONFIG_BASE_DIR + '/crypto_database.db'
 BLOCKCHAIN = CONFIG_BASE_DIR + '/duino_blockchain.db'
@@ -127,7 +136,6 @@ except Exception as e:
         wrapper_key = ???""", e)
     exit()
 
-global_blocks = 1
 duco_prices = {
     "xmg":  0.0065,
     "bch":  0.0065,
@@ -146,28 +154,18 @@ pregenerated_jobs = {
     "esp32": {},
     "esp8266": {}
 }
+global_blocks = 1
 global_last_block_hash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
-global_cpu_usage, global_ram_usage = 50, 50
-global_connections = 1
-minerapi = {}
-job_tiers = {}
-balances_to_update = {}
-disconnect_list = []
-banlist = []
-whitelisted_usernames = []
-whitelisted_ips = []
-connections_per_ip = {}
-miners_per_user = {}
-chip_ids = {}
-jail = []
-workers = {}
-registrations = {}
-estimated_profits = {}
-last_block = "DUCO-S1"
-cached_balances = {}
-cached_logins = {}
-mpproc = []
+global_cpu_usage, global_ram_usage, global_connections = 50, 50, 1
+minerapi, job_tiers, balances_to_update = {}, {}, {}
+disconnect_list, banlist = [], []
+whitelisted_usernames, whitelisted_ips = [], []
+connections_per_ip, miners_per_user = {}, {}
+chip_ids, workers, registrations = {}, {}, {}
+jail, mpproc = [], []
+cached_balances, cached_logins = {}, {}
 lock = threading.Lock()
+last_block = "DUCO-S1"
 
 # Registration email - text version
 text = """\
@@ -225,7 +223,8 @@ htmlBan = """\
     <h3>Hi there!</h3>
     <h4>We have noticed behavior on your account that does not comply with our
     <a href="https://github.com/revoxhere/duino-coin#terms-of-service">
-    terms of service
+        terms of service
+    </a>
     <p>As a result, your account has been permanently banned.<br>
        <italic>Sincerely, the Duino-Coin Team</italic>
     </p>
@@ -287,15 +286,17 @@ def create_backup():
                      '_'+str(counter)+"/transactions.db")
             admin_print("Successfully created backup for " + str(today))
 
-        hours = 1
+        hours = 6
         counter += 1
         sleep(60*60*hours)
 
 
-def perm_ban(ip):
+def perm_ban(ip, perm=False):
     if not ip in whitelisted_ips:
         os.system("sudo iptables -A INPUT -s " +
                   str(ip)+" -j DROP >/dev/null 2>&1")
+        if not perm:
+            threading.Timer(60*60, unban, [ip]).start()
 
 
 def unban(ip):
@@ -563,8 +564,7 @@ def database_updater():
 
                 if amount_to_update > 0:
                     increment_balance(user, amount_to_update)
-
-                balances_to_update.pop(user)
+                    balances_to_update[user] = 0
         except Exception:
             admin_print("Error adding user to DB queue: "
                         + str(traceback.format_exc()))
@@ -932,7 +932,7 @@ def input_management():
                             """UPDATE Users
                             set email = ?
                             where username = ?""",
-                            (password, command[1]))
+                            (command[2], command[1]))
                         conn.commit()
                         admin_print("Changed email of user " +
                                     str(command[1]))
@@ -1262,6 +1262,8 @@ def protocol_mine(data, connection, address, using_xxhash=False):
         if is_first_share:
             try:
                 username = str(data[1])
+                if username == "revox":
+                    print("revox connected")
                 if not user_exists(username):
                     send_data(
                         "BAD,This user doesn't exist\n",
@@ -1848,6 +1850,17 @@ def create_main_api_file():
         try:
             for miner in minerapi.copy():
                 try:
+                    if "Timestamp" in minerapi[miner]:
+                        d1 = datetime.datetime.fromtimestamp(minerapi[miner]["Timestamp"])
+                        d2 = datetime.datetime.now()
+                        rd = d2-d1
+                        if rd.total_seconds() > SOCKET_TIMEOUT*4:
+                            minerapi.pop(miner)
+                            continue
+                except:
+                    pass
+
+                try:
                     # Add miner hashrate to the server hashrate
                     if minerapi[miner]["Algorithm"] == "DUCO-S1":
                         try:
@@ -1932,7 +1945,7 @@ def create_main_api_file():
                 "Banned": len(banlist)
             }
 
-            duco_prices["pancake"] = 0.00511504
+            duco_prices["pancake"] = 0.00420784
 
             server_api = {
                 "Duino-Coin Server API": "github.com/revoxhere/duino-coin",
@@ -2639,7 +2652,7 @@ def handle(connection, address):
     ip_addr = address[0].replace("::ffff:", "")
 
     if ip_addr == "127.0.0.1" or ip_addr == "149.91.88.18":
-        connection.settimeout(60*10)
+        connection.settimeout(90)
     else:
         connection.settimeout(SOCKET_TIMEOUT)
 
@@ -2696,7 +2709,7 @@ def handle(connection, address):
                 """
                 thread_id = protocol_mine(data, connection, address)
                 username = data[1]
-                #send_data("NO,Update your miner", connection)
+                #send_data("NO,Please mine on the pool", connection)
                 break
 
             elif data[0] == "JOBXX":
@@ -2706,7 +2719,7 @@ def handle(connection, address):
                 thread_id = protocol_mine(
                     data, connection, address, using_xxhash=True)
                 username = data[1]
-                #send_data("NO,Update your miner", connection)
+                #send_data("NO,Please mine on the pool", connection)
                 break
 
             # USER FUNCTIONS
@@ -2834,8 +2847,7 @@ def handle(connection, address):
                 Pool.login(data=data)
 
             elif data[0] == "PoolSync":
-                connection.settimeout(90)
-                # print("Pool syncing")
+                #print("Pool syncing")
                 try:
                     blocks_to_add,\
                         poolConnections,\
@@ -2850,18 +2862,18 @@ def handle(connection, address):
                             amount_to_update = rewards[user]
                             if (amount_to_update
                                     and match(r"^[A-Za-z0-9_-]*$", user)):
-                                balances_to_update[user] = amount_to_update
+                                try:
+                                    balances_to_update[user] += float(amount_to_update)
+                                except:
+                                    balances_to_update[user] = float(amount_to_update)
 
                     if poolWorkers:
-                        for threadid in minerapi.copy():
-                            if len(str(threadid)) < 11:
-                                del minerapi[threadid]
-
                         for worker in poolWorkers.copy():
                             try:
                                 minerapi[worker] = poolWorkers[worker]
                             except Exception as e:
                                 print(e)
+                    #print("Pool synced", len(rewards))
                 except Exception:
                     print(traceback.format_exc())
 
@@ -3170,7 +3182,7 @@ if __name__ == "__main__":
             (HOSTNAME, port),
             handle=handle,
             backlog=BACKLOG,
-            spawn=Pool(5000)
+            spawn=Pool(POOL_SIZE)
         )
         admin_print("Successfully started TCP server on port " + str(port))
         server_thread.serve_forever()
