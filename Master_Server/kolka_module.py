@@ -32,12 +32,12 @@ def kolka_v1(hashrate, difficulty, workers):
         output = 0
 
     if difficulty > highest_pc_diff:
-        output = output + output * \
-            (pc_mining_perc ** (workers-1)) / (28110 ** workers)
+        output = 2*(output * \
+            (pc_mining_perc ** (workers-1)) / (28110 ** workers))
     elif difficulty > highest_avr_diff:
-        output = output + output * (pc_mining_perc ** (workers-1))
+        output = 2*(output * (pc_mining_perc ** (workers-1)))
     else:
-        output = output + output * (avr_mining_perc ** (workers-1))
+        output = 2*(output * (avr_mining_perc ** (workers-1)))
 
     return round(output, DECIMALS)
 
