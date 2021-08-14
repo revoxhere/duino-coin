@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.6)
+# Duino-Coin Python AVR Miner (v2.6.1)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -95,7 +95,7 @@ except ModuleNotFoundError:
     install('pypresence')
 
 # Global variables
-MINER_VER = '2.6'  # Version number
+MINER_VER = '2.61'  # Version number
 SOC_TIMEOUT = 45
 PERIODIC_REPORT_TIME = 60
 AVR_TIMEOUT = 3.1  # diff 6 * 100 / 196 h/s = 3.06
@@ -336,13 +336,13 @@ def load_config():
             rig_identifier = 'None'
 
         donation_level = '0'
-        if osname == 'nt' or osname == 'posix':
-            donation_level = input(
-                Style.RESET_ALL
-                + Fore.YELLOW
-                + get_string('ask_donation_level')
-                + Fore.RESET
-                + Style.BRIGHT)
+        #if osname == 'nt' or osname == 'posix':
+        #    donation_level = input(
+        #        Style.RESET_ALL
+        #        + Fore.YELLOW
+        #        + get_string('ask_donation_level')
+        #        + Fore.RESET
+        #        + Style.BRIGHT)
 
         # Check wheter donation_level is correct
         donation_level = sub(r'\D', '', donation_level)
@@ -457,17 +457,17 @@ def greeting():
         + Fore.YELLOW
         + ' '.join(avrport))
 
-    if osname == 'nt' or osname == 'posix':
-        print(
-            Style.DIM
-            + Fore.MAGENTA
-            + ' ‖ '
-            + Style.NORMAL
-            + Fore.RESET
-            + get_string('donation_level')
-            + Style.BRIGHT
-            + Fore.YELLOW
-            + str(donation_level))
+    #if osname == 'nt' or osname == 'posix':
+    #    print(
+    #        Style.DIM
+    #        + Fore.MAGENTA
+    #        + ' ‖ '
+    #        + Style.NORMAL
+    #        + Fore.RESET
+    #        + get_string('donation_level')
+    #        + Style.BRIGHT
+    #        + Fore.YELLOW
+    #        + str(donation_level))
     print(
         Style.DIM
         + Fore.MAGENTA
