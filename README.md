@@ -39,22 +39,6 @@ After loging-in you have access to the following commands:
 *   `BALA` - Server will return balance of current user
 *   `ESTP,username` - Server will return the 24h estimated profits of user
 *   `UEXI,username` - Server will check if the user is registered and return `NO,User is not registered` or `OK,User is registered`
-*   `JOB,username` (or `JOBXX,username` for XXHASH) - Server will return job for mining using DUCO-S1 (-S1A)
-    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, the network diff will be given) where diff is one of the below:
-        * `AVR`     - diff      6 - used for mining on Arduino, AVR boards
-        * `ARM`     - diff    500 - not used anywhere officially yet
-        * `DUE`     - diff   1000 - planned for mining on Arduino Due boards
-        * `ESP8266` - diff   1500 - used for mining on ESP8266 boards 
-        * `ESP32`   - diff   2400 - used for mining on ESP32 boards
-        * `LOW`     - diff   7.5k - used for mining on Web Miner, RPis, PC
-        * `MEDIUM`  - diff    75k - used for mining on PC
-        * `NET`     - diff  ~500k - used for mining on PC (network difficulty)
-        * `EXTREME` - diff    1M+ - not used anywhere officially yet
-    *   When sending the mining result, you can pass the hashrate count and the name of the miner along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s) and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner"
-        *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
-        *   If software name is not received, server uses `"Software": "Unknown"` in the API
-        *   If rig name is not received, server uses `"Identifier": "None"` in the API
-*   `JOBXX` - Server will return job for mining using XXHASH algorithm; documentation is the same as with DUCO-S1 job protocol
 *   `SEND,message,recipients_username,amount` - Send funds to someone, the server will return a message about the state of the transaction
 *   `GTXL,username,num` - Get last *num* of transactions involving *username* (both deposits and withdrawals)
 *   `CHGP,oldPassword,newPassword` - Change password of current user
@@ -128,6 +112,40 @@ You can use one of the following links to get some data from Duino-Coin Server:
 
 Documentation for DUCO REST api is available here: [duco-rest-api](https://github.com/revoxhere/duco-rest-api).
 To access these functions, just add the query URL after the server address: `https://server.duinocoin.com/<query>`.
+
+## Communicating with a duino-coin pool
+
+### Socket APi
+
+
+To build your own Duino-Coin miner, here's a list of of commands the pools accept.
+To start communication however, firstly you need to get the Pool Ip and port
+
+*   JSON
+    * `server.duinocoin.com/getPool` - To get some json returned containing the pool ip and port(e.g.{"name":"pulse-pool-2","ip":"149.91.88.18","port":6002,"connections":9689})
+*   Via the main server over wss(SSl required)
+    *  `wss://server.duinocoin.com:14808` - Proxied to **pulsepool** for webmining
+
+Now you can connect to it.
+
+After connecting, the pool will send its version number it's currently on (2.6).
+
+*   `JOB,username` (or `JOBXX,username` for XXHASH) - Pool will return job for mining using DUCO-S1 (-S1A)
+    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, the network diff will be given) where diff is one of the below:
+        * `AVR`     - diff      6 - used for mining on Arduino, AVR boards
+        * `ARM`     - diff    500 - not used anywhere officially yet
+        * `DUE`     - diff   1000 - planned for mining on Arduino Due boards
+        * `ESP8266` - diff   1500 - used for mining on ESP8266 boards 
+        * `ESP32`   - diff   2400 - used for mining on ESP32 boards
+        * `LOW`     - diff   7.5k - used for mining on Web Miner, RPis, PC
+        * `MEDIUM`  - diff    75k - used for mining on PC
+        * `NET`     - diff  ~500k - used for mining on PC (network difficulty)
+        * `EXTREME` - diff    1M+ - not used anywhere officially yet
+    *   When sending the mining result, you can pass the hashrate count and the name of the miner along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s) and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner"
+        *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
+        *   If software name is not received, server uses `"Software": "Unknown"` in the API
+        *   If rig name is not received, server uses `"Identifier": "None"` in the API
+
 
 ## C DUCO library
 
