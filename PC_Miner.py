@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python PC Miner (v2.6)
+# Duino-Coin Python PC Miner (v2.6.1)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -112,7 +112,7 @@ except ModuleNotFoundError:
 
 
 # Global variables
-MINER_VER = "2.6"  # Version number
+MINER_VER = "2.61"  # Version number
 NODE_ADDRESS = "server.duinocoin.com"
 AVAILABLE_PORTS = [
     2813,  # PC (1)
@@ -132,8 +132,7 @@ requested_diff = "NET"
 algorithm = "DUCO-S1"
 config = ConfigParser()
 donation_level = 0
-thread = []
-totalhashrate_mean = []
+totalhashrate_mean, thread = [], []
 mining_start_time = time()
 
 # Create resources folder if it doesn't exist
@@ -349,17 +348,17 @@ def Greeting():
     except Exception as e:
         debug_output("Error displaying CPU message: " + str(e))
 
-    if osname == "nt" or osname == "posix":
-        print(
-            Style.DIM
-            + Fore.YELLOW
-            + " ‖ "
-            + Style.NORMAL
-            + Fore.RESET
-            + get_string("donation_level")
-            + Style.BRIGHT
-            + Fore.YELLOW
-            + str(donation_level))
+    # if osname == "nt" or osname == "posix":
+    #    print(
+    #        Style.DIM
+    #        + Fore.YELLOW
+    #        + " ‖ "
+    #        + Style.NORMAL
+    #        + Fore.RESET
+    #        + get_string("donation_level")
+    #        + Style.BRIGHT
+    #        + Fore.YELLOW
+    #        + str(donation_level))
 
     print(
         Style.DIM
@@ -529,13 +528,13 @@ def loadConfig():
             rig_identiier = "None"
 
         donation_level = "0"
-        if osname == "nt" or osname == "posix":
-            donation_level = input(
-                Style.RESET_ALL
-                + Fore.YELLOW
-                + get_string("ask_donation_level")
-                + Fore.RESET
-                + Style.BRIGHT)
+        #if osname == "nt" or osname == "posix":
+        #    donation_level = input(
+        #        Style.RESET_ALL
+        #        + Fore.YELLOW
+        #        + get_string("ask_donation_level")
+        #        + Fore.RESET
+        #        + Style.BRIGHT)
 
         # Check whether efficiency is correct
         efficiency = sub(r"\D", "", efficiency)
@@ -633,8 +632,9 @@ def ducos1(
     # Loop from 1 too 100*diff
     for ducos1res in range(100 * int(difficulty) + 1):
         # If efficiency lower than 100% sleep to use less CPU
-        if ducos1res % 1000000 == 0 and float(100 - efficiency * 100) < 100:
-            sleep(float(efficiency))
+        if (ducos1res % 1000  == 0
+                and float(100 - efficiency * 100) < 100):
+            sleep((efficiency)/500)
         # Generate hash
         temp_hash = base_hash.copy()
         temp_hash.update(str(ducos1res).encode('ascii'))
@@ -660,8 +660,9 @@ def ducos1xxh(
     # Loop from 1 too 100*diff
     for ducos1xxres in range(100 * int(difficulty) + 1):
         # If efficiency lower than 100% sleep to use less CPU
-        if ducos1xxres % 1000000 == 0 and float(100 - efficiency * 100) < 100:
-            sleep(float(efficiency))
+        if (ducos1xxres % 1000 == 0
+                and float(100 - efficiency * 100) < 100):
+            sleep((efficiency)/500)
         # Generate hash
         ducos1xx = xxhash.xxh64(
             str(lastBlockHash) + str(ducos1xxres), seed=2811)
@@ -686,19 +687,22 @@ def Thread(
         efficiency: int,
         rig_identiier: str,
         algorithm: str,
-        hashrates_list,
+        hashrates_dict,
         totalhashrate_mean,
         NODE_ADDRESS: str,
         NODE_PORT: int):
     # Mining section for every thread
     start_time = time()
-    report_shares = 0
+    report_shares, totalhashrate = 0, 0
     while True:
         while True:
             try:
                 retry_counter = 0
                 while True:
                     try:
+                        if socket():
+                            socket().close()
+
                         if retry_counter >= 3:
                             debug_output(
                                 'Error connecting after 3 retries, '
@@ -829,12 +833,15 @@ def Thread(
                     # Retrieve work
                     job = soc.recv(128).decode().rstrip("\n")
                     job = job.split(",")
-                    debug_output("Received: " + str(job))
+                    debug_output("Thread "
+                                 + str(threadid)
+                                 + ": Received: " + str(job))
 
                     try:
                         diff = int(job[2])
-                        debug_output(str(threadid) +
-                                     "Correct job received")
+                        debug_output("Thread "
+                                     + str(threadid)
+                                     + ": Correct job received")
                         break
                     except:
                         pretty_print("cpu" + str(threadid),
@@ -860,17 +867,19 @@ def Thread(
                                  + str(result[0]))
 
                     # Convert to kH/s
-                    threadhashcount = int(result[1] / 1000)
-                    # Add this thread's hash counter
-                    # to the global hashrate counter
-                    hashrates_list[threadid] = threadhashcount
-                    # Calculate total hashrate of all thrads
-                    sharehashrate = 0
-                    for thread in hashrates_list.keys():
-                        sharehashrate += hashrates_list[thread]
-                    totalhashrate_mean.append(sharehashrate)
-                    # Get average from the last 20 hashrate measurements
-                    totalhashrate = mean(totalhashrate_mean[-20:])
+                    threadhashcount = result[1] / 1000
+                    try:
+                        # Add this thread to the global hashrate counter
+                        hashrates_dict[threadid] = threadhashcount
+                        # Calculate total hashrate of all thrads
+                        sharehashrate = 0
+                        for thread in hashrates_dict.keys():
+                            sharehashrate += hashrates_dict[thread]
+                        totalhashrate_mean.append(sharehashrate)
+                        # Get average from the last 20 hashrate measurements
+                        totalhashrate = mean(totalhashrate_mean[-20:])
+                    except Exception:
+                        totalhashrate = threadhashcount
 
                     while True:
                         # Send result of hashing algorithm to the server
@@ -891,8 +900,9 @@ def Thread(
                         feedback = soc.recv(64).decode().rstrip("\n")
                         responsetimestop = now()
 
-                        ping = int((responsetimestop - responsetimetart
-                                    ).microseconds / 1000)
+                        ping = int((
+                            responsetimestop - responsetimetart
+                        ).microseconds / 1000)
 
                         debug_output("Thread "
                                      + str(threadid)
@@ -916,13 +926,6 @@ def Thread(
                             formattedhashcount = str(
                                 "%02.1f" % float(totalhashrate)
                                 + " kH/s")
-
-                        if (totalhashrate > 1500
-                                and accepted.value % 50 == 0):
-                            pretty_print("sys0",
-                                         " " +
-                                         get_string("max_hashrate_notice"),
-                                         "warning")
 
                         diff = get_prefix(diff)
 
@@ -1206,7 +1209,6 @@ def initRichPresence():
 
 def updateRichPresence():
     # Update rich presence status
-    startTime = int(time())
     while True:
         try:
             # Calculate average total hashrate with prefix
@@ -1218,7 +1220,7 @@ def updateRichPresence():
 
             RPC.update(
                 details="Hashrate: " + str(totalhashrate),
-                start=startTime,
+                start=mining_start_time,
                 state="Acc. shares: "
                 + str(accepted.value)
                 + "/"
@@ -1231,7 +1233,9 @@ def updateRichPresence():
                     {"label": "Learn more",
                      "url": "https://duinocoin.com"},
                     {"label": "Discord Server",
-                     "url": "https://discord.gg/k48Ht5y"}])
+                     "url": "https://discord.gg/k48Ht5y"}
+                ]
+            )
             debug_output("Rich presence updated")
         except Exception as e:
             # Discord not launched
@@ -1332,7 +1336,7 @@ if __name__ == "__main__":
         khashcount = Value("i", 0)
         accepted = Value("i", 0)
         rejected = Value("i", 0)
-        hashrates_list = manager.dict()
+        hashrates_dict = manager.dict()
         totalhashrate_mean = manager.list()
     except Exception as e:
         print(e)
@@ -1404,14 +1408,13 @@ if __name__ == "__main__":
                     efficiency,
                     rig_identiier,
                     algorithm,
-                    hashrates_list,
+                    hashrates_dict,
                     totalhashrate_mean,
                     NODE_ADDRESS,
                     NODE_PORT))
             thread[x].start()
             if x > 4 and x % 4 == 0:
                 # Don't launch burst of threads
-                # to not get banned
                 sleep(5)
             else:
                 sleep(0.1)
