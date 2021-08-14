@@ -3,6 +3,7 @@
   * [Socket API](#Socket-API)
   * [HTTP JSON API](#HTTP-JSON-API)
   * [REST JSON API](#REST-JSON-API)
+- [Communicating with a duino-coin pool](#Communicating-with-a-duino-coin-pool)
 - [C DUCO library](#C-DUCO-library)
 - [Python3 DUCO module](#Python3-DUCO-module)
 - [Branding colors](#Branding)
@@ -117,18 +118,17 @@ To access these functions, just add the query URL after the server address: `htt
 
 ### Socket APi
 
-
 To build your own Duino-Coin miner, here's a list of of commands the pools accept.
-To start communication however, firstly you need to get the Pool Ip and port
+To start communication however, firstly you need to get the Pool ip and port
 
 *   JSON
     * `server.duinocoin.com/getPool` - To get some json returned containing the pool ip and port(e.g.{"name":"pulse-pool-2","ip":"149.91.88.18","port":6002,"connections":9689})
-*   Via the main server over wss(SSl required)
+*   Via the main server over wss (SSL required)
     *  `wss://server.duinocoin.com:14808` - Proxied to **pulsepool** for webmining
 
 Now you can connect to it.
 
-After connecting, the pool will send its version number it's currently on (2.6).
+After connecting, the pool will send its version number it's currently on (e.g. 2.6).
 
 *   `JOB,username` (or `JOBXX,username` for XXHASH) - Pool will return job for mining using DUCO-S1 (-S1A)
     *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, the network diff will be given) where diff is one of the below:
