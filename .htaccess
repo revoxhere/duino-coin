@@ -14,6 +14,10 @@ RewriteRule ^ /%1 [NC,L,R]
 RewriteCond %{REQUEST_FILENAME}.php -f
 RewriteRule ^ %{REQUEST_URI}.php [NC,L]
 
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+
 ### Error documents - add to main webserver configuration
 #ErrorDocument 301 /error/301.html
 #ErrorDocument 302 /error/302.html
