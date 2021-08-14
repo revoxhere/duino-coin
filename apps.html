@@ -1,398 +1,386 @@
 <!DOCTYPE html>
-<html lang="en"> 
-  <head>
+<html lang="en">
+
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Duino-Coin | Apps</title>
-    <link rel="icon" href="https://duinocoin.com/assets/icons/duco.png" type="image/png"/>
-    <link rel="shortcut icon" href="https://duinocoin.com/assets/icons/duco.png" type="image/png"/>
-
+    <link rel="icon" href="assets/icons/duco.svg" type="image/png" />
+    <link rel="shortcut icon" href="assets/icons/duco.svg" type="image/png" />
     <meta name="description" content="View apps developed by the Duino-Coin community.">
     <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency, bitcoin">
     <link rel="canonical" href="https://duinocoin.com/apps" />
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#EE5A24">
-
     <meta property="og:site_name" content="Duino-Coin | Apps" />
     <meta property="og:site" content="https://duinocoin.com" />
-    <meta property="og:title" content="Duino-Coin | Apps"/>
-    <meta property="og:description" content="View apps developed by the Duino-Coin community." /> 
-    <meta property="og:image" content="https://duinocoin.com/assets/icons/duco.png" />
+    <meta property="og:title" content="Duino-Coin | Apps" />
+    <meta property="og:description" content="View apps developed by the Duino-Coin community." />
+    <meta property="og:image" content="assets/icons/duco.svg" />
     <meta property="og:url" content="https://duinocoin.com/apps" />
     <meta property="og:type" content="website" />
-
     <meta name="twitter:title" content="Duino-Coin | Apps">
     <meta name="twitter:description" content="View apps developed by the Duino-Coin community.">
-    <meta name="twitter:image" content="https://duinocoin.com/assets/icons/duco.png">
+    <meta name="twitter:image" content="assets/icons/duco.svg">
     <meta name="twitter:site" content="@DuinoCoin">
     <meta name="twitter:creator" content="@DuinoCoin">
-
-    <link rel="stylesheet" href="assets/css/bulma.min.css">
-    <link rel="stylesheet" href="assets/css/bulma-pageloader.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/bulma-pageloader.min.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/bulma-prefers-dark.min.css">
     <script src="assets/js/all.min.js"></script>
-    <script src="assets/js/jquery-3.6.0.slim.min.js"></script>
     <script src="assets/js/jquery.min.js"></script>
-
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142187073-57"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    window.dataLayer = window.dataLayer || [];
 
-      gtag('config', 'UA-142187073-57');
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-142187073-57');
     </script>
-
     <style>
-      .is-primary { 
+    .is-primary {
         /* Override Bulmas primary color to Duco-Colored gradient*/
         background: linear-gradient(160deg, #e74c3c, #f39c12) !important;
-      }
-      .gradienttext {
+        border: none;
+    }
+
+    .gradienttext {
         /* Gradient text */
         background: -webkit-linear-gradient(160deg, #EA2027, #EE5A24) !important;
         -webkit-background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
         color: #EA2027 !important;
-      }
-      .grid-list {
+    }
+
+    .grid-list {
         /* Split unordered lists */
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-      }
+    }
     </style>
-  </head>
-  <body>
-    <div id="pageloader" class="pageloader is-active is-primary is-bottom-to-top">
-      <span class="title">Duino-Coin Apps and Projects</span>
-    </div>
+</head>
 
+<body>
+    <div id="pageloader" class="pageloader is-active is-primary is-bottom-to-top">
+        <span class="title">Duino-Coin Apps and Projects</span>
+    </div>
     <nav class="navbar" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        <a class="navbar-item" href="/">
-          <img src="assets/icons/duco.png" height="172">
-          &nbsp;&nbsp;&nbsp;Home
-        </a>
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarDuinoCoin">
-          <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
-        </a>
-      </div>
-      <div id="navbarDuinoCoin" class="navbar-menu">
-        <div class="navbar-start">
-          <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
-            <i class="fas fa-book" style="color:#f6b93b;"></i>&nbsp;Whitepaper
-          </a>
-          <a class="navbar-item" href="https://explorer.duinocoin.com">
-            <i class="fas fa-poll" style="color:#ff9f43;"></i>&nbsp;Network
-          </a>
-          <a class="navbar-item" href="donate.html">
-            <i class="fas fa-heart" style="color:#ee5253;"></i>&nbsp;Donate
-          </a>
-          <a class="navbar-item" href="team.html">
-            <i class="fas fa-user" style="color:#eb2f06;"></i>&nbsp;Our Team
-          </a>
-          <a class="navbar-item is-active" href="apps.html">
-            <i class="fas fa-lightbulb" style="color:#bc2504;"></i>&nbsp;Apps
-          </a>
-          <a class="navbar-item" href="contact.html">
-            <i class="fas fa-envelope" style="color:#c23a1d;"></i>&nbsp;Contact Us
-        </a>
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img src="assets/icons/duco.svg" height="172">
+                &nbsp;Home
+            </a>
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarDuinoCoin">
+                <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+            </a>
         </div>
-        <div class="navbar-end">
-          <a class="navbar-item" href="https://twitter.com/DuinoCoin/">
-            <i class="fab fa-lg fa-twitter"></i></a></li>
-          </a>
-          <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
-            <i class="fab fa-lg fa-reddit"></i></a></li>
-          </a>
-          <a class="navbar-item" href="https://discord.gg/kvBkccy">
-            <i class="fab fa-lg fa-discord"></i></a></li>
-          </a>
-          <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
-            <i class="fab fa-lg fa-github"></i></a></li>
-          </a>
-          <div class="navbar-item">
-            <div class="buttons">
-              <a class="button is-primary" href="getting-started.html">
-                <strong>Get started</strong>
-              </a>
+        <div id="navbarDuinoCoin" class="navbar-menu">
+            <div class="navbar-start">
+                <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
+                    <i class="fas fa-book" style="color:#f6b93b;"></i>&nbsp;Whitepaper
+                </a>
+                <a class="navbar-item" href="https://explorer.duinocoin.com">
+                    <i class="fas fa-poll" style="color:#ff9f43;"></i>&nbsp;Network
+                </a>
+                <a class="navbar-item" href="donate.html">
+                    <i class="fas fa-heart" style="color:#ee5253;"></i>&nbsp;Donate
+                </a>
+                <a class="navbar-item" href="team.html">
+                    <i class="fas fa-user" style="color:#eb2f06;"></i>&nbsp;Our Team
+                </a>
+                <a class="navbar-item" href="apps.html">
+                    <i class="fas fa-lightbulb" style="color:#ED4C67;"></i>&nbsp;Apps
+                </a>
+                <a class="navbar-item" href="contact.html">
+                    <i class="fas fa-envelope" style="color:#B53471;"></i>&nbsp;Contact Us
+                </a>
             </div>
-          </div>
+            <div class="navbar-end">
+                <a class="navbar-item" href="https://twitter.com/DuinoCoin/">
+                    <i class="fab fa-lg fa-twitter"></i></a></li>
+                </a>
+                <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
+                    <i class="fab fa-lg fa-reddit"></i></a></li>
+                </a>
+                <a class="navbar-item" href="https://discord.gg/kvBkccy">
+                    <i class="fab fa-lg fa-discord"></i></a></li>
+                </a>
+                <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
+                    <i class="fab fa-lg fa-github"></i></a></li>
+                </a>
+                <div class="navbar-item">
+                    <div class="buttons">
+                        <a class="button is-primary" href="getting-started.html">
+                            <strong>Get started</strong>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </nav>
     <br>
-
     <div class="container">
-      <p class="title is-size-1" align="center">
-        <i class="fa fa-lightbulb" style="color:#0984e3;"></i>
-        Apps and projects
-      </p>
-      <div class="about">
-          <p class="subtitle is-size-5 is-hidden-desktop" align="center">
-            Apps and projects made by the Duino-Coin community.
-          </p>
-          <p class="subtitle is-size-5 is-hidden-touch" align="center">
-            Apps and projects made by the Duino-Coin community.
-          </p>
-      </div>
-      <br>
-      <div class="columns is-multiline is-centered">
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                Duino-Stats
-              </p>
-              <p class="subtitle">
-                Bilaboz
-              </p>
+        <p class="title is-size-1" align="center">
+            <i class="fa fa-lightbulb" style="color:#ED4C67;"></i>
+            Verified apps and projects
+        </p>
+        <p class="subtitle is-size-5" align="center">
+            Made by the Duino-Coin community
+        </p>
+        <br>
+        <div class="columns is-multiline">
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            🤖 Duino-Stats
+                        </p>
+                        <p class="subtitle">
+                            Official Discord bot made by <b>Bilaboz</b>
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://github.com/Bilaboz/duino-stats">View on GitHub</a>
+                            </span>
+                        </p>
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://discord.gg/duinocoin">Join our Discord</a>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://github.com/Bilaboz/duino-stats">View on GitHub</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-half">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                Furim Faucet
-              </p>
-              <p class="subtitle">
-                Furim
-              </p>
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            🐳 Furim's Faucet & Raffle
+                        </p>
+                        <p class="subtitle">
+                            Duino-Coin Faucet and Raffle game made by <b>Furim</b>
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://faucet.furim.xyz">Visit Furim's Faucet</a>
+                            </span>
+                        </p>
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://raffle.furim.xyz">Visit Furim's Raffle</a>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://faucet.furim.xyz">Furim Faucet</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                Furim Raffle
-              </p>
-              <p class="subtitle">
-                Furim
-              </p>
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            🏆 Duino Tracker
+                        </p>
+                        <p class="subtitle">
+                            Duino-Coin account statistics tracker made by <b>Mockingbird</b>
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://duinotracker.com">
+                                    Visit the Duino Tracker
+                                </a>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://raffle.furim.xyz">Furim Raffle</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-half">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                Duino Tracker
-              </p>
-              <p class="subtitle">
-                Mockingbird
-              </p>
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            📋 Lukas' Dashboard
+                        </p>
+                        <p class="subtitle">
+                            Duino-Coin mining dashboard made by Lukas
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://lulaschkas.github.io/duco-mining-dashboard/">
+                                    Visit Lukas' Dashboard
+                                </a>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://duinotracker.com">Duino Tracker</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                Duino-Coin Mining Dashboard
-              </p>
-              <p class="subtitle">
-                Lukas
-              </p>
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            📱 Duino-Coin Android App
+                        </p>
+                        <p class="subtitle">
+                            Official Duino-Coin Android Wallet & Dashboard made by <b>Pripun</b>
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://play.google.com/store/apps/details?id=com.pripun.duinocoin">
+                                    View on Google Play
+                                </a>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://lulaschkas.github.io/duco-mining-dashboard/">Duino-Coin Mining Dashboard</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                Duinocoin Android App
-              </p>
-              <p class="subtitle">
-                Pripun
-              </p>
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            🎛️ DUCO Panel
+                        </p>
+                        <p class="subtitle">
+                            Unification of all tools & docs in a single desktop app made by <b>Zafra</b>
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://github.com/ponsato/ducopanel">View on GitHub</a>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://play.google.com/store/apps/details?id=com.pripun.duinocoin">View on Google Play</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                DUCO Panel
-              </p>
-              <p class="subtitle">
-                Zafra
-              </p>
+            <div class="column is-one-third is-half-mobile">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            ⛏ Minecraft Server (DuinoCraft)
+                        </p>
+                        <p class="subtitle">
+                            Minecraft (Java 1.16+) server ran by <b>Johnny</b> with Duino-Coin as in-game currency
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                Join <b>play.duinocraft.com</b>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://github.com/ponsato/ducopanel">View on GitHub</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                Minecraft Server (Duinocraft)
-              </p>
-              <p class="subtitle">
-                Johnny
-              </p>
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            💱 Node-S DUCO Exchange
+                        </p>
+                        <p class="subtitle">
+                            Duino-Coin to PayPal and Monero exchange made by <b>Connor2</b>
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="http://www.node-s.co.za/duco_exchange/home">Visit the Node-S Exchange</a>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="#">play.duinocraft.com</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                Node-S DUCO Exchange
-              </p>
-              <p class="subtitle">
-                Connor
-              </p>
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            🚰 Mr.Peer's Faucet
+                        </p>
+                        <p class="subtitle">
+                            Simple Duino-Coin faucet ran by Mr.Peer
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://faucetforduino.online/">Visit Mr.Peer's Faucet</a>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://node-s.co.za/duco_exchange/home">Node-S</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                AECL Breach Project
-              </p>
-              <p class="subtitle">
-                BetterNet
-              </p>
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            💰 DuCoWallet
+                        </p>
+                        <p class="subtitle">
+                            "Yet another wallet for DuinoCoin!" made by <b>Viktor</b>
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://github.com/viktor02/DuCoWallet">View on GitHub</a>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://discord.gg/6J4Ah7fhcf">AECL Breach Project Discord</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                Mr.Peer's Faucet
-              </p>
-              <p class="subtitle">
-                Mr.Peer
-              </p>
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            📠 Duino AVR Monitor
+                        </p>
+                        <p class="subtitle">
+                            GUI Windows App for monitoring AVR devices mining DUCO by <b>niknak</b>
+                        </p>
+                    </div>
+                    <footer class="card-footer">
+                        <p class="card-footer-item">
+                            <span>
+                                <a href="https://www.microsoft.com/store/apps/9NJ7HPFSR9V5">
+                                    View on Microsoft Store
+                                </a>
+                            </span>
+                        </p>
+                    </footer>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://faucetforduino.online/">Mr.Peers Faucet</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                DuCoWallet
-              </p>
-              <p class="subtitle">
-                Viktor
-              </p>
+            <div class="column is-one-third">
+                <div class="card">
+                    <div class="card-content">
+                        <p class="title">
+                            ❓ Your app here
+                        </p>
+                        <p class="subtitle">
+                            <a href="contact.html">
+                                Contact us
+                            </a>
+                            to add your Duino-related app here
+                        </p>
+                    </div>
+                </div>
             </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="https://github.com/viktor02/DuCoWallet">DuCoWallet on GitHub</a>
-                </span>
-              </p>
-            </footer>
-          </div>
         </div>
-        <div class="column is-one-third is-half-mobile">
-          <div class="card">
-            <div class="card-content">
-              <p class="title">
-                Phantoms Faucet
-              </p>
-              <p class="subtitle">
-                phantom32
-              </p>
-            </div>
-            <footer class="card-footer">
-              <p class="card-footer-item">
-                <span>
-                  <a href="#">coming soon</a>
-                </span>
-              </p>
-            </footer>
-          </div>
-        </div>
-      </div>
-      <br>
+        <br>
     </div>
     <!-- FOOTER -->
     <footer class="footer">
         <div class="content has-text-centered">
             <p>
                 <strong>Duino-Coin Website</strong> (v3) by <a href="https://github.com/revoxhere">Robert "revox" Piotrowski </a> from <b>Duino team</b> 2019-2021
-                <br>Hosted by <a href="https://kristian-kramer.com">Kristian "Tech1k" Kramer</a> and/or 
+                <br>Hosted by <a href="https://kristian-kramer.com">Kristian "Tech1k" Kramer</a> and/or
                 <a href="https://pages.github.com">GitHub Pages</a>
                 <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a><br>
                 <a href="https://bulma.io">
@@ -401,27 +389,27 @@
             </p>
         </div>
     </footer>
-  </body>
+</body>
+
 </html>
-
 <script>
-  let pageloader = document.getElementById("pageloader"); // PAGE LOAGER
-  pageloader.setAttribute('class', "pageloader is-active is-primary is-bottom-to-top"); // Before page is loaded
-  window.addEventListener('load', function() {
+let pageloader = document.getElementById("pageloader"); // PAGE LOAGER
+pageloader.setAttribute('class', "pageloader is-active is-primary is-bottom-to-top"); // Before page is loaded
+window.addEventListener('load', function() {
     pageloader.setAttribute('class', "pageloader is-primary is-bottom-to-top"); // After page is loaded
-  });
+});
 
-  document.addEventListener('DOMContentLoaded', () => { // HAMBURGER MENU
-  const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-  if ($navbarBurgers.length > 0) {
-    $navbarBurgers.forEach( el => { // Add a click event on each of burger menus
-      el.addEventListener('click', () => {
-        const target = el.dataset.target; // Get the target from the "data-target" attribute
-        const $target = document.getElementById(target);
-        el.classList.toggle('is-active'); // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
-        $target.classList.toggle('is-active');
+document.addEventListener('DOMContentLoaded', () => { // HAMBURGER MENU
+    const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+    if ($navbarBurgers.length > 0) {
+        $navbarBurgers.forEach(el => { // Add a click event on each of burger menus
+            el.addEventListener('click', () => {
+                const target = el.dataset.target; // Get the target from the "data-target" attribute
+                const $target = document.getElementById(target);
+                el.classList.toggle('is-active'); // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                $target.classList.toggle('is-active');
+            });
         });
-      });
     }
-  });
+});
 </script>
