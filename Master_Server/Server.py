@@ -97,7 +97,7 @@ EXPECTED_SHARETIME = 15  # in seconds
 Gevent
 """
 BACKLOG = None  # spawn connection instantly
-POOL_SIZE = None
+POOL_SIZE = 1000
 SOCKET_TIMEOUT = 15
 DB_TIMEOUT = 10
 
@@ -533,8 +533,8 @@ def transaction_queue_handle(queue):
                     try:
                         datab.execute(queue.get())
                         queue.task_done()
-                    except Exception as e:
-                        print(traceback.format_exc())
+                    except Exception:
+                        continue
                 datab.commit()
 
             timeEnd = time()
@@ -1646,11 +1646,12 @@ def get_sys_usage():
     counter = 0
     while True:
         counter += 1
-        if counter >= 5:
+        if counter % 5 == 0:
             global_connections = _get_connections()
-            counter = 0
+
         cpu_list.append(
-            floatmap(psutil.cpu_percent(interval=1), 0, 100, 0, 75))
+            floatmap(psutil.cpu_percent(interval=1), 0, 100, 0, 75)
+        )
         global_cpu_usage = mean(cpu_list[-50:])
         global_ram_usage = psutil.virtual_memory()[2]
         sleep(SAVE_TIME)
@@ -1863,19 +1864,16 @@ def create_main_api_file():
         try:
             for miner in minerapi.copy():
                 try:
+                    # Pop inactive miners from the API
                     if "Timestamp" in minerapi[miner]:
                         d1 = datetime.datetime.fromtimestamp(
                             minerapi[miner]["Timestamp"])
                         d2 = datetime.datetime.now()
                         rd = d2-d1
-                        # Pop inactive miners from the API
-                        if rd.total_seconds() > 45:
+                        if rd.total_seconds() > 60:
                             minerapi.pop(miner)
                             continue
-                except:
-                    pass
 
-                try:
                     # Add miner hashrate to the server hashrate
                     if minerapi[miner]["Algorithm"] == "DUCO-S1":
                         try:
@@ -1938,8 +1936,8 @@ def create_main_api_file():
                     except:
                         miners_per_user[username] = 1
 
-                except Exception as e:
-                    pass
+                except Exception:
+                    continue
 
             net_wattage = scientific_prefix("W", net_wattage, 2)
 
@@ -1965,7 +1963,7 @@ def create_main_api_file():
             current_time = now().strftime("%d/%m/%Y %H:%M:%S (UTC)")
             max_price = duco_prices[max(duco_prices, key=duco_prices.get)]
 
-            duco_prices["pancake"] = 0.00420784
+            duco_prices["pancake"] = 0.00507655
 
             server_api = {
                 "Duino-Coin Server API": "github.com/revoxhere/duino-coin",
@@ -2670,7 +2668,7 @@ def handle(connection, address):
 
     ip_addr = address[0].replace("::ffff:", "")
 
-    if ip_addr == "127.0.0.1" or ip_addr == "149.91.88.18":
+    if ip_addr == "149.91.88.18":
         connection.settimeout(90)
     else:
         connection.settimeout(SOCKET_TIMEOUT)
