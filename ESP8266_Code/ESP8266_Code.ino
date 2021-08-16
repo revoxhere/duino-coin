@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards - V2.55
+//  Code for ESP8266 boards - V2.6.3
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -15,6 +15,7 @@
 //  https://github.com/revoxhere - @revox
 //  https://github.com/JoyBed - @JoyBed
 //  https://github.com/kickshawprogrammer - @kickshawprogrammer
+//  https://github.com/ricaun - @ricaun
 //////////////////////////////////////////////////////////
 //  If you don't know what to do, visit official website
 //  and navigate to Getting Started page. Happy mining!
@@ -24,6 +25,10 @@
 #include <ESP8266mDNS.h> // OTA libraries
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
+
+#include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
+#include <ArduinoJson.h> // https://github.com/bblanchon/ArduinoJson
 
 //////////////////////////////////////////////////////////
 // NOTE: If during compilation, the below line causes a
@@ -47,13 +52,48 @@ const char* PASSWORD      = "WIFI PASS";    // Change this to your WiFi password
 const char* USERNAME      = "DUCO USERNAME";     // Change this to your Duino-Coin username
 const char* RIG_IDENTIFIER = "None";       // Change this if you want a custom miner name
 
-// Since 2.5.5 additional mining nodes available - you can change it manually to one of these:
-// Official Master Server: 51.15.127.80 port 2820
-// Official Kolka Pool: 149.91.88.18 port 6000
-// This will be replaced with an automatic picker in the future version
-const char * host = "149.91.88.18"; // Static server IP
-const int port = 6000;
+const char * urlPool = "http://51.15.127.80:4242/getPool";
 unsigned int share_count = 0; // Share variable
+String host = "";
+int port = 0;
+
+void UpdateHostPort(String input) {
+  // Thanks @ricaun for the code
+  DynamicJsonDocument doc(256);
+  deserializeJson(doc, input);
+
+  const char* name = doc["name"];
+  host = String(doc["ip"]);
+  port = int(doc["port"]);
+
+  Serial.println("Fetched pool: " + String(name) + " " + String(host) + " " + String(port));
+}
+
+String httpGetString(String URL) {
+  String payload = "";
+  WiFiClient client;
+  HTTPClient http;
+  if (http.begin(client, URL))
+  {
+    int httpCode = http.GET();
+    if (httpCode == HTTP_CODE_OK)
+    {
+      payload = http.getString();
+    }
+    else
+    {
+      Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+    }
+    http.end();
+  }
+  return payload;
+}
+
+void UpdatePool() {
+  String input = httpGetString(urlPool);
+  if (input == "") return;
+  UpdateHostPort(input);
+}
 
 WiFiClient client;
 String client_buffer = "";
@@ -95,6 +135,8 @@ void SetupWifi() {
 
   Serial.println("\nConnected to WiFi!");
   Serial.println("Local IP address: " + WiFi.localIP().toString());
+
+  UpdatePool();
 }
 
 void SetupOTA() {
@@ -278,7 +320,7 @@ void loop() {
       client.print(String(duco_numeric_result)
                    + ","
                    + String(hashrate)
-                   + ",ESP8266 Miner v2.55"
+                   + ",ESP8266 Miner v2.63"
                    + ","
                    + String(RIG_IDENTIFIER)
                    + ","
