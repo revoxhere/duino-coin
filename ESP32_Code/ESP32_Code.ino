@@ -59,6 +59,9 @@ public:
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
+#include <ArduinoJson.h>
+#include <HTTPClient.h>
+
 
 #ifdef ENABLE_OTA
 #include <ArduinoOTA.h>
@@ -69,18 +72,63 @@ TaskHandle_t Task1;
 TaskHandle_t Task2;
 SemaphoreHandle_t xMutex;
 
-// Since 2.5.5 additional mining nodes available - you can change it manually to one of these:
-// Official Master Server: 51.15.127.80 port 2820
-// Official Kolka Pool: 149.91.88.18 port 6000
-// This will be replaced with an automatic picker in the future version
-const char * host = "149.91.88.18"; // Static server IP
-const int port = 6000;
+
+const char * urlPool = "http://51.15.127.80:4242/getPool";
+unsigned int share_count = 0; // Share variable
+String host = "";
+int port = 0;
 
 volatile int wifiStatus = 0;
 volatile int wifiPrev = WL_CONNECTED;
 volatile bool OTA_status = false;
 
 volatile char ID[23]; // DUCO MCU ID
+
+void SetHostPort(String h, int p)
+{
+  host = h;
+  port = p;
+}
+
+void UpdateHostPort(String input) {
+  // Thanks @ricaun for the code
+  DynamicJsonDocument doc(256);
+  deserializeJson(doc, input);
+
+  const char* name = doc["name"];
+  const char* host = doc["ip"];
+  int port = doc["port"];
+
+  Serial.println("Fetched pool: " + String(name) + " " + String(host) + " " + String(port));
+  SetHostPort(String(host), port);
+}
+
+String httpGetString(String URL) {
+  String payload = "";
+  WiFiClient client;
+  HTTPClient http;
+  if (http.begin(client, URL))
+  {
+    int httpCode = http.GET();
+    if (httpCode == HTTP_CODE_OK)
+    {
+      payload = http.getString();
+    }
+    else
+    {
+      Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+    }
+    http.end();
+  }
+  return payload;
+}
+
+void UpdatePool() {
+  String input = httpGetString(urlPool);
+  if (input == "") return;
+  UpdateHostPort(input);
+}
+
 
 void WiFireconnect( void * pvParameters ) {
   int n = 0;
@@ -102,6 +150,7 @@ void WiFireconnect( void * pvParameters ) {
       Serial.println(F("\nConnected to WiFi!"));
       Serial.println("Local IP address: " + WiFi.localIP().toString());
       Serial.println();
+      UpdatePool();
     }
     else if ((wifiStatus != WL_CONNECTED)&&(wifiPrev == WL_CONNECTED)) {
       esp_task_wdt_reset(); // Reset watchdog timer
@@ -188,7 +237,7 @@ void Task1code( void * pvParameters ) {
     client1.setTimeout(1);
     client1.flush();
     yield();
-    if (!client1.connect(host, port)) {
+    if (!client1.connect(host.c_str(), port)) {
       Serial.println(F("CORE1 connection failed"));
       delay(500);
       continue;
@@ -265,7 +314,7 @@ void Task1code( void * pvParameters ) {
           HashRate1 = iJob1 / ElapsedTimeSeconds1; // Calculate hashrate
           if (!client1.connected()) {
             Serial.println(F("CORE1 Lost connection. Trying to reconnect"));
-            if (!client1.connect(host, port)) {
+            if (!client1.connect(host.c_str(), port)) {
               Serial.println(F("CORE1 connection failed"));
               break;
             }
@@ -342,7 +391,7 @@ void Task2code( void * pvParameters ) {
     client.setTimeout(1);
     client.flush();
     yield();
-    if (!client.connect(host, port)) {
+    if (!client.connect(host.c_str(), port)) {
       Serial.println(F("CORE2 connection failed"));
       delay(500);
       continue;
@@ -419,7 +468,7 @@ void Task2code( void * pvParameters ) {
           HashRate = iJob / ElapsedTimeSeconds; // Calculate hashrate
           if (!client.connected()) {
             Serial.println(F("CORE2 Lost connection. Trying to reconnect"));
-            if (!client.connect(host, port)) {
+            if (!client.connect(host.c_str(), port)) {
               Serial.println(F("CORE2 connection failed"));
               break;
             }
