@@ -54,8 +54,11 @@ public:
 } Serial;
 #endif
 
-#include <esp_task_wdt.h>                           //Include WDT libary
+// #include "esp32/sha.h" // Uncomment this line if you're using an older version of the ESP32 core and sha_parellel_engine doesn't work for you
+// #include "hwcrypto/sha.h" // If the above still doesn't work, you can try this one
 #include "sha/sha_parallel_engine.h" // Include hardware accelerated hashing library
+
+#include <esp_task_wdt.h> //Include WDT libary
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
