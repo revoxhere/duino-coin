@@ -5,7 +5,7 @@
 // | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP32 boards v2.55
+//  Code for ESP32 boards v2.6.3
 //  © Duino-Coin Community 2019-2021
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ public:
 #endif
 
 #include <esp_task_wdt.h>                           //Include WDT libary
-#include "hwcrypto/sha.h" // Include hardware accelerated hashing library
+#include "sha/sha_parallel_engine.h" // Include hardware accelerated hashing library
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <WiFiUdp.h>
@@ -321,7 +321,7 @@ void Task1code( void * pvParameters ) {
             Serial.println(F("CORE1 Reconnection successful."));
           }
           client1.flush();
-          client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.55," + String(rigname) + "," + String((char*)ID)); // Send result to server
+          client1.print(String(iJob1) + "," + String(HashRate1) + ",ESP32 CORE1 Miner v2.63," + String(rigname) + "," + String((char*)ID)); // Send result to server
           Serial.println(F("CORE1 Posting result and waiting for feedback."));
           while(!client1.available()){
             if (!client1.connected()) {
@@ -475,7 +475,7 @@ void Task2code( void * pvParameters ) {
             Serial.println(F("CORE2 Reconnection successful."));
           }
           client.flush();
-          client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.55," + String(rigname) + "," + String((char*)ID)); // Send result to server
+          client.print(String(iJob) + "," + String(HashRate) + ",ESP32 CORE2 Miner v2.63," + String(rigname) + "," + String((char*)ID)); // Send result to server
           Serial.println(F("CORE2 Posting result and waiting for feedback."));
           while(!client.available()){
             if (!client.connected()) {
@@ -511,7 +511,7 @@ void setup() {
   //disableCore0WDT();
   //disableCore1WDT();
   Serial.begin(500000); // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP32 Miner v2.55");
+  Serial.println("\n\nDuino-Coin ESP32 Miner v2.63");
   
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
   btStop();
