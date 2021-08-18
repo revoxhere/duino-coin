@@ -584,7 +584,7 @@ def mine_avr(com, threadid):
     global hashrate
 
     start_time = time()
-    report_shares = 0
+    report_shares, last_shares = 0, 0
     while True:
         try:
             while True:
@@ -1054,7 +1054,7 @@ def mine_avr(com, threadid):
                     elapsed_time = end_time - start_time
                     if (threadid == 0
                             and elapsed_time >= PERIODIC_REPORT_TIME):
-                        report_shares = shares[0] - report_shares
+                        report_shares = shares[0] - last_shares
                         uptime = calculate_uptime(mining_start_time)
 
                         periodic_report(start_time,
@@ -1063,6 +1063,7 @@ def mine_avr(com, threadid):
                                         hashrate,
                                         uptime)
                         start_time = time()
+                        last_shares = shares[0] 
                     break
 
         except Exception as e:
