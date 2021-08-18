@@ -63,7 +63,7 @@ void UpdateHostPort(String input) {
   deserializeJson(doc, input);
 
   const char* name = doc["name"];
-  host = String(doc["ip"]);
+  host = String((const char*)doc["ip"]);
   port = int(doc["port"]);
 
   Serial.println("Fetched pool: " + String(name) + " " + String(host) + " " + String(port));
