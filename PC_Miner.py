@@ -468,9 +468,9 @@ class Miner:
                     lang = "english"
             else:
                 try:
-                    ConfigParser().read(Settings.DATA_DIR
+                    configparser.read(Settings.DATA_DIR
                                         + Settings.SETTINGS_FILE)
-                    lang = ConfigParser()["Duino-Coin-PC-Miner"]["language"]
+                    lang = configparser["PC Miner"]["language"]
                 except Exception:
                     lang = "english"
         except Exception as e:
