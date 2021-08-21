@@ -697,9 +697,9 @@ class Miner:
 
                     if id == 0:
                         end_time = time()
-                        elapsed_time = end_time - last_report_shares
+                        elapsed_time = end_time - last_report
                         if elapsed_time >= Settings.REPORT_TIME:
-                            report_shares = accept.value - report_shares
+                            report_shares = accept.value - last_report_shares
                             uptime = calculate_uptime(mining_start_time)
                             periodic_report(last_report, end_time,
                                             report_shares,
