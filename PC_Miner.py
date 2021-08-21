@@ -623,7 +623,7 @@ class Miner:
                      "success", "sys"+str(id))
 
         last_report = time()
-        report_shares = 0
+        report_shares, last_report_shares = 0, 0
         while True:
             try:
                 Miner.m_connect(id, pool)
@@ -697,7 +697,7 @@ class Miner:
 
                     if id == 0:
                         end_time = time()
-                        elapsed_time = end_time - last_report
+                        elapsed_time = end_time - last_report_shares
                         if elapsed_time >= Settings.REPORT_TIME:
                             report_shares = accept.value - report_shares
                             uptime = calculate_uptime(mining_start_time)
@@ -705,6 +705,7 @@ class Miner:
                                             report_shares,
                                             sum(hashrate.values()), uptime)
                             last_report = time()
+                            last_report_shares = accept.value 
 
             except KeyboardInterrupt:
                 _exit(0)
