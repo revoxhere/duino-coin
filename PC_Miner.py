@@ -678,7 +678,6 @@ class Miner:
                     feedback = Client.recv().split(Settings.SEPARATOR)
                     ping = (time() - time_start) * 1000
                     
-                    print(str(feedback))
                     if feedback[0] == "GOOD":
                         accept.value += 1
                         share_print(id, "accept",
