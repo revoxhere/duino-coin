@@ -242,7 +242,7 @@ class Pool:
 
                 conn.commit()
 
-                send_data(data="LoginOK", connection=self.connection)
+            send_data(data="LoginOK", connection=self.connection)
         else:
             send_data(data="LoginFailed", connection=self.connection)
 
@@ -257,50 +257,108 @@ class Pool:
             send_data(data="No PoolID provided", connection=self.connection)
 
         try:
-            try:
-                info = str(data[1].decode())
-                info = ast.literal_eval(info)
+            info = str(data[1].decode())
+            info = ast.literal_eval(info)
 
-                blocks_to_add = int(info['blocks']['blockIncrease'])
-                big_blocks_to_add = info['blocks']['bigBlocks']
-                poolCpu = float(info['cpu'])
-                poolRam = float(info['ram'])
-                poolConnections = int(info['connections'])
-            except Exception as e:
-                print("Error fetching JSON data:", e)
+            blocks_to_add = int(info['blocks']['blockIncrease'])
+            big_blocks_to_add = info['blocks']['bigBlocks']
+            poolCpu = float(info['cpu'])
+            poolRam = float(info['ram'])
+            poolConnections = int(info['connections'])
         except Exception as e:
+            print(self.poolID, "is having trouble with sending JSON data:", e)
             send_data(data=f"NO,Error: {e}", connection=self.connection)
             return 0, 0, {}, {}, 1
 
         with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
             datab = conn.cursor()
-            datab.execute("""UPDATE PoolList 
-                SET cpu = ?, 
-                ram = ?, 
-                connections = ? 
-                WHERE identifier = ?""",
-                          (poolCpu,
-                           poolRam,
-                           poolConnections,
-                           self.poolID))
+            if poolConnections > 0:
+                datab.execute("""UPDATE PoolList 
+                    SET cpu = ?, 
+                    ram = ?, 
+                    connections = ? 
+                    WHERE identifier = ?""",
+                              (poolCpu,
+                               poolRam,
+                               poolConnections,
+                               self.poolID))
+            else:
+                datab.execute("""UPDATE PoolList 
+                    SET cpu = ?, 
+                    ram = ?
+                    WHERE identifier = ?""",
+                              (poolCpu,
+                               poolRam,
+                               self.poolID))
             conn.commit()
 
+        i = 0
+        while i < 3:
+            try:
+                if self.poolID == "pulse-pool-1":
+                    rewards = requests.get(
+                        f"http://{self.poolIP}/rewards.json").json()
+                    poolWorkers = requests.get(
+                        f"http://{self.poolIP}/workers.json").json()
+
+                elif self.poolID == "pulse-pool-2":
+                    rewards = requests.get(
+                        f"http://{self.poolIP}/rewards_2.json").json()
+                    poolWorkers = requests.get(
+                        f"http://{self.poolIP}/workers_2.json").json()
+
+                    ###
+
+                elif self.poolID == "winner-pool-1":
+                    rewards = requests.get(
+                        f"http://{self.poolIP}/rewards.json").json()
+                    poolWorkers = requests.get(
+                        f"http://{self.poolIP}/workers.json").json()
+
+                elif self.poolID == "winner-pool-2":
+                    rewards = requests.get(
+                        f"http://{self.poolIP}/rewards_2.json").json()
+                    poolWorkers = requests.get(
+                        f"http://{self.poolIP}/workers_2.json").json()
+
+                    ###
+
+                elif self.poolID == "beyond-pool-1":
+                    rewards = requests.get(
+                        f"http://{self.poolIP}/rewards.json").json()
+                    poolWorkers = requests.get(
+                        f"http://{self.poolIP}/workers.json").json()
+
+                elif self.poolID == "beyond-pool-2":
+                    rewards = requests.get(
+                        f"http://{self.poolIP}/rewards.json").json()
+                    poolWorkers = requests.get(
+                        f"http://{self.poolIP}/workers.json").json()
+
+                    ###
+
+                elif self.poolID == "star-pool-1":
+                    rewards = requests.get(
+                        f"http://{self.poolIP}/rewards.json").json()
+                    poolWorkers = requests.get(
+                        f"http://{self.poolIP}/workers.json").json()
+
+                    ###
+
+                else:
+                    rewards = requests.get(
+                        f"http://{self.poolIP}:6001/rewards").json()
+                    poolWorkers = requests.get(
+                        f"http://{self.poolIP}:6001/workers").json()
+
+                break
+            except Exception as e:
+                print(self.poolID,
+                      "is having trouble sending JSON:", e,
+                      "retrying", i)
+                i += 1
+
         send_data(data="SyncOK", connection=self.connection)
-
-        try:
-            r_rewards = requests.get(f"http://{self.poolIP}/rewards.json")
-            rewards = r_rewards.json()
-            #print("Synced rewards")
-        except:
-            pass
-
-        try:
-            r_workers = requests.get(f"http://{self.poolIP}/workers.json")
-            poolWorkers = r_workers.json()
-            #print("Synced workers")
-        except:
-            pass
-
         return blocks_to_add, poolConnections, poolWorkers, rewards, 0
 
     def logout(self, data):
