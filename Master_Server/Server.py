@@ -91,15 +91,15 @@ BLOCK_PROBABILITY = 500000  # 1 in X
 BLOCK_PROBABILITY_XXH = 10000  # 1 in X
 BLOCK_REWARD = 28.11  # duco
 UPDATE_MINERAPI_EVERY = 2  # shares
-EXPECTED_SHARETIME = 15  # in seconds
+EXPECTED_SHARETIME = 20  # in seconds
 
 """
 Gevent
 """
 BACKLOG = None  # spawn connection instantly
-POOL_SIZE = 1000
+POOL_SIZE = None
 SOCKET_TIMEOUT = 15
-DB_TIMEOUT = 10
+DB_TIMEOUT = 5
 
 
 """
@@ -146,6 +146,7 @@ duco_prices = {
     "dgb":  0.0065,
     "trx":  0.0065,
     "nano": 0.0065,
+    "fjc": 0.0065,
     "justswap": 0.0065,
     "nodes": 0.0065
 }
@@ -299,19 +300,20 @@ def create_backup():
 def perm_ban(ip, perm=False):
     if not ip in whitelisted_ips:
         os.system("sudo iptables -A INPUT -s " +
-                  str(ip)+" -j DROP >/dev/null 2>&1")
+                  str(ip)+" -j DROP")
         if not perm:
             threading.Timer(60*10, unban, [ip]).start()
 
 
 def unban(ip):
-    os.system("sudo iptables -D INPUT -s "+str(ip)+" -j DROP >/dev/null 2>&1")
+    os.system("sudo iptables -D INPUT -s "+str(ip)
+              + " -j DROP >/dev/null 2>&1")
 
 
 def temporary_ban(ip):
     if not ip in whitelisted_ips:
         os.system("sudo iptables -A INPUT -s " +
-                  str(ip)+" -j DROP >/dev/null 2>&1")
+                  str(ip)+" -j DROP")
         threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
 
 
@@ -533,17 +535,17 @@ def transaction_queue_handle(queue):
                     try:
                         datab.execute(queue.get())
                         queue.task_done()
-                    except Exception:
-                        continue
+                    except Exception as e:
+                        print(traceback.format_exc())
                 datab.commit()
 
             timeEnd = time()
             timeElapsed = round(timeEnd - timeStart, 2)
             #admin_print("Internal db commited - " + str(s) + " updates " + str(timeElapsed) + "s\n")
 
-            if timeElapsed < SAVE_TIME:
-                sleep(SAVE_TIME-timeElapsed)
-        sleep(3)
+            if timeElapsed < SAVE_TIME/2:
+                sleep(SAVE_TIME/2-timeElapsed)
+        sleep(1)
 
 
 def database_updater():
@@ -560,14 +562,15 @@ def database_updater():
                 if user in disconnect_list or user in banlist:
                     balances_to_update[user] = 0
 
-                amount_to_update = balances_to_update[user] / 2
+                amount_to_update = balances_to_update[user] / 3
 
-                if amount_to_update > 0.05:
+                if 0.75 > amount_to_update > 0.05:
                     amount_to_update = 0.05
 
                 if amount_to_update > 0:
                     increment_balance(user, amount_to_update)
                     balances_to_update[user] = 0
+
         except Exception:
             admin_print("Error adding user to DB queue: "
                         + str(traceback.format_exc()))
@@ -668,8 +671,8 @@ def input_management():
             - help - shows this help menu
             - balance <user> - prints user balance
             - set <user> <number> - sets user balance to number
-            - subtract <user> <number> - subtract number from user balance
-            - add <user> <number> - add number to user balance
+            - subtract <user> <number> - moves DUCO from user to coinexchange
+            - add <user> <number> - moves DUCO from coinexchange to user
             - clear - clears the console
             - exit - exits DUCO server
             - restart - restarts DUCO server
@@ -963,6 +966,7 @@ def input_management():
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
                     increment_balance(str(command[1]), -float(command[2]))
+                    increment_balance("coinexchange", float(command[2]))
                     admin_print(
                         "Successfully added balance change to the queue")
 
@@ -1003,6 +1007,7 @@ def input_management():
                 confirm = input("  Y/n")
                 if confirm == "Y" or confirm == "y" or confirm == "":
                     increment_balance(str(command[1]), float(command[2]))
+                    increment_balance("coinexchange", -float(command[2]))
                     admin_print(
                         "Successfully added balance change to the queue")
 
@@ -1518,7 +1523,8 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 "Diff":         difficulty,
                 "Software":     str(miner_name),
                 "Identifier":   str(rig_identifier),
-                "Earnings":     reward
+                "Earnings":     reward,
+                "Timestamp":    int(time())
             }
 
             thread_miner_api["Hashrate"] = reported_hashrate
@@ -1646,13 +1652,12 @@ def get_sys_usage():
     counter = 0
     while True:
         counter += 1
-        if counter % 5 == 0:
+        if counter >= 5:
             global_connections = _get_connections()
-
+            counter = 0
         cpu_list.append(
-            floatmap(psutil.cpu_percent(interval=1), 0, 100, 0, 75)
-        )
-        global_cpu_usage = mean(cpu_list[-50:])
+            floatmap(psutil.cpu_percent(interval=1), 0, 100, 0, 75))
+        global_cpu_usage = mean(cpu_list[-5:])
         global_ram_usage = psutil.virtual_memory()[2]
         sleep(SAVE_TIME)
 
@@ -1790,7 +1795,7 @@ def get_last_blocks(limit=1000):
     blocks_dict = {}
     with sqlconn(CONFIG_BLOCKS, timeout=DB_TIMEOUT) as conn:
         datab = conn.cursor()
-        datab.execute("SELECT * FROM Blocks ORDER BY hash DESC")
+        datab.execute("SELECT * FROM Blocks")
         rows = datab.fetchall()
 
     for row in rows:
@@ -1845,8 +1850,7 @@ def create_main_api_file():
     global miners_per_user
 
     while True:
-        sleep(SAVE_TIME)
-
+        timeS = time()
         total_hashrate, net_wattage = 0, 0
         ducos1_hashrate, xxhash_hashrate = 0, 0
         minerapi_public, miners_per_user = {}, {}
@@ -1864,16 +1868,6 @@ def create_main_api_file():
         try:
             for miner in minerapi.copy():
                 try:
-                    # Pop inactive miners from the API
-                    if "Timestamp" in minerapi[miner]:
-                        d1 = datetime.datetime.fromtimestamp(
-                            minerapi[miner]["Timestamp"])
-                        d2 = datetime.datetime.now()
-                        rd = d2-d1
-                        if rd.total_seconds() > 60:
-                            minerapi.pop(miner)
-                            continue
-
                     # Add miner hashrate to the server hashrate
                     if minerapi[miner]["Algorithm"] == "DUCO-S1":
                         try:
@@ -1887,7 +1881,10 @@ def create_main_api_file():
                             xxhash_hashrate += minerapi[miner]["Hashrate"]
 
                     # Calculate power usage
-                    software = minerapi[miner]["Software"].upper()
+                    try:
+                        software = minerapi[miner]["Software"].upper()
+                    except:
+                        software = "?"
                     identifier = minerapi[miner]["Identifier"].upper()
 
                     if ("AVR" in software
@@ -1936,8 +1933,8 @@ def create_main_api_file():
                     except:
                         miners_per_user[username] = 1
 
-                except Exception:
-                    continue
+                except Exception as e:
+                    pass
 
             net_wattage = scientific_prefix("W", net_wattage, 2)
 
@@ -1963,7 +1960,7 @@ def create_main_api_file():
             current_time = now().strftime("%d/%m/%Y %H:%M:%S (UTC)")
             max_price = duco_prices[max(duco_prices, key=duco_prices.get)]
 
-            duco_prices["pancake"] = 0.00507655
+            duco_prices["pancake"] = 0.00420784
 
             server_api = {
                 "Duino-Coin Server API": "github.com/revoxhere/duino-coin",
@@ -1983,6 +1980,8 @@ def create_main_api_file():
                 "Duco price TRX":        duco_prices["trx"],
                 "Duco price XRP":        duco_prices["xrp"],
                 "Duco price DGB":        duco_prices["dgb"],
+                "Duco price NANO":       duco_prices["nano"],
+                "Duco price FJC":        duco_prices["fjc"],
                 "Duco Node-S price":     duco_prices["nodes"],
                 "Duco JustSwap price":   duco_prices["justswap"],
                 "Duco PancakeSwap price": duco_prices["pancake"],
@@ -1994,7 +1993,7 @@ def create_main_api_file():
                 "Kolka":                 kolka_dict,
                 "Miner distribution":    miner_dict,
                 "Top 10 richest miners": get_richest_users(10),
-                # "Active workers":        miners_per_user
+                "Active workers":        miners_per_user
             }
 
             with open(API_JSON_URI, 'w') as outfile:
@@ -2007,6 +2006,10 @@ def create_main_api_file():
         except Exception:
             admin_print("Error creating main api.json file:"
                         + str(traceback.format_exc()))
+        timeE = time()
+        timeEl = timeE - timeS
+        if timeEl < SAVE_TIME:
+            sleep(SAVE_TIME-timeEl)
 
 
 def create_minerapi():
@@ -2016,36 +2019,55 @@ def create_minerapi():
     in the REST API
     """
     global minerapi
-    while True:
-        sleep(15)
 
+    while True:
+        timeS = time()
         memory_datab.execute("DELETE FROM Miners")
 
+        d2 = time()
         for threadid in minerapi.copy():
+            try:
+                soft = minerapi[threadid]["Software"]
+            except:
+                soft = "?"
             try:
                 memory_datab.execute(
                     """INSERT INTO Miners
                     (threadid, username, hashrate,
                     sharetime, accepted, rejected,
                     diff, software, identifier, algorithm)
-                    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (threadid,
-                     minerapi[threadid]["User"],
-                     minerapi[threadid]["Hashrate"],
-                     minerapi[threadid]["Sharetime"],
-                     minerapi[threadid]["Accepted"],
-                     minerapi[threadid]["Rejected"],
-                     minerapi[threadid]["Diff"],
-                     minerapi[threadid]["Software"],
-                     minerapi[threadid]["Identifier"],
-                     minerapi[threadid]["Algorithm"]))
-            except:
+                    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (
+                        threadid,
+                        minerapi[threadid]["User"],
+                        minerapi[threadid]["Hashrate"],
+                        minerapi[threadid]["Sharetime"],
+                        minerapi[threadid]["Accepted"],
+                        minerapi[threadid]["Rejected"],
+                        minerapi[threadid]["Diff"],
+                        soft,
+                        minerapi[threadid]["Identifier"],
+                        minerapi[threadid]["Algorithm"]
+                    )
+                )
+
+                d1 = minerapi[threadid]["Timestamp"]
+                rd = d2-d1
+                if rd > 90:
+                    # Pop inactive miners from the API
+                    minerapi.pop(threadid)
+            except Exception as e:
                 pass
         memory.commit()
 
         with sqlconn(CONFIG_MINERAPI) as disk_conn:
             memory.backup(disk_conn)
             disk_conn.commit()
+
+        timeE = time()
+        timeEl = abs(timeE - timeS)
+
+        if timeEl < SAVE_TIME:
+            sleep(SAVE_TIME-timeEl)
 
 
 def protocol_login(data, connection):
@@ -2439,6 +2461,7 @@ def get_duco_prices():
             exchange_rate_xrp = de_api["xrp"]["sell"]
             exchange_rate_dgb = de_api["dgb"]["sell"]
             exchange_rate_nano = de_api["nano"]["sell"]
+            exchange_rate_fjc = de_api["fjc"]["sell"]
 
             """
             Get pairs prices from Coingecko
@@ -2448,7 +2471,8 @@ def get_duco_prices():
                     coingecko_api = requests.get(
                         "https://api.coingecko.com/"
                         + "api/v3/simple/price?ids="
-                        + "magi,tron,bitcoin-cash,ripple,digibyte,nano"
+                        + "magi,tron,bitcoin-cash,ripple,"
+                        + "digibyte,nano,fujicoin"
                         + "&vs_currencies=usd",
                         data=None
                     ).json()
@@ -2487,6 +2511,11 @@ def get_duco_prices():
             nano_usd = float(coingecko_api["nano"]["usd"])
             duco_prices["nano"] = round(
                 nano_usd * exchange_rate_nano, 8
+            )
+
+            fjc_usd = float(coingecko_api["fujicoin"]["usd"])
+            duco_prices["fjc"] = round(
+                fjc_usd * exchange_rate_fjc, 8
             )
 
             """
@@ -2668,10 +2697,7 @@ def handle(connection, address):
 
     ip_addr = address[0].replace("::ffff:", "")
 
-    if ip_addr == "149.91.88.18":
-        connection.settimeout(90)
-    else:
-        connection.settimeout(SOCKET_TIMEOUT)
+    connection.settimeout(SOCKET_TIMEOUT)
 
     try:
         """
@@ -2724,19 +2750,19 @@ def handle(connection, address):
                 it's not our job so we pass him to the
                 DUCO-S1 job handler 
                 """
-                thread_id = protocol_mine(data, connection, address)
-                username = data[1]
-                #send_data("NO,Please mine on the pool", connection)
+                #thread_id = protocol_mine(data, connection, address)
+                #username = data[1]
+                send_data("BAD,Please mine on the pool", connection)
                 break
 
             elif data[0] == "JOBXX":
                 """ 
                 Same situation as above, just use the XXHASH switch 
                 """
-                thread_id = protocol_mine(
-                    data, connection, address, using_xxhash=True)
-                username = data[1]
-                #send_data("NO,Please mine on the pool", connection)
+                # thread_id = protocol_mine(
+                #    data, connection, address, using_xxhash=True)
+                #username = data[1]
+                send_data("BAD,Please mine on the pool", connection)
                 break
 
             # USER FUNCTIONS
@@ -2896,11 +2922,11 @@ def handle(connection, address):
                                         amount_to_update)
 
                     if poolWorkers:
-                        for worker in poolWorkers.copy():
+                        for worker in poolWorkers:
                             try:
                                 minerapi[worker] = poolWorkers[worker]
                             except Exception:
-                                continue
+                                pass
 
                     timestamp = str(now().strftime("%H:%M:%S"))
                     pool_infos.append(timestamp
@@ -3179,8 +3205,8 @@ if __name__ == "__main__":
     from kolka_chip_module import *
     try:
         from wrapped_duco_functions import *
-    except:
-        pass
+    except Exception as e:
+        print(e)
 
     admin_print("Launching background threads")
     # threading.Thread(target=autorestarter).start()
