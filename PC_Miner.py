@@ -640,14 +640,24 @@ class Miner:
 
                     job = Client.recv().split(Settings.SEPARATOR)
 
+                    try:
+                        diff = int(job[2])
+                        break
+                    except:
+                        pretty_print("Node message: "
+                                     + job[0],
+                                     "error", "cpu" + str(id))
+                        sleep(3)
+
+                while True:
                     time_start = time()
                     if user_settings["algorithm"] == "XXHASH":
                         back_color = Back.CYAN
-                        result = Algorithms.XXHASH(job[0], job[1], int(job[2]),
+                        result = Algorithms.XXHASH(job[0], job[1], diff,
                                                    user_settings["intensity"])
                     else:
                         back_color = Back.YELLOW
-                        result = Algorithms.DUCOS1(job[0], job[1], int(job[2]),
+                        result = Algorithms.DUCOS1(job[0], job[1], diff,
                                                    user_settings["intensity"])
                     computetime = time() - time_start
 
@@ -667,7 +677,8 @@ class Miner:
                     time_start = time()
                     feedback = Client.recv().split(Settings.SEPARATOR)
                     ping = (time() - time_start) * 1000
-
+                    
+                    print(str(feedback))
                     if feedback[0] == "GOOD":
                         accept.value += 1
                         share_print(id, "accept",
@@ -693,7 +704,7 @@ class Miner:
                                     back_color)
 
                     else:
-                        pretty_print("Node message: " + str(feedback[0]))
+                        pretty_print("Node message: " + str(feedback[0]), "error", "cpu" + str(id))
 
                     if id == 0:
                         end_time = time()
