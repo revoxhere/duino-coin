@@ -163,6 +163,8 @@ Server source code, documentation for API calls and official libraries for devel
     Since that table is getting really long, it's collapsed by default. Click this text to expand it!
   </summary>
 
+  ### Please not that currently the rewards are being changed to logarythmical and the table is not accurate.
+  
   | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
   | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 196 H/s                           | 1                 | 0.2 W          | 9-10                |
