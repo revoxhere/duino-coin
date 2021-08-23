@@ -95,7 +95,7 @@ After doing this, you are good to go with launching the software (just double cl
   </summary>
 
   ### Other miners known to work with Duino-Coin:
-  *   [DuinoCoibyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - miner for LabVIEW family by ericddm
+  *   [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - miner for LabVIEW family by ericddm
   *   [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - a JavaScript miner which you can easily implement in your site by Hoiboy19
   *   [Mineuino](https://github.com/VatsaDev/Mineuino) - website monetizer by VatsaDev
   *   [hauchel's duco-related stuff repository](https://github.com/hauchel/duco/) - Collection of various codes for mining DUCO on other microcontrollers
