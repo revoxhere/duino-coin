@@ -35,7 +35,6 @@
     <link rel="stylesheet" type="text/css" href="assets/css/bulma-prefers-dark.min.css">
     <script src="assets/js/all.min.js"></script>
     <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/captchacheck.js"></script>
     <script src="https://hcaptcha.com/1/api.js" async defer></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69"></script>
     <script>
@@ -221,4 +220,13 @@ document.addEventListener('DOMContentLoaded', () => { // HAMBURGER MENU
         });
     }
 });
+</script>
+<script>
+window.onload = function() {
+    var hcaptcha = document.forms["contactform"]["h-captcha-response"];
+    hcaptcha.required = true;
+    hcaptcha.oninvalid = function(e) {
+        alert("Please complete the captcha.");
+    }
+}
 </script>
