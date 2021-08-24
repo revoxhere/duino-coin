@@ -54,7 +54,7 @@
 | 💻 Supported by a large number of platforms<br>👥 A fast-growing community<br>💱 Easy to use & exchange<br>(on DUCO Exchange, Node-S, JustSwap)<br>🌎 Available everywhere<br>:new: Fully original & open-source project<br>🌳 Beginner & eco-friendly<br>💰 Cost-effective & easy to mine | ⚒️ Algorithms: DUCO-S1, XXHASH,<br>more planned (including PoS)<br>♐ Rewards: supported by "Kolka system"<br>helping to reward miners fairly<br>⚡ Transaction time: Instant<br>🪙 Coin supply: Infinite<br>(before December 2020: 350k coins)<br>(new limits planned for the future)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Decimals: up to 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Teensy 4.1 boards |
 
 
-## Get started
+## Getting started
 
 #### The easiest way to get started with Duino-Coin is to download [the latest release](https://github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
 After downloading the release, unzip it and launch the desired program.<br>
@@ -137,6 +137,7 @@ After doing this, you are good to go with launching the software (just double cl
   *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI Wallet by viktor02
 
   This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
+  You may also view a similar list on the [website](https://duinocoin.com/apps).
 </details>
 
 ## DUCO & wDUCO
@@ -219,6 +220,7 @@ Some third-party included files may have different licenses - please check their
 13. A user's DUCOs may be burnt if a violation can be proven.<br/>
 14. These terms of service can change at any time without prior notice.<br/>
 15. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+
 
 ## Privacy policy
 1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
