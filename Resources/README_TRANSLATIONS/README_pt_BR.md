@@ -87,7 +87,7 @@ Depois de fazer isso, você está pronto para iniciar o software (apenas clique 
   </summary>
 
   ### Other miners known to work with Duino-Coin:
-  *   [DuinoCoibyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - Uma mineradora para a família LabVIEW, feita pelo ericddm
+  *   [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - Uma mineradora para a família LabVIEW, feita pelo ericddm
   *   [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - Uma mineradora em JavaScript que você pode implementar facilmente em seu site, feita pelo Hoiboy19
   *   [Mineuino](https://github.com/VatsaDev/Mineuino) - Um monetizador de sites feito pelo VatsaDev
   *   [hauchel's duco-related stuff repository](https://github.com/hauchel/duco/) - Coleção de varios códigos para minerar DUCO em outros microcontroladores
