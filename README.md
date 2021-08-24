@@ -14,9 +14,15 @@
   <br>
 </h1>
 
+
 ## Duino-Coin Website
 
 This branch of the Duino-Coin repository contains the code for the Duino-Coin website located at [https://duinocoin.com](https://duinocoin.com).
+
+
+## License
+
+The Duino-Coin website is distributed under the MIT License. See the `LICENSE` file for more information.
 
 
 ## Website maintainers
