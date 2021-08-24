@@ -213,7 +213,6 @@ Bazı üçüncü-parti dosyalar farklı lisanslar kullanıyor olabilir - lütfen
 *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
 *   [@DoctorEenot](https://github.com/DoctorEenot) (Geliştirici)
 ##
-*   [@HGEcode](https://github.com/HGEcode) (Python geliştiricisi)
 *   [@LDarki](https://github.com/LDarki) (Web geliştiricisi)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Geliştirici)
 *   [@Pripun](https://github.com/Pripun) (Mobil uygulama geliştiricisi)

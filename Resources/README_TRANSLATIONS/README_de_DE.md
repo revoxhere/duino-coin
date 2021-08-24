@@ -226,7 +226,6 @@ Some third-party included files may have different licenses - please check their
     *   [@Bilaboz](https://github.com/bilaboz/) (Lead dev)
     *   [@connorhess](https://github.com/connorhess) (Lead dev)
     *   [@JoyBed](https://github.com/JoyBed) (Lead dev)
-    *   [@HGEcode](https://github.com/HGEcode) (Dev)
     *   [@LDarki](https://github.com/LDarki) (Web dev)
     *   [@travelmode](https://github.com/colonelwatch) (Dev)
     *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)

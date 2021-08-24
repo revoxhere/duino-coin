@@ -224,7 +224,6 @@ Duino-Coin ส่วนใหญ่ถูกเผยแพร่ภายใต
 *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (เว็บมาสเตอร์)
 *   [@DoctorEenot](https://github.com/DoctorEenot) (นักพัฒนา)
 ##
-*   [@HGEcode](https://github.com/HGEcode) (นักพัฒนาไพธอน)
 *   [@LDarki](https://github.com/LDarki) (นักพัฒนาเว็บ)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (นักพัฒนา)
 *   [@Pripun](https://github.com/Pripun) (นักพัฒนาแอพมือถือ)

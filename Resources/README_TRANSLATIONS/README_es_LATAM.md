@@ -241,7 +241,6 @@ Algunos archivos de terceros incluidos podrían tener otras licensias - por favo
     *   [@Bilaboz](https://github.com/bilaboz/) (Desarrollador principal)
     *   [@connorhess](https://github.com/connorhess) (Desarrollador principal)
     *   [@JoyBed](https://github.com/JoyBed) (Desarrollador principal)
-    *   [@HGEcode](https://github.com/HGEcode) (Desarrollador)
     *   [@LDarki](https://github.com/LDarki) (Desarrollador web)
     *   [@travelmode](https://github.com/colonelwatch) (Desarrollador)
     *   [@ygboucherk](https://github.com/ygboucherk) (Desarollador de [wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2))

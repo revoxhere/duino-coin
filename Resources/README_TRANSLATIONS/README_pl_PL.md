@@ -223,7 +223,6 @@ Niektóre pliki niepochodzące od nas mogą mieć inne licencje - sprawdź ich k
     *   [@Bilaboz](https://github.com/bilaboz/) (główny deweloper)
     *   [@connorhess](https://github.com/connorhess) (główny deweloper
     *   [@JoyBed](https://github.com/JoyBed) (główny deweloper)
-    *   [@HGEcode](https://github.com/HGEcode) (deweloper)
     *   [@LDarki](https://github.com/LDarki) (web deweloper)
     *   [@travelmode](https://github.com/colonelwatch) (deweloper)
     *   [@ygboucherk](https://github.com/ygboucherk) (deweloper [wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2))

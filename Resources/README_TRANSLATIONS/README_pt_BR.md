@@ -225,7 +225,6 @@ Alguns arquivos incluídos de terceiros podem ter licenças diferentes - por fav
 *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
 *   [@DoctorEenot](https://github.com/DoctorEenot) (Dev)
 ##
-*   [@HGEcode](https://github.com/HGEcode) (Python dev)
 *   [@LDarki](https://github.com/LDarki) (Web dev)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
 *   [@Pripun](https://github.com/Pripun) (Mobile apps dev)
