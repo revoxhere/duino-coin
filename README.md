@@ -44,7 +44,7 @@
 <br>
 
 <h3>
-  Duino-Coin is a coin that can be mined with Arduinos, ESP8266/32 boards, Raspberry Pis, computers, and many more<br>
+  Duino-Coin is a coin that can be mined with Arduinos, ESP8266/32 boards, Raspberry Pis, computers, and many more 
   (including Wi-Fi routers, smart TVs, smartphones, smartwatches, SBCs, MCUs or even GPUs)
 </h3>
 
@@ -52,6 +52,7 @@
 | Key features | Technical specifications | (Some of many) supported boards |
 |-|-|-|
 | 💻 Supported by a large number of platforms<br>👥 A fast-growing community<br>💱 Easy to use & exchange<br>(on DUCO Exchange, Node-S, JustSwap)<br>🌎 Available everywhere<br>:new: Fully original & open-source project<br>🌳 Beginner & eco-friendly<br>💰 Cost-effective & easy to mine | ⚒️ Algorithms: DUCO-S1, XXHASH,<br>more planned (including PoS)<br>♐ Rewards: supported by "Kolka system"<br>helping to reward miners fairly<br>⚡ Transaction time: Instant<br>🪙 Coin supply: Infinite<br>(before December 2020: 350k coins)<br>(new limits planned for the future)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Decimals: up to 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Teensy 4.1 boards |
+
 
 ## Get started
 
@@ -93,6 +94,7 @@ After doing this, you are good to go with launching the software (just double cl
   <summary>
     Since that list is getting really long, it's collapsed by default. Click this text to expand it!
   </summary>
+
 
   ### Other miners known to work with Duino-Coin:
   *   [DuinoCoibyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - miner for LabVIEW family by ericddm
@@ -139,7 +141,8 @@ After doing this, you are good to go with launching the software (just double cl
 
 ## DUCO & wDUCO
 
-Duino-Coin is a hybrid currency, meaning that it can be converted to wDUCO which is DUCO wrapped on the [Tron](https://tron.network) network (as a token). Currently there aren't many uses for it, other than just storing funds in external wallet or exchanging wDUCO to another token on JustSwap. Tutorial on using wDUCO is available in the [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
+Duino-Coin is a hybrid currency, meaning that it can be converted to wDUCO which is DUCO wrapped on the [Tron](https://tron.network) network (as a token). Currently there aren't many uses for it, other than just storing funds in an external wallet or exchanging wDUCO to another token on JustSwap. A tutorial on using wDUCO is available in the [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
+
 
 ## Development
 
@@ -155,6 +158,7 @@ How to help?
 *   Open a pull request
 
 Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch.
+
 
 ## Benchmarks of officially tested devices and boards
 
@@ -196,7 +200,7 @@ Server source code, documentation for API calls and official libraries for devel
 
 ## License
 
-Duino-Coin is mostly distributed under the MIT License. See `LICENSE` file for more information.
+Duino-Coin is mostly distributed under the MIT License. See the `LICENSE` file for more information.
 Some third-party included files may have different licenses - please check their `LICENSE` statements (usually at the top of the source code files).
 
 ## Terms of service
@@ -215,11 +219,13 @@ Some third-party included files may have different licenses - please check their
 13. A user's DUCOs may be burnt if a violation can be proven.<br/>
 14. These terms of service can change at any time without prior notice.<br/>
 15. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+
 ## Privacy policy
 1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
 2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
 3. Balances, transactions and mining-related data is publicly available in the public <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
 4. The privacy policy may be changed in the future with a prior notification.
+
 
 ## Active project maintainers
 
@@ -230,17 +236,18 @@ Some third-party included files may have different licenses - please check their
 ##
 *   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
+*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer)
 *   [@DoctorEenot](https://github.com/DoctorEenot) (Dev)
 ##
-*   [@HGEcode](https://github.com/HGEcode) (Python dev)
 *   [@LDarki](https://github.com/LDarki) (Web dev)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
 *   [@Pripun](https://github.com/Pripun) (Mobile apps dev)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
 
-Also big thanks to all [Contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped to develop the Duino-Coin project.
+Also, big thanks to all the [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped to develop the Duino-Coin project.
 
 <hr>
 
 Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
+<br/>
+Website Link: [https://duinocoin.com/](https://duinocoin.com/)
