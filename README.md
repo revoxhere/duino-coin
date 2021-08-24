@@ -29,7 +29,7 @@ The Duino-Coin website is distributed under the MIT License. See the `LICENSE` f
 * [@Revox](https://github.com/revoxhere/) - kristian@beyondcoin.io (Duino-Coin Founder)
 * [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer)
 
-Also, big thanks to all [Contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped with the Duino-Coin website.
+Also, big thanks to all the [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped with the Duino-Coin website.
 
 <hr>
 
