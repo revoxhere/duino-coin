@@ -1,4 +1,4 @@
-<!-- Translate up to line 94 so far :)
+<!-- Translate up to line 118 so far :)
 *** Offizielles Duino Coin README
 *** by revox, 2019-2021
 -->
@@ -85,35 +85,37 @@ Der einfachste Weg zu starten, ist  [den neusten release](https://github.com/rev
 
 <hr>
 
- Wenn du die Programme von source lunchen willst, must du vielleicht einige Dependencies installieren. So kann man es auf Debian-based Linux distros (z.B. Ubuntu, Debian oder Raspian) machen:
+ Wenn du die Programme vom Master.zip Starten willst, musst du vielleicht einige zusätzliche erweiterungen hierfür Installieren. So kann man es auf Debian-based Linux distros (z.B. Ubuntu, Debian oder Raspian) machen:
 ```BASH
 sudo apt install python3 python3-pip git
 git clone https://github.com/revoxhere/duino-coin
 cd duino-coin
 python3 -m pip install -r requirements.txt
 ```
-If you are on Windows, download [Python 3](https://www.python.org/downloads/), then [our repository](https://github.com/revoxhere/duino-coin/archive/master.zip), extract it and open the folder in command prompt. In CMD, type:
+Wenn du Windows nutzt, musst du [Python 3](https://www.python.org/downloads/) herunterladen, und dann die [Master Repository](https://github.com/revoxhere/duino-coin/archive/master.zip), diese dann Entpacken (WinRar, 7zip) Danach kannst du ein CMD Fester öffnen (Windows + R Taste). 
+
+Im CMD Fenster, Schreibe/kopiere dies hinein:
 ```BASH
 py -m pip install -r requirements.txt
 ```
-Note for Windows users: Make sure python and pip are added to your PATH
+Wichtig für Windows nutzer: Immer sicher gehen das [Python 3](https://www.python.org/downloads/) und Python3-pip installiert sind und geupdatet sind.
 
-After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py` OR `py PC_Miner.py`).
+Nach all diesen Schritten, bist du so weit das du den Miner starten kannst. (z.b. `python3 PC_Miner.py` oder `py PC_Miner.py`).
 
 <hr>
 
-You can also get the whole Duino-Coin bundle on the AUR - just install it with your favourite AUR Helper:
+Du kannst das ganze Duino-Coin Paket auch mit AUR laden - dazu einfach ein Ladevorgang starten mit deinem Favorisierten AUR Helfer Programm:
 
 ```BASH
 sudo pacman -S yay
 yay -S duino-coin
 ```
 
-Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD).
+Duino-Coin AUR Paket wird bereitgestellt von [PhereloHD](https://github.com/PhereloHD).
 
-<h3 align="center">Community-made software</h3><br>
+<h3 align="center">Von der Community erstellte Software von Talentierten Mitgliedern</h3><br>
 
-**Other miners known to work with Duino-Coin:**
+**Andere Miner-/Software/Hardware/Chips die bekannt sind das Duino-Coin damit Funktioniert:**
 *   [duino-coin-kodi](https://github.com/SandUhrGucker/duino-coin-kodi) - Mining addon for Kodi Media Center by SandUhrGucker
 *   [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - Python script to mine Duino-Coin on routers by BastelPichi
 *   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - mine with less connections on multiple devices by DoctorEenot
