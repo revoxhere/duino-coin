@@ -207,14 +207,14 @@ Bazı üçüncü-parti dosyalar farklı lisanslar kullanıyor olabilir - lütfen
 *   [@Bilaboz](https://github.com/bilaboz/) (Ana NodeJS geliştiricisi)
 *   [@connorhess](https://github.com/connorhess) (Ana Python geliştiricisi, Node-S sahibi)
 *   [@JoyBed](https://github.com/JoyBed) (Ana AVR geliştiricisi)
+*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer) <!-- translation wanted -->
 ##
 *   [@EinWildesPanda](https://github.com/EinWildesPanda) (Geliştirici)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) geliştiricisi)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
 *   [@DoctorEenot](https://github.com/DoctorEenot) (Geliştirici)
-##
 *   [@LDarki](https://github.com/LDarki) (Web geliştiricisi)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Geliştirici)
+##
 *   [@Pripun](https://github.com/Pripun) (Mobil uygulama geliştiricisi)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR geliştiricisi)
 

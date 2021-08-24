@@ -229,7 +229,7 @@ Some third-party included files may have different licenses - please check their
     *   [@LDarki](https://github.com/LDarki) (Web dev)
     *   [@travelmode](https://github.com/colonelwatch) (Dev)
     *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-    *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
+    *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer)
     *   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
 
 *   **Contributors:**
