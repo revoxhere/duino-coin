@@ -3,6 +3,17 @@
 *** by Kristian, 2021
 -->
 
+<a href="https://duinocoin.com">
+  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" width="215px" align="right"/>
+</a>
+
+<h1>
+  <a href="https://duinocoin.com">
+    <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" width="430px"/>
+  </a>
+  <br>
+</h1>
+
 ## Duino-Coin Website
 
 This branch of the Duino-Coin repository contains the code for the Duino-Coin website located at [https://duinocoin.com](https://duinocoin.com).
