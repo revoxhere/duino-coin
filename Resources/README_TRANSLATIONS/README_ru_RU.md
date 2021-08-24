@@ -220,7 +220,6 @@ Duino-Coin в основном распространяется по лицен�
     *   [@travelmode](https://github.com/colonelwatch) (Dev)
     *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
     *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer)
-    *   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
 
 *   **Помошники:**
     *   [@5Q](https://github.com/its5Q)

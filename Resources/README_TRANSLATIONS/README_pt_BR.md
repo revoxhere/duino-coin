@@ -221,13 +221,12 @@ Alguns arquivos incluídos de terceiros podem ter licenças diferentes - por fav
 *   [@JoyBed](https://github.com/JoyBed) (Lead AVR dev)
 *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Develoepr)
 ##
-*   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
 *   [@DoctorEenot](https://github.com/DoctorEenot) (Dev)
 *   [@LDarki](https://github.com/LDarki) (Web dev)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
-##
 *   [@Pripun](https://github.com/Pripun) (Mobile apps dev)
+##
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
 
 Um grande agradecimento para todos [Contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) que ajudaram a desenvolver o projeto Duino-Coin.

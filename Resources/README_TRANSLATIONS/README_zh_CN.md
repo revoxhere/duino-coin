@@ -235,7 +235,6 @@ Duino-Coin 主要根据MIT许可证进行分发。有关更多信息，请参见
     *   [@travelmode](https://github.com/colonelwatch) (Dev)
     *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
     *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer)
-    *   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
 
 *   **贡献者:**
     *   [@5Q](https://github.com/its5Q)
