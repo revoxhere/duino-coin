@@ -225,7 +225,6 @@ class Client:
                              "error", "net0")
                 sleep(15)
 
-
 def get_prefix(symbol: str,
                val: float,
                accuracy: int):
@@ -628,89 +627,104 @@ class Miner:
             try:
                 Miner.m_connect(id, pool)
                 while True:
-                    job_req = "JOB"
-                    if user_settings["algorithm"] == "XXHASH":
-                        job_req = "JOBXX"
+                    try:
+                        while True:
+                            job_req = "JOB"
+                            if user_settings["algorithm"] == "XXHASH":
+                                job_req = "JOBXX"
 
-                    Client.send(job_req
-                                + Settings.SEPARATOR
-                                + str(user_settings["username"])
-                                + Settings.SEPARATOR
-                                + str(user_settings["start_diff"]))
+                            Client.send(job_req
+                                        + Settings.SEPARATOR
+                                        + str(user_settings["username"])
+                                        + Settings.SEPARATOR
+                                        + str(user_settings["start_diff"]))
 
-                    job = Client.recv().split(Settings.SEPARATOR)
+                            job = Client.recv().split(Settings.SEPARATOR)
 
-                    time_start = time()
-                    if user_settings["algorithm"] == "XXHASH":
-                        back_color = Back.CYAN
-                        result = Algorithms.XXHASH(job[0], job[1], int(job[2]),
-                                                   user_settings["intensity"])
-                    else:
-                        back_color = Back.YELLOW
-                        result = Algorithms.DUCOS1(job[0], job[1], int(job[2]),
-                                                   user_settings["intensity"])
-                    computetime = time() - time_start
+                            try:
+                                if (len(job) == 3):
 
-                    hashrate[id] = result[1]
-                    total_hashrate = sum(hashrate.values())
+                                    break            
+                            except:
+                                pretty_print("invalid job", "error")
+                                sleep(3)
+                        while True:
+                            time_start = time()
+                            if user_settings["algorithm"] == "XXHASH":
+                                back_color = Back.CYAN
+                                result = Algorithms.XXHASH(job[0], job[1], int(job[2]),
+                                                        user_settings["intensity"])
+                            else:
+                                back_color = Back.YELLOW
+                                result = Algorithms.DUCOS1(job[0], job[1], int(job[2]),
+                                                        user_settings["intensity"])
+                            computetime = time() - time_start
 
-                    Client.send(str(result[0])
-                                + Settings.SEPARATOR
-                                + str(result[1])
-                                + Settings.SEPARATOR
-                                + "Official PC Miner ("
-                                + user_settings["algorithm"]
-                                + ") v" + str(Settings.VER)
-                                + Settings.SEPARATOR
-                                + str(user_settings["identifier"]))
+                            hashrate[id] = result[1]
+                            total_hashrate = sum(hashrate.values())
+                            while True:
+                                Client.send(str(result[0])
+                                            + Settings.SEPARATOR
+                                            + str(result[1])
+                                            + Settings.SEPARATOR
+                                            + "Official PC Miner ("
+                                            + user_settings["algorithm"]
+                                            + ") v" + str(Settings.VER)
+                                            + Settings.SEPARATOR
+                                            + str(user_settings["identifier"]))
 
-                    time_start = time()
-                    feedback = Client.recv().split(Settings.SEPARATOR)
-                    ping = (time() - time_start) * 1000
+                                time_start = time()
+                                feedback = Client.recv().split(Settings.SEPARATOR)
+                                ping = (time() - time_start) * 1000
 
-                    if feedback[0] == "GOOD":
-                        accept.value += 1
-                        share_print(id, "accept",
-                                    accept.value, reject.value,
-                                    result[1], total_hashrate,
-                                    computetime, job[2], ping,
-                                    back_color)
+                                if feedback[0] == "GOOD":
+                                    accept.value += 1
+                                    share_print(id, "accept",
+                                                accept.value, reject.value,
+                                                result[1], total_hashrate,
+                                                computetime, job[2], ping,
+                                                back_color)
 
-                    elif feedback[0] == "BLOCK":
-                        reject.value += 1
-                        share_print(id, "block",
-                                    accept.value, reject.value,
-                                    result[1], total_hashrate,
-                                    computetime, job[2], ping,
-                                    back_color)
+                                elif feedback[0] == "BLOCK":
+                                    reject.value += 1
+                                    share_print(id, "block",
+                                                accept.value, reject.value,
+                                                result[1], total_hashrate,
+                                                computetime, job[2], ping,
+                                                back_color)
 
-                    elif feedback[0] == "BAD":
-                        reject.value += 1
-                        share_print(id, "reject",
-                                    accept.value, reject.value,
-                                    result[1], total_hashrate,
-                                    computetime, job[2], ping,
-                                    back_color)
+                                elif feedback[0] == "BAD":
+                                    reject.value += 1
+                                    share_print(id, "reject",
+                                                accept.value, reject.value,
+                                                result[1], total_hashrate,
+                                                computetime, job[2], ping,
+                                                back_color)
 
-                    else:
-                        pretty_print("Node message: " + str(feedback[0]))
+                                else:
+                                    pretty_print("Node message: " + str(feedback[0]))
 
-                    if id == 0:
-                        end_time = time()
-                        elapsed_time = end_time - last_report
-                        if elapsed_time >= Settings.REPORT_TIME:
-                            report_shares = accept.value - last_report_shares
-                            uptime = calculate_uptime(mining_start_time)
-                            periodic_report(last_report, end_time,
-                                            report_shares,
-                                            sum(hashrate.values()), uptime)
-                            last_report = time()
-                            last_report_shares = accept.value 
-
+                                if id == 0:
+                                    end_time = time()
+                                    elapsed_time = end_time - last_report
+                                    if elapsed_time >= Settings.REPORT_TIME:
+                                        report_shares = accept.value - last_report_shares
+                                        uptime = calculate_uptime(mining_start_time)
+                                        periodic_report(last_report, end_time,
+                                                        report_shares,
+                                                        sum(hashrate.values()), uptime)
+                                        last_report = time()
+                                        last_report_shares = accept.value 
+                                break
+                            break
+                    except Exception as e:
+                        pretty_print(get_string("error_while_mining"), "error" ,"net" + str(id))
+                        sleep(5)
+                        break  
             except KeyboardInterrupt:
                 _exit(0)
             else:
-                pretty_print("Error, restarting")
+                pretty_print("Error, restarting", "error")
 
 
 class Discord_rp:
