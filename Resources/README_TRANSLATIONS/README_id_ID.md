@@ -46,8 +46,8 @@
 <br>
 
 <h3>
- Duino-Coin adalah koin yang dapat ditambang dengan Arduino, papan ESP8266/32, Raspberry Pi, komputer, dan banyak lagi
-  (termasuk router Wi-Fi, TV pintar, smartphone, smartwatches, SBC, MCU, atau bahkan GPU)
+ Duino-Coin adalah koin yang dapat ditambang dengan Arduino, papan modul ESP8266/32, Raspberry Pi, komputer, dan banyak lagi
+  (termasuk router Wi-Fi, smartTV, smartphone, smartwatches, SBC, MCU, atau bahkan GPU)
 </h3>
 
 
