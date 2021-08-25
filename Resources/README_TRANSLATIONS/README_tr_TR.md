@@ -37,7 +37,7 @@
 
 | Ana özellikleri | Teknik Ayrıntıları | Desteklenen kartlar(dan bazıları) |
 |-|-|-|
-| 💻 Çoğu platform tarafından destekleniyor<br>👥 Arkadaş canlısı ve büyüyen bir topluluk<br>💱 Kullanması & Takas etmesi kolay<br>(DUCO Exchange, Node-S, JustSwap'da)<br>🌎 Heryerde mevcut<br>:new: Tamamen orijinal & açık kaynaklı proje<br>🌳 Acemi & Çevre Dostu<br>💰 Uygun maliyetli & madenciliği kolay | ⚒️ Algoritmalar: DUCO-S1, XXHASH,<br>dahası planlanıyor(PoS dahil)<br>♐ Ödüller: "Kolka sistemi" tarafından destekleinyor<br>Madencilerin adil bir şekilde ödüllendirilmesine yardımcı<br>⚡ Aktarım hızı: Anlık<br>🪙 Maksimum Arz: Sonsuz<br>(Aralık 2020'den önce: 350 bin)<br>(gelecekte yeni limitler berirlenmesi planlandı)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Ondalıkları: 20'ye kadar | ♾️ Arduinolar<br>(Uno, Nano, Mega, Due, Pro Mini, vb.)<br>📶 ESP8266'lar<br>(NodeMCU, Wemos, vb.)<br>📶 ESP32'ler<br>(ESP-WROOM, ESP32-CAM, vb.)<br>🍓 Raspberry Pi'lar<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pi'lar<br>(Zero, Zero 2, PC, Plus, vb.)<br>⚡ Teensy 4.1 kartları |
+| 💻 Çoğu platform tarafından destekleniyor<br>👥 Arkadaş canlısı ve büyüyen bir topluluk<br>💱 Kullanması & Takas etmesi kolay<br>(DUCO Exchange, Node-S, JustSwap'da)<br>🌎 Heryerde mevcut<br>:new: Tamamen orijinal & açık kaynaklı proje<br>🌳 Acemi & Çevre Dostu<br>💰 Uygun maliyetli & madenciliği kolay | ⚒️ Algoritmalar: DUCO-S1, XXHASH,<br>dahası planlanıyor(PoS dahil)<br>♐ Ödüller: "Kolka sistemi" tarafından,<br>Madencilerin adil bir şekilde ödüllendirilmesine yardımcı olmak adına destekleniyor<br>⚡ Aktarım hızı: Anlık<br>🪙 Maksimum Arz: Sonsuz<br>(Aralık 2020'den önce: 350 bin)<br>(gelecekte yeni limitler berirlenmesi planlandı)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Ondalıkları: 20'ye kadar | ♾️ Arduinolar<br>(Uno, Nano, Mega, Due, Pro Mini, vb.)<br>📶 ESP8266'lar<br>(NodeMCU, Wemos, vb.)<br>📶 ESP32'ler<br>(ESP-WROOM, ESP32-CAM, vb.)<br>🍓 Raspberry Pi'lar<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pi'lar<br>(Zero, Zero 2, PC, Plus, vb.)<br>⚡ Teensy 4.1 kartları |
 
 ## Duino-Coin'i kullanmaya başlamak
 
@@ -67,7 +67,7 @@ Bunu yaptıktan sonra yazılımı Python Yorumlayıcısı ile çalıştırabilir
 1. [Python 3](https://www.python.org/downloads/)'ü indirin ve kurun (Python'u ve Pip'i PATH'e eklediğinizden emin olun)
 2. [Duino-Coin deposunu](https://github.com/revoxhere/duino-coin/archive/master.zip) indirin
 3. İndirdiğiniz zip arşivini bir klasöre çıkarın ve komut istemini o klasörde başlatın
-4. Komut isteminde gerekli kütüphaneleri indirmek için ´py -m pip install -r requirements.txt´ komutunu çalıştırın
+4. Komut isteminde gerekli kütüphaneleri indirmek için `py -m pip install -r requirements.txt` komutunu çalıştırın
 
 Bunu yaptıktan sonra istediğiniz yazılımı çalıştırabilirsiniz (istediğiniz ´.py´ dosyasına çift tıklayın veya komut isteminde ´py PC_miner.py´ vb. ile çalıştırın).
 
@@ -79,6 +79,7 @@ Bunu yaptıktan sonra istediğiniz yazılımı çalıştırabilirsiniz (istediğ
   </summary>
 
   ### Duino-Coin ile çalışan diğer madenci yazılımları:
+  *   [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - LabVIEW ailesi için ericddm tarafından geliştirilmiş madenci
   *   [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - Hoiboy19 tarafından websitenize kolayca ekleyebileceğiniz bir madenci
   *   [Mineuino](https://github.com/VatsaDev/Mineuino) - VatsaDev tarafınan websitelerinizden para kazanmanızı sağlayan bir yalızım
   *   [hauchel's duco-related stuff repository](https://github.com/hauchel/duco/) - farklı mikronetleyicilerde DUCO kazan yazılımların bir koleksiyonu
@@ -102,6 +103,8 @@ Bunu yaptıktan sonra istediğiniz yazılımı çalıştırabilirsiniz (istediğ
       *   [Arduino IDE için Teensy 4.1 code](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) joaquinbvw tarafından
 
   ### Diğer araçlar:
+  *   [DuinoCoin-balance-Home-Assistant](https://github.com/NL647/DuinoCoin-balance-Home-Assistant) - NL647 tarafından geliştirilen ve Home Assistant'ta mevcut bakiyenizi görmenizi sağlayan bir eklenti
+  *   [Duino Coin Status Monitor](https://github.com/TSltd/duino_coin) - TSltd tarafından ESP8266 üzerinde 128x64 SSD1306 OLED kullanan bir yazılım
   *   [ducopanel](https://github.com/ponsato/ducopanel) - ponsato tarafından Duino-Coin madencilerinizi kontrol etmek için bir GUI uygulaması
   *   [Duino AVR Monitör](https://www.microsoft.com/store/apps/9NJ7HPFSR9V5) - niknak tarafından AVR madencileri kontrol etmek için GUI Windows uygulaması 
   *   [Duino-Coin Arduino kütüphanesi](https://github.com/ricaun/arduino-DuinoCoin) ricaun tarafından
@@ -113,8 +116,10 @@ Bunu yaptıktan sonra istediğiniz yazılımı çalıştırabilirsiniz (istediğ
   *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) siunus tarafından hesap statistikleri
   *   [duino-tools](https://github.com/kyngs/duino-tools) kyngs tarafından Java'da yazılmış araçlar
   *   [Duino Stats](https://github.com/Bilaboz/duino-stats) Bilaboz tarafından resmi Discord Bot'u
+  *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) - viktor02 tarafından geliştirilen Cüzdan arayüzü
 
   Bu liste aktif olarak güncelleniyor. Eğer bu listeye ekleme yapmak isterseniz, bir PR sunun veya geliştiricilerin biri ile iletişime geçin.
+  Ayrıca benzer bir listeyi [burada](https://duinocoin.com/apps) bulabilirsiniz.
 </details>
 
 ## DUCO & wDUCO
@@ -207,16 +212,14 @@ Bazı üçüncü-parti dosyalar farklı lisanslar kullanıyor olabilir - lütfen
 *   [@Bilaboz](https://github.com/bilaboz/) (Ana NodeJS geliştiricisi)
 *   [@connorhess](https://github.com/connorhess) (Ana Python geliştiricisi, Node-S sahibi)
 *   [@JoyBed](https://github.com/JoyBed) (Ana AVR geliştiricisi)
+*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer) <!-- translation wanted -->
 ##
-*   [@EinWildesPanda](https://github.com/EinWildesPanda) (Geliştirici)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) geliştiricisi)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
 *   [@DoctorEenot](https://github.com/DoctorEenot) (Geliştirici)
-##
-*   [@HGEcode](https://github.com/HGEcode) (Python geliştiricisi)
 *   [@LDarki](https://github.com/LDarki) (Web geliştiricisi)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Geliştirici)
 *   [@Pripun](https://github.com/Pripun) (Mobil uygulama geliştiricisi)
+##
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR geliştiricisi)
 
 Bu arada Duino-Coin'i geliştirmeye yardımcı olan tüm [Katkıcılara](https://github.com/revoxhere/duino-coin/graphs/contributors) çok teşekkürler.

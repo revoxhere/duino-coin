@@ -1,4 +1,4 @@
-<!--
+<!-- Translate up to line 118 so far :)
 *** Offizielles Duino Coin README
 *** by revox, 2019-2021
 -->
@@ -37,7 +37,7 @@
 </p>
 
 <h3 align="center">Duino-Coin ist eine Kryprowährung, die zum Beispiel auf Arduinos, ESP boards, Raspberry Pis, Computern, und mehr gemint werden kann</h3>
-<h4 align="center">inklusive Wi-Fi router, smart TVs, smartphones, smartwatches, SBCs, MCUs, GPUs - du sagst es!</h4><br />
+<h4 align="center">inklusive Wi-Fi Router, SmartTV's, Smartphones, Smartwatches, SBCs, MCUs, GPUs - eigentlich alles das einen kleinen Programmierbaren Microchip hat.!</h4><br />
 
 <table align="center">
   <tr>
@@ -46,13 +46,13 @@
   </tr>
   <tr>
     <td>
-      💻 Von vielen Plattformen unterstützt<br>
-      👥 Eine freundliche & wachsende community<br>
+      💻 Von vielen Betriebssystem Plattformen unterstützt<br>
+      👥 Eine freundliche & wachsende Community<br>
       💱 Einfach zu nutzten & in andere Währungen umzutauschen<br>
       🌎 Überall verfügbar<br>
       :new: Komplett originales Projekt<br>
       :blush: Anfänger freundlich <br>
-      💰 Kosten-effektiv<br>
+      💰 Kosten-Effektiv<br>
       ⛏️ Einfach zu minen<br>
       📚 Open-source<br>
     </td>
@@ -70,59 +70,61 @@
 
 <h2 align="center">Get started</h2><br>
 
-Offiziele Start-guides um einen Account zu erstellen und einen Miner zu auf vielen geräten zu starten, sind verfügbar <a href="https://revoxhere.github.io/duino-coin/getting-started">auf der offizielen Website</a>.<br>
-Ein FAQ und Hilfe kann in den Wikis gefunden werden [Wikis](https://github.com/revoxhere/duino-coin/wiki).
+Offiziele Start-Guide um einen Account zu erstellen und einen Miner zu auf vielen Geräten zu Starten, sind verfügbar und Helfen euch bei der Einrichtung. <a href="https://revoxhere.github.io/duino-coin/getting-started">auf der offizielen Website</a>.<br>
+Ein FAQ und Hilfe kann in der Wiki-Seite gefunden werden [Wikis](https://github.com/revoxhere/duino-coin/wiki).
 <br>
 
 | Offiziele Wallets | Offiziele Miner |
 :-----------------:|:----------------:
 [<img src="https://i.imgur.com/msVtLHs.png">](https://duinocoin.com/getting-started#register)  |  [<img src="https://i.imgur.com/SMkKHOK.png">](https://duinocoin.com/getting-started#computer)
 
-<h3 align="center">Duino-Coin installieren</h2><br>
+<h3 align="center">Duino-Coin Installieren</h2><br>
 
 Der einfachste Weg zu starten, ist  [den neusten release](https://github.com/revoxhere/duino-coin/releases/latest) für dein OS herunterzuladen.<br>
-<br> Wenn der Download fertig ist, unzipe ihn und öffnen dein gewünschtes Programm. Es sind keine anderen programme nötig. <br>
+<br> Wenn der Download fertig ist, Entpacke ihn und öffnen dein gewünschtes Programm. Es sind keine anderen Programme nötig. <br>
 
 <hr>
 
- Wenn du die Programme von source lunchen willst, must du vielleicht einige Dependencies installieren. So kann man es auf Debian-based Linux distros (z.B. Ubuntu, Debian oder Raspian) machen:
+ Wenn du die Programme vom Master.zip Starten willst, musst du vielleicht einige zusätzliche erweiterungen hierfür Installieren. So kann man es auf Debian-based Linux distros (z.B. Ubuntu, Debian oder Raspian) machen:
 ```BASH
 sudo apt install python3 python3-pip git
 git clone https://github.com/revoxhere/duino-coin
 cd duino-coin
 python3 -m pip install -r requirements.txt
 ```
-If you are on Windows, download [Python 3](https://www.python.org/downloads/), then [our repository](https://github.com/revoxhere/duino-coin/archive/master.zip), extract it and open the folder in command prompt. In CMD, type:
+Wenn du Windows nutzt, musst du [Python 3](https://www.python.org/downloads/) herunterladen, und dann die [Master Repository](https://github.com/revoxhere/duino-coin/archive/master.zip), diese dann Entpacken (WinRar, 7zip) Danach kannst du ein CMD Fester öffnen (Windows + R Taste). 
+
+Im CMD Fenster, Schreibe/kopiere dies hinein:
 ```BASH
 py -m pip install -r requirements.txt
 ```
-Note for Windows users: Make sure python and pip are added to your PATH
+Wichtig für Windows nutzer: Immer sicher gehen das [Python 3](https://www.python.org/downloads/) und Python3-pip installiert sind und geupdatet sind.
 
-After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py` OR `py PC_Miner.py`).
+Nach all diesen Schritten, bist du so weit das du den Miner starten kannst. (z.b. `python3 PC_Miner.py` oder `py PC_Miner.py`).
 
 <hr>
 
-You can also get the whole Duino-Coin bundle on the AUR - just install it with your favourite AUR Helper:
+Du kannst das ganze Duino-Coin Paket auch mit AUR laden - dazu einfach ein Ladevorgang starten mit deinem Favorisierten AUR Helfer Programm:
 
 ```BASH
 sudo pacman -S yay
 yay -S duino-coin
 ```
 
-Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD).
+Duino-Coin AUR Paket wird bereitgestellt von [PhereloHD](https://github.com/PhereloHD).
 
-<h3 align="center">Community-made software</h3><br>
+<h3 align="center">Von der Community erstellte Software von Talentierten Mitgliedern</h3><br>
 
-**Other miners known to work with Duino-Coin:**
+**Andere Miner-/Software/Hardware/Chips die bekannt sind das Duino-Coin damit Funktioniert:**
 *   [duino-coin-kodi](https://github.com/SandUhrGucker/duino-coin-kodi) - Mining addon for Kodi Media Center by SandUhrGucker
-*   [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - Python script to mine Duino-Coin on routers by BastelPichi
-*   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - mine with less connections on multiple devices by DoctorEenot
-*   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - MicroPython miner or ESP boards by fabiopolancoe
-*   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Python miner for Nintendo 3DS by PhereloHD & HGEpro
-*   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Miner in Docker by Alicia426
-*   [nonceMiner](https://github.com/colonelwatch/nonceMiner) - Fastest Duino-Coin miner available by colonelwatch
-*   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) - simple NodeJS miner by DarkThinking
-*   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - pure C miner by phantom32
+*   [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - Python Script für das Mining von Duino-Coin auf Routern by BastelPichi
+*   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - Mining mit weniger Bandbreite für Android Handy by DoctorEenot
+*   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - MicroPython Miner / ESP Boards  by fabiopolancoe
+*   [DUCO Miner für Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Python Miner für Nintendo 3DS by PhereloHD & HGEpro
+*   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Miner in Docker (Linux/ARM) by Alicia426
+*   [nonceMiner](https://github.com/colonelwatch/nonceMiner) -  Schneller Duino-Coin Miner by colonelwatch
+*   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) - Einfach NodeJS Miner by DarkThinking
+*   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - Pure C Miner by phantom32
 *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
 *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
 *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
@@ -134,18 +136,18 @@ Duino-Coin AUR bundle is maintained by [PhereloHD](https://github.com/PhereloHD)
 <!--*   [Multithreaded Python Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Multithreaded_PC_Miner.py) by Bilaboz (DEPRECATED) -->
 
 **Other tools:**
-*   [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) and troubleshooting helper by Lulaschkas
-*   [duco-miners](https://github.com/dansinclair25/duco-miners) CLI mining dashboard made by dansinclair25
+*   [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) Dashboard und Problembeseitigungs Hilfe by Lulaschkas
+*   [duco-miners](https://github.com/dansinclair25/duco-miners) CLI Mining Dashboard by dansinclair25
 *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
-*   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) for Chrome and derivatives by LDarki
-*   [DUCO Monitor](https://siunus.github.io/duco-monitor/) account statistics website by siunus
-*   [duino-tools](https://github.com/kyngs/duino-tools) written in Java by kyngs
-*   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
+*   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) Für Chrome  by LDarki
+*   [DUCO Monitor](https://siunus.github.io/duco-monitor/) Account Statistiken by siunus
+*   [duino-tools](https://github.com/kyngs/duino-tools) by kyngs
+*   [Duino Stats](https://github.com/Bilaboz/duino-stats) DUINO-COIN Discord Bot by Bilaboz
 <!--*   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz (DEPRECATED) -->
 
-This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
+Diese Liste wird ständig geupdatet. Wenn auch du deine Software hier auflisten möchtest die zum Projekt beiträgt, Einfach einen Antrag in Git stellen, oder einen der Programmierer Dev's auf Discord anschreiben.
 
-<h3 align="center">wDUCO tutorial</h3><br>
+<h3 align="center">wDUCO Tutorial</h3><br>
 
 Duino-Coin is a hybrid currency, meaning that it can be converted to wDUCO which is DUCO wrapped on the [Tron](https://tron.network) network (as a token). Currently there aren't many uses for it, other than just storing funds in external wallet or exchanging wDUCO to another token on JustSwap. Tutorial on using wDUCO is available in the [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
 
@@ -226,12 +228,10 @@ Some third-party included files may have different licenses - please check their
     *   [@Bilaboz](https://github.com/bilaboz/) (Lead dev)
     *   [@connorhess](https://github.com/connorhess) (Lead dev)
     *   [@JoyBed](https://github.com/JoyBed) (Lead dev)
-    *   [@HGEcode](https://github.com/HGEcode) (Dev)
     *   [@LDarki](https://github.com/LDarki) (Web dev)
     *   [@travelmode](https://github.com/colonelwatch) (Dev)
     *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-    *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
-    *   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
+    *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer)
 
 *   **Contributors:**
     *   [@5Q](https://github.com/its5Q)

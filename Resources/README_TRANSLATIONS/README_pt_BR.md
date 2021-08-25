@@ -87,6 +87,7 @@ Depois de fazer isso, você está pronto para iniciar o software (apenas clique 
   </summary>
 
   ### Other miners known to work with Duino-Coin:
+  *   [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - Uma mineradora para a família LabVIEW, feita pelo ericddm
   *   [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - Uma mineradora em JavaScript que você pode implementar facilmente em seu site, feita pelo Hoiboy19
   *   [Mineuino](https://github.com/VatsaDev/Mineuino) - Um monetizador de sites feito pelo VatsaDev
   *   [hauchel's duco-related stuff repository](https://github.com/hauchel/duco/) - Coleção de varios códigos para minerar DUCO em outros microcontroladores
@@ -153,6 +154,8 @@ O código-fonte do servidor, a documentação para chamadas de API e bibliotecas
   <summary>
     Como essa tabela está ficando muito longa, ela é recolhida por padrão. Clique neste texto para expandi-lo!
   </summary>
+  
+  ### Note que atualmente as recompensas estão sendo alteradas para logarítmicas e essa tabela não é mais tão precisa.
 
   | Dispositivo/CPU/SBC/MCU/chip                                   | Hashrate Médio<br>(todos os núcleos) | Núcleos de<br>mineração | Consumo<br>energia | Média<br>DUCO/dia |
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
@@ -216,16 +219,14 @@ Alguns arquivos incluídos de terceiros podem ter licenças diferentes - por fav
 *   [@Bilaboz](https://github.com/bilaboz/) (Lead NodeJS dev)
 *   [@connorhess](https://github.com/connorhess) (Lead Python dev, Node-S owner)
 *   [@JoyBed](https://github.com/JoyBed) (Lead AVR dev)
+*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Develoepr)
 ##
-*   [@EinWildesPanda](https://github.com/EinWildesPanda) (Dev)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster)
 *   [@DoctorEenot](https://github.com/DoctorEenot) (Dev)
-##
-*   [@HGEcode](https://github.com/HGEcode) (Python dev)
 *   [@LDarki](https://github.com/LDarki) (Web dev)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
 *   [@Pripun](https://github.com/Pripun) (Mobile apps dev)
+##
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
 
 Um grande agradecimento para todos [Contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) que ajudaram a desenvolver o projeto Duino-Coin.

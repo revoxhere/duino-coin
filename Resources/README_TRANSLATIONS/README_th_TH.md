@@ -222,15 +222,23 @@ Duino-Coin ส่วนใหญ่ถูกเผยแพร่ภายใต
 *   [@Bilaboz](https://github.com/bilaboz/) (หัวหน้านักพัฒนา NodeJS)
 *   [@connorhess](https://github.com/connorhess) (หัวน้านักพัฒนาไพธอน, เจ้าของ Node-S)
 *   [@JoyBed](https://github.com/JoyBed) (หัวน้านักพัฒนา AVR)
+<<<<<<< HEAD
 *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (หัวหน้าเว็บมาสเตอร์ และนักพัฒนา DUCO)
 ##
 *   [@Pripun](https://github.com/Pripun) (นักพัฒนาแอพมือถือ)
+=======
+*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (เว็บมาสเตอร์)
+##
+
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) นักพัฒนา)
 *   [@DoctorEenot](https://github.com/DoctorEenot) (นักพัฒนา)
-##
-*   [@HGEcode](https://github.com/HGEcode) (นักพัฒนาไพธอน)
 *   [@LDarki](https://github.com/LDarki) (นักพัฒนาเว็บ)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (นักพัฒนา)
+
+=======
+*   [@Pripun](https://github.com/Pripun) (นักพัฒนาแอพมือถือ)
+##
+
 *   [@joaquinbvw](https://github.com/joaquinbvw) (นักพัฒนา AVR)
 
 และขอขอบคุณ [ผู้ช่วยเหลือ](https://github.com/revoxhere/duino-coin/graphs/contributors)ทั้งหมด ที่ช่วยกันพัฒนาโครงการ Duino-Coin
