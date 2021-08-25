@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 #############################################
-# Duino-Coin Master Server (v2.6.2)
+# Duino-Coin Master Server (v2.6.3)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
 #############################################
 
-# Import libraries
+#import gevent.monkey
+#gevent.monkey.patch_all()
+
 import threading
 import multiprocessing
+
 import socket
 import datetime
 import configparser
@@ -22,6 +25,9 @@ import smtplib
 import subprocess
 import traceback
 import libducohash
+import resource
+import ast
+
 from statistics import mean
 from random import randint
 from hashlib import sha1
@@ -34,6 +40,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from collections import OrderedDict
 from operator import itemgetter
+
 # python3 -m pip install colorama
 from colorama import Back, Fore, Style, init
 # python3 -m pip install bcrypt
@@ -51,8 +58,6 @@ from xxhash import xxh64
 from shutil import copyfile
 # python3 -m pip install udatetime
 import udatetime as utime
-import resource
-import ast
 
 """
 Server
@@ -127,6 +132,7 @@ try:
     PoolPassword = config["main"]["PoolPassword"]
     WRAPPER_KEY = config["main"]["wrapper_key"]
     NodeS_Username = config["main"]["NodeS_Username"]
+    CAPTCHA_SECRET_KEY = config["main"]["captcha"]
 except Exception as e:
     print("""Please create config/AdminData.ini config file first:
         [main]
@@ -136,19 +142,20 @@ except Exception as e:
         PoolPassword = ???
         wrapper_private_key = ???
         NodeS_Username = ???
-        wrapper_key = ???""", e)
+        wrapper_key = ???
+        CAPTCHA_SECRET_KEY = ???""", e)
     exit()
 
 duco_prices = {
-    "xmg":  0.0065,
-    "bch":  0.0065,
-    "xrp":  0.0065,
-    "dgb":  0.0065,
-    "trx":  0.0065,
-    "nano": 0.0065,
-    "fjc": 0.0065,
-    "justswap": 0.0065,
-    "nodes": 0.0065
+    "xmg":  0.01877,
+    "bch":  0.01877,
+    "xrp":  0.01877,
+    "dgb":  0.01877,
+    "trx":  0.01877,
+    "nano": 0.01877,
+    "fjc": 0.01877,
+    "justswap": 0.01877,
+    "nodes": 0.01877
 }
 pregenerated_jobs = {
     "avr": {},
@@ -165,7 +172,7 @@ minerapi, job_tiers, balances_to_update = {}, {}, {}
 disconnect_list, banlist = [], []
 whitelisted_usernames, whitelisted_ips = [], []
 connections_per_ip, miners_per_user = {}, {}
-chip_ids, workers, registrations = {}, {}, {}
+chip_ids, workers, registrations = {}, {}, []
 jail, mpproc, pool_infos = [], [], []
 cached_balances, cached_logins = {}, {}
 lock = threading.Lock()
@@ -240,61 +247,38 @@ htmlBan = """\
 
 
 def create_backup():
-    """
-    Creates a backup folder every day
-    """
-    counter = 0
+    sleep(10)
     while True:
         if not ospath.isdir('backups/'):
             os.mkdir('backups/')
 
-        today = datetime.date.today()
-        if not ospath.isdir('backups/'+str(today)+'_0/'):
-            while duco_prices["xmg"] <= 0:
-                pass
-            else:
-                with open("charts/prices.txt",
-                          "a") as pricesfile:
-                    pricesfile.write(
-                        "," + str(duco_prices["xmg"]).rstrip("\n"))
-                with open("charts/prices_trx.txt",
-                          "a") as pricesfile:
-                    pricesfile.write(
-                        "," + str(duco_prices["trx"]).rstrip("\n"))
-                with open("charts/prices_bch.txt",
-                          "a") as pricesfile:
-                    pricesfile.write(
-                        "," + str(duco_prices["bch"]).rstrip("\n"))
-                with open("charts/pricesNodeS.txt",
-                          "a") as pricesNodeSfile:
-                    pricesNodeSfile.write(
-                        "," + str(duco_prices["nodes"]).rstrip("\n"))
-                with open("charts/pricesJustSwap.txt",
-                          "a") as pricesJustSwapfile:
-                    pricesJustSwapfile.write(
-                        "," + str(duco_prices["justswap"]).rstrip("\n"))
+        timestamp = now().strftime("%Y-%m-%d_%H-%M-%S")
+        os.mkdir('backups/'+str(timestamp))
 
-        if not ospath.isdir('backups/'+str(today)+'_'+str(counter)+'/'):
-            os.mkdir('backups/'+str(today)+'_'+str(counter))
-            copyfile(BLOCKCHAIN,
-                     "backups/"+str(today) +
-                     '_'+str(counter)+"/"
-                     + BLOCKCHAIN.replace(CONFIG_BASE_DIR, ""))
-            copyfile(DATABASE,
-                     "backups/"+str(today) +
-                     '_'+str(counter)+"/"
-                     + DATABASE.replace(CONFIG_BASE_DIR, ""))
-            copyfile(CONFIG_BLOCKS,
-                     "backups/"+str(today) +
-                     '_'+str(counter)+"/foundBlocks.db")
-            copyfile(CONFIG_TRANSACTIONS,
-                     "backups/"+str(today) +
-                     '_'+str(counter)+"/transactions.db")
-            admin_print("Successfully created backup for " + str(today))
+        with open("charts/prices.txt", "a") as f:
+            f.write("\n," + str(duco_prices["xmg"]).rstrip("\n"))
+        with open("charts/prices_trx.txt", "a") as f:
+            f.write("\n," + str(duco_prices["trx"]).rstrip("\n"))
+        with open("charts/prices_bch.txt", "a") as f:
+            f.write("\n," + str(duco_prices["bch"]).rstrip("\n"))
+        with open("charts/pricesNodeS.txt", "a") as f:
+            f.write("\n," + str(duco_prices["nodes"]).rstrip("\n"))
+        with open("charts/pricesJustSwap.txt", "a") as f:
+            f.write("\n," + str(duco_prices["justswap"]).rstrip("\n"))
 
-        hours = 6
-        counter += 1
-        sleep(60*60*hours)
+        copyfile(BLOCKCHAIN,
+                 "backups/"+str(timestamp)+"/"
+                 + BLOCKCHAIN.replace(CONFIG_BASE_DIR, ""))
+        copyfile(DATABASE,
+                 "backups/"+str(timestamp)+"/"
+                 + DATABASE.replace(CONFIG_BASE_DIR, ""))
+        copyfile(CONFIG_BLOCKS,
+                 "backups/"+str(timestamp)+"/foundBlocks.db")
+        copyfile(CONFIG_TRANSACTIONS,
+                 "backups/"+str(timestamp)+"/transactions.db")
+
+        admin_print("Successfully created backup for " + str(timestamp))
+        sleep(60*60)
 
 
 def perm_ban(ip, perm=False):
@@ -562,10 +546,10 @@ def database_updater():
                 if user in disconnect_list or user in banlist:
                     balances_to_update[user] = 0
 
-                amount_to_update = balances_to_update[user] / 3
+                amount_to_update = balances_to_update[user]
 
-                if 0.75 > amount_to_update > 0.05:
-                    amount_to_update = 0.05
+                if amount_to_update > 0.03:
+                    amount_to_update = 0.03
 
                 if amount_to_update > 0:
                     increment_balance(user, amount_to_update)
@@ -632,10 +616,20 @@ def increment_balance(user: str, amount: float):
 def create_transaction(sender: str,
                        recipient: str,
                        amount: float,
-                       block_hash: str,
                        memo="None"):
     try:
         timestamp = now().strftime("%d/%m/%Y %H:%M:%S")
+        random = random.randint(0, 77777)
+
+        if random < 37373:
+            block_hash = sha1(
+                bytes(str(username)+str(amount)+str(random),
+                      encoding='ascii')).hexdigest()
+        else:
+            block_hash = xxh64(
+                bytes(str(username)+str(amount)+str(random),
+                      encoding='ascii'), seed=2811).hexdigest()
+
         with sqlconn(CONFIG_TRANSACTIONS,
                      timeout=DB_TIMEOUT) as datab:
             datab.execute(
@@ -984,7 +978,6 @@ def input_management():
                     create_transaction(command[1],
                                        "coinexchange",
                                        command[2],
-                                       global_last_block_hash_cp,
                                        "DUCO Exchange transaction")
                     admin_print("Successfully generated transaction: " +
                                 global_last_block_hash_cp)
@@ -1011,21 +1004,9 @@ def input_management():
                     admin_print(
                         "Successfully added balance change to the queue")
 
-                    import random
-                    random = random.randint(0, 77777)
-                    if random < 37373:
-                        global_last_block_hash_cp = sha1(
-                            bytes(str(command[0])+str(command[1])+str(random),
-                                  encoding='ascii')).hexdigest()
-                    else:
-                        global_last_block_hash_cp = xxh64(
-                            bytes(str(command[0])+str(command[1])+str(random),
-                                  encoding='ascii'), seed=2811).hexdigest()
-
                     create_transaction("coinexchange",
                                        command[1],
                                        command[2],
-                                       global_last_block_hash_cp,
                                        "DUCO Exchange transaction")
                     admin_print("Successfully generated transaction: " +
                                 global_last_block_hash_cp)
@@ -1321,6 +1302,12 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                         # Very bad error correction from esps
                         req_difficulty.rstrip("JOB")
 
+                    if "AVR" in req_difficulty:
+                        send_data(
+                        "BAD,AVR mining is disabled\n",
+                            connection)
+                        return thread_id
+
                     if not req_difficulty in job_tiers:
                         req_difficulty = "NET"
                 except:
@@ -1594,9 +1581,9 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
             if accepted_shares > UPDATE_MINERAPI_EVERY:
                 try:
-                    balances_to_update[username] += reward
+                    balances_to_update[username] += reward / 3.33
                 except:
-                    balances_to_update[username] = reward
+                    balances_to_update[username] = reward / 3.33
         else:
             """
             Incorrect result received
@@ -1960,7 +1947,7 @@ def create_main_api_file():
             current_time = now().strftime("%d/%m/%Y %H:%M:%S (UTC)")
             max_price = duco_prices[max(duco_prices, key=duco_prices.get)]
 
-            duco_prices["pancake"] = 0.00420784
+            duco_prices["pancake"] = 0.00251652
 
             server_api = {
                 "Duino-Coin Server API": "github.com/revoxhere/duino-coin",
@@ -2179,10 +2166,20 @@ def protocol_register(data, connection, address):
     """
     Register a new user, return on error
     """
+    global registrations
     username = str(data[1])
     unhashed_pass = str(data[2]).encode('utf-8')
     email = str(data[3]).replace("REGI", "")
     ip = address[0].replace("::ffff:", "")
+
+    send_data("NO,Please use the webwallet (wallet.duinocoin.com)", connection)
+    return
+
+    if ip in registrations:
+        send_data(
+            "NO,You have already registered",
+            connection)
+        return
 
     """
     Do some basic checks
@@ -2231,20 +2228,17 @@ def protocol_register(data, connection, address):
         Register a new account if  the registration
         e-mail was sent successfully
         """
-        registrations[ip] = 1
-        while True:
-            try:
-                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
-                    datab = conn.cursor()
-                    datab.execute(
-                        """INSERT INTO Users
-                        (username, password, email, balance)
-                        VALUES(?, ?, ?, ?)""",
-                        (username, password, email, .0))
-                    conn.commit()
-                    break
-            except:
-                pass
+        created = str(now().strftime("%d/%m/%Y %H:%M:%S"))
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                """INSERT INTO Users
+                (username, password, email, balance, created)
+                VALUES(?, ?, ?, ?, ?)""",
+                (username, password, email, .0, created))
+            conn.commit()
+        registrations.append(ip)
+        print("Registered", username, email, unhashed_pass)
         send_data("OK", connection)
         return
     else:
@@ -2323,7 +2317,6 @@ def protocol_send_funds(data, connection, username):
                     with sqlconn(DATABASE,
                                  timeout=DB_TIMEOUT) as conn:
                         datab = conn.cursor()
-                        datab.execute('PRAGMA journal_mode=wal')
                         datab.execute(
                             """UPDATE Users
                             set balance = ?
@@ -2339,11 +2332,8 @@ def protocol_send_funds(data, connection, username):
                 except:
                     pass
 
-            create_transaction(username,
-                               recipient,
-                               amount,
-                               global_last_block_hash_cp,
-                               memo)
+            create_transaction(username, recipient,
+                               amount, memo)
 
             send_data(
                 "OK,Successfully transferred funds,"
@@ -2472,7 +2462,7 @@ def get_duco_prices():
                         "https://api.coingecko.com/"
                         + "api/v3/simple/price?ids="
                         + "magi,tron,bitcoin-cash,ripple,"
-                        + "digibyte,nano,fujicoin"
+                        + "digibyte,nano,fujicoin,bitcoin"
                         + "&vs_currencies=usd",
                         data=None
                     ).json()
@@ -2483,9 +2473,15 @@ def get_duco_prices():
             """
             Calculate prices from exchange rates
             """
-            xmg_usd = float(coingecko_api["magi"]["usd"])
+
+            r = requests.get('https://btcpop.co/api/market-public.php').json()
+            for row in r:
+                if row["ticker"] == "XMG":
+                    xmg_btc = float(row["lastTradePrice"])
+                    break
+            btc_usd = float(coingecko_api["bitcoin"]["usd"])
             duco_prices["xmg"] = round(
-                xmg_usd * exchange_rate_xmg, 8
+                xmg_btc * btc_usd, 8
             )
 
             bch_usd = float(coingecko_api["bitcoin-cash"]["usd"])
@@ -2557,6 +2553,9 @@ def get_duco_prices():
                 )
             except:
                 duco_prices["justswap"] = 0
+
+            print(duco_prices)
+
         except Exception as e:
             admin_print("Error fetching prices: " + str(e))
         sleep(360)
@@ -2909,19 +2908,19 @@ def handle(connection, address):
 
                     global_blocks += blocks_to_add
 
-                    if rewards:
+                    if not rewards:
                         for user in rewards:
                             amount_to_update = rewards[user]
                             if (amount_to_update
                                     and match(r"^[A-Za-z0-9_-]*$", user)):
                                 try:
                                     balances_to_update[user] += float(
-                                        amount_to_update)
+                                        amount_to_update) / 3.33
                                 except:
                                     balances_to_update[user] = float(
-                                        amount_to_update)
+                                        amount_to_update) / 3.33
 
-                    if poolWorkers:
+                    if not poolWorkers:
                         for worker in poolWorkers:
                             try:
                                 minerapi[worker] = poolWorkers[worker]
@@ -3124,7 +3123,6 @@ def create_databases():
             IF NOT EXISTS 
             user_id 
             ON Users(username)""")
-        datab.execute("PRAGMA journal_mode = WAL")
         datab.commit()
 
     with sqlconn(CONFIG_TRANSACTIONS) as datab:
@@ -3133,7 +3131,6 @@ def create_databases():
             IF NOT EXISTS 
             tx_id 
             ON Transactions(hash)""")
-        datab.execute("PRAGMA journal_mode = WAL")
         datab.commit()
 
     with sqlconn(CONFIG_BLOCKS) as datab:
@@ -3142,7 +3139,6 @@ def create_databases():
             IF NOT EXISTS 
             block_id 
             ON Blocks(hash)""")
-        datab.execute("PRAGMA journal_mode = WAL")
         datab.commit()
 
 
