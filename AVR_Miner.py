@@ -158,6 +158,8 @@ try:
             lang = 'turkish'
         elif locale.startswith('pt'):
             lang = 'portuguese'
+        elif locale.startswith('nl'):
+            lang = 'dutch'
         elif locale.startswith('zh'):
             lang = 'chinese_simplified'
         elif locale.startswith('th'):
