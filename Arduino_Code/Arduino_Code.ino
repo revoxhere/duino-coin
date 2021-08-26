@@ -109,9 +109,9 @@ void loop() {
     // Send result back to the program with share time
     Serial.print(String(ducos1result, 2) 
                  + "," 
-                 + String(elapsedTime, 10) 
+                 + String(elapsedTime, 2) 
                  + "," 
-                 + DUCOID 
+                 + String(DUCOID) 
                  + "\n");
     // Turn on built-in led
     #if defined(ARDUINO_ARCH_AVR)
