@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin Python AVR Miner (v2.6.1)
+# Duino-Coin Python AVR Miner (v2.6.4)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2019-2021
@@ -95,10 +95,10 @@ except ModuleNotFoundError:
     install('pypresence')
 
 # Global variables
-MINER_VER = '2.61'  # Version number
+MINER_VER = '2.64'  # Version number
 SOC_TIMEOUT = 45
 PERIODIC_REPORT_TIME = 60
-AVR_TIMEOUT = 3.1  # diff 6 * 100 / 196 h/s = 3.06
+AVR_TIMEOUT = 4  # diff 6 * 100 / 196 h/s = 3.06
 BAUDRATE = 115200
 RESOURCES_DIR = 'AVRMiner_' + str(MINER_VER) + '_resources'
 shares = [0, 0]
@@ -158,8 +158,6 @@ try:
             lang = 'turkish'
         elif locale.startswith('pt'):
             lang = 'portuguese'
-        elif locale.startswith('nl'):
-            lang = 'dutch'
         elif locale.startswith('zh'):
             lang = 'chinese_simplified'
         elif locale.startswith('th'):
@@ -338,7 +336,7 @@ def load_config():
             rig_identifier = 'None'
 
         donation_level = '0'
-        #if osname == 'nt' or osname == 'posix':
+        # if osname == 'nt' or osname == 'posix':
         #    donation_level = input(
         #        Style.RESET_ALL
         #        + Fore.YELLOW
@@ -364,7 +362,7 @@ def load_config():
             'identifier':       rig_identifier,
             'debug':            'n',
             "soc_timeout":      45,
-            "avr_timeout":      3.1,
+            "avr_timeout":      4,
             "discord_presence": "y",
             "periodic_report":  60,
             "shuffle_ports":    "y"
@@ -459,7 +457,7 @@ def greeting():
         + Fore.YELLOW
         + ' '.join(avrport))
 
-    #if osname == 'nt' or osname == 'posix':
+    # if osname == 'nt' or osname == 'posix':
     #    print(
     #        Style.DIM
     #        + Fore.MAGENTA
@@ -586,7 +584,7 @@ def mine_avr(com, threadid):
     global hashrate
 
     start_time = time()
-    report_shares, last_shares = 0, 0
+    report_shares = 0
     while True:
         try:
             while True:
@@ -665,7 +663,7 @@ def mine_avr(com, threadid):
                 debug_output(com + ': requested job from the server')
                 soc.sendall(
                     bytes(
-                        'JOB,'
+                        'JOBAVR,'
                         + str(username)
                         + ',AVR',
                         encoding='ascii'))
@@ -760,18 +758,8 @@ def mine_avr(com, threadid):
                                 retry_counter += 1
 
                         try:
-                            debug_output(
-                                com
-                                + ': received result ('
-                                + str(result[0])
-                                + ')')
-                            debug_output(
-                                com
-                                + ': received time ('
-                                + str(result[1])
-                                + ')')
                             # Convert AVR time to seconds
-                            computetime = round(int(result[1]) / 1000000, 3)
+                            computetime = round(int(result[1], 2) / 1000000, 3)
                             if computetime < 1:
                                 computetime = str(
                                     int(computetime * 1000)) + "ms"
@@ -779,7 +767,7 @@ def mine_avr(com, threadid):
                                 computetime = str(round(computetime, 2)) + "s"
                             # Calculate hashrate
                             hashrate_t = round(
-                                int(result[0]) * 1000000 / int(result[1]), 2)
+                                int(result[0], 2) * 1000000 / int(result[1], 2), 2)
                             hashrate_mean.append(hashrate_t)
                             # Get average from the last hashrate measurements
                             hashrate = mean(hashrate_mean[-5:])
@@ -790,13 +778,12 @@ def mine_avr(com, threadid):
                                 + ' (avg:' + str(hashrate) + ')')
 
                             try:
-                                chipID = result[2]
                                 debug_output(
                                     com + ': chip ID: ' + str(result[2]))
                                 """ Check if chipID got received, this is 
                                     of course just a fraction of what's 
                                     happening on the server with it """
-                                if not chipID.startswith('DUCOID'):
+                                if not result[2].startswith('DUCOID'):
                                     raise Exception('Wrong chipID string')
                             except Exception:
                                 pretty_print(
@@ -808,7 +795,7 @@ def mine_avr(com, threadid):
                                     + ' This can cause problems with the'
                                     + ' Kolka system',
                                     'warning')
-                                chipID = 'None'
+                                result[2] = 'None'
                             break
                         except Exception as e:
                             pretty_print(
@@ -832,13 +819,13 @@ def mine_avr(com, threadid):
                             bytes(
                                 str(result[0])
                                 + ','
-                                + str(hashrate_t)
+                                + str(result[1])
                                 + ',Official AVR Miner v'
                                 + str(MINER_VER)
                                 + ','
                                 + str(rig_identifier)
                                 + ','
-                                + str(chipID),
+                                + str(result[2]),
                                 encoding='ascii'))
                     except Exception as e:
                         pretty_print(
@@ -1056,7 +1043,7 @@ def mine_avr(com, threadid):
                     elapsed_time = end_time - start_time
                     if (threadid == 0
                             and elapsed_time >= PERIODIC_REPORT_TIME):
-                        report_shares = shares[0] - last_shares
+                        report_shares = shares[0] - report_shares
                         uptime = calculate_uptime(mining_start_time)
 
                         periodic_report(start_time,
@@ -1065,7 +1052,8 @@ def mine_avr(com, threadid):
                                         hashrate,
                                         uptime)
                         start_time = time()
-                        last_shares = shares[0] 
+
+                    sleep(1)
                     break
 
         except Exception as e:
@@ -1087,7 +1075,7 @@ def periodic_report(start_time,
                     uptime):
     seconds = round(end_time - start_time)
     pretty_print("sys0",
-                 " " 
+                 " "
                  + get_string('periodic_mining_report')
                  + Fore.RESET
                  + Style.NORMAL
@@ -1135,8 +1123,8 @@ def fetch_pools():
                 "https://server.duinocoin.com/getPool"
             ).json()
 
-            NODE_ADDRESS = response["ip"]
-            NODE_PORT = response["port"]
+            NODE_ADDRESS = "51.158.182.90"  # response["ip"]
+            NODE_PORT = 6000  # response["port"]
 
             return NODE_ADDRESS, NODE_PORT
         except Exception as e:
