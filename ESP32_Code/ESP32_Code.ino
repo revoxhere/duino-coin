@@ -1,24 +1,17 @@
 /*
-   _____        _                    _____      _
-  |  __ \      (_)                  / ____|    (_)
-  | |  | |_   _ _ _ __   ___ ______| |     ___  _ _ __
-  | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \
-  | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
-  |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-  Code for ESP32 boards v2.6.4
-  © Duino-Coin Community 2019-2021
-  Distributed under MIT License
+  ,------.          ,--.                       ,-----.       ,--.         
+  |  .-.  \ ,--.,--.`--',--,--,  ,---. ,-----.'  .--./ ,---. `--',--,--,  
+  |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \ 
+  |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  | 
+  `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--' 
+  Official code for ESP32 boards                            version 2.6.4
   
-  WARNING: THIS CODE IS NOT YET FINISHED
-
-  https://github.com/revoxhere/duino-coin - GitHub
-  https://duinocoin.com - Official Website
-  https://discord.gg/k48Ht5y - Discord
-  https://github.com/revoxhere - @revox
-  https://github.com/JoyBed - @JoyBed
+  Duino-Coin Team & Community 2019-2021 © MIT Licensed
+  https://duinocoin.com
+  https://github.com/revoxhere/duino-coin
 
   If you don't know where to start, visit official website and navigate to
-  Getting Started page. Have fun mining!
+  the Getting Started page. Have fun mining!
 */
 
 // Change this to your WiFi name
