@@ -112,6 +112,7 @@ IO files location
 """
 CONFIG_BASE_DIR = "config"
 DATABASE = CONFIG_BASE_DIR + '/crypto_database.db'
+POOL_DATABASE = CONFIG_BASE_DIR + '/pools_database.db'
 BLOCKCHAIN = CONFIG_BASE_DIR + '/duino_blockchain.db'
 CONFIG_TRANSACTIONS = CONFIG_BASE_DIR + "/transactions.db"
 CONFIG_BLOCKS = CONFIG_BASE_DIR + "/foundBlocks.db"
@@ -168,7 +169,7 @@ pregenerated_jobs = {
 global_blocks = 1
 global_last_block_hash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
 global_cpu_usage, global_ram_usage, global_connections = 50, 50, 1
-minerapi, job_tiers, balances_to_update = {}, {}, {}
+minerapi, job_tiers, balance_queue = {}, {}, {}
 disconnect_list, banlist = [], []
 whitelisted_usernames, whitelisted_ips = [], []
 connections_per_ip, miners_per_user = {}, {}
@@ -533,27 +534,27 @@ def transaction_queue_handle(queue):
 
 
 def database_updater():
-    global balances_to_update
+    global balance_queue
     while True:
         qsize = queue.qsize()
         sleep((qsize*0.01)+1)
         try:
-            for user in balances_to_update.copy():
+            for user in balance_queue.copy():
                 if user in jail:
-                    balances_to_update["giveaways"] = balances_to_update[user]
-                    balances_to_update[user] = balances_to_update[user] * -3
+                    balance_queue["giveaways"] = balance_queue[user]
+                    balance_queue[user] = balance_queue[user] * -3
 
                 if user in disconnect_list or user in banlist:
-                    balances_to_update[user] = 0
+                    balance_queue[user] = 0
 
-                amount_to_update = balances_to_update[user]
+                amount_to_update = balance_queue[user]
 
                 if amount_to_update > 0.03:
                     amount_to_update = 0.03
 
                 if amount_to_update > 0:
                     increment_balance(user, amount_to_update)
-                    balances_to_update[user] = 0
+                    balance_queue[user] = 0
 
         except Exception:
             admin_print("Error adding user to DB queue: "
@@ -619,15 +620,17 @@ def create_transaction(sender: str,
                        memo="None"):
     try:
         timestamp = now().strftime("%d/%m/%Y %H:%M:%S")
+
+        import random
         random = random.randint(0, 77777)
 
         if random < 37373:
             block_hash = sha1(
-                bytes(str(username)+str(amount)+str(random),
+                bytes(str(sender)+str(amount)+str(random),
                       encoding='ascii')).hexdigest()
         else:
             block_hash = xxh64(
-                bytes(str(username)+str(amount)+str(random),
+                bytes(str(sender)+str(amount)+str(random),
                       encoding='ascii'), seed=2811).hexdigest()
 
         with sqlconn(CONFIG_TRANSACTIONS,
@@ -963,24 +966,11 @@ def input_management():
                     increment_balance("coinexchange", float(command[2]))
                     admin_print(
                         "Successfully added balance change to the queue")
-
-                    import random
-                    random = random.randint(0, 77777)
-                    if random < 37373:
-                        global_last_block_hash_cp = sha1(
-                            bytes(str(command[0])+str(command[1])+str(random),
-                                  encoding='ascii')).hexdigest()
-                    else:
-                        global_last_block_hash_cp = xxh64(
-                            bytes(str(command[0])+str(command[1])+str(random),
-                                  encoding='ascii'), seed=2811).hexdigest()
-
                     create_transaction(command[1],
                                        "coinexchange",
                                        command[2],
                                        "DUCO Exchange transaction")
-                    admin_print("Successfully generated transaction: " +
-                                global_last_block_hash_cp)
+                    admin_print("Successfully generated transaction")
                 else:
                     admin_print("Canceled")
             except Exception:
@@ -1003,13 +993,11 @@ def input_management():
                     increment_balance("coinexchange", -float(command[2]))
                     admin_print(
                         "Successfully added balance change to the queue")
-
                     create_transaction("coinexchange",
                                        command[1],
                                        command[2],
                                        "DUCO Exchange transaction")
-                    admin_print("Successfully generated transaction: " +
-                                global_last_block_hash_cp)
+                    admin_print("Successfully generated transaction")
                 else:
                     admin_print("Canceled")
             except Exception:
@@ -1241,7 +1229,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
     global global_blocks
     global workers
     global minerapi
-    global balances_to_update
+    global balance_queue
     global last_block
     global PING_SLEEP_TIME
 
@@ -1581,9 +1569,9 @@ def protocol_mine(data, connection, address, using_xxhash=False):
 
             if accepted_shares > UPDATE_MINERAPI_EVERY:
                 try:
-                    balances_to_update[username] += reward / 3.33
+                    balance_queue[username] += reward / 3.33
                 except:
-                    balances_to_update[username] = reward / 3.33
+                    balance_queue[username] = reward / 3.33
         else:
             """
             Incorrect result received
@@ -1874,14 +1862,14 @@ def create_main_api_file():
                         software = "?"
                     identifier = minerapi[miner]["Identifier"].upper()
 
-                    if ("AVR" in software
-                        or "I2C" in software
-                            or "ARDUINO" in software):
-                        # 0,2W for Arduino @ peak 40mA/5V
-                        net_wattage += 0.2
-                        miner_dict["Arduino"] += 1
+                    #if ("AVR" in software
+                    #    or "I2C" in software
+                    #        or "ARDUINO" in software):
+                    #    # 0,2W for Arduino @ peak 40mA/5V
+                    #    net_wattage += 0.2
+                    #    miner_dict["Arduino"] += 1
 
-                    elif "ESP32" in software:
+                    if "ESP32" in software:
                         # 1,4W (but 2 cores) for ESP32 @ peak 480mA/3,3V
                         net_wattage += 0.7
                         miner_dict["ESP32"] += 1
@@ -1947,7 +1935,7 @@ def create_main_api_file():
             current_time = now().strftime("%d/%m/%Y %H:%M:%S (UTC)")
             max_price = duco_prices[max(duco_prices, key=duco_prices.get)]
 
-            duco_prices["pancake"] = 0.00251652
+            duco_prices["pancake"] = 0.00314783
 
             server_api = {
                 "Duino-Coin Server API": "github.com/revoxhere/duino-coin",
@@ -2554,8 +2542,6 @@ def get_duco_prices():
             except:
                 duco_prices["justswap"] = 0
 
-            print(duco_prices)
-
         except Exception as e:
             admin_print("Error fetching prices: " + str(e))
         sleep(360)
@@ -2687,7 +2673,7 @@ def handle(connection, address):
     global global_blocks
     global global_last_block_hash
     global minerapi
-    global balances_to_update
+    global balance_queue
     global global_connections
     global disconnect_list
     global pool_infos
@@ -2908,24 +2894,20 @@ def handle(connection, address):
 
                     global_blocks += blocks_to_add
 
-                    if not rewards:
-                        for user in rewards:
-                            amount_to_update = rewards[user]
-                            if (amount_to_update
-                                    and match(r"^[A-Za-z0-9_-]*$", user)):
-                                try:
-                                    balances_to_update[user] += float(
-                                        amount_to_update) / 3.33
-                                except:
-                                    balances_to_update[user] = float(
-                                        amount_to_update) / 3.33
-
-                    if not poolWorkers:
-                        for worker in poolWorkers:
+                    for user in rewards:
+                        amount_to_update = rewards[user]
+                        if (amount_to_update
+                                and match(r"^[A-Za-z0-9_-]*$", user)):
                             try:
-                                minerapi[worker] = poolWorkers[worker]
-                            except Exception:
-                                pass
+                                balance_queue[user] += amount_to_update
+                            except:
+                                balance_queue[user] = amount_to_update
+
+                    for worker in poolWorkers:
+                        try:
+                            minerapi[worker] = poolWorkers[worker]
+                        except Exception:
+                            pass
 
                     timestamp = str(now().strftime("%H:%M:%S"))
                     pool_infos.append(timestamp
