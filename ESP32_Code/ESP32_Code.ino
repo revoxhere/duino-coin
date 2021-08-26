@@ -65,6 +65,7 @@ static class {
 TaskHandle_t WiFirec;
 TaskHandle_t Task1;
 TaskHandle_t Task2;
+TaskHandle_t MinerCheckin;
 SemaphoreHandle_t xMutex;
 
 const char *get_pool_api = "http://51.15.127.80:4242/getPool";
@@ -74,6 +75,12 @@ volatile int wifi_state = 0;
 volatile int wifi_prev_state = WL_CONNECTED;
 volatile bool ota_state = false;
 volatile char chip_id[23];  // DUCO MCU ID
+float hashrate_two = 0.0;
+float hashrate_one = 0.0;
+unsigned long shares_one = 0;  // Share variable
+unsigned long shares_two = 0;
+unsigned int diff_one = 0;
+unsigned int diff_two = 0;
 
 void UpdatePool() {
   String input = "";
@@ -145,7 +152,8 @@ void WiFireconnect(void *pvParameters) {
     if ((wifi_state == WL_CONNECTED) && (wifi_prev_state != WL_CONNECTED)) {
       esp_task_wdt_reset();  // Reset watchdog timer
       Serial.println(F("\nConnected to WiFi!"));
-      Serial.println("Local IP address: " + WiFi.localIP().toString());
+      Serial.println("    IP address: " + WiFi.localIP().toString());
+      Serial.println("      Rig name: " + String(rig_identifier));
       Serial.println();
 
       UpdatePool();
@@ -218,12 +226,10 @@ void WiFireconnect(void *pvParameters) {
 // Task1code
 void Task1code(void *pvParameters) {
   WiFiClient client_one;
-  unsigned long shares_one = 0;  // Share variable
   String SERVER_VER = "";
   int buff_two_size = 0;
   String hash1 = "";
   String job1 = "";
-  unsigned int diff_one = 0;
   size_t len = 0;
   size_t final_len = 0;
   unsigned int job_size_task_one = 100;
@@ -237,7 +243,6 @@ void Task1code(void *pvParameters) {
   unsigned long elapsed_time_one = 0;
   float elapsed_time_ms_one = 0.0;
   float elapsed_time_sec_one = 0.0;
-  float hashrate_one = 0.0;
   String feedback_one = "";
   esp_task_wdt_add(NULL);
 
@@ -360,7 +365,7 @@ void Task1code(void *pvParameters) {
 
           client_one.flush();
           client_one.print(String(duco_res_one) + "," + String(hashrate_one) +
-                           ",ESP32 CORE1 Miner v2.63," +
+                           ",ESP32 CORE1 Miner v2.65," +
                            String(rig_identifier) + "," +
                            String((char *)chip_id));  // Send result to server
           Serial.println(F("CORE1 Posting result and waiting for feedback."));
@@ -403,12 +408,10 @@ void Task1code(void *pvParameters) {
 // Task2code
 void Task2code(void *pvParameters) {
   WiFiClient client;
-  unsigned long shares_two = 0;
   String SERVER_VER = "";
   int buff_two_size = 0;
   String hash = "";
   String job = "";
-  unsigned int diff_two = 0;
   size_t len = 0;
   size_t final_len = 0;
   unsigned int job_two_size = 100;
@@ -422,7 +425,6 @@ void Task2code(void *pvParameters) {
   unsigned long elapsed_time = 0;
   float elapsed_time_ms = 0.0;
   float elapsed_time_sec = 0.0;
-  float hashrate = 0.0;
   String feedback = "";
   esp_task_wdt_add(NULL);
 
@@ -526,7 +528,7 @@ void Task2code(void *pvParameters) {
           elapsed_time = EndTime - StartTime;          // Calculate elapsed time
           elapsed_time_ms = elapsed_time / 1000;       // Convert to miliseconds
           elapsed_time_sec = elapsed_time_ms / 1000;   // Convert to seconds
-          hashrate = duco_res_two / elapsed_time_sec;  // Calculate hashrate
+          hashrate_two = duco_res_two / elapsed_time_sec;  // Calculate hashrate
 
           if (!client.connected()) {
             Serial.println(F("CORE2 Lost connection. Trying to reconnect"));
@@ -538,8 +540,8 @@ void Task2code(void *pvParameters) {
           }
 
           client.flush();
-          client.print(String(duco_res_two) + "," + String(hashrate) +
-                       ",ESP32 CORE2 Miner v2.63," + String(rig_identifier) +
+          client.print(String(duco_res_two) + "," + String(hashrate_two) +
+                       ",ESP32 CORE2 Miner v2.65," + String(rig_identifier) +
                        "," + String((char *)chip_id));  // Send result to server
           Serial.println(F("CORE2 Posting result and waiting for feedback."));
 
@@ -560,8 +562,8 @@ void Task2code(void *pvParameters) {
 
           Serial.println("CORE2 " + String(feedback) + " share #" +
                          String(shares_two) + " (" + String(duco_res_two) +
-                         ")" + " hashrate: " + String(hashrate));
-          if (hashrate < 4000) {
+                         ")" + " hashrate: " + String(hashrate_two));
+          if (hashrate_two < 4000) {
             Serial.println(F("CORE2 Low hashrate. Restarting"));
             client.flush();
             client.stop();
@@ -581,7 +583,7 @@ void setup() {
   // disableCore0WDT();
   // disableCore1WDT();
   Serial.begin(500000);  // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP32 Miner v2.63");
+  Serial.println("\n\nDuino-Coin ESP32 Miner v2.65");
 
   WiFi.mode(WIFI_STA);  // Setup ESP in client mode
   btStop();
@@ -665,6 +667,88 @@ void setup() {
       Task2code, "Task2", 10000, NULL, 2, &Task2,
       1);  // create a task with priority 2 and executed on core 1
   delay(250);
+  xTaskCreatePinnedToCore(
+      MinerCheckinCode, "MinerCheckin", 10000, NULL, 1, &MinerCheckin, 
+      1); //create a task with priority 1 and executed on core 1
+  delay(250);
+}
+
+// ************************************************************
+void MinerCheckinCode( void * pvParameters ) {
+	// This function can periodically update a server on the EPS32. 
+	// The sever details and request parameters are specific, but I have an example below
+
+	unsigned long lastWdtReset = 0;
+	unsigned long wdtResetDelay = 1000;
+	for(;;) {
+		if ((millis() - lastWdtReset) > wdtResetDelay) {
+			esp_task_wdt_reset();
+			lastWdtReset = millis();
+		}
+		yield();
+	}
+	/**************************************************
+	 * Example code
+	const char* serverName = "http://10.10.1.1/api/espCheckin.php"; // the URL of my checking API
+
+	unsigned long checkinDelay = 10000; // Check in to the IOT service every 10 seconds
+	unsigned long wdtResetDelay = 1000; // How often to reset the watchdog timer
+
+	unsigned long lastCheckin = 0;
+	unsigned long lastWdtReset = 0;
+	unsigned long lastShares = 0;
+
+	esp_task_wdt_add(NULL);// Register this task with the watchdog
+	for(;;) { // Loop forever
+		if ((millis() - lastWdtReset) > wdtResetDelay) {
+			esp_task_wdt_reset();
+			lastWdtReset = millis();
+		}
+
+		if (WiFi.status() == WL_CONNECTED && (millis() - lastCheckin) > checkinDelay) {
+			WiFiClient client;
+			HTTPClient http;
+			http.begin(client, serverName);
+			http.setTimeout(2000); // Set the timeout low so we don't hang anything too much
+			http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+			String httpRequestData = String("rigname=") + rig_identifier;
+			httpRequestData = httpRequestData + "&username=" + username;
+			httpRequestData = httpRequestData + "&pool=" + host + ":" + port;
+			httpRequestData = httpRequestData + "&accepted_1=" + shares_one;
+			httpRequestData = httpRequestData + "&accepted_2=" + shares_two;
+			httpRequestData = httpRequestData + "&hashrate_1=" + hashrate_one;
+			httpRequestData = httpRequestData + "&hashrate_2=" + hashrate_two;
+			httpRequestData = httpRequestData + "&difficulty_1=" + diff_one;
+			httpRequestData = httpRequestData + "&difficulty_2=" + diff_two;
+			httpRequestData = httpRequestData + "&connected=" + ((shares_one + shares_two)>lastShares);
+			
+			int httpResponseCode = http.POST(httpRequestData);
+			if(0) { // Save cycles and I don't care what they said, but could do
+				yield();
+				Serial.print("CHECKIN: Response code: ");
+				Serial.print(httpResponseCode);
+				if(httpResponseCode == HTTP_CODE_OK) {
+					String payload = http.getString();
+					DynamicJsonDocument doc(1024);
+					char buffer[2048];
+	
+					yield();
+					deserializeJson(doc, payload);
+					serializeJsonPretty(doc, buffer);
+					Serial.print(" ");
+					Serial.println(buffer);
+				} else {
+					Serial.print(", Error: ");
+					Serial.println(http.errorToString(httpResponseCode).c_str());
+				}
+			}
+			http.end();
+			lastCheckin = millis();
+			lastShares = shares_one + shares_two;
+		}
+		yield();
+	}
+	*/
 }
 
 void loop() {}
