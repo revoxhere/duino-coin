@@ -10,6 +10,8 @@ from Server import WRAPPER_KEY as wrapper_private_key
 
 use_wrapper = True
 wrapper_permission = False
+wrap_enabled = False
+unwrap_enabled = True
 
 if use_wrapper:
     import tronpy  # python3 -m pip install tronpy
@@ -57,7 +59,7 @@ def confirmunwraptx(duco_username, recipient, amount):
 
 
 def protocol_wrap_wduco(username, tron_address, amount):
-    if use_wrapper and wrapper_permission:
+    if use_wrapper and wrapper_permission and wrap_enabled:
         try:
             with sqlite3.connect(database) as conn:
                 datab = conn.cursor()
@@ -176,7 +178,7 @@ def protocol_wrap_wduco(username, tron_address, amount):
 
 
 def protocol_unwrap_wduco(username, tron_address, amount):
-    if use_wrapper and wrapper_permission:
+    if use_wrapper and wrapper_permission and unwrap_enabled:
         while True:
             try:
                 with sqlite3.connect(database) as conn:
