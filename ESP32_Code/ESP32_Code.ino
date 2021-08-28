@@ -24,7 +24,7 @@ const char *username = "Your Duino-Coin username";
 const char *rig_identifier = "None";
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 2
-// Define watchdog timer seconds
+/ Define watchdog timer seconds
 #define WDT_TIMEOUT 60
 
 /* WARNING choosing the pool from the device will require at least 4k of dynamic memory on your board
@@ -72,7 +72,7 @@ static class {
 #if (USE_SERVER_CHOSEN_POOL)
 const char *get_pool_api = "http://51.15.127.80:4242/getPool";
 #else
-const char *get_pool_list_api = "TBD";
+const char *get_pool_list_api = "TBD"; // To be implimented - will hard code to SSL server for now
 const int con_cap = 10000; // do not connect to servers with over this many connections
 const float cpu_cap = 90; // do not connect to servers with over thisCPU in use
 const float ram_cap = 90; // do not connect to servers with over this RAM in use
@@ -153,31 +153,30 @@ void UpdateHostPort(String input) {
 
 #else
 // This is the 'new' functionality where the server returns all of the pools and the ESP will iterate through checking for the fastest connection.
-// All it does is sets the host/port global variables for the threads to use below
+// All it does is sets the host/port global variables for the connection it chooses, then the threads kick in as normal after that
 String getPoolList() {
-//	String pools = "";
-//
-//	// Hard code a default for testing until we get a public URL
-//	pools += "{\"result\":[";
-//	pools += "{\"ip\":\"149.91.88.18\",\"name\":\"pulse-pool-1\",\"port\":1612\"status\":\"True\"},";
-//	pools += "{\"ip\":\"149.91.88.18\",\"name\":\"pulse-pool-2\",\"port\":6004,\"status\":\"True\"},";
-//	pools += "{\"ip\":\"51.158.182.90\",\"name\":\"star-pool-1\",\"port\":6000,\"status\":\"True\"},";
-//	pools += "{\"ip\":\"50.112.145.154\",\"name\":\"beyond-pool-1\",\"port\":6000,\"status\":\"True\"},";
-//	pools += "{\"ip\":\"35.173.194.122\",\"name\":\"beyond-pool-2\",\"port\":6000,\"status\":\"True\"}";
-//	pools += "],\"success\":true}";
-//
-//	// If the server returns a pool list, then use that instead
-//	//String URL = get_pool_list_api
-//	String http_pools = httpGetString(get_pool_list_api);
-//	if(http_pools.length()) {
-//		pools = http_pools;
-//	}
-//
-//	return pools;
+	if(strlen(get_pool_list_api)) {
+		String pools = "";
+	
+		// Hard code a default for testing until we get a public URL
+		pools += "{\"result\":[";
+		pools += "{\"ip\":\"149.91.88.18\",\"name\":\"pulse-pool-1\",\"port\":1612,\"status\":\"True\",\"ram\":50,\"cpu\":50,\"connections\":50},";
+		pools += "{\"ip\":\"149.91.88.18\",\"name\":\"pulse-pool-2\",\"port\":6004,\"status\":\"True\",\"ram\":50,\"cpu\":50,\"connections\":50},";
+		pools += "{\"ip\":\"51.158.182.90\",\"name\":\"star-pool-1\",\"port\":6000,\"status\":\"True\",\"ram\":50,\"cpu\":50,\"connections\":50},";
+		pools += "{\"ip\":\"50.112.145.154\",\"name\":\"beyond-pool-1\",\"port\":6000,\"status\":\"True\",\"ram\":50,\"cpu\":50,\"connections\":50},";
+		pools += "{\"ip\":\"35.173.194.122\",\"name\":\"beyond-pool-2\",\"port\":6000,\"status\":\"True\",\"ram\":50,\"cpu\":50,\"connections\":50}";
+		pools += "],\"success\":true}";
 
+		// If the server returns a pool list, then use that instead
+		String http_pools = httpGetString(get_pool_list_api);
+		if(http_pools.length()) {
+			pools = http_pools;
+		}
+	
+		return pools;
+	}
 	String server = "server.duinocoin.com";
 	String uri = "/all_pools";
-	
 	const char* root_ca = \
 		"-----BEGIN CERTIFICATE-----\n" \
 		"MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/\n" \
@@ -204,9 +203,9 @@ String getPoolList() {
 	WiFiClientSecure client;
 	client.setCACert(root_ca);
 
-	#if (FIND_POOL_DEBUG) 
+#if (FIND_POOL_DEBUG) 
 	Serial.println("[HTTPS] CONNECT: " + server);
-	#endif
+#endif
 	if (!client.connect(server.c_str(), 443)) {
 		Serial.println("[HTTPS] Connection failed.");
 		return payload;
@@ -214,27 +213,27 @@ String getPoolList() {
 	String tx = "";
 
 	tx = "GET " + uri + " HTTP/1.1";
-	#if (FIND_POOL_DEBUG)
+#if (FIND_POOL_DEBUG)
 	Serial.println("[TX] " + tx);
-	#endif
+#endif
 	client.print(tx + "\r\n");
 
 	tx = "Host: " + server;
-	#if (FIND_POOL_DEBUG)
+#if (FIND_POOL_DEBUG)
 	Serial.println("[TX] " + tx);
-	#endif
+#endif
 	client.print(tx + "\r\n");
 
 	tx = "Connection: close";
-	#if (FIND_POOL_DEBUG)
+#if (FIND_POOL_DEBUG)
 	Serial.println("[TX] " + tx);
-	#endif
+#endif
 	client.print(tx + "\r\n");
 
 	tx = "";
-	#if (FIND_POOL_DEBUG)
+#if (FIND_POOL_DEBUG)
 	Serial.println("[TX] " + tx);
-	#endif
+#endif
 	client.print(tx + "\r\n");
 	
 	int maxloops = 0;
@@ -251,9 +250,9 @@ String getPoolList() {
 		//read back one line from the server
 		String line = client.readStringUntil('\n'); // Ending is \r\n
 		line.trim();
-		#if (FIND_POOL_DEBUG)
+#if (FIND_POOL_DEBUG)
 		Serial.println("[RX] " + line);
-		#endif
+#endif
 		if(line.length() == 0 && !body) {
 			body = true;
 		}
@@ -264,9 +263,9 @@ String getPoolList() {
 		maxloops++;
 	}
 	
-	#if (FIND_POOL_DEBUG)
+#if (FIND_POOL_DEBUG)
 	Serial.println("[HTTPS] Closing connection.");
-	#endif
+#endif
 	client.stop();
 
   return payload;
@@ -280,8 +279,9 @@ void findPool() {
 		StaticJsonDocument<4096> doc; // 4k might be big, but we need at least 2k right now with 5 pools
 		DeserializationError error = deserializeJson(doc, pools);
 		if (error) {
+			Serial.print(F("findPool(): Bad JSON: "));
 			Serial.println(error.f_str());
-			delay(500);
+			delay(5000);
             esp_restart();
 		} else {
 			if(doc.containsKey("result")) {
@@ -390,12 +390,12 @@ void findPool() {
 					host = best_host;
 				} else {
 					Serial.println(F("findPool(): no pools"));
-					delay(500);
+					delay(5000);
 		            esp_restart();
 				}
 			} else {
 				Serial.println(F("findPool(): bad response"));
-				delay(500);
+				delay(5000);
 	            esp_restart();
 			}
 		}
@@ -679,8 +679,8 @@ void Task1code(void *pvParameters) {
 	    client_one.flush();
 	    client_one.stop();
 	  } else {
-	    //delay(1000);
 	    esp_task_wdt_reset();
+	    delay(100);
 	  	yield();
 	  }
   }
@@ -861,8 +861,8 @@ void Task2code(void *pvParameters) {
 	    client.flush();
 	    client.stop();
 	  } else {
-	    //delay(1000);
 	    esp_task_wdt_reset();
+	    delay(100);
 	  	yield();
 	  }
   }
