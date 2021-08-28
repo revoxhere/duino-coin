@@ -62,11 +62,11 @@ tu sistema operativo (OS). Después de descargar el último lanzamiento, extráe
 No hay dependencias extra requeridas.
 
 Si necesitas ayuda, puedes revisar la guía oficial de instalación, la puedes encontrar en el <a href="https://duinocoin.com/getting-started">sitio oficial</a>.<br>
-FAQ (preguntas frecuentes) y ayuda con el diagnóstico deproblemas se pueden encontrar en las [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
+FAQ (preguntas frecuentes) y ayuda con el diagnóstico de problemas se pueden encontrar en las [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
 
 ### Instalación Manual
 
-#### Linux
+#### Linux (debian distros)
 
 ```BASH
 sudo apt update
@@ -80,7 +80,7 @@ Después de esto, estas listo para ejecutar el software (Ej. `python3 PC_Miner.p
 
 #### En Windows
 
-1.  Descarga en instala [Python 3](https://www.python.org/downloads/) (asegurate que Python3 y PIP están añadidos a la PATH)
+1.  Descarga en instala [Python 3](https://www.python.org/downloads/) (asegúrate que Python3 y PIP están añadidos a la PATH)
 2.  Descarga [el repositorio de Duino-Coin](https://github.com/revoxhere/duino-coin/archive/master.zip)
 3.  Extrae el archivo .zip que ya descargaste, y abre el archivo en la consola de comandos (CMD)
 4.  En la CMD, escribe: `py -m pip install -r requirements.txt` para instalar las dependencias pip requeridas
