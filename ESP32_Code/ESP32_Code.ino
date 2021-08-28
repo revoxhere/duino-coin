@@ -69,17 +69,21 @@ static class {
 #include <ArduinoOTA.h>
 #endif
 
+#if (USE_SERVER_CHOSEN_POOL)
+const char *get_pool_api = "http://51.15.127.80:4242/getPool";
+#else
+const char *get_pool_list_api = "TBD";
+const int con_cap = 10000; // do not connect to servers with over this many connections
+const float cpu_cap = 90; // do not connect to servers with over thisCPU in use
+const float ram_cap = 90; // do not connect to servers with over this RAM in use
+#define FIND_POOL_DEBUG false
+#endif
+
 TaskHandle_t WiFirec;
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 TaskHandle_t MinerCheckin;
 SemaphoreHandle_t xMutex;
-
-#if (USE_SERVER_CHOSEN_POOL)
-const char *get_pool_api = "http://51.15.127.80:4242/getPool";
-#else
-const char *get_pool_list_api = "https://server.duinocoin.com/all_pools";
-#endif
 
 String host;
 int port;
@@ -150,28 +154,132 @@ void UpdateHostPort(String input) {
 #else
 // This is the 'new' functionality where the server returns all of the pools and the ESP will iterate through checking for the fastest connection.
 // All it does is sets the host/port global variables for the threads to use below
-void findPool() {
-	// Start with a static pool list to start with for now
-	String pools = "";
-	pools += "{\"result\":[";
-	pools += "{\"ip\":\"149.91.88.18\",\"name\":\"pulse-pool-1\",\"port\":1612\"status\":\"True\"},";
-	pools += "{\"ip\":\"149.91.88.18\",\"name\":\"pulse-pool-2\",\"port\":6004,\"status\":\"True\"},";
-	pools += "{\"ip\":\"51.158.182.90\",\"name\":\"star-pool-1\",\"port\":6000,\"status\":\"True\"},";
-	pools += "{\"ip\":\"50.112.145.154\",\"name\":\"beyond-pool-1\",\"port\":6000,\"status\":\"True\"},";
-	pools += "{\"ip\":\"35.173.194.122\",\"name\":\"beyond-pool-2\",\"port\":6000,\"status\":\"True\"}";
-	pools += "],\"success\":true}";
+String getPoolList() {
+//	String pools = "";
+//
+//	// Hard code a default for testing until we get a public URL
+//	pools += "{\"result\":[";
+//	pools += "{\"ip\":\"149.91.88.18\",\"name\":\"pulse-pool-1\",\"port\":1612\"status\":\"True\"},";
+//	pools += "{\"ip\":\"149.91.88.18\",\"name\":\"pulse-pool-2\",\"port\":6004,\"status\":\"True\"},";
+//	pools += "{\"ip\":\"51.158.182.90\",\"name\":\"star-pool-1\",\"port\":6000,\"status\":\"True\"},";
+//	pools += "{\"ip\":\"50.112.145.154\",\"name\":\"beyond-pool-1\",\"port\":6000,\"status\":\"True\"},";
+//	pools += "{\"ip\":\"35.173.194.122\",\"name\":\"beyond-pool-2\",\"port\":6000,\"status\":\"True\"}";
+//	pools += "],\"success\":true}";
+//
+//	// If the server returns a pool list, then use that instead
+//	//String URL = get_pool_list_api
+//	String http_pools = httpGetString(get_pool_list_api);
+//	if(http_pools.length()) {
+//		pools = http_pools;
+//	}
+//
+//	return pools;
 
-	// If the server returns a pool list, then use that instead
-	String http_pools = httpGetString(get_pool_list_api);
-	if(http_pools.length()) {
-		pools = http_pools;
+	String server = "server.duinocoin.com";
+	String uri = "/all_pools";
+	
+	const char* root_ca = \
+		"-----BEGIN CERTIFICATE-----\n" \
+		"MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/\n" \
+		"MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT\n" \
+		"DkRTVCBSb290IENBIFgzMB4XDTAwMDkzMDIxMTIxOVoXDTIxMDkzMDE0MDExNVow\n" \
+		"PzEkMCIGA1UEChMbRGlnaXRhbCBTaWduYXR1cmUgVHJ1c3QgQ28uMRcwFQYDVQQD\n" \
+		"Ew5EU1QgUm9vdCBDQSBYMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB\n" \
+		"AN+v6ZdQCINXtMxiZfaQguzH0yxrMMpb7NnDfcdAwRgUi+DoM3ZJKuM/IUmTrE4O\n" \
+		"rz5Iy2Xu/NMhD2XSKtkyj4zl93ewEnu1lcCJo6m67XMuegwGMoOifooUMM0RoOEq\n" \
+		"OLl5CjH9UL2AZd+3UWODyOKIYepLYYHsUmu5ouJLGiifSKOeDNoJjj4XLh7dIN9b\n" \
+		"xiqKqy69cK3FCxolkHRyxXtqqzTWMIn/5WgTe1QLyNau7Fqckh49ZLOMxt+/yUFw\n" \
+		"7BZy1SbsOFU5Q9D8/RhcQPGX69Wam40dutolucbY38EVAjqr2m7xPi71XAicPNaD\n" \
+		"aeQQmxkqtilX4+U9m5/wAl0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNV\n" \
+		"HQ8BAf8EBAMCAQYwHQYDVR0OBBYEFMSnsaR7LHH62+FLkHX/xBVghYkQMA0GCSqG\n" \
+		"SIb3DQEBBQUAA4IBAQCjGiybFwBcqR7uKGY3Or+Dxz9LwwmglSBd49lZRNI+DT69\n" \
+		"ikugdB/OEIKcdBodfpga3csTS7MgROSR6cz8faXbauX+5v3gTt23ADq1cEmv8uXr\n" \
+		"AvHRAosZy5Q6XkjEGB5YGV8eAlrwDPGxrancWYaLbumR9YbK+rlmM6pZW87ipxZz\n" \
+		"R8srzJmwN0jP41ZL9c8PDHIyh8bwRLtTcm1D9SZImlJnt1ir/md2cXjbDaJWFBM5\n" \
+		"JDGFoqgCWjBH4d1QB7wCCZAA62RjYJsWvIjJEubSfZGL+T0yjWW06XyxV3bqxbYo\n" \
+		"Ob8VZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ\n" \
+		"-----END CERTIFICATE-----\n";
+
+	String payload = "";
+	WiFiClientSecure client;
+	client.setCACert(root_ca);
+
+	#if (FIND_POOL_DEBUG) 
+	Serial.println("[HTTPS] CONNECT: " + server);
+	#endif
+	if (!client.connect(server.c_str(), 443)) {
+		Serial.println("[HTTPS] Connection failed.");
+		return payload;
 	}
+	String tx = "";
+
+	tx = "GET " + uri + " HTTP/1.1";
+	#if (FIND_POOL_DEBUG)
+	Serial.println("[TX] " + tx);
+	#endif
+	client.print(tx + "\r\n");
+
+	tx = "Host: " + server;
+	#if (FIND_POOL_DEBUG)
+	Serial.println("[TX] " + tx);
+	#endif
+	client.print(tx + "\r\n");
+
+	tx = "Connection: close";
+	#if (FIND_POOL_DEBUG)
+	Serial.println("[TX] " + tx);
+	#endif
+	client.print(tx + "\r\n");
+
+	tx = "";
+	#if (FIND_POOL_DEBUG)
+	Serial.println("[TX] " + tx);
+	#endif
+	client.print(tx + "\r\n");
+	
+	int maxloops = 0;
+	
+	//wait for the server's reply to become available
+	while (!client.available() && maxloops < 1000) {
+		yield();
+		delay(1);
+		maxloops++;
+	}
+
+	bool body = false;
+	while (client.available() && maxloops < 1000) {
+		//read back one line from the server
+		String line = client.readStringUntil('\n'); // Ending is \r\n
+		line.trim();
+		#if (FIND_POOL_DEBUG)
+		Serial.println("[RX] " + line);
+		#endif
+		if(line.length() == 0 && !body) {
+			body = true;
+		}
+		if(body && line.length()) {
+			payload += line;
+		}
+		yield();
+		maxloops++;
+	}
+	
+	#if (FIND_POOL_DEBUG)
+	Serial.println("[HTTPS] Closing connection.");
+	#endif
+	client.stop();
+
+  return payload;
+}
+
+void findPool() {
+	Serial.println(F("findPool(): Retrieving pool list"));
+	String pools = getPoolList();
 
 	if(pools.length()) {
 		StaticJsonDocument<4096> doc; // 4k might be big, but we need at least 2k right now with 5 pools
 		DeserializationError error = deserializeJson(doc, pools);
 		if (error) {
-			Serial.print(F("findPool(): invalid JSON: "));
 			Serial.println(error.f_str());
 			delay(500);
             esp_restart();
@@ -188,61 +296,105 @@ void findPool() {
 					String name = v["name"].as<const char*>();
 					String ip = v["ip"].as<const char*>();
 					int lp = v["port"].as<const int>();
-					//String url = ip + ":" + lp;
+					float ram = v["ram"].as<const float>();
+					float cpu = v["cpu"].as<const float>();
+					int con = v["connections"].as<const int>();
 	
-					// Could probably check CPU < 90, or connections < 10000 etc... But just check it's enabled
+					// Only connect to servers that are 'safe'
 					if(status == "True") {
-						Serial.print(String("findPool(): Checking '") + name + "'");
-						//Serial.print (String(" on http://") + url);
-	
-					    unsigned long start = millis();
-						WiFiClient client;
-					    client.setTimeout(1);
-					    client.flush();
-					    yield();
-	
-						if (!client.connect(ip.c_str(), lp)) {
-							Serial.println(F(" - connection failed"));
-						} else {
-							while (!client.available()) {
-								yield();
-								if (!client.connected()) break;
-								delay(10);
+						if(ram > 0 && ram < ram_cap) {
+							if(cpu > 0 && cpu < cpu_cap) {
+								if(con > 0 && con < con_cap) {
+									Serial.print(String("findPool(): Checking '") + name + "'");
+									//Serial.print ("url: http://" + url);
+				
+								    unsigned long start = millis();
+									WiFiClient client;
+								    client.setTimeout(1);
+								    client.flush();
+								    yield();
+				
+									if (!client.connect(ip.c_str(), lp)) {
+										Serial.println(F(" - connection failed"));
+									} else {
+										while (!client.available()) {
+											yield();
+											if (!client.connected()) break;
+											delay(10);
+										}
+				
+										// Server sends SERVER_VERSION after connecting
+										String server_version = client.readString();
+									    unsigned long duration = millis() - start;
+										Serial.println(String(" - ") + duration + " ms");
+									    if(duration < best_ms) {
+									    	best_ms = duration;
+									    	best_host = ip;
+									    	best_port = lp;
+									    	best_name = name;
+									    }
+										client.flush();
+										client.stop();
+										esp_task_wdt_reset();
+										yield();
+									}
+								} else {
+#if (FIND_POOL_DEBUG)
+									Serial.print(String("findPool(): Skipping '") + name + "'");
+									Serial.print (F(" - ("));
+									Serial.print (String("connections: ") + con + "/" + con_cap);
+									Serial.print (F(")"));
+									//Serial.print (String(" on http://") + url);
+									Serial.println();
+#endif
+								}
+							} else {
+#if (FIND_POOL_DEBUG)
+								Serial.print(String("findPool(): Skipping '") + name + "'");
+								Serial.print (F(" - ("));
+								Serial.print (String("cpu: ") + cpu + "/" + cpu_cap);
+								Serial.print (F(")"));
+								//Serial.print (String(" on http://") + url);
+								Serial.println();
+#endif
 							}
-	
-							// Server sends SERVER_VERSION after connecting
-							String server_version = client.readString();
-						    unsigned long duration = millis() - start;
-							Serial.println(String(" - ") + duration + " ms");
-						    if(duration < best_ms) {
-						    	best_ms = duration;
-						    	best_host = ip;
-						    	best_port = lp;
-						    	best_name = name;
-						    }
-							client.flush();
-							client.stop();
-							esp_task_wdt_reset();
-							yield();
+						} else {
+#if (FIND_POOL_DEBUG)
+							Serial.print(String("findPool(): Skipping '") + name + "'");
+							Serial.print (F(" - ("));
+							Serial.print (String("ram: ") + ram + "/" + ram_cap);
+							Serial.print (F(")"));
+							//Serial.print (String(" on http://") + url);
+							Serial.println();
+#endif
 						}
 					} else {
+#if (FIND_POOL_DEBUG)
 						Serial.print(String("findPool(): Skipping '") + name + "'");
+						Serial.print (F(" - ("));
+						Serial.print (String("status: ") + status);
+						Serial.print (F(")"));
 						//Serial.print (String(" on http://") + url);
 						Serial.println();
+#endif
 					}
 				}
 	
 				if(best_host.length()) {
-					Serial.println(String("\nfindPool(): best connection: '") + best_name + "' at " + best_ms + "ms");
+					Serial.print(String("\nfindPool(): best connection: '") + best_name + "'");
+#if (FIND_POOL_DEBUG)
+					Serial.print(String(" at ") + best_ms + "ms");
+#endif
+					Serial.println();
 					port = best_port;
 					host = best_host;
 				} else {
-					Serial.println(F("findPool(): Unable to find a connectable pool"));
+					Serial.println(F("findPool(): no pools"));
 					delay(500);
 		            esp_restart();
 				}
 			} else {
-				Serial.println(F("findPool(): cannot find pool list in response"));
+				Serial.println(F("findPool(): bad response"));
 				delay(500);
 	            esp_restart();
 			}
@@ -372,6 +524,7 @@ void Task1code(void *pvParameters) {
     if (ota_state)  // If the OTA is working then reset the watchdog.
       esp_task_wdt_reset();
     while (wifi_state != WL_CONNECTED) {
+      yield();
       delay(1000);
       esp_task_wdt_reset();
     }
@@ -560,6 +713,7 @@ void Task2code(void *pvParameters) {
     if (ota_state)  // If the OTA is working then reset the watchdog.
       esp_task_wdt_reset();
     while (wifi_state != WL_CONNECTED) {
+      yield();
       delay(1000);
       esp_task_wdt_reset();
     }
