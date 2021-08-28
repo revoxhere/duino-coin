@@ -4,7 +4,7 @@
   |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \ 
   |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  | 
   `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--' 
-  Official code for ESP32 boards                            version 2.6.4
+  Official code for ESP32 boards                            version 2.6.5
   
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
@@ -26,6 +26,13 @@ const char *rig_identifier = "None";
 #define LED_BUILTIN 2
 // Define watchdog timer seconds
 #define WDT_TIMEOUT 60
+
+/* WARNING choosing the pool from the device will require at least 4k of dynamic memory on your board
+ *  It is also not known what the full extent on the pools will be so use with caution for now. If 
+ *  you disable the pool choice from the server report any issue you find. Here is the history for 
+ *  this change: https://github.com/revoxhere/duino-coin/issues/894 
+ */
+#define USE_SERVER_CHOSEN_POOL true
 
 // #include "hwcrypto/sha.h" // Uncomment this line if you're using an older
 // version of the ESP32 core and sha_parellel_engine doesn't work for you
@@ -68,7 +75,12 @@ TaskHandle_t Task2;
 TaskHandle_t MinerCheckin;
 SemaphoreHandle_t xMutex;
 
+#if (USE_SERVER_CHOSEN_POOL)
 const char *get_pool_api = "http://51.15.127.80:4242/getPool";
+#else
+const char *get_pool_list_api = "https://server.duinocoin.com/all_pools";
+#endif
+
 String host;
 int port;
 volatile int wifi_state = 0;
@@ -82,6 +94,26 @@ unsigned long shares_two = 0;
 unsigned int diff_one = 0;
 unsigned int diff_two = 0;
 
+String httpGetString(String URL) {
+  String payload = "";
+  WiFiClient client;
+  HTTPClient http;
+
+  if (http.begin(client, URL)) {
+    int httpCode = http.GET();
+    if (httpCode == HTTP_CODE_OK) {
+      payload = http.getString();
+    } else {
+      Serial.printf("[HTTP] GET... failed, error: %s\n",
+                    http.errorToString(httpCode).c_str());
+    }
+    http.end();
+  }
+  return payload;
+}
+
+#if (USE_SERVER_CHOSEN_POOL)
+// This is the 'current' functionality where the server chooses a pool for you.
 void UpdatePool() {
   String input = "";
 
@@ -108,30 +140,116 @@ void UpdateHostPort(String input) {
   const char *h = doc["ip"];
   int p = doc["port"];
 
-  host = h;
   port = p;
+  host = h;
 
   Serial.println("Fetched pool: " + String(name) + " - " + String(host) + ":" +
                  String(port));
 }
 
-String httpGetString(String URL) {
-  String payload = "";
-  WiFiClient client;
-  HTTPClient http;
+#else
+// This is the 'new' functionality where the server returns all of the pools and the ESP will iterate through checking for the fastest connection.
+// All it does is sets the host/port global variables for the threads to use below
+void findPool() {
+	// Start with a static pool list to start with for now
+	String pools = "";
+	pools += "{\"result\":[";
+	pools += "{\"ip\":\"149.91.88.18\",\"name\":\"pulse-pool-1\",\"port\":1612\"status\":\"True\"},";
+	pools += "{\"ip\":\"149.91.88.18\",\"name\":\"pulse-pool-2\",\"port\":6004,\"status\":\"True\"},";
+	pools += "{\"ip\":\"51.158.182.90\",\"name\":\"star-pool-1\",\"port\":6000,\"status\":\"True\"},";
+	pools += "{\"ip\":\"50.112.145.154\",\"name\":\"beyond-pool-1\",\"port\":6000,\"status\":\"True\"},";
+	pools += "{\"ip\":\"35.173.194.122\",\"name\":\"beyond-pool-2\",\"port\":6000,\"status\":\"True\"}";
+	pools += "],\"success\":true}";
 
-  if (http.begin(client, URL)) {
-    int httpCode = http.GET();
-    if (httpCode == HTTP_CODE_OK) {
-      payload = http.getString();
-    } else {
-      Serial.printf("[HTTP] GET... failed, error: %s\n",
-                    http.errorToString(httpCode).c_str());
-    }
-    http.end();
-  }
-  return payload;
+	// If the server returns a pool list, then use that instead
+	String http_pools = httpGetString(get_pool_list_api);
+	if(http_pools.length()) {
+		pools = http_pools;
+	}
+
+	if(pools.length()) {
+		StaticJsonDocument<4096> doc; // 4k might be big, but we need at least 2k right now with 5 pools
+		DeserializationError error = deserializeJson(doc, pools);
+		if (error) {
+			Serial.print(F("findPool(): invalid JSON: "));
+			Serial.println(error.f_str());
+			delay(500);
+            esp_restart();
+		} else {
+			if(doc.containsKey("result")) {
+				String best_name = "";
+				String best_host = "";
+				int best_port = 0;
+				unsigned long best_ms = 99999;
+	
+				const JsonArray& result =  doc["result"];
+				for(JsonVariant v : result) {
+					String status = v["status"].as<const char*>();
+					String name = v["name"].as<const char*>();
+					String ip = v["ip"].as<const char*>();
+					int lp = v["port"].as<const int>();
+					//String url = ip + ":" + lp;
+	
+					// Could probably check CPU < 90, or connections < 10000 etc... But just check it's enabled
+					if(status == "True") {
+						Serial.print(String("findPool(): Checking '") + name + "'");
+						//Serial.print (String(" on http://") + url);
+	
+					    unsigned long start = millis();
+						WiFiClient client;
+					    client.setTimeout(1);
+					    client.flush();
+					    yield();
+	
+						if (!client.connect(ip.c_str(), lp)) {
+							Serial.println(F(" - connection failed"));
+						} else {
+							while (!client.available()) {
+								yield();
+								if (!client.connected()) break;
+								delay(10);
+							}
+	
+							// Server sends SERVER_VERSION after connecting
+							String server_version = client.readString();
+						    unsigned long duration = millis() - start;
+							Serial.println(String(" - ") + duration + " ms");
+						    if(duration < best_ms) {
+						    	best_ms = duration;
+						    	best_host = ip;
+						    	best_port = lp;
+						    	best_name = name;
+						    }
+							client.flush();
+							client.stop();
+							esp_task_wdt_reset();
+							yield();
+						}
+					} else {
+						Serial.print(String("findPool(): Skipping '") + name + "'");
+						//Serial.print (String(" on http://") + url);
+						Serial.println();
+					}
+				}
+	
+				if(best_host.length()) {
+					Serial.println(String("\nfindPool(): best connection: '") + best_name + "' at " + best_ms + "ms");
+					port = best_port;
+					host = best_host;
+				} else {
+					Serial.println(F("findPool(): Unable to find a connectable pool"));
+					delay(500);
+		            esp_restart();
+				}
+			} else {
+				Serial.println(F("findPool(): cannot find pool list in response"));
+				delay(500);
+	            esp_restart();
+			}
+		}
+	}
 }
+#endif
 
 void WiFireconnect(void *pvParameters) {
   int n = 0;
@@ -156,9 +274,13 @@ void WiFireconnect(void *pvParameters) {
       Serial.println("      Rig name: " + String(rig_identifier));
       Serial.println();
 
+#if (USE_SERVER_CHOSEN_POOL)
       UpdatePool();
       yield();
       delay(100);
+#else
+      findPool();
+#endif
     }
 
     else if ((wifi_state != WL_CONNECTED) &&
@@ -253,155 +375,161 @@ void Task1code(void *pvParameters) {
       delay(1000);
       esp_task_wdt_reset();
     }
-    shares_one = 0;  // Share variable
-    Serial.println(F("\nCORE1 Connecting to Duino-Coin server..."));
-    // Use WiFiClient class to create TCP connection
-    client_one.setTimeout(1);
-    client_one.flush();
-    yield();
-
-    if (!client_one.connect(host.c_str(), port)) {
-      Serial.println(F("CORE1 connection failed"));
-      delay(500);
-      continue;
-    }
-
-    Serial.println(F("CORE1 is connected"));
-    while (!client_one.available()) {
-      yield();
-      if (!client_one.connected()) break;
-      delay(10);
-    }
-
-    // Server sends SERVER_VERSION after connecting
-    SERVER_VER = client_one.readString();
-    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
-    delay(50);
-    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
-    Serial.println("CORE1 Connected to the server. Server version: " +
-                   String(SERVER_VER));
-    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
-    delay(50);
-    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
-
-    while (client_one.connected()) {
-      esp_task_wdt_reset();
-      Serial.println("CORE1 Asking for a new job for user: " +
-                     String(username));
-      client_one.flush();
-
-      // Ask for new job
-      client_one.print("JOB," + String(username) + ",ESP32");
-      while (!client_one.available()) {
-        if (!client_one.connected()) break;
-        delay(10);
-      }
-
-      yield();
-      if (!client_one.connected()) break;
-      delay(50);
-      yield();
-
-      buff_two_size = client_one.available();
-      Serial.print(F("CORE1 Buffer size is "));
-      Serial.println(buff_two_size);
-      if (buff_two_size <= 10) {
-        Serial.println(
-            F("CORE1 Buffer size is too small. Requesting another job."));
-        continue;
-      }
-
-      hash1 = client_one.readStringUntil(
-          ',');  // Read data to the first peroid - last block hash
-      job1 = client_one.readStringUntil(
-          ',');  // Read data to the next peroid - expected hash
-      diff_one = client_one.readStringUntil('\n').toInt() * 100 +
-                 1;  // Read and calculate remaining data - difficulty
-      client_one.flush();
-      job1.toUpperCase();
-      const char *c = job1.c_str();
-
-      len = job1.length();
-      final_len = len / 2;
-      memset(job11, 0, job_size_task_one);
-      for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
-        job11[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
-      memset(shaResult1, 0, sizeof(shaResult1));
-
-      Serial.println("CORE1 Job received: " + String(hash1) + " " +
-                     String(job1) + " " + String(diff_one));
-      StartTime1 = micros();  // Start time measurement
-
-      for (unsigned long duco_res_one = 0; duco_res_one < diff_one;
-           duco_res_one++) {
-        hash11 = hash1 + String(duco_res_one);
-        payload_length_one = hash11.length();
-
-        while (xSemaphoreTake(xMutex, portMAX_DELAY) != pdTRUE)
-          ;
-        esp_sha(SHA1, (const unsigned char *)hash11.c_str(), payload_length_one,
-                shaResult1);
-        xSemaphoreGive(xMutex);
-
-        if (memcmp(shaResult1, job11, sizeof(shaResult1)) == 0) {
-          end_time_one = micros();  // End time measurement
-          elapsed_time_one =
-              end_time_one - StartTime1;  // Calculate elapsed time
-          elapsed_time_ms_one =
-              elapsed_time_one / 1000;  // Convert to miliseconds
-          elapsed_time_sec_one =
-              elapsed_time_ms_one / 1000;  // Convert to seconds
-          hashrate_one =
-              duco_res_one / elapsed_time_sec_one;  // Calculate hashrate
-
-          if (!client_one.connected()) {
-            Serial.println(F("CORE1 Lost connection. Trying to reconnect"));
-            if (!client_one.connect(host.c_str(), port)) {
-              Serial.println(F("CORE1 connection failed"));
-              break;
-            }
-            Serial.println(F("CORE1 Reconnection successful."));
-          }
-
-          client_one.flush();
-          client_one.print(String(duco_res_one) + "," + String(hashrate_one) +
-                           ",ESP32 CORE1 Miner v2.65," +
-                           String(rig_identifier) + "," +
-                           String((char *)chip_id));  // Send result to server
-          Serial.println(F("CORE1 Posting result and waiting for feedback."));
-
-          while (!client_one.available()) {
-            if (!client_one.connected()) {
-              Serial.println(
-                  F("CORE1 Lost connection. Didn't receive feedback."));
-              break;
-            }
-            delay(10);
-            yield();
-          }
-          delay(50);
-          yield();
-
-          feedback_one = client_one.readStringUntil('\n');  // Receive feedback
-          client_one.flush();
-          shares_one++;
-          Serial.println("CORE1 " + String(feedback_one) + " share #" +
-                         String(shares_one) + " (" + String(duco_res_one) +
-                         ")" + " hashrate: " + String(hashrate_one));
-
-          if (hashrate_one < 4000) {
-            Serial.println(F("CORE1 Low hashrate. Restarting"));
-            client_one.flush();
-            client_one.stop();
-            esp_restart();
-          }
-          break;  // Stop and ask for more work
-        }
-      }
-    }
-    Serial.println(F("CORE1 Not connected. Restarting core 1"));
-    client_one.flush();
-    client_one.stop();
+    if(host.length()) {
+	    shares_one = 0;  // Share variable
+	    Serial.println(F("\nCORE1 Connecting to Duino-Coin server..."));
+	    // Use WiFiClient class to create TCP connection
+	    client_one.setTimeout(1);
+	    client_one.flush();
+	    yield();
+	
+	    if (!client_one.connect(host.c_str(), port)) {
+	      Serial.println(F("CORE1 connection failed"));
+	      delay(500);
+	      continue;
+	    }
+	
+	    Serial.println(F("CORE1 is connected"));
+	    while (!client_one.available()) {
+	      yield();
+	      if (!client_one.connected()) break;
+	      delay(10);
+	    }
+	
+	    // Server sends SERVER_VERSION after connecting
+	    SERVER_VER = client_one.readString();
+	    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
+	    delay(50);
+	    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
+	    Serial.println("CORE1 Connected to the server. Server version: " +
+	                   String(SERVER_VER));
+	    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
+	    delay(50);
+	    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
+	
+	    while (client_one.connected()) {
+	      esp_task_wdt_reset();
+	      Serial.println("CORE1 Asking for a new job for user: " +
+	                     String(username));
+	      client_one.flush();
+	
+	      // Ask for new job
+	      client_one.print("JOB," + String(username) + ",ESP32");
+	      while (!client_one.available()) {
+	        if (!client_one.connected()) break;
+	        delay(10);
+	      }
+	
+	      yield();
+	      if (!client_one.connected()) break;
+	      delay(50);
+	      yield();
+	
+	      buff_two_size = client_one.available();
+	      Serial.print(F("CORE1 Buffer size is "));
+	      Serial.println(buff_two_size);
+	      if (buff_two_size <= 10) {
+	        Serial.println(
+	            F("CORE1 Buffer size is too small. Requesting another job."));
+	        continue;
+	      }
+	
+	      hash1 = client_one.readStringUntil(
+	          ',');  // Read data to the first peroid - last block hash
+	      job1 = client_one.readStringUntil(
+	          ',');  // Read data to the next peroid - expected hash
+	      diff_one = client_one.readStringUntil('\n').toInt() * 100 +
+	                 1;  // Read and calculate remaining data - difficulty
+	      client_one.flush();
+	      job1.toUpperCase();
+	      const char *c = job1.c_str();
+	
+	      len = job1.length();
+	      final_len = len / 2;
+	      memset(job11, 0, job_size_task_one);
+	      for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
+	        job11[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
+	      memset(shaResult1, 0, sizeof(shaResult1));
+	
+	      Serial.println("CORE1 Job received: " + String(hash1) + " " +
+	                     String(job1) + " " + String(diff_one));
+	      StartTime1 = micros();  // Start time measurement
+	
+	      for (unsigned long duco_res_one = 0; duco_res_one < diff_one;
+	           duco_res_one++) {
+	        hash11 = hash1 + String(duco_res_one);
+	        payload_length_one = hash11.length();
+	
+	        while (xSemaphoreTake(xMutex, portMAX_DELAY) != pdTRUE)
+	          ;
+	        esp_sha(SHA1, (const unsigned char *)hash11.c_str(), payload_length_one,
+	                shaResult1);
+	        xSemaphoreGive(xMutex);
+	
+	        if (memcmp(shaResult1, job11, sizeof(shaResult1)) == 0) {
+	          end_time_one = micros();  // End time measurement
+	          elapsed_time_one =
+	              end_time_one - StartTime1;  // Calculate elapsed time
+	          elapsed_time_ms_one =
+	              elapsed_time_one / 1000;  // Convert to miliseconds
+	          elapsed_time_sec_one =
+	              elapsed_time_ms_one / 1000;  // Convert to seconds
+	          hashrate_one =
+	              duco_res_one / elapsed_time_sec_one;  // Calculate hashrate
+	
+	          if (!client_one.connected()) {
+	            Serial.println(F("CORE1 Lost connection. Trying to reconnect"));
+	            if (!client_one.connect(host.c_str(), port)) {
+	              Serial.println(F("CORE1 connection failed"));
+	              break;
+	            }
+	            Serial.println(F("CORE1 Reconnection successful."));
+	          }
+	
+	          client_one.flush();
+	          client_one.print(String(duco_res_one) + "," + String(hashrate_one) +
+	                           ",ESP32 CORE1 Miner v2.65," +
+	                           String(rig_identifier) + "," +
+	                           String((char *)chip_id));  // Send result to server
+	          Serial.println(F("CORE1 Posting result and waiting for feedback."));
+	
+	          while (!client_one.available()) {
+	            if (!client_one.connected()) {
+	              Serial.println(
+	                  F("CORE1 Lost connection. Didn't receive feedback."));
+	              break;
+	            }
+	            delay(10);
+	            yield();
+	          }
+	          delay(50);
+	          yield();
+	
+	          feedback_one = client_one.readStringUntil('\n');  // Receive feedback
+	          client_one.flush();
+	          shares_one++;
+	          Serial.println("CORE1 " + String(feedback_one) + " share #" +
+	                         String(shares_one) + " (" + String(duco_res_one) +
+	                         ")" + " hashrate: " + String(hashrate_one));
+	
+	          if (hashrate_one < 4000) {
+	            Serial.println(F("CORE1 Low hashrate. Restarting"));
+	            client_one.flush();
+	            client_one.stop();
+	            esp_restart();
+	          }
+	          break;  // Stop and ask for more work
+	        }
+	      }
+	    }
+	    Serial.println(F("CORE1 Not connected. Restarting core 1"));
+	    client_one.flush();
+	    client_one.stop();
+	  } else {
+	    //delay(1000);
+	    esp_task_wdt_reset();
+	  	yield();
+	  }
   }
 }
 
@@ -435,147 +563,154 @@ void Task2code(void *pvParameters) {
       delay(1000);
       esp_task_wdt_reset();
     }
-    shares_two = 0;  // Share variable
-
-    Serial.println(F("\nCORE2 Connecting to Duino-Coin server..."));
-    client.setTimeout(1);
-    client.flush();
-    yield();
-
-    if (!client.connect(host.c_str(), port)) {
-      Serial.println(F("CORE2 connection failed"));
-      delay(500);
-      continue;
-    }
-
-    Serial.println(F("CORE2 is connected"));
-    while (!client.available()) {
-      yield();
-      if (!client.connected()) break;
-      delay(10);
-    }
-
-    // Server sends SERVER_VERSION after connecting
-    SERVER_VER = client.readString();
-    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
-    delay(50);
-    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
-    Serial.println("CORE2 Connected to the server. Server version: " +
-                   String(SERVER_VER));
-    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
-    delay(50);
-    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
-
-    while (client.connected()) {
-      esp_task_wdt_reset();
-      Serial.println("CORE2 Asking for a new job for user: " +
-                     String(username));
-
-      client.flush();
-      client.print("JOB," + String(username) + ",ESP32");  // Ask for new job
-      while (!client.available()) {
-        if (!client.connected()) break;
-        delay(10);
-      }
-      yield();
-      if (!client.connected()) break;
-      delay(50);
-      yield();
-
-      buff_two_size = client.available();
-      Serial.print(F("CORE2 Buffer size is "));
-      Serial.println(buff_two_size);
-      if (buff_two_size <= 10) {
-        Serial.println(
-            F("CORE2 Buffer size is too small. Requesting another job."));
-        continue;
-      }
-
-      // Read data to the first peroid - last block hash
-      hash = client.readStringUntil(',');
-      // Read data to the next peroid - expected hash
-      job = client.readStringUntil(',');
-      // Read and calculate remaining data - difficulty
-      diff_two = client.readStringUntil('\n').toInt() * 100 + 1;
-      client.flush();
-      job.toUpperCase();
-      const char *c = job.c_str();
-
-      len = job.length();
-      final_len = len / 2;
-      memset(job1, 0, job_two_size);
-      for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
-        job1[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
-      memset(shaResult, 0, sizeof(shaResult));
-
-      Serial.println("CORE2 Job received: " + String(hash) + " " + String(job) +
-                     " " + String(diff_two));
-      StartTime = micros();  // Start time measurement
-
-      for (unsigned long duco_res_two = 0; duco_res_two < diff_two;
-           duco_res_two++) {
-        hash1 = hash + String(duco_res_two);
-        payloadLength = hash1.length();
-
-        while (xSemaphoreTake(xMutex, portMAX_DELAY) != pdTRUE)
-          ;
-        esp_sha(SHA1, (const unsigned char *)hash1.c_str(), payloadLength,
-                shaResult);
-        xSemaphoreGive(xMutex);
-
-        if (memcmp(shaResult, job1, sizeof(shaResult)) == 0) {
-          EndTime = micros();                          // End time measurement
-          elapsed_time = EndTime - StartTime;          // Calculate elapsed time
-          elapsed_time_ms = elapsed_time / 1000;       // Convert to miliseconds
-          elapsed_time_sec = elapsed_time_ms / 1000;   // Convert to seconds
-          hashrate_two = duco_res_two / elapsed_time_sec;  // Calculate hashrate
-
-          if (!client.connected()) {
-            Serial.println(F("CORE2 Lost connection. Trying to reconnect"));
-            if (!client.connect(host.c_str(), port)) {
-              Serial.println(F("CORE2 connection failed"));
-              break;
-            }
-            Serial.println(F("CORE2 Reconnection successful."));
-          }
-
-          client.flush();
-          client.print(String(duco_res_two) + "," + String(hashrate_two) +
-                       ",ESP32 CORE2 Miner v2.65," + String(rig_identifier) +
-                       "," + String((char *)chip_id));  // Send result to server
-          Serial.println(F("CORE2 Posting result and waiting for feedback."));
-
-          while (!client.available()) {
-            if (!client.connected()) {
-              Serial.println(
-                  F("CORE2 Lost connection. Didn't receive feedback."));
-              break;
-            }
-            delay(10);
-            yield();
-          }
-          delay(50);
-          yield();
-          feedback = client.readStringUntil('\n');  // Receive feedback
-          client.flush();
-          shares_two++;
-
-          Serial.println("CORE2 " + String(feedback) + " share #" +
-                         String(shares_two) + " (" + String(duco_res_two) +
-                         ")" + " hashrate: " + String(hashrate_two));
-          if (hashrate_two < 4000) {
-            Serial.println(F("CORE2 Low hashrate. Restarting"));
-            client.flush();
-            client.stop();
-            esp_restart();
-          }
-          break;  // Stop and ask for more work
-        }
-      }
-    }
-    Serial.println(F("CORE2 Not connected. Restarting core 2"));
-    client.flush();
-    client.stop();
+ 
+	if(host.length()) {
+		shares_two = 0;  // Share variable
+	
+	    Serial.println(F("\nCORE2 Connecting to Duino-Coin server..."));
+	    client.setTimeout(1);
+	    client.flush();
+	    yield();
+	
+	    if (!client.connect(host.c_str(), port)) {
+	      Serial.println(F("CORE2 connection failed"));
+	      delay(500);
+	      continue;
+	    }
+	
+	    Serial.println(F("CORE2 is connected"));
+	    while (!client.available()) {
+	      yield();
+	      if (!client.connected()) break;
+	      delay(10);
+	    }
+	
+	    // Server sends SERVER_VERSION after connecting
+	    SERVER_VER = client.readString();
+	    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
+	    delay(50);
+	    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
+	    Serial.println("CORE2 Connected to the server. Server version: " +
+	                   String(SERVER_VER));
+	    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
+	    delay(50);
+	    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
+	
+	    while (client.connected()) {
+	      esp_task_wdt_reset();
+	      Serial.println("CORE2 Asking for a new job for user: " +
+	                     String(username));
+	
+	      client.flush();
+	      client.print("JOB," + String(username) + ",ESP32");  // Ask for new job
+	      while (!client.available()) {
+	        if (!client.connected()) break;
+	        delay(10);
+	      }
+	      yield();
+	      if (!client.connected()) break;
+	      delay(50);
+	      yield();
+	
+	      buff_two_size = client.available();
+	      Serial.print(F("CORE2 Buffer size is "));
+	      Serial.println(buff_two_size);
+	      if (buff_two_size <= 10) {
+	        Serial.println(
+	            F("CORE2 Buffer size is too small. Requesting another job."));
+	        continue;
+	      }
+	
+	      // Read data to the first peroid - last block hash
+	      hash = client.readStringUntil(',');
+	      // Read data to the next peroid - expected hash
+	      job = client.readStringUntil(',');
+	      // Read and calculate remaining data - difficulty
+	      diff_two = client.readStringUntil('\n').toInt() * 100 + 1;
+	      client.flush();
+	      job.toUpperCase();
+	      const char *c = job.c_str();
+	
+	      len = job.length();
+	      final_len = len / 2;
+	      memset(job1, 0, job_two_size);
+	      for (size_t i = 0, j = 0; j < final_len; i += 2, j++)
+	        job1[j] = (c[i] % 32 + 9) % 25 * 16 + (c[i + 1] % 32 + 9) % 25;
+	      memset(shaResult, 0, sizeof(shaResult));
+	
+	      Serial.println("CORE2 Job received: " + String(hash) + " " + String(job) +
+	                     " " + String(diff_two));
+	      StartTime = micros();  // Start time measurement
+	
+	      for (unsigned long duco_res_two = 0; duco_res_two < diff_two;
+	           duco_res_two++) {
+	        hash1 = hash + String(duco_res_two);
+	        payloadLength = hash1.length();
+	
+	        while (xSemaphoreTake(xMutex, portMAX_DELAY) != pdTRUE)
+	          ;
+	        esp_sha(SHA1, (const unsigned char *)hash1.c_str(), payloadLength,
+	                shaResult);
+	        xSemaphoreGive(xMutex);
+	
+	        if (memcmp(shaResult, job1, sizeof(shaResult)) == 0) {
+	          EndTime = micros();                          // End time measurement
+	          elapsed_time = EndTime - StartTime;          // Calculate elapsed time
+	          elapsed_time_ms = elapsed_time / 1000;       // Convert to miliseconds
+	          elapsed_time_sec = elapsed_time_ms / 1000;   // Convert to seconds
+	          hashrate_two = duco_res_two / elapsed_time_sec;  // Calculate hashrate
+	
+	          if (!client.connected()) {
+	            Serial.println(F("CORE2 Lost connection. Trying to reconnect"));
+	            if (!client.connect(host.c_str(), port)) {
+	              Serial.println(F("CORE2 connection failed"));
+	              break;
+	            }
+	            Serial.println(F("CORE2 Reconnection successful."));
+	          }
+	
+	          client.flush();
+	          client.print(String(duco_res_two) + "," + String(hashrate_two) +
+	                       ",ESP32 CORE2 Miner v2.65," + String(rig_identifier) +
+	                       "," + String((char *)chip_id));  // Send result to server
+	          Serial.println(F("CORE2 Posting result and waiting for feedback."));
+	
+	          while (!client.available()) {
+	            if (!client.connected()) {
+	              Serial.println(
+	                  F("CORE2 Lost connection. Didn't receive feedback."));
+	              break;
+	            }
+	            delay(10);
+	            yield();
+	          }
+	          delay(50);
+	          yield();
+	          feedback = client.readStringUntil('\n');  // Receive feedback
+	          client.flush();
+	          shares_two++;
+	
+	          Serial.println("CORE2 " + String(feedback) + " share #" +
+	                         String(shares_two) + " (" + String(duco_res_two) +
+	                         ")" + " hashrate: " + String(hashrate_two));
+	          if (hashrate_two < 4000) {
+	            Serial.println(F("CORE2 Low hashrate. Restarting"));
+	            client.flush();
+	            client.stop();
+	            esp_restart();
+	          }
+	          break;  // Stop and ask for more work
+	        }
+	      }
+	    }
+	    Serial.println(F("CORE2 Not connected. Restarting core 2"));
+	    client.flush();
+	    client.stop();
+	  } else {
+	    //delay(1000);
+	    esp_task_wdt_reset();
+	  	yield();
+	  }
   }
 }
 
@@ -675,8 +810,8 @@ void setup() {
 
 // ************************************************************
 void MinerCheckinCode( void * pvParameters ) {
-	// This function can periodically update a server on the EPS32. 
-	// The sever details and request parameters are specific, but I have an example below
+	// This function can periodically update a server on the status of the ESP32 miner. 
+	// The server details and request parameters are specific, but I have an example below.
 
 	unsigned long lastWdtReset = 0;
 	unsigned long wdtResetDelay = 1000;
@@ -687,68 +822,62 @@ void MinerCheckinCode( void * pvParameters ) {
 		}
 		yield();
 	}
-	/**************************************************
-	 * Example code
-	const char* serverName = "http://10.10.1.1/api/espCheckin.php"; // the URL of my checking API
-
-	unsigned long checkinDelay = 10000; // Check in to the IOT service every 10 seconds
-	unsigned long wdtResetDelay = 1000; // How often to reset the watchdog timer
-
-	unsigned long lastCheckin = 0;
-	unsigned long lastWdtReset = 0;
-	unsigned long lastShares = 0;
-
-	esp_task_wdt_add(NULL);// Register this task with the watchdog
-	for(;;) { // Loop forever
-		if ((millis() - lastWdtReset) > wdtResetDelay) {
-			esp_task_wdt_reset();
-			lastWdtReset = millis();
-		}
-
-		if (WiFi.status() == WL_CONNECTED && (millis() - lastCheckin) > checkinDelay) {
-			WiFiClient client;
-			HTTPClient http;
-			http.begin(client, serverName);
-			http.setTimeout(2000); // Set the timeout low so we don't hang anything too much
-			http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-			String httpRequestData = String("rigname=") + rig_identifier;
-			httpRequestData = httpRequestData + "&username=" + username;
-			httpRequestData = httpRequestData + "&pool=" + host + ":" + port;
-			httpRequestData = httpRequestData + "&accepted_1=" + shares_one;
-			httpRequestData = httpRequestData + "&accepted_2=" + shares_two;
-			httpRequestData = httpRequestData + "&hashrate_1=" + hashrate_one;
-			httpRequestData = httpRequestData + "&hashrate_2=" + hashrate_two;
-			httpRequestData = httpRequestData + "&difficulty_1=" + diff_one;
-			httpRequestData = httpRequestData + "&difficulty_2=" + diff_two;
-			httpRequestData = httpRequestData + "&connected=" + ((shares_one + shares_two)>lastShares);
-			
-			int httpResponseCode = http.POST(httpRequestData);
-			if(0) { // Save cycles and I don't care what they said, but could do
-				yield();
-				Serial.print("CHECKIN: Response code: ");
-				Serial.print(httpResponseCode);
-				if(httpResponseCode == HTTP_CODE_OK) {
-					String payload = http.getString();
-					DynamicJsonDocument doc(1024);
-					char buffer[2048];
 	
-					yield();
-					deserializeJson(doc, payload);
-					serializeJsonPretty(doc, buffer);
-					Serial.print(" ");
-					Serial.println(buffer);
-				} else {
-					Serial.print(", Error: ");
-					Serial.println(http.errorToString(httpResponseCode).c_str());
-				}
-			}
-			http.end();
-			lastCheckin = millis();
-			lastShares = shares_one + shares_two;
-		}
-		yield();
-	}
-	*/
+//	const char* apiUrl = "http://10.10.1.1/api/espCheckin.php"; // the URL of the checking API
+//
+//	unsigned long checkinDelay = 10000; // Check in to the IOT service every 10 seconds
+//	unsigned long lastCheckin = 0;
+//	unsigned long lastShares = 0;
+//
+//	esp_task_wdt_add(NULL);// Register this task with the watchdog
+//	for(;;) { // Loop forever
+//		if ((millis() - lastWdtReset) > wdtResetDelay) {
+//			esp_task_wdt_reset();
+//			lastWdtReset = millis();
+//		}
+//
+//		if (WiFi.status() == WL_CONNECTED && (millis() - lastCheckin) > checkinDelay) {
+//			WiFiClient client;
+//			HTTPClient http;
+//			http.begin(client, apiUrl);
+//			http.setTimeout(2000); // Set the timeout low so we don't hang anything too much
+//			http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+//			String httpRequestData = String("rigname=") + rig_identifier;
+//			httpRequestData = httpRequestData + "&username=" + username;
+//			httpRequestData = httpRequestData + "&pool=" + host + ":" + port;
+//			httpRequestData = httpRequestData + "&accepted_1=" + shares_one;
+//			httpRequestData = httpRequestData + "&accepted_2=" + shares_two;
+//			httpRequestData = httpRequestData + "&hashrate_1=" + hashrate_one;
+//			httpRequestData = httpRequestData + "&hashrate_2=" + hashrate_two;
+//			httpRequestData = httpRequestData + "&difficulty_1=" + (diff_one-1)/100;
+//			httpRequestData = httpRequestData + "&difficulty_2=" + (diff_two-1)/100;
+//			httpRequestData = httpRequestData + "&connected=" + ((shares_one + shares_two)>lastShares);
+//			
+//			int httpResponseCode = http.POST(httpRequestData);
+//			if(0) { // Save cycles and I don't care what they said, but could do
+//				yield();
+//				Serial.print("CHECKIN: Response code: ");
+//				Serial.print(httpResponseCode);
+//				if(httpResponseCode == HTTP_CODE_OK) {
+//					String payload = http.getString();
+//					DynamicJsonDocument doc(1024);
+//					char buffer[2048];
+//	
+//					yield();
+//					deserializeJson(doc, payload);
+//					serializeJsonPretty(doc, buffer);
+//					Serial.print(" ");
+//					Serial.println(buffer);
+//				} else {
+//					Serial.print(", Error: ");
+//					Serial.println(http.errorToString(httpResponseCode).c_str());
+//				}
+//			}
+//			http.end();
+//			lastCheckin = millis();
+//			lastShares = shares_one + shares_two;
+//		}
+//		yield();
+//	}
 }
-
 void loop() {}
