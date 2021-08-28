@@ -1,6 +1,6 @@
 <!-- Translate up to line 118 so far :)
 *** Offizielles Duino Coin README
-*** by revox, 2019-2021
+*** by revox,BastelPichi, 2019-2021
 -->
 
 <p align = "center">
@@ -46,8 +46,8 @@
   </tr>
   <tr>
     <td>
-      💻 Von vielen Betriebssystem Plattformen unterstützt<br>
-      👥 Eine freundliche & wachsende Community<br>
+      💻 Von vielen Betriebssystemen unterstützt<br>
+      👥 freundliche & wachsende Community<br>
       💱 Einfach zu nutzten & in andere Währungen umzutauschen<br>
       🌎 Überall verfügbar<br>
       :new: Komplett originales Projekt<br>
@@ -62,7 +62,7 @@
       ⚡ Transaktionszeit: sofort<br>
       🔢 Dezimalstellen: bis zu 20<br>
       🔤 Ticker: DUCO (ᕲ)<br>
-      ⚒️ Algorithmen: DUCO-S1, DUCO-S1A, XXHASH +mehr geplannt<br>
+      ⚒️ Algorithmen: DUCO-S1, DUCO-S1A, XXHASH + mehr geplannt<br>
       ♐ Rewards: unterstützt durch das "Kolka System", welches hilft, miner fair zu belohnen<br>
     </td>
   </tr>
@@ -70,7 +70,7 @@
 
 <h2 align="center">Get started</h2><br>
 
-Offiziele Start-Guide um einen Account zu erstellen und einen Miner zu auf vielen Geräten zu Starten, sind verfügbar und Helfen euch bei der Einrichtung. <a href="https://revoxhere.github.io/duino-coin/getting-started">auf der offizielen Website</a>.<br>
+Offiziele Anleitungen um einen ACccount zu erstellen, und auf vielen Geräten zu minen, <a href="https://revoxhere.github.io/duino-coin/getting-started">auf der offizielen Website</a>.<br>
 Ein FAQ und Hilfe kann in der Wiki-Seite gefunden werden [Wikis](https://github.com/revoxhere/duino-coin/wiki).
 <br>
 
@@ -80,27 +80,27 @@ Ein FAQ und Hilfe kann in der Wiki-Seite gefunden werden [Wikis](https://github.
 
 <h3 align="center">Duino-Coin Installieren</h2><br>
 
-Der einfachste Weg zu starten, ist  [den neusten release](https://github.com/revoxhere/duino-coin/releases/latest) für dein OS herunterzuladen.<br>
+Der einfachste Weg zu starten, ist  [das neuste release](https://github.com/revoxhere/duino-coin/releases/latest) für dein OS herunterzuladen.<br>
 <br> Wenn der Download fertig ist, Entpacke ihn und öffnen dein gewünschtes Programm. Es sind keine anderen Programme nötig. <br>
 
 <hr>
 
- Wenn du die Programme vom Master.zip Starten willst, musst du vielleicht einige zusätzliche erweiterungen hierfür Installieren. So kann man es auf Debian-based Linux distros (z.B. Ubuntu, Debian oder Raspian) machen:
+ Wenn du die Programme dierekt über Python starten willst, musst du vielleicht einige zusätzliche pip-module installieren. So kann man es auf Debian-basierenden Linux distros (z.B. Ubuntu, Debian oder Raspian) machen:
 ```BASH
 sudo apt install python3 python3-pip git
 git clone https://github.com/revoxhere/duino-coin
 cd duino-coin
 python3 -m pip install -r requirements.txt
 ```
-Wenn du Windows nutzt, musst du [Python 3](https://www.python.org/downloads/) herunterladen, und dann die [Master Repository](https://github.com/revoxhere/duino-coin/archive/master.zip), diese dann Entpacken (WinRar, 7zip) Danach kannst du ein CMD Fester öffnen (Windows + R Taste). 
+Wenn du Windows nutzt, musst du [Python 3](https://www.python.org/downloads/) herunterladen, das [Master Repository](https://github.com/revoxhere/duino-coin/archive/master.zip), dieses dann Entpacken (WinRar, 7zip) Danach kannst du ein CMD Fester öffnen (Windows + R Taste). 
 
 Im CMD Fenster, Schreibe/kopiere dies hinein:
 ```BASH
 py -m pip install -r requirements.txt
 ```
-Wichtig für Windows nutzer: Immer sicher gehen das [Python 3](https://www.python.org/downloads/) und Python3-pip installiert sind und geupdatet sind.
+Wichtig für Windows nutzer: Immer sicher gehen das [Python 3](https://www.python.org/downloads/) und Python3-pip installiert und im PATH sind.
 
-Nach all diesen Schritten, bist du so weit das du den Miner starten kannst. (z.b. `python3 PC_Miner.py` oder `py PC_Miner.py`).
+Jetzt kannst du den Miner starten. (z.b. `python3 PC_Miner.py` oder `py PC_Miner.py`).
 
 <hr>
 
@@ -111,7 +111,7 @@ sudo pacman -S yay
 yay -S duino-coin
 ```
 
-Duino-Coin AUR Paket wird bereitgestellt von [PhereloHD](https://github.com/PhereloHD).
+das Duino-Coin AUR Paket wird bereitgestellt von [PhereloHD](https://github.com/PhereloHD).
 <br><br>
 <h2 align="center">Von der Community erstellte Software von Talentierten Mitgliedern</h2><br>
 
@@ -145,7 +145,7 @@ Duino-Coin AUR Paket wird bereitgestellt von [PhereloHD](https://github.com/Pher
 *   [Duino Stats](https://github.com/Bilaboz/duino-stats) DUINO-COIN Discord Bot by Bilaboz
 <!--*   [Duino-Coin Auto Updater](https://github.com/Bilaboz/duino-coin-auto-updater) by Bilaboz (DEPRECATED) -->
 
-Diese Liste wird ständig geupdatet. Wenn auch du deine Software hier auflisten möchtest die zum Projekt beiträgt, Einfach einen Antrag in Git stellen, oder einen der Programmierer Dev's auf Discord anschreiben.
+Diese Liste wird ständig geupdatet. Wenn auch du deine Software hier auflisten möchtest die zum Projekt beiträgt, einfach einen Pull request auf Github erstellen, oder einen der Programmierer auf Discord anschreiben.
 <br><br>
 <h3 align="center">wDUCO Tutorial</h3><br>
 
