@@ -12,7 +12,7 @@
   <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" width="430px"/>
 </a>
 
-## Duino-Coin Website
+## Source of the main website
 
 This branch of the Duino-Coin repository contains the code for the Duino-Coin website located at [https://duinocoin.com](https://duinocoin.com).
 
