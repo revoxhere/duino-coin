@@ -69,8 +69,8 @@ TaskHandle_t MinerCheckin;
 SemaphoreHandle_t xMutex;
 
 const char *get_pool_api = "http://51.15.127.80:4242/getPool";
-String host;
-int port;
+String host = "";
+int port = 0;
 volatile int wifi_state = 0;
 volatile int wifi_prev_state = WL_CONNECTED;
 volatile bool ota_state = false;
@@ -249,7 +249,7 @@ void Task1code(void *pvParameters) {
   for (;;) {
     if (ota_state)  // If the OTA is working then reset the watchdog.
       esp_task_wdt_reset();
-    while (wifi_state != WL_CONNECTED) {
+    while (wifi_state != WL_CONNECTED || port == 0) {
       delay(1000);
       esp_task_wdt_reset();
     }
@@ -431,7 +431,7 @@ void Task2code(void *pvParameters) {
   for (;;) {
     if (ota_state)  // If the OTA is working then reset the watchdog.
       esp_task_wdt_reset();
-    while (wifi_state != WL_CONNECTED) {
+    while (wifi_state != WL_CONNECTED || port == 0) {
       delay(1000);
       esp_task_wdt_reset();
     }
