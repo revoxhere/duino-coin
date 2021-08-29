@@ -1,69 +1,148 @@
-## Table of contents
-- [Commnicating with the master server](#Commnicating-with-the-master-server)
-  * [Socket API](#Socket-API)
-  * [HTTP JSON API](#HTTP-JSON-API)
-  * [REST JSON API](#REST-JSON-API)
-- [C DUCO library](#C-DUCO-library)
-- [Python3 DUCO module](#Python3-DUCO-module)
-- [Branding colors](#Branding)
+<!--
+*** Official Duino-Coin APIs README
+*** by revoxhere, 2021
+-->
 
-## Commnicating with the master server
+<a href="https://duinocoin.com">
+  <img src="api.png" width="215px" align="right"/>
+</a>
 
-### Socket API
 
-To build your own Duino-Coin apps, here's a list of of commands the master server accepts.
-To start communication however, firstly you need to connect to the server. For now you have two options:
-*   TCP connection
-    * `tcp://51.15.127.80:2811` - General purpose port
-    * `tcp://51.15.127.80:2812` - General purpose port
-    * `tcp://51.15.127.80:2813` - General purpose port
-    * Note: you can also use `server.duinocoin.com` instead of `51.15.127.80`
-*   Secure Websocket sonnection (SSL required)
-    *  `wss://server.duinocoin.com:14808` - Proxied to **pulsepool** for webmining
-    *  `wss://server.duinocoin.com:15808` - General purpose port used for wallets
+<a href="https://duinocoin.com">
+  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" width="430px"/>
+</a>
 
-**Make sure you don't create more more than 50 connections in time shorter than 30 seconds.**
-If you do that, the server may ban your IP for creating too much traffic and being a potential DDoS attacker.
+## Official docs for developers
 
-After connecting, the server will send its version number it's currently on (2.4).
-At this point you can send `LOGI` or `REGI` request to login or register an account or `JOB,username` to receive job for mining.
-To login, send `LOGI,username,password` - replace username and password with credentials. After sucessfull login server will send `OK`.
-If login fails, server will send `NO,Reason of failed login`.
+This branch of the Duino-Coin repository contains documentation for public API calls and links to external libraries that can be useful for anyone trying to make their own Duino-related app.
 
-To register, send `REGI,username,password,email` - again, by replacing the placeholders with the respective data.
-After sucessful registration, the server will send `OK`.
-If the registration fails, the server will send `NO,Reason of failed registration`.
+### Table of contents
 
-After loging-in you have access to the following commands:
-*   `PING` - Server will return "Pong!" message ASAP 
-*   `BALA` - Server will return balance of current user
-*   `ESTP,username` - Server will return the 24h estimated profits of user
-*   `UEXI,username` - Server will check if the user is registered and return `NO,User is not registered` or `OK,User is registered`
-*   `JOB,username` (or `JOBXX,username` for XXHASH) - Server will return job for mining using DUCO-S1 (-S1A)
-    *   You can ask for a specific mining difficulty: `JOB,username,DIFF` (if you don't ask for a specific difficulty, the network diff will be given) where diff is one of the below:
-        * `AVR`     - diff      6 - used for mining on Arduino, AVR boards
-        * `ARM`     - diff    500 - not used anywhere officially yet
-        * `DUE`     - diff   1000 - planned for mining on Arduino Due boards
-        * `ESP8266` - diff   1500 - used for mining on ESP8266 boards 
-        * `ESP32`   - diff   2400 - used for mining on ESP32 boards
-        * `LOW`     - diff   7.5k - used for mining on Web Miner, RPis, PC
-        * `MEDIUM`  - diff    75k - used for mining on PC
-        * `NET`     - diff  ~500k - used for mining on PC (network difficulty)
-        * `EXTREME` - diff    1M+ - not used anywhere officially yet
-    *   When sending the mining result, you can pass the hashrate count and the name of the miner along with rig name to display in the API, e.g.`6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s) and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner"
-        *   If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
-        *   If software name is not received, server uses `"Software": "Unknown"` in the API
-        *   If rig name is not received, server uses `"Identifier": "None"` in the API
-*   `JOBXX` - Server will return job for mining using XXHASH algorithm; documentation is the same as with DUCO-S1 job protocol
-*   `SEND,message,recipients_username,amount` - Send funds to someone, the server will return a message about the state of the transaction
-*   `GTXL,username,num` - Get last *num* of transactions involving *username* (both deposits and withdrawals)
-*   `CHGP,oldPassword,newPassword` - Change password of current user
-*   `WRAP,amount,tronAddress` - Wrap DUCO on Tron network (wDUCO)
-*    wDUCO unwrapping:
-     1.  Send a Tron transaction with method `initiateWithdraw(duco_username,amount)`
-     2.  Send a server call `UNWRAP,amount,tron_address`
+- Commnicating with the master server
+  - Over a [TCP connection](#TCP-connection)
+  - Over a [WebSocket connecton](#WebSocket-connection)
+  - List of [server commands](#Server-commands)
+- Duino-Coin [REST API](#REST-API)
+- Duino-Coin [JSON user data](#JSON-data)
+- Icons, colors - [branding](#Branding)
 
-### HTTP JSON API
+##
+
+### TCP connection
+
+Before starting, make sure your app doesn't create more more than 50 connections in time shorter than 30 seconds,
+if you do that, the server may ban your IP address for creating too much traffic.
+
+To communicate with the master server, create a simple tcp connection to one of the following addresses:
+
+* `51.15.127.80:2811`
+* `51.15.127.80:2812`
+* `51.15.127.80:2813`
+* `51.15.127.80:2814`
+* `51.15.127.80:2815`
+
+Note: you can also use `server.duinocoin.com` instead of `51.15.127.80`
+
+### WebSocket connection
+
+To communicate with the master server, create a secure websocket (wss) connection to one of the following addresses:
+
+*  `wss://server.duinocoin.com:14808` - Proxied to PulsePool - **only mining commands accepted**
+*  `wss://server.duinocoin.com:15808`
+
+### Server commands
+
+Right after connecting, the server will send its version, e.g. `2.4`.
+
+After connecting you can send `LOGI,username,password` request to login or `REGI,username,password,email` to request registration of a new account (see below).<br>
+You can also send `JOB` request to receive job for mining.
+
+#### Auth
+
+To login, send `LOGI,username,password` - replace username and password with credentials.<br>
+After sucessfull login server will send `OK`.<br>
+If login fails, server will send `NO,reason of failed login`.
+
+#### Registration
+
+To register, send `REGI,username,password,email` - replace the placeholders with the respective data.<br>
+After sucessful registration, the server will send `OK`.<br>
+If the registration fails, the server will send `NO,reason of failed registration`.
+
+### Other commands
+
+These commands are only available after a successfull login:
+
+#### Ping
+
+After sending `PING` the srver will return `Pong!` as fast as it can
+
+#### User balance
+
+After sending `BALA` the server will return balance of the current logged-in user
+
+#### User exists
+
+After sending `UEXI,username` the server will check if the user is registered.<br>
+If this wallet is taken, the reply will be `NO,User is not registered`<br>
+If not, the response will be `OK,User is registered`.<br>
+
+#### DUCO-S1 Mining
+
+After sending `JOB,username` (or `JOBXX,username` for XXHASH) the server will return job for mining using DUCO-S1.<br>
+You can ask for a specific **start** difficulty: `JOB,username,diff` where diff is one of the below:
+* `LOW` - used for mining on Web Miner, RPis, PC
+* `MEDIUM` - used for mining on PC
+* `NET` - used for mining on PC (network difficulty)
+* `EXTREME` - not used anywhere officially
+
+When sending the mining result you can pass the hashrate count and the name of the miner along with rig name to display in the API.<br>
+Example: sending `6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s)
+and the name of the software was "My Cool Miner v4.20" with a rig named "House Miner".<br>
+
+If hashrate is not received, server estimates it from time it took to receive share and sets `"Is estimated": "True"` in the API
+If software name is not received, server uses `"Software": "Unknown"` in the API
+If rig name is not received, server uses `"Identifier": "None"` in the API
+
+#### XXHASH Mining
+
+After sending `JOBXX` the server will return job for mining using XXHASH algorithm.<br>
+The documentation is the same as with the DUCO-S1 job protocol but only `XXHASH` difficulty is available.
+
+#### Transfer funds
+
+After sending `SEND,message,recipients_username,amount` the server will attempt to send funds to `recipients_username`.<br>
+The server will return a message about the state of the transaction.<br>
+A successfull transaction will return `OK,Successfully transferred funds,transaction_hash` where transaction_hash is the unique hash of each transaction that
+can be checked in the explorer.
+
+#### Last transactions
+
+After sending `GTXL,username,num` the server will return last `num` of transactions involving `username` (both deposits and withdrawals) in JSON format.
+
+#### Password change 
+
+After sending `CHGP,oldPassword,newPassword` the server will change password of current user.<br>
+
+#### wDUCO wrapping
+
+After sending `WRAP,amount,tronAddress` the server will wrap DUCO on the Tron network (transfer to wDUCO).
+
+#### wDUCO unwrapping
+
+1. Send a Tron transaction - e.g. `initiateWithdraw(duco_username, amount)`
+2. Send `UNWRAP,amount,tron_address` to the server
+
+##
+
+### REST API
+
+Documentation for the DUCO REST api is available here: [duco-rest-api](https://github.com/revoxhere/duco-rest-api).
+To access these functions, just add the query URL after the server address: `https://server.duinocoin.com/<query>`.
+
+##
+
+### JSON data
 
 You can use one of the following links to get some data from Duino-Coin Server:
 *   General statistics & worker API refreshed every 5s
@@ -123,19 +202,8 @@ You can use one of the following links to get some data from Duino-Coin Server:
             "Amount generated": 7.00026306
          }
         ```
-        
-### REST JSON API
 
-Documentation for DUCO REST api is available here: [duco-rest-api](https://github.com/revoxhere/duco-rest-api).
-To access these functions, just add the query URL after the server address: `https://server.duinocoin.com/<query>`.
-
-## C DUCO library
-
-If you want to easily access the Duino-Coin API with your C apps, you can use [libduco](https://github.com/SarahIsWeird/libduco) which is made by [@Sarah](https://github.com/SarahIsWeird/). [@ygboucherk](https://github.com/ygboucherk) is also working on one wich you can access here [duino-coin-C-lib](https://github.com/ygboucherk/duino-coin-C-lib)
-
-## Python3 DUCO module
-
-If you want to easily access the Duino-Coin API with your Python3 apps, [@connorhess](https://github.com/connorhess) made an official module for that here: [duco_api](https://github.com/revoxhere/duino-coin/tree/useful-tools/duco_api).
+##
 
 ## Branding
 
