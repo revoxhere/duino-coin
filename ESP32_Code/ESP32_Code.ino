@@ -4,7 +4,7 @@
   |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \ 
   |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  | 
   `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--' 
-  Official code for ESP32 boards                            version 2.6.4
+  Official code for ESP32 boards                              version 2.7
   
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
@@ -365,8 +365,8 @@ void Task1code(void *pvParameters) {
 
           client_one.flush();
           client_one.print(String(duco_res_one) + "," + String(hashrate_one) +
-                           ",ESP32 CORE1 Miner v2.65," +
-                           String(rig_identifier) + "," +
+                           ",ESP32 Miner v2.7 (core 1)," +
+                           String(rig_identifier) + ",DUCOID" +
                            String((char *)chip_id));  // Send result to server
           Serial.println(F("CORE1 Posting result and waiting for feedback."));
 
@@ -541,8 +541,8 @@ void Task2code(void *pvParameters) {
 
           client.flush();
           client.print(String(duco_res_two) + "," + String(hashrate_two) +
-                       ",ESP32 CORE2 Miner v2.65," + String(rig_identifier) +
-                       "," + String((char *)chip_id));  // Send result to server
+                       ",ESP32 Miner v2.7 (core 2)," + String(rig_identifier) +
+                       ",DUCOID" + String((char *)chip_id));  // Send result to server
           Serial.println(F("CORE2 Posting result and waiting for feedback."));
 
           while (!client.available()) {
@@ -583,7 +583,7 @@ void setup() {
   // disableCore0WDT();
   // disableCore1WDT();
   Serial.begin(500000);  // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP32 Miner v2.65");
+  Serial.println("\n\nDuino-Coin ESP32 Miner v2.7");
 
   WiFi.mode(WIFI_STA);  // Setup ESP in client mode
   btStop();
@@ -594,7 +594,7 @@ void setup() {
       (uint16_t)(chipid >> 32);  // Preparing for printing a 64 bit value (it's
                                  // actually 48 bits long) into a char array
   snprintf(
-      (char *)chip_id, 23, "DUCOID%04X%08X", chip,
+      (char *)chip_id, 23, "%04X%08X", chip,
       (uint32_t)chipid);  // Storing the 48 bit chip chip_id into a char array.
 
   ota_state = false;
