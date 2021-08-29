@@ -585,7 +585,7 @@ class Miner:
 
         if id == 0:
             Client.send("MOTD")
-            motd = Client.recv().replace("\n", "\n\t\t")
+            motd = Client.recv(512).replace("\n", "\n\t\t")
 
             pretty_print("MOTD: " + Fore.RESET + Style.NORMAL + str(motd),
                          "success", "net" + str(id))
