@@ -14,7 +14,7 @@
 
 ## Official docs for developers
 
-This branch of the Duino-Coin repository contains documentation for public API calls and links to external libraries that can be useful for anyone trying to make their own Duino-related app.
+This branch of the Duino-Coin repository contains documentation for public API calls that can be useful for anyone trying to make their own Duino-related app.
 
 ### Table of contents
 
