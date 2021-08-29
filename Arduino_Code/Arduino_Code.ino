@@ -4,7 +4,7 @@
   |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \ 
   |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  | 
   `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--' 
-  Official code for Arduino boards                          version 2.6.5
+  Official code for Arduino boards                            version 2.7
   
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
