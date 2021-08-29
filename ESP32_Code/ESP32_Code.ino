@@ -24,7 +24,7 @@ const char *username = "Your Duino-Coin username";
 const char *rig_identifier = "None";
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 2
-/ Define watchdog timer seconds
+// Define watchdog timer seconds
 #define WDT_TIMEOUT 60
 
 /* WARNING choosing the pool from the device will require at least 4k of dynamic memory on your board
@@ -155,7 +155,7 @@ void UpdateHostPort(String input) {
 // This is the 'new' functionality where the server returns all of the pools and the ESP will iterate through checking for the fastest connection.
 // All it does is sets the host/port global variables for the connection it chooses, then the threads kick in as normal after that
 String getPoolList() {
-	if(strlen(get_pool_list_api)) {
+	if(String(get_pool_list_api).length()) {
 		String pools = "";
 	
 		// Hard code a default for testing until we get a public URL
@@ -175,6 +175,7 @@ String getPoolList() {
 	
 		return pools;
 	}
+
 	String server = "server.duinocoin.com";
 	String uri = "/all_pools";
 	const char* root_ca = \
@@ -979,7 +980,7 @@ void MinerCheckinCode( void * pvParameters ) {
 	
 //	const char* apiUrl = "http://10.10.1.1/api/espCheckin.php"; // the URL of the checking API
 //
-//	unsigned long checkinDelay = 10000; // Check in to the IOT service every 10 seconds
+//	unsigned long checkinDelay = 2000; // Check in to the IOT service every 10 seconds
 //	unsigned long lastCheckin = 0;
 //	unsigned long lastShares = 0;
 //
@@ -1031,6 +1032,7 @@ void MinerCheckinCode( void * pvParameters ) {
 //			lastCheckin = millis();
 //			lastShares = shares_one + shares_two;
 //		}
+//		delay(100);
 //		yield();
 //	}
 }
