@@ -629,6 +629,7 @@ void setup() {
       .onEnd([]() { Serial.println(F("\nEnd")); })
       .onProgress([](unsigned int progress, unsigned int total) {
         Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+        esp_task_wdt_reset();
         ota_state = true;
       })
       .onError([](ota_error_t error) {
