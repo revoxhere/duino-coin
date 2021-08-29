@@ -4,16 +4,13 @@
 -->
 
 <a href="https://duinocoin.com">
-  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" width="215px" align="right"/>
+  <img src="assets/images/web.png" width="215px" align="right"/>
 </a>
 
-<h1>
-  <a href="https://duinocoin.com">
-    <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" width="430px"/>
-  </a>
-  <br>
-</h1>
 
+<a href="https://duinocoin.com">
+  <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" width="430px"/>
+</a>
 
 ## Duino-Coin Website
 
