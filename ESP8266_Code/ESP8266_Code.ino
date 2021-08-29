@@ -1,25 +1,18 @@
-//////////////////////////////////////////////////////////
-//  _____        _                    _____      _
-// |  __ \      (_)                  / ____|    (_)
-// | |  | |_   _ _ _ __   ___ ______| |     ___  _ _ __
-// | |  | | | | | | '_ \ / _ \______| |    / _ \| | '_ \ 
-// | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
-// |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
-//  Code for ESP8266 boards - V2.6.3
-//  © Duino-Coin Community 2019-2021
-//  Distributed under MIT License
-//////////////////////////////////////////////////////////
-//  https://github.com/revoxhere/duino-coin - GitHub
-//  https://duinocoin.com - Official Website
-//  https://discord.gg/k48Ht5y - Discord
-//  https://github.com/revoxhere - @revox
-//  https://github.com/JoyBed - @JoyBed
-//  https://github.com/kickshawprogrammer - @kickshawprogrammer
-//  https://github.com/ricaun - @ricaun
-//////////////////////////////////////////////////////////
-//  If you don't know what to do, visit official website
-//  and navigate to Getting Started page. Happy mining!
-//////////////////////////////////////////////////////////
+/*
+  ,------.          ,--.                       ,-----.       ,--.         
+  |  .-.  \ ,--.,--.`--',--,--,  ,---. ,-----.'  .--./ ,---. `--',--,--,  
+  |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \ 
+  |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  | 
+  `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--' 
+  Official code for ESP8266 boards                            version 2.7
+  
+  Duino-Coin Team & Community 2019-2021 © MIT Licensed
+  https://duinocoin.com
+  https://github.com/revoxhere/duino-coin
+
+  If you don't know where to start, visit official website and navigate to
+  the Getting Started page. Have fun mining!
+*/
 
 #include <ESP8266WiFi.h> // Include WiFi library
 #include <ESP8266mDNS.h> // OTA libraries
@@ -30,17 +23,13 @@
 #include <WiFiClient.h>
 #include <ArduinoJson.h> // https://github.com/bblanchon/ArduinoJson
 
-//////////////////////////////////////////////////////////
-// NOTE: If during compilation, the below line causes a
-// "fatal error: Crypto.h: No such file or directory"
-// message to occur; it means that you do NOT have the
-// latest version of the ESP8266/Arduino Core library.
-//
-// To install/upgrade it, go to the below link and
-// follow the instructions of the readme file:
-//
-//       https://github.com/esp8266/Arduino
-//////////////////////////////////////////////////////////
+/* If during compilation the line below causes a
+"fatal error: Crypto.h: No such file or directory"
+message to occur; it means that you do NOT have the
+latest version of the ESP8266/Arduino Core library.
+To install/upgrade it, go to the below link and
+follow the instructions of the readme file:
+https://github.com/esp8266/Arduino */
 #include <Crypto.h>  // experimental SHA1 crypto library
 using namespace experimental::crypto;
 
@@ -261,7 +250,7 @@ bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
 void setup() {
   // Start serial connection
   Serial.begin(500000);
-  Serial.println("\nDuino-Coin ESP8266 Miner v2.6.3");
+  Serial.println("\nDuino-Coin ESP8266 Miner v2.7");
 
   // Prepare for blink() function
   pinMode(LED_BUILTIN, OUTPUT);
@@ -320,10 +309,10 @@ void loop() {
       client.print(String(duco_numeric_result)
                    + ","
                    + String(hashrate)
-                   + ",ESP8266 Miner v2.63"
+                   + ",ESP8266 Miner v2.7"
                    + ","
                    + String(RIG_IDENTIFIER)
-                   + ","
+                   + ",DUCOID"
                    + String(chipID));
 
       waitForClientData();
