@@ -139,6 +139,7 @@ After doing this, you are good to go with launching the software (just double cl
   *   [duino-tools](https://github.com/kyngs/duino-tools) written in Java by kyngs
   *   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
   *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI Wallet by viktor02
+  *   [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - a Duino-Coin iOS widget by Naphob 
 
   This list will be actively updated. If you want to add software to this list, submit a PR or contact one of the developers.
   You may also view a similar list on the [website](https://duinocoin.com/apps).
