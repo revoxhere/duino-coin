@@ -587,6 +587,10 @@ def mine_avr(com, threadid):
     report_shares = 0
     while True:
         try:
+            ser.close()
+        except:
+            pass
+        try:
             while True:
                 try:
                     ser = Serial(com, baudrate=int(BAUDRATE),
