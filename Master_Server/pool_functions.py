@@ -1,6 +1,6 @@
 import sqlite3
 from server_functions import receive_data, send_data
-from Server import DIFF_INCREASES_PER, CONFIG_BLOCKS, DB_TIMEOUT
+from Server import DIFF_INCREASES_PER, CONFIG_BLOCKS, DB_TIMEOUT, floatmap
 import ast
 import json
 import datetime
@@ -265,41 +265,43 @@ class Pool:
             poolCpu = float(info['cpu'])
             poolRam = float(info['ram'])
             poolConnections = int(info['connections'])
+
+            hide_this_pool = "False"
+            if self.poolID == "pi-pool-1":
+                if poolConnections > 2000:
+                    hide_this_pool = "True"
+
         except Exception as e:
             print(self.poolID, "is having trouble with sending JSON data:", e)
             send_data(data=f"NO,Error: {e}", connection=self.connection)
             return 0, 0, {}, {}, 1
 
-        with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
-            datab = conn.cursor()
-            if poolConnections > 0:
+        try:
+            with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
+                datab = conn.cursor()
                 datab.execute("""UPDATE PoolList 
                     SET cpu = ?, 
                     ram = ?, 
-                    connections = ? 
+                    connections = ?,
+                    hidden = ?
                     WHERE identifier = ?""",
                               (poolCpu,
                                poolRam,
                                poolConnections,
+                               hide_this_pool,
                                self.poolID))
-            else:
-                datab.execute("""UPDATE PoolList 
-                    SET cpu = ?, 
-                    ram = ?
-                    WHERE identifier = ?""",
-                              (poolCpu,
-                               poolRam,
-                               self.poolID))
-            conn.commit()
+                conn.commit()
+        except Exception as e:
+            print(e)
 
         i = 0
         while i < 3:
             try:
                 if self.poolID == "pulse-pool-1":
                     rewards = requests.get(
-                        f"http://{self.poolIP}/rewards.json").json()
+                        f"http://{self.poolIP}/rewards_1.json").json()
                     poolWorkers = requests.get(
-                        f"http://{self.poolIP}/workers.json").json()
+                        f"http://{self.poolIP}/workers_1.json").json()
 
                 elif self.poolID == "pulse-pool-2":
                     rewards = requests.get(
@@ -309,31 +311,17 @@ class Pool:
 
                     ###
 
-                elif self.poolID == "winner-pool-1":
-                    rewards = requests.get(
-                        f"http://{self.poolIP}/rewards.json").json()
-                    poolWorkers = requests.get(
-                        f"http://{self.poolIP}/workers.json").json()
-
-                elif self.poolID == "winner-pool-2":
-                    rewards = requests.get(
-                        f"http://{self.poolIP}/rewards_2.json").json()
-                    poolWorkers = requests.get(
-                        f"http://{self.poolIP}/workers_2.json").json()
-
-                    ###
-
                 elif self.poolID == "beyond-pool-1":
                     rewards = requests.get(
-                        f"http://{self.poolIP}/rewards.json").json()
+                        f"http://{self.poolIP}/rewards_1.json").json()
                     poolWorkers = requests.get(
-                        f"http://{self.poolIP}/workers.json").json()
+                        f"http://{self.poolIP}/workers_1.json").json()
 
                 elif self.poolID == "beyond-pool-2":
                     rewards = requests.get(
-                        f"http://{self.poolIP}/rewards.json").json()
+                        f"http://{self.poolIP}/rewards_1.json").json()
                     poolWorkers = requests.get(
-                        f"http://{self.poolIP}/workers.json").json()
+                        f"http://{self.poolIP}/workers_1.json").json()
 
                     ###
 
