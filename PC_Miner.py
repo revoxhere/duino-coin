@@ -103,7 +103,8 @@ try:
     doing this will generate an error for devices 
     that don't have access to the /proc folder
     """
-    sys.stderr = open(os.devnull, "w")
+    #sys.stderr = open(os.devnull, "w")
+    #print("yeah")
     import psutil
 except ModuleNotFoundError:
     print("Psutil is not installed. "
@@ -633,6 +634,7 @@ class Miner:
         """
         Main section that executes the functionalities from the sections above.
         """
+        
         using_algo = get_string("using_algo")
         if user_settings["algorithm"] == "XXHASH":
             using_algo = get_string("using_algo_xxh")
@@ -784,21 +786,19 @@ class Discord_rp:
                 pass
             sleep(15)
 
-
+Miner.preload()
+p_list = []
 if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
 
     mining_start_time = time()
     cpu = cpuinfo.get_cpu_info()
-
-    p_list = []
     accept = Manager().Value("i", 0)
     reject = Manager().Value("i", 0)
     hashrate = Manager().dict()
 
     signal(SIGINT, handler)
-    Miner.preload()
     user_settings = Miner.load_cfg()
     Miner.greeting()
     fastest_pool = Client.fetch_pool()
@@ -816,3 +816,4 @@ if __name__ == "__main__":
 
     for p in p_list:
         p.join()
+
