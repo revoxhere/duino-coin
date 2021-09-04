@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner v2.7 © MIT licensed
+Duino-Coin Official PC Miner v2.7.1 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -79,7 +79,6 @@ except ModuleNotFoundError:
 
 try:
     import cpuinfo
-    cpu = cpuinfo.get_cpu_info()
 except ModuleNotFoundError:
     print("Cpuinfo is not installed. "
           + "Miner will try to automatically install it "
@@ -97,10 +96,15 @@ except ModuleNotFoundError:
           + "python3 -m pip install pypresence")
     install("pypresence")
 
-working_psutil = True
+psutil_en = True
 try:
-    sys.stderr = open(os.devnull, "w") #Suppress psutil import error output
-    import psutil #Doing this will generate an error for devices that don't have access to the /proc folder
+    """
+    Suppress psutil import error output,
+    doing this will generate an error for devices 
+    that don't have access to the /proc folder
+    """
+    sys.stderr = open(os.devnull, "w")
+    import psutil
 except ModuleNotFoundError:
     print("Psutil is not installed. "
           + "Miner will try to automatically install it "
@@ -109,12 +113,11 @@ except ModuleNotFoundError:
     install("psutil")
 
 try:
-    psutil.cpu_percent() #Try to generate the error again
-except: #Catch it this time
-    sys.stderr = sys.__stderr__ #Resumes output
-    working_psutil = False
-    print("Looks like psutil is having trouble retrieving cpu info. If you are running the miner on Termux, ignore this message. Proceeding...")
-
+    psutil.cpu_percent()
+except:
+    sys.stderr = sys.__stderr__
+    psutil_en = False
+    print("Psutil disabled")
 
 
 class Settings:
@@ -123,7 +126,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 2.7
+    VER = 2.71
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -157,7 +160,7 @@ class Algorithms:
 
         for nonce in range(100 * diff + 1):
             if (int(eff) != 100 and nonce % (1_000 * int(eff)) == 0):
-                if working_psutil != False:
+                if psutil_en:
                     if psutil.cpu_percent() > int(eff):
                         sleep(1/100*int(eff))
 
@@ -178,7 +181,7 @@ class Algorithms:
         for nonce in range(100 * diff + 1):
             if (int(eff) != 100
                     and nonce % (1_000 * int(eff)) == 0):
-                if working_psutil != False:
+                if psutil_en:
                     if psutil.cpu_percent() > int(eff):
                         sleep(1/100/int(eff))
 
@@ -201,6 +204,7 @@ class Client:
         global s
         s = socket()
         s.connect((pool))
+        s.settimeout(SOC_TIMEOUT)
 
     def send(msg: str):
         sent = s.sendall(str(msg).encode(Settings.ENCODING))
@@ -402,7 +406,7 @@ class Miner:
                   + " translation: " + Fore.YELLOW
                   + get_string("translation_autor"))
 
-        if working_psutil != False:
+        if psutil_en:
             print(Style.DIM + Fore.YELLOW + Settings.BLOCK
                   + Style.NORMAL + Fore.RESET + "CPU: " + Style.BRIGHT
                   + Fore.YELLOW + str(user_settings["threads"])
@@ -517,16 +521,17 @@ class Miner:
                       + get_string("recommended")
                       + ")\n" + Style.BRIGHT
                       + "2" + Style.NORMAL + " - XXHASH")
-                algorithm = sub(r"\D", "",
-                                input(get_string("ask_algorithm")
-                                      + Style.BRIGHT))
-                if algorithm == "2":
+                prompt = sub(r"\D", "",
+                             input(get_string("ask_algorithm")
+                                   + Style.BRIGHT))
+                if prompt == "2":
                     algorithm = "XXHASH"
 
             intensity = None
-            if working_psutil != False:
+            if psutil_en:
                 intensity = sub(r"\D", "",
-                                input(Style.NORMAL + get_string("ask_intensity")
+                                input(Style.NORMAL
+                                      + get_string("ask_intensity")
                                        + Style.BRIGHT))
 
             if not intensity:
@@ -738,12 +743,13 @@ class Miner:
                                 break
                             break
                     except Exception as e:
-                        pretty_print(get_string("error_while_mining") + str(e),
-                                     "error", "net" + str(id))
+                        pretty_print(get_string("error_while_mining")
+                                     + " " + str(e), "error", "net" + str(id))
                         sleep(5)
                         break
             except Exception as e:
                 pass
+
 
 class Discord_rp:
     def connect():
@@ -780,7 +786,12 @@ class Discord_rp:
 
 
 if __name__ == "__main__":
+    from multiprocessing import freeze_support
+    freeze_support()
+
     mining_start_time = time()
+    cpu = cpuinfo.get_cpu_info()
+
     p_list = []
     accept = Manager().Value("i", 0)
     reject = Manager().Value("i", 0)
