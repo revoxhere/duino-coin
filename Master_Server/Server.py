@@ -7,7 +7,7 @@
 #############################################
 
 #import gevent.monkey
-#gevent.monkey.patch_all()
+# gevent.monkey.patch_all()
 
 import threading
 import multiprocessing
@@ -72,7 +72,7 @@ PORTS = [
     2814,  # General purpose
     2815,  # General purpose
 ]
-SERVER_VER = 2.6  # announced to clients
+SERVER_VER = 2.7  # announced to clients
 SAVE_TIME = 10  # in seconds
 MAX_WORKERS = 150
 BCRYPT_ROUNDS = 6
@@ -104,7 +104,7 @@ Gevent
 BACKLOG = None  # spawn connection instantly
 POOL_SIZE = None
 SOCKET_TIMEOUT = 15
-DB_TIMEOUT = 5
+DB_TIMEOUT = 10
 
 
 """
@@ -122,6 +122,7 @@ CONFIG_JAIL = CONFIG_BASE_DIR + "/jailed.txt"
 CONFIG_WHITELIST = CONFIG_BASE_DIR + "/whitelisted.txt"
 CONFIG_WHITELIST_USR = CONFIG_BASE_DIR + "/whitelistedUsernames.txt"
 API_JSON_URI = "api.json"
+CONFIG_JAIL_DUMP = "/home/debian/websites/poolsyncdata/jailed.json"
 
 config = configparser.ConfigParser()
 try:
@@ -179,53 +180,63 @@ cached_balances, cached_logins = {}, {}
 lock = threading.Lock()
 last_block = "DUCO-S1"
 
-# Registration email - text version
-text = """\
-Hi there!
-Your e-mail address has been successfully verified
-and you are now registered on the Duino-Coin network!
-We hope you'll have a great time using Duino-Coin.
-If you have any difficulties there are a lot of guides
-on our website: https://duinocoin.com/getting-started
-You can also join our Discord server:
-https://discord.gg/duinocoin to chat, take part in
-giveaways, trade and get help from other Duino-Coin users.
-Happy mining!
-Sincerely, the Duino-Coin Team
-"""
-
 # Registration email - HTML version
 html = """\
 <html>
   <body>
     <img src="https://github.com/revoxhere/duino-coin/raw/master/Resources/ducobanner.png?raw=true"
     width="360px" height="auto"><br>
-    <h3>Hi there!</h3>
-    <h4>Your e-mail address has been successfully verified
-    and you are now registered on the Duino-Coin network!</h4>
-    <p>We hope you'll have a great time using Duino-Coin.
-    <br>If you have any difficulties there are a lot of
-    <a href="https://duinocoin.com/getting-started">guides
-    on our website</a>.<br>
-       You can also join our
-       <a href="https://discord.gg/duinocoin">Discord server</a>
-       to chat, take part in giveaways, trade and get
-       help from other Duino-Coin users.<br><br>
-       Happy mining!<br>
-       <italic>Sincerely, the Duino-Coin Team</italic>
+    <h1 style="color: #e67e22">
+        Hi there, {user} 👋
+    </h1>
+    <p style="font-size:1.2em">
+        We're just letting you know that your wallet has been successfully verified
+        and you are now registered on the <b>DUCO</b> network 😎
+        <br><br>
+        We hope you'll have a great time using <b>Duino-Coin</b>.<br>
+        💡 If you're just starting out, we recommend taking a look at our
+        <a href="https://duinocoin.com/getting-started">
+            getting started guides
+        </a>
+        on our website.<br>
+        💬 You can also join our
+        <a href="https://discord.gg/duinocoin">
+            Discord server
+        </a>
+        to chat, take part in giveaways, trade and get
+        help from other <b>Duino-Coin</b> users.<br>
+        You can also reply to this email at any time if you need any specific help ✔️<br>
+        Happy mining!<br><br>
+        <span style="color: #e67e22">
+            Sincerely, <a href="https://duinocoin.com/team">the Duino-Coin Team</a>
+        </span>
     </p>
   </body>
 </html>
 """
 
-# Ban email - text version
-textBan = """\
-Hi there!
-We have noticed behavior on your account that
-does not comply with our terms of service.
-As a result, your account has been
-permanently banned.
-Sincerely, hte Duino-Coin Team
+html_ver = """\
+<html>
+  <body>
+    <h1 style="color: #ff57b9">
+        Hi there, {user} 👋
+    </h1>
+    <p style="font-size:1.2em">
+        We have noticed that you're a really active miner with lots of workers, and that's cool! 😎<br>
+        But because we are struggling with the cheater problem, we are asking you to <b>send us a photo of your rig 📷</b>
+        to verify you're not using any emulation softwares. Don't worry - we will not save the image, it's just for checking if you're using real hardware.<br>
+        It would be cool if you <b>showed your Duino username</b> somewhere in the photo.<br><br>
+        If you don't send the photo within the next 3 days we will need to close your account or disable it until you pass this verification.<br>
+    </p>
+    <br>
+    <p>
+        You can reply to this email if you need any additional help ✔<br>
+        <span style="color: #ff57b9">
+            Thank you for using DUCO Exchange 😊
+        </span>
+    </p>
+  </body>
+</html>
 """
 
 # Ban email - HTML version
@@ -234,13 +245,27 @@ htmlBan = """\
   <body>
     <img src="https://github.com/revoxhere/duino-coin/raw/master/Resources/ducobanner.png?raw=true"
     width="360px" height="auto"><br>
-    <h3>Hi there!</h3>
-    <h4>We have noticed behavior on your account that does not comply with our
-    <a href="https://github.com/revoxhere/duino-coin#terms-of-service">
-        terms of service
-    </a>
-    <p>As a result, your account has been permanently banned.<br>
-       <italic>Sincerely, the Duino-Coin Team</italic>
+    <h1 style="color: #e67e22">
+        Hi there, {user} 👋
+    </h1>
+    <p style="font-size:1.2em">
+        We have noticed that behavior on your account that does not comply with our
+        <a href="https://github.com/revoxhere/duino-coin#terms-of-service">
+            terms of service
+        </a> ❌
+        <br><br>
+        This usually narrows down to exploting bugs, using unofficial miners or
+        creating spam and/or multiple wallets.<br>
+        We rarely give bans, but we had to close your account as this behavior is not cool 🚫<br>
+        You should understand that <b>Duino-Coin</b> is a free service and we're all putting our time
+        and efort into making this, while you are just destroying it.<br>
+        If you're jealous, just
+        <a href="https://mlsdev.com/blog/how-to-create-your-own-cryptocurrency">create your own coin</a>.<br>
+        If you're sure that you're not breaking any points of the ToS,
+        you can reply to this email at any time if you need any specific help ✔️
+        <span style="color: #e67e22">
+            Sincerely, <a href="https://duinocoin.com/team">the Duino-Coin Team</a>
+        </span>
     </p>
   </body>
 </html>
@@ -521,7 +546,8 @@ def transaction_queue_handle(queue):
                         datab.execute(queue.get())
                         queue.task_done()
                     except Exception as e:
-                        print(traceback.format_exc())
+                        print("DB ERR:", traceback.format_exc())
+                        sleep(0.1)
                 datab.commit()
 
             timeEnd = time()
@@ -530,14 +556,13 @@ def transaction_queue_handle(queue):
 
             if timeElapsed < SAVE_TIME/2:
                 sleep(SAVE_TIME/2-timeElapsed)
-        sleep(1)
+        sleep(0.1)
 
 
 def database_updater():
     global balance_queue
     while True:
-        qsize = queue.qsize()
-        sleep((qsize*0.01)+1)
+        sleep(queue.qsize()*0.00025)
         try:
             for user in balance_queue.copy():
                 if user in jail:
@@ -549,10 +574,10 @@ def database_updater():
 
                 amount_to_update = balance_queue[user]
 
-                if amount_to_update > 0.03:
-                    amount_to_update = 0.03
+                if amount_to_update > 0.075:
+                    amount_to_update = 0.075
 
-                if amount_to_update > 0:
+                if amount_to_update != 0:
                     increment_balance(user, amount_to_update)
                     balance_queue[user] = 0
 
@@ -680,7 +705,23 @@ def input_management():
             - jail <username> - jails username
             - pass <username> <password> - verify password of user
             - pools - returns info about last pool updates
+            - insert <usr> <pwd> <mail> <bal> - inserts user to db
+            - verify <usr> - send verify request
+            - setv <usr> - set <usr> as verified
+            - unsetv <usr> -set <usr> as unverified
             """)
+
+        elif command[0] == "insert":
+            created = str(now().strftime("%d/%m/%Y %H:%M:%S"))
+            with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                datab = conn.cursor()
+                datab.execute(
+                    """INSERT INTO Users
+                    (username, password, email, balance, created)
+                    VALUES(?, ?, ?, ?, ?)""",
+                    (command[1], command[2], command[3], command[4], created))
+                conn.commit()
+                admin_print("Successfully added user")
 
         elif command[0] == "pools":
             admin_print("Last infos about pool updates:")
@@ -702,6 +743,74 @@ def input_management():
 
         elif command[0] == "ban":
             protocol_ban(command[1])
+
+        elif command[0] == "verify":
+            protocol_verify(command[1])
+
+        elif command[0] == "setv":
+            try:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+                    datab.execute(
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
+                        (command[1],))
+                    verify = str(datab.fetchone()[5])
+
+                admin_print(command[1]
+                            + "'s verification: "
+                            + str(verify)
+                            + ", set it to Yes?")
+
+                confirm = input("  Y/n")
+                if confirm == "Y" or confirm == "y" or confirm == "":
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                        datab = conn.cursor()
+                        datab.execute(
+                            """UPDATE Users
+                            set rig_verified = ?
+                            where username = ?""",
+                            ("Yes", command[1]))
+                        conn.commit()
+                        admin_print("User is now marked as verified")
+                else:
+                    admin_print("Canceled")
+            except Exception as e:
+                admin_print("Error setting verification: " + str(e))
+            protocol_verified_mail(command[1])
+
+        elif command[0] == "unsetv":
+            try:
+                with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                    datab = conn.cursor()
+                    datab.execute(
+                        """SELECT *
+                        FROM Users
+                        WHERE username = ?""",
+                        (command[1],))
+                    verify = str(datab.fetchone()[5])
+
+                admin_print(command[1]
+                            + "'s verification: "
+                            + str(verify)
+                            + ", set it to No?")
+
+                confirm = input("  Y/n")
+                if confirm == "Y" or confirm == "y" or confirm == "":
+                    with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+                        datab = conn.cursor()
+                        datab.execute(
+                            """UPDATE Users
+                            set rig_verified = ?
+                            where username = ?""",
+                            ("No", command[1]))
+                        conn.commit()
+                        admin_print("User is now marked as NOT verified")
+                else:
+                    admin_print("Canceled")
+            except Exception as e:
+                admin_print("Error unsetting verification: " + str(e))
 
         elif command[0] == "exit":
             admin_print("Are you sure you want to exit DUCO server?")
@@ -1036,6 +1145,74 @@ def email_exists(email: str):
             return True
 
 
+def protocol_verified_mail(username: str):
+    try:
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                """SELECT *
+            FROM Users
+            WHERE username = ?""",
+                (username,))
+            email = str(datab.fetchone()[2])
+
+            message = MIMEMultipart("alternative")
+            message["Subject"] = "Your mining rig is now verified ✔️"
+            message["From"] = DUCO_EMAIL
+            message["To"] = email
+
+            email_body = ("Coolio, nice rig {user}! "
+                          + "You're now verified").replace(
+                "{user}", str(username))
+            part = MIMEText(email_body, "html")
+            message.attach(part)
+
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL("smtp.gmail.com",
+                                  465, context=context) as smtpserver:
+                smtpserver.login(DUCO_EMAIL, DUCO_PASS)
+                smtpserver.sendmail(
+                    DUCO_EMAIL, email, message.as_string())
+            admin_print("Sent email to " + str(email))
+    except Exception as e:
+        admin_print("Error sending email: " + str(e))
+
+
+def protocol_verify(username: str):
+    with open("to_verify.txt", 'a') as file:
+        file.write(str(username) + " " + str(now()) + "\n")
+        admin_print("Added username to verify list")
+
+    try:
+        with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
+            datab = conn.cursor()
+            datab.execute(
+                """SELECT *
+            FROM Users
+            WHERE username = ?""",
+                (username,))
+            email = str(datab.fetchone()[2])
+
+            message = MIMEMultipart("alternative")
+            message["Subject"] = "📷 Verify your Duino-Coin mining rig"
+            message["From"] = DUCO_EMAIL
+            message["To"] = email
+
+            email_body = html_ver.replace("{user}", str(username))
+            part = MIMEText(email_body, "html")
+            message.attach(part)
+
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL("smtp.gmail.com",
+                                  465, context=context) as smtpserver:
+                smtpserver.login(DUCO_EMAIL, DUCO_PASS)
+                smtpserver.sendmail(
+                    DUCO_EMAIL, email, message.as_string())
+            admin_print("Sent email to " + str(email))
+    except Exception as e:
+        admin_print("Error sending email: " + str(e))
+
+
 def protocol_ban(username: str):
     with open(CONFIG_BANS, 'a') as bansfile:
         bansfile.write(str(username) + "\n")
@@ -1059,15 +1236,14 @@ def protocol_ban(username: str):
             email = str(datab.fetchone()[2])
 
             message = MIMEMultipart("alternative")
-            message["Subject"] = "ToS violation on account " + \
-                str(username)
+            message["Subject"] = ("❌ Terms of Service violation "
+                                  + "on your Duino-Coin wallet")
             message["From"] = DUCO_EMAIL
             message["To"] = email
 
-            part1 = MIMEText(textBan, "plain")
-            part2 = MIMEText(htmlBan, "html")
-            message.attach(part1)
-            message.attach(part2)
+            email_body = htmlBan.replace("{user}", str(username))
+            part = MIMEText(email_body, "html")
+            message.attach(part)
 
             context = ssl.create_default_context()
             with smtplib.SMTP_SSL("smtp.gmail.com",
@@ -1081,7 +1257,17 @@ def protocol_ban(username: str):
 
     try:
         recipient = "giveaways"
-        global_last_block_hash_cp = global_last_block_hash
+        # Generate TXID
+        import random
+        random = random.randint(0, 77777)
+        if random < 37373:
+            global_last_block_hash_cp = sha1(
+                bytes(str(username)+str(recipient)+str(random),
+                      encoding='ascii')).hexdigest()
+        else:
+            global_last_block_hash_cp = xxh64(
+                bytes(str(username)+str(recipient)+str(random),
+                      encoding='ascii'), seed=2811).hexdigest()
         memo = "Kolka ban"
 
         with sqlconn(DATABASE, timeout=DB_TIMEOUT) as conn:
@@ -1119,20 +1305,8 @@ def protocol_ban(username: str):
                 (round(float(recipientbal), DECIMALS), recipient))
             conn.commit()
 
-        with sqlconn(CONFIG_TRANSACTIONS, timeout=DB_TIMEOUT) as conn:
-            datab = conn.cursor()
-            formatteddatetime = now().strftime("%d/%m/%Y %H:%M:%S")
-            datab.execute(
-                """INSERT INTO Transactions
-                (timestamp, username, recipient, amount, hash, memo)
-                VALUES(?, ?, ?, ?, ?, ?)""",
-                (formatteddatetime,
-                    username,
-                    recipient,
-                    amount,
-                    global_last_block_hash_cp,
-                    memo))
-            conn.commit()
+        create_transaction(username, recipient,
+                           amount, memo)
         admin_print("Transferred balance to giveaways account")
     except Exception as e:
         admin_print("Error transfering balance: " +
@@ -1247,6 +1421,12 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 username = str(data[1])
                 if username == "revox":
                     print("revox connected")
+                else:
+                    send_data(
+                        "BAD,Mining is disabled\n",
+                        connection)
+                    return thread_id
+
                 if not user_exists(username):
                     send_data(
                         "BAD,This user doesn't exist\n",
@@ -1289,12 +1469,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                     if "JOB" in req_difficulty:
                         # Very bad error correction from esps
                         req_difficulty.rstrip("JOB")
-
-                    if "AVR" in req_difficulty:
-                        send_data(
-                        "BAD,AVR mining is disabled\n",
-                            connection)
-                        return thread_id
 
                     if not req_difficulty in job_tiers:
                         req_difficulty = "NET"
@@ -1357,12 +1531,6 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                     perm_ban(ip_addr)
                 return thread_id
 
-       # if req_difficulty != "AVR":
-       #     send_data(
-       #         "BAD,Only AVR mining is enabled on the server",
-       #         connection)
-       #     return thread_id
-
         if (job_tiers[req_difficulty]["difficulty"]
                 > job_tiers["ESP32"]["difficulty"]):
             if using_xxhash:
@@ -1411,6 +1579,12 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 break
         difference = utime.now() - job_sent_timestamp
         sharetime = difference.total_seconds()
+        try:
+            if req_difficulty == "AVR":
+                result[0] = str(int(result[0], 2))
+            print(result[0])
+        except Exception:
+            print(traceback.format_exc())
 
         connection.settimeout(SOCKET_TIMEOUT)
 
@@ -1418,6 +1592,7 @@ def protocol_mine(data, connection, address, using_xxhash=False):
             max_hashrate = job_tiers["XXHASH"]["max_hashrate"]
         else:
             max_hashrate = job_tiers[req_difficulty]["max_hashrate"]
+
         numeric_result = int(job[2])
 
         # Calculating sharetime respecting sleeptime for ping
@@ -1642,10 +1817,10 @@ def scientific_prefix(symbol: str, value: float, accuracy: int):
     Input: symbol to add, value 
     Output rounded value with scientific prefix as string
     """
-    if value >= 900000000:
-        prefix = " G"
-        value = value / 1000000000
-    elif value >= 900000:
+    # if value >= 900000000:
+    #    prefix = " G"
+    #    value = value / 1000000000
+    if value >= 900000:
         prefix = " M"
         value = value / 1000000
     elif value >= 900:
@@ -1826,6 +2001,7 @@ def create_main_api_file():
 
     while True:
         timeS = time()
+        total_hashrate_list = []
         total_hashrate, net_wattage = 0, 0
         ducos1_hashrate, xxhash_hashrate = 0, 0
         minerapi_public, miners_per_user = {}, {}
@@ -1834,15 +2010,34 @@ def create_main_api_file():
             "GPU": 0,
             "CPU": 0,
             "RPi": 0,
+            "Phone": 0,
+            "Web": 0,
             "ESP32": 0,
             "ESP8266": 0,
             "Arduino": 0,
             "Other": 0
         }
-
+        hashrates = {}
         try:
             for miner in minerapi.copy():
                 try:
+                    username = minerapi[miner]["User"]
+
+                    if user_exists(username) and not username in banlist:
+                        try:
+                            miners_per_user[username] += 1
+                        except:
+                            miners_per_user[username] = 1
+                    else:
+                        minerapi.pop(miner)
+                        continue
+
+                    if miners_per_user[username] >= MAX_WORKERS:
+                        balance_queue[username] = balance_queue[username] / 2
+                        minerapi.pop(miner)
+                        miners_per_user[username] = MAX_WORKERS
+                        continue
+
                     # Add miner hashrate to the server hashrate
                     if minerapi[miner]["Algorithm"] == "DUCO-S1":
                         try:
@@ -1861,26 +2056,38 @@ def create_main_api_file():
                     except:
                         software = "?"
                     identifier = minerapi[miner]["Identifier"].upper()
+                    hashrate = minerapi[miner]["Hashrate"]
 
-                    #if ("AVR" in software
-                    #    or "I2C" in software
-                    #        or "ARDUINO" in software):
-                    #    # 0,2W for Arduino @ peak 40mA/5V
-                    #    net_wattage += 0.2
-                    #    miner_dict["Arduino"] += 1
+                    if ("AVR" in software
+                            or "I2C" in software):
+                        if 220 > hashrate > 190:
+                            # 0,2W for Arduino @ peak 40mA/5V
+                            net_wattage += 0.2
+                            miner_dict["Arduino"] += 1
+                        else:
+                            net_wattage += 1
+                            miner_dict["Other"] += 1
 
-                    if "ESP32" in software:
+                    elif ("ESP32" in software
+                          and hashrate < 17000):
                         # 1,4W (but 2 cores) for ESP32 @ peak 480mA/3,3V
                         net_wattage += 0.7
                         miner_dict["ESP32"] += 1
 
-                    elif "ESP8266" in software:
+                    elif ("ESP8266" in software
+                          and hashrate < 11000):
                         # 1,3W for ESP8266 @ peak 400mA/3,3V
                         net_wattage += 1.3
                         miner_dict["ESP8266"] += 1
 
+                    elif "WEBMINER" in software:
+                        net_wattage += 1
+                        miner_dict["Web"] += 1
+
                     elif ("PC" in software
-                          or "WEB" in software):
+                          or "DOCKER" in software
+                          or "NONCE" in software
+                          or "ROUTER" in sotware):
                         if ("RASPBERRY" in identifier
                                 or "PI" in identifier):
                             # 3,875 for one Pi4 core - Pi4 max 15,8W
@@ -1898,23 +2105,23 @@ def create_main_api_file():
                         net_wattage += 50
                         miner_dict["GPU"] += 1
 
-                    else:
-                        net_wattage += 5
-                        miner_dict["Other"] += 1
+                    elif ("ANDROID" in software
+                          or "PHONE" in software):
+                        net_wattage += 1
+                        miner_dict["Phone"] += 1
 
-                    username = minerapi[miner]["User"]
-                    try:
-                        miners_per_user[username] += 1
-                    except:
-                        miners_per_user[username] = 1
+                    else:
+                        net_wattage += 1
+                        miner_dict["Other"] += 1
 
                 except Exception as e:
                     pass
 
             net_wattage = scientific_prefix("W", net_wattage, 2)
 
-            total_hashrate = xxhash_hashrate + ducos1_hashrate
-            total_hashrate = scientific_prefix("H/s", total_hashrate, 4)
+            total_hashrate_list.append(xxhash_hashrate + ducos1_hashrate)
+            total_hashrate = scientific_prefix(
+                "H/s", mean(total_hashrate_list[-50:]), 4)
 
             xxhash_hashrate = scientific_prefix("H/s", xxhash_hashrate, 1)
             ducos1_hashrate = scientific_prefix("H/s", ducos1_hashrate, 1)
@@ -1935,7 +2142,7 @@ def create_main_api_file():
             current_time = now().strftime("%d/%m/%Y %H:%M:%S (UTC)")
             max_price = duco_prices[max(duco_prices, key=duco_prices.get)]
 
-            duco_prices["pancake"] = 0.00314783
+            duco_prices["pancake"] = 0.00188540
 
             server_api = {
                 "Duino-Coin Server API": "github.com/revoxhere/duino-coin",
@@ -1968,7 +2175,7 @@ def create_main_api_file():
                 "Kolka":                 kolka_dict,
                 "Miner distribution":    miner_dict,
                 "Top 10 richest miners": get_richest_users(10),
-                "Active workers":        miners_per_user
+                # "Active workers":        miners_per_user
             }
 
             with open(API_JSON_URI, 'w') as outfile:
@@ -2002,34 +2209,39 @@ def create_minerapi():
         d2 = time()
         for threadid in minerapi.copy():
             try:
-                soft = minerapi[threadid]["Software"]
-            except:
-                soft = "?"
-            try:
-                memory_datab.execute(
-                    """INSERT INTO Miners
-                    (threadid, username, hashrate,
-                    sharetime, accepted, rejected,
-                    diff, software, identifier, algorithm)
-                    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (
-                        threadid,
-                        minerapi[threadid]["User"],
-                        minerapi[threadid]["Hashrate"],
-                        minerapi[threadid]["Sharetime"],
-                        minerapi[threadid]["Accepted"],
-                        minerapi[threadid]["Rejected"],
-                        minerapi[threadid]["Diff"],
-                        soft,
-                        minerapi[threadid]["Identifier"],
-                        minerapi[threadid]["Algorithm"]
-                    )
-                )
-
-                d1 = minerapi[threadid]["Timestamp"]
-                rd = d2-d1
-                if rd > 90:
-                    # Pop inactive miners from the API
+                if ("luna" in minerapi[threadid]["Software"] or
+                        "luna" in minerapi[threadid]["Identifier"]):
                     minerapi.pop(threadid)
+                else:
+                    memory_datab.execute(
+                        """INSERT INTO Miners
+                        (threadid, username, hashrate,
+                        sharetime, accepted, rejected,
+                        diff, software, identifier, algorithm)
+                        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (
+                            threadid,
+                            minerapi[threadid]["User"],
+                            minerapi[threadid]["Hashrate"],
+                            minerapi[threadid]["Sharetime"],
+                            minerapi[threadid]["Accepted"],
+                            minerapi[threadid]["Rejected"],
+                            minerapi[threadid]["Diff"],
+                            minerapi[threadid]["Software"],
+                            minerapi[threadid]["Identifier"],
+                            minerapi[threadid]["Algorithm"]
+                        )
+                    )
+
+                    # Pop inactive miners from the API
+                    soft = minerapi[threadid]["Software"].upper()
+                    d1 = minerapi[threadid]["Timestamp"]
+                    rd = d2-d1
+                    if ("PC" in soft or "ANDROID" in soft):
+                        if rd > 90:
+                            minerapi.pop(threadid)
+                    else:
+                        if rd > 45:
+                            minerapi.pop(threadid)
             except Exception as e:
                 pass
         memory.commit()
@@ -2125,28 +2337,27 @@ def protocol_login(data, connection):
 
 def send_registration_email(username, email):
     message = MIMEMultipart("alternative")
-    message["Subject"] = ("Welcome on the Duino-Coin network, "
+    message["Subject"] = (u"\U0001F44B" +
+                          " Welcome on the Duino-Coin network, "
                           + str(username)
-                          + "! "
-                          + u"\U0001F44B")
+                          + "!")
     try:
         message["From"] = DUCO_EMAIL
         message["To"] = email
-        part1 = MIMEText(text, "plain")
-        part2 = MIMEText(html, "html")
-        message.attach(part1)
-        message.attach(part2)
-        context = ssl.create_default_context()
 
+        email_body = html.replace("{user}", str(username))
+        part = MIMEText(email_body, "html")
+        message.attach(part)
+
+        context = ssl.create_default_context()
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as smtp:
             smtp.login(
                 DUCO_EMAIL, DUCO_PASS)
             smtp.sendmail(
                 DUCO_EMAIL, email, message.as_string())
-            # admin_print("Sent registration email to " + email)
             return True
     except Exception as e:
-        # admin_print("Error sending registration email:", e)
+        print(traceback.format_exc())
         return False
 
 
@@ -2239,8 +2450,22 @@ def protocol_send_funds(data, connection, username):
     Transfers funds from one account to another
     """
     try:
-        global_last_block_hash_cp = global_last_block_hash
+        # Generate TXID
+        import random
+        random = random.randint(0, 77777)
+        if random < 37373:
+            global_last_block_hash_cp = sha1(
+                bytes(str(username)+str(data)+str(random),
+                      encoding='ascii')).hexdigest()
+        else:
+            global_last_block_hash_cp = xxh64(
+                bytes(str(username)+str(data)+str(random),
+                      encoding='ascii'), seed=2811).hexdigest()
+
         memo = sub(r'[^A-Za-z0-9 .()-:/!#_+-]+', ' ', str(data[1]))
+        if len(str(memo)) > 256:
+            memo = str(memo[0:256]) + "..."
+
         recipient = str(data[2])
 
         try:
@@ -2735,19 +2960,19 @@ def handle(connection, address):
                 it's not our job so we pass him to the
                 DUCO-S1 job handler 
                 """
-                #thread_id = protocol_mine(data, connection, address)
-                #username = data[1]
-                send_data("BAD,Please mine on the pool", connection)
+                thread_id = protocol_mine(data, connection, address)
+                username = data[1]
+                #send_data("BAD,Please mine on the pool", connection)
                 break
 
             elif data[0] == "JOBXX":
                 """ 
                 Same situation as above, just use the XXHASH switch 
                 """
-                # thread_id = protocol_mine(
-                #    data, connection, address, using_xxhash=True)
-                #username = data[1]
-                send_data("BAD,Please mine on the pool", connection)
+                thread_id = protocol_mine(
+                    data, connection, address, using_xxhash=True)
+                username = data[1]
+                #send_data("BAD,Please mine on the pool", connection)
                 break
 
             # USER FUNCTIONS
@@ -3136,11 +3361,27 @@ def load_configfiles():
             jail.append(username)
         admin_print("Successfully loaded jailed usernames file")
 
+    with open(CONFIG_JAIL_DUMP, 'w') as outfile:
+        json.dump(
+            jailedusr,
+            outfile,
+            indent=4,
+            ensure_ascii=False
+        )
+
     with open(CONFIG_BANS, "r") as bannedusrfile:
         bannedusr = bannedusrfile.read().splitlines()
         for username in bannedusr:
             banlist.append(username)
         admin_print("Successfully loaded banned usernames file")
+
+    with open('/home/debian/websites/poolsyncdata/bans.json', 'w') as outfile:
+        json.dump(
+            bannedusr,
+            outfile,
+            indent=4,
+            ensure_ascii=False
+        )
 
     with open(CONFIG_WHITELIST, "r") as whitelistfile:
         whitelisted = whitelistfile.read().splitlines()
