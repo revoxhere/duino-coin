@@ -589,7 +589,25 @@ def mine_avr(com, threadid):
         try:
             while True:
                 try:
-                    # Default AVR mining port
+                    ser = Serial(com, baudrate=int(BAUDRATE),
+                                 timeout=float(AVR_TIMEOUT))
+                    break
+                except Exception as e:
+                    pretty_print(
+                        'usb'
+                        + str(''.join(filter(str.isdigit, com))),
+                        get_string('board_connection_error')
+                        + str(com)
+                        + get_string('board_connection_error2')
+                        + Style.NORMAL
+                        + Fore.RESET
+                        + ' (port connection err: '
+                        + str(e)
+                        + ')',
+                        'error')
+                    sleep(10)
+            while True:
+                try:
                     debug_output('Connecting to ' +
                                  str(NODE_ADDRESS + ":" + str(NODE_PORT)))
                     soc = socket()
@@ -663,7 +681,7 @@ def mine_avr(com, threadid):
                 debug_output(com + ': requested job from the server')
                 soc.sendall(
                     bytes(
-                        'JOBAVR,'
+                        'JOB,'
                         + str(username)
                         + ',AVR',
                         encoding='ascii'))
@@ -686,32 +704,6 @@ def mine_avr(com, threadid):
                     sleep(3)
 
                 while True:
-                    while True:
-                        try:
-                            ser.close()
-                        except:
-                            pass
-
-                        try:
-                            ser = Serial(com,
-                                         baudrate=int(BAUDRATE),
-                                         timeout=float(AVR_TIMEOUT))
-                            break
-                        except Exception as e:
-                            pretty_print(
-                                'usb'
-                                + str(''.join(filter(str.isdigit, com))),
-                                get_string('board_connection_error')
-                                + str(com)
-                                + get_string('board_connection_error2')
-                                + Style.NORMAL
-                                + Fore.RESET
-                                + ' (port connection err: '
-                                + str(e)
-                                + ')',
-                                'error')
-                            sleep(10)
-
                     while True:
                         retry_counter = 0
                         while True:
@@ -759,15 +751,18 @@ def mine_avr(com, threadid):
 
                         try:
                             # Convert AVR time to seconds
-                            computetime = round(int(result[1], 2) / 1000000, 3)
-                            if computetime < 1:
+                            computetime_i = round(
+                                int(result[1], 2) / 1000000, 3)
+                            if computetime_i < 1:
                                 computetime = str(
-                                    int(computetime * 1000)) + "ms"
+                                    int(computetime_i * 1000)) + "ms"
                             else:
-                                computetime = str(round(computetime, 2)) + "s"
+                                computetime = str(
+                                    round(computetime_i, 2)) + "s"
+
+                            num_res = int(result[0], 2)
                             # Calculate hashrate
-                            hashrate_t = round(
-                                int(result[0], 2) * 1000000 / int(result[1], 2), 2)
+                            hashrate_t = round(num_res / computetime_i, 2)
                             hashrate_mean.append(hashrate_t)
                             # Get average from the last hashrate measurements
                             hashrate = mean(hashrate_mean[-5:])
@@ -775,27 +770,7 @@ def mine_avr(com, threadid):
                                 com +
                                 ': calculated hashrate (' +
                                 str(hashrate_t) + ')'
-                                + ' (avg:' + str(hashrate) + ')')
-
-                            try:
-                                debug_output(
-                                    com + ': chip ID: ' + str(result[2]))
-                                """ Check if chipID got received, this is 
-                                    of course just a fraction of what's 
-                                    happening on the server with it """
-                                if not result[2].startswith('DUCOID'):
-                                    raise Exception('Wrong chipID string')
-                            except Exception:
-                                pretty_print(
-                                    'usb'
-                                    + str(''.join(filter(str.isdigit, com))),
-                                    ' Possible incorrect chip ID!'
-                                    + Style.NORMAL
-                                    + Fore.RESET
-                                    + ' This can cause problems with the'
-                                    + ' Kolka system',
-                                    'warning')
-                                result[2] = 'None'
+                                + ' (avg: ' + str(hashrate) + ')')
                             break
                         except Exception as e:
                             pretty_print(
@@ -812,14 +787,15 @@ def mine_avr(com, threadid):
                             debug_output(
                                 com + ': error splitting data: ' + str(e))
                             sleep(1)
+                            break
 
                     try:
                         # Send result to the server
                         soc.sendall(
                             bytes(
-                                str(result[0])
+                                str(num_res)
                                 + ','
-                                + str(result[1])
+                                + str(hashrate_t)
                                 + ',Official AVR Miner v'
                                 + str(MINER_VER)
                                 + ','
@@ -1125,6 +1101,7 @@ def fetch_pools():
 
             NODE_ADDRESS = response["ip"]
             NODE_PORT = response["port"]
+            debug_output("Fetched " + str(response["name"]))
 
             return NODE_ADDRESS, NODE_PORT
         except Exception as e:
@@ -1177,7 +1154,6 @@ if __name__ == '__main__':
     try:
         NODE_ADDRESS, NODE_PORT = fetch_pools()
     except Exception as e:
-        print(e)
         NODE_ADDRESS = "server.duinocoin.com"
         NODE_PORT = 2813
         debug_output("Using default server port and address")
