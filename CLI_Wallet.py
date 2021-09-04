@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##########################################
-# Duino-Coin CLI Wallet (v2.5.6)
+# Duino-Coin CLI Wallet (v2.7.1)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
 # © Duino-Coin Community 2021
@@ -37,10 +37,10 @@ except:
 wrong_passphrase = False
 iterations = 100_000
 timeout = 30  # Socket timeout
-VER = 2.56
+VER = 2.71
 RESOURCES_DIR = 'CLI_Wallet_' + str(VER) + '_resources'
 use_wrapper = False
-WS_URI = "wss://server.duinocoin.com:15808"
+WS_URI = "ws://server.duinocoin.com:15808"
 config = configparser.ConfigParser()
 
 # Check if the resources folder exists, and makes one if not
@@ -259,8 +259,7 @@ signal(SIGINT, handler)  # Enable signal handler
 while True:
     try:
         wss_conn = websocket.create_connection(WS_URI)
-        wss_conn.settimeout(timeout)
-        SERVER_VER = wss_conn.recv().rstrip("\n")
+        SERVER_VER = wss_conn.recv().decode()
 
         jsonapi = requests.get(
             "https://raw.githubusercontent.com/"
@@ -297,7 +296,7 @@ def reconnect():
             # Try to connect
             wss_conn = websocket.create_connection(WS_URI)
             wss_conn.settimeout(timeout)
-            SERVER_VER = wss_conn.recv().rstrip("\n")
+            SERVER_VER = wss_conn.recv().decode().rstrip("\n")
 
             jsonapi = requests.get(
                 "https://raw.githubusercontent.com/"
@@ -359,7 +358,8 @@ while True:
                         + str(password)
                         + str(",placeholder"),
                         encoding="utf8"))
-                    loginFeedback = wss_conn.recv().rstrip("\n").split(",")
+                    loginFeedback = wss_conn.recv().decode()
+                    loginFeedback = loginFeedback.rstrip("\n").split(",")
                     server_timeout = False
 
                     if loginFeedback[0] == "OK":
@@ -434,7 +434,8 @@ while True:
                         + str(email),
                         encoding="utf8"))
 
-                    regiFeedback = wss_conn.recv().rstrip("\n").split(",")
+                    regiFeedback = wss_conn.recv().decode()
+                    regiFeedback = regiFeedback.rstrip("\n").split(",")
 
                     if regiFeedback[0] == "OK":
                         print(Style.RESET_ALL
@@ -479,11 +480,11 @@ while True:
             else:
                 try:
                     priv_key = password_decrypt(
-                            config["wrapper"]["priv_key"],
-                            b64decode(
-                                config["wallet"]["password"]
-                            ).decode("utf8")
-                        ).decode(utf8)
+                        config["wrapper"]["priv_key"],
+                        b64decode(
+                            config["wallet"]["password"]
+                        ).decode("utf8")
+                    ).decode(utf8)
                 except InvalidToken:
                     print(getString("invalid_passphrase_wrapper"))
                     use_wrapper = False
@@ -532,7 +533,7 @@ while True:
                 + str(",placeholder"),
                 encoding="utf8"))
 
-            loginFeedback = wss_conn.recv().rstrip("\n").split(",")
+            loginFeedback = wss_conn.recv().decode().rstrip("\n").split(",")
             if loginFeedback[0] == "OK":
                 break
             else:
@@ -554,7 +555,7 @@ while True:
                     wss_conn = reconnect()
                 try:
                     balance = round(
-                        float(wss_conn.recv().rstrip("\n")), 8)
+                        float(wss_conn.recv().decode().rstrip("\n")), 8)
                     balanceusd = round(
                         float(balance) * float(ducofiat), 6)
                     break
@@ -683,7 +684,7 @@ while True:
                     + str(amount),
                     encoding="utf8"))
                 while True:
-                    message = wss_conn.recv().rstrip("\n")
+                    message = wss_conn.recv().decode().rstrip("\n")
                     print(Style.RESET_ALL
                           + Fore.BLUE
                           + getString("server_message")
@@ -712,7 +713,7 @@ while True:
                     encoding="utf8"))
 
                 while True:
-                    message = wss_conn.recv().rstrip("\n")
+                    message = wss_conn.recv().decode().rstrip("\n")
                     print(Style.RESET_ALL
                           + Fore.BLUE
                           + getString("server_message")
@@ -882,7 +883,8 @@ while True:
 
                     try:
                         wss_conn.send(bytes("BALA", encoding="utf8"))
-                        balance = round(float(wss_conn.recv().rstrip("\n")), 8)
+                        balance = round(
+                            float(wss_conn.recv().decode().rstrip("\n")), 8)
                     except:
                         wss_conn = reconnect()
                     if float(amount) >= 10 and float(amount) <= balance:
