@@ -45,23 +45,44 @@
       gtag('config', 'UA-142187073-69');
     </script>
     <style>
-        .is-primary { 
+    .is-primary { 
         /* Override Bulmas primary color to Duco-Colored gradient*/
         background: linear-gradient(160deg, #e74c3c, #f39c12) !important;
         border: none;
-      }
-      .gradienttext {
+    }
+
+    .gradienttext {
         /* Gradient text */
         background: -webkit-linear-gradient(160deg, #EA2027, #EE5A24) !important;
         -webkit-background-clip: text !important;
         -webkit-text-fill-color: transparent !important;
         color: #EA2027 !important;
-      }
-      .grid-list {
+    }
+
+    .grid-list {
         /* Split unordered lists */
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-      }
+    }
+
+    /* Scroll bar */
+    * {
+	    scrollbar-width: thin;
+	    scrollbar-color: whitesmoke rgba(255,168,16,1);
+    }
+
+    *::-webkit-scrollbar {
+	    width: 7px;
+    }
+
+    *::-webkit-scrollbar-track {
+	    background: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+	    background-color: rgba(255,168,16,1);
+	    border-radius: 20px;
+    }
     </style>
 </head>
 
