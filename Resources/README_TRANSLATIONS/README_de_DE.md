@@ -36,7 +36,7 @@
     <img src="https://img.shields.io/badge/release-2.4.5-ff4112.svg?style=for-the-badge" /></a>
 </p>
 
-<h3 align="center">Duino-Coin ist eine Kryprowährung, die zum Beispiel auf Arduinos, ESP boards, Raspberry Pis, Computern, und mehr gemint werden kann</h3>
+<h3 align="center">Duino-Coin ist eine Kryptowährung, die zum Beispiel auf Arduinos, ESP boards, Raspberry Pis, Computern, und mehr gemint werden kann</h3>
 <h4 align="center">inklusive Wi-Fi Router, SmartTV's, Smartphones, Smartwatches, SBCs, MCUs, GPUs - eigentlich alles das einen kleinen Programmierbaren Microchip hat.!</h4><br />
 
 <table align="center">
