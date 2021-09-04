@@ -160,7 +160,7 @@ class Algorithms:
 
         for nonce in range(100 * diff + 1):
             if (int(eff) != 100 and nonce % (1_000 * int(eff)) == 0):
-                if psutil_en:
+                if psutil_en and int(eff) < 95:
                     if psutil.cpu_percent() > int(eff):
                         sleep(1/100*int(eff))
 
@@ -181,7 +181,7 @@ class Algorithms:
         for nonce in range(100 * diff + 1):
             if (int(eff) != 100
                     and nonce % (1_000 * int(eff)) == 0):
-                if psutil_en:
+                if psutil_en and int(eff) < 95:
                     if psutil.cpu_percent() > int(eff):
                         sleep(1/100/int(eff))
 
@@ -203,8 +203,8 @@ class Client:
     def connect(pool: tuple):
         global s
         s = socket()
+        s.settimeout(Settings.SOC_TIMEOUT)
         s.connect((pool))
-        s.settimeout(SOC_TIMEOUT)
 
     def send(msg: str):
         sent = s.sendall(str(msg).encode(Settings.ENCODING))
