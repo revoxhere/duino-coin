@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner v2.7.1 © MIT licensed
+Duino-Coin Official PC Miner v2.7.2 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -127,7 +127,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 2.71
+    VER = 2.72
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -407,12 +407,13 @@ class Miner:
                   + " translation: " + Fore.YELLOW
                   + get_string("translation_autor"))
 
-        if psutil_en:
-            print(Style.DIM + Fore.YELLOW + Settings.BLOCK
-                  + Style.NORMAL + Fore.RESET + "CPU: " + Style.BRIGHT
-                  + Fore.YELLOW + str(user_settings["threads"])
-                  + "x " + str(cpu["brand_raw"]))
-        else:
+        try:
+            if psutil_en:
+                print(Style.DIM + Fore.YELLOW + Settings.BLOCK
+                    + Style.NORMAL + Fore.RESET + "CPU: " + Style.BRIGHT
+                    + Fore.YELLOW + str(user_settings["threads"])
+                    + "x " + str(cpu["brand_raw"]))
+        except:
             print(Style.DIM + Fore.YELLOW + Settings.BLOCK
                   + Style.NORMAL + Fore.RESET + "CPU: " + Style.BRIGHT
                   + Fore.YELLOW + str(user_settings["threads"])
@@ -788,11 +789,11 @@ class Discord_rp:
 
 Miner.preload()
 p_list = []
+mining_start_time = time()
 if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
 
-    mining_start_time = time()
     cpu = cpuinfo.get_cpu_info()
     accept = Manager().Value("i", 0)
     reject = Manager().Value("i", 0)
