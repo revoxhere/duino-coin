@@ -2,17 +2,20 @@
 # Minimal version of Duino-Coin PC Miner, useful for developing own apps.
 # Created by revox 2020-2021
 # Modifications made by Robert Furr (robtech21) and YeahNotSewerSide
+# Mining Pools added by mkursadulusoy - 2021-09-06
 
 import hashlib
 import os
-import socket
+from socket import socket
 import sys  # Only python3 included libraries
 import time
 import ssl
 import select
+from json import load as jsonload
+import requests
 
-AVAILABLE_PORTS = [2812, 2813, 2814, 2815, 2816]
-soc = None
+
+soc = socket()
 
 username = input('Username?\n> ')
 diff_choice = input(
@@ -22,45 +25,28 @@ if diff_choice.lower == "n":
 else:
     UseLowerDiff = True
 
-
-def get_fastest_connection(server_ip: str):
-    connection_pool = []
-    available_connections = []
-    for i in range(len(AVAILABLE_PORTS)):
-        connection_pool.append(socket.socket())
-        connection_pool[i].setblocking(0)
-        try:
-            connection_pool[i].connect((server_ip,
-                                        AVAILABLE_PORTS[i]))
-        except BlockingIOError as e:
-            pass
-
-    ready_connections, _, __ = select.select(connection_pool, [], [])
-
+def fetch_pools():
     while True:
-        for connection in ready_connections:
-            try:
-                server_version = connection.recv(100)
-            except:
-                continue
-            if server_version == b'':
-                continue
+        try:
+            response = requests.get(
+                "https://server.duinocoin.com/getPool"
+            ).json()
+            NODE_ADDRESS = response["ip"]
+            NODE_PORT = response["port"]
 
-            available_connections.append(connection)
-            connection.send(b'PING')
-
-        ready_connections, _, __ = select.select(available_connections, [], [])
-        ready_connections[0].recv(100)
-        ready_connections[0].settimeout(10)
-        return ready_connections[0]
-
+            return NODE_ADDRESS, NODE_PORT
+        except Exception as e:
+            print(" Error retrieving mining node: "+ str(e)+ ", retrying in 15s","error")
+            time.sleep(15)
 
 while True:
     try:
         print('Searching for fastest connection to the server')
-        soc = get_fastest_connection(str("server.duinocoin.com"))
+        NODE_ADDRESS, NODE_PORT = fetch_pools()
+        soc.connect((str(NODE_ADDRESS), int(NODE_PORT)))
         print('Fastest connection found')
-
+        server_version = soc.recv(100).decode()
+        print ("Server Version: "+server_version)
         # Mining section
         while True:
             if UseLowerDiff:
@@ -79,7 +65,7 @@ while True:
 
             # Receive work
             job = soc.recv(1024).decode().rstrip("\n")
-            # Split received data to job and difficulty
+            # Split received data to job and difficulty 
             job = job.split(",")
             difficulty = job[2]
 
