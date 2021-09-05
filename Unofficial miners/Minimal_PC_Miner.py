@@ -42,7 +42,12 @@ def fetch_pools():
 while True:
     try:
         print('Searching for fastest connection to the server')
-        NODE_ADDRESS, NODE_PORT = fetch_pools()
+        try:
+            NODE_ADDRESS, NODE_PORT = fetch_pools()
+        except Exception as e:
+            NODE_ADDRESS = "server.duinocoin.com"
+            NODE_PORT = 2813
+            print("Using default server port and address")
         soc.connect((str(NODE_ADDRESS), int(NODE_PORT)))
         print('Fastest connection found')
         server_version = soc.recv(100).decode()
