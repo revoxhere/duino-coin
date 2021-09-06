@@ -329,5 +329,115 @@
         "donate_3": " (ที่อยู่ของแรปเปอร์)",
         "donate_4": " (revox, หัวหน้านักพัฒนา DUCO)",
         "donate_5": " (นักพัฒนา wDUCO)"
+    },
+    "turkish": {
+        "translation_autor": "mkursadulusoy",
+        "cant_connect_to_server": "Sunucuya bağlanılamıyor. Sistem bakımda veya kısa süreliğine erişilemiyor olabilir..\n15 Saniye içinde yeniden denenecek.",
+        "cant_recieve_pool_ip_and_port": " Pool adres ve IP alınamıyor.\n15 Saniye içinde çıkılacak.",
+        "server_message": "Sunucu mesajı: ",
+        "success": "Başarılı!",
+        "cancelled": "İptal edildi...",
+        "duco_commands": " DUCO emirleri:",
+        "wrapper_commands": " Wrapper-related emriler:",
+
+        "base64_not_installed": "Base64 kurulu değil. Lütfen manuel olarak \"base64\" yükleyiniz.\n15 Saniye içinde çıkılacak.",
+        "tronpy_not_installed": "Tronpy kurulu değil. Lütfen şu kodu kullanarak yükleyin: python3 -m pip install tronpy.\ntronpy yüklü olmadığı için Wrapper devre dışı.",
+        "tronpy_not_installed_2": "Tronpy kurulu değil. Lütfen şu kodu kullanarak yükleyin: python3 -m pip install tronpy.",
+        "cryptography_not_installed": "Cryptography kurulu değil. Lütfen şu kodu kullanarak yükleyin: python3 -m pip install cryptography.\n15 Saniye içinde çıkılacak.",
+        "secrets_not_installed": "Secrets kurulu değil. Lütfen şu kodu kullanarak yükleyin: python3 -m pip install secrets.\n15 Saniye içinde çıkılacak.",
+        "websocket_not_installed": "Websocket-client kurulu değil. Lütfen şu kodu kullanarak yükleyin: python3 -m pip install websocket-client.\n15 Saniye içinde çıkılacak.",
+        "colorama_not_installed": "Colorama kurulu değil. Lütfen şu kodu kullanarak yükleyin: python3 -m pip install colorama.\n15 Saniye içinde çıkılacak.",
+
+        "first_run": "Duino-Coin CLI Cüzdan ilk çalıştırma\n",
+        "select_option": "Lütfen seçin",
+        "choice_input": "  1 - Giriş Yap\n  2 - Kayıt Ol\n  3 - Çıkış\n",
+        "choice_input_wrapper": "1 - Yeni bir anahtar üret\n2 - Anahtar yükle \n3 - İptal\n",
+        "value_not_numeric": "Hata! Değer nümerik olmalıdır.",
+
+        "enter_username": "Kullanıcı adınızı girin: ",
+        "enter_email": "E-Posta adresinizi girin: ",
+        "enter_password": "Şifrenizi girin (güvenliğiniz için gizlenecek): ",
+        "confirm_password": "Şifrenizi tekrar girin (güvenliğiniz için gizlenecek): ",
+        "enter_current_password": "Mevcut şifresinizi girin: ",
+        "enter_new_password": "Yeni şifreyi girin: ",
+
+        "agree_requirments": "Kaydolarak Kullanım koşullarını ve gizlilik ilkelerini kabul etmiş olacaksınız. Bu bilgilere şuradan ulaşabilirsiniz: ",
+
+        "register_success": "Yeni hesap başarıyla kaydedildi.",
+        "register_failed": "Yeni hesap kaydedilemedi, Sebep: ",
+
+        "login_success": "Giriş Başarılı",
+        "login_failed": "Giriş yapılamadı, Sebep: ",
+
+        "decrypt_private_key": "Kişisel anahtarın şifresini çözmek için parola: ",
+        "encrypt_private_key": "Kişisel anahtarı şifrelemek için parolanızı girin: ",
+        "invalid_passphrase_wrapper": "Yanlış parola, Wrapper bu oturum için devre dışı bırakıldı",
+        "input_private_key": "Kişisel anahtarınızı girin: ",
+        "incorrect_key": "Yanlış bir giriş sağlandı",
+        "incorrect_value": "Yanlış bir değer girildi,
+
+        "cli_wallet_text": "\nDuino-Coin CLI Cüzdan",
+        "you_have": "Bakiye: ",
+        "which_is_about": "Yaklaşık ",
+        "duco_price": "DUCO fiyatı: ",
+
+        "pending_unwraps": "bekleyen unwrap işlemleri ",
+        "tron_address": "Alıcı Tron adresi: ",
+        "trx_balance": "TRX bakiyesi (ücretler için kullanışlı): ",
+
+        "how_encrypt_private_key": "Kişisel anahtarınızı nasıl şifrelemek istersiniz?",
+        "encryption_choice": "1 - DUCO parolası ile şifreleme\n2 - kendinize ait bir parola kullanma (daha güvenli)",
+
+        "amount_to_wrap": "Wrap edilecek miktarı girin (en az 10): ",
+        "no_amount_numeric": "HAYIR, Miktar nümerik olmalıdır... İptal ediliyor.",
+        "enter_tron_address_or_local": "Tron adresini girin veya yerel bir cüzdan seçmek için boş bırakın: ",
+
+        "error_min_10_duco": "Hata, en az miktar 10 DUCO olabilir",
+        "error_unsufficient_balance": "hata, yetersiz bakiye",
+        "error_wrong_passphrase": "Wrapper devre dışı, yanlış parola girdiniz.",
+        "error_configure_wrapperconf": "Wrapper devre dışı, `wrapperconf` kodunu kullanarak ayarlayın",
+        "error_not_enough_energy_or_trx": "Hata, yeterli energy veya trx iniz bulunmalı",
+
+        "enter_amount_unwrap": "Unwrap edilecek miktarı girin: ",
+        "initiating_unwrap": "Unwrap gerçekleştiriliyor...\nTXid :",
+        "error_initiating_unwrap": "Unwrap işlemi yapılırken bir hata ile karşılaşıldı. İptal ediliyor.",
+        "amount_over_pending_values": "Girilen miktar bekleyen değerden daha fazla, txn ücretleri ödememek için bekleyen değer kullanılacak",
+        "transaction_send_txid": "İşlem gönderildi, txid :",
+        "finished_unwrapping": "Unwrap işlemi tamamlandı",
+
+        "confirm_export_private_key": "Kişisel anahtarın çıktısını almak için YES yazın: ",
+        "private_key": "Kişisel anahtar: ",
+        "cancelled_invalid_confirmation": "İptal edildi, yanlış doğrulama",
+
+        "help_list_command": "`help` yazarak mevcut komutları görebilirsiniz.",
+        "duco_console": "DUCO Konsol ᕲ ",
+
+        "enter_recipients_name": "Alıcının kullanıcı adını girin: ",
+        "enter_amount_transfer": "Transfer edilecek miktarı girin: ",
+        "enter_tron_recipients_name": "Alıcının TRON adresini girin: ",
+        "enter_tron_amount_transfer": "Transfer edilecek miktarı girin: ",
+        "amount_numeric": "Miktar nümerik olmalıdır... İptal ediliyor.",
+
+        "tron_transaction_submitted": "İşlem TRON ağına başarıyla gönderildi.\nTXID:",
+        "tron_successful_transaction": "İşlem Başarılı",
+        "tron_error_transaction": "İşlem onaylanırken hata ile karşılaşıldı",
+
+        "see_you_soon": " Görüşmek üzere!",
+        "sigint_detected": "\nSIGINT algılandı - Çıkış yapılıyor.",
+
+        "about_1": "Duino-Coin CLI Cüzdan <3 ile Duino-Coin topluluğu tarafından geliştirilmiştir.",
+        "about_2": "Mevcut versiyon ",
+        "about_3": "Ayrıca MIT lisansı altındadır.",
+        "about_4": "Sunucu versiyonu: ",
+        "about_5": "Sunucu ",
+        "about_6": ", versiyonunda ancak kullanıcı ",
+        "about_7": ", versiyonundadır.Uygulamayı son sürüme güncelleyin.",
+        "about_8": "Uygulama güncel",
+
+        "donate_1": "Lütfen DUCO ve wDUCO nun sürdürülmesi için bağışlarınızı esirgemeyin (wrap ve unwrap işlemleri yöneticiler için ücretler barındırmaktadır.)",
+        "donate_2": "TRON ve tokenlar: ",
+        "donate_3": " (wrapper adresi)",
+        "donate_4": " (revox, DUCO lider geliştirici)",
+        "donate_5": " (wDUCO geliştirici)"
     }
 }
