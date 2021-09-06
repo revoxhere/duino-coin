@@ -17,6 +17,13 @@ import requests
 
 soc = socket()
 
+
+
+def current_time():
+    t = time.localtime()
+    current_time = time.strftime("%H:%M:%S", t)
+    return current_time
+
 username = input('Username?\n> ')
 diff_choice = input(
     'Use lower difficulty? (Y/N) [Leave empty for default of True]\n> ')
@@ -36,22 +43,22 @@ def fetch_pools():
 
             return NODE_ADDRESS, NODE_PORT
         except Exception as e:
-            print(" Error retrieving mining node: "+ str(e)+ ", retrying in 15s","error")
+            print (f'{current_time()} : Error retrieving mining node, retrying in 15s')
             time.sleep(15)
 
 while True:
     try:
-        print('Searching for fastest connection to the server')
+        print(f'{current_time()} : Searching for fastest connection to the server')
         try:
             NODE_ADDRESS, NODE_PORT = fetch_pools()
         except Exception as e:
             NODE_ADDRESS = "server.duinocoin.com"
             NODE_PORT = 2813
-            print("Using default server port and address")
+            print(f'{current_time()} : Using default server port and address')
         soc.connect((str(NODE_ADDRESS), int(NODE_PORT)))
-        print('Fastest connection found')
+        print(f'{current_time()} : Fastest connection found')
         server_version = soc.recv(100).decode()
-        print ("Server Version: "+server_version)
+        print (f'{current_time()} : Server Version: '+ server_version)
         # Mining section
         while True:
             if UseLowerDiff:
@@ -102,7 +109,7 @@ while True:
                     feedback = soc.recv(1024).decode().rstrip("\n")
                     # If result was good
                     if feedback == "GOOD":
-                        print("Accepted share",
+                        print(f'{current_time()} : Accepted share',
                               result,
                               "Hashrate",
                               int(hashrate/1000),
@@ -112,7 +119,7 @@ while True:
                         break
                     # If result was incorrect
                     elif feedback == "BAD":
-                        print("Rejected share",
+                        print(f'{current_time()} : Rejected share',
                               result,
                               "Hashrate",
                               int(hashrate/1000),
@@ -122,6 +129,6 @@ while True:
                         break
 
     except Exception as e:
-        print("Error occured: " + str(e) + ", restarting in 5s.")
+        print(f'{current_time()} : Error occured: ' + str(e) + ", restarting in 5s.")
         time.sleep(5)
         os.execl(sys.executable, sys.executable, *sys.argv)
