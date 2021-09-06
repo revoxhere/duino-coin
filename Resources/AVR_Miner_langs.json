@@ -740,7 +740,7 @@
         "total_mining_time": "\n\t\t‖ Tempo de atividade total do minerador: "
     },
     "turkish": {
-        "translation_autor": "Scatchie",
+        "translation_autor": "Scatchie - mkursadulusoy",
         "sigint_detected": " SIGINT algılandı - Çıkış yapılıyor.",
         "goodbye": " Görüşmek üzere!",
         "greeting_morning": "Günaydın",
@@ -804,6 +804,21 @@
         "local_transactions_list": "Lokal Aktarımlar",
         "local_transactions_list_warning": "Lokal Aktarımlar Listesi Uyarısı",
         "connection_search": "Sunuculara bağlanmak için en hızlı bağlantı aranıyor"
+		"uptime_seconds": " saniye",
+        "uptime_minute": " dakika",
+        "uptime_minutes": " dakika",
+        "uptime_hour": " saat",
+        "uptime_hours": " saat",
+        "periodic_mining_report": "Periyodik madencilik raporu (BETA): ",
+		"report_period": "\n\t\t‖ Son ",
+        "report_time": " saniyede",
+        "report_body1": "\n\t\t‖ Toplam kazım miktarı: ",
+        "report_body2": " shares (",
+        "report_body3": " shares/s)",
+        "report_body4": "\n\t\t‖ Toplam hashrate ",
+        "report_body5": "\n\t\t‖ Bu zaman boyunca çözülen hash miktarı: ",
+        "report_body6": " hashes",
+        "total_mining_time": "\n\t\t‖ Toplam madencilik zamanı: "
     },
     "azerbaijani": {
         "translation_autor": "Muhabbet Kuşu",
