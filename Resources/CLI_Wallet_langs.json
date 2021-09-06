@@ -374,7 +374,7 @@
         "invalid_passphrase_wrapper": "Yanlış parola, Wrapper bu oturum için devre dışı bırakıldı",
         "input_private_key": "Kişisel anahtarınızı girin: ",
         "incorrect_key": "Yanlış bir giriş sağlandı",
-        "incorrect_value": "Yanlış bir değer girildi,
+        "incorrect_value": "Yanlış bir değer girildi",
 
         "cli_wallet_text": "\nDuino-Coin CLI Cüzdan",
         "you_have": "Bakiye: ",
