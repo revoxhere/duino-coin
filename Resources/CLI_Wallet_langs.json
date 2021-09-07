@@ -9,13 +9,13 @@
         "duco_commands": " DUCO commands:",
         "wrapper_commands": " Wrapper-related commands:",
 
-        "base64_not_installed": "Base64 is not installed. Please manually install \"base64\"\nExiting in 15s.",
-        "tronpy_not_installed": "Tronpy is not installed. Please install it using: python3 -m pip install tronpy.\nWrapper is disabled because tronpy is not installed.",
-        "tronpy_not_installed_2": "Tronpy is not installed. Please install it using: python3 -m pip install tronpy.",
-        "cryptography_not_installed": "Cryptography is not installed. Please install it using: python3 -m pip install cryptography.\nExiting in 15s.",
-        "secrets_not_installed": "Secrets is not installed. Please install it using: python3 -m pip install secrets.\nExiting in 15s.",
-        "websocket_not_installed": "Websocket-client is not installed. Please install it using: python3 -m pip install websocket-client.\nExiting in 15s.",
-        "colorama_not_installed": "Colorama is not installed. Please install it using: python3 -m pip install colorama.\nExiting in 15s.",
+        "base64_not_installed": "Base64 tidak terinstal. Please manually install \"base64\"\nKeluar dalam 15 detik.",
+        "tronpy_not_installed": "Tronpy tidak terinstal. Silakan instal menggunakan: python3 -m pip install tronpy.\nWrapper is disabled because tronpy tidak terinstal.",
+        "tronpy_not_installed_2": "Tronpy tidak terinstal. Silakan instal menggunakan: python3 -m pip install tronpy.",
+        "cryptography_not_installed": "Cryptography tidak terinstal. Silakan instal menggunakan: python3 -m pip install cryptography.\nKeluar dalam 15 detik.",
+        "secrets_not_installed": "Secrets tidak terinstal. Silakan instal menggunakan: python3 -m pip install secrets.\nKeluar dalam 15 detik.",
+        "websocket_not_installed": "Websocket-client tidak terinstal. Silakan instal menggunakan: python3 -m pip install websocket-client.\nKeluar dalam 15 detik.",
+        "colorama_not_installed": "Colorama tidak terinstal. Silakan instal menggunakan: python3 -m pip install colorama.\nKeluar dalam 15 detik.",
 
         "first_run": "Duino-Coin CLI Wallet first-run\n",
         "select_option": "Select an option",
@@ -439,5 +439,116 @@
         "donate_3": " (wrapper adresi)",
         "donate_4": " (revox, DUCO lider geliştirici)",
         "donate_5": " (wDUCO geliştirici)"
+    },
+
+    "indonesian": {
+        "translation_autor": "fajarafriansh",
+        "cant_connect_to_server": "Tidak dapat terhubung ke server. Mungkin sedang dalam pemeliharaan atau tidak aktif untuk sementara.\nMencoba lagi dalam 15 detik.",
+        "cant_recieve_pool_ip_and_port": " Tidak dapat menerima alamat pool dan IP.\nKeluar dalam 15 detik.",
+        "server_message": "Pesan server: ",
+        "success": "Sukses!",
+        "cancelled": "Dibatalkan...",
+        "duco_commands": " Perintah DUCO:",
+        "wrapper_commands": " Perintah Wrapper-related:",
+
+        "base64_not_installed": "Base64 tidak terinstal. Harap instal \"base64\" secara manual\nKeluar dalam 15 detik.",
+        "tronpy_not_installed": "Tronpy tidak terinstal. Silakan instal menggunakan: python3 -m pip install tronpy.\nWrapper dinonaktifkan karena tronpy tidak terinstal.",
+        "tronpy_not_installed_2": "Tronpy tidak terinstal. Silakan instal menggunakan: python3 -m pip install tronpy.",
+        "cryptography_not_installed": "Cryptography tidak terinstal. Silakan instal menggunakan: python3 -m pip install cryptography.\nKeluar dalam 15 detik.",
+        "secrets_not_installed": "Secrets tidak terinstal. Silakan instal menggunakan: python3 -m pip install secrets.\nKeluar dalam 15 detik.",
+        "websocket_not_installed": "Websocket-client tidak terinstal. Silakan instal menggunakan: python3 -m pip install websocket-client.\nKeluar dalam 15 detik.",
+        "colorama_not_installed": "Colorama tidak terinstal. Silakan instal menggunakan: python3 -m pip install colorama.\nKeluar dalam 15 detik.",
+
+        "first_run": "Dompet CLI Duino-Coin first-run\n",
+        "select_option": "Pilih opsi",
+        "choice_input": "  1 - Masuk\n  2 - Daftar\n  3 - Keluar\n",
+        "choice_input_wrapper": "1 - Buat kunci baru\n2 - Impor kunci\n3 - Batalkan\n",
+        "value_not_numeric": "Galat, nilainya harus numerik",
+
+        "enter_username": "Masukkan nama pengguna Anda: ",
+        "enter_email": "Masukkan alamat email Anda: ",
+        "enter_password": "Masukkan kata sandi Anda (tidak ditampilkan untuk privasi): ",
+        "confirm_password": "Konfirmasikan kata sandi Anda (tidak ditampilkan untuk privasi): ",
+        "enter_current_password": "Masukkan kata sandi Anda: ",
+        "enter_new_password": "Masukan kata sandi baru: ",
+
+        "agree_requirments": "Dengan mendaftarkan akun baru, Anda menyetujui persyaratan layanan dan kebijakan privasi yang tersedia di ",
+
+        "register_success": "Berhasil mendaftarkan akun baru",
+        "register_failed": "Tidak dapat mendaftarkan pengguna baru, alasannya: ",
+
+        "login_success": "Berhasil masuk",
+        "login_failed": "Tidak dapat masuk, alasannya: ",
+
+        "decrypt_private_key": "Frasa sandi untuk mendekripsi kunci pribadi: ",
+        "encrypt_private_key": "Masukkan frasa sandi Anda untuk mengenkripsi kunci pribadi: ",
+        "invalid_passphrase_wrapper": "Frasa sandi tidak valid, menonaktifkan wrapper untuk sesi ini",
+        "input_private_key": "Masukkan kunci pribadi Anda sendiri: ",
+        "incorrect_key": "Kunci yang diberikan salah",
+        "incorrect_value": "Nilai yang diberikan salah",
+
+        "cli_wallet_text": "\nDompet CLI Duino-Coin",
+        "you_have": "Anda memiliki ",
+        "which_is_about": "Tentang ",
+        "duco_price": "Harga DUCO: ",
+
+        "pending_unwraps": "Unwraps tertunda ",
+        "tron_address": "Alamat Tron untuk menerima: ",
+        "trx_balance": "Saldo TRX (berguna untuk biaya): ",
+
+        "how_encrypt_private_key": "Bagaimana Anda ingin mengenkripsi kunci pribadi di dalam file konfigurasi?",
+        "encryption_choice": "1 - enkripsi menggunakan kata sandi DUCO\n2 - gunakan frasa sandi khusus Anda (lebih aman)",
+
+        "amount_to_wrap": "Masukkan jumlah yang akan dibungkus (minimal 10): ",
+        "no_amount_numeric": "TIDAK, Jumlah harus berupa angka... membatalkan",
+        "enter_tron_address_or_local": "Masukkan alamat Tron atau biarkan kosong untuk memilih dompet lokal: ",
+
+        "error_min_10_duco": "Galat, jumlah minimum adalah 10 DUCO",
+        "error_unsufficient_balance": "Galat, saldo tidak mencukupi",
+        "error_wrong_passphrase": "Wrapper dinonaktifkan, Anda memasukkan frasa sandi yang salah",
+        "error_configure_wrapperconf": "Wrapper dinonaktifkan, konfigurasikan menggunakan `wrapperconf`",
+        "error_not_enough_energy_or_trx": "Gagal, Anda harus memiliki cukup energi atau trx",
+
+        "enter_amount_unwrap": "Masukkan jumlah yang akan dibuka: ",
+        "initiating_unwrap": "Memulai membuka bungkusan...\nTXid :",
+        "error_initiating_unwrap": "Ada kesalahan saat memulai membuka, membatalkan",
+        "amount_over_pending_values": "Jumlahnya melebihi nilai yang tertunda, menggunakan nilai yang tertunda untuk menghemat biaya txn",
+        "transaction_send_txid": "Transaksi terkirim, txid :",
+        "finished_unwrapping": "Selesai membuka bungkus",
+
+        "confirm_export_private_key": "Ketik YES untuk mengonfirmasi ekspor kunci pribadi : ",
+        "private_key": "Kunci pribadi: ",
+        "cancelled_invalid_confirmation": "Dibatalkan, konfirmasi tidak valid",
+
+        "help_list_command": "Ketik `help` untuk melihat daftar perintah yang tersedia",
+        "duco_console": "Konsol DUCO ᕲ ",
+
+        "enter_recipients_name": "Masukkan nama pengguna penerima: ",
+        "enter_amount_transfer": "Masukkan jumlah yang akan dikirim: ",
+        "enter_tron_recipients_name": "Masukkan alamat TRON penerima: ",
+        "enter_tron_amount_transfer": "Masukkan jumlah yang akan dikirim: ",
+        "amount_numeric": "Jumlahnya harus numerik... membatalkan",
+
+        "tron_transaction_submitted": "Transaksi dikirim ke jaringan TRON\nTXID:",
+        "tron_successful_transaction": "Transaksi berhasil",
+        "tron_error_transaction": "Kesalahan saat mengonfirmasi transaksi",
+
+        "see_you_soon": " Sampai jumpa lagi!",
+        "sigint_detected": "\nSIGINT terdeteksi - Keluar dengan anggun.",
+
+        "about_1": "Dompet CLI Duino-Coin dibuat dengan <3 oleh komunitas Duino-Coin",
+        "about_2": "Ini adalah versi ",
+        "about_3": "Dan didistribusikan di bawah lisensi MIT",
+        "about_4": "Versi server: ",
+        "about_5": "Server ada di versi ",
+        "about_6": ", tetapi klien menggunakan versi ",
+        "about_7": ", Anda harus mempertimbangkan untuk mengunduh rilis terbaru",
+        "about_8": "Client is up-to-date",
+
+        "donate_1": "Jangan ragu untuk menyumbang untuk membantu memelihara DUCO dan wDUCO (pembungkusan/pembukaan melibatkan biaya untuk pengelola)",
+        "donate_2": "TRON dan token: ",
+        "donate_3": " (alamat pembungkus)",
+        "donate_4": " (revox, pengembang utama DUCO)",
+        "donate_5": " (pengembang wDUCO)"
     }
 }
