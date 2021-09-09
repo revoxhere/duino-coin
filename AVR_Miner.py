@@ -693,12 +693,11 @@ def mine_avr(com, threadid):
                 # Retrieve work
                 job = soc.recv(128).decode().rstrip("\n")
                 job = job.split(",")
-                debug_output("Received: " + str(job))
+                debug_output(com + ": Received: " + str(job))
 
                 try:
                     diff = int(job[2])
-                    debug_output(str(''.join(filter(str.isdigit, com)))
-                                 + "Correct job received")
+                    debug_output(com + ": Correct job received")
                 except:
                     pretty_print("usb"
                                  + str(''.join(filter(str.isdigit, com))),
