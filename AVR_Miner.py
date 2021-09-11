@@ -69,6 +69,47 @@ class Settings:
         COG = " ⚙"
 
 
+class Client:
+    """
+    Class helping to organize socket connections
+    """
+    def connect(pool: tuple):
+        global s
+        s = socket()
+        s.settimeout(Settings.SOC_TIMEOUT)
+        s.connect((pool))
+
+    def send(msg: str):
+        sent = s.sendall(str(msg).encode(Settings.ENCODING))
+        return True
+
+    def recv(limit: int = 128):
+        data = s.recv(limit).decode(Settings.ENCODING).rstrip("\n")
+        return data
+
+    def fetch_pool():
+        while True:
+            pretty_print("net0", " " + get_string("connection_search"),
+                         "warning")
+            try:
+                response = requests.get(
+                    "https://server.duinocoin.com/getPool").json()
+                if response["success"] == True:
+                    NODE_ADDRESS = response["ip"]
+                    NODE_PORT = response["port"]
+                    debug_output(f"Fetched pool: {response['name']}")
+                    return (response["ip"], response["port"])
+                else:
+                    pretty_print("net0", f"Error: {response['message']}"
+                                 + ", retrying in 15s", "error")
+                    sleep(15)
+            except Exception as e:
+                pretty_print("net0",
+                             f" Error fetching mining node: {e}"
+                             + ", retrying in 15s", "error")
+                sleep(15)
+
+
 try:
     # Check if pyserial is installed
     from serial import Serial
@@ -560,7 +601,7 @@ def share_print(id, type, accept, reject, total_hashrate,
               + "ping " + str("%02.0f" % int(ping)) + "ms")
 
 
-def mine_avr(com, threadid, NODE_ADDRESS, NODE_PORT):
+def mine_avr(com, threadid, fastest_pool):
     global hashrate
     start_time = time()
     report_shares = 0
@@ -597,14 +638,12 @@ def mine_avr(com, threadid, NODE_ADDRESS, NODE_PORT):
         while True:
             try:
                 if retry_counter > 3:
-                    NODE_ADDRESS, NODE_PORT = fetch_pools()
+                    fastest_pool = Client.fetch_pool()
                     retry_counter = 0
 
-                debug_output(f'Connecting to {NODE_ADDRESS}:{NODE_PORT}')
-                soc = socket()
-                soc.connect((str(NODE_ADDRESS), int(NODE_PORT)))
-                soc.settimeout(Settings.SOC_TIMEOUT)
-                server_version = soc.recv(100).decode()
+                debug_output(f'Connecting to {fastest_pool}')
+                soc = Client.connect(fastest_pool)
+                server_version = Client.recv(6)
 
                 if threadid == 0:
                     if float(server_version) <= float(Settings.VER):
@@ -623,8 +662,8 @@ def mine_avr(com, threadid, NODE_ADDRESS, NODE_PORT):
                             'warning')
                         sleep(10)
 
-                    soc.send(bytes("MOTD", encoding=Settings.ENCODING))
-                    motd = soc.recv(1024).decode().rstrip("\n")
+                    Client.send("MOTD")
+                    motd = Client.recv(1024)
 
                     if "\n" in motd:
                         motd = motd.replace("\n", "\n\t\t")
@@ -649,15 +688,12 @@ def mine_avr(com, threadid, NODE_ADDRESS, NODE_PORT):
         while True:
             try:
                 debug_output(com + ': Requesting job')
-                soc.sendall(bytes(
-                    'JOB'
-                    + Settings.SEPARATOR
-                    + str(username)
-                    + Settings.SEPARATOR
-                    + 'AVR',
-                    encoding=Settings.ENCODING))
-                job = soc.recv(128).decode().rstrip(
-                    "\n").split(Settings.SEPARATOR)
+                Client.send('JOB'
+                            + Settings.SEPARATOR
+                            + str(username)
+                            + Settings.SEPARATOR
+                            + 'AVR')
+                job = Client.recv(128).split(Settings.SEPARATOR)
                 debug_output(com + f": Received: {job[0]}")
 
                 try:
@@ -722,21 +758,18 @@ def mine_avr(com, threadid, NODE_ADDRESS, NODE_PORT):
                 break
 
             try:
-                soc.sendall(
-                    bytes(
-                        str(num_res)
-                        + Settings.SEPARATOR
-                        + str(hashrate_t)
-                        + Settings.SEPARATOR
-                        + f'Official AVR Miner v{Settings.VER}'
-                        + Settings.SEPARATOR
-                        + str(rig_identifier)
-                        + Settings.SEPARATOR
-                        + str(result[2]),
-                        encoding=Settings.ENCODING))
+                Client.send(str(num_res)
+                            + Settings.SEPARATOR
+                            + str(hashrate_t)
+                            + Settings.SEPARATOR
+                            + f'Official AVR Miner v{Settings.VER}'
+                            + Settings.SEPARATOR
+                            + str(rig_identifier)
+                            + Settings.SEPARATOR
+                            + str(result[2]))
 
                 responsetimetart = now()
-                feedback = soc.recv(64).decode().rstrip('\n')
+                feedback = Client.recv(64)
                 responsetimestop = now()
 
                 time_delta = (responsetimestop -
@@ -816,29 +849,6 @@ def calculate_uptime(start_time):
         return str(round(uptime // 3600)) + get_string('uptime_hours')
 
 
-def fetch_pools():
-    while True:
-        pretty_print("net0", " " + get_string("connection_search"),
-                     "warning")
-        try:
-            response = requests.get(
-                "https://server.duinocoin.com/getPool").json()
-            if response["success"] == True:
-                NODE_ADDRESS = response["ip"]
-                NODE_PORT = response["port"]
-                debug_output(f"Fetched pool: {response['name']}")
-                return NODE_ADDRESS, NODE_PORT
-            else:
-                pretty_print("net0", f"Error: {response['message']}"
-                             + ", retrying in 15s", "error")
-                sleep(15)
-        except Exception as e:
-            pretty_print("net0",
-                         f" Error fetching mining node: {e}"
-                         + ", retrying in 15s", "error")
-            sleep(15)
-
-
 if __name__ == '__main__':
     init(autoreset=True)
     title(f"{get_string('duco_avr_miner')}{str(Settings.VER)})")
@@ -862,12 +872,12 @@ if __name__ == '__main__':
         debug_output(f'Error displaying greeting message: {e}')
 
     try:
-        NODE_ADDRESS, NODE_PORT = fetch_pools()
+        fastest_pool = Client.fetch_pool()
         threadid = 0
         for port in avrport:
             thrThread(target=mine_avr,
                       args=(port, threadid,
-                            NODE_ADDRESS, NODE_PORT)).start()
+                            fastest_pool)).start()
             threadid += 1
     except Exception as e:
         debug_output(f'Error launching AVR thread(s): {e}')
