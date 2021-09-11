@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner v2.7.3 © MIT licensed
+Duino-Coin Official PC Miner 2.7.3 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -450,7 +450,7 @@ class Miner:
 
         print("\n" + Style.DIM + Fore.YELLOW + Settings.BLOCK + Fore.YELLOW
               + Style.BRIGHT + get_string("banner") + Style.RESET_ALL
-              + Fore.MAGENTA + " (v" + str(Settings.VER) + ") "
+              + Fore.MAGENTA + " (" + str(Settings.VER) + ") "
               + Fore.RESET + "2019-2021")
 
         print(Style.DIM + Fore.YELLOW + Settings.BLOCK + Style.NORMAL
@@ -782,7 +782,7 @@ class Miner:
                                             + Settings.SEPARATOR
                                             + "Official PC Miner ("
                                             + user_settings["algorithm"]
-                                            + ") v" + str(Settings.VER)
+                                            + ") " + str(Settings.VER)
                                             + Settings.SEPARATOR
                                             + str(user_settings["identifier"]))
 
