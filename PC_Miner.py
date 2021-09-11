@@ -27,6 +27,7 @@ import requests
 from pathlib import Path
 from re import sub
 from random import choice
+from platform import machine as osprocessor
 
 from signal import SIGINT, signal
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
@@ -237,6 +238,60 @@ class Client:
                 pretty_print(f" Error fetching mining node: {e}"
                              + ", retrying in 15s", "error", "net0")
                 sleep(15)
+
+
+class Donate:
+    def load(donation_level):
+        if donation_level > 0:
+            if os.name == 'nt':
+                if not Path(
+                        f"{Settings.DATA_DIR}/Donate.exe").is_file():
+                    url = ('https://server.duinocoin.com/'
+                           + 'donations/DonateExecutableWindows.exe')
+                    r = requests.get(url)
+                    with open(f"{Settings.DATA_DIR}/Donate.exe",
+                              'wb') as f:
+                        f.write(r.content)
+            elif os.name == "posix":
+                if osprocessor() == "aarch64":
+                    url = ('https://server.duinocoin.com/'
+                           + 'donations/DonateExecutableAARCH64')
+                elif osprocessor() == "armv7l":
+                    url = ('https://server.duinocoin.com/'
+                           + 'donations/DonateExecutableAARCH32')
+                else:
+                    url = ('https://server.duinocoin.com/'
+                           + 'donations/DonateExecutableLinux')
+                if not Path(
+                        f"{Settings.DATA_DIR}/Donate").is_file():
+                    r = requests.get(url)
+                    with open(f"{Settings.DATA_DIR}/Donate",
+                              "wb") as f:
+                        f.write(r.content)
+
+    def start(donation_level):
+        if os.name == 'nt':
+            cmd = (f'cd "{Settings.DATA_DIR}" & Donate.exe '
+                   + '-o stratum+tcp://xmg.minerclaim.net:7008 '
+                   + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
+        elif os.name == 'posix':
+            cmd = (f'cd "{Settings.DATA_DIR}" && chmod +x Donate '
+                   + '&& nice -20 ./Donate -o '
+                   + 'stratum+tcp://xmg.minerclaim.net:7008 '
+                   + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
+
+        if donation_level <= 0:
+            pretty_print(
+                'sys0', Fore.YELLOW
+                + get_string('free_network_warning')
+                + get_string('donate_warning')
+                + Fore.GREEN + 'https://duinocoin.com/donate'
+                + Fore.YELLOW + get_string('learn_more_donate'),
+                'warning')
+            sleep(5)
+
+        if donation_level > 0:
+            donateExecutable = Popen(cmd, shell=True, stderr=DEVNULL)
 
 
 def get_prefix(symbol: str,
@@ -580,16 +635,29 @@ class Miner:
             else:
                 rig_id = "None"
 
+            donation_level = '0'
+            if os.name == 'nt' or os.name == 'posix':
+                donation_level = input(Style.NORMAL
+                                       + get_string('ask_donation_level')
+                                       + Style.BRIGHT)
+
+            donation_level = sub(r'\D', '', donation_level)
+            if donation_level == '':
+                donation_level = 1
+            if float(donation_level) > int(5):
+                donation_level = 5
+            if float(donation_level) < int(0):
+                donation_level = 0
+
             configparser["PC Miner"] = {
                 "username":    username,
                 "intensity":   intensity,
                 "threads":     threads,
                 "start_diff":  start_diff,
-                "donate":      Settings.DONATE_LVL,
+                "donate":      int(donation_level),
                 "identifier":  rig_id,
                 "algorithm":   algorithm,
                 "language":    lang,
-                "debug":       "n",
                 "soc_timeout": Settings.SOC_TIMEOUT,
                 "report_sec":  Settings.REPORT_TIME,
                 "discord_rp":  "y"}
@@ -821,6 +889,9 @@ if __name__ == "__main__":
     user_settings = Miner.load_cfg()
     Miner.greeting()
     fastest_pool = Client.fetch_pool()
+
+    Donate.load(int(user_settings["donate"]))
+    Donate.start(int(user_settings["donate"]))
 
     for i in range(int(user_settings["threads"])):
         p = Process(target=Miner.mine,
