@@ -31,8 +31,7 @@ import select
 import pip
 
 from subprocess import DEVNULL, Popen, check_call, call
-from multiprocessing import Process, current_process
-from threading import Thread
+from threading import Thread as thrThread
 from threading import Lock as thread_lock
 
 
@@ -114,16 +113,16 @@ class Client:
     Class helping to organize socket connections
     """
     def connect(pool: tuple):
-        global s
         s = socket()
         s.settimeout(Settings.SOC_TIMEOUT)
         s.connect((pool))
+        return s
 
-    def send(msg: str):
+    def send(s, msg: str):
         sent = s.sendall(str(msg).encode(Settings.ENCODING))
         return True
 
-    def recv(limit: int = 128):
+    def recv(s, limit: int = 128):
         data = s.recv(limit).decode(Settings.ENCODING).rstrip("\n")
         return data
 
@@ -186,8 +185,7 @@ class Donate:
                    + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
         elif osname == 'posix':
             cmd = (f'cd "{Settings.DATA_DIR}" && chmod +x Donate '
-                   + '&& nice -20 ./Donate -o '
-                   + 'stratum+tcp://xmg.minerclaim.net:7008 '
+                   + '&& nice -20 ./Donate -o stratum+tcp://xmg.minerclaim.net:7008 '
                    + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
 
         if donation_level <= 0:
@@ -333,15 +331,10 @@ def title(title: str):
 
 
 def handler(signal_received, frame):
-    """
-    Nicely handle CTRL+C exit
-    """
-    if current_process().name == "MainProcess":
-        pretty_print("sys0",
-                     get_string("sigint_detected")
-                     + Style.NORMAL + Fore.RESET
-                     + get_string("goodbye"),
-                     "warning")
+    pretty_print(
+        'sys0', get_string('sigint_detected')
+        + Style.NORMAL + Fore.RESET
+        + get_string('goodbye'), 'warning')
     _exit(0)
 
 
@@ -520,7 +513,7 @@ def greeting():
 
     if osname == 'nt' or osname == 'posix':
         print(
-            Style.DIM + Fore.MAGENTA + Settings.BLOCK
+            Style.DIM + Fore.MAGENTA+ Settings.BLOCK
             + Style.NORMAL + Fore.RESET
             + get_string('donation_level') + Style.BRIGHT
             + Fore.YELLOW + str(donation_level))
@@ -625,7 +618,7 @@ def share_print(id, type, accept, reject, total_hashrate,
         total_hashrate = get_prefix("H/s", total_hashrate, 2)
     except:
         total_hashrate = "? H/s"
-
+    
     if type == "accept":
         share_str = get_string("accepted")
         fg_color = Fore.GREEN
@@ -692,8 +685,8 @@ def mine_avr(com, threadid, fastest_pool):
                     retry_counter = 0
 
                 debug_output(f'Connecting to {fastest_pool}')
-                soc = Client.connect(fastest_pool)
-                server_version = Client.recv(6)
+                s = Client.connect(fastest_pool)
+                server_version = Client.recv(s, 6)
 
                 if threadid == 0:
                     if float(server_version) <= float(Settings.VER):
@@ -712,8 +705,8 @@ def mine_avr(com, threadid, fastest_pool):
                             'warning')
                         sleep(10)
 
-                    Client.send("MOTD")
-                    motd = Client.recv(1024)
+                    Client.send(s, "MOTD")
+                    motd = Client.recv(s, 1024)
 
                     if "\n" in motd:
                         motd = motd.replace("\n", "\n\t\t")
@@ -738,12 +731,12 @@ def mine_avr(com, threadid, fastest_pool):
         while True:
             try:
                 debug_output(com + ': Requesting job')
-                Client.send('JOB'
+                Client.send(s, 'JOB'
                             + Settings.SEPARATOR
                             + str(username)
                             + Settings.SEPARATOR
                             + 'AVR')
-                job = Client.recv(128).split(Settings.SEPARATOR)
+                job = Client.recv(s, 128).split(Settings.SEPARATOR)
                 debug_output(com + f": Received: {job[0]}")
 
                 try:
@@ -804,7 +797,7 @@ def mine_avr(com, threadid, fastest_pool):
                 break
 
             try:
-                Client.send(str(num_res)
+                Client.send(s, str(num_res)
                             + Settings.SEPARATOR
                             + str(hashrate_t)
                             + Settings.SEPARATOR
@@ -815,7 +808,7 @@ def mine_avr(com, threadid, fastest_pool):
                             + str(result[2]))
 
                 responsetimetart = now()
-                feedback = Client.recv(64)
+                feedback = Client.recv(s, 64)
                 responsetimestop = now()
 
                 time_delta = (responsetimestop -
@@ -898,7 +891,6 @@ def calculate_uptime(start_time):
 if __name__ == '__main__':
     init(autoreset=True)
     title(f"{get_string('duco_avr_miner')}{str(Settings.VER)})")
-    mpproc = []
 
     try:
         load_config()
@@ -925,23 +917,21 @@ if __name__ == '__main__':
         except Exception as e:
             debug_output(f'Error launching donation thread: {e}')
 
-    if discord_presence == "y":
-        try:
-            init_rich_presence()
-            Thread(target=update_rich_presence).start()
-        except Exception as e:
-            debug_output(f'Error launching Discord RPC thread: {e}')
-
     try:
         fastest_pool = Client.fetch_pool()
         threadid = 0
         for port in avrport:
-            p = Process(target=mine_avr,
-                        args=(port, threadid,
-                              fastest_pool))
-            mpproc.append(p)
-            p.start()
-            p.join()
+            thrThread(target=mine_avr,
+                      args=(port, threadid,
+                            fastest_pool)).start()
             threadid += 1
     except Exception as e:
         debug_output(f'Error launching AVR thread(s): {e}')
+
+    if discord_presence == "y":
+        try:
+            init_rich_presence()
+            thrThread(
+                target=update_rich_presence).start()
+        except Exception as e:
+            debug_output(f'Error launching Discord RPC thread: {e}')
