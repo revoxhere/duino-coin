@@ -268,38 +268,29 @@ def load_config():
 
     if not Path(str(Settings.DATA_DIR) + '/Settings.cfg').is_file():
         print(
-            Style.BRIGHT
-            + get_string('basic_config_tool')
+            Style.BRIGHT + get_string('basic_config_tool')
             + Settings.DATA_DIR
             + get_string('edit_config_file_warning'))
 
         print(
-            Style.RESET_ALL
-            + get_string('dont_have_account')
-            + Fore.YELLOW
-            + get_string('wallet')
-            + Fore.RESET
+            Style.RESET_ALL + get_string('dont_have_account') 
+            + Fore.YELLOW + get_string('wallet') + Fore.RESET
             + get_string('register_warning'))
 
         username = input(
-            Style.RESET_ALL
-            + Fore.YELLOW
+            Style.RESET_ALL + Fore.YELLOW
             + get_string('ask_username')
-            + Fore.RESET
-            + Style.BRIGHT)
+            + Fore.RESET + Style.BRIGHT)
 
-        print(Style.RESET_ALL
-              + Fore.YELLOW
+        print(Style.RESET_ALL + Fore.YELLOW
               + get_string('ports_message'))
         portlist = serial.tools.list_ports.comports(include_links=True)
+
         for port in portlist:
             print(Style.RESET_ALL
-                  + Style.BRIGHT
-                  + Fore.RESET
-                  + '  '
-                  + str(port))
-        print(Style.RESET_ALL
-              + Fore.YELLOW
+                  + Style.BRIGHT + Fore.RESET
+                  + '  ' + str(port))
+        print(Style.RESET_ALL + Fore.YELLOW
               + get_string('ports_notice'))
 
         port_names = []
@@ -309,43 +300,34 @@ def load_config():
         avrport = ''
         while True:
             current_port = input(
-                Style.RESET_ALL
-                + Fore.YELLOW
+                Style.RESET_ALL + Fore.YELLOW
                 + get_string('ask_avrport')
-                + Fore.RESET
-                + Style.BRIGHT)
+                + Fore.RESET + Style.BRIGHT)
 
             if current_port in port_names:
                 avrport += current_port
                 confirmation = input(
-                    Style.RESET_ALL
-                    + Fore.YELLOW
+                    Style.RESET_ALL + Fore.YELLOW
                     + get_string('ask_anotherport')
-                    + Fore.RESET
-                    + Style.BRIGHT)
+                    + Fore.RESET  + Style.BRIGHT)
 
                 if confirmation == 'y' or confirmation == 'Y':
                     avrport += ','
                 else:
                     break
             else:
-                print(Style.RESET_ALL
-                      + Fore.RED
+                print(Style.RESET_ALL + Fore.RED
                       + 'Please enter a valid COM port from the list above')
 
         rig_identifier = input(
-            Style.RESET_ALL
-            + Fore.YELLOW
+            Style.RESET_ALL + Fore.YELLOW
             + get_string('ask_rig_identifier')
-            + Fore.RESET
-            + Style.BRIGHT)
+            + Fore.RESET + Style.BRIGHT)
         if rig_identifier == 'y' or rig_identifier == 'Y':
             rig_identifier = input(
-                Style.RESET_ALL
-                + Fore.YELLOW
+                Style.RESET_ALL + Fore.YELLOW
                 + get_string('ask_rig_name')
-                + Fore.RESET
-                + Style.BRIGHT)
+                + Fore.RESET + Style.BRIGHT)
         else:
             rig_identifier = 'None'
 
@@ -358,7 +340,7 @@ def load_config():
         #        + Fore.RESET
         #        + Style.BRIGHT)
 
-        # Check wheter donation_level is correct
+
         donation_level = sub(r'\D', '', donation_level)
         if donation_level == '':
             donation_level = 1
@@ -375,7 +357,7 @@ def load_config():
             'identifier':       rig_identifier,
             'debug':            'n',
             "soc_timeout":      45,
-            "Settings.AVR_TIMEOUT":      4,
+            "avr_timeout":      4,
             "discord_presence": "y",
             "periodic_report":  60,
             "shuffle_ports":    "y"}
@@ -409,7 +391,6 @@ def greeting():
     print(Style.RESET_ALL)
 
     current_hour = strptime(ctime(time())).tm_hour
-
     if current_hour < 12:
         greeting = get_string('greeting_morning')
     elif current_hour == 12:
@@ -422,97 +403,65 @@ def greeting():
         greeting = get_string('greeting_back')
 
     print(
-        Style.DIM
-        + Fore.MAGENTA
-        + ' ‖ '
-        + Fore.YELLOW
-        + Style.BRIGHT
-        + get_string('banner')
-        + Style.RESET_ALL
-        + Fore.MAGENTA
-        + ' (v'
-        + str(Settings.VER)
-        + ') '
-        + Fore.RESET
+        Style.DIM + Fore.MAGENTA
+        + Settings.BLOCK + Fore.YELLOW 
+        + Style.BRIGHT + get_string('banner')
+        + Style.RESET_ALL + Fore.MAGENTA
+        + ' (v{Settings.VER})' + Fore.RESET
         + '2019-2021')
 
     print(
-        Style.DIM
-        + Fore.MAGENTA
-        + ' ‖ '
-        + Style.NORMAL
-        + Fore.MAGENTA
+        Style.DIM + Fore.MAGENTA
+        + Settings.BLOCK + Style.NORMAL + Fore.MAGENTA
         + 'https://github.com/revoxhere/duino-coin')
 
     if lang != "english":
         print(
-            Style.DIM
-            + Fore.MAGENTA
-            + " ‖ "
-            + Style.NORMAL
-            + Fore.RESET
-            + lang.capitalize()
-            + " translation: "
-            + Fore.MAGENTA
+            Style.DIM + Fore.MAGENTA
+            + Settings.BLOCK + Style.NORMAL
+            + Fore.RESET + lang.capitalize()
+            + " translation: " + Fore.MAGENTA
             + get_string("translation_autor"))
 
     print(
-        Style.DIM
-        + Fore.MAGENTA
-        + ' ‖ '
-        + Style.NORMAL
-        + Fore.RESET
-        + get_string('avr_on_port')
-        + Style.BRIGHT
-        + Fore.YELLOW
+        Style.DIM + Fore.MAGENTA
+        + Settings.BLOCK + Style.NORMAL
+        + Fore.RESET+ get_string('avr_on_port')
+        + Style.BRIGHT + Fore.YELLOW
         + ' '.join(avrport))
 
     # if osname == 'nt' or osname == 'posix':
     #    print(
     #        Style.DIM
     #        + Fore.MAGENTA
-    #        + ' ‖ '
+    #        + Settings.BLOCK
     #        + Style.NORMAL
     #        + Fore.RESET
     #        + get_string('donation_level')
     #        + Style.BRIGHT
     #        + Fore.YELLOW
     #        + str(donation_level))
+
     print(
-        Style.DIM
-        + Fore.MAGENTA
-        + ' ‖ '
-        + Style.NORMAL
-        + Fore.RESET
-        + get_string('algorithm')
-        + Style.BRIGHT
-        + Fore.YELLOW
+        Style.DIM + Fore.MAGENTA
+        + Settings.BLOCK + Style.NORMAL
+        + Fore.RESET + get_string('algorithm')
+        + Style.BRIGHT + Fore.YELLOW
         + 'DUCO-S1A ⚙ AVR diff')
 
     if rig_identifier != "None":
         print(
-            Style.DIM
-            + Fore.MAGENTA
-            + ' ‖ '
-            + Style.NORMAL
-            + Fore.RESET
-            + get_string('rig_identifier')
-            + Style.BRIGHT
-            + Fore.YELLOW
-            + rig_identifier)
+            Style.DIM + Fore.MAGENTA
+            + Settings.BLOCK + Style.NORMAL
+            + Fore.RESET + get_string('rig_identifier')
+            + Style.BRIGHT + Fore.YELLOW + rig_identifier)
 
     print(
-        Style.DIM
-        + Fore.MAGENTA
-        + ' ‖ '
-        + Style.NORMAL
-        + Fore.RESET
-        + str(greeting)
-        + ', '
-        + Style.BRIGHT
-        + Fore.YELLOW
-        + str(username)
-        + '!\n')
+        Style.DIM + Fore.MAGENTA
+        + Settings.BLOCK + Style.NORMAL
+        + Fore.RESET + str(greeting)  + ', '
+        + Style.BRIGHT + Fore.YELLOW
+        + str(username) + '!\n')
 
 
 def init_rich_presence():
