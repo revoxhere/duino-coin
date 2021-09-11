@@ -358,8 +358,8 @@ def share_print(id, type,
               + " ∙ " + str("%04.1f" % float(computetime)) + "s"
               + Style.NORMAL + " ∙ " + Fore.BLUE + Style.BRIGHT
               + str(total_hashrate) + Fore.RESET + Style.NORMAL
-              + Settings.COG + " diff " + str(diff) + " ∙ " + Fore.CYAN
-              + "ping " + str("%02.0f" % int(ping)) + "ms")
+              + Settings.COG + f" diff {diff} ∙ " + Fore.CYAN
+              + f"ping {(int(ping))}ms")
 
 
 def get_string(string_name):
