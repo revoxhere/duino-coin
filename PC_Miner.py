@@ -618,15 +618,15 @@ class Miner:
                     Client.send("MOTD")
                     motd = Client.recv(512).replace("\n", "\n\t\t")
 
-                    pretty_print("MOTD: " + Fore.RESET + Style.NORMAL 
-                                + str(motd), "success", "net" + str(id))
+                    pretty_print("MOTD: " + Fore.RESET + Style.NORMAL
+                                 + str(motd), "success", "net" + str(id))
 
                     if float(POOL_VER) <= Settings.VER:
                         pretty_print(get_string("connected") + Fore.RESET
                                      + Style.NORMAL +
                                      get_string("connected_server")
                                      + str(POOL_VER) + ", " + pool[0] + ":"
-                                     + str(pool[1]) + ")", "success", 
+                                     + str(pool[1]) + ")", "success",
                                      "net" + str(id))
                     else:
                         pretty_print(get_string("outdated_miner")
