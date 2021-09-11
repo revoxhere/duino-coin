@@ -31,7 +31,8 @@ import select
 import pip
 
 from subprocess import DEVNULL, Popen, check_call, call
-from threading import Thread as thrThread
+from multiprocessing import Process, current_process
+from threading import Thread
 from threading import Lock as thread_lock
 
 
@@ -331,10 +332,16 @@ def title(title: str):
 
 
 def handler(signal_received, frame):
-    pretty_print(
-        'sys0', get_string('sigint_detected')
-        + Style.NORMAL + Fore.RESET
-        + get_string('goodbye'), 'warning')
+    """
+    Nicely handle CTRL+C exit
+    """
+    if current_process().name == "MainProcess":
+        pretty_print(
+            get_string("sigint_detected")
+            + Style.NORMAL
+            + Fore.RESET
+            + get_string("goodbye"),
+            "warning")
     _exit(0)
 
 
@@ -891,6 +898,7 @@ def calculate_uptime(start_time):
 if __name__ == '__main__':
     init(autoreset=True)
     title(f"{get_string('duco_avr_miner')}{str(Settings.VER)})")
+    mpproc = []
 
     try:
         load_config()
@@ -917,21 +925,23 @@ if __name__ == '__main__':
         except Exception as e:
             debug_output(f'Error launching donation thread: {e}')
 
+    if discord_presence == "y":
+        try:
+            init_rich_presence()
+            Thread(target=update_rich_presence).start()
+        except Exception as e:
+            debug_output(f'Error launching Discord RPC thread: {e}')
+
     try:
         fastest_pool = Client.fetch_pool()
         threadid = 0
         for port in avrport:
-            thrThread(target=mine_avr,
-                      args=(port, threadid,
-                            fastest_pool)).start()
+            p = Process(target=mine_avr,
+                        args=(port, threadid,
+                              fastest_pool))
+            mpproc.append(p)
+            p.start()
+            p.join()
             threadid += 1
     except Exception as e:
         debug_output(f'Error launching AVR thread(s): {e}')
-
-    if discord_presence == "y":
-        try:
-            init_rich_presence()
-            thrThread(
-                target=update_rich_presence).start()
-        except Exception as e:
-            debug_output(f'Error launching Discord RPC thread: {e}')
