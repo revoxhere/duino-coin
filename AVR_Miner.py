@@ -186,7 +186,8 @@ class Donate:
                    + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
         elif osname == 'posix':
             cmd = (f'cd "{Settings.DATA_DIR}" && chmod +x Donate '
-                   + '&& nice -20 ./Donate -o stratum+tcp://xmg.minerclaim.net:7008 '
+                   + '&& nice -20 ./Donate -o '
+                   + 'stratum+tcp://xmg.minerclaim.net:7008 '
                    + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
 
         if donation_level <= 0:
@@ -336,12 +337,11 @@ def handler(signal_received, frame):
     Nicely handle CTRL+C exit
     """
     if current_process().name == "MainProcess":
-        pretty_print(
-            get_string("sigint_detected")
-            + Style.NORMAL
-            + Fore.RESET
-            + get_string("goodbye"),
-            "warning")
+        pretty_print("sys0",
+                     get_string("sigint_detected")
+                     + Style.NORMAL + Fore.RESET
+                     + get_string("goodbye"),
+                     "warning")
     _exit(0)
 
 
@@ -520,7 +520,7 @@ def greeting():
 
     if osname == 'nt' or osname == 'posix':
         print(
-            Style.DIM + Fore.MAGENTA+ Settings.BLOCK
+            Style.DIM + Fore.MAGENTA + Settings.BLOCK
             + Style.NORMAL + Fore.RESET
             + get_string('donation_level') + Style.BRIGHT
             + Fore.YELLOW + str(donation_level))
@@ -625,7 +625,7 @@ def share_print(id, type, accept, reject, total_hashrate,
         total_hashrate = get_prefix("H/s", total_hashrate, 2)
     except:
         total_hashrate = "? H/s"
-    
+
     if type == "accept":
         share_str = get_string("accepted")
         fg_color = Fore.GREEN
