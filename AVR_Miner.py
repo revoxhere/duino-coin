@@ -596,7 +596,7 @@ def share_print(id, type, accept, reject, total_hashrate,
               + Style.NORMAL + " ∙ " + Fore.BLUE + Style.BRIGHT
               + str(total_hashrate) + Fore.RESET + Style.NORMAL
               + Settings.COG + " diff " + str(diff) + " ∙ " + Fore.CYAN
-              + "ping " + str("%02.0f" % int(ping)) + "ms")
+              + "ping " + str("%03.0f" % int(ping)) + "ms")
 
 
 def mine_avr(com, threadid, fastest_pool):
@@ -621,7 +621,7 @@ def mine_avr(com, threadid, fastest_pool):
                 break
             except Exception as e:
                 pretty_print(
-                    'usb'
+                    'sys'
                     + port_num(com),
                     get_string('board_connection_error')
                     + str(com)
@@ -697,7 +697,7 @@ def mine_avr(com, threadid, fastest_pool):
                 try:
                     diff = int(job[2])
                 except:
-                    pretty_print("usb" + port_num(com),
+                    pretty_print("sys" + port_num(com),
                                  f" Node message: {job[1]}", "warning")
                     sleep(3)
             except Exception as e:
@@ -726,15 +726,13 @@ def mine_avr(com, threadid, fastest_pool):
                 if retry_counter > 3:
                     break
 
-                if "\x00" in result or not result:
-                    continue
-
                 else:
                     try:
                         if result[0] and result[1]:
+                            _ = int(result[0], 2)
                             debug_output(com + f': Result: {result[0]}')
                             break
-                    except Exception:
+                    except Exception as e:
                         debug_output(com + f': Retrying data read: {e}')
                         retry_counter += 1
                         continue
@@ -747,7 +745,7 @@ def mine_avr(com, threadid, fastest_pool):
                 hashrate_mean.append(hashrate_t)
                 hashrate = mean(hashrate_mean[-5:])
             except Exception as e:
-                pretty_print('usb' + port_num(com),
+                pretty_print('sys' + port_num(com),
                              get_string('mining_avr_connection_error')
                              + Style.NORMAL + Fore.RESET
                              + ' (error reading result from the board: '
