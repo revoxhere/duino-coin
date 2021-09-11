@@ -710,32 +710,30 @@ def mine_avr(com, threadid, fastest_pool):
 
             retry_counter = 0
             while True:
-                debug_output(com + ': Sending job to the board')
-                ser.write(bytes(str(job[0]
-                                    + Settings.SEPARATOR
-                                    + job[1]
-                                    + Settings.SEPARATOR
-                                    + job[2]
-                                    + Settings.SEPARATOR),
-                                encoding=Settings.ENCODING))
-
-                debug_output(com + ': Reading result from the board')
-                result = ser.read_until(b'\n').decode().strip().split(',')
-                ser.flush()
-
                 if retry_counter > 3:
                     break
 
-                else:
-                    try:
-                        if result[0] and result[1]:
-                            _ = int(result[0], 2)
-                            debug_output(com + f': Result: {result[0]}')
-                            break
-                    except Exception as e:
-                        debug_output(com + f': Retrying data read: {e}')
-                        retry_counter += 1
-                        continue
+                try:
+                    debug_output(com + ': Sending job to the board')
+                    ser.write(bytes(str(job[0]
+                                        + Settings.SEPARATOR
+                                        + job[1]
+                                        + Settings.SEPARATOR
+                                        + job[2]
+                                        + Settings.SEPARATOR),
+                                    encoding=Settings.ENCODING))
+                    debug_output(com + ': Reading result from the board')
+                    result = ser.read_until(b'\n').decode().strip().split(',')
+                    ser.flush()
+
+                    if result[0] and result[1]:
+                        _ = int(result[0], 2)
+                        debug_output(com + f': Result: {result[0]}')
+                        break
+                except Exception as e:
+                    debug_output(com + f': Retrying data read: {e}')
+                    retry_counter += 1
+                    continue
 
             try:
                 computetime = round(int(result[1], 2) / 1000000, 3)
