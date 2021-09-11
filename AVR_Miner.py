@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner v2.7.3 © MIT licensed
+Duino-Coin Official AVR Miner 2.7.3 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -488,8 +488,8 @@ def greeting():
         + Settings.BLOCK + Fore.YELLOW
         + Style.BRIGHT + get_string('banner')
         + Style.RESET_ALL + Fore.MAGENTA
-        + ' (v{Settings.VER})' + Fore.RESET
-        + '2019-2021')
+        + f' {Settings.VER}' + Fore.RESET
+        + ' 2019-2021')
 
     print(
         Style.DIM + Fore.MAGENTA
@@ -801,7 +801,7 @@ def mine_avr(com, threadid, fastest_pool):
                             + Settings.SEPARATOR
                             + str(hashrate_t)
                             + Settings.SEPARATOR
-                            + f'Official AVR Miner v{Settings.VER}'
+                            + f'Official AVR Miner {Settings.VER}'
                             + Settings.SEPARATOR
                             + str(rig_identifier)
                             + Settings.SEPARATOR
