@@ -418,12 +418,10 @@ def load_config():
         debug = config["AVR Miner"]['debug']
         rig_identifier = config["AVR Miner"]['identifier']
         Settings.SOC_TIMEOUT = int(config["AVR Miner"]["soc_timeout"])
-        Settings.AVR_TIMEOUT = float(
-            config["AVR Miner"]["Settings.AVR_TIMEOUT"])
+        Settings.AVR_TIMEOUT = float(config["AVR Miner"]["avr_timeout"])
         discord_presence = config["AVR Miner"]["discord_presence"]
         shuffle_ports = config["AVR Miner"]["shuffle_ports"]
-        Settings.REPORT_TIME = int(
-            config["AVR Miner"]["periodic_report"])
+        Settings.REPORT_TIME = int(config["AVR Miner"]["periodic_report"])
 
 
 def greeting():
@@ -860,7 +858,7 @@ if __name__ == '__main__':
         pretty_print(
             'sys0', get_string('load_config_error')
             + Settings.DATA_DIR + get_string('load_config_error_warning')
-            + Style.NORMAL + Fore.RESET + ' ({e})', 'error')
+            + Style.NORMAL + Fore.RESET + f' ({e})', 'error')
         debug_output(f'Error reading configfile: {e}')
         sleep(10)
         _exit(1)
