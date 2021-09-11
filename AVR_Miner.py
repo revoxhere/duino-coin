@@ -273,7 +273,7 @@ def load_config():
             + get_string('edit_config_file_warning'))
 
         print(
-            Style.RESET_ALL + get_string('dont_have_account') 
+            Style.RESET_ALL + get_string('dont_have_account')
             + Fore.YELLOW + get_string('wallet') + Fore.RESET
             + get_string('register_warning'))
 
@@ -309,7 +309,7 @@ def load_config():
                 confirmation = input(
                     Style.RESET_ALL + Fore.YELLOW
                     + get_string('ask_anotherport')
-                    + Fore.RESET  + Style.BRIGHT)
+                    + Fore.RESET + Style.BRIGHT)
 
                 if confirmation == 'y' or confirmation == 'Y':
                     avrport += ','
@@ -339,7 +339,6 @@ def load_config():
         #        + get_string('ask_donation_level')
         #        + Fore.RESET
         #        + Style.BRIGHT)
-
 
         donation_level = sub(r'\D', '', donation_level)
         if donation_level == '':
@@ -404,7 +403,7 @@ def greeting():
 
     print(
         Style.DIM + Fore.MAGENTA
-        + Settings.BLOCK + Fore.YELLOW 
+        + Settings.BLOCK + Fore.YELLOW
         + Style.BRIGHT + get_string('banner')
         + Style.RESET_ALL + Fore.MAGENTA
         + ' (v{Settings.VER})' + Fore.RESET
@@ -426,7 +425,7 @@ def greeting():
     print(
         Style.DIM + Fore.MAGENTA
         + Settings.BLOCK + Style.NORMAL
-        + Fore.RESET+ get_string('avr_on_port')
+        + Fore.RESET + get_string('avr_on_port')
         + Style.BRIGHT + Fore.YELLOW
         + ' '.join(avrport))
 
@@ -459,7 +458,7 @@ def greeting():
     print(
         Style.DIM + Fore.MAGENTA
         + Settings.BLOCK + Style.NORMAL
-        + Fore.RESET + str(greeting)  + ', '
+        + Fore.RESET + str(greeting) + ', '
         + Style.BRIGHT + Fore.YELLOW
         + str(username) + '!\n')
 
