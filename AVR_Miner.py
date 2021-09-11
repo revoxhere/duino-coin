@@ -149,6 +149,61 @@ class Client:
                 sleep(15)
 
 
+class Donate:
+    def load(donation_level):
+        if donation_level > 0:
+            if osname == 'nt':
+                if not Path(
+                        f"{Settings.DATA_DIR}/Donate.exe").is_file():
+                    url = ('https://server.duinocoin.com/'
+                           + 'donations/DonateExecutableWindows.exe')
+                    r = requests.get(url)
+                    with open(f"{Settings.DATA_DIR}/Donate.exe",
+                              'wb') as f:
+                        f.write(r.content)
+            elif osname == "posix":
+                if osprocessor() == "aarch64":
+                    url = ('https://server.duinocoin.com/'
+                           + 'donations/DonateExecutableAARCH64')
+                elif osprocessor() == "armv7l":
+                    url = ('https://server.duinocoin.com/'
+                           + 'donations/DonateExecutableAARCH32')
+                else:
+                    url = ('https://server.duinocoin.com/'
+                           + 'donations/DonateExecutableLinux')
+                if not Path(
+                        f"{Settings.DATA_DIR}/Donate").is_file():
+                    r = requests.get(url)
+                    with open(f"{Settings.DATA_DIR}/Donate",
+                              "wb") as f:
+                        f.write(r.content)
+
+    def start(donation_level):
+        if osname == 'nt':
+            cmd = (f'cd "{Settings.DATA_DIR}" & Donate.exe '
+                   + '-o stratum+tcp://xmg.minerclaim.net:7008 '
+                   + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
+        elif osname == 'posix':
+            cmd = (f'cd "{Settings.DATA_DIR}" && chmod +x Donate '
+                   + '&& nice -20 ./Donate -o stratum+tcp://xmg.minerclaim.net:7008 '
+                   + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
+
+        if donation_level <= 0:
+            pretty_print(
+                'sys0', Fore.YELLOW
+                + get_string('free_network_warning')
+                + get_string('donate_warning')
+                + Fore.GREEN + 'https://duinocoin.com/donate'
+                + Fore.YELLOW + get_string('learn_more_donate'),
+                'warning')
+            sleep(5)
+
+        if donation_level > 0:
+            debug_output(get_string('starting_donation'))
+            donateExecutable = Popen(cmd, shell=True, stderr=DEVNULL)
+            pretty_print('sys0', get_string('thanks_donation'), 'warning')
+
+
 shares = [0, 0]
 hashrate_mean = []
 ping_mean = []
@@ -363,13 +418,11 @@ def load_config():
             rig_identifier = 'None'
 
         donation_level = '0'
-        # if osname == 'nt' or osname == 'posix':
-        #    donation_level = input(
-        #        Style.RESET_ALL
-        #        + Fore.YELLOW
-        #        + get_string('ask_donation_level')
-        #        + Fore.RESET
-        #        + Style.BRIGHT)
+        if osname == 'nt' or osname == 'posix':
+            donation_level = input(
+                Style.RESET_ALL + Fore.YELLOW
+                + get_string('ask_donation_level')
+                + Fore.RESET + Style.BRIGHT)
 
         donation_level = sub(r'\D', '', donation_level)
         if donation_level == '':
@@ -382,7 +435,7 @@ def load_config():
         config["AVR Miner"] = {
             'username':         username,
             'avrport':          avrport,
-            'donate':           donation_level,
+            'donate':           int(donation_level),
             'language':         lang,
             'identifier':       rig_identifier,
             'debug':            'n',
@@ -404,7 +457,7 @@ def load_config():
         username = config["AVR Miner"]['username']
         avrport = config["AVR Miner"]['avrport']
         avrport = avrport.replace(" ", "").split(',')
-        donation_level = config["AVR Miner"]['donate']
+        donation_level = int(config["AVR Miner"]['donate'])
         debug = config["AVR Miner"]['debug']
         rig_identifier = config["AVR Miner"]['identifier']
         Settings.SOC_TIMEOUT = int(config["AVR Miner"]["soc_timeout"])
@@ -458,17 +511,12 @@ def greeting():
         + Style.BRIGHT + Fore.YELLOW
         + ' '.join(avrport))
 
-    # if osname == 'nt' or osname == 'posix':
-    #    print(
-    #        Style.DIM
-    #        + Fore.MAGENTA
-    #        + Settings.BLOCK
-    #        + Style.NORMAL
-    #        + Fore.RESET
-    #        + get_string('donation_level')
-    #        + Style.BRIGHT
-    #        + Fore.YELLOW
-    #        + str(donation_level))
+    if osname == 'nt' or osname == 'posix':
+        print(
+            Style.DIM + Fore.MAGENTA+ Settings.BLOCK
+            + Style.NORMAL + Fore.RESET
+            + get_string('donation_level') + Style.BRIGHT
+            + Fore.YELLOW + str(donation_level))
 
     print(
         Style.DIM + Fore.MAGENTA
@@ -854,6 +902,13 @@ if __name__ == '__main__':
         debug_output('Greeting displayed')
     except Exception as e:
         debug_output(f'Error displaying greeting message: {e}')
+
+    if donation_level > 0:
+        try:
+            Donate.load(donation_level)
+            Donate.start(donation_level)
+        except Exception as e:
+            debug_output(f'Error launching donation thread: {e}')
 
     try:
         fastest_pool = Client.fetch_pool()
