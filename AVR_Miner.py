@@ -587,7 +587,7 @@ def share_print(id, type, accept, reject, total_hashrate,
     with thread_lock():
         print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
               + Fore.WHITE + Style.BRIGHT + Back.MAGENTA + Fore.RESET
-              + " cpu" + str(id) + " " + Back.RESET
+              + " avr" + str(id) + " " + Back.RESET
               + fg_color + Settings.PICK + share_str + Fore.RESET
               + str(accept) + "/" + str(accept + reject) + Fore.YELLOW
               + " (" + str(round(accept / (accept + reject) * 100)) + "%)"
@@ -595,8 +595,8 @@ def share_print(id, type, accept, reject, total_hashrate,
               + " ∙ " + str("%04.1f" % float(computetime)) + "s"
               + Style.NORMAL + " ∙ " + Fore.BLUE + Style.BRIGHT
               + str(total_hashrate) + Fore.RESET + Style.NORMAL
-              + Settings.COG + " diff " + str(diff) + " ∙ " + Fore.CYAN
-              + "ping " + str("%03.0f" % int(ping)) + "ms")
+              + Settings.COG + f" diff {diff} ∙ " + Fore.CYAN
+              + f"ping {(int(ping))}ms")
 
 
 def mine_avr(com, threadid, fastest_pool):
