@@ -282,16 +282,16 @@ class Donate:
 
         if donation_level <= 0:
             pretty_print(
-                'sys0', Fore.YELLOW
-                + get_string('free_network_warning')
+                Fore.YELLOW + get_string('free_network_warning')
                 + get_string('donate_warning')
                 + Fore.GREEN + 'https://duinocoin.com/donate'
                 + Fore.YELLOW + get_string('learn_more_donate'),
-                'warning')
+                'warning', 'sys0')
             sleep(5)
 
         if donation_level > 0:
             donateExecutable = Popen(cmd, shell=True, stderr=DEVNULL)
+            pretty_print(get_string('thanks_donation'), 'warning', 'sys0')
 
 
 def get_prefix(symbol: str,
