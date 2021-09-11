@@ -609,9 +609,16 @@ def share_print(id, type, accept, reject, total_hashrate,
     Produces nicely formatted CLI output for shares:
     HH:MM:S |avrN| ⛏ Accepted 0/0 (100%) ∙ 0.0s ∙ 0 kH/s ⚙ diff 0 k ∙ ping 0ms
     """
-    total_hashrate = get_prefix("H/s", total_hashrate, 2)
-    diff = get_prefix("", int(diff), 0)
+    try:
+        diff = get_prefix("", int(diff), 0)
+    except:
+        diff = "?"
 
+    try:
+        total_hashrate = get_prefix("H/s", total_hashrate, 2)
+    except:
+        total_hashrate = "? H/s"
+    
     if type == "accept":
         share_str = get_string("accepted")
         fg_color = Fore.GREEN
