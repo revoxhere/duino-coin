@@ -220,24 +220,22 @@ class Client:
         Fetches best pool from the /getPool API endpoint
         """
         while True:
-            pretty_print("net0", " " + get_string("connection_search"),
-                         "warning")
+            pretty_print(" " + get_string("connection_search"),
+                         "warning", "net0")
             try:
                 response = requests.get(
                     "https://server.duinocoin.com/getPool").json()
                 if response["success"] == True:
                     NODE_ADDRESS = response["ip"]
                     NODE_PORT = response["port"]
-                    debug_output(f"Fetched pool: {response['name']}")
                     return (response["ip"], response["port"])
                 else:
-                    pretty_print("net0", f"Error: {response['message']}"
-                                 + ", retrying in 15s", "error")
+                    pretty_print(f"Error: {response['message']}"
+                                 + ", retrying in 15s", "error", "net0")
                     sleep(15)
             except Exception as e:
-                pretty_print("net0",
-                             f" Error fetching mining node: {e}"
-                             + ", retrying in 15s", "error")
+                pretty_print(f" Error fetching mining node: {e}"
+                             + ", retrying in 15s", "error", "net0")
                 sleep(15)
 
 
@@ -639,6 +637,7 @@ class Miner:
                                      get_string("update_warning"),
                                      "warning", "net" + str(id))
                         sleep(5)
+                break
             except:
                 pretty_print(get_string('connecting_error')
                              + Style.NORMAL + f' (connection err: {e})',
