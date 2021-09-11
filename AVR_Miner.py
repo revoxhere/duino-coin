@@ -43,6 +43,45 @@ def install(package):
     call([sys.executable, __file__])
 
 
+try:
+    from serial import Serial
+    import serial.tools.list_ports
+except ModuleNotFoundError:
+    print("Pyserial is not installed. "
+          + "Miner will try to automatically install it "
+          + "If it fails, please manually execute "
+          + "python3 -m pip install pyserial")
+    install('pyserial')
+
+try:
+    import requests
+except ModuleNotFoundError:
+    print("Requests is not installed. "
+          + "Miner will try to automatically install it "
+          + "If it fails, please manually execute "
+          + "python3 -m pip install requests")
+    install('requests')
+
+try:
+    from colorama import Back, Fore, Style, init
+    init(autoreset=True)
+except ModuleNotFoundError:
+    print("Colorama is not installed. "
+          + "Miner will try to automatically install it "
+          + "If it fails, please manually execute "
+          + "python3 -m pip install colorama")
+    install("colorama")
+
+try:
+    from pypresence import Presence
+except ModuleNotFoundError:
+    print("Pypresence is not installed. "
+          + "Miner will try to automatically install it "
+          + "If it fails, please manually execute "
+          + "python3 -m pip install pypresence")
+    install("pypresence")
+
+
 def now():
     return datetime.now()
 
@@ -109,55 +148,6 @@ class Client:
                              + ", retrying in 15s", "error")
                 sleep(15)
 
-
-try:
-    # Check if pyserial is installed
-    from serial import Serial
-    import serial.tools.list_ports
-except ModuleNotFoundError:
-    print(
-        now().strftime('%H:%M:%S ')
-        + 'Pyserial is not installed. '
-        + 'Miner will try to install it. '
-        + 'If it fails, please manually install "pyserial" python3 package.'
-        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
-    install('pyserial')
-
-try:
-    # Check if requests is installed
-    import requests
-except ModuleNotFoundError:
-    print(
-        now().strftime('%H:%M:%S ')
-        + 'Requests is not installed. '
-        + 'Miner will try to install it. '
-        + 'If it fails, please manually install "requests" python3 package.'
-        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
-    install('requests')
-
-try:
-    # Check if colorama is installed
-    from colorama import Back, Fore, Style, init
-except ModuleNotFoundError:
-    print(
-        now().strftime('%H:%M:%S ')
-        + 'Colorama is not installed. '
-        + 'Miner will try to install it. '
-        + 'If it fails, please manually install "colorama" python3 package.'
-        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
-    install('colorama')
-
-try:
-    # Check if pypresence is installed
-    from pypresence import Presence
-except ModuleNotFoundError:
-    print(
-        now().strftime('%H:%M:%S ')
-        + 'Pypresence is not installed. '
-        + 'Miner will try to install it. '
-        + 'If it fails, please manually install "pypresence" python3 package.'
-        + '\nIf you can\'t install it, use the Minimal-PC_Miner.')
-    install('pypresence')
 
 shares = [0, 0]
 hashrate_mean = []
