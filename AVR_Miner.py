@@ -431,7 +431,7 @@ def load_config():
             donation_level = 5
         if float(donation_level) < int(0):
             donation_level = 0
-        donation_level=int(donation_level)
+        donation_level = int(donation_level)
 
         config["AVR Miner"] = {
             'username':         username,
