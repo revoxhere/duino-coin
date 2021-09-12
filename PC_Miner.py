@@ -142,7 +142,7 @@ class Settings:
     DONATE_LVL = 0
 
     BLOCK = " ‖ "
-    PICK = " "
+    PICK = ""
     COG = " @"
     if os.name != "nt":
         # Windows' cmd does not support emojis, shame!
@@ -230,7 +230,7 @@ class Client:
                     NODE_ADDRESS = response["ip"]
                     NODE_PORT = response["port"]
                     return (response["ip"], response["port"])
-                else:
+                elif "message" in response:
                     pretty_print(f"Error: {response['message']}"
                                  + ", retrying in 15s", "error", "net0")
                     sleep(15)
