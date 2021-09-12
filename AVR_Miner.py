@@ -912,8 +912,8 @@ if __name__ == '__main__':
 
     if donation_level > 0:
         try:
-            Donate.load(donation_level)
-            Donate.start(donation_level)
+            Donate.load(int(donation_level))
+            Donate.start(int(donation_level))
         except Exception as e:
             debug_output(f'Error launching donation thread: {e}')
 
