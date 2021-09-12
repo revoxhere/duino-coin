@@ -100,7 +100,7 @@ class Settings:
     SEPARATOR = ","
     ENCODING = "utf-8"
     BLOCK = " ‖ "
-    PICK = " "
+    PICK = ""
     COG = " @"
     if osname != "nt":
         # Windows' cmd does not support emojis, shame!
@@ -138,9 +138,9 @@ class Client:
                     NODE_PORT = response["port"]
                     debug_output(f"Fetched pool: {response['name']}")
                     return (response["ip"], response["port"])
-                else:
-                    pretty_print("net0", f"Error: {response['message']}"
-                                 + ", retrying in 15s", "error")
+                elif "message" in response:
+                    pretty_print(f"Error: {response['message']}"
+                                 + ", retrying in 15s", "error", "net0")
                     sleep(15)
             except Exception as e:
                 pretty_print("net0",
