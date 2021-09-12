@@ -24,6 +24,11 @@ const char *username = "Your Duino-Coin username";
 const char *rig_identifier = "None";
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 2
+#define BLINK_SHARE_FOUND    1
+#define BLINK_SETUP_COMPLETE 2
+#define BLINK_CLIENT_CONNECT 3
+#define BLINK_RESET_DEVICE   5
+
 // Define watchdog timer seconds
 #define WDT_TIMEOUT 60
 
@@ -81,6 +86,15 @@ unsigned long shares_one = 0;  // Share variable
 unsigned long shares_two = 0;
 unsigned int diff_one = 0;
 unsigned int diff_two = 0;
+
+void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
+  uint8_t state = LOW;
+
+  for (int x = 0; x < (count << 1); ++x) {
+    digitalWrite(pin, state ^= HIGH);
+    delay(75);
+  }
+}
 
 void UpdatePool() {
   String input = "";
@@ -155,7 +169,7 @@ void WiFireconnect(void *pvParameters) {
       Serial.println("    IP address: " + WiFi.localIP().toString());
       Serial.println("      Rig name: " + String(rig_identifier));
       Serial.println();
-
+      blink(BLINK_SETUP_COMPLETE);// Sucessfull connection with wifi network
       UpdatePool();
       yield();
       delay(100);
@@ -173,6 +187,7 @@ void WiFireconnect(void *pvParameters) {
 
       if (n == 0) {
         Serial.println(F("No networks found. Resetting ESP32."));
+	blink(BLINK_RESET_DEVICE);
         esp_restart();
       }
 
@@ -275,14 +290,9 @@ void Task1code(void *pvParameters) {
 
     // Server sends SERVER_VERSION after connecting
     SERVER_VER = client_one.readString();
-    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
-    delay(50);
-    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
     Serial.println("CORE1 Connected to the server. Server version: " +
                    String(SERVER_VER));
-    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
-    delay(50);
-    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
+    blink(BLINK_CLIENT_CONNECT); // Sucessfull connection with the server
 
     while (client_one.connected()) {
       esp_task_wdt_reset();
@@ -388,11 +398,13 @@ void Task1code(void *pvParameters) {
           Serial.println("CORE1 " + String(feedback_one) + " share #" +
                          String(shares_one) + " (" + String(duco_res_one) +
                          ")" + " hashrate: " + String(hashrate_one));
-
+          blink(BLINK_SHARE_FOUND);
+		
           if (hashrate_one < 4000) {
             Serial.println(F("CORE1 Low hashrate. Restarting"));
             client_one.flush();
             client_one.stop();
+            blink(BLINK_RESET_DEVICE);
             esp_restart();
           }
           break;  // Stop and ask for more work
@@ -457,14 +469,9 @@ void Task2code(void *pvParameters) {
 
     // Server sends SERVER_VERSION after connecting
     SERVER_VER = client.readString();
-    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
-    delay(50);
-    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
     Serial.println("CORE2 Connected to the server. Server version: " +
                    String(SERVER_VER));
-    digitalWrite(LED_BUILTIN, HIGH);  // Turn off built-in led
-    delay(50);
-    digitalWrite(LED_BUILTIN, LOW);  // Turn on built-in led
+    blink(BLINK_CLIENT_CONNECT); // Sucessfull connection with the server
 
     while (client.connected()) {
       esp_task_wdt_reset();
@@ -563,10 +570,13 @@ void Task2code(void *pvParameters) {
           Serial.println("CORE2 " + String(feedback) + " share #" +
                          String(shares_two) + " (" + String(duco_res_two) +
                          ")" + " hashrate: " + String(hashrate_two));
+	  blink(BLINK_SHARE_FOUND);
+		
           if (hashrate_two < 4000) {
             Serial.println(F("CORE2 Low hashrate. Restarting"));
             client.flush();
             client.stop();
+	    blink(BLINK_RESET_DEVICE);
             esp_restart();
           }
           break;  // Stop and ask for more work
@@ -645,6 +655,7 @@ void setup() {
         else if (error == OTA_END_ERROR)
           Serial.println(F("End Failed"));
         ota_state = false;
+	blink(BLINK_RESET_DEVICE);
         esp_restart();
       });
 
