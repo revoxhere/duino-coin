@@ -431,11 +431,12 @@ def load_config():
             donation_level = 5
         if float(donation_level) < int(0):
             donation_level = 0
+        donation_level = int(donation_level)
 
         config["AVR Miner"] = {
             'username':         username,
             'avrport':          avrport,
-            'donate':           int(donation_level),
+            'donate':           donation_level,
             'language':         lang,
             'identifier':       rig_identifier,
             'debug':            'n',
@@ -912,8 +913,8 @@ if __name__ == '__main__':
 
     if donation_level > 0:
         try:
-            Donate.load(int(donation_level))
-            Donate.start(int(donation_level))
+            Donate.load(donation_level)
+            Donate.start(donation_level)
         except Exception as e:
             debug_output(f'Error launching donation thread: {e}')
 
