@@ -15,6 +15,7 @@ from multiprocessing import cpu_count, current_process
 from multiprocessing import Process, Manager
 from threading import Thread
 from datetime import datetime
+from random import randint
 
 from os import execl, mkdir, _exit
 from subprocess import DEVNULL, Popen, check_call
@@ -229,11 +230,13 @@ class Client:
                 if response["success"] == True:
                     NODE_ADDRESS = response["ip"]
                     NODE_PORT = response["port"]
-                    return (response["ip"], response["port"])
+                    return (NODE_ADDRESS, NODE_PORT)
                 elif "message" in response:
                     pretty_print(f"Error: {response['message']}"
                                  + ", retrying in 15s", "error", "net0")
-                    sleep(15)
+                    sleep(10)
+                else:
+                    raise
             except Exception as e:
                 pretty_print(f" Error fetching mining node: {e}"
                              + ", retrying in 15s", "error", "net0")
@@ -716,7 +719,8 @@ class Miner:
     def mine(id: int, user_settings: list,
              pool: tuple,
              accept: int, reject: int,
-             hashrate: list):
+             hashrate: list,
+             single_miner_id: str):
         """
         Main section that executes the functionalities from the sections above.
         """
@@ -776,15 +780,18 @@ class Miner:
                             hashrate[id] = result[1]
                             total_hashrate = sum(hashrate.values())
                             while True:
-                                Client.send(str(result[0])
+                                Client.send(f"{result[0]}"
                                             + Settings.SEPARATOR
-                                            + str(result[1])
+                                            + f"{result[1]}"
                                             + Settings.SEPARATOR
-                                            + "Official PC Miner ("
-                                            + user_settings["algorithm"]
-                                            + ") " + str(Settings.VER)
+                                            + "Official PC Miner"
+                                            + f"({user_settings['algorithm']})"
+                                            + f" {Settings.VER}"
                                             + Settings.SEPARATOR
-                                            + str(user_settings["identifier"]))
+                                            + f"{user_settings['identifier']}"
+                                            + Settings.SEPARATOR
+                                            + Settings.SEPARATOR
+                                            + f"{single_miner_id}")
 
                                 time_start = time()
                                 feedback = Client.recv(
@@ -893,11 +900,19 @@ if __name__ == "__main__":
     Donate.load(int(user_settings["donate"]))
     Donate.start(int(user_settings["donate"]))
 
+    """
+    Generate a random number that's used only to
+    make the wallets display one miner with many threads
+    instead of many separate miners clogging it up
+    (like it was before release 2.7.3)
+    """
+    single_miner_id = randint(0, 2811)
+
     for i in range(int(user_settings["threads"])):
         p = Process(target=Miner.mine,
                     args=[i, user_settings,
                           fastest_pool, accept, reject,
-                          hashrate])
+                          hashrate, single_miner_id])
         p_list.append(p)
         p.start()
         sleep(0.05)
