@@ -98,30 +98,6 @@ except ModuleNotFoundError:
           + "python3 -m pip install pypresence")
     install("pypresence")
 
-psutil_en = True
-try:
-    """
-    Suppress psutil import error output,
-    doing this will generate an error for devices 
-    that don't have access to the /proc folder
-    """
-    #sys.stderr = open(os.devnull, "w")
-    # print("yeah")
-    import psutil
-except ModuleNotFoundError:
-    print("Psutil is not installed. "
-          + "Miner will try to automatically install it "
-          + "If it fails, please manually execute "
-          + "python3 -m pip install psutil")
-    install("psutil")
-
-try:
-    psutil.cpu_percent()
-except:
-    sys.stderr = sys.__stderr__
-    psutil_en = False
-    print("Psutil disabled")
-
 
 class Settings:
     """
@@ -162,11 +138,6 @@ class Algorithms:
         base_hash = sha1(last_h.encode('ascii'))
 
         for nonce in range(100 * diff + 1):
-            if (int(eff) != 100 and nonce % (1_000 * int(eff)) == 0):
-                if psutil_en and int(eff) < 95:
-                    if psutil.cpu_percent() > int(eff):
-                        sleep(1/100*int(eff))
-
             temp_h = base_hash.copy()
             temp_h.update(str(nonce).encode('ascii'))
             d_res = temp_h.hexdigest()
@@ -182,12 +153,6 @@ class Algorithms:
         time_start = time()
 
         for nonce in range(100 * diff + 1):
-            if (int(eff) != 100
-                    and nonce % (1_000 * int(eff)) == 0):
-                if psutil_en and int(eff) < 95:
-                    if psutil.cpu_percent() > int(eff):
-                        sleep(1/100/int(eff))
-
             d_res = xxh64(last_h + str(nonce),
                           seed=2811).hexdigest()
 
@@ -466,11 +431,10 @@ class Miner:
                   + get_string("translation_autor"))
 
         try:
-            if psutil_en:
-                print(Style.DIM + Fore.YELLOW + Settings.BLOCK
-                      + Style.NORMAL + Fore.RESET + "CPU: " + Style.BRIGHT
-                      + Fore.YELLOW + str(user_settings["threads"])
-                      + "x " + str(cpu["brand_raw"]))
+            print(Style.DIM + Fore.YELLOW + Settings.BLOCK
+                  + Style.NORMAL + Fore.RESET + "CPU: " + Style.BRIGHT
+                  + Fore.YELLOW + str(user_settings["threads"])
+                  + "x " + str(cpu["brand_raw"]))
         except:
             print(Style.DIM + Fore.YELLOW + Settings.BLOCK
                   + Style.NORMAL + Fore.RESET + "CPU: " + Style.BRIGHT
@@ -587,19 +551,19 @@ class Miner:
                 if prompt == "2":
                     algorithm = "XXHASH"
 
-            intensity = None
-            if psutil_en:
-                intensity = sub(r"\D", "",
-                                input(Style.NORMAL
-                                      + get_string("ask_intensity")
-                                       + Style.BRIGHT))
+            intensity = 100  # None
+            ##
+            # intensity = sub(r"\D", "",
+            # input(Style.NORMAL
+            ##                      + get_string("ask_intensity")
+            # + Style.BRIGHT))
 
-            if not intensity:
-                intensity = 95
-            elif float(intensity) > 100:
-                intensity = 100
-            elif float(intensity) < 1:
-                intensity = 1
+            # if not intensity:
+            ##    intensity = 95
+            # elif float(intensity) > 100:
+            ##    intensity = 100
+            # elif float(intensity) < 1:
+            ##    intensity = 1
 
             threads = sub(r"\D", "",
                           input(Style.NORMAL + get_string("ask_threads")
@@ -785,7 +749,6 @@ class Miner:
                                             + f"{result[1]}"
                                             + Settings.SEPARATOR
                                             + "Official PC Miner"
-                                            + f"({user_settings['algorithm']})"
                                             + f" {Settings.VER}"
                                             + Settings.SEPARATOR
                                             + f"{user_settings['identifier']}"
