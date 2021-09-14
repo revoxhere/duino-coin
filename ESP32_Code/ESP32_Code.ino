@@ -76,6 +76,7 @@ SemaphoreHandle_t xMutex;
 const char *get_pool_api = "http://51.15.127.80:4242/getPool";
 String host = "";
 int port = 0;
+int walletid = 0;
 volatile int wifi_state = 0;
 volatile int wifi_prev_state = WL_CONNECTED;
 volatile bool ota_state = false;
@@ -375,9 +376,9 @@ void Task1code(void *pvParameters) {
 
           client_one.flush();
           client_one.print(String(duco_res_one) + "," + String(hashrate_one) +
-                           ",ESP32 Miner v2.7 (core 1)," +
+                           ",Official ESP32 Miner 2.73," +
                            String(rig_identifier) + ",DUCOID" +
-                           String((char *)chip_id));  // Send result to server
+                           String((char *)chip_id) + "," + String(walletid));  // Send result to server
           Serial.println(F("CORE1 Posting result and waiting for feedback."));
 
           while (!client_one.available()) {
@@ -548,8 +549,8 @@ void Task2code(void *pvParameters) {
 
           client.flush();
           client.print(String(duco_res_two) + "," + String(hashrate_two) +
-                       ",ESP32 Miner v2.7 (core 2)," + String(rig_identifier) +
-                       ",DUCOID" + String((char *)chip_id));  // Send result to server
+                       ",Official ESP32 Miner 2.73," + String(rig_identifier) +
+                       ",DUCOID" + String((char *)chip_id) + "," + String(walletid));  // Send result to server
           Serial.println(F("CORE2 Posting result and waiting for feedback."));
 
           while (!client.available()) {
@@ -593,7 +594,7 @@ void setup() {
   // disableCore0WDT();
   // disableCore1WDT();
   Serial.begin(500000);  // Start serial connection
-  Serial.println("\n\nDuino-Coin ESP32 Miner v2.7");
+  Serial.println("\n\nDuino-Coin Official ESP32 Miner 2.73");
 
   WiFi.mode(WIFI_STA);  // Setup ESP in client mode
   btStop();
@@ -606,6 +607,7 @@ void setup() {
   snprintf(
       (char *)chip_id, 23, "%04X%08X", chip,
       (uint32_t)chipid);  // Storing the 48 bit chip chip_id into a char array.
+  walletid = random(0, 2811);
 
   ota_state = false;
 
