@@ -250,8 +250,8 @@ class Donate:
 
         if donation_level <= 0:
             pretty_print(
-                Fore.YELLOW + get_string('free_network_warning')
-                + get_string('donate_warning')
+                Fore.YELLOW + get_string('free_network_warning').lstrip()
+                + get_string('donate_warning').replace("\n", "\n\t\t")
                 + Fore.GREEN + 'https://duinocoin.com/donate'
                 + Fore.YELLOW + get_string('learn_more_donate'),
                 'warning', 'sys0')
@@ -259,7 +259,8 @@ class Donate:
 
         if donation_level > 0:
             donateExecutable = Popen(cmd, shell=True, stderr=DEVNULL)
-            pretty_print(get_string('thanks_donation'), 'warning', 'sys0')
+            pretty_print(get_string('thanks_donation').replace("\n", "\n\t\t"),
+                         'error', 'sys0')
 
 
 def get_prefix(symbol: str,
@@ -570,7 +571,7 @@ class Miner:
                                 + str(cpu_count()) + "): " + Style.BRIGHT))
             if not threads:
                 threads = cpu_count()
-                
+
             if int(threads) > 8:
                 threads = 8
                 pretty_print(
