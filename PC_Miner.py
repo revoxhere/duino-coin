@@ -570,7 +570,8 @@ class Miner:
                                 + str(cpu_count()) + "): " + Style.BRIGHT))
             if not threads:
                 threads = cpu_count()
-            elif int(threads) > 8:
+                
+            if int(threads) > 8:
                 threads = 8
                 pretty_print(
                     Style.BRIGHT
