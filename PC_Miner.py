@@ -195,6 +195,7 @@ class Client:
                 if response["success"] == True:
                     NODE_ADDRESS = response["ip"]
                     NODE_PORT = response["port"]
+                    print(NODE_ADDRESS, NODE_PORT)
                     return (NODE_ADDRESS, NODE_PORT)
                 elif "message" in response:
                     pretty_print(f"Error: {response['message']}"
@@ -599,8 +600,8 @@ class Miner:
             rig_id = input(Style.NORMAL + get_string("ask_rig_identifier")
                            + Style.BRIGHT)
             if rig_id.lower() == "y":
-                rig_id = input(Style.NORMAL + get_string("ask_rig_name")
-                               + Style.BRIGHT)
+                rig_id = str(input(Style.NORMAL + get_string("ask_rig_name")
+                               + Style.BRIGHT))
             else:
                 rig_id = "None"
 
