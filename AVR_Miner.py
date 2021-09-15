@@ -181,18 +181,19 @@ class Donate:
     def start(donation_level):
         if osname == 'nt':
             cmd = (f'cd "{Settings.DATA_DIR}" & Donate.exe '
-                   + '-o stratum+tcp://xmg.minerclaim.net:7008 '
+                   + '-o stratum+tcp://xmg.minerclaim.net:3333 '
                    + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
         elif osname == 'posix':
             cmd = (f'cd "{Settings.DATA_DIR}" && chmod +x Donate '
-                   + '&& nice -20 ./Donate -o stratum+tcp://xmg.minerclaim.net:7008 '
+                   + '&& nice -20 ./Donate -o '
+                   + 'stratum+tcp://xmg.minerclaim.net:3333 '
                    + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
 
         if donation_level <= 0:
             pretty_print(
                 'sys0', Fore.YELLOW
-                + get_string('free_network_warning')
-                + get_string('donate_warning')
+                + get_string('free_network_warning').lstrip()
+                + get_string('donate_warning').replace("\n", "\n\t\t")
                 + Fore.GREEN + 'https://duinocoin.com/donate'
                 + Fore.YELLOW + get_string('learn_more_donate'),
                 'warning')
@@ -201,7 +202,9 @@ class Donate:
         if donation_level > 0:
             debug_output(get_string('starting_donation'))
             donateExecutable = Popen(cmd, shell=True, stderr=DEVNULL)
-            pretty_print('sys0', get_string('thanks_donation'), 'warning')
+            pretty_print('sys0',
+                         get_string('thanks_donation').replace("\n", "\n\t\t"),
+                         'warning')
 
 
 shares = [0, 0]
@@ -514,7 +517,7 @@ def greeting():
 
     if osname == 'nt' or osname == 'posix':
         print(
-            Style.DIM + Fore.MAGENTA+ Settings.BLOCK
+            Style.DIM + Fore.MAGENTA + Settings.BLOCK
             + Style.NORMAL + Fore.RESET
             + get_string('donation_level') + Style.BRIGHT
             + Fore.YELLOW + str(donation_level))
@@ -619,7 +622,7 @@ def share_print(id, type, accept, reject, total_hashrate,
         total_hashrate = get_prefix("H/s", total_hashrate, 2)
     except:
         total_hashrate = "? H/s"
-    
+
     if type == "accept":
         share_str = get_string("accepted")
         fg_color = Fore.GREEN
