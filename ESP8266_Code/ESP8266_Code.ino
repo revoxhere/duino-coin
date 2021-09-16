@@ -4,7 +4,7 @@
   |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \
   |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  |
   `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--'
-  Official code for ESP8266 boards                            version 2.7
+  Official code for ESP8266 boards                          version 2.7.3
 
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
