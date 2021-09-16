@@ -137,14 +137,17 @@ class Client:
                     NODE_ADDRESS = response["ip"]
                     NODE_PORT = response["port"]
                     debug_output(f"Fetched pool: {response['name']}")
-                    return (response["ip"], response["port"])
+                    return (NODE_ADDRESS, NODE_PORT)
                 elif "message" in response:
-                    pretty_print(f"Error: {response['message']}"
-                                 + ", retrying in 15s", "error", "net0")
+                    pretty_print(f"Warning: {response['message']}"
+                                 + ", retrying in 15s", "warning", "net0")
                     sleep(15)
+                else:
+                    raise Exception(
+                        "no response - IP ban or connection error")
             except Exception as e:
                 pretty_print("net0",
-                             f" Error fetching mining node: {e}"
+                             f"Error fetching mining node: {e}"
                              + ", retrying in 15s", "error")
                 sleep(15)
 
