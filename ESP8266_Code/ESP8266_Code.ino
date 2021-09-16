@@ -14,14 +14,13 @@
   the Getting Started page. Have fun mining!
 */
 
-#include <ESP8266WiFi.h> // Include WiFi library
-#include <ESP8266mDNS.h> // OTA libraries
-#include <WiFiUdp.h>
-#include <ArduinoOTA.h>
-
-#include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
-#include <ArduinoJson.h> // https://github.com/bblanchon/ArduinoJson
+/* If during compilation the line below causes a
+  "fatal error: arduinoJson.h: No such file or directory"
+  message to occur; it means that you do NOT have the
+  ArduinoJSON library installed. To install it, 
+  go to the below link and follow the instructions: 
+  https://github.com/revoxhere/duino-coin/issues/832 */
+#include <ArduinoJson.h>
 
 /* If during compilation the line below causes a
   "fatal error: Crypto.h: No such file or directory"
@@ -33,6 +32,12 @@
 #include <Crypto.h>  // experimental SHA1 crypto library
 using namespace experimental::crypto;
 
+#include <ESP8266WiFi.h> // Include WiFi library
+#include <ESP8266mDNS.h> // OTA libraries
+#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+#include <ESP8266HTTPClient.h>
+#include <WiFiClient.h>
 #include <Ticker.h>
 
 namespace {
