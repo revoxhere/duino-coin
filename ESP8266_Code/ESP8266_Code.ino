@@ -1,11 +1,11 @@
 /*
-  ,------.          ,--.                       ,-----.       ,--.         
-  |  .-.  \ ,--.,--.`--',--,--,  ,---. ,-----.'  .--./ ,---. `--',--,--,  
-  |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \ 
-  |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  | 
-  `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--' 
+  ,------.          ,--.                       ,-----.       ,--.
+  |  .-.  \ ,--.,--.`--',--,--,  ,---. ,-----.'  .--./ ,---. `--',--,--,
+  |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \
+  |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  |
+  `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--'
   Official code for ESP8266 boards                            version 2.7
-  
+
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
   https://github.com/revoxhere/duino-coin
@@ -24,12 +24,12 @@
 #include <ArduinoJson.h> // https://github.com/bblanchon/ArduinoJson
 
 /* If during compilation the line below causes a
-"fatal error: Crypto.h: No such file or directory"
-message to occur; it means that you do NOT have the
-latest version of the ESP8266/Arduino Core library.
-To install/upgrade it, go to the below link and
-follow the instructions of the readme file:
-https://github.com/esp8266/Arduino */
+  "fatal error: Crypto.h: No such file or directory"
+  message to occur; it means that you do NOT have the
+  latest version of the ESP8266/Arduino Core library.
+  To install/upgrade it, go to the below link and
+  follow the instructions of the readme file:
+  https://github.com/esp8266/Arduino */
 #include <Crypto.h>  // experimental SHA1 crypto library
 using namespace experimental::crypto;
 
@@ -40,6 +40,7 @@ const char* SSID          = "WIFI SSID";   // Change this to your WiFi name
 const char* PASSWORD      = "WIFI PASS";    // Change this to your WiFi password
 const char* USERNAME      = "DUCO USERNAME";     // Change this to your Duino-Coin username
 const char* RIG_IDENTIFIER = "None";       // Change this if you want a custom miner name
+const bool USE_HIGHER_DIFF = false; // Change to true if using 160 MHz to not get the first share rejected
 
 const char * urlPool = "http://51.15.127.80:4242/getPool";
 unsigned int share_count = 0; // Share variable
@@ -87,6 +88,7 @@ void UpdatePool() {
 WiFiClient client;
 String client_buffer = "";
 String chipID = "";
+String START_DIFF = "";
 
 // Loop WDT... please don't feed me...
 // See lwdtcb() and lwdtFeed() below
@@ -248,11 +250,8 @@ bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
 } // namespace
 
 void setup() {
-  // Start serial connection
   Serial.begin(500000);
   Serial.println("\nDuino-Coin ESP8266 Miner v2.7");
-
-  // Prepare for blink() function
   pinMode(LED_BUILTIN, OUTPUT);
 
   SetupWifi();
@@ -260,11 +259,11 @@ void setup() {
 
   lwdtFeed();
   lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
-
-  // Sucessfull connection with wifi network
-  blink(BLINK_SETUP_COMPLETE);
-
+  if (USE_HIGHER_DIFF) START_DIFF = "ESP8266H";
+  else START_DIFF = "ESP8266";
   chipID = String(ESP.getChipId(), HEX);
+
+  blink(BLINK_SETUP_COMPLETE);
 }
 
 void loop() {
@@ -277,7 +276,7 @@ void loop() {
 
   ConnectToServer();
   Serial.println("Asking for a new job for user: " + String(USERNAME));
-  client.print("JOB," + String(USERNAME) + ",ESP8266");
+  client.print("JOB," + String(USERNAME) + "," + String(START_DIFF));
 
   waitForClientData();
   String last_block_hash = getValue(client_buffer, SEP_TOKEN, 0);
@@ -309,7 +308,7 @@ void loop() {
       client.print(String(duco_numeric_result)
                    + ","
                    + String(hashrate)
-                   + ",ESP8266 Miner v2.7"
+                   + ",Official ESP8266 Miner 2.73"
                    + ","
                    + String(RIG_IDENTIFIER)
                    + ",DUCOID"
@@ -324,8 +323,7 @@ void loop() {
                      + String(hashrate / 1000, 2)
                      + " kH/s ("
                      + String(elapsed_time_s)
-                     + "s) Free RAM: "
-                     + String(ESP.getFreeHeap()));
+                     + "s");
 
       blink(BLINK_SHARE_FOUND);
       break;
