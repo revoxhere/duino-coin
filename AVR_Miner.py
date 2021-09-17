@@ -659,6 +659,9 @@ def mine_avr(com, threadid, fastest_pool):
         while True:
             try:
                 ser.close()
+                pretty_print('sys' + port_num(com),
+                    f"Closed COM port {com}", 'success')
+                sleep(2)
             except:
                 pass
             try:
