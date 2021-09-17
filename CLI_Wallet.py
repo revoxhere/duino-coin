@@ -257,6 +257,9 @@ signal(SIGINT, handler)  # Enable signal handler
 
 
 while True:
+    print(("Warning: CLI and GUI wallets are being deprecated "
+           + "in favor of the Web Wallet. "
+           + "This app may not run properly."))
     try:
         wss_conn = websocket.create_connection(WS_URI)
         SERVER_VER = wss_conn.recv().decode()
