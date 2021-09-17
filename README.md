@@ -120,7 +120,7 @@ Server source code, documentation for API calls and official libraries for devel
     Since that table is getting really long, it's collapsed by default. Click this text to expand it!
   </summary>
 
-  ### Please not that currently the rewards are being changed to logarythmical and the table is not accurate.
+  ### Please not that the rewards depend on a lot of factors and the table below is just for orientation purposes.
   
   | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
@@ -130,7 +130,7 @@ Server source code, documentation for API calls and official libraries for devel
   | ESP32                                                     | 23 kH/s                           | 2                 | 1 W            | 8-9                 |
   | Raspberry Pi Zero                                         | 17 kH/s                           | 1                 | 1.1 W          | -                   |
   | Raspberry Pi 3                                            | 440 kH/s                          | 4                 | 5.1 W          | -                   |
-  | Raspberry Pi 4                                            | 1.3 MH/s                          | 4                 | 6.4 W          | -                   |
+  | Raspberry Pi 4                                            | 740 kH/s (32bit)                  | 4                 | 6.4 W          | 10                  |
   | ODROID XU4                                                | 1.0 MH/s                          | 8                 | 5 W            | 9                   |
   | Atomic Pi                                                 | 690 kH/s                          | 4                 | 6 W            | -                   |
   | Orange Pi Zero 2                                          | 740 kH/s                          | 4                 | 2.55 W         | -                   |
