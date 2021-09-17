@@ -6,9 +6,6 @@
 # © Duino-Coin Community 2019-2021
 #############################################
 
-#import gevent.monkey
-# gevent.monkey.patch_all()
-
 import threading
 import multiprocessing
 
@@ -56,16 +53,18 @@ from gevent.pool import Pool
 from xxhash import xxh64
 # python3 -m pip install shutil
 from shutil import copyfile
-# python3 -m pip install udatetime
-import udatetime as utime
+from datetime import datetime as utime
 
 """
 Server
 """
 HOSTNAME = ""
 PORTS = [
-    2809,  # Websocket proxy
-    2810,  # Pools
+    2806,  #
+    2807,  # Pulse
+    2808,  # Bynd
+    2809,
+    2810,
     2811,  # General purpose
     2812,  # General purpose
     2813,  # General purpose
@@ -74,7 +73,8 @@ PORTS = [
 ]
 SERVER_VER = 2.7  # announced to clients
 SAVE_TIME = 10  # in seconds
-MAX_WORKERS = 150
+MINERAPI_SAVE_TIME = 5
+MAX_WORKERS = 50
 BCRYPT_ROUNDS = 6
 DECIMALS = 20  # max float precision
 PING_SLEEP_TIME = 0.5  # in seconds
@@ -95,16 +95,16 @@ READY_HASHES_NUM = 5000  # in shares
 BLOCK_PROBABILITY = 500000  # 1 in X
 BLOCK_PROBABILITY_XXH = 10000  # 1 in X
 BLOCK_REWARD = 28.11  # duco
-UPDATE_MINERAPI_EVERY = 2  # shares
+UPDATE_MINERAPI_EVERY = 1  # shares
 EXPECTED_SHARETIME = 20  # in seconds
 
 """
 Gevent
 """
 BACKLOG = None  # spawn connection instantly
-POOL_SIZE = None
-SOCKET_TIMEOUT = 15
-DB_TIMEOUT = 10
+POOL_SIZE = 5000
+SOCKET_TIMEOUT = 30
+DB_TIMEOUT = 5
 
 
 """
@@ -135,6 +135,8 @@ try:
     WRAPPER_KEY = config["main"]["wrapper_key"]
     NodeS_Username = config["main"]["NodeS_Username"]
     CAPTCHA_SECRET_KEY = config["main"]["captcha"]
+    BCH_SECRET_KEY = config["main"]["bch"]
+    TRX_SECRET_KEY = config["main"]["trx"]
 except Exception as e:
     print("""Please create config/AdminData.ini config file first:
         [main]
@@ -145,7 +147,9 @@ except Exception as e:
         wrapper_private_key = ???
         NodeS_Username = ???
         wrapper_key = ???
-        CAPTCHA_SECRET_KEY = ???""", e)
+        captcha = ???
+        bch = ???
+        trx = ???""", e)
     exit()
 
 duco_prices = {
@@ -156,6 +160,7 @@ duco_prices = {
     "trx":  0.01877,
     "nano": 0.01877,
     "fjc": 0.01877,
+    "rvn": 0.01877,
     "justswap": 0.01877,
     "nodes": 0.01877
 }
@@ -169,8 +174,9 @@ pregenerated_jobs = {
 }
 global_blocks = 1
 global_last_block_hash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
-global_cpu_usage, global_ram_usage, global_connections = 50, 50, 1
+global_cpu_usage, global_ram_usage, global_connections = 60, 30, 1
 minerapi, job_tiers, balance_queue = {}, {}, {}
+lastsync = {}
 disconnect_list, banlist = [], []
 whitelisted_usernames, whitelisted_ips = [], []
 connections_per_ip, miners_per_user = {}, {}
@@ -273,7 +279,7 @@ htmlBan = """\
 
 
 def create_backup():
-    sleep(10)
+    sleep(5)
     while True:
         if not ospath.isdir('backups/'):
             os.mkdir('backups/')
@@ -281,16 +287,18 @@ def create_backup():
         timestamp = now().strftime("%Y-%m-%d_%H-%M-%S")
         os.mkdir('backups/'+str(timestamp))
 
-        with open("charts/prices.txt", "a") as f:
-            f.write("\n," + str(duco_prices["xmg"]).rstrip("\n"))
-        with open("charts/prices_trx.txt", "a") as f:
-            f.write("\n," + str(duco_prices["trx"]).rstrip("\n"))
-        with open("charts/prices_bch.txt", "a") as f:
-            f.write("\n," + str(duco_prices["bch"]).rstrip("\n"))
-        with open("charts/pricesNodeS.txt", "a") as f:
-            f.write("\n," + str(duco_prices["nodes"]).rstrip("\n"))
-        with open("charts/pricesJustSwap.txt", "a") as f:
-            f.write("\n," + str(duco_prices["justswap"]).rstrip("\n"))
+        today = now().strftime("%Y-%m-%d")
+        if not any(today in s for s in os.listdir("backups/")):
+            with open("charts/prices.txt", "a") as f:
+                f.write("\n," + str(duco_prices["xmg"]).rstrip("\n"))
+            with open("charts/prices_trx.txt", "a") as f:
+                f.write("\n," + str(duco_prices["trx"]).rstrip("\n"))
+            with open("charts/prices_bch.txt", "a") as f:
+                f.write("\n," + str(duco_prices["bch"]).rstrip("\n"))
+            with open("charts/pricesNodeS.txt", "a") as f:
+                f.write("\n," + str(duco_prices["nodes"]).rstrip("\n"))
+            with open("charts/pricesJustSwap.txt", "a") as f:
+                f.write("\n," + str(duco_prices["justswap"]).rstrip("\n"))
 
         copyfile(BLOCKCHAIN,
                  "backups/"+str(timestamp)+"/"
@@ -307,23 +315,21 @@ def create_backup():
         sleep(60*60)
 
 
-def perm_ban(ip, perm=False):
-    if not ip in whitelisted_ips:
-        os.system("sudo iptables -A INPUT -s " +
-                  str(ip)+" -j DROP")
-        if not perm:
-            threading.Timer(60*10, unban, [ip]).start()
+def perm_ban(ip):
+    if not ip in whitelist:
+        print("Banning", ip)
+        os.system(f"sudo iptables -A INPUT -s {ip} -j REJECT")
+        os.system(f"echo \"iptables -D INPUT -s {ip} -j REJECT\""
+                  + " | at now +15 minutes -M")
 
 
 def unban(ip):
-    os.system("sudo iptables -D INPUT -s "+str(ip)
-              + " -j DROP >/dev/null 2>&1")
+    os.system(f"sudo iptables -D INPUT -s {ip} -j REJECT >/dev/null 2>&1")
 
 
 def temporary_ban(ip):
     if not ip in whitelisted_ips:
-        os.system("sudo iptables -A INPUT -s " +
-                  str(ip)+" -j DROP")
+        os.system(f"sudo iptables -A INPUT -s {ip} -j REJECT")
         threading.Timer(TEMP_BAN_TIME, unban, [ip]).start()
 
 
@@ -554,15 +560,15 @@ def transaction_queue_handle(queue):
             timeElapsed = round(timeEnd - timeStart, 2)
             #admin_print("Internal db commited - " + str(s) + " updates " + str(timeElapsed) + "s\n")
 
-            if timeElapsed < SAVE_TIME/2:
-                sleep(SAVE_TIME/2-timeElapsed)
+            if timeElapsed < 10:
+                sleep(10-timeElapsed)
         sleep(0.1)
 
 
 def database_updater():
     global balance_queue
     while True:
-        sleep(queue.qsize()*0.00025)
+        sleep(queue.qsize()*0.0003)
         try:
             for user in balance_queue.copy():
                 if user in jail:
@@ -572,10 +578,7 @@ def database_updater():
                 if user in disconnect_list or user in banlist:
                     balance_queue[user] = 0
 
-                amount_to_update = balance_queue[user]
-
-                if amount_to_update > 0.075:
-                    amount_to_update = 0.075
+                amount_to_update = balance_queue[user] * 0.9
 
                 if amount_to_update != 0:
                     increment_balance(user, amount_to_update)
@@ -1674,7 +1677,8 @@ def protocol_mine(data, connection, address, using_xxhash=False):
                 "Software":     str(miner_name),
                 "Identifier":   str(rig_identifier),
                 "Earnings":     reward,
-                "Timestamp":    int(time())
+                "Timestamp":    int(time()),
+                "Pool":         "Master server",
             }
 
             thread_miner_api["Hashrate"] = reported_hashrate
@@ -1809,7 +1813,7 @@ def get_sys_usage():
             floatmap(psutil.cpu_percent(interval=1), 0, 100, 0, 75))
         global_cpu_usage = mean(cpu_list[-5:])
         global_ram_usage = psutil.virtual_memory()[2]
-        sleep(SAVE_TIME)
+        sleep(5)
 
 
 def scientific_prefix(symbol: str, value: float, accuracy: int):
@@ -1969,26 +1973,22 @@ def create_secondary_api_files():
             json.dump(
                 get_last_blocks(),
                 outfile,
-                ensure_ascii=False
-            )
-        sleep(SAVE_TIME)
+                ensure_ascii=False)
+        sleep(5)
 
         with open('balances.json', 'w') as outfile:
             json.dump(
                 get_balances(),
                 outfile,
-                ensure_ascii=False
-            )
-
-        sleep(SAVE_TIME)
+                ensure_ascii=False)
+        sleep(5)
 
         with open('transactions.json', 'w') as outfile:
             json.dump(
                 get_last_transactions(),
                 outfile,
-                ensure_ascii=False
-            )
-        sleep(SAVE_TIME)
+                ensure_ascii=False)
+        sleep(5)
 
 
 def create_main_api_file():
@@ -1999,6 +1999,7 @@ def create_main_api_file():
     """
     global miners_per_user
 
+    sleep(5)
     while True:
         timeS = time()
         total_hashrate_list = []
@@ -2015,13 +2016,12 @@ def create_main_api_file():
             "ESP32": 0,
             "ESP8266": 0,
             "Arduino": 0,
-            "Other": 0
-        }
+            "Other": 0}
         hashrates = {}
         try:
             for miner in minerapi.copy():
                 try:
-                    username = minerapi[miner]["User"]
+                    username = minerapi[miner]["u"]
 
                     if user_exists(username) and not username in banlist:
                         try:
@@ -2039,34 +2039,24 @@ def create_main_api_file():
                         continue
 
                     # Add miner hashrate to the server hashrate
-                    if minerapi[miner]["Algorithm"] == "DUCO-S1":
-                        try:
-                            ducos1_hashrate += minerapi[miner]["Hashrate_calc"]
-                        except:
-                            ducos1_hashrate += minerapi[miner]["Hashrate"]
+                    if minerapi[miner]["al"] == "DUCO-S1":
+                        ducos1_hashrate += minerapi[miner]["h"]
                     else:
-                        try:
-                            xxhash_hashrate += minerapi[miner]["Hashrate_calc"]
-                        except:
-                            xxhash_hashrate += minerapi[miner]["Hashrate"]
+                        xxhash_hashrate += minerapi[miner]["h"]
 
                     # Calculate power usage
                     try:
-                        software = minerapi[miner]["Software"].upper()
+                        software = minerapi[miner]["sft"].upper()
                     except:
                         software = "?"
-                    identifier = minerapi[miner]["Identifier"].upper()
-                    hashrate = minerapi[miner]["Hashrate"]
+                    identifier = minerapi[miner]["id"].upper()
+                    hashrate = minerapi[miner]["h"]
 
                     if ("AVR" in software
                             or "I2C" in software):
-                        if 220 > hashrate > 190:
-                            # 0,2W for Arduino @ peak 40mA/5V
-                            net_wattage += 0.2
-                            miner_dict["Arduino"] += 1
-                        else:
-                            net_wattage += 1
-                            miner_dict["Other"] += 1
+                        # 0,2W for Arduino @ peak 40mA/5V
+                        net_wattage += 0.2
+                        miner_dict["Arduino"] += 1
 
                     elif ("ESP32" in software
                           and hashrate < 17000):
@@ -2086,7 +2076,6 @@ def create_main_api_file():
 
                     elif ("PC" in software
                           or "DOCKER" in software
-                          or "NONCE" in software
                           or "ROUTER" in sotware):
                         if ("RASPBERRY" in identifier
                                 or "PI" in identifier):
@@ -2101,7 +2090,8 @@ def create_main_api_file():
                             miner_dict["CPU"] += 1
 
                     elif ("OPENCL" in software
-                          or "GPU" in software):
+                          or "GPU" in software
+                          or "NONCE" in software):
                         net_wattage += 50
                         miner_dict["GPU"] += 1
 
@@ -2130,19 +2120,16 @@ def create_main_api_file():
                 sorted(
                     miners_per_user.items(),
                     key=itemgetter(1),
-                    reverse=True
-                )
-            )
+                    reverse=True))
 
             kolka_dict = {
                 "Jailed": len(jail),
-                "Banned": len(banlist)
-            }
+                "Banned": len(banlist)}
 
             current_time = now().strftime("%d/%m/%Y %H:%M:%S (UTC)")
             max_price = duco_prices[max(duco_prices, key=duco_prices.get)]
 
-            duco_prices["pancake"] = 0.00188540
+            duco_prices["pancake"] = 0.00176586
 
             server_api = {
                 "Duino-Coin Server API": "github.com/revoxhere/duino-coin",
@@ -2159,6 +2146,7 @@ def create_main_api_file():
                 "Duco price":            max_price,
                 "Duco price XMG":        duco_prices["xmg"],
                 "Duco price BCH":        duco_prices["bch"],
+                "Duco price RVN":        duco_prices["rvn"],
                 "Duco price TRX":        duco_prices["trx"],
                 "Duco price XRP":        duco_prices["xrp"],
                 "Duco price DGB":        duco_prices["dgb"],
@@ -2174,24 +2162,21 @@ def create_main_api_file():
                 "Last block hash":       global_last_block_hash[:10],
                 "Kolka":                 kolka_dict,
                 "Miner distribution":    miner_dict,
-                "Top 10 richest miners": get_richest_users(10),
-                # "Active workers":        miners_per_user
-            }
+                "Top 10 richest miners": get_richest_users(10)}
 
             with open(API_JSON_URI, 'w') as outfile:
                 json.dump(
                     server_api,
                     outfile,
-                    ensure_ascii=False
-                )
+                    ensure_ascii=False)
 
         except Exception:
             admin_print("Error creating main api.json file:"
                         + str(traceback.format_exc()))
         timeE = time()
         timeEl = timeE - timeS
-        if timeEl < SAVE_TIME:
-            sleep(SAVE_TIME-timeEl)
+        if timeEl < 5:
+            sleep(5-timeEl)
 
 
 def create_minerapi():
@@ -2206,43 +2191,37 @@ def create_minerapi():
         timeS = time()
         memory_datab.execute("DELETE FROM Miners")
 
-        d2 = time()
         for threadid in minerapi.copy():
             try:
-                if ("luna" in minerapi[threadid]["Software"] or
-                        "luna" in minerapi[threadid]["Identifier"]):
-                    minerapi.pop(threadid)
-                else:
-                    memory_datab.execute(
-                        """INSERT INTO Miners
-                        (threadid, username, hashrate,
-                        sharetime, accepted, rejected,
-                        diff, software, identifier, algorithm)
-                        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (
-                            threadid,
-                            minerapi[threadid]["User"],
-                            minerapi[threadid]["Hashrate"],
-                            minerapi[threadid]["Sharetime"],
-                            minerapi[threadid]["Accepted"],
-                            minerapi[threadid]["Rejected"],
-                            minerapi[threadid]["Diff"],
-                            minerapi[threadid]["Software"],
-                            minerapi[threadid]["Identifier"],
-                            minerapi[threadid]["Algorithm"]
-                        )
-                    )
+                memory_datab.execute(
+                    """INSERT INTO Miners
+                    (threadid, username, hashrate,
+                    sharetime, accepted, rejected,
+                    diff, software, identifier, algorithm, pool, walletid)
+                    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (threadid,
+                        minerapi[threadid]["u"],
+                        minerapi[threadid]["h"],
+                        minerapi[threadid]["s"],
+                        minerapi[threadid]["a"],
+                        minerapi[threadid]["r"],
+                        minerapi[threadid]["d"],
+                        minerapi[threadid]["sft"],
+                        minerapi[threadid]["id"],
+                        minerapi[threadid]["al"],
+                        minerapi[threadid]["p"],
+                        minerapi[threadid]["wd"]))
 
-                    # Pop inactive miners from the API
-                    soft = minerapi[threadid]["Software"].upper()
-                    d1 = minerapi[threadid]["Timestamp"]
-                    rd = d2-d1
-                    if ("PC" in soft or "ANDROID" in soft):
-                        if rd > 90:
-                            minerapi.pop(threadid)
-                    else:
-                        if rd > 45:
-                            minerapi.pop(threadid)
-            except Exception as e:
+                # Pop inactive miners from the API
+                last_miner_share = minerapi[threadid]["t"]
+                pool_sync_time = lastsync[str(minerapi[threadid]["p"])]
+
+                difference = float(pool_sync_time) - float(last_miner_share)
+                difference_server = time() - float(last_miner_share)
+                if (difference > MINERAPI_SAVE_TIME*3
+                        or difference_server > 60*5):
+                    minerapi.pop(threadid)
+            except:
                 pass
         memory.commit()
 
@@ -2253,8 +2232,8 @@ def create_minerapi():
         timeE = time()
         timeEl = abs(timeE - timeS)
 
-        if timeEl < SAVE_TIME:
-            sleep(SAVE_TIME-timeEl)
+        if timeEl < MINERAPI_SAVE_TIME:
+            sleep(MINERAPI_SAVE_TIME-timeEl)
 
 
 def protocol_login(data, connection):
@@ -2573,7 +2552,7 @@ def protocol_get_balance(data, connection, username):
     try:
         if username in cached_balances:
             last_cache_time = cached_balances[username]["last"]
-            if (now() - last_cache_time).total_seconds() <= SAVE_TIME:
+            if (now() - last_cache_time).total_seconds() <= 10:
                 send_data(
                     round(float(cached_balances[username]["bal"]), DECIMALS),
                     connection)
@@ -2660,6 +2639,7 @@ def get_duco_prices():
                                   data=None).json()["result"]
             exchange_rate_xmg = de_api["xmg"]["sell"]
             exchange_rate_bch = de_api["bch"]["sell"]
+            exchange_rate_rvn = de_api["rvn"]["sell"]
             exchange_rate_trx = de_api["trx"]["sell"]
             exchange_rate_xrp = de_api["xrp"]["sell"]
             exchange_rate_dgb = de_api["dgb"]["sell"]
@@ -2675,7 +2655,8 @@ def get_duco_prices():
                         "https://api.coingecko.com/"
                         + "api/v3/simple/price?ids="
                         + "magi,tron,bitcoin-cash,ripple,"
-                        + "digibyte,nano,fujicoin,bitcoin"
+                        + "digibyte,nano,fujicoin,bitcoin,"
+                        + "ravencoin"
                         + "&vs_currencies=usd",
                         data=None
                     ).json()
@@ -2700,6 +2681,11 @@ def get_duco_prices():
             bch_usd = float(coingecko_api["bitcoin-cash"]["usd"])
             duco_prices["bch"] = round(
                 bch_usd * exchange_rate_bch, 8
+            )
+
+            rvn_usd = float(coingecko_api["ravencoin"]["usd"])
+            duco_prices["rvn"] = round(
+                rvn_usd * exchange_rate_rvn, 8
             )
 
             xrp_usd = float(coingecko_api["ripple"]["usd"])
@@ -2902,13 +2888,18 @@ def handle(connection, address):
     global global_connections
     global disconnect_list
     global pool_infos
+    global lastsync
 
     logged_in = False
-
     ip_addr = address[0].replace("::ffff:", "")
 
-    connection.settimeout(SOCKET_TIMEOUT)
-
+    if (ip_addr == "127.0.0.1"
+        or ip_addr == "0.0.0.0"
+            or ip_addr == "51.15.127.80"):
+        connection.settimeout(60)
+    else:
+        connection.settimeout(SOCKET_TIMEOUT)
+    # print(ip_addr, "connected")
     try:
         """
         Send server version
@@ -2926,10 +2917,80 @@ def handle(connection, address):
             """
             data = receive_data(connection)
 
-            if not data:
+            if not data or data == None:
                 break
 
-            if data[0] == "LOGI":
+            # POOL FUNCTIONS
+
+            elif data[0] == "PoolLogin":
+                try:
+                    timestamp = str(now().strftime("%H:%M:%S"))
+                    info = str(data[1])
+                    info = ast.literal_eval(info)
+                    info = json.loads(info)
+                    pool_infos.append(timestamp
+                                      + " - Pool "
+                                        + info['identifier']
+                                        + " logged in")
+                    Pool = PF.Pool(connection=connection)
+                    Pool.login(data=data)
+                except Exception:
+                    print(traceback.format_exc())
+
+            elif data[0] == "PoolSync":
+                try:
+                    blocks_to_add,\
+                        poolConnections,\
+                        poolWorkers,\
+                        rewards,\
+                        error = Pool.sync(data)
+
+                    global_blocks += blocks_to_add
+
+                    for user in rewards:
+                        amount_to_update = rewards[user]
+                        if (amount_to_update
+                                and match(r"^[A-Za-z0-9_-]*$", user)):
+                            try:
+                                balance_queue[user] += amount_to_update
+                            except:
+                                balance_queue[user] = amount_to_update
+
+                    for worker in poolWorkers:
+                        try:
+                            minerapi[worker] = poolWorkers[worker]
+                            minerapi[worker]["t"] = time()
+                        except Exception as e:
+                            print(traceback.format_exc())
+
+                    timestamp = str(now().strftime("%H:%M:%S"))
+                    pool_infos.append(timestamp
+                                      + " - Pool synced "
+                                      + str(len(rewards))
+                                      + " rewards")
+
+                    lastsync[str(info['identifier'])] = time()
+                except Exception:
+                    print(traceback.format_exc())
+
+            elif data[0] == "PoolLogout":
+                Pool = PF.Pool(connection=connection)
+                Pool.logout(data=data)
+
+            elif data[0] == "PoolLoginAdd":
+                PF.pool_login_add(connection=connection,
+                                  data=data,
+                                  PoolPassword=PoolPassword)
+
+            elif data[0] == "PoolLoginRemove":
+                PF.pool_login_remove(connection=connection,
+                                     data=data,
+                                     PoolPassword=PoolPassword)
+
+            elif data[0] == "VER":
+                send_data(SERVER_VER, connection)
+
+            elif data[0] == "LOGI":
                 """
                 Client requested authentication
                 """
@@ -2960,19 +3021,21 @@ def handle(connection, address):
                 it's not our job so we pass him to the
                 DUCO-S1 job handler 
                 """
-                thread_id = protocol_mine(data, connection, address)
-                username = data[1]
-                #send_data("BAD,Please mine on the pool", connection)
+                #thread_id = protocol_mine(data, connection, address)
+                #username = data[1]
+                send_data("BAD,Please mine on the pool", connection)
+                perm_ban(ip_addr)
                 break
 
             elif data[0] == "JOBXX":
                 """ 
                 Same situation as above, just use the XXHASH switch 
                 """
-                thread_id = protocol_mine(
-                    data, connection, address, using_xxhash=True)
-                username = data[1]
-                #send_data("BAD,Please mine on the pool", connection)
+                # thread_id = protocol_mine(
+                #    data, connection, address, using_xxhash=True)
+                #username = data[1]
+                send_data("BAD,Please mine on the pool", connection)
+                perm_ban(ip_addr)
                 break
 
             # USER FUNCTIONS
@@ -2987,7 +3050,7 @@ def handle(connection, address):
                     send_data("NO,Not logged in", connection)
                     break
 
-           # elif data[0] == "NODE":
+            # elif data[0] == "NODE":
                 """ 
                 Client is a node
                 """
@@ -3092,77 +3155,15 @@ def handle(connection, address):
                 else:
                     send_data("NO,Not logged in", connection)
 
-            # POOL FUNCTIONS
-
-            elif data[0] == "PoolLogin":
-                try:
-                    timestamp = str(now().strftime("%H:%M:%S"))
-                    info = str(data[1])
-                    info = ast.literal_eval(info)
-                    info = json.loads(info)
-                    pool_infos.append(timestamp
-                                      + " - Pool "
-                                        + info['identifier']
-                                        + " logged in")
-                    Pool = PF.Pool(connection=connection)
-                    Pool.login(data=data)
-                except Exception:
-                    print(traceback.format_exc())
-
-            elif data[0] == "PoolSync":
-                try:
-                    blocks_to_add,\
-                        poolConnections,\
-                        poolWorkers,\
-                        rewards,\
-                        error = Pool.sync(data)
-
-                    global_blocks += blocks_to_add
-
-                    for user in rewards:
-                        amount_to_update = rewards[user]
-                        if (amount_to_update
-                                and match(r"^[A-Za-z0-9_-]*$", user)):
-                            try:
-                                balance_queue[user] += amount_to_update
-                            except:
-                                balance_queue[user] = amount_to_update
-
-                    for worker in poolWorkers:
-                        try:
-                            minerapi[worker] = poolWorkers[worker]
-                        except Exception:
-                            pass
-
-                    timestamp = str(now().strftime("%H:%M:%S"))
-                    pool_infos.append(timestamp
-                                      + " - Pool synced "
-                                      + str(len(rewards))
-                                      + " rewards")
-                except Exception:
-                    print(traceback.format_exc())
-
-            elif data[0] == "PoolLogout":
-                Pool = PF.Pool(connection=connection)
-                Pool.logout(data=data)
-
-            elif data[0] == "PoolLoginAdd":
-                PF.pool_login_add(connection=connection,
-                                  data=data,
-                                  PoolPassword=PoolPassword)
-
-            elif data[0] == "PoolLoginRemove":
-                PF.pool_login_remove(connection=connection,
-                                     data=data,
-                                     PoolPassword=PoolPassword)
-
-            sleep(PING_SLEEP_TIME)
+            else:
+                break
 
     except Exception:
         pass
         # print(traceback.format_exc())
     finally:
-        # print("Closing socket")
+        # print(ip_addr, "closing socket")
+
         try:
             del minerapi[thread_id]
         except:
@@ -3183,8 +3184,6 @@ def handle(connection, address):
             pass
 
         connection.close()
-
-        return
 
 
 def countips():
@@ -3239,7 +3238,8 @@ def create_databases():
     memory_datab = memory.cursor()
 
     memory_datab.execute(
-        """CREATE TABLE
+        """
+        CREATE TABLE
         IF NOT EXISTS
         Miners(
         threadid   TEXT,
@@ -3251,12 +3251,15 @@ def create_databases():
         diff       INTEGER,
         software   TEXT,
         identifier TEXT,
-        algorithm  TEXT)""")
+        algorithm  TEXT,
+        pool       TEXT,
+        walletid   TEXT)
+        """)
     memory_datab.execute(
         """CREATE INDEX 
         IF NOT EXISTS
         miner_id 
-        ON Miners(Identifier)""")
+        ON Miners(threadid)""")
     memory.commit()
 
     if not os.path.isfile(CONFIG_TRANSACTIONS):
@@ -3365,9 +3368,7 @@ def load_configfiles():
         json.dump(
             jailedusr,
             outfile,
-            indent=4,
-            ensure_ascii=False
-        )
+            ensure_ascii=False)
 
     with open(CONFIG_BANS, "r") as bannedusrfile:
         bannedusr = bannedusrfile.read().splitlines()
@@ -3379,9 +3380,7 @@ def load_configfiles():
         json.dump(
             bannedusr,
             outfile,
-            indent=4,
-            ensure_ascii=False
-        )
+            ensure_ascii=False)
 
     with open(CONFIG_WHITELIST, "r") as whitelistfile:
         whitelisted = whitelistfile.read().splitlines()
@@ -3400,7 +3399,7 @@ def load_configfiles():
 
 
 def autorestarter():
-    sleep(61*60)
+    sleep(5*60)
     admin_print("Autorestarting")
     for proc in mpproc:
         proc.terminate()
@@ -3445,8 +3444,7 @@ if __name__ == "__main__":
     transaction_queue = multiprocessing.Process(
         target=transaction_queue_handle,
         args=[queue, ],
-        daemon=True
-    )
+        daemon=True)
     transaction_queue.start()
     mpproc.append(transaction_queue)
 
@@ -3461,8 +3459,7 @@ if __name__ == "__main__":
             (HOSTNAME, port),
             handle=handle,
             backlog=BACKLOG,
-            spawn=Pool(POOL_SIZE)
-        )
+            spawn=Pool(POOL_SIZE))
         admin_print("Successfully started TCP server on port " + str(port))
         server_thread.serve_forever()
 
