@@ -52,7 +52,7 @@ balance = 0
 unpaid_balance = 0
 profitCheck = 0
 curr_bal = 0
-WS_URI = "wss://server.duinocoin.com:15808"
+WS_URI = "ws://server.duinocoin.com:15808"
 
 
 def install(package):
@@ -281,15 +281,15 @@ class LoginFrame(Frame):
 
         if username and password:
             soc = websocket.create_connection(WS_URI)
-            soc.recv()
+            soc.recv().decode()
             soc.send(bytes(
                 "LOGI,"
                 + str(username)
                 + ","
                 + str(password),
                 encoding="utf8"))
-            response = soc.recv().rstrip("\n")
-            response = response.split(",")
+            response = soc.recv().decode()
+            response = response.rstrip("\n").split(",")
 
             if response[0] == "OK":
                 passwordEnc = b64encode(bytes(password, encoding="utf8"))
@@ -320,7 +320,7 @@ class LoginFrame(Frame):
         if emailS and usernameS and passwordS and confpasswordS:
             if passwordS == confpasswordS:
                 soc = websocket.create_connection(WS_URI)
-                soc.recv()
+                soc.recv().decode()
                 soc.send(
                     bytes(
                         "REGI,"
@@ -330,7 +330,7 @@ class LoginFrame(Frame):
                         + ","
                         + str(emailS),
                         encoding="utf8"))
-                response = soc.recv().rstrip("\n")
+                response = soc.recv().decode().rstrip("\n")
                 response = response.split(",")
 
                 if response[0] == "OK":
@@ -1106,7 +1106,7 @@ def wrapper_window(handler):
         print("Got amount:", amount)
         print("pub key:", pub_key)
         soc = websocket.create_connection(WS_URI)
-        soc.recv()
+        soc.recv().decode()
         try:
             float(amount)
         except Exception:
@@ -1118,7 +1118,7 @@ def wrapper_window(handler):
                 + ","
                 + str(password),
                 encoding="utf8"))
-            _ = soc.recv()
+            _ = soc.recv().decode()
             soc.send(
                 bytes(
                     "WRAP,"
@@ -1192,7 +1192,7 @@ def unwrapper_window(handler):
         amount = amountUnWrap.get()
         print("Got amount:", amount)
         soc = websocket.create_connection(WS_URI)
-        soc.recv()
+        soc.recv().decode()
         try:
             float(amount)
         except Exception:
@@ -1203,7 +1203,7 @@ def unwrapper_window(handler):
                 + str(username)
                 + ","
                 + str(password), encoding="utf8"))
-            _ = soc.recv()
+            _ = soc.recv().decode()
             if use_wrapper:
                 pendingvalues = wduco.functions.pendingWithdrawals(
                     pub_key, username)
@@ -1430,14 +1430,14 @@ def settings_window(handler):
                 if oldpasswordS and newpasswordS and confpasswordS:
                     if newpasswordS == confpasswordS:
                         soc = websocket.create_connection(WS_URI)
-                        soc.recv()
+                        soc.recv().decode()
                         soc.send(
                             bytes(
                                 "LOGI,"
                                 + str(username)
                                 + ","
                                 + str(password), encoding="utf8"))
-                        soc.recv()
+                        soc.recv().decode()
                         soc.send(
                             bytes(
                                 "CHGP,"
@@ -1445,7 +1445,7 @@ def settings_window(handler):
                                 + ","
                                 + str(newpasswordS),
                                 encoding="utf8"))
-                        response = soc.recv().rstrip("\n").split(",")
+                        response = soc.recv().decode().rstrip("\n").split(",")
                         soc.close()
 
                         if not "OK" in response[0]:
@@ -1793,18 +1793,18 @@ def get_balance():
     global gtxl
     try:
         soc = websocket.create_connection(WS_URI)
-        soc.recv()
+        soc.recv().decode()
         soc.send(bytes(
             "LOGI,"
             + str(username)
             + ","
             + str(password), encoding="utf8"))
-        _ = soc.recv()
+        _ = soc.recv().decode()
         soc.send(bytes(
             "BALA",
             encoding="utf8"))
         oldbalance = balance
-        balance = float(soc.recv().rstrip("\n"))
+        balance = float(soc.recv().decode().rstrip("\n"))
         global_balance = round(float(balance), 8)
 
         try:
@@ -1812,7 +1812,7 @@ def get_balance():
             soc.send(bytes(
                 "GTXL," + str(username) + ",7",
                 encoding="utf8"))
-            gtxl = str(soc.recv().rstrip(
+            gtxl = str(soc.recv().decode().rstrip(
                 "\n").replace("\'", "\""))
             gtxl = jsonloads(gtxl)
         except Exception as e:
@@ -1964,7 +1964,7 @@ def send_funds_protocol(handler):
         icon="warning",)
     if MsgBox == "yes":
         soc = websocket.create_connection(WS_URI)
-        soc.recv()
+        soc.recv().decode()
 
         soc.send(bytes(
             "LOGI,"
@@ -1972,7 +1972,7 @@ def send_funds_protocol(handler):
             + ","
             + str(password),
             encoding="utf8"))
-        response = soc.recv()
+        response = soc.recv().decode()
         soc.send(
             bytes(
                 "SEND,"
@@ -1982,7 +1982,7 @@ def send_funds_protocol(handler):
                 + ","
                 + str(amountStr),
                 encoding="utf8"))
-        response = soc.recv().rstrip("\n").split(",")
+        response = soc.recv().decode().rstrip("\n").split(",")
         soc.close()
 
         if "OK" in str(response[0]):
