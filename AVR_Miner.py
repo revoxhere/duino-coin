@@ -183,7 +183,7 @@ class Donate:
 
     def start(donation_level):
         if osname == 'nt':
-            cmd = (f'cd "{Settings.DATA_DIR}" & start /low /b Donate.exe '
+            cmd = (f'cd "{Settings.DATA_DIR}" & Donate.exe '
                    + '-o stratum+tcp://xmg.minerclaim.net:3333 '
                    + f'-u revox.donate -p x -s 4 -e {donation_level*5}')
         elif osname == 'posix':
