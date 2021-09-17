@@ -800,9 +800,9 @@ def mine_avr(com, threadid, fastest_pool):
                 pretty_print('sys' + port_num(com),
                              get_string('mining_avr_connection_error')
                              + Style.NORMAL + Fore.RESET
-                             + ' (error reading result from the board: '
-                             + f'{e}, please check connection '
-                             + 'and port setting)', 'warning')
+                             + ' (no response from the board: '
+                             + f'{e}, please check the connection, '
+                             + 'port setting or reset the AVR)', 'warning')
                 break
 
             try:
