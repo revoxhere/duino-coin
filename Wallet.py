@@ -167,6 +167,10 @@ def openTransaction(hashToOpen):
 class LoginFrame(Frame):
     def __init__(self, master):
         super().__init__(master)
+        messagebox.showerror(title="Warning",
+                             message=("CLI and GUI wallets are being deprecated in favor of the Web Wallet. "
+                                      + "This app may not run properly."))
+
         master.title("Login")
         master.resizable(False, False)
 
