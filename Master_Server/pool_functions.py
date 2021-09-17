@@ -1,6 +1,6 @@
 import sqlite3
 from server_functions import receive_data, send_data
-from Server import DIFF_INCREASES_PER, CONFIG_BLOCKS, DB_TIMEOUT, floatmap
+from Server import DIFF_INCREASES_PER, CONFIG_BLOCKS, DB_TIMEOUT
 import ast
 import json
 import datetime
@@ -15,6 +15,11 @@ def dict_factory(cursor, row):
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
+
+
+def floatmap(x, in_min, in_max, out_min, out_max):
+    # Arduino's built in map function remade in python
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 
 def generate_block(username, reward, new_block_hash, algo):
@@ -265,14 +270,12 @@ class Pool:
             poolCpu = float(info['cpu'])
             poolRam = float(info['ram'])
             poolConnections = int(info['connections'])
-
             hide_this_pool = "False"
-            if self.poolID == "pi-pool-1":
-                if poolConnections > 2000:
-                    hide_this_pool = "True"
+            if poolConnections > 6500:
+                hide_this_pool = "True"
 
+            send_data(data="SyncOK", connection=self.connection)
         except Exception as e:
-            print(self.poolID, "is having trouble with sending JSON data:", e)
             send_data(data=f"NO,Error: {e}", connection=self.connection)
             return 0, 0, {}, {}, 1
 
@@ -292,61 +295,16 @@ class Pool:
                                self.poolID))
                 conn.commit()
         except Exception as e:
-            print(e)
+            pass
 
-        i = 0
-        while i < 3:
-            try:
-                if self.poolID == "pulse-pool-1":
-                    rewards = requests.get(
-                        f"http://{self.poolIP}/rewards_1.json").json()
-                    poolWorkers = requests.get(
-                        f"http://{self.poolIP}/workers_1.json").json()
+        try:
+            rewards = requests.get(
+                f"http://{self.poolIP}/rewards_{self.poolID}.json").json()
+            poolWorkers = requests.get(
+                f"http://{self.poolIP}/workers_{self.poolID}.json").json()
+        except Exception as e:
+            pass
 
-                elif self.poolID == "pulse-pool-2":
-                    rewards = requests.get(
-                        f"http://{self.poolIP}/rewards_2.json").json()
-                    poolWorkers = requests.get(
-                        f"http://{self.poolIP}/workers_2.json").json()
-
-                    ###
-
-                elif self.poolID == "beyond-pool-1":
-                    rewards = requests.get(
-                        f"http://{self.poolIP}/rewards_1.json").json()
-                    poolWorkers = requests.get(
-                        f"http://{self.poolIP}/workers_1.json").json()
-
-                elif self.poolID == "beyond-pool-2":
-                    rewards = requests.get(
-                        f"http://{self.poolIP}/rewards_1.json").json()
-                    poolWorkers = requests.get(
-                        f"http://{self.poolIP}/workers_1.json").json()
-
-                    ###
-
-                elif self.poolID == "star-pool-1":
-                    rewards = requests.get(
-                        f"http://{self.poolIP}/rewards.json").json()
-                    poolWorkers = requests.get(
-                        f"http://{self.poolIP}/workers.json").json()
-
-                    ###
-
-                else:
-                    rewards = requests.get(
-                        f"http://{self.poolIP}:6001/rewards").json()
-                    poolWorkers = requests.get(
-                        f"http://{self.poolIP}:6001/workers").json()
-
-                break
-            except Exception as e:
-                print(self.poolID,
-                      "is having trouble sending JSON:", e,
-                      "retrying", i)
-                i += 1
-
-        send_data(data="SyncOK", connection=self.connection)
         return blocks_to_add, poolConnections, poolWorkers, rewards, 0
 
     def logout(self, data):
