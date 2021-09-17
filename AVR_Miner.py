@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 2.7.3 © MIT licensed
+Duino-Coin Official AVR Miner 2.73 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -782,6 +782,8 @@ def mine_avr(com, threadid, fastest_pool):
                         _ = int(result[0], 2)
                         debug_output(com + f': Result: {result[0]}')
                         break
+                    else:
+                        raise Exception("No data received from AVR")
                 except Exception as e:
                     debug_output(com + f': Retrying data read: {e}')
                     retry_counter += 1
