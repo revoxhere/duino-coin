@@ -106,7 +106,7 @@ class Settings:
     ENCODING = "UTF8"
     SEPARATOR = ","
     VER = 2.73
-    DATA_DIR = "Duino-Coin PC Miner " + str(VER)
+    DATA_DIR = "Duino-Coin-PC-Miner-" + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
                     + "duino-coin/master/Resources/"
