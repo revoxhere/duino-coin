@@ -121,7 +121,7 @@ class Settings:
     BLOCK = " ‖ "
     PICK = ""
     COG = " @"
-    if os.name != "nt":
+    if os.name != "nt" or bool(os.name == "nt" and os.environ.get("WT_SESSION")):
         # Windows' cmd does not support emojis, shame!
         PICK = " ⛏"
         COG = " ⚙"
