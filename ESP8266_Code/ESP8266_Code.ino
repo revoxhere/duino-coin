@@ -47,7 +47,7 @@ const char* USERNAME      = "DUCO USERNAME";     // Change this to your Duino-Co
 const char* RIG_IDENTIFIER = "None";       // Change this if you want a custom miner name
 const bool USE_HIGHER_DIFF = false; // Change to true if using 160 MHz to not get the first share rejected
 
-const char * urlPool = "http://51.15.127.80:4242/getPool";
+const char * urlPool = "http://149.91.88.18:4242/getPool";
 unsigned int share_count = 0; // Share variable
 String host = "";
 int port = 0;
