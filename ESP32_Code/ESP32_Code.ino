@@ -73,7 +73,7 @@ TaskHandle_t Task2;
 TaskHandle_t MinerCheckin;
 SemaphoreHandle_t xMutex;
 
-const char *get_pool_api = "http://51.15.127.80:4242/getPool";
+const char *get_pool_api = "https://149.91.88.18/getPool";
 String host = "";
 int port = 0;
 int walletid = 0;
