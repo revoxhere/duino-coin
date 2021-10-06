@@ -32,9 +32,9 @@ const char *rig_identifier = "None";
 // Define watchdog timer seconds
 #define WDT_TIMEOUT 60
 
-// #include "hwcrypto/sha.h" // Uncomment this line if you're using an older
+#include "hwcrypto/sha.h" // Uncomment this line if you're using an older
 // version of the ESP32 core and sha_parellel_engine doesn't work for you
-#include "sha/sha_parallel_engine.h"  // Include hardware accelerated hashing library
+// #include "sha/sha_parallel_engine.h"  // Include hardware accelerated hashing library
 
 /* If you're using the ESP32-CAM board or other board
   that doesn't support OTA (Over-The-Air programming)
@@ -73,7 +73,8 @@ TaskHandle_t Task2;
 TaskHandle_t MinerCheckin;
 SemaphoreHandle_t xMutex;
 
-const char *get_pool_api = "https://149.91.88.18/getPool";
+const char *get_pool_api = "https://server.duinocoin.com/getPool";
+const char *miner_version = "Official ESP32 Miner 2.74";
 String host = "";
 int port = 0;
 int walletid = 0;
@@ -81,6 +82,7 @@ volatile int wifi_state = 0;
 volatile int wifi_prev_state = WL_CONNECTED;
 volatile bool ota_state = false;
 volatile char chip_id[23];  // DUCO MCU ID
+char rigname_auto[23]; // SPACE TO STORE RIG NAME
 float hashrate_two = 0.0;
 float hashrate_one = 0.0;
 unsigned long shares_one = 0;  // Share variable
@@ -132,7 +134,8 @@ void UpdateHostPort(String input) {
 
 String httpGetString(String URL) {
   String payload = "";
-  WiFiClient client;
+  WiFiClientSecure client;
+  client.setInsecure();
   HTTPClient http;
 
   if (http.begin(client, URL)) {
@@ -376,7 +379,7 @@ void Task1code(void *pvParameters) {
 
           client_one.flush();
           client_one.print(String(duco_res_one) + "," + String(hashrate_one) +
-                           ",Official ESP32 Miner 2.73," +
+                           "," + String(miner_version) + "," +
                            String(rig_identifier) + ",DUCOID" +
                            String((char *)chip_id) + "," + String(walletid));  // Send result to server
           Serial.println(F("CORE1 Posting result and waiting for feedback."));
@@ -549,7 +552,7 @@ void Task2code(void *pvParameters) {
 
           client.flush();
           client.print(String(duco_res_two) + "," + String(hashrate_two) +
-                       ",Official ESP32 Miner 2.73," + String(rig_identifier) +
+                       "," + String(miner_version) + "," + String(rig_identifier) +
                        ",DUCOID" + String((char *)chip_id) + "," + String(walletid));  // Send result to server
           Serial.println(F("CORE2 Posting result and waiting for feedback."));
 
@@ -594,7 +597,7 @@ void setup() {
   // disableCore0WDT();
   // disableCore1WDT();
   Serial.begin(500000);  // Start serial connection
-  Serial.println("\n\nDuino-Coin Official ESP32 Miner 2.73");
+  Serial.println("\n\nDuino-Coin " + String(miner_version));
 
   WiFi.mode(WIFI_STA);  // Setup ESP in client mode
   btStop();
@@ -608,6 +611,12 @@ void setup() {
       (char *)chip_id, 23, "%04X%08X", chip,
       (uint32_t)chipid);  // Storing the 48 bit chip chip_id into a char array.
   walletid = random(0, 2811);
+
+  // Autogenerate ID if required
+  if( strcmp(rig_identifier, "Auto") == 0 ){
+    snprintf(rigname_auto, 23, "ESP32-%04X%08X", chip, (uint32_t)chipid);
+    rig_identifier = &rigname_auto[0];
+  }
 
   ota_state = false;
 
