@@ -41,14 +41,16 @@ using namespace experimental::crypto;
 #include <Ticker.h>
 
 namespace {
-const char* SSID          = "WIFI SSID";   // Change this to your WiFi name
+const char* SSID          = "WIFI SSID";    // Change this to your WiFi name
 const char* PASSWORD      = "WIFI PASS";    // Change this to your WiFi password
-const char* USERNAME      = "DUCO USERNAME";     // Change this to your Duino-Coin username
-const char* RIG_IDENTIFIER = "None";       // Change this if you want a custom miner name
-const bool USE_HIGHER_DIFF = false; // Change to true if using 160 MHz to not get the first share rejected
+const char* USERNAME      = "DUCO USERNAME";// Change this to your Duino-Coin username
+const char* RIG_IDENTIFIER = "Auto";        // Change this if you want a custom miner name (or use Auto to autogenerate)
+const bool USE_HIGHER_DIFF = false;         // Change to true if using 160 MHz to not get the first share rejected
 
-const char * urlPool = "https://149.91.88.18/getPool";
+const char * urlPool = "https://server.duinocoin.com/getPool";
+const char * miner_version = "Official ESP8266 Miner 2.74";
 unsigned int share_count = 0; // Share variable
+String AutoRigName = "";
 String host = "";
 int port = 0;
 
@@ -66,7 +68,8 @@ void UpdateHostPort(String input) {
 
 String httpGetString(String URL) {
   String payload = "";
-  WiFiClient client;
+  WiFiClientSecure client;
+  client.setInsecure();
   HTTPClient http;
   if (http.begin(client, URL))
   {
@@ -130,7 +133,8 @@ void SetupWifi() {
   }
 
   Serial.println("\nConnected to WiFi!");
-  Serial.println("Local IP address: " + WiFi.localIP().toString());
+  Serial.println("    IP address: " + WiFi.localIP().toString());
+  Serial.println("      Rig name: " + String(RIG_IDENTIFIER));
 
   UpdatePool();
 }
@@ -256,8 +260,16 @@ bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
 
 void setup() {
   Serial.begin(500000);
-  Serial.println("\nDuino-Coin ESP8266 Miner v2.7");
+  Serial.println("\nDuino-Coin " + String(miner_version));
   pinMode(LED_BUILTIN, OUTPUT);
+
+  // Autogenerate ID if required
+  chipID = String(ESP.getChipId(), HEX);
+  if( strcmp(RIG_IDENTIFIER, "Auto") == 0 ){
+    AutoRigName = "ESP8266-" + chipID;
+    AutoRigName.toUpperCase();
+    RIG_IDENTIFIER = AutoRigName.c_str();
+  }
 
   SetupWifi();
   SetupOTA();
@@ -266,7 +278,6 @@ void setup() {
   lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
   if (USE_HIGHER_DIFF) START_DIFF = "ESP8266H";
   else START_DIFF = "ESP8266";
-  chipID = String(ESP.getChipId(), HEX);
 
   blink(BLINK_SETUP_COMPLETE);
 }
@@ -313,7 +324,7 @@ void loop() {
       client.print(String(duco_numeric_result)
                    + ","
                    + String(hashrate)
-                   + ",Official ESP8266 Miner 2.73"
+                   + "," + String(miner_version)
                    + ","
                    + String(RIG_IDENTIFIER)
                    + ",DUCOID"
@@ -328,7 +339,7 @@ void loop() {
                      + String(hashrate / 1000, 2)
                      + " kH/s ("
                      + String(elapsed_time_s)
-                     + "s");
+                     + "s)");
 
       blink(BLINK_SHARE_FOUND);
       break;
