@@ -132,7 +132,8 @@ void UpdateHostPort(String input) {
 
 String httpGetString(String URL) {
   String payload = "";
-  WiFiClient client;
+  WiFiClientSecure client;
+  client.setInsecure();
   HTTPClient http;
 
   if (http.begin(client, URL)) {
