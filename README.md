@@ -217,7 +217,7 @@ Some third-party included files may have different licenses - please check their
 4. Mining on GPUs, FPGAs and other high-efficiency hardware is allowed, but using only the `EXTREME` mining difficulty.<br/>
 5. Any users using miners on difficulty not suited for their hardware (see the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">difficulty list</a>) will be automatically throttled by being moved to correct difficulty tier.<br/>
 6. Any user that keeps trying to use lower difficulty than it's suited for may get temporarily blocked.<br/>
-7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
+7. Banning involves blocking the user from accessing their coins along with the removal of their account.<br/>
 8. Only coins earned legally are eligible for the exchange.<br/>
 9. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
 10. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
@@ -225,8 +225,7 @@ Some third-party included files may have different licenses - please check their
 12. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed as it's unfair for others.<br />
 13. A user's DUCOs may be burnt if a violation can be proven.<br/>
 14. These terms of service can change at any time without prior notice.<br/>
-15. Having alt accounts without a rational reason (e.g. for multi-mining) are not allowed.<br/>
-16. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+15. Every user using Duino-Coin agrees to comply with the above rules.<br/>
 
 
 ## Privacy policy
