@@ -4,7 +4,7 @@
   |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \
   |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  |
   `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--'
-  Official code for ESP8266 boards                          version 2.7.3
+  Official code for ESP8266 boards                          version 2.7.4
 
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
@@ -44,7 +44,7 @@ namespace {
 const char* SSID          = "WIFI SSID";    // Change this to your WiFi name
 const char* PASSWORD      = "WIFI PASS";    // Change this to your WiFi password
 const char* USERNAME      = "DUCO USERNAME";// Change this to your Duino-Coin username
-const char* RIG_IDENTIFIER = "Auto";        // Change this if you want a custom miner name (or use Auto to autogenerate)
+const char* RIG_IDENTIFIER = "None";        // Change this if you want a custom miner name (or use Auto to autogenerate)
 const bool USE_HIGHER_DIFF = false;         // Change to true if using 160 MHz to not get the first share rejected
 
 const char * urlPool = "https://server.duinocoin.com/getPool";
