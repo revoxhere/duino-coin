@@ -55,7 +55,7 @@
 
 | Key features | Technical specifications | (Some of many) supported boards |
 |-|-|-|
-| 💻 Supported by a large number of platforms<br>👥 A fast-growing community<br>💱 Easy to use & exchange<br>(on DUCO Exchange, Node-S, JustSwap)<br>🌎 Available everywhere<br>:new: Fully original & open-source project<br>🌳 Beginner & eco-friendly<br>💰 Cost-effective & easy to mine | ⚒️ Algorithms: DUCO-S1, XXHASH,<br>more planned (including PoS)<br>♐ Rewards: supported by "Kolka system"<br>helping to reward miners fairly<br>⚡ Transaction time: Instant<br>🪙 Coin supply: Infinite<br>(before December 2020: 350k coins)<br>(new limits planned for the future)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Decimals: up to 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Teensy 4.1 boards |
+| 💻 Supported by a large number of platforms<br>👥 A fast-growing community<br>💱 Easy to use & exchange<br>(on DUCO Exchange, Node-S, JustSwap, SushiSwap)<br>🌎 Available everywhere<br>:new: Fully original & open-source project<br>🌳 Beginner & eco-friendly<br>💰 Cost-effective & easy to mine | ⚒️ Algorithms: DUCO-S1, XXHASH,<br>more planned (including PoS)<br>♐ Rewards: supported by "Kolka system"<br>helping to reward miners fairly<br>⚡ Transaction time: Instant<br>🪙 Coin supply: Infinite<br>(before December 2020: 350k coins)<br>(new limits planned for the future)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Decimals: up to 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Teensy 4.1 boards |
 
 
 ## Getting started
@@ -126,9 +126,9 @@ Server source code, documentation for API calls and official libraries for devel
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
   | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 196 H/s                           | 1                 | 0.2 W          | 9-10                |
   | Teensy 4.1 (soft cryptography)                            | 80 kH/s                           | 1                 | 0.5 W          | -                   |
-  | NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 9.3 kH/s (160MHz) 4.6 kH/s (80Mhz)| 1                 | 0.6 W          | 6-7                 |
-  | ESP32                                                     | 23 kH/s                           | 2                 | 1 W            | 8-9                 |
-  | Raspberry Pi Zero                                         | 17 kH/s                           | 1                 | 1.1 W          | -                   |
+  | NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 10 kH/s (160MHz) 4.9 kH/s (80Mhz) | 1                 | 0.6 W          | 6-7                 |
+  | ESP32                                                     | 33 kH/s                           | 2                 | 1 W            | 8-9                 |
+  | Raspberry Pi Zero                                         | 18 kH/s                           | 1                 | 1.1 W          | -                   |
   | Raspberry Pi 3                                            | 440 kH/s                          | 4                 | 5.1 W          | -                   |
   | Raspberry Pi 4                                            | 740 kH/s (32bit)                  | 4                 | 6.4 W          | 10                  |
   | ODROID XU4                                                | 1.0 MH/s                          | 8                 | 5 W            | 9                   |
@@ -225,11 +225,12 @@ Some third-party included files may have different licenses - please check their
 12. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed as it's unfair for others.<br />
 13. A user's DUCOs may be burnt if a violation can be proven.<br/>
 14. These terms of service can change at any time without prior notice.<br/>
-15. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+15. Having alt accounts without a rational reason (e.g. for multi-mining) are not allowed.<br/>
+16. Every user using Duino-Coin agrees to comply with the above rules.<br/>
 
 
 ## Privacy policy
-1. On the master server we only store usernames, hashed passwords (with the help of bcrypt) and e-mails of users as their account data.<br/>
+1. On the master server we only store usernames, hashed passwords (with the help of bcrypt), account creation dates and e-mails of users as their data.<br/>
 2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
 3. Balances, transactions and mining-related data is publicly available in the public <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
 4. The privacy policy may be changed in the future with a prior notification.
@@ -241,6 +242,7 @@ Some third-party included files may have different licenses - please check their
 *   [@Bilaboz](https://github.com/bilaboz/) (Lead NodeJS dev)
 *   [@connorhess](https://github.com/connorhess) (Lead Python dev, Node-S owner)
 *   [@JoyBed](https://github.com/JoyBed) (Lead AVR dev)
+*   [@Yennefer](https://www.instagram.com/vlegle/) (Lead social manager)
 *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
