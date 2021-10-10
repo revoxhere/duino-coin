@@ -149,7 +149,7 @@
         "connected_server": " برای تسلط بر سرور دوین کوین (v",
         "outdated_miner": " ماینر قدیمی است (v",
         "server_is_on_version": " سرور روی v است",
-        "update_warning": ", لطفاً آخرین نسخه را از https://github.com/revoxhere/duino-coin/releases/" بارگیری کنید ",
+        "update_warning": ", لطفاً آخرین نسخه را از https://github.com/revoxhere/duino-coin/releases/ بارگیری کنید ",
         "connecting_error": " خطا در اتصال به سرور. تلاش مجدد در 10 ثانیه ",
         "mining_thread": " تعداد ماینینگ #",
         "mining_thread_starting": " شروع می شود ",
