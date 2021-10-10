@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 2.73 © MIT licensed
+Duino-Coin Official PC Miner 2.74 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -105,7 +105,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 2.73
+    VER = 2.74
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -492,6 +492,8 @@ class Miner:
                     lang = "polish"
                 elif locale.startswith("fr"):
                     lang = "french"
+                elif locale.startswith("fa"):
+                    lang = "farsi"
                 elif locale.startswith("mt"):
                     lang = "maltese"
                 elif locale.startswith("ru"):
