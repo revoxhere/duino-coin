@@ -4,7 +4,7 @@
   |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \
   |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  |
   `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--'
-  Official code for ESP8266 boards                          version 2.7.4
+  Official code for ESP8266 boards                          version 2.7.5
 
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
@@ -41,14 +41,14 @@ using namespace experimental::crypto;
 #include <Ticker.h>
 
 namespace {
-const char* SSID          = "WIFI SSID";    // Change this to your WiFi name
-const char* PASSWORD      = "WIFI PASS";    // Change this to your WiFi password
-const char* USERNAME      = "DUCO USERNAME";// Change this to your Duino-Coin username
-const char* RIG_IDENTIFIER = "None";        // Change this if you want a custom miner name (or use Auto to autogenerate)
-const bool USE_HIGHER_DIFF = false;         // Change to true if using 160 MHz to not get the first share rejected
+const char* SSID          =  "WIFI SSID";    // Change this to your WiFi name
+const char* PASSWORD      =  "WIFI PASS";    // Change this to your WiFi password
+const char* USERNAME      =  "DUCO USERNAME";// Change this to your Duino-Coin username
+const char* RIG_IDENTIFIER = "None";         // Change this if you want a custom miner name (or use Auto to autogenerate)
+const bool USE_HIGHER_DIFF = false;          // Change to true if using 160 MHz to not get the first share rejected
 
-const char * urlPool = "https://server.duinocoin.com/getPool";
-const char * miner_version = "Official ESP8266 Miner 2.74";
+const char * get_pool_api[] = {"https://server.duinocoin.com/getPool"};
+const char * miner_version = "Official ESP8266 Miner 2.75";
 unsigned int share_count = 0; // Share variable
 String AutoRigName = "";
 String host = "";
@@ -88,8 +88,30 @@ String httpGetString(String URL) {
 }
 
 void UpdatePool() {
-  String input = httpGetString(urlPool);
-  if (input == "") return;
+  String input = "";
+  int waitTime = 1;
+  int poolIndex = 0;
+  int poolSize = sizeof(get_pool_api) / sizeof(char*);
+
+  while (input == "") {
+    Serial.println("Fetching pool (" + String(get_pool_api[poolIndex]) + ")... ");
+    input = httpGetString(get_pool_api[poolIndex]);
+    poolIndex += 1;
+
+    // Check if pool index needs to roll over
+    if( poolIndex >= poolSize ){
+      Serial.println("Retrying pool list in: " + String(waitTime) + "s");
+      poolIndex %= poolSize;
+      delay(waitTime * 1000);
+
+      // Increase wait time till a maximum of 16 seconds (addresses: Limit connection requests on failure in ESP boards #1041)
+      waitTime *= 2;
+      if( waitTime > 16 )
+        waitTime = 16;
+    }
+  }
+
+  // Setup pool with new input
   UpdateHostPort(input);
 }
 

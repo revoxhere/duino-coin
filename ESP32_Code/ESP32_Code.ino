@@ -4,7 +4,7 @@
   |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \ 
   |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  | 
   `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--' 
-  Official code for ESP32 boards                            version 2.7.4
+  Official code for ESP32 boards                            version 2.7.5
   
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
@@ -22,6 +22,7 @@ const char *wifi_password = "Your WiFi password";
 const char *username = "Your Duino-Coin username";
 // Change this if you want a custom rig identifier
 const char *rig_identifier = "None";
+
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 2
 #define BLINK_SHARE_FOUND    1
@@ -32,9 +33,9 @@ const char *rig_identifier = "None";
 // Define watchdog timer seconds
 #define WDT_TIMEOUT 60
 
-#include "hwcrypto/sha.h" // Uncomment this line if you're using an older
+// #include "hwcrypto/sha.h" // Uncomment this line if you're using an older
 // version of the ESP32 core and sha_parellel_engine doesn't work for you
-// #include "sha/sha_parallel_engine.h"  // Include hardware accelerated hashing library
+#include "sha/sha_parallel_engine.h"  // Include hardware accelerated hashing library
 
 /* If you're using the ESP32-CAM board or other board
   that doesn't support OTA (Over-The-Air programming)
@@ -73,8 +74,8 @@ TaskHandle_t Task2;
 TaskHandle_t MinerCheckin;
 SemaphoreHandle_t xMutex;
 
-const char *get_pool_api = "https://server.duinocoin.com/getPool";
-const char *miner_version = "Official ESP32 Miner 2.74";
+const char *get_pool_api[] = {"https://server.duinocoin.com/getPool"};
+const char *miner_version = "Official ESP32 Miner 2.75";
 String host = "";
 int port = 0;
 int walletid = 0;
@@ -101,12 +102,29 @@ void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
 
 void UpdatePool() {
   String input = "";
-
+  int waitTime = 1;
+  int poolIndex = 0;
+  int poolSize = sizeof(get_pool_api) / sizeof(char*);
+  
   while (input == "") {
-    Serial.println("Fetching pool... ");
-    input = httpGetString(get_pool_api);
+    Serial.println("Fetching pool (" + String(get_pool_api[poolIndex]) + ")... ");
+    input = httpGetString(get_pool_api[poolIndex]);
+    poolIndex += 1;
+
+    // Check if pool index needs to roll over
+    if( poolIndex >= poolSize ){
+      Serial.println("Retrying pool list in: " + String(waitTime) + "s");
+      poolIndex %= poolSize;
+      delay(waitTime * 1000);
+
+      // Increase wait time till a maximum of 16 seconds (addresses: Limit connection requests on failure in ESP boards #1041)
+      waitTime *= 2;
+      if( waitTime > 16 )
+        waitTime = 16;
+    }
   }
 
+  // Setup pool with new input
   UpdateHostPort(input);
 }
 
