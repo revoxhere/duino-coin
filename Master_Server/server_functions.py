@@ -1,3 +1,63 @@
+#!/usr/bin/env python3
+"""
+Duino-Coin Server module © MIT licensed
+https://duinocoin.com
+https://github.com/revoxhere/duino-coin-rest-api
+Duino-Coin Team & Community 2019-2021
+"""
+
+import threading
+import requests
+import json
+from time import sleep
+
+def scaleway_unban(ip, auth_key, instance_id, time=60*45):
+    sleep(time)
+    api = "https://api.scaleway.com/instance/v1/zones/nl-ams-1/security_groups"
+    headers = {
+        "X-Auth-Token": auth_key,
+        "Content-Type": "application/json"
+    }
+    pid2 = requests.delete(
+        f"{api}/{instance_id}/rules/{pid}",
+        headers=headers).text
+    if not pid2:
+        print("Banned", pid, ip)
+
+
+def scaleway_ban(ip, auth_key, instance_id, time=60*45):
+    api = "https://api.scaleway.com/instance/v1/zones/nl-ams-1/security_groups"
+
+    data = {
+        "protocol": "ANY",
+        "direction": "inbound",
+        "action": "drop",
+        "ip_range": f"{ip}",
+        "dest_port_from": None, #None for all
+        "dest_port_to": None, #None for all
+        "editable": True,
+        "position": 1
+    }
+
+    headers = {
+        "X-Auth-Token": auth_key,
+        "Content-Type": "application/json"
+    }
+
+    pid = requests.post(
+        f"{api}/{instance_id}/rules",
+        data=json.dumps(data),
+        headers=headers).json()
+
+    try:
+        pid = pid["rule"]["id"]
+        print("Banned", pid, ip)
+        threading.Thread(target=scaleway_unban, args=[ip, auth_key, instance_id, time]).start()
+    except:
+        pass
+
+
+
 def pool_info_parser(data, data2):
     if data[0] == "PoolSync":
         length_of_base = 9
@@ -22,30 +82,33 @@ def pool_info_parser(data, data2):
     return data
 
 
-def receive_data(connection, limit=256):
+def receive_data(connection, limit=1024):
     """ Returns received data from the connection,
         raises an exception on error """
-    data = connection.recv(limit)
+    try:
+        data = connection.recv(limit)
 
-    if not data:
+        if not data:
+            connection.close()
+            return None
+
+        else:
+            data_pre_split = data
+            data = data.decode("utf-8").replace("\n", "").split(",")
+            if data[0].startswith("Pool"):
+                data = pool_info_parser(data, data_pre_split)
+            return data
+    except:
         connection.close()
-        raise Exception("Connection closed unexpectedly")
         return None
-    else:
-        data_pre_split = data
-        data = data.decode("utf8").replace("\n", "").split(",")
-        if data[0].startswith("Pool"):
-            data = pool_info_parser(data, data_pre_split)
-
-        return data
 
 
 def send_data(data, connection):
     """ Sends data to the connection,
         raises an exception on error """
     try:
-        connection.sendall(bytes(str(data), encoding="utf8"))
+        connection.sendall(bytes(str(data), encoding="utf-8"))
     except Exception:
         connection.close()
-        raise Exception("Connection closed unexpectedly")
+    return
         
