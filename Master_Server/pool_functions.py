@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+"""
+Duino-Coin Pool sync module © MIT licensed
+https://duinocoin.com
+https://github.com/revoxhere/duino-coin-rest-api
+Duino-Coin Team & Community 2019-2021
+"""
+
 import sqlite3
 from server_functions import receive_data, send_data
 from Server import DIFF_INCREASES_PER, CONFIG_BLOCKS, DB_TIMEOUT
@@ -18,7 +26,6 @@ def dict_factory(cursor, row):
 
 
 def floatmap(x, in_min, in_max, out_min, out_max):
-    # Arduino's built in map function remade in python
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 
@@ -44,22 +51,22 @@ def _pool_list():
     with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
         conn.row_factory = dict_factory
         c2 = conn.cursor()
-        c2.execute("""CREATE TABLE 
-            IF NOT EXISTS 
+        c2.execute("""CREATE TABLE
+            IF NOT EXISTS
             PoolList(
-            identifier TEXT, 
-            name TEXT, 
-            ip TEXT, 
-            port TEXT, 
-            Status TEXT, 
-            hidden TEXT, 
-            cpu REAL, 
-            ram REAL, 
+            identifier TEXT,
+            name TEXT,
+            ip TEXT,
+            port TEXT,
+            Status TEXT,
+            hidden TEXT,
+            cpu REAL,
+            ram REAL,
             connections INT)""")
 
         c2.execute(
-            """SELECT name, ip, port, Status, ram, cpu 
-            FROM PoolList 
+            """SELECT name, ip, port, Status, ram, cpu
+            FROM PoolList
             WHERE hidden != 'True'""")
         info = c2.fetchall()
         info = str(info).replace("'", '"')
@@ -79,10 +86,12 @@ def pool_login_add(connection, data, PoolPassword):
         info = ast.literal_eval(info)
         info = json.loads(info)
 
-        poolName = info['name']
         poolHost = info['host']
         poolPort = info['port']
+
         poolID = info['identifier']
+        poolName = info['name']
+
         poolHidden = info['hidden']
     except Exception as e:
         print(e)
@@ -92,36 +101,36 @@ def pool_login_add(connection, data, PoolPassword):
         with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
             c2 = conn.cursor()
             print("Debug 4")
-            c2.execute("""CREATE TABLE 
-                IF NOT EXISTS 
+            c2.execute("""CREATE TABLE
+                IF NOT EXISTS
                 PoolList(
-                identifier TEXT, 
-                name TEXT, 
-                ip TEXT, 
-                port TEXT, 
-                Status TEXT, 
-                hidden TEXT, 
-                cpu REAL, 
-                ram REAL, 
+                identifier TEXT,
+                name TEXT,
+                ip TEXT,
+                port TEXT,
+                Status TEXT,
+                hidden TEXT,
+                cpu REAL,
+                ram REAL,
                 connections INT)""")
 
             c2.execute(
-                """SELECT 
-                COUNT(identifier) 
-                FROM PoolList 
+                """SELECT
+                COUNT(identifier)
+                FROM PoolList
                 WHERE identifier = ?""",
                 (poolID,))
             if (c2.fetchall()[0][0]) == 0:
                 c2.execute("""INSERT INTO PoolList(
-                    identifier, 
-                    name, 
-                    ip, 
-                    port, 
-                    Status, 
-                    hidden, 
-                    cpu, 
-                    ram, 
-                    connections) 
+                    identifier,
+                    name,
+                    ip,
+                    port,
+                    Status,
+                    hidden,
+                    cpu,
+                    ram,
+                    connections)
                     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                            (poolID,
                             poolName,
@@ -152,29 +161,29 @@ def pool_login_remove(connection, data, PoolPassword):
     if password == PoolPassword:
         with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
             c2 = conn.cursor()
-            c2.execute("""CREATE TABLE 
-                IF NOT EXISTS 
+            c2.execute("""CREATE TABLE
+                IF NOT EXISTS
                 PoolList(
-                identifier TEXT, 
-                name TEXT, 
-                ip TEXT, 
-                port TEXT, 
-                Status TEXT, 
-                hidden TEXT, 
-                cpu REAL, 
-                ram REAL, 
+                identifier TEXT,
+                name TEXT,
+                ip TEXT,
+                port TEXT,
+                Status TEXT,
+                hidden TEXT,
+                cpu REAL,
+                ram REAL,
                 connections INT)""")
 
             c2.execute(
-                """SELECT 
-                COUNT(identifier) 
-                FROM PoolList 
+                """SELECT
+                COUNT(identifier)
+                FROM PoolList
                 WHERE identifier = ?""",
                 (poolID,))
             if (c2.fetchall()[0][0]) != 0:
                 c2.execute(
-                    """DELETE 
-                    FROM PoolList 
+                    """DELETE
+                    FROM PoolList
                     WHERE identifier=?""",
                     (poolID,))
 
@@ -193,6 +202,7 @@ class Pool:
         self.poolID = None
         self.poolIP = None
         self.connection = connection
+        self.session = requests.Session()
 
     def login(self, data):
         try:
@@ -202,6 +212,7 @@ class Pool:
 
             self.poolIP = info['host']
             self.poolID = info['identifier']
+            self.poolName = info['name']
             poolPort = info['port']
             poolVersion_sent = info['version']
         except IndexError:
@@ -211,22 +222,22 @@ class Pool:
             with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
                 c2 = conn.cursor()
                 c2.execute(
-                    """CREATE TABLE 
-                    IF NOT EXISTS 
+                    """CREATE TABLE
+                    IF NOT EXISTS
                     PoolList(
-                    identifier TEXT, 
-                    name TEXT, 
-                    ip TEXT, 
-                    port TEXT, 
-                    Status TEXT, 
-                    hidden TEXT, 
-                    cpu REAL, 
-                    ram REAL, 
+                    identifier TEXT,
+                    name TEXT,
+                    ip TEXT,
+                    port TEXT,
+                    Status TEXT,
+                    hidden TEXT,
+                    cpu REAL,
+                    ram REAL,
                     connections INT)""")
 
                 c2.execute(
-                    """SELECT COUNT(identifier) 
-                    FROM PoolList 
+                    """SELECT COUNT(identifier)
+                    FROM PoolList
                     WHERE identifier = ?""",
                     (self.poolID,))
 
@@ -234,11 +245,11 @@ class Pool:
                     send_data(data="NO,Identifier not found",
                               connection=self.connection)
 
-                c2.execute("""UPDATE PoolList 
-                    SET ip = ?, 
-                    port = ?, 
-                    connections = ?, 
-                    Status = ? 
+                c2.execute("""UPDATE PoolList
+                    SET ip = ?,
+                    port = ?,
+                    connections = ?,
+                    Status = ?
                     WHERE identifier = ?""",
                            (self.poolIP,
                             poolPort, 0,
@@ -258,8 +269,11 @@ class Pool:
         rewards = {}
         poolCpu = 0
         poolRam = 0
-        if self.poolID == None:
+        self.connection.settimeout(45)
+
+        if not self.poolID or not self.poolName:
             send_data(data="No PoolID provided", connection=self.connection)
+            return blocks_to_add, poolConnections, poolWorkers, rewards, 0
 
         try:
             info = str(data[1].decode())
@@ -271,10 +285,9 @@ class Pool:
             poolRam = float(info['ram'])
             poolConnections = int(info['connections'])
             hide_this_pool = "False"
-            if poolConnections > 6500:
-                hide_this_pool = "True"
 
-            send_data(data="SyncOK", connection=self.connection)
+            # if poolConnections > 7000:
+            #    hide_this_pool = "True"
         except Exception as e:
             send_data(data=f"NO,Error: {e}", connection=self.connection)
             return 0, 0, {}, {}, 1
@@ -282,9 +295,9 @@ class Pool:
         try:
             with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
                 datab = conn.cursor()
-                datab.execute("""UPDATE PoolList 
-                    SET cpu = ?, 
-                    ram = ?, 
+                datab.execute("""UPDATE PoolList
+                    SET cpu = ?,
+                    ram = ?,
                     connections = ?,
                     hidden = ?
                     WHERE identifier = ?""",
@@ -295,15 +308,33 @@ class Pool:
                                self.poolID))
                 conn.commit()
         except Exception as e:
-            pass
+            print(e)
 
-        try:
-            rewards = requests.get(
-                f"http://{self.poolIP}/rewards_{self.poolID}.json").json()
-            poolWorkers = requests.get(
-                f"http://{self.poolIP}/workers_{self.poolID}.json").json()
-        except Exception as e:
-            pass
+        i = 0
+        while i < 2:
+            try:
+                # print(f"Attempting to download http://{self.poolIP}/rewards_{self.poolName}.json")
+                rewards = self.session.get(
+                    f"http://{self.poolIP}/rewards_{self.poolName}.json").json()
+                # print(f"Downloaded http://{self.poolIP}/rewards_{self.poolName}.json OK")
+                break
+            except Exception as e:
+                i += 1
+        else:
+            print(f"Gave up retrying http://{self.poolIP}/rewards_{self.poolName}.json")
+
+        i = 0
+        while i < 2:
+            try:
+                # print(f"Attempting to download http://{self.poolIP}/workers_{self.poolName}.json")
+                poolWorkers = self.session.get(
+                    f"http://{self.poolIP}/workers_{self.poolName}.json").json()
+                # print(f"Downloaded http://{self.poolIP}/workers_{self.poolName}.json OK")
+                break
+            except Exception as e:
+                i += 1
+        else:
+            print(f"Gave up retrying http://{self.poolIP}/workers_{self.poolName}.json")
 
         return blocks_to_add, poolConnections, poolWorkers, rewards, 0
 
@@ -315,23 +346,23 @@ class Pool:
 
         with sqlite3.connect(POOL_DATABASE, timeout=DB_TIMEOUT) as conn:
             c2 = conn.cursor()
-            c2.execute("""CREATE TABLE 
-                IF NOT EXISTS 
+            c2.execute("""CREATE TABLE
+                IF NOT EXISTS
                 PoolList(
-                identifier TEXT, 
-                name TEXT, 
-                ip TEXT, 
-                port TEXT, 
-                Status TEXT, 
-                hidden TEXT, 
-                cpu REAL, 
-                ram REAL, 
+                identifier TEXT,
+                name TEXT,
+                ip TEXT,
+                port TEXT,
+                Status TEXT,
+                hidden TEXT,
+                cpu REAL,
+                ram REAL,
                 connections INT)""")
 
             c2.execute(
-                """SELECT 
-                COUNT(identifier) 
-                FROM PoolList 
+                """SELECT
+                COUNT(identifier)
+                FROM PoolList
                 WHERE identifier = ?""",
                 (poolID,))
             if (c2.fetchall()[0][0]) == 0:
@@ -339,8 +370,8 @@ class Pool:
                           connection=self.connection)
 
             c2.execute(
-                """UPDATE PoolList 
-                SET Status = ? 
+                """UPDATE PoolList
+                SET Status = ?
                 WHERE identifier = ?""",
                 ("False", poolID))
 
