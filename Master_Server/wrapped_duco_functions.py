@@ -1,4 +1,12 @@
-# wDUCO 2.0 functions by yanis (@ygboucherk), 2020-2021
+#!/usr/bin/env python3
+"""
+Duino-Coin wDUCO API © MIT licensed
+developed by yanis (@ygboucherk) 
+https://duinocoin.com
+https://github.com/revoxhere/duino-coin-rest-api
+Duino-Coin Team & Community 2019-2021
+"""
+
 import sqlite3
 import traceback
 import datetime
@@ -7,10 +15,11 @@ from Server import DATABASE as database
 from Server import DB_TIMEOUT as database_timeout
 from Server import CONFIG_TRANSACTIONS as config_db_transactions
 from Server import WRAPPER_KEY as wrapper_private_key
+from Server import admin_print
 
 use_wrapper = True
 wrapper_permission = False
-wrap_enabled = False
+wrap_enabled = True
 unwrap_enabled = True
 
 if use_wrapper:
@@ -54,7 +63,7 @@ def confirmunwraptx(duco_username, recipient, amount):
         PrivateKey(
             bytes.fromhex(wrapper_private_key)))
     txn = txn.broadcast()
-    print("Sent confirm tx to tron network by" + duco_username)
+    admin_print("Sent confirm tx to tron network by " + duco_username)
     return feedback
 
 
@@ -77,12 +86,9 @@ def protocol_wrap_wduco(username, tron_address, amount):
 
         elif float(balance) >= float(amount) and float(amount) > 0:
             balancebackup = balance
-            print("Backed up balance: " + str(balancebackup))
+            # admin_print("Backed up balance: " + str(balancebackup))
             try:
-                print("All checks done, initiating wrapping routine")
                 balance -= float(amount)
-                print("DUCO removed from pending balance")
-
                 while True:
                     try:
                         with sqlite3.connect(database,
@@ -96,35 +102,38 @@ def protocol_wrap_wduco(username, tron_address, amount):
                             conn.commit()
                         break
                     except:
-                        print("Retrying")
+                        # print("Retrying")
                         pass
-                print("DUCO balance sent to DB, sending tron transaction")
+                # print("DUCO balance sent to DB, sending tron transaction")
 
-                print("Tron wrapper called")
-                txn = wduco.functions.wrap(
-                    tron_address,
-                    int(float(amount)*10**6)
-                ).with_owner(wrapper_public_key
-                             ).fee_limit(20_000_000
-                                         ).build().sign(
-                    PrivateKey(
-                        bytes.fromhex(wrapper_private_key)))
+                # print("Tron wrapper called")
+                try:
+                    txn = wduco.functions.wrap(
+                        tron_address,
+                        int(float(amount)*10**6)
+                    ).with_owner(wrapper_public_key
+                                 ).fee_limit(20_000_000
+                                             ).build().sign(
+                        PrivateKey(
+                            bytes.fromhex(wrapper_private_key)))
 
-                print("Txid: " + txn.txid)
-                txn = txn.broadcast()
+                    admin_print("Wrap TXID: " + txn.txid)
+                    txn = txn.broadcast()
 
-                print("Sent wrap tx to TRON network")
-                txnsucceeded = txn.wait()
-                if txnsucceeded:
-                    trontxfeedback = txn.result()
-                else:
+                    admin_print("Sent wrap tx to TRON network")
+                    txnsucceeded = txn.wait()
+                    if txnsucceeded:
+                        trontxfeedback = txn.result()
+                    else:
+                        trontxfeedback = False
+                except:
                     trontxfeedback = False
 
                 if trontxfeedback:
-                    print("Successful wrapping")
+                    admin_print("Successful wrap")
                     now = datetime.datetime.now()
                     lastBlockHash = sha1(bytes(
-                        str(tron_address)+str(amount), encoding='utf8')
+                        str(tron_address)+str(now), encoding='utf8')
                     ).hexdigest()
                     try:
                         with sqlite3.connect(config_db_transactions,
@@ -134,47 +143,54 @@ def protocol_wrap_wduco(username, tron_address, amount):
 
                             formatteddatetime = now.strftime(
                                 "%d/%m/%Y %H:%M:%S")
+                            memo = str(tron_address)
                             datab.execute("""INSERT INTO 
                                 Transactions(
                                 timestamp, 
                                 username, 
                                 recipient, 
                                 amount, 
-                                hash) 
-                                VALUES(?, ?, ?, ?, ?)""",
+                                hash,
+                                memo) 
+                                VALUES(?, ?, ?, ?, ?, ?)""",
                                           (formatteddatetime,
                                            username,
-                                           "wDUCO Wrap (" +
-                                           str(tron_address)+")",
+                                           "wDUCO",
                                               amount,
-                                              lastBlockHash))
+                                              lastBlockHash,
+                                              memo))
                             tranconn.commit()
                     except Exception as e:
                         print(e)
                     return "OK,Sucessfull wrapping,"+str(lastBlockHash)
                 else:
-                    try:
+                    with sqlite3.connect(database,
+                                         timeout=database_timeout
+                                         ) as tranconn:
+                        datab = tranconn.cursor()
                         datab.execute(
                             """UPDATE Users 
                             set balance = ? 
                             where username = ?""",
                             (balancebackup, username))
-                    except Exception:
-                        pass
+                        tranconn.commit()
+                    #print("Error with Tron blockchain")
+                    return "NO,Wrapper was unable to broadcast the transaction. Try again later"
             except Exception as e:
-                try:
+                with sqlite3.connect(database,
+                                     timeout=database_timeout
+                                     ) as tranconn:
+                    datab = tranconn.cursor()
                     datab.execute(
                         """UPDATE Users 
                         set balance = ? 
                         where username = ?""",
                         (balancebackup, username))
-                except Exception:
-                    pass
-                print("Error with Tron blockchain:")
-                print(traceback.format_exc())
-                return "NO,error with Tron blockchain"+str(e)
+                    tranconn.commit()
+                #print("Error with Tron blockchain:", traceback.format_exc())
+                return "NO,Error with Tron blockchain: "+str(e)
     else:
-        return "NO,Wrapper disabled"
+        return "NO,Wrapper is disabled"
 
 
 def protocol_unwrap_wduco(username, tron_address, amount):
@@ -182,7 +198,7 @@ def protocol_unwrap_wduco(username, tron_address, amount):
         while True:
             try:
                 with sqlite3.connect(database) as conn:
-                    print("Retrieving user balance")
+                    #print("Retrieving user balance")
                     datab = conn.cursor()
                     datab.execute(
                         "SELECT * FROM Users WHERE username = ?", (username,))
@@ -192,8 +208,9 @@ def protocol_unwrap_wduco(username, tron_address, amount):
             except Exception:
                 pass
 
-        print("Balance retrieved")
-        while True:
+        #print("Balance retrieved")
+        i = 0
+        while i < 3:
             try:
                 wbalance = float(
                     int(wduco.functions.pendingWithdrawals(
@@ -202,14 +219,16 @@ def protocol_unwrap_wduco(username, tron_address, amount):
                 )/10**6
                 break
             except:
-                print("Retrying wDUCO balance fetch")
+                i += 1
+        if i >= 3:
+            return "NO,error with Tron blockchain"
 
         if float(amount) <= float(wbalance) and float(amount) > 0:
 
             if float(amount) <= float(wbalance):
-                print("Correct amount")
+                #print("Correct amount")
                 balancebackup = balance
-                print("Updating DUCO Balance")
+                #print("Updating DUCO Balance")
                 balancebackup = balance
                 balance = str(float(balance)+float(amount))
                 while True:
@@ -226,7 +245,7 @@ def protocol_unwrap_wduco(username, tron_address, amount):
                     except Exception:
                         pass
                 try:
-                    print("Sending tron transaction")
+                    admin_print("Sending tron transaction")
                     txn = wduco.functions.confirmWithdraw(
                         username,
                         tron_address,
@@ -236,10 +255,10 @@ def protocol_unwrap_wduco(username, tron_address, amount):
                                              ).build().sign(
                         PrivateKey(bytes.fromhex(wrapper_private_key)))
 
-                    print("Txid: " + txn.txid)
+                    admin_print("Unwrap TXID: " + txn.txid)
                     txn = txn.broadcast()
 
-                    print("Sent confirm tx to tron network")
+                    #print("Sent confirm tx to tron network")
                     txnsucceeded = txn.wait()
                     if txnsucceeded:
                         trontxfeedback = txn.result()
@@ -247,7 +266,7 @@ def protocol_unwrap_wduco(username, tron_address, amount):
                         trontxfeedback = False
 
                     if trontxfeedback:
-                        print("Successful unwrapping")
+                        admin_print("Successful unwrap")
                         try:
                             with sqlite3.connect(config_db_transactions,
                                                  timeout=database_timeout
@@ -257,23 +276,25 @@ def protocol_unwrap_wduco(username, tron_address, amount):
                                 formatteddatetime = now.strftime(
                                     "%d/%m/%Y %H:%M:%S")
                                 lastBlockHash = sha1(
-                                    bytes(str(tron_address)+str(amount),
+                                    bytes(str(tron_address)+str(now),
                                           encoding='utf8')
                                 ).hexdigest()
+                                memo = str(tron_address)
                                 datab.execute("""INSERT INTO 
                                         Transactions(
                                         timestamp, 
                                         username, 
                                         recipient, 
                                         amount, 
-                                        hash) 
-                                        VALUES(?, ?, ?, ?, ?)""",
+                                        hash,
+                                        memo) 
+                                        VALUES(?, ?, ?, ?, ?, ?)""",
                                               (formatteddatetime,
-                                               "wDUCO Unwrap (" +
-                                               str(tron_address) + ")",
+                                               "wDUCO",
                                                   username,
                                                   amount,
-                                                  lastBlockHash))
+                                                  lastBlockHash,
+                                                  memo))
                                 tranconn.commit()
                         except Exception as e:
                             print(e)
@@ -306,8 +327,8 @@ def protocol_unwrap_wduco(username, tron_address, amount):
                                 break
                         except Exception:
                             pass
-                    print("Error with Tron blockchain:")
-                    print(traceback.format_exc())
+                    #print("Error with Tron blockchain:")
+                    # print(traceback.format_exc())
                     return "NO,error with Tron blockchain"+str(e)
     else:
         return "NO,Wrapper disabled"
