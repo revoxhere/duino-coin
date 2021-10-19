@@ -27,8 +27,9 @@
 
           body{
               font-family: 'Lato', sans-serif;
-              color: #888;
+              color: whitesmoke;
               margin: 0;
+              background: rgba(255, 167, 16, 0.75);
           }
 
           #main{
@@ -68,7 +69,7 @@
           .button {
               position: relative;
               border-radius: 4px;
-              background-color: #A9A9A9;
+              background: linear-gradient(160deg, #e74c3c, #f39c12);
               border: none;
               color: #FFFFFF;
               text-align: center;
@@ -79,6 +80,17 @@
               cursor: pointer;
               margin: 5px;
               top: -25px;
+          }
+
+          .button:hover {
+              color: #fafafa !important;
+              background: linear-gradient(223deg, #e74c3c, #f39c12, #f31291, #f3d012);
+              background-size: 800% 800%;
+
+              -webkit-animation: gradientAnim 1s ease infinite;
+              -moz-animation: gradientAnim 1s ease infinite;
+              -o-animation: gradientAnim 1s ease infinite;
+              animation: gradientAnim 1s ease infinite;
           }
 
           .button span {
