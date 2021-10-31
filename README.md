@@ -185,6 +185,7 @@ Server source code, documentation for API calls and official libraries for devel
       *   [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) by joaquinbvw
 
   ### Other tools:
+  *   [DUINO Mining Rig](https://repalmakershop.com/pages/duino-mining-rig) - 3D files, PCB designs and instructions for creating your own Duino rig by ReP_AL
   *   [DuinoCoin-balance-Home-Assistant](https://github.com/NL647/DuinoCoin-balance-Home-Assistant) - addon for home assistant displaying your balance by NL647
   *   [Duino Coin Status Monitor](https://github.com/TSltd/duino_coin) for 128x64 SSD1306 OLED and ESP8266 by TSltd
   *   [ducopanel](https://github.com/ponsato/ducopanel) - a GUI app for controling your Duino-Coin miners by ponsato
