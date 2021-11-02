@@ -33,6 +33,8 @@ import pip
 from subprocess import DEVNULL, Popen, check_call, call
 from threading import Thread as thrThread
 from threading import Lock as thread_lock
+from threading import Semaphore
+printlock = Semaphore(value=1)
 
 
 def install(package):
@@ -840,19 +842,25 @@ def mine_avr(com, threadid, fastest_pool):
 
             if feedback == 'GOOD':
                 shares[0] += 1
+                printlock.acquire()
                 share_print(port_num(com), "accept",
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping)
+                printlock.release()
             elif feedback == 'BLOCK':
                 shares[0] += 1
+                printlock.acquire()
                 share_print(port_num(com), "block",
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping)
+                printlock.release()
             else:
                 shares[1] += 1
+                printlock.acquire()
                 share_print(port_num(com), "reject",
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping)
+                printlock.release()
 
             title(get_string('duco_avr_miner') + str(Settings.VER)
                   + f') - {shares[0]}/{(shares[0] + shares[1])}'
