@@ -18,10 +18,11 @@ This branch of the Duino-Coin repository contains documentation for public API c
 
 ### Table of contents
 
-- Commnicating with the master server
+- Communicating with the master server
   - Over a [TCP connection](#TCP-connection)
   - Over a [WebSocket connecton](#WebSocket-connection)
   - List of [server commands](#Server-commands)
+- Communicating with a [Mining Pool](#Mining-Pools)
 - Duino-Coin [REST API](#REST-API)
 - Duino-Coin [JSON user data](#JSON-data)
 - Icons, colors - [branding](#Branding)
@@ -42,6 +43,8 @@ To communicate with the master server, create a simple tcp connection to one of 
 * `51.15.127.80:2815`
 
 Note: you can also use `server.duinocoin.com` instead of `51.15.127.80`
+
+The current IP adress is always here too: `https://raw.githubusercontent.com/revoxhere/duino-coin/gh-pages/serverip.txt`
 
 ### WebSocket connection
 
@@ -132,6 +135,18 @@ After sending `WRAP,amount,tronAddress` the server will wrap DUCO on the Tron ne
 
 1. Send a Tron transaction - e.g. `initiateWithdraw(duco_username, amount)`
 2. Send `UNWRAP,amount,tron_address` to the server
+
+##
+
+### Mining Pools
+
+To reduce server load, its better to mine on a Pool.
+
+You can get the pool connection details here:
+
+`https://server.duinocoin.com/getPool`
+
+It works like the main server, but only mining commands are accepted. More docs [here](https://github.com/Bilaboz/duino-coin-pools).
 
 ##
 
