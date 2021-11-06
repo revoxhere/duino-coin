@@ -354,6 +354,7 @@ def load_config():
     global username
     global donation_level
     global avrport
+    global hashrate_list
     global debug
     global rig_identifier
     global discord_presence
@@ -460,6 +461,7 @@ def load_config():
 
         avrport = avrport.split(',')
         print(Style.RESET_ALL + get_string('config_saved'))
+        hashrate_list = [0] * len(avrport)
 
     else:
         config.read(str(Settings.DATA_DIR) + '/Settings.cfg')
@@ -474,6 +476,7 @@ def load_config():
         discord_presence = config["AVR Miner"]["discord_presence"]
         shuffle_ports = config["AVR Miner"]["shuffle_ports"]
         Settings.REPORT_TIME = int(config["AVR Miner"]["periodic_report"])
+        hashrate_list = [0] * len(avrport)
 
 
 def greeting():
@@ -553,9 +556,9 @@ def init_rich_presence():
     # Initialize Discord rich presence
     global RPC
     try:
-        RPC = Presence(808045598447632384)
+        RPC = Presence(905158274490441808)
         RPC.connect()
-        Thread(target=Discord_rp.update).start()
+        thrThread(target=update_rich_presence).start()
     except Exception as e:
         #print("Error launching Discord RPC thread: " + str(e))
         pass
@@ -565,13 +568,13 @@ def update_rich_presence():
     startTime = int(time())
     while True:
         try:
-            total_hashrate = get_prefix("H/s", sum(hashrate.values()), 2)
+            total_hashrate = get_prefix("H/s", sum(hashrate_list), 2)
             RPC.update(details="Hashrate: " + str(total_hashrate),
                        start=mining_start_time,
-                       state=str(accept.value) + "/"
-                       + str(reject.value + accept.value)
+                       state=str(shares[0]) + "/"
+                       + str(shares[0] + shares[1])
                        + " accepted shares",
-                       large_image="ducol",
+                       large_image="avrminer",
                        large_text="Duino-Coin, "
                        + "a coin that can be mined with almost everything"
                        + ", including AVR boards",
@@ -801,6 +804,7 @@ def mine_avr(com, threadid, fastest_pool):
 
                 hashrate_mean.append(hashrate_t)
                 hashrate = mean(hashrate_mean[-5:])
+                hashrate_list[threadid] = hashrate
             except Exception as e:
                 pretty_print('sys' + port_num(com),
                              get_string('mining_avr_connection_error')
