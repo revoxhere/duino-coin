@@ -27,11 +27,13 @@
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_th_TH.md">
     <img src="https://img.shields.io/badge/-%E0%B9%84%E0%B8%97%E0%B8%A2-ff0092.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_pt_BR.md">
-    <img src="https://img.shields.io/badge/-Portugu%C3%AAs-ff00ad.svg?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/badge/-Portugu%C3%AAs-ff009a.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_de_DE.md">
-    <img src="https://img.shields.io/badge/-Deutsch-ff00c8.svg?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/badge/-Deutsch-ff00b2.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_id_ID.md">
-    <img src="https://img.shields.io/badge/-bahasa Indonesia-ff0ae3.svg?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/badge/-bahasa Indonesia-ff00ca.svg?style=for-the-badge" /></a>
+  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_kr_KR.md">
+    <img src="https://img.shields.io/badge/한국인-ff0ae3.svg?style=for-the-badge" /></a>
 </h1>
 <a href="https://wallet.duinocoin.com">
   <img src="https://img.shields.io/badge/Online Wallet-a202ff.svg?style=for-the-badge&logo=Web" /></a>
