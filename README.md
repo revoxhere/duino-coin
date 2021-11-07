@@ -120,7 +120,7 @@ Server source code, documentation for API calls and official libraries for devel
     Since that table is getting really long, it's collapsed by default. Click this text to expand it!
   </summary>
 
-  ### Please not that the rewards depend on a lot of factors and the table below is just for orientation purposes.
+  ### Please note that the rewards depend on a lot of factors and the table below is just for orientation purposes.
   
   | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
