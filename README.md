@@ -131,7 +131,7 @@ Server source code, documentation for API calls and official libraries for devel
   | NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 10 kH/s (160MHz) 4.9 kH/s (80Mhz) | 1                 | 0.6 W          | 6-7                 |
   | ESP32                                                     | 33 kH/s                           | 2                 | 1 W            | 8-9                 |
   | Raspberry Pi Zero                                         | 18 kH/s                           | 1                 | 1.1 W          | -                   |
-  | Raspberry Pi 3                                            | 440 kH/s                          | 4                 | 5.1 W          | -                   |
+  | Raspberry Pi 3                                            | 440 kH/s                          | 4                 | 5.1 W          | 4-5                 |
   | Raspberry Pi 4                                            | 740 kH/s (32bit)                  | 4                 | 6.4 W          | 10                  |
   | ODROID XU4                                                | 1.0 MH/s                          | 8                 | 5 W            | 9                   |
   | Atomic Pi                                                 | 690 kH/s                          | 4                 | 6 W            | -                   |
@@ -140,13 +140,13 @@ Server source code, documentation for API calls and official libraries for devel
   | Libre Computers Tritium H5CC                              | 480 kH/s                          | 4                 | 5 W            | -                   |
   | Libre Computers Le Potato                                 | 410 kH/s                          | 4                 | 5 W            | -                   |
   | Pine64 ROCK64                                             | 640 kH/s                          | 4                 | 5 W            | -                   |
-  | Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | -              | 5-6                 |
+  | Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | -              | 3.3                 |
   | Intel Core i5-2430M                                       | 1.18 MH/s                         | 4                 | -              | 6.5                 |
   | Intel Core i5-3230M                                       | 1.52 MH/s                         | 4                 | -              | 7.2                 |
   | Intel Core i5-5350U                                       | 1.35 MH/s                         | 4                 | -              | 6.0                 |
   | Intel Core i5-7200U                                       | 1.62 MH/s                         | 4                 | -              | 7.5                 |
   | Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | -              | 9.1                 |   
-  | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | -                   |
+  | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | 3.7                 |
   | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 67 W           | 15.44               |
 
   All tests were performed using the DUCO-S1 algorithm. This table will be actively updated.
