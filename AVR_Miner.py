@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 2.73 © MIT licensed
+Duino-Coin Official AVR Miner 2.74 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -31,7 +31,7 @@ import select
 import pip
 
 from subprocess import DEVNULL, Popen, check_call, call
-from threading import Thread as thrThread
+from threading import Thread
 from threading import Lock as thread_lock
 from threading import Semaphore
 printlock = Semaphore(value=1)
@@ -93,7 +93,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '2.73'
+    VER = '2.74'
     SOC_TIMEOUT = 45
     REPORT_TIME = 60
     AVR_TIMEOUT = 4  # diff 6 * 100 / 196 h/s = 3.06
@@ -260,16 +260,24 @@ try:
             lang = 'russian'
         elif locale.startswith('pl'):
             lang = 'polish'
+        elif locale.startswith('de'):
+            lang = 'german'
         elif locale.startswith('fr'):
             lang = 'french'
         elif locale.startswith('tr'):
             lang = 'turkish'
+        elif locale.startswith('iy'):
+            lang = 'italian'
         elif locale.startswith('pt'):
             lang = 'portuguese'
         elif locale.startswith('zh'):
             lang = 'chinese_simplified'
         elif locale.startswith('th'):
             lang = 'thai'
+        elif locale.startswith('az'):
+            lang = 'azerbaijani'
+        elif locale.startswith('nl'):
+            lang = 'dutch'
         else:
             lang = 'english'
     else:
@@ -558,7 +566,7 @@ def init_rich_presence():
     try:
         RPC = Presence(905158274490441808)
         RPC.connect()
-        thrThread(target=update_rich_presence).start()
+        Thread(target=update_rich_presence).start()
     except Exception as e:
         #print("Error launching Discord RPC thread: " + str(e))
         pass
@@ -945,7 +953,7 @@ if __name__ == '__main__':
         fastest_pool = Client.fetch_pool()
         threadid = 0
         for port in avrport:
-            thrThread(target=mine_avr,
+            Thread(target=mine_avr,
                       args=(port, threadid,
                             fastest_pool)).start()
             threadid += 1
@@ -955,7 +963,7 @@ if __name__ == '__main__':
     if discord_presence == "y":
         try:
             init_rich_presence()
-            thrThread(
+            Thread(
                 target=update_rich_presence).start()
         except Exception as e:
             debug_output(f'Error launching Discord RPC thread: {e}')
