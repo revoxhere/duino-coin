@@ -4,7 +4,7 @@
   |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \ 
   |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  | 
   `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--' 
-  Official code for Arduino boards                            version 2.7
+  Official code for Arduino boards                          version 2.7.4
   
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
@@ -89,6 +89,12 @@ String get_DUCOID() {
 void loop() {
   // Wait for serial data
   if (Serial.available() > 0) {
+    // Turn on the built-in led
+    #if defined(ARDUINO_ARCH_AVR)
+        PORTB = PORTB & B11011111;
+    #else
+        digitalWrite(LED_BUILTIN, HIGH);
+    #endif
     memset(job, 0, job_maxsize);
     // Read last block hash
     lastblockhash = Serial.readStringUntil(',');
@@ -113,17 +119,9 @@ void loop() {
                  + "," 
                  + String(DUCOID) 
                  + "\n");
-    // Turn on built-in led
+    // Turn off the built-in led
     #if defined(ARDUINO_ARCH_AVR)
         PORTB = PORTB | B00100000;
-    #else
-        digitalWrite(LED_BUILTIN, HIGH);
-    #endif
-        // Wait a bit
-        delay(25);
-        // Turn off built-in led
-    #if defined(ARDUINO_ARCH_AVR)
-        PORTB = PORTB & B11011111;
     #else
         digitalWrite(LED_BUILTIN, LOW);
     #endif
