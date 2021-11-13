@@ -61,14 +61,6 @@ def install(package):
 
     execl(sys.executable, sys.executable, *sys.argv)
 
-
-try:
-    from xxhash import xxh64
-    xxhash_en = True
-except ModuleNotFoundError:
-    print("Xxhash is not installed - this mining algorithm will be disabled")
-    xxhash_en = False
-
 try:
     from colorama import Back, Fore, Style, init
     init(autoreset=True)
@@ -142,19 +134,9 @@ class Algorithms:
             temp_h.update(str(nonce).encode('ascii'))
             d_res = temp_h.hexdigest()
 
-            if d_res == exp_h:
-                time_elapsed = time() - time_start
-                hashrate = nonce / time_elapsed
-                return [nonce, hashrate]
-
-        return [0, 0]
-
-    def XXHASH(last_h: str, exp_h: str, diff: int,  eff: int):
-        time_start = time()
-
-        for nonce in range(100 * diff + 1):
-            d_res = xxh64(last_h + str(nonce),
-                          seed=2811).hexdigest()
+            if eff != 0:
+                if nonce % 5000 == 0:
+                    sleep(eff / 100)
 
             if d_res == exp_h:
                 time_elapsed = time() - time_start
@@ -503,7 +485,7 @@ class Miner:
                 elif locale.startswith("tr"):
                     lang = "turkish"
                 elif locale.startswith("pr"):
-                    lang = "portugese"
+                    lang = "portuguese"
                 elif locale.startswith("it"):
                     lang = "italian"
                 elif locale.startswith("zh"):
@@ -543,31 +525,17 @@ class Miner:
                 username = choice(["revox", "Bilaboz", "JoyBed", "Connor2"])
 
             algorithm = "DUCO-S1"
-            if xxhash_en:
-                print(Style.BRIGHT
-                      + "1" + Style.NORMAL + " - DUCO-S1 ("
-                      + get_string("recommended")
-                      + ")\n" + Style.BRIGHT
-                      + "2" + Style.NORMAL + " - XXHASH")
-                prompt = sub(r"\D", "",
-                             input(get_string("ask_algorithm")
-                                   + Style.BRIGHT))
-                if prompt == "2":
-                    algorithm = "XXHASH"
 
-            intensity = 100  # None
-            ##
-            # intensity = sub(r"\D", "",
-            # input(Style.NORMAL
-            ##                      + get_string("ask_intensity")
-            # + Style.BRIGHT))
+            intensity = None
+            intensity = sub(r"\D", "",
+                input(Style.NORMAL + get_string("ask_intensity") + Style.BRIGHT))
 
-            # if not intensity:
-            ##    intensity = 95
-            # elif float(intensity) > 100:
-            ##    intensity = 100
-            # elif float(intensity) < 1:
-            ##    intensity = 1
+            if not intensity:
+                intensity = 95
+            elif float(intensity) > 100:
+                intensity = 100
+            elif float(intensity) < 1:
+                intensity = 1
 
             threads = sub(r"\D", "",
                           input(Style.NORMAL + get_string("ask_threads")
@@ -695,9 +663,6 @@ class Miner:
         """
 
         using_algo = get_string("using_algo")
-        if user_settings["algorithm"] == "XXHASH":
-            using_algo = get_string("using_algo_xxh")
-
         pretty_print(get_string("mining_thread") + str(id)
                      + get_string("mining_thread_starting")
                      + Style.NORMAL + Fore.RESET + using_algo + Fore.YELLOW
@@ -714,9 +679,6 @@ class Miner:
                     try:
                         while True:
                             job_req = "JOB"
-                            if user_settings["algorithm"] == "XXHASH":
-                                job_req = "JOBXX"
-
                             Client.send(job_req
                                         + Settings.SEPARATOR
                                         + str(user_settings["username"])
@@ -734,16 +696,23 @@ class Miner:
 
                         while True:
                             time_start = time()
-                            if user_settings["algorithm"] == "XXHASH":
-                                back_color = Back.CYAN
-                                result = Algorithms.XXHASH(
-                                    job[0], job[1], int(job[2]),
-                                    user_settings["intensity"])
-                            else:
-                                back_color = Back.YELLOW
-                                result = Algorithms.DUCOS1(
-                                    job[0], job[1], int(job[2]),
-                                    user_settings["intensity"])
+                            back_color = Back.YELLOW
+
+                            eff = 0
+                            eff_setting = int(user_settings["intensity"])
+                            if 99 > eff_setting >= 90:
+                                eff = 0.005
+                            elif 90 > eff_setting >= 70:
+                                eff = 0.1
+                            elif 70 > eff_setting >= 50:
+                                eff = 0.8
+                            elif 50 > eff_setting >= 30:
+                                eff = 1.8
+                            elif 30 > eff_setting >= 1:
+                                eff = 3
+
+                            result = Algorithms.DUCOS1(
+                                    job[0], job[1], int(job[2]), eff)
                             computetime = time() - time_start
 
                             hashrate[id] = result[1]
