@@ -266,7 +266,7 @@ try:
             lang = 'french'
         elif locale.startswith('tr'):
             lang = 'turkish'
-        elif locale.startswith('iy'):
+        elif locale.startswith('it'):
             lang = 'italian'
         elif locale.startswith('pt'):
             lang = 'portuguese'
