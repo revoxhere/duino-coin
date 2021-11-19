@@ -379,7 +379,7 @@
         "block_found": " Blok najdeny ",
         "rejected": " Odmietnuty ",
         "error_while_mining": " Chyba pocas miningu - pravdepodobne chyba pripojenia - restart za 5s.",
-        "board_on_port": " AVR na poste ",
+        "board_on_port": " AVR na porte ",
         "board_is_connected": " je pripojena",
         "board_connection_error": " AVR pripojenie chybne na porte ",
         "board_connection_error2": ", skontrolujte ci je pripojene alebo nie.",
