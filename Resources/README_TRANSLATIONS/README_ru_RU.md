@@ -86,7 +86,7 @@
 
 <hr>
 
-Если вы хотите запускать программы из исходного кода, вам нужно установить наш репозиторий. Ниже описано как это сделать в дистрибутивах на основе debian (например, Ubuntu, Debian, Raspian):
+Если вы хотите запускать программы из исходного кода, вам нужно установить наш репозиторий. Ниже описано как это сделать в дистрибутивах на основе debian (например, Ubuntu, Debian, Raspbian):
 ```BASH
 sudo apt install python3 python3-pip git
 git clone https://github.com/revoxhere/duino-coin
@@ -205,21 +205,21 @@ Duino-Coin в основном распространяется по лицен�
 
 <h4 align="center">Политика конфиденциальности</h2><br>
 1. На главном сервере мы храним только имена пользователей, хэшированные пароли (с помощью bcrypt) и электронные почты пользователей в качестве данных их учетных записей.<br>
-2. Электронные почты не являются общедоступными и используются только для связи с пользователем, когда это необходимо, подтверждая обмен на <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Обмен</a> и получения другой информации (планируется на будущее).<br>
+2. Электронные почты не являются общедоступными и используются только для связи с пользователем, когда это необходимо, подтверждая обмен на <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> и получения другой информации (планируется на будущее).<br>
 3. Балансы, транзакции и данные, связанные с майнингом, находятся в открытом доступе <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">API JSON</a>.<br>
 4. Политика конфиденциальности может быть изменена в будущем с предварительным уведомлением.<br>
  
 <h2 align="center">Разработчики</h2><br>
 
 *   **Разработчики:**
-    *   [@revox](https://github.com/revoxhere/) (Founder/lead dev) - robik123.345@gmail.com
-    *   [@Bilaboz](https://github.com/bilaboz/) (Lead dev)
-    *   [@connorhess](https://github.com/connorhess) (Lead dev)
-    *   [@JoyBed](https://github.com/JoyBed) (Lead dev)
-    *   [@LDarki](https://github.com/LDarki) (Web dev)
-    *   [@travelmode](https://github.com/colonelwatch) (Dev)
-    *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-    *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer)
+    *   [@revox](https://github.com/revoxhere/) (Основатель/Ведущий разработчик) - robik123.345@gmail.com
+    *   [@Bilaboz](https://github.com/bilaboz/) (Ведущий разработчик)
+    *   [@connorhess](https://github.com/connorhess) (Ведущий разработчик)
+    *   [@JoyBed](https://github.com/JoyBed) (Ведущий разработчик)
+    *   [@LDarki](https://github.com/LDarki) (Ведущий веб-разработчик)
+    *   [@travelmode](https://github.com/colonelwatch) (Разработчик)
+    *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) Разработчик)
+    *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Ведущий веб-мастер и DUCO Разработчик)
 
 *   **Помощники:**
     *   [@5Q](https://github.com/its5Q)
@@ -228,11 +228,11 @@ Duino-Coin в основном распространяется по лицен�
     *   [@Nosh-Ware](https://github.com/Nosh-Ware)
     *   [@BastelPichi](https://github.com/BastelPichi)
     *   [@suifengtec](https://github.com/suifengtec)
-    *   Thanks to [@Furim](https://github.com/Furim) for help in the early development stage
-    *   Thanks to [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg) for designing early logos
-    *   Thanks to [@Tech1k](https://github.com/Tech1k) for [Beyondcoin](https://beyondcoin.io) partnership and providing [duinocoin.com](https://duinocoin.com) domain
-    *   Thanks to [@MrKris7100](https://github.com/MrKris7100) for help with implementing SHA1 algorithm
-    *   Thanks to [@daknuett](https://github.com/daknuett) for help with Arduino SHA1 library
+    *   Спасибо [@Furim](https://github.com/Furim) за помощью на ранней стадии развития
+    *   Спасибо [@ATAR4XY](https://www.youtube.com/channel/UC-gf5ejhDuAc_LMxvugPXbg) за создание дизайна прошлых логотипов
+    *   Спасибо [@Tech1k](https://github.com/Tech1k) за [Beyondcoin](https://beyondcoin.io) partnership and providing [duinocoin.com](https://duinocoin.com) домен
+    *   Спасибо [@MrKris7100](https://github.com/MrKris7100) за помощь в реализации SHA1 algorithm
+    *   Спасибо [@daknuett](https://github.com/daknuett) за помощь с Arduino SHA1 library
 
 <hr>
 
