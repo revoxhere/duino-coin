@@ -162,6 +162,8 @@ Zdrojový kód servera, dokumentácia pre volania API a oficiálne knižnice na 
   </summary>
   
   Upozorňujeme, že tieto softvéry nie sú vyvinuté nami a neposkytujeme žiadne záruky, že ich používanie nebude mať za následok ban účtu. Berte ich ako zvedavosť.
+  
+  Stojí za zmienku, že použitím [nonceMiner](https://github.com/colonelwatch/nonceMiner) od Colonelwatch **budete zabanovaný**.
 
   ### Ostatné minery, o ktorých je známe, že pracujú s Duino-Coin:
   *   [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - miner pre rodinu LabVIEW od ericddm
@@ -175,7 +177,6 @@ Zdrojový kód servera, dokumentácia pre volania API a oficiálne knižnice na 
   *   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - MicroPython miner pre ESP dosky od fabiopolancoe
   *   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Python miner pre Nintendo 3DS od PhereloHD & HGEpro
   *   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Miner v Docker od Alicie426
-  *   [nonceMiner](https://github.com/colonelwatch/nonceMiner) - Najrýchlejší Duino-Coin miner dostupný od Colonelwatch
   *   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) - jednoduchý nodeJS miner od DarkThinking
   *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - C miner od phantom32 & revoxhere
   *   [Go Miner](https://github.com/yippiez/go-miner) od yippiez
