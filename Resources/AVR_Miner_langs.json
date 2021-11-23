@@ -372,7 +372,7 @@
         "outdated_miner": " Miner je zastarany (v",
         "server_is_on_version": " server na v",
         "update_warning": ", stiahnite si najnovsiu verziu z https://github.com/revoxhere/duino-coin/releases/",
-        "connecting_error": " Chyba pri pripajany na server. Odznova o 10s",
+        "connecting_error": " Chyba pri pripajani na server. Odznova o 10s",
         "duco_avr_miner": "Duino-Coin AVR Miner (v",
         "accepted_shares": " prijate riesenia",
         "accepted": " Prijate ",
