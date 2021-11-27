@@ -175,7 +175,7 @@
         "error_unsufficient_balance": "Error, nedostatočný zostatok",
         "error_wrong_passphrase": "Wrapper je vypnutý, zadali ste nesprávnu passfrázu",
         "error_configure_wrapperconf": "Wrapper je vypnutý, nakonfigurujte ho pomocou `wrapperconf`",
-        "error_not_enough_energy_or_trx": "Nepodarilo sa, mali by ste mať dostatok energie alebo trx,
+        "error_not_enough_energy_or_trx": "Nepodarilo sa, mali by ste mať dostatok energie alebo trx",
 
         "enter_amount_unwrap": "zadajte množstvo na rozbalenie ",
         "initiating_unwrap": "Spúšťa sa rozbalenie...\nTXid :",
@@ -188,7 +188,7 @@
         "private_key": "Súkromný kľúč: ",
         "cancelled_invalid_confirmation": "Zrušené, neplatné potvrdenie",
 
-        "help_list_command": "Ak chcete zobraziť zoznam dostupných príkazov, zadajte `help`
+        "help_list_command": "Ak chcete zobraziť zoznam dostupných príkazov, zadajte `help`",
         "duco_console": "DUCO konzola ᕲ ",
 
         "enter_recipients_name": "Zadajte používateľské meno príjemcu: ",
