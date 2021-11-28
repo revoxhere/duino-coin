@@ -84,6 +84,8 @@ try:
             lang = "dutch"
         elif locale.startswith("th"):
             lang = "thai"
+        elif locale.startswith("sk"):
+            lang = "slovak"
         else:
             lang = "english"
     else:
