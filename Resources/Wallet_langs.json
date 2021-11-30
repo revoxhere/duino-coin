@@ -105,7 +105,7 @@
 		"tray_exit": "Exit window"
 	},
   "korean": {
-		"translation_author": "cnu-cse student",
+		"translation_author": "cnu-cse student k.h.e",
 		"welcome_message": "\nDuino-Coin\nTkinter GUI Wallet에 오신 것을 환영합니다",
 		"warning": "경고",
 		"duino_coin_wallet": "Duino-Coin Wallet",
