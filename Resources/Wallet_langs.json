@@ -208,7 +208,7 @@
 		"sessionprofit_unavailable2": "첫 번째로 예상 이익 확인하기.",
 		"tray_show": "윈도우 창 열기",
 		"tray_exit": "윈도우 창 종료"
-	}
+	},
         "slovak": {
 		"translation_author": "backo",
 		"welcome_message": "Vitajte v\nDuino-Coin\nTkinter GUI peňaženke",
