@@ -2620,6 +2620,8 @@ try:
         lang = "slovak"
     elif locale.startswith("th"):
         lang = "thai"
+    elif locale.startswith("ko"):
+            lang = "korean"
     else:
         lang = "english"
 except IndexError:

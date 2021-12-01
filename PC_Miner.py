@@ -494,6 +494,8 @@ class Miner:
                     lang = "chinese_simplified"
                 elif locale.startswith("th"):
                     lang = "thai"
+                elif locale.startswith("ko"):
+                    lang = "korean"
                 else:
                     lang = "english"
             else:

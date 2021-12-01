@@ -278,6 +278,8 @@ try:
             lang = 'azerbaijani'
         elif locale.startswith('nl'):
             lang = 'dutch'
+        elif locale.startswith('ko'):
+            lang = 'korean'
         else:
             lang = 'english'
     else:
