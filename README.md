@@ -214,24 +214,6 @@ Duino-Coin is mostly distributed under the MIT License. See the `LICENSE` file f
 Some third-party included files may have different licenses - please check their `LICENSE` statements (usually at the top of the source code files).
 
 
-## 서비스 약관
-1. Duino-Coins ("DUCOs")은 채굴이라는 프로세스를 통해 채굴자가 코인을 얻습니다.<br/>
-2. 채굴은 DUCO-S1 (and XXHASH) 알고리즘(<a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a> 설명 참조)을 사용하는 것으로 설명되며, 여기서 수학 문제의 올바른 답을 찾으면 채굴자에게 보상을 제공합니다.<br/>
-3. 채굴은 CPU, AVR 보드(예: Arduino 보드), 싱글 보드 컴퓨터(예: Raspberry Pi 보드), ESP32/8266 보드를 사용하여 공식 채굴자를 통해 채굴할 수 있습니다.(기타 공식적으로 허용되는 채굴자는 README 상단에 설명되어 있습니다.)<br/>
-4. GPU, FPGA 및 기타 고효율 하드웨어에서 채굴이 허용되지만, 'EXTREME' 채굴 난이도만 사용합니다.<br/>
-5. 자신의 하드웨어에 적합하지 않은 난이도의 채굴기(<a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">difficulty list</a> 참조)를 사용하는 모든 사용자에게는 올바른 채굴 난이도로 자동으로 조절됩니다.<br/>
-6. 적합한 것보다 낮은 난이도를 계속 사용하려고 하는 사용자는 일시적으로 차단될 수 있습니다.<br/>
-7. 금지란 계정 제거와 함께 사용자가 자신의 코인에 엑세스하는 것을 차단하는 것입니다.<br/>
-8. 합법적으로 획득한 코인만 교환이 가능합니다.<br/>
-9. 서비스 약관 위반(또는 남용)을 조사하기 위해 계정이 일시적으로 정지될 수 있습니다. <br/>
-10. DUCO-Exchange("공식 거래소")에 대한 교환 요청은 서비스 약관 위반 조사 중에 지연 및/또는 거부될 수 있습니다. <br/>
-11. 공식 거래소에 대한 교환 요청은 서비스 약관 위반 및/또는 자금 부족으로 인해 거부될 수 있습니다.<br/>
-12. 무료 클라우드 호스팅 서비스(또는 무료 VPS 서비스 - 예: Repl.it, GitHub Actions 등)로 채굴하는 것은 불공정하므로 허용되지 않습니다.<br/>
-13. 위반 사항이 입증될 경우 사용자의 DUCO가 소멸될 수 있습니다.<br/>
-14. 이 서비스 약관은 사전 통지 없이 언제든지 변경될 수 있습니다.<br/>
-15. 합리적인 이유(예: 다중 채굴) 없이 부계정을 갖는 것은 허용되지 않습니다.<br/>
-16. Duino-Coin을 사용하는 모든 사용자는 위의 규칙을 준수하는 데 동의합니다.<br/>
-
 ## Terms of service
 1. Duino-Coins ("DUCOs") are earned by miners with a process called mining.<br/>
 2. Mining is described as using DUCO-S1 algorithm (as explained in the <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
@@ -257,11 +239,7 @@ Some third-party included files may have different licenses - please check their
 3. Balances, transactions and mining-related data is publicly available in the public <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
 4. The privacy policy may be changed in the future with a prior notification.
 
-## 개인 정보 정책
-1. master 서버에는 사용자의 이름, 해시된 비밀번호(bcrypt를 이용), 계정 생성 날짜 및 사용자의 이메일만 데이터로 저장됩니다.<br/>
-2. 이메일은 공개적으로 사용할 수 없으며, <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> 에서 교환을 확인하고 비정기적인 뉴스레터(향후 계획)를 수신하는 등 필요시 사용자에게 연락할 때만 사용됩니다.<br/>
-3. 잔액, 거래 및 마이닝 관련 데이터는  <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a> 에서 공개적으로 사용할 수 있습니다. </br>
-4. 개인 정보 정책은 추후 사전 공지를 통해 변경될 수 있습니다.
+
 ## Active project maintainers
 
 *   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Lead Python dev, project founder)
