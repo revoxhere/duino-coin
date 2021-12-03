@@ -61,6 +61,7 @@ def install(package):
 
     execl(sys.executable, sys.executable, *sys.argv)
 
+
 try:
     from colorama import Back, Fore, Style, init
     init(autoreset=True)
@@ -107,13 +108,15 @@ class Settings:
     SETTINGS_FILE = "/Settings.cfg"
 
     SOC_TIMEOUT = 15
-    REPORT_TIME = 50
+    REPORT_TIME = 120
     DONATE_LVL = 0
 
     BLOCK = " ‖ "
     PICK = ""
     COG = " @"
-    if os.name != "nt" or bool(os.name == "nt" and os.environ.get("WT_SESSION")):
+    if (os.name != "nt"
+        or bool(os.name == "nt"
+                and os.environ.get("WT_SESSION"))):
         # Windows' cmd does not support emojis, shame!
         PICK = " ⛏"
         COG = " ⚙"
@@ -461,7 +464,7 @@ class Miner:
             with open(Settings.DATA_DIR + Settings.TRANSLATIONS_FILE,
                       "wb") as f:
                 f.write(requests.get(Settings.TRANSLATIONS,
-                    timeout=5).content)
+                                     timeout=5).content)
 
         with open(Settings.DATA_DIR + Settings.TRANSLATIONS_FILE, "r",
                   encoding=Settings.ENCODING) as file:
@@ -534,7 +537,9 @@ class Miner:
 
             intensity = None
             intensity = sub(r"\D", "",
-                input(Style.NORMAL + get_string("ask_intensity") + Style.BRIGHT))
+                            input(Style.NORMAL +
+                                  get_string("ask_intensity") +
+                                  Style.BRIGHT))
 
             if not intensity:
                 intensity = 95
@@ -718,7 +723,7 @@ class Miner:
                                 eff = 3
 
                             result = Algorithms.DUCOS1(
-                                    job[0], job[1], int(job[2]), eff)
+                                job[0], job[1], int(job[2]), eff)
                             computetime = time() - time_start
 
                             hashrate[id] = result[1]
