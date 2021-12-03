@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 2.74 © MIT licensed
+Duino-Coin Official PC Miner 2.75 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -97,7 +97,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 2.74
+    VER = 2.75
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -166,14 +166,15 @@ class Client:
 
     def fetch_pool():
         """
-        Fetches best pool from the /getPool API endpoint
+        Fetches the best pool from the /getPool API endpoint
         """
         while True:
             pretty_print(" " + get_string("connection_search"),
                          "warning", "net0")
             try:
                 response = requests.get(
-                    "https://server.duinocoin.com/getPool").json()
+                    "https://server.duinocoin.com/getPool",
+                    timeout=5).json()
                 if response["success"] == True:
                     NODE_ADDRESS = response["ip"]
                     NODE_PORT = response["port"]
@@ -181,7 +182,7 @@ class Client:
                 elif "message" in response:
                     pretty_print(f"Warning: {response['message']}"
                                  + ", retrying in 15s", "warning", "net0")
-                    sleep(10)
+                    sleep(15)
                 else:
                     raise Exception(
                         "no response - IP ban or connection error")
@@ -199,7 +200,7 @@ class Donate:
                         f"{Settings.DATA_DIR}/Donate.exe").is_file():
                     url = ('https://server.duinocoin.com/'
                            + 'donations/DonateExecutableWindows.exe')
-                    r = requests.get(url)
+                    r = requests.get(url, timeout=10)
                     with open(f"{Settings.DATA_DIR}/Donate.exe",
                               'wb') as f:
                         f.write(r.content)
@@ -215,7 +216,7 @@ class Donate:
                            + 'donations/DonateExecutableLinux')
                 if not Path(
                         f"{Settings.DATA_DIR}/Donate").is_file():
-                    r = requests.get(url)
+                    r = requests.get(url, timeout=10)
                     with open(f"{Settings.DATA_DIR}/Donate",
                               "wb") as f:
                         f.write(r.content)
@@ -459,7 +460,8 @@ class Miner:
         if not Path(Settings.DATA_DIR + Settings.TRANSLATIONS_FILE).is_file():
             with open(Settings.DATA_DIR + Settings.TRANSLATIONS_FILE,
                       "wb") as f:
-                f.write(requests.get(Settings.TRANSLATIONS).content)
+                f.write(requests.get(Settings.TRANSLATIONS,
+                    timeout=5).content)
 
         with open(Settings.DATA_DIR + Settings.TRANSLATIONS_FILE, "r",
                   encoding=Settings.ENCODING) as file:
