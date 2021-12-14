@@ -41,6 +41,8 @@
   <img src="https://img.shields.io/badge/Online Wallet-a202ff.svg?style=for-the-badge&logo=Web" /></a>
 <a href="https://play.google.com/store/apps/details?id=com.pripun.duinocoin">
   <img src="https://img.shields.io/badge/Android App-eb00cb.svg?style=for-the-badge&logo=Android" /></a>
+<a href="https://github.com/fahimrahmanbooom/Duino-Coin_iOS_App">
+  <img src="https://img.shields.io/badge/iOS App-eb00cb.svg?style=for-the-badge&logo=Apple" /></a>
 <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
   <img src="https://img.shields.io/badge/whitepaper-ff0095.svg?style=for-the-badge&logo=Academia" /></a>
 <a href="https://youtu.be/im0Tca7EjrA">
