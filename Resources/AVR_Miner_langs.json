@@ -551,6 +551,7 @@
         "report_body4": "\n\t\t‖ With the hashrate of ",
         "report_body5": "\n\t\t‖ In this time period, you've solved ",
         "report_body6": " hashes",
+        "report_body7": "\n\t\t‖ Block found: ",
         "total_mining_time": "\n\t\t‖ Total miner uptime: "
     },
     "italian": {
