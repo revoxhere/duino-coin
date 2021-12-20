@@ -82,9 +82,11 @@
         "report_body4":"\n\t\t‖ With the hashrate of ",
         "report_body5":"\n\t\t‖ In this time period, you've solved ",
         "report_body6":" hashes",
+        "report_body7": "\n\t\t‖ Blocks found: ",
         "total_mining_time":"\n\t\t‖ Total miner uptime: ",
 
-        "fasthash_available": "Fasthash accelerations are available for your platform",
+        "fasthash_available": "Using fasthash hashing accelerations",
+        "fasthash_download": "Downloading fasthash accelerations module",
         "node_picker_unavailable": "Node picker doesn't seem to be responding properly - retrying in ",
         "node_picker_error": "Fatal error fetching server from the node picker - retrying in "
     },
