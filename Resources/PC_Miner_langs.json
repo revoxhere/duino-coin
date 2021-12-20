@@ -82,7 +82,11 @@
         "report_body4":"\n\t\t‖ With the hashrate of ",
         "report_body5":"\n\t\t‖ In this time period, you've solved ",
         "report_body6":" hashes",
-        "total_mining_time":"\n\t\t‖ Total miner uptime: "
+        "total_mining_time":"\n\t\t‖ Total miner uptime: ",
+
+        "fasthash_available": "Fasthash accelerations are available for your platform",
+        "node_picker_unavailable": "Node picker doesn't seem to be responding properly - retrying in ",
+        "node_picker_error": "Fatal error fetching server from the node picker - retrying in "
     },
     "korean":{
         "translation_autor":"hotmoist, roroxxn, hj-k66",
