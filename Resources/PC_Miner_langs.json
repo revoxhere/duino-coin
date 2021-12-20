@@ -1,6 +1,7 @@
 {
     "english":{
         "translation_autor":"Duino-Coin developers",
+        "translation": "English translation: ",
         "sigint_detected":" SIGINT detected - Exiting gracefully.",
         "goodbye":" See you soon!",
         "greeting_morning":"Have a wonderful morning",
@@ -67,7 +68,6 @@
         "max_hashrate_notice":"Mining Duino-Coin with powerful equipment may not be very profitable for you - we suggest trying Coin Magi (https://xmg.network) - our 'sister' coin",
         "recommended":"recommended",
         "connection_search":"Searching for the fastest node to connect to",
-        "connecting_node":" Retrieved mining node: ",
         "uptime_seconds":" seconds",
         "uptime_minute":" minute",
         "uptime_minutes":" minutes",
@@ -88,10 +88,12 @@
         "fasthash_available": "Using fasthash hashing accelerations",
         "fasthash_download": "Downloading fasthash accelerations module",
         "node_picker_unavailable": "Node picker doesn't seem to be responding properly - retrying in ",
-        "node_picker_error": "Fatal error fetching server from the node picker - retrying in "
+        "node_picker_error": "Fatal error fetching server from the node picker - retrying in ",
+        "connecting_node":" Retrieved mining node: "
     },
     "korean":{
         "translation_autor":"hotmoist, roroxxn, hj-k66",
+        "translation": "한국어 번역: ",
         "sigint_detected":" SIGINT 탐지 - 정상적으로 종료 중.",
         "goodbye":" 또 만나요!",
         "greeting_morning":"좋은 아침이에요",
@@ -177,6 +179,7 @@
     },
     "farsi":{
         "translation_autor":"Syamakszk",
+        "translation": "ترجمه فارسی: ",
         "sigint_detected":" شناسایی شد- با ظرافت خارج شد.",
         "goodbye":" به زودی می بینمت!",
         "greeting_morning":"صبح فوق العاده ای داشته باشید",
@@ -262,6 +265,7 @@
     }, 
     "slovak":{
         "translation_autor":"backo",
+        "translation": "Slovenský preklad: ",
         "sigint_detected":" SIGINT detekovaný – ukončuje sa.",
         "goodbye":" Dovidenia!",
         "greeting_morning":"Prajem pekné ráno",
@@ -346,7 +350,8 @@
         "total_mining_time":"\n\t\t‖ Celková doba prevádzky: "
     },
     "italian":{
-        "translation_autor":"Il mastro Stefanuzzo (no spaces on GitHub)",
+        "translation_autor":"Il mastro Stefanuzzo",
+        "translation": "Traduzione italiana: ",
         "sigint_detected":" SIGINT rilevato - Uscita dal programma.",
         "goodbye":" A presto!",
         "greeting_morning":"Passa una buona mattinata",
@@ -415,6 +420,7 @@
     },
     "polish":{
         "translation_autor":"revox",
+        "translation": "Polskie tłumaczenie: ",
         "sigint_detected":" SIGINT wykryty - Wyłączam koparkę.",
         "goodbye":" Do zobaczenia wkrótce!",
         "greeting_morning":"Miłego ranka",
@@ -495,10 +501,18 @@
         "report_body4":"\n\t\t‖ Z szybkością ",
         "report_body5":"\n\t\t‖ Podczas tego czasu rozwiązałeś ",
         "report_body6":" hashy",
-        "total_mining_time":"\n\t\t‖ Koparka działa przez: "
+        "report_body7": "\n\t\t‖ Znalezione bloik: ",
+        "total_mining_time":"\n\t\t‖ Koparka działa przez: ",
+
+        "fasthash_available": "Akceleracje fasthash są dostępne",
+        "fasthash_download": "Pobieranie modułu akceleracji fasthash",
+        "node_picker_unavailable": "Menedżer do wyboru serwerów nie odpowiada - ponowna próba za ",
+        "node_picker_error": "Błąd przy wyborze serwera - ponowna próba za ",
+        "connecting_node":" Wybrano najszybszy serwer: "
     },
     "spanish":{
         "translation_autor":"HGEpro",
+        "translation": "Traducción Española: ",
         "sigint_detected":" SIGINT detectado - Saliendo correctamente.",
         "goodbye":" ¡Hasta pronto!",
         "greeting_morning":"Tenga un maravilloso día",
@@ -563,6 +577,7 @@
     },
     "french":{
         "translation_autor":"Bilaboz",
+        "translation": "Traduction française: ",
         "sigint_detected":" SIGINT détecté - Fermeture...",
         "goodbye":" A bientôt!",
         "greeting_morning":"J'espère que vous passez une bonne matinée!",
@@ -628,6 +643,7 @@
     },
     "russian":{
         "translation_autor":"5Q",
+        "translation": "Русский перевод: ",
         "sigint_detected":" Обнаружен SIGINT - завершаем работу.",
         "goodbye":" До скорой встречи!",
         "greeting_morning":"Желаю вам прекрасного утра",
@@ -692,6 +708,7 @@
     },
     "german":{
         "translation_autor":"BastelPichi, EinWildesPanda",
+        "translation": "Deutsche Übersetzung: ",
         "sigint_detected":" SIGINT erkannt - Schließe Miner.",
         "goodbye":" Bis Bald!",
         "greeting_morning":"Guten Morgen!",
@@ -757,6 +774,7 @@
     },
     "chinese_simplified":{
         "translation_autor":"suifengtec",
+        "translation": "中文翻译：",
         "sigint_detected":"检测到 SIGINT - 优雅退出.",
         "goodbye":" 待会儿见!",
         "greeting_morning":"早上好啊!",
@@ -822,6 +840,7 @@
     },
     "turkish":{
         "translation_autor":"Scatchie",
+        "translation": "Türkçe tercümesi: ",
         "sigint_detected":" SIGINT algılandı - Çıkış yapılıyor.",
         "goodbye":" Görüşmek üzere!",
         "greeting_morning":"Günaydın",
@@ -888,6 +907,7 @@
     },
     "portuguese":{
         "translation_autor":"bonsai e gsrbr",
+        "translation": "Tradução em português: ",
         "sigint_detected":" SIGINT detectado - Saindo corretamente.",
         "goodbye":" Até!",
         "greeting_morning":"Bom dia",
@@ -972,6 +992,7 @@
     },
     "maltese":{
         "translation_autor":"IdotMaster1/MattyInnit",
+        "translation": "Traduzzjoni bil-Malti: ",
         "sigint_detected":"SIGINT misjub - Itfi l-iskavatur.",
         "goodbye":"Narawk dalwaqt!",
         "greeting_morning":"Miłego ranka",
@@ -1033,6 +1054,7 @@
     },
     "thai":{
         "translation_autor":"naphob",
+        "translation": "แปลไทย: ",
         "sigint_detected":" ตรวจพบ SIGINT - จบการใช้งานอย่่างปลอดภัย",
         "goodbye":" แล้วพบกันใหม่",
         "greeting_morning":"อรุณสวัสดิ์",
