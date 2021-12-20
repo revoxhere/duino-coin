@@ -518,7 +518,7 @@
         "duco_avr_miner": "Duino-Coin AVR Miner (v",
         "accepted_shares": " accepted shares",
         "accepted": " Accepted ",
-        "block_found": " Block found ",
+        "block_found": " Block(s) found ",
         "rejected": " Rejected ",
         "error_while_mining": " Error while mining - most likely a connection error - restarting in 5s.",
         "board_on_port": " AVR on port ",
