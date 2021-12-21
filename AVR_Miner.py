@@ -213,7 +213,7 @@ class Donate:
                          'warning')
 
 
-shares = [0, 0, 0]
+shares = [0, 0]
 hashrate_mean = []
 ping_mean = []
 diff = 0
@@ -345,8 +345,12 @@ def title(title: str):
         this escape sequence to change
         the console window title
         """
-        print('\33]0;' + title + '\a', end='')
-        sys.stdout.flush()
+        try:
+            print('\33]0;' + title + '\a', end='')
+            sys.stdout.flush()
+        except Exception:
+            # wasn't able to set title (e.g., running headless)
+            pretty_print(Exception)
 
 
 def handler(signal_received, frame):
@@ -671,7 +675,6 @@ def mine_avr(com, threadid, fastest_pool):
     global hashrate
     start_time = time()
     report_shares = 0
-    last_report_share = 0
     while True:
         while True:
             try:
@@ -865,7 +868,6 @@ def mine_avr(com, threadid, fastest_pool):
                 printlock.release()
             elif feedback == 'BLOCK':
                 shares[0] += 1
-                shares[2] += 1
                 printlock.acquire()
                 share_print(port_num(com), "block",
                             shares[0], shares[1], hashrate,
@@ -886,17 +888,16 @@ def mine_avr(com, threadid, fastest_pool):
             end_time = time()
             elapsed_time = end_time - start_time
             if threadid == 0 and elapsed_time >= Settings.REPORT_TIME:
-                report_shares = shares[0] - last_report_share
+                report_shares = shares[0] - report_shares
                 uptime = calculate_uptime(mining_start_time)
 
                 periodic_report(start_time, end_time, report_shares,
-                                shares[2], hashrate, uptime)
+                                hashrate, uptime)
                 start_time = time()
-                last_report_share = shares[0]
 
 
 def periodic_report(start_time, end_time, shares,
-                    block, hashrate, uptime):
+                    hashrate, uptime):
     seconds = round(end_time - start_time)
     pretty_print("sys0",
                  " " + get_string('periodic_mining_report')
@@ -906,9 +907,7 @@ def periodic_report(start_time, end_time, shares,
                  + get_string('report_body1')
                  + str(shares) + get_string('report_body2')
                  + str(round(shares/seconds, 1))
-                 + get_string('report_body3')
-                 + get_string('report_body7') + str(block)
-                 + get_string('report_body4')
+                 + get_string('report_body3') + get_string('report_body4')
                  + str(int(hashrate)) + " H/s" + get_string('report_body5')
                  + str(int(hashrate*seconds)) + get_string('report_body6')
                  + get_string('total_mining_time') + str(uptime), "success")
