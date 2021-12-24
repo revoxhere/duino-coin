@@ -345,8 +345,12 @@ def title(title: str):
         this escape sequence to change
         the console window title
         """
-        print('\33]0;' + title + '\a', end='')
-        sys.stdout.flush()
+        try:
+            print('\33]0;' + title + '\a', end='')
+            sys.stdout.flush()
+        except Exception:
+            # wasn't able to set title (e.g., running headless)
+            pretty_print(Exception)
 
 
 def handler(signal_received, frame):
