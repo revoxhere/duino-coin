@@ -623,12 +623,12 @@ class Miner:
         return configparser["PC Miner"]
 
     def m_connect(id, pool):
-        retry_count = 0
+        retry_counter = 0
         while True:
             try:
-                if retry_count > 3:
+                if retry_counter > 3:
                     pool = Client.fetch_pool()
-                    retry_count = 0
+                    retry_counter = 0
 
                 socket_connection = Client.connect(pool)
                 POOL_VER = Client.recv(5)
