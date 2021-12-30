@@ -261,3 +261,5 @@ Big thanks to all the [contributors](https://github.com/revoxhere/duino-coin/gra
 Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
 <br/>
 Website Link: [https://duinocoin.com/](https://duinocoin.com/)
+<br/>
+Duino-Coin Status Page: [https://status.duinocoin.com](https://status.duinocoin.com)
