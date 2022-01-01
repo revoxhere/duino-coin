@@ -1,214 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Duino-Coin</title>
-    <link rel="icon" href="assets/icons/duco.svg" type="image/png" />
-    <link rel="shortcut icon" href="assets/icons/duco.svg" type="image/png" />
-    <meta name="description" content="Duino-Coin - coin that can be mined with almost everything.">
-    <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency, bitcoin">
     <link rel="canonical" href="https://duinocoin.com" />
     <meta name="robots" content="index, follow">
+    <!-- Favicons -->
     <meta name="theme-color" content="#EE5A24">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/favicons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicons/favicon-16x16.png">
-    <link rel="shortcut icon" href="/assets/icons/favicons/favicon.ico">
     <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="msapplication-config" content="/assets/icons/favicons/browserconfig.xml">
-    <link rel="manifest" href="manifest.json">
-    <meta property="og:site_name" content="Duino-Coin" />
-    <meta property="og:site" content="https://duinocoin.com" />
-    <meta property="og:title" content="Duino-Coin" />
-    <meta property="og:description" content="Duino-Coin - coin that can be mined with almost everything." />
-    <meta property="og:image" content="https://duinocoin.com/assets/icons/duco.png" />
-    <meta property="og:url" content="https://duinocoin.com" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:title" content="Duino-Coin">
-    <meta name="twitter:description" content="Duino-Coin - coin that can be mined with almost everything.">
-    <meta name="twitter:image" content="https://duinocoin.com/assets/icons/duco.png">
-    <meta name="twitter:site" content="@DuinoCoin">
-    <meta name="twitter:creator" content="@DuinoCoin">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma-pageloader.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma-prefers-dark.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png?v=2">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png?v=2">
+    <link rel="manifest" href="favicons/site.webmanifest?v=2">
+    <link rel="mask-icon" href="favicons/safari-pinned-tab.svg?v=2" color="#5bbad5">
+    <link rel="shortcut icon" href="favicons/favicon.ico?v=2">
+    <!-- Primary Meta Tags -->
+    <title>Duino-Coin - a simple, eco-friendly, centralized coin</title>
+    <meta name="title" content="Duino-Coin - a simple, eco-friendly, centralized coin">
+    <meta name="description" content="Duino focuses on energy efficient mining with almost anything, including Arduino boards.It's mostly, but not only, dedicated to people who are just starting out in the crypto world as it doesn't require any expensive equipment.">
+    <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://duinocoin.com/">
+    <meta property="og:title" content="Duino-Coin - a simple, eco-friendly, centralized coin">
+    <meta property="og:description" content="Duino focuses on energy efficient mining with almost anything, including Arduino boards.It's mostly, but not only, dedicated to people who are just starting out in the crypto world as it doesn't require any expensive equipment.">
+    <meta property="og:image" content="/backgrounds/banner.png">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://duinocoin.com/">
+    <meta property="twitter:title" content="Duino-Coin - a simple, eco-friendly, centralized coin">
+    <meta property="twitter:description" content="Duino focuses on energy efficient mining with almost anything, including Arduino boards.It's mostly, but not only, dedicated to people who are just starting out in the crypto world as it doesn't require any expensive equipment.">
+    <!-- CSS -->
+    <link rel="preload" href="assets/css/mystyles.css" as="style">
+    <link rel="stylesheet" type="text/css" href="assets/css/mystyles.css">
+    <!-- Jquery and FA -->
+    <link rel="preload" href="assets/js/all.min.js" as="script">
     <script src="assets/js/all.min.js"></script>
+    <link rel="preload" href="assets/js/jquery.min.js" as="script">
     <script src="assets/js/jquery.min.js"></script>
+    <!-- Others -->
+    <link rel="preload" href="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69" as="script">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-142187073-69');
-    </script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js" as="script">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js"></script>
     <style>
-    .is-primary {
-        /* Override Bulmas primary color to Duco-Colored gradient*/
-        background: linear-gradient(160deg, #e74c3c, #f39c12) !important;
-        border: none;
+    a>figure {
+        transition: 0.2s all;
     }
 
-    .is-primary-animated {
-        color: #fafafa;
-        background: linear-gradient(160deg, #ff9f43, #FC427B, #f39c12, #e66767);
-        background-size: 800% 800%;
+    a>figure:hover {
+        transform: scale(1.1);
+    }
 
-        -webkit-animation: gradientAnim 7s ease infinite;
-        -moz-animation: gradientAnim 7s ease infinite;
-        -o-animation: gradientAnim 7s ease infinite;
-        animation: gradientAnim 7s ease infinite;
+    .navbar-item:hover {
+        color: #ff9f43;
     }
 
     .button:hover {
-        color: #fafafa !important;
-        background: linear-gradient(223deg, #e74c3c, #f39c12, #f31291, #f3d012);
-        background-size: 800% 800%;
-        border: 1px solid white !important;
-
-        -webkit-animation: gradientAnim 1s ease infinite;
-        -moz-animation: gradientAnim 1s ease infinite;
-        -o-animation: gradientAnim 1s ease infinite;
-        animation: gradientAnim 1s ease infinite;
+        transform: scale(1.1);
     }
 
-    .rotating {
+    #wavecontainer {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center
+    }
+
+    #waveduco {
+        height: 12rem;
+        color: white;
+        z-index: 1;
         position: absolute;
-        right: 10%;
-        width: 15em;
-        height: 15em;
-        margin-top: 5em;
-        animation: rotation 2.5s ease infinite;
-        transition: 0.1s;
+        display: table;
+        margin: 0 auto;
+        animation: scale 2.73s ease-in-out infinite;
     }
 
-    @keyframes rotation {
+    #devices {
+        transition: opacity 0.5s;
+    }
+
+    .hide {
+        opacity: 0 !important;
+    }
+
+    @keyframes scale {
         0% {
-            transform: rotate(0deg);
+            transform: scale(1.3);
         }
 
-        40% {
-            transform: rotate(0deg);
+        30% {
+            transform: scale(0.9);
+        }
+
+        85% {
+            transform: scale(1.3);
         }
 
         100% {
-            transform: rotate(360deg);
+            transform: scale(1.3);
         }
-    }
-
-    @-webkit-keyframes gradientAnim {
-        0% {
-            background-position: 0% 23%
-        }
-
-        50% {
-            background-position: 100% 78%
-        }
-
-        100% {
-            background-position: 0% 23%
-        }
-    }
-
-    @-moz-keyframes gradientAnim {
-        0% {
-            background-position: 0% 23%
-        }
-
-        50% {
-            background-position: 100% 78%
-        }
-
-        100% {
-            background-position: 0% 23%
-        }
-    }
-
-    @-o-keyframes gradientAnim {
-        0% {
-            background-position: 0% 23%
-        }
-
-        50% {
-            background-position: 100% 78%
-        }
-
-        100% {
-            background-position: 0% 23%
-        }
-    }
-
-    @keyframes gradientAnim {
-        0% {
-            background-position: 0% 23%
-        }
-
-        50% {
-            background-position: 100% 78%
-        }
-
-        100% {
-            background-position: 0% 23%
-        }
-    }
-
-    .gradienttext {
-        /* Gradient text */
-        background: -webkit-linear-gradient(160deg, #EA2027, #EE5A24) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        color: #EA2027 !important;
-    }
-
-    .ducologo {
-        /* DUCO text */
-        font-size: 6.5em;
-        background: -webkit-linear-gradient(left, #ffb412, #f31291);
-        -webkit-filter: drop-shadow(0px 1px 1px #333);
-        -webkit-background-clip: text;
-        -webkit-text-stroke: 7px transparent;
-    }
-
-    .hero-body {
-        margin-left: 5%;
-    }
-
-    .is-shadow {
-        text-shadow: 0px 1px 5px #333;
-    }
-
-    /* Scroll bar */
-    * {
-	    scrollbar-width: thin;
-	    scrollbar-color: whitesmoke rgba(255,168,16,1);
-    }
-
-    *::-webkit-scrollbar {
-	    width: 7px;
-    }
-
-    *::-webkit-scrollbar-track {
-	    background: transparent;
-    }
-
-    *::-webkit-scrollbar-thumb {
-	    background-color: rgba(255,168,16,1);
-	    border-radius: 20px;
     }
     </style>
 </head>
 
 <body>
-    <div id="pageloader" class="pageloader is-active is-primary is-bottom-to-top">
-        <span class="title">Duino-Coin</span>
+    <div id="pageloader">
+        <div id="loader"></div>
     </div>
     <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <a class="navbar-item is-active" href="/">
-                <img src="assets/icons/duco.svg" height="172">
-                &nbsp;Home
+                <img src="assets/icons/duino.png" height="172">
             </a>
             <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar">
                 <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
@@ -216,284 +121,587 @@
         </div>
         <div id="navbar" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
-                    <i class="fas fa-book" style="color:#f6b93b;"></i>&nbsp;Whitepaper
-                </a>
                 <a class="navbar-item" href="https://explorer.duinocoin.com">
-                    <i class="fas fa-poll" style="color:#ff9f43;"></i>&nbsp;Network
+                    Network stats & explorer
                 </a>
-                <a class="navbar-item" href="donate.html">
-                    <i class="fas fa-heart" style="color:#ee5253;"></i>&nbsp;Donate
-                </a>
-                <a class="navbar-item" href="team.html">
-                    <i class="fas fa-user" style="color:#eb2f06;"></i>&nbsp;Our Team
-                </a>
-                <a class="navbar-item" href="apps.html">
-                    <i class="fas fa-lightbulb" style="color:#ED4C67;"></i>&nbsp;Apps
-                </a>
-                <a class="navbar-item" href="contact.html">
-                    <i class="fas fa-envelope" style="color:#B53471;"></i>&nbsp;Contact Us
-                </a>
-            </div>
-            <div class="navbar-end">
-                <a class="navbar-item" href="https://twitter.com/DuinoCoin/">
-                    <i class="fab fa-lg fa-twitter"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
-                    <i class="fab fa-lg fa-reddit"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://discord.gg/kvBkccy">
-                    <i class="fab fa-lg fa-discord"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
-                    <i class="fab fa-lg fa-github"></i></a></li>
-                </a>
-                <div class="navbar-item">
-                    <div class="buttons">
-                        <a class="button is-primary" href="getting-started.html">
-                            <strong>Get started</strong>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        Resources
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
+                            <span>
+                                <i class="fa fa-fw fa-book"></i>
+                                <span>Whitepaper</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/tree/useful-tools#branding">
+                            <span>
+                                <i class="fa fa-fw fa-brush"></i>
+                                <span>Branding</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/tree/useful-tools">
+                            <span>
+                                <i class="fa fa-fw fa-code"></i>
+                                <span>API docs
+                                </span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="apps.html">
+                            <span>
+                                <i class="fa fa-fw fa-check"></i>
+                                <span>Apps and faucets</span>
+                            </span>
                         </a>
                     </div>
+                </div>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        Duino team
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="team.html">
+                            <span>
+                                <i class="fa fa-fw fa-users"></i>
+                                <span>Meet our team</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="donate.html">
+                            <span>
+                                <i class="fa fa-fw fa-heart"></i>
+                                <span>Donate</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://store.duinocoin.com">
+                            <span>
+                                <i class="fa fa-fw fa-tshirt"></i>
+                                <span>Official merch</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        More
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="contact.html">
+                            <span>
+                                <i class="fa fa-fw fa-envelope"></i>
+                                <span>Contact us</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="legal.html">
+                            <span>
+                                <i class="fa fa-fw fa-balance-scale"></i>
+                                <span>Terms of service</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navbar-end is-hidden-touch">
+            <a class="navbar-item" href="https://twitter.com/DuinoCoin/">
+                <i class="fab fa-lg fa-twitter"></i>
+            </a>
+            <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
+                <i class="fab fa-lg fa-reddit"></i>
+            </a>
+            <a class="navbar-item" href="https://discord.gg/kvBkccy">
+                <i class="fab fa-lg fa-discord"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
+                <i class="fab fa-lg fa-github"></i>
+            </a>
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-primary" href="getting-started.html">
+                        <strong>Get started</strong>
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
-    <section class="hero is-primary-animated is-fullheight-with-navbar">
+    <section class="hero is-medium mt-5-mobile">
         <div class="hero-body">
-            <div class="columns">
-                <div class="column is-two-thirds is-mobile">
-                    <p class="has-text-white title ducologo">
+            <div class="columns is-vcentered">
+                <div class="column is-2"></div>
+                <div class="column">
+                    <p class="title has-text-weight-bold is-size-1">
                         Duino-Coin
                     </p>
-                    <p class="subtitle has-text-white is-shadow">
-                        A centralized coin that can be mined with Arduinos, ESP8266/32s, Raspberry Pis, computers, smartphones and many more.
+                    <p class="title is-size-4 has-text-weight-normal">
+                        Simple, eco-friendly, centralized coin that can be mined with
+                        <b id="devices">almost everything</b>.
                     </p>
-                    <p class="subtitle has-text-white is-shadow">
-                        <b>Please note</b> that Duino in it's current state is more for fun than profits.
-                        The main purpose of the project is to show that low-power devices can have a place in cryptography.
-                        There are many people that don't quite get the idea -
-                        if you're wondering if this project is for you, plase read our whitepaper.
-                    </p>
-                    <div class="columns">
-                        <div class="column">
-                            <ul class="is-shadow">
-                                <li><i class="fa fa-desktop fa-fw"></i>&nbsp;Supported by a large number of platforms</li>
-                                <li><i class="fa fa-users fa-fw"></i>&nbsp;Fast-growing community</li>
-                                <li><i class="fa fa-exchange-alt fa-fw"></i>&nbsp;Easy to use & exchange</li>
-                                <li><i class="fa fa-globe-europe fa-fw"></i>&nbsp;Available everywhere</li>
-                                <li><i class="fa fa-splotch fa-fw"></i>&nbsp;Beginner-friendly</li>
-                                <li><i class="fa fa-book-open fa-fw"></i>&nbsp;Fully open-source</li>
-                                <li><i class="fa fa-check-square fa-fw"></i>&nbsp;Easy to mine</li>
-                            </ul>
-                        </div>
-                        <div class="column">
-                            <ul class="is-shadow">
-                                <li>
-                                    <i class="fa fa-receipt fa-fw"></i>&nbsp;
-                                    Ticker: DUCO (ᕲ)
-                                </li>
-                                <li>
-                                    <i class="fa fa-coins fa-fw"></i>&nbsp;
-                                    Coin supply: Infinite (350k coins before December 2020, new limits planned for the future)
-                                </li>
-                                <li>
-                                    <i class="fa fa-clock fa-fw"></i>&nbsp;
-                                    Transaction time: Instant
-                                </li>
-                                <li>
-                                    <i class="fa fa-code fa-fw"></i>&nbsp;
-                                    Consensus: PoW (DUCO-S1, XXHASH); PoS & more planned; rewards managed by the original KOLKA (& GRATKA) system
-                                </li>
-                                <li>
-                                    <i class="fa fa-users fa-fw"></i>&nbsp;
-                                    Users on network:
-                                    <span id="users">
-                                        7311
-                                    </span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="buttons are-normal">
-                        <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf" class="button has-text-dark is-white">
-                            <i class="fa fa-book"></i>&nbsp;Whitepaper
+                    <div class="buttons is-normal">
+                        <a href="#explore" class="button is-primary">
+                            <span><i class="fa fa-caret-down"></i>&nbsp;Explore</span>
                         </a>
-                        <a href="https://github.com/revoxhere/duino-coin/releases/latest" class="button is-success has-text-dark">
-                            <i class="fa fa-download"></i>&nbsp;Latest release
-                        </a>
-                        <a href="getting-started.html" class="button is-warning has-text-dark">
-                            <i class="fa fa-arrow-right"></i>&nbsp;Get started
-                        </a>
-                        <a href="https://wallet.duinocoin.com" class="button is-info has-text-dark">
-                            <i class="fa fa-wallet"></i>&nbsp;Web Wallet
+                        <a href="https://wallet.duinocoin.com" class="button">
+                            <span><i class="fa fa-wallet"></i>&nbsp;Online Wallet</span>
                         </a>
                     </div>
                 </div>
-                <div class="column is-hidden-touch">
-                    <a href="https://youtu.be/bFnCdqMke34"><img class="rotating is-centered" src="assets/icons/duco-alt.png"></p></a>
+                <div class="column is-hidden-mobile">
+                    <a href="https://youtu.be/im0Tca7EjrA">
+                        <div id="wavecontainer">
+                            <img src="/assets/icons/duino.png" id="waveduco">
+                        </div>
+                    </a>
                 </div>
+                <div class="column is-2"></div>
             </div>
         </div>
     </section>
-    <br>
-    <div class="container">
-        <div class="box">
-            <p class="subtitle is-size-2">
-                <i class="fa fa-question fa-fw" style="color:#8e44ad;"></i>&nbsp;What is the point of mining on AVR boards</span>
-            </p>
-            <p class="subtitle is-size-5">
-                Simply saying - <b>because now you can</b>. There is literally no other coin that is built around it.<br>Many people have Arduinos that are just laying around waiting for better days - we thought it'd be a cool idea to put these small devices in use in the crypto world, especially since they're low-power. We wanted to create something new and unique, and from the size of community we've gathered, looks like we accomplished it.<br><br>If the idea of setting it all up sounds hard for you - don't worry. We have a lot of <b>guides to make it all easy</b>.
-                <a href="getting-started.html" class="button is-inline is-primary-animated">
-                    Get started
-                </a>
-            </p>
-        </div>
-    </div>
-    <br>
-    <div class="container">
-        <div class="columns">
-            <div class="column">
-                <div class="box">
-                    <p class="subtitle is-size-2">
-                        <i class="fa fa-coins fa-fw" style="color:#3498db"></i>&nbsp;Profits</span>
+    <section class="hero is-medium">
+        <div class="hero-body" id="explore">
+            <div class="columns is-centered">
+                <div class="column is-2"></div>
+                <div class="column">
+                    <p class="title has-text-weight-bold is-size-2">
+                        What is Duino-Coin?
                     </p>
-                    <p class="subtitle is-size-5">
-                        <b>Duino-Coin will never give you any huge profits from mining.</b>
-                        For big earnings you should probably take a look at other coins.
-                        As we often say, DUCO is mostly for fun and gaining experience with electronics or cryptocurrencies as a beginner, the profits are just a bonus.
+                    <p class="title is-size-4 has-text-weight-normal">
+                        Duino was founded in 2019 and is a <b>for-fun</b>, fully oryginal crypto coin project developed by <a href="team.html">a team of young developers</a> that focuses on <span class="has-text-success">energy efficient mining</span>. It's mostly, but not only, dedicated to people who are just starting out in the crypto world as it doesn't require any expensive equipment.
                     </p>
+                    <div class="buttons">
+                        <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf" class="button is-success">
+                            <span><i class="fa fa-book"></i>&nbsp;Read our Whitepaper</span>
+                        </a>
+                    </div>
                 </div>
+                <div class="column is-2"></div>
             </div>
-            <div class="column">
-                <div class="box">
-                    <p class="subtitle is-size-2">
-                        <i class="fa fa-exchange-alt fa-fw" style="color:#e74c3c"></i>&nbsp;Exchanges</span>
-                    </p>
-                    <p class="subtitle is-size-5">
-                        Duino can be currently exchanged on these sites:
-                    </p>
-                    <div class="columns">
-                        <div class="column">
-                            <li>
-                                <a href="https://exchange.duinocoin.com">
-                                    DUCO Exchange
+        </div>
+    </section>
+    <section class="hero is-small">
+        <div class="hero-body" id="explore">
+            <div class="columns">
+                <div class="column is-2"></div>
+                <div class="column">
+                    <div class="columns is-vcentered">
+                        <div class="column has-text-centered">
+                            <div>
+                                <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools">
+                                    <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
+                                        <div id="code"></div>
+                                    </figure>
                                 </a>
-                            </li>
+                                <span class="heading is-size-4">
+                                    For developers
+                                </span>
+                                <span class="subtitle is-size-5">
+                                    <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools">
+                                        Developer documentation
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="column has-text-centered">
+                            <div>
+                                <a href="getting-started.html">
+                                    <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
+                                        <div id="pickaxe"></div>
+                                    </figure>
+                                </a>
+                                <span class="heading is-size-4">
+                                    For miners
+                                </span>
+                                <span class="subtitle is-size-5">
+                                    <a href="getting-started.html">
+                                        Getting started guides
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="column has-text-centered">
+                            <div>
+                                <a href="#exchanges">
+                                    <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
+                                        <div id="money"></div>
+                                    </figure>
+                                </a>
+                                <span class="heading is-size-4">
+                                    For investors
+                                </span>
+                                <span class="subtitle is-size-5">
+                                    <a href="#exchanges">
+                                        Exchange list
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-2"></div>
+            </div>
+        </div>
+    </section>
+    <section class="hero is-medium">
+        <div class="hero-body" id="explore">
+            <div class="columns is-centered">
+                <div class="column is-2"></div>
+                <div class="column">
+                    <p class="title has-text-weight-bold is-size-3">
+                        Technical specifications
+                    </p>
+                    <table class="table is-fullwidth">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-info-circle has-text-info"></i>
+                                    Ticker
+                                </th>
+                                <th>
+                                    DUCO (ᕲ)
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-cog has-text-info"></i>
+                                    Consensus
+                                </th>
+                                <th>
+                                    Proof of work
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-angle-double-right has-text-info"></i>
+                                    Algorithm
+                                </th>
+                                <th>
+                                    DUCO-S1 (SHA-1 implementation)
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-bolt has-text-info"></i>
+                                    Transaction time
+                                </th>
+                                <th>
+                                    Instant
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-coins has-text-info"></i>
+                                    Coin supply
+                                </th>
+                                <th>
+                                    Infinite (with burning)
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-faucet has-text-info"></i>
+                                    Mining rewards
+                                </th>
+                                <th>
+                                    Managed by the Kolka system
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="title has-text-weight-bold is-size-4 mt-nav">
+                        Kolka system
+                    </p>
+                    <div class="subtitle is-size-4">
+                        To make mining with underpowered devices possible Duino uses the so-called Kolka system
+                        that consists of a few stages that test the device performance, assign a difficulty tier and distribute the rewards according to these variables.<br>
+                        Kolka is explained in more detail in the Whitepaper.
+                    </div>
+                </div>
+                <div class="column">
+                    <p class="title has-text-weight-bold is-size-3">
+                        Key features
+                    </p>
+                    <table class="table is-fullwidth">
+                        <tbody>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-microchip has-text-success"></i>
+                                    <span>Mineable with Arduinos, ESPs, Raspberry Pis</span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-users has-text-success"></i>
+                                    <span>Fast-growing community</span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-coins has-text-success"></i>
+                                    <span>Easy to use & exchange</span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-globe has-text-success"></i>
+                                    <span>Available everywhere</span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-code has-text-success"></i>
+                                    <span>Fully open-source</span>
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    <i class="fa fa-fw fa-check has-text-success"></i>
+                                    <span>Beginner-friendly</span>
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p class="title has-text-weight-bold is-size-4 mt-nav">
+                        Kolka reward distribution
+                    </p>
+                    <div class="columns is-mobile">
+                        <div class="column is-narrow">
+                            <img src="assets/images/arrow.png" style="height:100%">
                         </div>
                         <div class="column">
-                            <li>
+                            <div class="content is-size-4 my-3">
+                                Arduinos (and similar <abbr title="Alf-Egil Bogen Vegard Wollan RISC microcontroller, also known as Advanced Virtual RISC">AVRs</abbr>)<br>
+                                Raspberry Pi Picos (and similar <abbr title="Advanced RISC Machines">ARMs</abbr>)<br>
+                                ESP8266s and ESP32s<br>
+                                Raspberry Pi 2/3/4 (and similar <abbr title="Single Board Computers">SBCs</abbr>)<br>
+                                Typical computers<br>
+                                High-end computers<br>
+                                Graphic cards, etc.<br>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-2"></div>
+            </div>
+            <div class="columns">
+                <div class="column is-2"></div>
+                <div class="column">
+                    <p class="title has-text-weight-bold is-size-4 mt-nav">
+                        Multi-chain
+                    </p>
+                    <div class="subtitle is-size-4">
+                        Duino-Coin is a <abbr title="Using master servers to store the coins">centralized</abbr> coin with it's own chain. It's possible however to wrap
+                        (convert) DUCOs to <b>wDUCO</b>, <b>bscDUCO</b>, <b>celoDUCO</b> or <b>maticDUCO</b> to store them in a <abbr title="Using clients to store the coins">decentralized</abbr> form on another coins' chain. More info about wrapping can be found in the getting started guides.
+                    </div>
+                </div>
+                <div class="column is-2"></div>
+            </div>
+        </div>
+    </section>
+    <section class="hero is-medium">
+        <div class="hero-body" id="explore">
+            <div class="columns" id="exchanges">
+                <div class="column is-2"></div>
+                <div class="column">
+                    <p class="title has-text-weight-bold is-size-3">
+                        Exchanges
+                    </p>
+                    <div class="columns is-multiline">
+                        <div class="column is-one-third has-text-centered">
+                            <div class="box">
+                                <a href="https://exchange.duinocoin.com/">
+                                    <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
+                                        <img src="assets/icons/ducoexchange.png">
+                                    </figure>
+                                </a>
+                                <p class="heading mt-3 is-size-4">DUCO Exchange</p>
+                            </div>
+                        </div>
+                        <div class="column is-one-third has-text-centered">
+                            <div class="box">
                                 <a href="http://www.node-s.co.za/duco_exchange/home">
-                                    Node-S
+                                    <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
+                                        <img src="assets/icons/nodes.png">
+                                    </figure>
                                 </a>
-                            </li>
+                                <p class="heading mt-3 is-size-4">Node-S</p>
+                            </div>
                         </div>
-                        <div class="column">
-                            <li>
-                                <a href="https://justswap.io/#/scan/detail/trx/TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U">
-                                    JustSwap
-                                </a>
-                            </li>
-                        </div>
-                        <div class="column">
-                            <li>
+                        <div class="column is-one-third has-text-centered">
+                            <div class="box">
                                 <a href="https://pancakeswap.finance/swap?inputCurrency=0xcf572ca0ab84d8ce1652b175e930292e2320785b">
-                                    PancakeSwap
+                                    <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
+                                        <img src="assets/icons/pancake.png">
+                                    </figure>
                                 </a>
-                            </li>
+                                <p class="heading mt-3 is-size-4">PancakeSwap</p>
+                            </div>
+                        </div>
+                        <div class="column is-half has-text-centered">
+                            <div class="box">
+                                <a href="https://sunswap.com/#/scan/detail/TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U">
+                                    <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
+                                        <img src="assets/icons/sunswap.png">
+                                    </figure>
+                                </a>
+                                <p class="heading mt-3 is-size-4">SunSwap</p>
+                            </div>
+                        </div>
+                        <div class="column is-half has-text-centered">
+                            <div class="box">
+                                <a href="https://medium.com/@johnny.mnemonic/guide-to-swapping-duino-coin-on-sushi-com-12bca3192ea2">
+                                    <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
+                                        <img src="assets/icons/sushi.png">
+                                    </figure>
+                                </a>
+                                <p class="heading mt-3 is-size-4">SushiSwap</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <br>
-    <div class="container">
-        <div class="columns">
-            <div class="column">
-                <div class="box">
-                    <div class="containter">
-                        <i class="fa fa-user fa-fw" style="color:#747d8c;"></i><span class="title is-size-6">&nbsp;Beyondtoshi (<a href="https://beyondcoin.io">Beyondcoin</a> Founder)</span><br>
-                        <span class="subtitle is-size-6">
-                            <i>Duino-Coin presents a new type of crypto allowing even the average person to successfully mine. Duino-Coin has a great and bright future, so what are you waiting for, start mining today!</i>
-                        </span><br>
-                        <i class="fa fa-user fa-fw mt-4" style="color:#1e90ff;"></i><span class="title is-size-6">&nbsp;js</span><br>
-                        <span class="subtitle is-size-6">
-                            <i>The beautiful thing about Duino is that you can use boards like Arduino, ESP and so on. Low power devices are the way to go imho. Developers should think about expanding the list of boards on which DUCO would be available, maybe something with alternative power sources (solar, wind, etc).</i>
-                        </span><br>
-                        <i class="fa fa-user fa-fw mt-4" style="color:#f19066;"></i><span class="title is-size-6">&nbsp;Hextor73</span><br>
-                        <span class="subtitle is-size-6">
-                            <i>DUCO is like cheese: there is no such thing as "too much cheese"</i>
-                        </span><br>
-                        <i class="fa fa-user fa-fw mt-4" style="color:#f8a5c2;"></i><span class="title is-size-6">&nbsp;Cosula</span><br>
-                        <span class="subtitle is-size-6">
-                            <i>I think thats the beauty of this thing. Everybody can mine! Maybe not get filthy rich by doing it, but still mine! I love this project. If nothing else then for sbc/arduino hobbyists playground and learning place.</i>
-                        </span><br>
-                        <i class="fa fa-user fa-fw mt-4" style="color:#c44569;"></i><span class="title is-size-6">&nbsp;Designer91</span><br>
-                        <span class="subtitle is-size-6">
-                            <i>Duino-Coin has potential to be a great coin with a huge advantage for education and understanding of block chain, it's the only coin with a $5-10 entry to mine with an Arduino. It's what drew me to the project.</i>
-                        </span><br>
-                        <i class="fa fa-user fa-fw mt-4" style="color:#2ed573;"></i><span class="title is-size-6">&nbsp;Hypogre</span><br>
-                        <span class="subtitle is-size-6">
-                            <i>I have been using Duino-Coin for a couple months now and I have to say, it is the best cryptocurrency I've ever mined! It is easy, cheap, and fun to mine! The Discord server is also amazing! They do a ton of giveaways.</i>
-                        </span>
-                    </div>
-                    <p class="has-text-right is-size-7 mt-3">
-                        User opinions are taken from our official <a href="discord.html">Discord server</a>
+                    <p class="subtitle has-text-right">
+                        Want to see DUCO featured on more exchanges?<br>
+                        Reach out to your favourite exchange site and ask if they'd like to list Duino-Coin.
                     </p>
                 </div>
+                <div class="column is-2"></div>
             </div>
         </div>
-    </div>
-    <br>
+    </section>
+    <section class="hero is-small">
+        <div class="hero-body" id="explore">
+            <div class="columns" id="exchanges">
+                <div class="column is-2"></div>
+                <div class="column has-text-centered">
+                    <p class="title has-text-weight-bold is-size-3">
+                        Excited yet?
+                    </p>
+                    <a href="getting-started.html" class="button is-large is-primary">
+                        Get started
+                    </a>
+                </div>
+                <div class="column is-2"></div>
+            </div>
+        </div>
+    </section>
+    <br><br><br><br><br>
     </div>
     <!-- FOOTER -->
     <footer class="footer">
         <div class="content has-text-centered">
             <p>
-                <strong>Duino-Coin Website</strong> (v3) by <a href="https://github.com/revoxhere">Robert "revox" Piotrowski </a> from <b>Duino team</b> 2019-2022
-                <br>Hosted by <a href="https://kk.dev">Kristian "Tech1k" Kramer</a>
-                <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a><br>
-                <a href="https://bulma.io">
-                    <img src="assets/images/made-with-bulma.png" alt="Made with Bulma" width="188" height="84">
-                </a>
-                <br/>
-                <a href="https://duinocoin.com/legal">ToS & Privacy Policy</a>
-                <br/>
-                <a href="https://status.duinocoin.com/">Status</a>
+                <strong>Duino-Coin</strong> by <a href="https://revoxhere.github.io">Robert "revox" Piotrowski </a> from the <b>Duino team</b> 2019-2022
+                <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a>
             </p>
         </div>
     </footer>
 </body>
-</html>
 <script>
-let pageloader = document.getElementById("pageloader"); // PAGE LOAGER
-pageloader.setAttribute('class', "pageloader is-active is-primary is-bottom-to-top"); // Before page is loaded
-window.addEventListener('load', function() {
-    pageloader.setAttribute('class', "pageloader is-primary is-bottom-to-top"); // After page is loaded
+/* Animations */
+const wavecontainer = document.getElementById('wavecontainer');
+const pickaxecontainer = document.getElementById('pickaxe');
+const codecontainer = document.getElementById('code');
+const moneycontainer = document.getElementById('money');
+const pageloader = document.getElementById('loader');
+
+bodymovin.loadAnimation({
+    wrapper: pageloader,
+    animType: 'svg',
+    autoplay: true,
+    loop: true,
+    path: 'assets/animations/loader.json'
 });
 
-document.addEventListener('DOMContentLoaded', () => { // HAMBURGER MENU
+bodymovin.loadAnimation({
+    wrapper: wavecontainer,
+    animType: 'svg',
+    autoplay: true,
+    loop: true,
+    path: 'assets/animations/wave.json'
+});
+
+bodymovin.loadAnimation({
+    wrapper: pickaxecontainer,
+    animType: 'svg',
+    autoplay: true,
+    loop: true,
+    path: 'assets/animations/pickaxe.json'
+});
+
+bodymovin.loadAnimation({
+    wrapper: codecontainer,
+    animType: 'svg',
+    autoplay: true,
+    loop: true,
+    path: 'assets/animations/code.json'
+});
+
+bodymovin.loadAnimation({
+    wrapper: moneycontainer,
+    animType: 'svg',
+    autoplay: true,
+    loop: true,
+    path: 'assets/animations/money.json'
+});
+
+/* Animated device names */
+const devices = [
+    "Arduino boards",
+    "ESP8266 boards",
+    "ESP32 boards",
+    "Raspberry Pi boards",
+    "Orange Pi boards",
+    "computers",
+    "smartphones",
+    "smart TVs",
+    "Wi-Fi routers",
+    "microcontrollers",
+    "single-board computers",
+    "Teensy boards",
+]
+
+function delay(delay) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(2);
+        }, delay);
+    });
+}
+
+async function change_devices() {
+    devicetext = document.getElementById("devices")
+    await delay(1500);
+    while (true) {
+        for (element in devices) {
+            devicetext.classList.add('hide');
+            await delay(200);
+            devicetext.innerHTML = devices[element];
+            devicetext.classList.remove('hide');
+            await delay(800);
+        }
+    }
+}
+
+change_devices();
+
+/* Toshi's stuff */
+window.dataLayer = window.dataLayer || [];
+
+function gtag() { dataLayer.push(arguments); }
+gtag('js', new Date());
+gtag('config', 'UA-142187073-69');
+
+/* On page loaded */
+$(window).on('load', function() {
     const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
     if ($navbarBurgers.length > 0) {
-        $navbarBurgers.forEach(el => { // Add a click event on each of burger menus
+        $navbarBurgers.forEach(el => {
             el.addEventListener('click', () => {
-                const target = el.dataset.target; // Get the target from the "data-target" attribute
+                const target = el.dataset.target;
                 const $target = document.getElementById(target);
-                el.classList.toggle('is-active'); // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                el.classList.toggle('is-active');
                 $target.classList.toggle('is-active');
             });
         });
     }
+    $("#pageloader").fadeOut();
 });
 </script>
-<script>
-// Some statistics to fill in from the API
-document.addEventListener('DOMContentLoaded', () => {
-    let ducoUsdPrice = 0.0956;
-    $.getJSON('https://raw.githubusercontent.com/revoxhere/duco-statistics/master/api.json', function(data) {
-        ducoUsdPrice = data["Duco price"];
-        document.getElementById("users").innerHTML = data["Registered users"];
-        document.getElementById("price").innerHTML = "$" + ducoUsdPrice.toFixed(4);
-    });
-});
-</script>
+</html>

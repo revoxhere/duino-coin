@@ -4,611 +4,765 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Duino-Coin | Apps and Faucets</title>
-    <link rel="icon" href="assets/icons/duco.svg" type="image/png" />
-    <link rel="shortcut icon" href="assets/icons/duco.svg" type="image/png" />
-    <meta name="description" content="View apps and faucets developed by the Duino-Coin community.">
-    <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency, bitcoin">
-    <link rel="canonical" href="https://duinocoin.com/apps" />
+    <link rel="canonical" href="https://duinocoin.com" />
     <meta name="robots" content="index, follow">
+    <!-- Favicons -->
     <meta name="theme-color" content="#EE5A24">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/favicons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicons/favicon-16x16.png">
-    <link rel="shortcut icon" href="/assets/icons/favicons/favicon.ico">
     <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="msapplication-config" content="/assets/icons/favicons/browserconfig.xml">
-    <link rel="manifest" href="manifest.json">
-    <meta property="og:site_name" content="Duino-Coin" />
-    <meta property="og:site" content="https://duinocoin.com" />
-    <meta property="og:title" content="Duino-Coin | Apps and Faucets" />
-    <meta property="og:description" content="View apps and faucets developed by the Duino-Coin community." />
-    <meta property="og:image" content="https://duinocoin.com/assets/icons/duco.png" />
-    <meta property="og:url" content="https://duinocoin.com/apps" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:title" content="Duino-Coin | Apps and Faucets">
-    <meta name="twitter:description" content="View apps and faucets developed by the Duino-Coin community.">
-    <meta name="twitter:image" content="https://duinocoin.com/assets/icons/duco.png">
-    <meta name="twitter:site" content="@DuinoCoin">
-    <meta name="twitter:creator" content="@DuinoCoin">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma-pageloader.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma-prefers-dark.min.css">
-    <script src="assets/js/all.min.js?v=2"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png?v=2">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png?v=2">
+    <link rel="manifest" href="favicons/site.webmanifest?v=2">
+    <link rel="mask-icon" href="favicons/safari-pinned-tab.svg?v=2" color="#5bbad5">
+    <link rel="shortcut icon" href="favicons/favicon.ico?v=2">
+    <!-- Primary Meta Tags -->
+    <title>Community Duino-Coin app list</title>
+    <meta name="title" content="Community Duino-Coin app list">
+    <meta name="description" content="Browse verified community-created apps and faucets for Duino-Coin.">
+    <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://duinocoin.com/">
+    <meta property="og:title" content="Community Duino-Coin app list">
+    <meta property="og:description" content="Browse verified community-created apps and faucets for Duino-Coin">
+    <meta property="og:image" content="/backgrounds/apps.png">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://duinocoin.com/">
+    <meta property="twitter:title" content="Community Duino-Coin app list">
+    <meta property="twitter:description" content="Browse verified community-created apps and faucets for Duino-Coin">
+    <!-- CSS -->
+    <link rel="preload" href="assets/css/mystyles.css" as="style">
+    <link rel="stylesheet" type="text/css" href="assets/css/mystyles.css">
+    <!-- Jquery and FA -->
+    <link rel="preload" href="assets/js/all.min.js" as="script">
+    <script src="assets/js/all.min.js"></script>
+    <link rel="preload" href="assets/js/jquery.min.js" as="script">
     <script src="assets/js/jquery.min.js"></script>
+    <!-- Others -->
+    <link rel="preload" href="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69" as="script">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-142187073-69');
-    </script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js" as="script">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js"></script>
     <style>
-    .is-primary {
-        /* Override Bulmas primary color to Duco-Colored gradient*/
-        background: linear-gradient(160deg, #e74c3c, #f39c12) !important;
-        border: none;
+    a>figure {
+        transition: 0.2s all;
     }
 
-    .gradienttext {
-        /* Gradient text */
-        background: -webkit-linear-gradient(160deg, #EA2027, #EE5A24) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        color: #EA2027 !important;
+    a>figure:hover {
+        transform: scale(1.1);
     }
 
-    .grid-list {
-        /* Split unordered lists */
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+    .navbar-item:hover {
+        color: #ff9f43;
     }
 
-    .appicon {
-        width: 32px;
-        top: 5px;
+    .button:hover:not(.is-link) {
+        transform: scale(1.1);
+    }
+
+    .icon-text>span {
+        overflow-wrap: break-word !important;
+        word-wrap: break-word !important;
+        hyphens: auto !important;
+    }
+
+    #wavecontainer {
         position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center
+    }
+
+    #waveduco {
+        height: 12rem;
+        color: white;
+        z-index: 1;
+        position: absolute;
+        display: table;
+        margin: 0 auto;
+        animation: scale 2.73s ease-in-out infinite;
+    }
+
+    #devices {
+        transition: opacity 0.5s;
+    }
+
+    .hide {
+        opacity: 0 !important;
+    }
+
+    @keyframes scale {
+        0% {
+            transform: scale(1.3);
+        }
+
+        30% {
+            transform: scale(0.9);
+        }
+
+        85% {
+            transform: scale(1.3);
+        }
+
+        100% {
+            transform: scale(1.3);
+        }
     }
     </style>
 </head>
 
 <body>
-    <div id="pageloader" class="pageloader is-active is-primary is-bottom-to-top">
-        <span class="title">Duino-Coin Apps and Projects</span>
+    <div id="pageloader">
+        <div id="loader"></div>
     </div>
     <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-            <a class="navbar-item" href="/">
-                <img src="assets/icons/duco.svg" height="172">
-                &nbsp;Home
+            <a class="navbar-item is-active" href="/">
+                <img src="assets/icons/duino.png" height="172">
             </a>
-            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarDuinoCoin">
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar">
                 <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
             </a>
         </div>
-        <div id="navbarDuinoCoin" class="navbar-menu">
+        <div id="navbar" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
-                    <i class="fas fa-book" style="color:#f6b93b;"></i>&nbsp;Whitepaper
-                </a>
                 <a class="navbar-item" href="https://explorer.duinocoin.com">
-                    <i class="fas fa-poll" style="color:#ff9f43;"></i>&nbsp;Network
+                    Network stats & explorer
                 </a>
-                <a class="navbar-item" href="donate.html">
-                    <i class="fas fa-heart" style="color:#ee5253;"></i>&nbsp;Donate
-                </a>
-                <a class="navbar-item" href="team.html">
-                    <i class="fas fa-user" style="color:#eb2f06;"></i>&nbsp;Our Team
-                </a>
-                <a class="navbar-item" href="apps.html">
-                    <i class="fas fa-lightbulb" style="color:#ED4C67;"></i>&nbsp;Apps
-                </a>
-                <a class="navbar-item" href="contact.html">
-                    <i class="fas fa-envelope" style="color:#B53471;"></i>&nbsp;Contact Us
-                </a>
-            </div>
-            <div class="navbar-end">
-                <a class="navbar-item" href="https://twitter.com/DuinoCoin/">
-                    <i class="fab fa-lg fa-twitter"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
-                    <i class="fab fa-lg fa-reddit"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://discord.gg/kvBkccy">
-                    <i class="fab fa-lg fa-discord"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
-                    <i class="fab fa-lg fa-github"></i></a></li>
-                </a>
-                <div class="navbar-item">
-                    <div class="buttons">
-                        <a class="button is-primary" href="getting-started.html">
-                            <strong>Get started</strong>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        Resources
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
+                            <span>
+                                <i class="fa fa-fw fa-book"></i>
+                                <span>Whitepaper</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/tree/useful-tools#branding">
+                            <span>
+                                <i class="fa fa-fw fa-brush"></i>
+                                <span>Branding</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/tree/useful-tools">
+                            <span>
+                                <i class="fa fa-fw fa-code"></i>
+                                <span>API docs
+                                </span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="apps.html">
+                            <span>
+                                <i class="fa fa-fw fa-check"></i>
+                                <span>Apps and faucets</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        Duino team
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="team.html">
+                            <span>
+                                <i class="fa fa-fw fa-users"></i>
+                                <span>Meet our team</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="donate.html">
+                            <span>
+                                <i class="fa fa-fw fa-heart"></i>
+                                <span>Donate</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://store.duinocoin.com">
+                            <span>
+                                <i class="fa fa-fw fa-tshirt"></i>
+                                <span>Official merch</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        More
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="contact.html">
+                            <span>
+                                <i class="fa fa-fw fa-envelope"></i>
+                                <span>Contact us</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="legal.html">
+                            <span>
+                                <i class="fa fa-fw fa-balance-scale"></i>
+                                <span>Terms of service</span>
+                            </span>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="navbar-end is-hidden-touch">
+            <a class="navbar-item" href="https://twitter.com/DuinoCoin/">
+                <i class="fab fa-lg fa-twitter"></i>
+            </a>
+            <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
+                <i class="fab fa-lg fa-reddit"></i>
+            </a>
+            <a class="navbar-item" href="https://discord.gg/kvBkccy">
+                <i class="fab fa-lg fa-discord"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
+                <i class="fab fa-lg fa-github"></i>
+            </a>
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-primary" href="getting-started.html">
+                        <strong>Get started</strong>
+                    </a>
+                </div>
+            </div>
+        </div>
     </nav>
-    <br>
-    <div class="container">
-        <p class="title is-size-1" align="center">
-            <i class="fa fa-lightbulb" style="color:#ED4C67;"></i>
-            Verified apps and projects
-        </p>
-        <p class="subtitle is-size-5" align="center">
-            Made by the Duino-Coin community
-        </p>
-        <br>
-        <div class="columns is-multiline">
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/duinostats.png" class="appicon" alt="Duino-Stats Discord Bot"></img> Duino-Stats
-                        </p>
-                        <p class="subtitle">
-                            Official Discord bot made by <b><a href="https://github.com/bilaboz">Bilaboz</a></b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://github.com/Bilaboz/duino-stats">View on GitHub</a>
-                            </span>
-                        </p>
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://discord.gg/duinocoin">Join our Discord</a>
-                            </span>
-                        </p>
-                    </footer>
+    <section class="section">
+        <div class="container">
+            <div class="hero">
+                <div class="hero-body mt-nav">
+                    <p class="title">
+                        Looking for verified Duino apps?
+                    </p>
+                    <p class="subtitle">
+                        Here you can find approved Duino-Coin related apps and faucets created by the community.
+                    </p>
                 </div>
             </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/duinostatsmini.png" class="appicon" alt="Duino-Stats Mini Discord Bot"></img> Duino-Stats Mini
-                        </p>
-                        <p class="subtitle">
-                            Official public Discord bot made by <b><a href="https://github.com/primitt">primitt</a></b> and <b><a href="https://github.com/revoxhere">revox</a></b>
-                        </p>
+            <div class="columns is-multiline">
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/duinostats.png">
+                                    </span>
+                                </span>
+                                <span>Duino Stats</span>
+                            </p>
+                            <p class="subtitle">
+                                The original, official Discord bot made by
+                                <strong><a href="https://github.com/bilaboz">Bilaboz</a></strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://github.com/Bilaboz/duino-stats">View on GitHub</a>
+                                </span>
+                            </p>
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://discord.gg/duinocoin">Join our Discord</a>
+                                </span>
+                            </p>
+                        </footer>
                     </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://github.com/primitt/duino-stats-mini">View on GitHub</a>
-                            </span>
-                        </p>
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://github.com/primitt/duino-stats-mini/">Invite to your server</a>
-                            </span>
-                        </p>
-                    </footer>
                 </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/duco.png" class="appicon" alt="Duino-Coin Faucet"></img> Duino-Coin Faucet
-                        </p>
-                        <p class="subtitle">
-                            The official Duino-Coin Faucet made by <b><a href="https://kk.dev">Beyondtoshi</a></b><br/>
-                            <span style="position: relative; top: 5px; font-size: 16px;"><b>Note:</b> each account can only claim once!</span>
-                        </p>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/duinostatsmini.png">
+                                    </span>
+                                </span>
+                                <span>Duino Stats Mini</span>
+                            </p>
+                            <p class="subtitle">
+                                Official public Discord bot made by <strong><a href="https://github.com/primitt">primitt</a></strong> and <strong><a href="https://github.com/revoxhere">revox</a></strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://github.com/primitt/duino-stats-mini">View on GitHub</a>
+                                </span>
+                            </p>
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://github.com/primitt/duino-stats-mini/">Invite to your server</a>
+                                </span>
+                            </p>
+                        </footer>
                     </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://faucet.duinocoin.com">Visit the Duino-Coin Faucet</a>
-                            </span>
-                        </p>
-                    </footer>
                 </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/furimfaucet.png" class="appicon" alt="Furim's Duinocoin Faucet & Raffle"></img> Furim's Faucet & Raffle
-                        </p>
-                        <p class="subtitle">
-                            Duino-Coin Faucet and Raffle game made by <b><a href="https://github.com/Furim">Furim</a></b>
-                        </p>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title icon-text is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/furimfaucet.png">
+                                    </span>
+                                </span>
+                                <span>Furim's services</span>
+                            </p>
+                            <p class="subtitle">
+                                Cloud, faucet and raffle game made by <strong><a href="https://github.com/Furim">Furim</a></strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://furim.xyz">Visit Furim's services</a>
+                                </span>
+                            </p>
+                        </footer>
                     </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://faucet.furim.xyz">Visit Furim's Faucet</a>
-                            </span>
-                        </p>
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://raffle.furim.xyz">Visit Furim's Raffle</a>
-                            </span>
-                        </p>
-                    </footer>
                 </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            🏆 Duino Tracker
-                        </p>
-                        <p class="subtitle">
-                            Duino-Coin account statistics tracker made by <b>Mockingbird</b>
-                        </p>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span>🏆 Duino Tracker</span>
+                            </p>
+                            <p class="subtitle">
+                                Account statistics tracker made by <strong>Mockingbird</strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://duinotracker.com">
+                                        Visit Duino Tracker
+                                    </a>
+                                </span>
+                            </p>
+                        </footer>
                     </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://duinotracker.com">
-                                    Visit the Duino Tracker
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/ducodashboard.png">
+                                    </span>
+                                </span>
+                                <span>Lukas' Dashboard</span>
+                            </p>
+                            <p class="subtitle">
+                                Mining dashboard and problem troubleshooter made by <strong><a href="https://github.com/lulaschkas">Lukas</a></strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://duco.sytes.net/">
+                                        Visit Lukas' Dashboard
+                                    </a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/androidapp.png">
+                                    </span>
+                                </span>
+                                <span>Android wallet</span>
+                            </p>
+                            <p class="subtitle">
+                                Official Android wallet made by <strong>Pripun</strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://play.google.com/store/apps/details?id=com.pripun.duinocoin">
+                                        View on Google Play
+                                    </a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/companion.png">
+                                    </span>
+                                </span>
+                                <span>Duino-Coin Companion</span>
+                            </p>
+                            <p class="subtitle">
+                                Duino dashboard for Android made by <strong>ProtoThis</strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://play.google.com/store/apps/details?id=com.protothis.duinocoin">
+                                        View on Google Play
+                                    </a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/ducopanel.png">
+                                    </span>
+                                </span>
+                                <span>DUCO Panel</span>
+                            </p>
+                            <p class="subtitle">
+                                Unification of all tools & docs in a single desktop app made by <strong>Zafra</strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://github.com/ponsato/ducopanel">View on GitHub</a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span>⛏ DuinoCraft</span>
+                            </p>
+                            <p class="subtitle">
+                                Minecraft (Java 1.16+) server ran by <strong>Johnny B.</strong> with Duino-Coin as in-game currency
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    Join <strong>play.duinocraft.com</strong>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/node-s.png">
+                                    </span>
+                                </span>
+                                <span>Node-S exchange</span>
+                            </p>
+                            <p class="subtitle">
+                                Duino to PayPal and Monero exchange made by <strong><a href="https://github.com/connorhess">Connor2</a></strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="http://www.node-s.co.za/duco_exchange/home">Visit Node-S</a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/dcw.png">
+                                    </span>
+                                </span>
+                                <span>DuCoWallet</span>
+                            </p>
+                            <p class="subtitle">
+                                "Yet another wallet for DuinoCoin!" made by <strong>Viktor</strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://github.com/viktor02/DuCoWallet">View on GitHub</a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/avrmonitor.png">
+                                    </span>
+                                </span>
+                                <span>Duino AVR Monitor</span>
+                            </p>
+                            <p class="subtitle">
+                                GUI Windows App for monitoring AVR devices mining DUCO by <strong>niknak</strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://www.microsoft.com/store/apps/9NJ7HPFSR9V5">
+                                        View on Microsoft Store
+                                    </a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <i class="fab fa-telegram" style="color: #0088CC;"></i> 
+                                    </span>
+                                </span>
+                                <span>Telegram Bot</span>
+                            </p>
+                            <p class="subtitle">
+                                Automatic Duino-Coin reports to your Telegram chat. Made by <strong>yosefhuang1</strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://github.com/yosefhuang1/duco_telegram_bot">
+                                        View on GitHub
+                                    </a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/duinocoinwallet.png"> 
+                                    </span>
+                                </span>
+                                <span>Wallet extension</span>
+                            </p>
+                            <p class="subtitle">
+                                Browser extension for viewing the web wallet. Created by <strong><a href="https://github.com/Mcorial">MyEcoria</a></strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://github.com/Mcorial/DuinoCoin-Wallet-extension">
+                                        View on GitHub
+                                    </a>
+                                </span>
+                            </p>
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://microsoftedge.microsoft.com/addons/detail/duinocoin-wallet/ippiokklhjjdlmmonmjimgbgnnllcleg">Microsoft Store</a>
+                                </span>
+                            </p>
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://addons.mozilla.org/en-US/firefox/addon/duinocoin-wallet/">Mozilla Store</a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title icon-text is-size-3">
+                                <span class="icon is-medium">
+                                    <i class="fa fa-faucet has-text-primary"></i>
+                                </span>
+                                <span>Duino-Coin Faucet</span>
+                            </p>
+                            <p class="subtitle">
+                                The official Duino-Coin Faucet made by <strong><a href="https://kristian-kramer.com">Beyondtoshi</a></strong><br>
+                                <small><strong>Note:</strong> each account can only claim once!</small>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://faucet.duinocoin.com">Visit the Duino-Coin Faucet</a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/furimfaucet.png">
+                                    </span>
+                                </span>
+                                <span>Furim's Faucet</span>
+                            </p>
+                            <p class="subtitle">
+                                Duino-Coin Faucet made by <strong><a href="https://github.com/Furim">Furim</a></strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://faucet.furim.xyz">Visit Furim's Faucet</a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/amogusfaucet.png">
+                                    </span>
+                                </span>
+                                <span>Amogus Faucet</span>
+                            </p>
+                            <p class="subtitle">
+                                Duino-Coin Faucet made by <strong>Ajdasz</strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="https://duco-faucet.pcgeek.pl">Visit Amogus Faucet</a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span class="icon-text">
+                                    <span class="icon is-medium">
+                                        <img src="assets/icons/app/duinocoinwallet.png">
+                                    </span>
+                                </span>
+                                <span>MyEcoria's Faucet</span>
+                            </p>
+                            <p class="subtitle">
+                                Duino-Coin Faucet made by <strong><a href="https://github.com/Mcorial">MyEcoria</a></strong>
+                            </p>
+                        </div>
+                        <footer class="card-footer">
+                            <p class="card-footer-item">
+                                <span>
+                                    <a href="http://s.ddns.net/duinofaucet/">Visit MyEcoria's Faucet</a>
+                                </span>
+                            </p>
+                        </footer>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title is-size-3">
+                                <span>❓ Your app here</span>
+                            </p>
+                            <p class="subtitle">
+                                <a href="contact.html">
+                                    Contact us
                                 </a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/ducodashboard.png" class="appicon" alt="Duinocoin Mining Dashboard"></img> Lukas' Dashboard
-                        </p>
-                        <p class="subtitle">
-                            Duino-Coin mining dashboard made by <b><a href="https://github.com/lulaschkas">Lukas</a></b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://duco.sytes.net/">
-                                    Visit Lukas' Dashboard
-                                </a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/androidapp.png" class="appicon" alt="Duino-Coin Android App"></img> Duino-Coin Android App
-                        </p>
-                        <p class="subtitle">
-                            Official Duino-Coin Android Wallet & Dashboard made by <b>Pripun</b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://play.google.com/store/apps/details?id=com.pripun.duinocoin">
-                                    View on Google Play
-                                </a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/ducopanel.png" class="appicon" alt="DUCO Panel"></img> DUCO Panel
-                        </p>
-                        <p class="subtitle">
-                            Unification of all tools & docs in a single desktop app made by <b>Zafra</b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://github.com/ponsato/ducopanel">View on GitHub</a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            ⛏ Minecraft Server (DuinoCraft)
-                        </p>
-                        <p class="subtitle">
-                            Minecraft (Java 1.16+) server ran by <b>Johnny</b> with Duino-Coin as in-game currency
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                Join <b>play.duinocraft.com</b>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/node-s.png" class="appicon" alt="Node-S Duinocoin Exchange"></img> Node-S DUCO Exchange
-                        </p>
-                        <p class="subtitle">
-                            Duino-Coin to PayPal and Monero exchange made by <b><a href="https://github.com/connorhess">Connor2</a></b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="http://www.node-s.co.za/duco_exchange/home">Visit the Node-S Exchange</a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/dcw.png" class="appicon" alt="DuCoWallet"></img> DuCoWallet
-                        </p>
-                        <p class="subtitle">
-                            "Yet another wallet for DuinoCoin!" made by <b>Viktor</b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://github.com/viktor02/DuCoWallet">View on GitHub</a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/avrmonitor.png" class="appicon" alt="Duino AVR Monitor"></img> Duino AVR Monitor
-                        </p>
-                        <p class="subtitle">
-                            GUI Windows App for monitoring AVR devices mining DUCO by <b>niknak</b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://www.microsoft.com/store/apps/9NJ7HPFSR9V5">
-                                    View on Microsoft Store
-                                </a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <i class="fab fa-telegram" style="color: #0088CC;"></i> DuinoCoin Telegram Bot
-                        </p>
-                        <p class="subtitle">
-                            Made by <b>yosefhuang1</b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://github.com/yosefhuang1/duco_telegram_bot">
-                                    View on GitHub
-                                </a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/duinocoinwallet.png" class="appicon" alt="DuinoCoin Wallet"></img> DuinoCoin Wallet Extension
-                        </p>
-                        <p class="subtitle">
-                            It is a browser extension that allows you to view all your portfolio information with one click. Created by <b><a href="https://github.com/Mcorial">MyEcoria</a></b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://github.com/Mcorial/DuinoCoin-Wallet-extension">
-                                    View on GitHub
-                                </a>
-                            </span>
-                        </p>
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://microsoftedge.microsoft.com/addons/detail/duinocoin-wallet/ippiokklhjjdlmmonmjimgbgnnllcleg">Microsoft store</a>
-                            </span>
-                        </p>
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://addons.mozilla.org/en-US/firefox/addon/duinocoin-wallet/">Mozilla store</a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            ❓ Your app here
-                        </p>
-                        <p class="subtitle">
-                            <a href="contact.html">
-                                Contact us
-                            </a>
-                            to add your Duino-related app here
-                        </p>
+                                to add your Duino-related app here
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
+            <p class="title has-text-centered mt-5">
+                Full list of Duino-related apps and miners can be found on
+                <a href="https://github.com/revoxhere/duino-coin#community-made-softwares">GitHub</a>
+            </p>
         </div>
-        <br>
-    </div>
-    <hr />
-    <div class="container">
-        <p class="title is-size-1" align="center">
-            <span class="icon"><i class="fa fa-faucet" style="color:#ED4C67;"></i></span>
-            &nbsp;Verified faucets
-        </p>
-        <p class="subtitle is-size-5" align="center">
-            Made by the Duino-Coin community
-        </p>
-        <br>
-        <div class="columns is-multiline">
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/duco.png" class="appicon" alt="Duinocoin Faucet"></img> Duino-Coin Faucet
-                        </p>
-                        <p class="subtitle">
-                            The official Duino-Coin Faucet made by <b><a href="https://kk.dev">Beyondtoshi</a></b><br/>
-                            <span style="position: relative; top: 5px; font-size: 16px;"><b>Note:</b> each account can only claim once!</span>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://faucet.duinocoin.com">Visit the Duino-Coin Faucet</a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/furimfaucet.png" class="appicon" alt="Furim's Duinocoin Faucet & Raffle"></img> Furim's Faucet
-                        </p>
-                        <p class="subtitle">
-                            Duino-Coin Faucet made by <b><a href="https://github.com/Furim">Furim</a></b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://faucet.furim.xyz">Visit Furim's Faucet</a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/amogusfaucet.png" class="appicon" alt="Duinocoin Amogus Faucet"></img> Amogus Faucet
-                        </p>
-                        <p class="subtitle">
-                            Duino-Coin Faucet made by <b>Ajdasz</b>
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="https://duco-faucet.pcgeek.pl">Visit the Amogus Faucet</a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            <img src="assets/icons/app/duinocoinwallet.png" class="appicon" alt="MyEcoria's Faucet"></img> MyEcoria's Faucet
-                        </p>
-                        <p class="subtitle">
-                            A duinocoin faucet created by <b><a href="https://github.com/Mcorial">MyEcoria</a></b> which offers you the opportunity to discover the world of crypto
-                        </p>
-                    </div>
-                    <footer class="card-footer">
-                        <p class="card-footer-item">
-                            <span>
-                                <a href="http://s.ddns.net/">Visit MyEcoria's Faucet</a>
-                            </span>
-                        </p>
-                    </footer>
-                </div>
-            </div>
-            <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">
-                            ❓ Your faucet here
-                        </p>
-                        <p class="subtitle">
-                            <a href="contact.html">
-                                Contact us
-                            </a>
-                            to add your Duino faucet here
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <br>
+    </section>
+    <br><br><br><br><br>
     </div>
     <!-- FOOTER -->
     <footer class="footer">
         <div class="content has-text-centered">
             <p>
-                <strong>Duino-Coin Website</strong> (v3) by <a href="https://github.com/revoxhere">Robert "revox" Piotrowski </a> from <b>Duino team</b> 2019-2022
-                <br>Hosted by <a href="https://kk.dev">Kristian "Tech1k" Kramer</a>
-                <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a><br>
-                <a href="https://bulma.io">
-                    <img src="assets/images/made-with-bulma.png" alt="Made with Bulma" width="188" height="84">
-                </a>
-                <br/>
-                <a href="https://duinocoin.com/legal">ToS & Privacy Policy</a>
-                <br/>
-                <a href="https://status.duinocoin.com/">Status</a>
+                <strong>Duino-Coin</strong> by <a href="https://revoxhere.github.io">Robert "revox" Piotrowski </a> from the <strong>Duino team</strong> 2019-2022
+                <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a>
             </p>
         </div>
     </footer>
 </body>
-
-</html>
 <script>
-let pageloader = document.getElementById("pageloader"); // PAGE LOAGER
-pageloader.setAttribute('class', "pageloader is-active is-primary is-bottom-to-top"); // Before page is loaded
-window.addEventListener('load', function() {
-    pageloader.setAttribute('class', "pageloader is-primary is-bottom-to-top"); // After page is loaded
+const pageloader = document.getElementById('loader');
+bodymovin.loadAnimation({
+    wrapper: pageloader,
+    animType: 'svg',
+    autoplay: true,
+    loop: true,
+    path: 'assets/animations/loader.json'
 });
 
-document.addEventListener('DOMContentLoaded', () => { // HAMBURGER MENU
+function copy(text) {
+    navigator.clipboard.writeText(text);
+}
+
+/* On page loaded */
+$(window).on('load', function() {
     const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
     if ($navbarBurgers.length > 0) {
-        $navbarBurgers.forEach(el => { // Add a click event on each of burger menus
+        $navbarBurgers.forEach(el => {
             el.addEventListener('click', () => {
-                const target = el.dataset.target; // Get the target from the "data-target" attribute
+                const target = el.dataset.target;
                 const $target = document.getElementById(target);
-                el.classList.toggle('is-active'); // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                el.classList.toggle('is-active');
                 $target.classList.toggle('is-active');
             });
         });
     }
+
+    $("#pageloader").fadeOut();
 });
 </script>
+
+</html>

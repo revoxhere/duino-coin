@@ -4,505 +4,704 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Duino-Coin | Our Team</title>
-    <link rel="icon" href="assets/icons/duco.svg" type="image/png" />
-    <link rel="shortcut icon" href="assets/icons/duco.svg" type="image/png" />
-    <meta name="description" content="Contact to Duino-Coin developers - coin that can be mined with almost everything.">
-    <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency, bitcoin">
-    <link rel="canonical" href="https://duinocoin.com/team" />
+    <link rel="canonical" href="https://duinocoin.com" />
     <meta name="robots" content="index, follow">
+    <!-- Favicons -->
     <meta name="theme-color" content="#EE5A24">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/favicons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicons/favicon-16x16.png">
-    <link rel="shortcut icon" href="/assets/icons/favicons/favicon.ico">
     <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="msapplication-config" content="/assets/icons/favicons/browserconfig.xml">
-    <link rel="manifest" href="manifest.json">
-    <meta property="og:site_name" content="Duino-Coin" />
-    <meta property="og:site" content="https://duinocoin.com" />
-    <meta property="og:title" content="Duino-Coin | Our Team" />
-    <meta property="og:description" content="Contact with Duino-Coin developers - coin that can be mined with almost everything." />
-    <meta property="og:image" content="https://duinocoin.com/assets/icons/duco.png" />
-    <meta property="og:url" content="https://duinocoin.com/team" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:title" content="Duino-Coin | Our Team">
-    <meta name="twitter:description" content="Contact to Duino-Coin developers - coin that can be mined with almost everything.">
-    <meta name="twitter:image" content="https://duinocoin.com/assets/icons/duco.png">
-    <meta name="twitter:site" content="@DuinoCoin">
-    <meta name="twitter:creator" content="@DuinoCoin">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma-pageloader.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma-prefers-dark.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png?v=2">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png?v=2">
+    <link rel="manifest" href="favicons/site.webmanifest?v=2">
+    <link rel="mask-icon" href="favicons/safari-pinned-tab.svg?v=2" color="#5bbad5">
+    <link rel="shortcut icon" href="favicons/favicon.ico?v=2">
+    <!-- Primary Meta Tags -->
+    <title>Meet the Duino-Coin Team</title>
+    <meta name="title" content="Meet the Duino-Coin Team">
+    <meta name="description" content="See who's working behind the scenes of Duino-Coin.">
+    <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency, team">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://duinocoin.com/">
+    <meta property="og:title" content="Meet the Duino-Coin Team">
+    <meta property="og:description" content="See who's working behind the scenes of Duino-Coin.">
+    <meta property="og:image" content="/backgrounds/team.png">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://duinocoin.com/">
+    <meta property="twitter:title" content="Meet the Duino-Coin Team">
+    <meta property="twitter:description" content="See who's working behind the scenes of Duino-Coin.">
+    <!-- CSS -->
+    <link rel="preload" href="assets/css/mystyles.css" as="style">
+    <link rel="stylesheet" type="text/css" href="assets/css/mystyles.css">
+    <!-- Jquery and FA -->
+    <link rel="preload" href="assets/js/all.min.js" as="script">
     <script src="assets/js/all.min.js"></script>
+    <link rel="preload" href="assets/js/jquery.min.js" as="script">
     <script src="assets/js/jquery.min.js"></script>
+    <!-- Others -->
+    <link rel="preload" href="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69" as="script">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69"></script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'UA-142187073-69');
-    </script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js" as="script">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js"></script>
     <style>
-    .is-primary {
-        /* Override Bulmas primary color to Duco-Colored gradient*/
-        background: linear-gradient(160deg, #e74c3c, #f39c12) !important;
-        border: none;
+    a>figure {
+        transition: 0.2s all;
     }
 
-    .gradienttext {
-        /* Gradient text */
-        background: -webkit-linear-gradient(160deg, #EA2027, #EE5A24) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        color: #EA2027 !important;
+    a>figure:hover {
+        transform: scale(1.1);
     }
 
-    .grid-list {
-        /* Split unordered lists */
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+    .navbar-item:hover {
+        color: #ff9f43;
     }
 
-    /* Scroll bar */
-    * {
-        scrollbar-width: thin;
-        scrollbar-color: whitesmoke rgba(255, 168, 16, 1);
+    .button:hover {
+        transform: scale(1.1);
     }
 
-    *::-webkit-scrollbar {
-        width: 7px;
+    #wavecontainer {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center
     }
 
-    *::-webkit-scrollbar-track {
-        background: transparent;
+    #waveduco {
+        height: 12rem;
+        color: white;
+        z-index: 1;
+        position: absolute;
+        display: table;
+        margin: 0 auto;
+        animation: scale 2.73s ease-in-out infinite;
     }
 
-    *::-webkit-scrollbar-thumb {
-        background-color: rgba(255, 168, 16, 1);
-        border-radius: 20px;
+    #devices {
+        transition: opacity 0.5s;
+    }
+
+    .hide {
+        opacity: 0 !important;
+    }
+
+    @keyframes scale {
+        0% {
+            transform: scale(1.3);
+        }
+
+        30% {
+            transform: scale(0.9);
+        }
+
+        85% {
+            transform: scale(1.3);
+        }
+
+        100% {
+            transform: scale(1.3);
+        }
     }
     </style>
 </head>
 
 <body>
-    <div id="pageloader" class="pageloader is-active is-primary is-bottom-to-top">
-        <span class="title">Duino-Coin Our Team</span>
+    <div id="pageloader">
+        <div id="loader"></div>
     </div>
     <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-            <a class="navbar-item" href="/">
-                <img src="assets/icons/duco.svg" height="172">
-                &nbsp;Home
+            <a class="navbar-item is-active" href="/">
+                <img src="assets/icons/duino.png" height="172">
             </a>
-            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarDuinoCoin">
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar">
                 <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
             </a>
         </div>
-        <div id="navbarDuinoCoin" class="navbar-menu">
+        <div id="navbar" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
-                    <i class="fas fa-book" style="color:#f6b93b;"></i>&nbsp;Whitepaper
-                </a>
                 <a class="navbar-item" href="https://explorer.duinocoin.com">
-                    <i class="fas fa-poll" style="color:#ff9f43;"></i>&nbsp;Network
+                    Network stats & explorer
                 </a>
-                <a class="navbar-item" href="donate.html">
-                    <i class="fas fa-heart" style="color:#ee5253;"></i>&nbsp;Donate
-                </a>
-                <a class="navbar-item" href="team.html">
-                    <i class="fas fa-user" style="color:#eb2f06;"></i>&nbsp;Our Team
-                </a>
-                <a class="navbar-item" href="apps.html">
-                    <i class="fas fa-lightbulb" style="color:#ED4C67;"></i>&nbsp;Apps
-                </a>
-                <a class="navbar-item" href="contact.html">
-                    <i class="fas fa-envelope" style="color:#B53471;"></i>&nbsp;Contact Us
-                </a>
-            </div>
-            <div class="navbar-end">
-                <a class="navbar-item" href="https://twitter.com/DuinoCoin/">
-                    <i class="fab fa-lg fa-twitter"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
-                    <i class="fab fa-lg fa-reddit"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://discord.gg/kvBkccy">
-                    <i class="fab fa-lg fa-discord"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
-                    <i class="fab fa-lg fa-github"></i></a></li>
-                </a>
-                <div class="navbar-item">
-                    <div class="buttons">
-                        <a class="button is-primary" href="getting-started.html">
-                            <strong>Get started</strong>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        Resources
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
+                            <span>
+                                <i class="fa fa-fw fa-book"></i>
+                                <span>Whitepaper</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/tree/useful-tools#branding">
+                            <span>
+                                <i class="fa fa-fw fa-brush"></i>
+                                <span>Branding</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/tree/useful-tools">
+                            <span>
+                                <i class="fa fa-fw fa-code"></i>
+                                <span>API docs
+                                </span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="apps.html">
+                            <span>
+                                <i class="fa fa-fw fa-check"></i>
+                                <span>Apps and faucets</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        Duino team
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="team.html">
+                            <span>
+                                <i class="fa fa-fw fa-users"></i>
+                                <span>Meet our team</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="donate.html">
+                            <span>
+                                <i class="fa fa-fw fa-heart"></i>
+                                <span>Donate</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://store.duinocoin.com">
+                            <span>
+                                <i class="fa fa-fw fa-tshirt"></i>
+                                <span>Official merch</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        More
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="contact.html">
+                            <span>
+                                <i class="fa fa-fw fa-envelope"></i>
+                                <span>Contact us</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="legal.html">
+                            <span>
+                                <i class="fa fa-fw fa-balance-scale"></i>
+                                <span>Terms of service</span>
+                            </span>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="navbar-end is-hidden-touch">
+            <a class="navbar-item" href="https://twitter.com/DuinoCoin/">
+                <i class="fab fa-lg fa-twitter"></i>
+            </a>
+            <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
+                <i class="fab fa-lg fa-reddit"></i>
+            </a>
+            <a class="navbar-item" href="https://discord.gg/kvBkccy">
+                <i class="fab fa-lg fa-discord"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
+                <i class="fab fa-lg fa-github"></i>
+            </a>
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-primary" href="getting-started.html">
+                        <strong>Get started</strong>
+                    </a>
+                </div>
+            </div>
+        </div>
     </nav>
-    <br>
-    <div class="container">
-        <p class="title is-size-1" align="center">
-            <i class="fa fa-at" style="color:#0984e3;"></i>
-            Get in touch with our team
-        </p>
-        <div class="columns">
-            <div class="column is-one-quarter"></div>
-            <div class="column is-one-quarter">
-                <p class="subtitle is-size-5 is-hidden-desktop" align="center">
-                    The best way to speak with the community and developers is to join our <a href="https://discord.gg/kvBkccy">Discord server</a>.<br>
-                    <span class="subtitle is-size-6 is-hidden-desktop">
-                        In it, you'll find occasional giveaways, be notified of latest announcements<br>
-                        and you'll also be able to earn bot coins and convert them to DUCO by just chatting.
-                    </span>
-                </p>
-                <div class="column is-one-quarter is-hidden-desktop">
-                    <div class="container" align="center">
-                        <iframe src="https://discordapp.com/widget?id=677615191793467402&theme=dark" height="350" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+    <section class="section">
+        <div class="container">
+            <div class="hero">
+                <div class="hero-body mt-nav">
+                    <p class="title">
+                        Duino-Coin is a project created by a team of young, ambitious developers
+                    </p>
+                    <p class="subtitle">
+                        Here you can meet us and get contact info if you need to reach out to us 😊
+                    </p>
+                </div>
+            </div>
+            <div class="columns is-multiline is-vcentered">
+                <div class="column is-full">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-128x128">
+                                    <img class="is-rounded" src="assets/images/revox.jpg">
+                                </figure>
+                            </div>
+                            <div class="column is-one-fifth">
+                                <span class="subtitle is-size-6 has-text-success">
+                                    LEAD DEV | <b>FOUNDER</b>
+                                </span><br>
+                                <span class="title">
+                                    revox
+                                </span><br>
+                                <span class="subtitle">
+                                    Robert Piotrowski<br>
+                                    17, Poland
+                                </span>
+                                <div class="subtitle">
+                                    <a href="https://revoxhere.github.io">
+                                        <i class="fa fa-globe"></i>
+                                    </a>
+                                    <a href="mailto:robik123.345@gmail.com">
+                                        <i class="fa fa-at"></i>
+                                    </a>
+                                    <a href="https://github.com/revoxhere">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://www.youtube.com/channel/UCgqCK9yt-ajwi4XBu4-jIvA">
+                                        <i class="fab fa-youtube"></i>
+                                    </a>
+                                    <a href="https://www.reddit.com/user/reVox96">
+                                        <i class="fab fa-reddit"></i>
+                                    </a>
+                                    <a href="https://steamcommunity.com/id/revoxxxhere">
+                                        <i class="fab fa-steam"></i>
+                                    </a>
+                                    <a href="https://twitter.com/revox_here">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    <a href="https://www.instagram.com/revox.here">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle">
+                                    Electronics and IT enthusiast studying as an electronics technician. Started journey with crypto in 2018 with
+                                    <a href="https://magi.duinocoin.com">Coin Magi</a>, which he mined on a Raspberry Pi 3.
+                                    Created Duino-Coin in 2019 as a response to his friend's question: <i>"can I mine anything with Atmega chips?"</i>. Designer, developer and sysadmin - all in one.
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="column is-one-quarter"></div>
                 </div>
-                <p class="subtitle is-size-5 is-hidden-touch" align="right">
-                    The best way to speak with the community and developers is to join our <a href="https://discord.gg/kvBkccy">Discord server</a>.<br>
-                    <span class="subtitle is-size-6 is-hidden-touch">
-                        In it, you'll find occasional giveaways, be notified of latest announcements<br>
-                        and you'll also be able to earn bot coins and convert them to DUCO by just chatting.
-                    </span>
-                </p>
-            </div>
-            <div class="column is-one-quarter is-hidden-touch">
-                <div class="container" align="left">
-                    <iframe src="https://discordapp.com/widget?id=677615191793467402&theme=dark" height="350" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+                <div class="column is-half">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-128x128">
+                                    <img class="is-rounded" src="assets/images/yennefer.png">
+                                </figure>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="subtitle is-size-6" style="color:#8e44ad">
+                                    LEAD SOCIAL MANAGER
+                                </span><br>
+                                <span class="title">
+                                    Yennefer
+                                </span><br>
+                                <span class="subtitle">
+                                    18, Poland
+                                </span>
+                                <div class="subtitle">
+                                    <a href="https://www.youtube.com/channel/UCGiSfYN6VcqH7ZCAk6JPXmw">
+                                        <i class="fab fa-youtube"></i>
+                                    </a>
+                                    <a href="https://twitter.com/ushld">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    <a href="https://www.instagram.com/vlegle">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle">
+                                    Fast-learning IT student. Taking care of the community-related DUCO stuff since 2020.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-half">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-128x128">
+                                    <img class="is-rounded" src="assets/images/bilaboz.png">
+                                </figure>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="subtitle is-size-6">
+                                    LEAD DEV
+                                </span><br>
+                                <span class="title">
+                                    Bilaboz
+                                </span><br>
+                                <span class="subtitle">
+                                    18, France
+                                </span>
+                                <div class="subtitle">
+                                    <a href="mailto:bilaboz@protonmail.com">
+                                        <i class="fa fa-at"></i>
+                                    </a>
+                                    <a href="https://github.com/Bilaboz">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://steamcommunity.com/id/bilaboz">
+                                        <i class="fab fa-steam"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle">
+                                    Talented back-end developer focused on pool softwares, official Discord bots development and taking care of the servers. Joined in early 2020.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-half">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-128x128">
+                                    <img class="is-rounded" src="assets/images/joybed.png">
+                                </figure>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="subtitle is-size-6">
+                                    LEAD DEV
+                                </span><br>
+                                <span class="title">
+                                    JoyBed
+                                </span><br>
+                                <span class="subtitle">
+                                    Oliver Szabó<br>
+                                    23, Slovakia
+                                </span>
+                                <div class="subtitle">
+                                    <a href="mailto:16oliver16@gmail.com">
+                                        <i class="fa fa-at"></i>
+                                    </a>
+                                    <a href="https://www.youtube.com/channel/UC_znWokaiIwHf6UUMUZDMVA">
+                                        <i class="fab fa-youtube"></i>
+                                    </a>
+                                    <a href="https://github.com/JoyBed">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://forums.macrumors.com/members/.1180937/">
+                                        <i class="fab fa-apple"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle">
+                                    Electrical engineer, car enthusiast, AVR developer, PowerPC lover and chicken breeder. Part of Duino team since 2020.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-half">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-128x128">
+                                    <img class="is-rounded" src="assets/images/connor.png">
+                                </figure>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="subtitle is-size-6">
+                                    LEAD DEV
+                                </span><br>
+                                <span class="title">
+                                    Connor2
+                                </span><br>
+                                <span class="subtitle">
+                                    Connor Hess<br>
+                                    17, South Africa
+                                </span>
+                                <div class="subtitle">
+                                    <a href="http://www.node-s.co.za">
+                                        <i class="fa fa-globe"></i>
+                                    </a>
+                                    <a href="https://www.youtube.com/channel/UC5kWU6rUYbNUPpyGAEyfrgg">
+                                        <i class="fab fa-youtube"></i>
+                                    </a>
+                                    <a href="https://github.com/connorhess">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://twitter.com/connor_cmc">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle">
+                                    Node-S owner and experienced Python developer. Helping Duino since 2020.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-64x64">
+                                    <img class="is-rounded" src="assets/images/yanis.png">
+                                </figure>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="title is-size-5">
+                                    yanis
+                                </span><br>
+                                <span class="subtitle is-size-6">
+                                    France
+                                </span>
+                                <div class="subtitle is-size-6">
+                                    <a href="https://www.youtube.com/channel/UCt4bGpFCNFnz6-KzYsgmoiA">
+                                        <i class="fab fa-youtube"></i>
+                                    </a>
+                                    <a href="https://github.com/ygboucherk">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://www.instagram.com/ygboucherk">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle is-size-6">
+                                    Tokenized DUCO chains maintainer.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-64x64">
+                                    <img class="is-rounded" src="assets/images/tech1k.png">
+                                </figure>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="title is-size-5">
+                                    Kristian
+                                </span><br>
+                                <span class="subtitle is-size-6">
+                                    16, USA
+                                </span>
+                                <div class="subtitle is-size-6">
+                                    <a href="https://kristian-kramer.com">
+                                        <i class="fa fa-globe"></i>
+                                    </a>
+                                    <a href="https://github.com/tech1k">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://linkedin.com/in/kristian-kramer">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    <a href="https://twitter.com/kristianjkramer">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    <a href="https://t.me/beyondtoshi">
+                                        <i class="fab fa-telegram"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle is-size-6">
+                                    Lead Duino webmaster.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-64x64">
+                                    <img class="is-rounded" src="assets/images/joaquin.png">
+                                </figure>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="title is-size-5">
+                                    joaquinbw
+                                </span><br>
+                                <span class="subtitle is-size-6">
+                                    Peru
+                                </span>
+                                <div class="subtitle is-size-6">
+                                    <a href="https://github.com/joaquinbvw">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://linkedin.com/in/joaquinbvw">
+                                        <i class="fab fa-linkedin"></i>
+                                    </a>
+                                    <a href="https://discordapp.com/users/908352544240177162">
+                                        <i class="fab fa-discord"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle is-size-6">
+                                    Duino AVR developer.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-64x64">
+                                    <img class="is-rounded" src="assets/images/pripun.png">
+                                </figure>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="title is-size-5">
+                                    Pripun
+                                </span><br>
+                                <div class="subtitle is-size-6">
+                                    <a href="https://github.com/Pripun">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://discordapp.com/users/816723125814427668">
+                                        <i class="fab fa-discord"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle is-size-6">
+                                    Android developer.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-64x64">
+                                    <img class="is-rounded" src="assets/images/lukas.png">
+                                </figure>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="title is-size-5">
+                                    Lulaschkas
+                                </span><br>
+                                <div class="subtitle is-size-6">
+                                    <a href="https://duco.sytes.net">
+                                        <i class="fa fa-globe"></i>
+                                    </a>
+                                    <a href="https://github.com/Lulaschkas">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://discordapp.com/users/664792860188475398">
+                                        <i class="fab fa-discord"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle is-size-6">
+                                    Dashboard and utility developer.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-one-third">
+                    <div class="box">
+                        <div class="columns is-vcentered">
+                            <div class="column is-narrow">
+                                <figure class="image is-64x64">
+                                    <img class="is-rounded" src="assets/images/furim.png">
+                                </figure>
+                            </div>
+                            <div class="column is-narrow">
+                                <span class="title is-size-5">
+                                    Furim
+                                </span><br>
+                                <div class="subtitle is-size-6">
+                                    <a href="https://about.furim.xyz">
+                                        <i class="fa fa-globe"></i>
+                                    </a>
+                                    <a href="https://github.com/furim">
+                                        <i class="fab fa-github"></i>
+                                    </a>
+                                    <a href="https://discordapp.com/users/664792860188475398">
+                                        <i class="fab fa-discord"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="subtitle is-size-6">
+                                    Furim's services developer.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="column is-one-quarter"></div>
+            <p class="title has-text-centered">
+                HUGE thanks to everyone who helped with developing Duino! 💖
+            </p>
+            <p class="subtitle has-text-centered">
+                List of all Duino-Coin contrubutors can be found on <a href="https://github.com/revoxhere/duino-coin/graphs/contributors">GitHub</a>.
+            </p>
         </div>
-        <br>
-        <p class="title is-size-3" align="center">
-            If you want a more direct conversation
-        </p>
-        <p class="subtitle is-size-3" align="center">
-            You can use one of the following ways of contacting us:
-        </p>
-        <div class="columns is-multiline">
-            <div class="column">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/revox.png">
-                    </figure>
-                    <span class="subtitle is-size-6 pb-1" style="color:#e84118;">
-                        LEAD DEV | <b>FOUNDER</b>
-                    </span><br>
-                    <span class="title is-size-3">
-                        revox
-                    </span><br>
-                    <span class="subtitle is-size-6">
-                        Robert Piotrowski<br>
-                        17, Bydgoszcz (Poland)
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li><a href="mailto:robik123.345@gmail.com">robik123.345@gmail.com</a></li>
-                        <li>GitHub: <a href="https://github.com/revoxhere/">revoxhere</a></li>
-                        <li>YouTube: <a href="https://www.youtube.com/channel/UCgqCK9yt-ajwi4XBu4-jIvA">revox</a></li>
-                        <li>Reddit: <a href="https://www.reddit.com/user/reVox96">reVox96</a></li>
-                        <li>Steam: <a href="https://steamcommunity.com/id/revoxxxhere/">revoxsvko</a></li>
-                        <li>Twitter: <a href="https://twitter.com/revox_here">@revox_here</a></li>
-                        <li>Instagram: <a href="https://www.instagram.com/revox.here/">revox.here</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/yennefer.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#e84118;">
-                        LEAD DEV
-                    </span><br>
-                    <span class="title is-size-3">
-                        Yennefer
-                    </span><br>
-                    <span class="subtitle is-size-6">
-                        Caroline T.<br>
-                        17, Poland
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li>YouTube: <a href="https://www.youtube.com/channel/UCGiSfYN6VcqH7ZCAk6JPXmw">Karolina T.</a></li>
-                        <li>Twitter: <a href="https://twitter.com/ushld">@ushld</a></li>
-                        <li>Steam: <a href="https://steamcommunity.com/id/ushld">pure dopamine</a></li>
-                        <li>Instagram: <a href="https://www.instagram.com/vlegle/">vlegle</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/bilaboz.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#e84118;">
-                        LEAD DEV
-                    </span><br>
-                    <span class="title is-size-3">
-                        Bilaboz
-                    </span><br>
-                    <span class="subtitle is-size-6">
-                        18, France
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li><a href="mailto:bilaboz@protonmail.com">bilaboz@protonmail.com</a></li>
-                        <li>GitHub: <a href="https://github.com/Bilaboz/">Bilaboz</a></li>
-                        <li>Steam: <a href="https://steamcommunity.com/id/bilaboz/">Bilaboz</a></li>
-                        <li>Twitch: <a href="https://www.twitch.tv/bilaboz">bilaboz</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/joybed.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#e84118;">
-                        LEAD DEV
-                    </span><br>
-                    <span class="title is-size-3">
-                        JoyBed
-                    </span><br>
-                    <span class="subtitle is-size-6">
-                        Oliver Szabó<br>
-                        23, Slovakia
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li><a href="mailto:16oliver16@gmail.com">16oliver16@gmail.com</a></li>
-                        <li>GitHub: <a href="https://github.com/JoyBed">JoyBed</a></li>
-                        <li>MacRumors: <a href="https://forums.macrumors.com/members/.1180937/">joybed</a></li>
-                        <li>YouTube: <a href="https://www.youtube.com/channel/UC_znWokaiIwHf6UUMUZDMVA">Oliver Szabó</a></li>
-                        <li><a href="http://joybed.ddns.net">Personal website</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/connor.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#e84118;">
-                        LEAD DEV
-                    </span><br>
-                    <span class="title is-size-3">
-                        Connor2
-                    </span><br>
-                    <span class="subtitle is-size-6">
-                        Connor Hess<br>
-                        17, South Africa
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li>GitHub: <a href="https://github.com/connorhess">connorhess</a></li>
-                        <li>YouTube: <a href="https://www.youtube.com/channel/UC5kWU6rUYbNUPpyGAEyfrgg">Node-s</a></li>
-                        <li>Twitter: <a href="https://twitter.com/connor_cmc">@Connor2</a></li>
-                        <li><a href="http://www.node-s.co.za">Node-S website</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="columns is-multiline">
-            <div class="column is-one-quarter">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/yanis.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#27ae60;">
-                        DEV
-                    </span><br>
-                    <span class="title is-size-4">
-                        yanis
-                    </span><br>
-                    <span class="subtitle is-size-6">
-                        France
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li>GitHub: <a href="https://github.com/ygboucherk">ygboucherk</a></li>
-                        <li>YouTube: <a href="https://www.youtube.com/channel/UCt4bGpFCNFnz6-KzYsgmoiA">Yanis B.</a></li>
-                        <li>Instagram: <a href="https://www.instagram.com/ygboucherk/">ygboucherk</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column is-one-quarter">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/tech1k.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#2980b9;">
-                        WEBMASTER | WEB DEV | DEV
-                    </span><br>
-                    <span class="title is-size-5">
-                        Beyondtoshi
-                    </span><br>
-                    <span class="subtitle is-size-6">
-                        Kristian Kramer<br>
-                        16, Colorado (USA)
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li><a href="mailto:hello@kk.dev">hello@kk.dev</a></li>
-                        <li>GitHub: <a href="https://github.com/tech1k">Tech1k</a></li>
-                        <li>LinkedIn: <a href="https://linkedin.com/in/kristian-kramer">Kristian K.</a></li>
-                        <li>Twitter: <a href="https://twitter.com/kristianjkramer">@KristianJKramer</a></li>
-                        <li>Telegram: <a href="https://t.me/beyondtoshi">Beyondtoshi</a></li>
-                        <li>Steam: <a href="https://steamcommunity.com/id/Tech1k">Tech1k</a></li>
-                        <li><a href="https://kk.dev">Portfolio website</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column is-one-quarter">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/joaquin.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#27ae60;">
-                        DEV
-                    </span><br>
-                    <span class="title is-size-4">
-                        joaquinbw
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li>GitHub: <a href="https://github.com/joaquinbvw">joaquinbvw</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column is-one-quarter">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/pripun.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#27ae60;">
-                        DEV
-                    </span><br>
-                    <span class="title is-size-4">
-                        Pripun
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li>GitHub: <a href="https://github.com/Pripun">Pripun</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column is-one-quarter">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/lukas.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#27ae60;">
-                        DEV
-                    </span><br>
-                    <span class="title is-size-4">
-                        Lulaschkas
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li>GitHub: <a href="https://github.com/Lulaschkas">Lulaschkas</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column is-one-quarter">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/scatchie.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#d35400;">
-                        SOCIAL MANAGER
-                    </span><br>
-                    <span class="title is-size-4">
-                        Scatchie
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li>GitHub: <a href="https://github.com/iiScatchy">iiScatchy</a></li>
-                        <li>Twitch: <a href="https://www.twitch.tv/scatchy">scatchy</a></li>
-                        <li>Reddit: <a href="https://www.reddit.com/user/xScatchy">xScatchy</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/null.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#d35400;">
-                        SOCIAL MANAGER
-                    </span><br>
-                    <span class="title is-size-4">
-                        Null
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li>GitHub: <a href="https://github.com/primitt">primboi</a></li>
-                        <li>Twitch: <a href="https://twitch.tv/primittLive">primittLive</a></li>
-                        <li>YouTube: <a href="https://www.youtube.com/channel/UChqisnoIZNUmv-67RNp484g">Primitt</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box" align="center">
-                    <figure class="image is-128x128 mb-1">
-                        <img class="is-rounded" width="128" src="assets/images/gsrbr.png">
-                    </figure>
-                    <span class="subtitle is-size-6" style="color:#d35400;">
-                        SOCIAL MANAGER
-                    </span><br>
-                    <span class="title is-size-4">
-                        gsrbr
-                    </span><br>
-                    <span class="subtitle is-size-6">
-                        Gabriel Ribeiro<br>
-                        20, Brazil
-                    </span><br>
-                    <ul align="left" class="is-size-6 mt-2">
-                        <li>GitHub: <a href="https://github.com/gsrbr">gsrbr</a></li>
-                        <li>YouTube: <a href="https://www.youtube.com/c/cogumelinho">Cogumelinho</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+    </section>
+    <br><br><br><br><br>
     </div>
-    <br>
     <!-- FOOTER -->
     <footer class="footer">
         <div class="content has-text-centered">
             <p>
-                <strong>Duino-Coin Website</strong> (v3) by <a href="https://github.com/revoxhere">Robert "revox" Piotrowski </a> from <b>Duino team</b> 2019-2022
-                <br>Hosted by <a href="https://kristian-kramer.com">Kristian "Tech1k" Kramer</a>
-                <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a><br>
-                <a href="https://bulma.io">
-                    <img src="assets/images/made-with-bulma.png" alt="Made with Bulma" width="188" height="84">
-                </a>
-                <br/>
-                <a href="https://duinocoin.com/legal">ToS & Privacy Policy</a>
-                <br/>
-                <a href="https://status.duinocoin.com/">Status</a>
+                <strong>Duino-Coin</strong> by <a href="https://revoxhere.github.io">Robert "revox" Piotrowski </a> from the <b>Duino team</b> 2019-2022
+                <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a>
             </p>
         </div>
     </footer>
 </body>
-
-</html>
 <script>
-let pageloader = document.getElementById("pageloader"); // PAGE LOAGER
-pageloader.setAttribute('class', "pageloader is-active is-primary is-bottom-to-top"); // Before page is loaded
-window.addEventListener('load', function() {
-    pageloader.setAttribute('class', "pageloader is-primary is-bottom-to-top"); // After page is loaded
+const pageloader = document.getElementById('loader');
+bodymovin.loadAnimation({
+    wrapper: pageloader,
+    animType: 'svg',
+    autoplay: true,
+    loop: true,
+    path: 'assets/animations/loader.json'
 });
 
-document.addEventListener('DOMContentLoaded', () => { // HAMBURGER MENU
+/* On page loaded */
+$(window).on('load', function() {
     const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
     if ($navbarBurgers.length > 0) {
-        $navbarBurgers.forEach(el => { // Add a click event on each of burger menus
+        $navbarBurgers.forEach(el => {
             el.addEventListener('click', () => {
-                const target = el.dataset.target; // Get the target from the "data-target" attribute
+                const target = el.dataset.target;
                 const $target = document.getElementById(target);
-                el.classList.toggle('is-active'); // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                el.classList.toggle('is-active');
                 $target.classList.toggle('is-active');
             });
         });
     }
+    $("#pageloader").fadeOut();
 });
 </script>
+</html>

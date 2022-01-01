@@ -1,322 +1,429 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Duino-Coin | Donate</title>
-    <link rel="icon" href="assets/icons/duco.svg" type="image/png" />
-    <link rel="shortcut icon" href="assets/icons/duco.svg" type="image/png" />
-    <meta name="description" content="Donate to Duino-Coin - coin that can be mined with almost everything.">
-    <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency, bitcoin">
-    <link rel="canonical" href="https://duinocoin.com/donate" />
+    <link rel="canonical" href="https://duinocoin.com" />
     <meta name="robots" content="index, follow">
+    <!-- Favicons -->
     <meta name="theme-color" content="#EE5A24">
-    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/favicons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicons/favicon-16x16.png">
-    <link rel="shortcut icon" href="/assets/icons/favicons/favicon.ico">
     <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="msapplication-config" content="/assets/icons/favicons/browserconfig.xml">
-    <link rel="manifest" href="manifest.json">
-    <meta property="og:site_name" content="Duino-Coin" />
-    <meta property="og:site" content="https://duinocoin.com" />
-    <meta property="og:title" content="Duino-Coin | Donate" />
-    <meta property="og:description" content="Donate to Duino-Coin - coin that can be mined with almost everything." />
-    <meta property="og:image" content="https://duinocoin.com/assets/icons/duco.png" />
-    <meta property="og:url" content="https://duinocoin.com/donate" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:title" content="Duino-Coin | Donate">
-    <meta name="twitter:description" content="Donate to Duino-Coin - coin that can be mined with almost everything.">
-    <meta name="twitter:image" content=https://duinocoin.com/assets/icons/duco.png">
-    <meta name="twitter:site" content="@DuinoCoin">
-    <meta name="twitter:creator" content="@DuinoCoin">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma-pageloader.min.css">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma-prefers-dark.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png?v=2">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon-32x32.png?v=2">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon-16x16.png?v=2">
+    <link rel="manifest" href="favicons/site.webmanifest?v=2">
+    <link rel="mask-icon" href="favicons/safari-pinned-tab.svg?v=2" color="#5bbad5">
+    <link rel="shortcut icon" href="favicons/favicon.ico?v=2">
+    <!-- Primary Meta Tags -->
+    <title>Support Duino-Coin</title>
+    <meta name="title" content="Support Duino-Coin">
+    <meta name="description" content="Buy a cup of coffee or a slice of pizza for the Duino team.">
+    <meta name="keywords" content="duino, duinocoin, arduino, crypto, mining, blockchain, cryptocurrency">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://duinocoin.com/">
+    <meta property="og:title" content="Support Duino-Coin">
+    <meta property="og:description" content="Buy a cup of coffee or a slice of pizza for the Duino team">
+    <meta property="og:image" content="/backgrounds/donate.png">
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://duinocoin.com/">
+    <meta property="twitter:title" content="Support Duino-Coin">
+    <meta property="twitter:description" content="Buy a cup of coffee or a slice of pizza for the Duino team">
+    <!-- CSS -->
+    <link rel="preload" href="assets/css/mystyles.css" as="style">
+    <link rel="stylesheet" type="text/css" href="assets/css/mystyles.css">
+    <!-- Jquery and FA -->
+    <link rel="preload" href="assets/js/all.min.js" as="script">
     <script src="assets/js/all.min.js"></script>
+    <link rel="preload" href="assets/js/jquery.min.js" as="script">
     <script src="assets/js/jquery.min.js"></script>
+    <!-- Others -->
+    <link rel="preload" href="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69" as="script">
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'UA-142187073-69');
-    </script>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js" as="script">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js"></script>
     <style>
-    .is-primary {
-        /* Override Bulmas primary color to Duco-Colored gradient*/
-        background: linear-gradient(160deg, #e74c3c, #f39c12) !important;
-        border: none;
+    a>figure {
+        transition: 0.2s all;
     }
 
-    .gradienttext {
-        /* Gradient text */
-        background: -webkit-linear-gradient(160deg, #EA2027, #EE5A24) !important;
-        -webkit-background-clip: text !important;
-        -webkit-text-fill-color: transparent !important;
-        color: #EA2027 !important;
+    a>figure:hover {
+        transform: scale(1.1);
     }
 
-    .grid-list {
-        /* Split unordered lists */
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
+    .navbar-item:hover {
+        color: #ff9f43;
     }
 
-    /* Scroll bar */
-    * {
-	    scrollbar-width: thin;
-	    scrollbar-color: whitesmoke rgba(255,168,16,1);
+    .button:hover {
+        transform: scale(1.1);
     }
 
-    *::-webkit-scrollbar {
-	    width: 7px;
+    #wavecontainer {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center
     }
 
-    *::-webkit-scrollbar-track {
-	    background: transparent;
+    #waveduco {
+        height: 12rem;
+        color: white;
+        z-index: 1;
+        position: absolute;
+        display: table;
+        margin: 0 auto;
+        animation: scale 2.73s ease-in-out infinite;
     }
 
-    *::-webkit-scrollbar-thumb {
-	    background-color: rgba(255,168,16,1);
-	    border-radius: 20px;
+    #devices {
+        transition: opacity 0.5s;
+    }
+
+    .hide {
+        opacity: 0 !important;
+    }
+
+    @keyframes scale {
+        0% {
+            transform: scale(1.3);
+        }
+
+        30% {
+            transform: scale(0.9);
+        }
+
+        85% {
+            transform: scale(1.3);
+        }
+
+        100% {
+            transform: scale(1.3);
+        }
     }
     </style>
 </head>
 
 <body>
-    <div id="pageloader" class="pageloader is-active is-primary is-bottom-to-top">
-        <span class="title">Duino-Coin Donate</span>
+    <div id="pageloader">
+        <div id="loader"></div>
     </div>
     <nav class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
-            <a class="navbar-item" href="/">
-                <img src="assets/icons/duco.svg" height="172">
-                &nbsp;Home
+            <a class="navbar-item is-active" href="/">
+                <img src="assets/icons/duino.png" height="172">
             </a>
-            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarDuinoCoin">
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar">
                 <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
             </a>
         </div>
-        <div id="navbarDuinoCoin" class="navbar-menu">
+        <div id="navbar" class="navbar-menu">
             <div class="navbar-start">
-                <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
-                    <i class="fas fa-book" style="color:#f6b93b;"></i>&nbsp;Whitepaper
-                </a>
                 <a class="navbar-item" href="https://explorer.duinocoin.com">
-                    <i class="fas fa-poll" style="color:#ff9f43;"></i>&nbsp;Network
+                    Network stats & explorer
                 </a>
-                <a class="navbar-item" href="donate.html">
-                    <i class="fas fa-heart" style="color:#ee5253;"></i>&nbsp;Donate
-                </a>
-                <a class="navbar-item" href="team.html">
-                    <i class="fas fa-user" style="color:#eb2f06;"></i>&nbsp;Our Team
-                </a>
-                <a class="navbar-item" href="apps.html">
-                    <i class="fas fa-lightbulb" style="color:#ED4C67;"></i>&nbsp;Apps
-                </a>
-                <a class="navbar-item" href="contact.html">
-                    <i class="fas fa-envelope" style="color:#B53471;"></i>&nbsp;Contact Us
-                </a>
-            </div>
-            <div class="navbar-end">
-                <a class="navbar-item" href="https://twitter.com/DuinoCoin/">
-                    <i class="fab fa-lg fa-twitter"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
-                    <i class="fab fa-lg fa-reddit"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://discord.gg/kvBkccy">
-                    <i class="fab fa-lg fa-discord"></i></a></li>
-                </a>
-                <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
-                    <i class="fab fa-lg fa-github"></i></a></li>
-                </a>
-                <div class="navbar-item">
-                    <div class="buttons">
-                        <a class="button is-primary" href="getting-started.html">
-                            <strong>Get started</strong>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        Resources
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">
+                            <span>
+                                <i class="fa fa-fw fa-book"></i>
+                                <span>Whitepaper</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/tree/useful-tools#branding">
+                            <span>
+                                <i class="fa fa-fw fa-brush"></i>
+                                <span>Branding</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://github.com/revoxhere/duino-coin/tree/useful-tools">
+                            <span>
+                                <i class="fa fa-fw fa-code"></i>
+                                <span>API docs
+                                </span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="apps.html">
+                            <span>
+                                <i class="fa fa-fw fa-check"></i>
+                                <span>Apps and faucets</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        Duino team
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="team.html">
+                            <span>
+                                <i class="fa fa-fw fa-users"></i>
+                                <span>Meet our team</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="donate.html">
+                            <span>
+                                <i class="fa fa-fw fa-heart"></i>
+                                <span>Donate</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="https://store.duinocoin.com">
+                            <span>
+                                <i class="fa fa-fw fa-tshirt"></i>
+                                <span>Official merch</span>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link">
+                        More
+                    </a>
+                    <div class="navbar-dropdown">
+                        <a class="navbar-item" href="contact.html">
+                            <span>
+                                <i class="fa fa-fw fa-envelope"></i>
+                                <span>Contact us</span>
+                            </span>
+                        </a>
+                        <a class="navbar-item" href="legal.html">
+                            <span>
+                                <i class="fa fa-fw fa-balance-scale"></i>
+                                <span>Terms of service</span>
+                            </span>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="navbar-end is-hidden-touch">
+            <a class="navbar-item" href="https://twitter.com/DuinoCoin/">
+                <i class="fab fa-lg fa-twitter"></i>
+            </a>
+            <a class="navbar-item" href="https://www.reddit.com/r/Duinocoin/">
+                <i class="fab fa-lg fa-reddit"></i>
+            </a>
+            <a class="navbar-item" href="https://discord.gg/kvBkccy">
+                <i class="fab fa-lg fa-discord"></i>
+            </a>
+            <a class="navbar-item" href="https://github.com/revoxhere/duino-coin">
+                <i class="fab fa-lg fa-github"></i>
+            </a>
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-primary" href="getting-started.html">
+                        <strong>Get started</strong>
+                    </a>
+                </div>
+            </div>
+        </div>
     </nav>
-    <br>
-    <div class="container">
-        <p class="title is-size-1" align="center">
-            <i class="fa fa-heart" style="color:#e74c3c;"></i>
-            Want to support us financially?
-        </p>
-        <p class="subtitle is-size-2" align="center">
-            This is the right place to do so!
-        </p>
-        <p class="subtitle is-size-5" align="center">
-            We maintain <b>Duino-Coin</b> mainly with our own money, which is sometimes insufficient or limited <i class="fa fa-business-time" style="color:#eb4d4b;"></i>.<br>
-            That's why we're asking everyone who likes this project to donate a cup of coffee <i class="fa fa-coffee" style="color:#6f4e37;"></i> (or a piece of pizza <i class="fa fa-pizza-slice" style="color:#f0932b;"></i>!)<br>
-            so we can continue to <b>maintain the servers</b>, <b>get listed on exchanges</b> and keep the development going strong <i class="fa fa-code" style="color:#6ab04c;"></i>.
-        </p>
-        <hr>
-        <p class="subtitle is-size-5" align="center">
-            You can donate to us by just sending funds to one of these addresses:
-        </p>
-        <div class="columns ml-6 mr-6 is-multiline">
-            <div class="column is-multiline">
-                <div class="box">
-                    <i class="fab fa-lg fa-bitcoin" style="color:#f39c12"></i>
-                    <span class="title is-size-5">Bitcoin</span><br>
-                    <span class="subtitle is-size-6">39GpTtgCNNwFbPnhEbCCBzNBewG3bA7oso</span>
+    <section class="section">
+        <div class="container">
+            <div class="hero">
+                <div class="hero-body mt-nav">
+                    <p class="title">
+                        We maintain Duino-Coin mainly with our own money, which is sometimes insufficient or limited
+                    </p>
+                    <p class="subtitle">
+                        If you're enjoying the project, it would be cool if you'd support us so that we can continue to maintain the servers and provide liquidity to Duino exchanges 😎
+                    </p>
                 </div>
             </div>
-            <div class="column">
-                <div class="box">
-                    <i class="fab fa-lg fa-bitcoin" style="color:#2ecc71"></i>
-                    <span class="title is-size-5">Bitcoin Cash</span><br>
-                    <span class="subtitle is-size-6">bitcoincash:qqv4g8e2nkpwg6dkzdfuyf0zzrfts9qe350t2epfay</span>
+            <p class="subtitle is-size-5 has-text-centered">
+                Here are the ways you can donate to us:
+            </p>
+            <div class="columns is-multiline">
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <i class="fab fa-lg fa-bitcoin" style="color:#f39c12"></i>
+                        <span class="title is-size-5">Bitcoin</span><br>
+                        <span class="subtitle is-size-6">39GpTtgCNNwFbPnhEbCCBzNBewG3bA7oso</span>
+                        <a title="Copy" onclick="copy('39GpTtgCNNwFbPnhEbCCBzNBewG3bA7oso')">
+                            <i class="fa fa-clipboard"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <i class="fab fa-lg fa-bitcoin" style="color:#2ecc71"></i>
+                        <span class="title is-size-5">Bitcoin Cash</span><br>
+                        <span class="subtitle is-size-6">bitcoincash:qqv4g8e2nkpwg6dkzdfuyf0zzrfts9qe350t2epfay</span>
+                        <a title="Copy" onclick="copy('bitcoincash:qqv4g8e2nkpwg6dkzdfuyf0zzrfts9qe350t2epfay')">
+                            <i class="fa fa-clipboard"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <img src="assets/icons/litecoin.png" width="16em">
+                        <span class="title is-size-5">Litecoin</span><br>
+                        <span class="subtitle is-size-6">LUgz5FArRpjma52jjEQAYjBK9VVV2Z9d3D</span>
+                        <a title="Copy" onclick="copy('LUgz5FArRpjma52jjEQAYjBK9VVV2Z9d3D')">
+                            <i class="fa fa-clipboard"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <img src="assets/icons/raven.png" width="16em">
+                        <span class="title is-size-5">Ravencoin</span><br>
+                        <span class="subtitle is-size-6">RH4bTDaHH7LSSCVSvXJzJ5KkiGR1QRMaqN</span>
+                        <a title="Copy" onclick="copy('RH4bTDaHH7LSSCVSvXJzJ5KkiGR1QRMaqN')">
+                            <i class="fa fa-clipboard"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <img src="assets/icons/ethereum.png" width="16em">
+                        <span class="title is-size-5">Ethereum</span><br>
+                        <span class="subtitle is-size-6">0x6f8333ecc3e6eeb2008d56503db1cf4b3bafa695</span>
+                        <a title="Copy" onclick="copy('0x6f8333ecc3e6eeb2008d56503db1cf4b3bafa695')">
+                            <i class="fa fa-clipboard"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <img src="assets/icons/magi.png" width="16em">
+                        <span class="title is-size-5">Coin Magi</span><br>
+                        <span class="subtitle is-size-6">95JLhkyWVDce5D17LyApULc5YC4vrVzaio</span>
+                        <a title="Copy" onclick="copy('95JLhkyWVDce5D17LyApULc5YC4vrVzaio')">
+                            <i class="fa fa-clipboard"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <img src="assets/icons/paypal.png" width="16em">
+                        <span class="title is-size-5">PayPal</span><br>
+                        <span class="subtitle is-size-6">
+                            <a href="https://paypal.me/duinocoin">paypal.me/duinocoin</a>
+                        </span>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <img src="assets/icons/duco.png" width="16em">
+                        <span class="title is-size-5">Duino-Coin</span>
+                        <div class="columns is-mobile">
+                            <div class="column">
+                                <span>
+                                    revox <a title="Copy" onclick="copy('revox')">
+                                        <i class="fa fa-clipboard"></i>
+                                    </a><br>
+                                    Bilaboz <a title="Copy" onclick="copy('Bilaboz')">
+                                        <i class="fa fa-clipboard"></i>
+                                    </a>
+                                </span>
+                            </div>
+                            <div class="column has-text-right">
+                                <span>
+                                    <a title="Copy" onclick="copy('connorhess')">
+                                        <i class="fa fa-clipboard"></i>
+                                    </a>connorhess<br>
+                                    <a title="Copy" onclick="copy('JoyBed')">
+                                        <i class="fa fa-clipboard"></i>
+                                    </a> JoyBed
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <img src="assets/icons/dogecoin.png" width="16em">
+                        <span class="title is-size-5">Dogecoin</span><br>
+                        <span class="subtitle is-size-6">DHnvi18rxbQMToZXxqndCGnEqLzifRAzin</span>
+                        <a title="Copy" onclick="copy('DHnvi18rxbQMToZXxqndCGnEqLzifRAzin')">
+                            <i class="fa fa-clipboard"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <img src="assets/icons/monero.png" width="16em">
+                        <span class="title is-size-5">Monero</span><br>
+                        <span class="subtitle is-size-6">84HAJVEokXxU8hFgy7BcmjDRW53ywteKRPWNe4BnHu1WNjTngqp8BHj1yhrjRHbTREivzxmXZTkuCdFGb5xFQ3EeBWwDca6</span>
+                        <a title="Copy" onclick="copy('84HAJVEokXxU8hFgy7BcmjDRW53ywteKRPWNe4BnHu1WNjTngqp8BHj1yhrjRHbTREivzxmXZTkuCdFGb5xFQ3EeBWwDca6')">
+                            <i class="fa fa-clipboard"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <img src="assets/icons/tron.png" width="16em">
+                        <span class="title is-size-5">Tron</span><br>
+                        <span class="subtitle is-size-6">TJsSD29FXfbq6BtGRmnfYGDUfrF9DPVGSq</span>
+                        <a title="Copy" onclick="copy('TJsSD29FXfbq6BtGRmnfYGDUfrF9DPVGSq')">
+                            <i class="fa fa-clipboard"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="column is-one-quarter">
+                    <div class="box">
+                        <i class="fa fa-question-circle"></i>
+                        <span class="title is-size-5">Other</span><br>
+                        <span class="subtitle is-size-6">
+                            <a href="contact.html">Contact us</a> if you want to help in a different way
+                        </span>
+                    </div>
                 </div>
             </div>
-            <div class="column">
-                <div class="box">
-                    <img src="assets/icons/litecoin.png" width="16em">
-                    <span class="title is-size-5">Litecoin</span><br>
-                    <span class="subtitle is-size-6">LUgz5FArRpjma52jjEQAYjBK9VVV2Z9d3D</span>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box">
-                    <img src="assets/icons/raven.png" width="16em">
-                    <span class="title is-size-5">Ravencoin</span><br>
-                    <span class="subtitle is-size-6">RH4bTDaHH7LSSCVSvXJzJ5KkiGR1QRMaqN</span>
-                </div>
-            </div>
-        </div>
-        <div class="columns ml-6 mr-6 is-multiline">
-            <div class="column">
-                <div class="box">
-                    <img src="assets/icons/ethereum.png" width="16em">
-                    <span class="title is-size-5">Ethereum</span><br>
-                    <span class="subtitle is-size-6">0x6f8333ecc3e6eeb2008d56503db1cf4b3bafa695</span>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box">
-                    <img src="assets/icons/magi.png" width="16em">
-                    <span class="title is-size-5">Coin Magi</span><br>
-                    <span class="subtitle is-size-6">93qJ8j93ibCye7pTWKTu88pr6a8xy7EUqC</span>
-                </div>
-            </div>
-            <!--Beyond bot is broken so idk what wallet should we use
-            <div class="column">
-              <div class="box">
-                <img src="assets/icons/beyondcoin.png" width="16em">
-                <span class="title is-size-5">Beyondcoin</span><br>
-                <span class="subtitle is-size-6">BTCpcG6JXYkn52pQGgDM11Fd7qEMxrHAGW</span>
-              </div>
-            </div>-->
-            <div class="column">
-                <div class="box">
-                    <img src="assets/icons/paypal.png" width="16em">
-                    <span class="title is-size-5">PayPal</span><br>
-                    <span class="subtitle is-size-6">
-                        <a href="https://paypal.me/duinocoin">paypal.me/duinocoin</a>
-                    </span>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box">
-                    <img src="assets/icons/duco.png" width="16em">
-                    <span class="title is-size-5">Duino-Coin</span>
-                    <span class="subtitle is-size-6">
-                        <ul class="grid-list">
-                            <li>revox</li>
-                            <li>Bilaboz</li>
-                            <li>connorhess</li>
-                            <li>JoyBed</li>
-                        </ul>
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="columns ml-6 mr-6 is-multiline">
-            <div class="column">
-                <div class="box">
-                    <img src="assets/icons/dogecoin.png" width="16em">
-                    <span class="title is-size-5">Dogecoin</span><br>
-                    <span class="subtitle is-size-6">DHnvi18rxbQMToZXxqndCGnEqLzifRAzin</span>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box">
-                    <img src="assets/icons/monero.png" width="16em">
-                    <span class="title is-size-5">Monero</span><br>
-                    <span class="subtitle is-size-6">84HAJVEokXxU8hFgy7BcmjDRW53ywteKRPWNe4BnHu1WNjTngqp8BHj1yhrjRHbTREivzxmXZTkuCdFGb5xFQ3EeBWwDca6</span>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box">
-                    <img src="assets/icons/tron.png" width="16em">
-                    <span class="title is-size-5">Tron</span><br>
-                    <span class="subtitle is-size-6">TJsSD29FXfbq6BtGRmnfYGDUfrF9DPVGSq</span>
-                </div>
-            </div>
-            <div class="column">
-                <div class="box">
-                    <i class="fa fa-question-circle"></i>
-                    <span class="title is-size-5">Other</span><br>
-                    <span class="subtitle is-size-6">
-                        <a href="contact.html">Contact us</a> if you want to help in another way.
-                    </span>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <p class="title is-size-5" align="center">
-            We're very thankful even for the smallest donations
-            <i class="fa fa-heart" style="color:#e74c3c;"></i>
+            <p class="title has-text-centered">
+                We're very thankful for all donations ❤️
+            </p>
             <br>
-        </p>
-        <p class="subtitle is-size-5" align="center">
-        </p>
-        <br/>
+        </div>
+    </section>
+    <br><br><br><br><br>
     </div>
     <!-- FOOTER -->
     <footer class="footer">
         <div class="content has-text-centered">
             <p>
-                <strong>Duino-Coin Website</strong> (v3) by <a href="https://github.com/revoxhere">Robert "revox" Piotrowski </a> from <b>Duino team</b> 2019-2022
-                <br>Hosted by <a href="https://kk.dev">Kristian "Tech1k" Kramer</a>
-                <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a><br>
-                <a href="https://bulma.io">
-                    <img src="assets/images/made-with-bulma.png" alt="Made with Bulma" width="188" height="84">
-                </a>
-                <br/>
-                <a href="https://duinocoin.com/legal">ToS & Privacy Policy</a>
-                <br/>
-                <a href="https://status.duinocoin.com/">Status</a>
+                <strong>Duino-Coin</strong> by <a href="https://revoxhere.github.io">Robert "revox" Piotrowski </a> from the <b>Duino team</b> 2019-2022
+                <br>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a>
             </p>
         </div>
     </footer>
 </body>
-</html>
 <script>
-let pageloader = document.getElementById("pageloader"); // PAGE LOAGER
-pageloader.setAttribute('class', "pageloader is-active is-primary is-bottom-to-top"); // Before page is loaded
-window.addEventListener('load', function() {
-    pageloader.setAttribute('class', "pageloader is-primary is-bottom-to-top"); // After page is loaded
+const pageloader = document.getElementById('loader');
+bodymovin.loadAnimation({
+    wrapper: pageloader,
+    animType: 'svg',
+    autoplay: true,
+    loop: true,
+    path: 'assets/animations/loader.json'
 });
 
-document.addEventListener('DOMContentLoaded', () => { // HAMBURGER MENU
+function copy(text) {
+    navigator.clipboard.writeText(text);
+}
+
+/* On page loaded */
+$(window).on('load', function() {
     const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
     if ($navbarBurgers.length > 0) {
-        $navbarBurgers.forEach(el => { // Add a click event on each of burger menus
+        $navbarBurgers.forEach(el => {
             el.addEventListener('click', () => {
-                const target = el.dataset.target; // Get the target from the "data-target" attribute
+                const target = el.dataset.target;
                 const $target = document.getElementById(target);
-                el.classList.toggle('is-active'); // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                el.classList.toggle('is-active');
                 $target.classList.toggle('is-active');
             });
         });
     }
+    $("#pageloader").fadeOut();
 });
 </script>
+
+</html>
