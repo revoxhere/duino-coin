@@ -485,6 +485,8 @@ class Miner:
                     lang = "maltese"
                 elif locale.startswith("ru"):
                     lang = "russian"
+                elif locale.startswith("uk"):
+                    lang = "ukrainian"
                 elif locale.startswith("de"):
                     lang = "german"
                 elif locale.startswith("tr"):
