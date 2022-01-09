@@ -24,6 +24,7 @@ This branch of the Duino-Coin repository contains documentation for public API c
   - List of [server commands](#Server-commands)
 - Communicating with a [Mining Pool](#Mining-Pools)
 - Duino-Coin [REST API](#REST-API)
+- Duino-Coin [Python API](#Python-API)
 - Duino-Coin [JSON user data](#JSON-data)
 - Icons, colors - [branding](#Branding)
 
@@ -154,6 +155,12 @@ It works like the main server, but only mining commands are accepted. More docs 
 
 Documentation for the DUCO REST api is available here: [duco-rest-api](https://github.com/revoxhere/duco-rest-api).
 To access these functions, just add the query URL after the server address: `https://server.duinocoin.com/<query>`.
+
+##
+
+### Python API
+
+BackrndSource's `pyduinocoin` library can be found here: [BackrndSource/pyduinocoin](https://github.com/BackrndSource/pyduinocoin)
 
 ##
 
