@@ -16,16 +16,15 @@ from os import _exit, execl, mkdir
 from os import name as osname
 from os import path, system
 from pathlib import Path
-from socket import socket
 from sqlite3 import connect as sqlconn
 import subprocess
 from threading import Thread, Timer
 from time import sleep, time
-from tkinter import (BOTH, END, LEFT, RIGHT, Button, Checkbutton, E, Entry,
-                     Frame, IntVar, Label, Listbox, N, PhotoImage, S,
+from tkinter import (END, LEFT, Button, E, Entry,
+                     Frame, Label, Listbox, N, PhotoImage, S,
                      Scrollbar, StringVar, Tk, Toplevel, W, messagebox, ttk)
 from tkinter.font import Font
-from urllib.request import urlopen, urlretrieve
+from urllib.request import urlretrieve
 from webbrowser import open_new_tab
 
 from requests import get
