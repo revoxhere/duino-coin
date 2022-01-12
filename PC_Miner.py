@@ -659,7 +659,7 @@ class Miner:
                                      "warning", "net" + str(id))
                         sleep(5)
                 break
-            except:
+            except Exception as e:
                 pretty_print(get_string('connecting_error')
                              + Style.NORMAL + f' (connection err: {e})',
                              'error', 'net0')
