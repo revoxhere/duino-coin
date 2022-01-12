@@ -793,7 +793,8 @@ class Miner:
                         sleep(5)
                         break
             except Exception as e:
-                pass
+                pretty_print(get_string("error_while_mining")
+                                     + " " + str(e), "error", "net" + str(id))
 
 
 class Discord_rp:
