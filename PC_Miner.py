@@ -537,7 +537,6 @@ class Miner:
 
             algorithm = "DUCO-S1"
 
-            intensity = None
             intensity = sub(r"\D", "",
                             input(Style.NORMAL +
                                   get_string("ask_intensity") +
