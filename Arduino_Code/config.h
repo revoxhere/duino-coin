@@ -14,7 +14,7 @@
 // along with cryptosuite2.  If not, see <http://www.gnu.org/licenses/>. //
 //                                                                       //
 
-
+#pragma GCC optimize ("-Ofast")
 
 // include the module config first, 
 // overwrite it in the arduino interface config.

@@ -14,6 +14,7 @@
 // along with cryptosuite2.  If not, see <http://www.gnu.org/licenses/>. //
 //                                                                       //
 
+#pragma GCC optimize ("-Ofast")
 #include "config.h"
 
 #ifndef SHA1_DISABLED

@@ -1,18 +1,22 @@
 /*
-  ,------.          ,--.                       ,-----.       ,--.         
-  |  .-.  \ ,--.,--.`--',--,--,  ,---. ,-----.'  .--./ ,---. `--',--,--,  
-  |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \ 
-  |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  | 
-  `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--' 
-  Official code for Arduino boards                          version 2.7.4
+
+   ____  __  __  ____  _  _  _____       ___  _____  ____  _  _ 
+  (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
+   )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  ( 
+  (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
+  Official code for Arduino boards                   version 3.0
   
-  Duino-Coin Team & Community 2019-2021 © MIT Licensed
+  Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
   https://github.com/revoxhere/duino-coin
   If you don't know where to start, visit official website and navigate to
   the Getting Started page. Have fun mining!
 */
 
+/* For microcontrollers with low memory change that to -Os in all files,
+for default settings use -O0. -O may be a good tradeoff between both */
+#pragma GCC optimize ("-Ofast")
+/* For microcontrollers with custom LED pins, adjust the line below */
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
 #endif
@@ -89,12 +93,6 @@ String get_DUCOID() {
 void loop() {
   // Wait for serial data
   if (Serial.available() > 0) {
-    // Turn on the built-in led
-    #if defined(ARDUINO_ARCH_AVR)
-        PORTB = PORTB & B11011111;
-    #else
-        digitalWrite(LED_BUILTIN, HIGH);
-    #endif
     memset(job, 0, job_maxsize);
     // Read last block hash
     lastblockhash = Serial.readStringUntil(',');
@@ -104,12 +102,24 @@ void loop() {
     difficulty = strtoul(Serial.readStringUntil(',').c_str(), NULL, 10);
     // Clearing the receive buffer reading one job.
     while (Serial.available()) Serial.read();
+    // Turn on the built-in led
+    #if defined(ARDUINO_ARCH_AVR)
+        PORTB = PORTB | B00100000;
+    #else
+        digitalWrite(LED_BUILTIN, LOW);
+    #endif
     // Start time measurement
     uint32_t startTime = micros();
     // Call DUCO-S1A hasher
     ducos1result = ducos1a(lastblockhash, newblockhash, difficulty);
     // Calculate elapsed time
     uint32_t elapsedTime = micros() - startTime;
+    // Turn on the built-in led
+    #if defined(ARDUINO_ARCH_AVR)
+        PORTB = PORTB & B11011111;
+    #else
+        digitalWrite(LED_BUILTIN, HIGH);
+    #endif
     // Clearing the receive buffer before sending the result.
     while (Serial.available()) Serial.read();
     // Send result back to the program with share time
@@ -119,11 +129,5 @@ void loop() {
                  + "," 
                  + String(DUCOID) 
                  + "\n");
-    // Turn off the built-in led
-    #if defined(ARDUINO_ARCH_AVR)
-        PORTB = PORTB | B00100000;
-    #else
-        digitalWrite(LED_BUILTIN, LOW);
-    #endif
   }
 }
