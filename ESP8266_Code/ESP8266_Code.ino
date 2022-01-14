@@ -53,7 +53,7 @@ const char* SSID = "My cool wifi name";
 const char* PASSWORD = "My secret wifi pass";
 // Change the part in brackets to your Duino-Coin username
 const char* USERNAME = "my_cool_username";
-// Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate)  
+// Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate)
 const char* RIG_IDENTIFIER = "Auto";
 // Change false to true if using 160 MHz clock mode to not get the first share rejected
 const bool USE_HIGHER_DIFF = false;
@@ -225,7 +225,7 @@ void UpdateHostPort(String input) {
   port = int(doc["port"]);
   node_id = String(name);
 
-  Serial.println("Poolpicker selected the best node: " + node_id);
+  Serial.println("Poolpicker selected the best mining node: " + node_id);
 }
 
 String httpGetString(String URL) {
@@ -252,13 +252,12 @@ void UpdatePool() {
   int poolSize = sizeof(POOLPICKER_URL) / sizeof(char*);
 
   while (input == "") {
-    Serial.println("Fetching pool (" + String(POOLPICKER_URL[poolIndex]) + ")... ");
+    Serial.println("Fetching mining node from the poolpicker in " + String(waitTime) + "s");
     input = httpGetString(POOLPICKER_URL[poolIndex]);
     poolIndex += 1;
 
     // Check if pool index needs to roll over
     if( poolIndex >= poolSize ){
-      Serial.println("Retrying pool list in: " + String(waitTime) + "s");
       poolIndex %= poolSize;
       delay(waitTime * 1000);
 
@@ -312,9 +311,10 @@ void SetupWifi() {
     }
   }
 
-  Serial.println("\nConnected to WiFi!");
-  Serial.println("IP address: " + WiFi.localIP().toString());
+  Serial.println("\n\nnSuccessfully connected to WiFi");
+  Serial.println("Local IP address: " + WiFi.localIP().toString());
   Serial.println("Rig name: " + String(RIG_IDENTIFIER));
+  Serial.println();
 
   UpdatePool();
 }
@@ -418,7 +418,7 @@ void ConnectToServer() {
   if (client.connected())
     return;
 
-  Serial.println("\nConnecting to Duino-Coin server...");
+  Serial.println("Connecting to the Duino-Coin server...");
   while (!client.connect(host, port));
 
   waitForClientData();
@@ -445,7 +445,7 @@ void dashboard() {
   s.replace("@@HASHRATE@@", String(hashrate / 1000));
   s.replace("@@DIFF@@", String(difficulty / 100));
   s.replace("@@SHARES@@", String(share_count));
-  s.replace("@@NODE@@", String(share_count));
+  s.replace("@@NODE@@", String(node_id));
 
   s.replace("@@DEVICE@@", String(DEVICE));
   s.replace("@@ID@@", String(RIG_IDENTIFIER));
@@ -511,12 +511,8 @@ void loop() {
   String expected_hash = getValue(client_buffer, SEP_TOKEN, 1);
   difficulty = getValue(client_buffer, SEP_TOKEN, 2).toInt() * 100 + 1;
 
-  Serial.println("Job received: "
-                 + last_block_hash
-                 + " "
-                 + expected_hash
-                 + " "
-                 + String(difficulty));
+  int job_len = last_block_hash.length() + expected_hash.length() + String(difficulty).length();
+  Serial.println("Received a correct job with size of " + String(job_len) + " bytes");
   expected_hash.toUpperCase();
 
   float start_time = micros();
