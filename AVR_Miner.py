@@ -846,7 +846,7 @@ def mine_avr(com, threadid, fastest_pool):
                             + str(result[2]))
 
                 responsetimetart = now()
-                feedback = Client.recv(s, 64)
+                feedback = Client.recv(s, 64).split(",")
                 responsetimestop = now()
 
                 time_delta = (responsetimestop -
@@ -854,7 +854,7 @@ def mine_avr(com, threadid, fastest_pool):
                 ping_mean.append(round(time_delta / 1000))
                 ping = mean(ping_mean[-10:])
                 diff = get_prefix("", int(diff), 0)
-                debug_output(com + f': retrieved feedback: {feedback}')
+                debug_output(com + f': retrieved feedback: {" ".join(feedback)}')
             except Exception as e:
                 pretty_print('net' + port_num(com),
                              get_string('connecting_error')
@@ -864,14 +864,14 @@ def mine_avr(com, threadid, fastest_pool):
                 sleep(5)
                 break
 
-            if feedback == 'GOOD':
+            if feedback[0] == 'GOOD':
                 shares[0] += 1
                 printlock.acquire()
                 share_print(port_num(com), "accept",
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping)
                 printlock.release()
-            elif feedback == 'BLOCK':
+            elif feedback[0] == 'BLOCK':
                 shares[0] += 1
                 shares[2] += 1
                 printlock.acquire()
@@ -884,7 +884,7 @@ def mine_avr(com, threadid, fastest_pool):
                 printlock.acquire()
                 share_print(port_num(com), "reject",
                             shares[0], shares[1], hashrate,
-                            computetime, diff, ping)
+                            computetime, diff, ping, feedback[1])
                 printlock.release()
 
             title(get_string('duco_avr_miner') + str(Settings.VER)
