@@ -1,10 +1,9 @@
 /*
-  ,------.          ,--.                       ,-----.       ,--.
-  |  .-.  \ ,--.,--.`--',--,--,  ,---. ,-----.'  .--./ ,---. `--',--,--,
-  |  |  \  :|  ||  |,--.|      \| .-. |'-----'|  |    | .-. |,--.|      \
-  |  '--'  /'  ''  '|  ||  ||  |' '-' '       '  '--'\' '-' '|  ||  ||  |
-  `-------'  `----' `--'`--''--' `---'         `-----' `---' `--'`--''--'
-  Official code for ESP32 boards                              version 3.0
+   ____  __  __  ____  _  _  _____       ___  _____  ____  _  _
+  (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
+   )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
+  (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
+  Official code for ESP32 boards                     version 3.0
 
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
@@ -15,17 +14,17 @@
 */
 
 /***************** START OF MINER CONFIGURATION SECTION *****************/
-// Change this to your WiFi name
-const char *wifi_ssid = "WiFi SSID";
-// Change this to your WiFi wifi_password
-const char *wifi_password = "WiFi Pass";
-// Change this to your Duino-Coin username
-const char *username = "Duino User";
-// Change this if you want a custom rig identifier
-const char *rig_identifier = "None";
-
+// Change the part in brackets to your WiFi name
+const char *SSID = "My cool Wi-Fi";
+// Change the part in brackets to your WiFi password
+const char *WIFI_PASS = "My secret pass";
+// Change the part in brackets to your Duino-Coin username
+const char *DUCO_USER = "my_cool_username";
+// Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate)
+const char *RIG_IDENTIFIER = "Auto";
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 2
+
 #define BLINK_SHARE_FOUND    1
 #define BLINK_SETUP_COMPLETE 2
 #define BLINK_CLIENT_CONNECT 3
@@ -33,6 +32,9 @@ const char *rig_identifier = "None";
 
 // Define watchdog timer seconds
 #define WDT_TIMEOUT 60
+
+// If optimizations cause problems, change them to -O0 (the default)
+#pragma GCC optimize ("-Ofast")
 
 // #include "hwcrypto/sha.h" // Uncomment this line if you're using an older
 // version of the ESP32 core and sha_parellel_engine doesn't work for you
@@ -42,7 +44,7 @@ const char *rig_identifier = "None";
    the ENABLE_MQTT defition line(#define ENABLE_MQTT).
    NOTE: enabling MQTT could slightly decrease hashrate */
 // #define ENABLE_MQTT
-// Change this to specify MQTT server (ip only no prefixes)
+// Change this to specify MQTT server (ip only - no prefixes)
 const char *mqtt_server = "";
 // Port mqtt server is listening at (default: 1883)
 const int mqtt_port = 1883;
@@ -56,8 +58,9 @@ const int mqtt_port = 1883;
 /* If you don't want to use the Serial interface comment
   the ENABLE_SERIAL definition line (#define ENABLE_SERIAL)*/
 #define ENABLE_SERIAL
-/****************** END OF MINER CONFIGURATION SECTION ******************/
-
+/* ***************** END OF MINER CONFIGURATION SECTION *****************
+   Do not change the lines below. These lines are static and dynamic variables
+   that will be used by the program for counters and measurements. */
 #ifndef ENABLE_SERIAL
 #define Serial DummySerial
 static class {
@@ -88,8 +91,7 @@ class PubSubClient {
 #endif
 
 // Data Structures
-typedef struct TaskData
-{
+typedef struct TaskData {
   TaskHandle_t handler;
   byte taskId;
   float hashrate;
@@ -105,6 +107,7 @@ typedef struct TaskData
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <esp_task_wdt.h>
+#include <WebServer.h>
 
 #ifdef ENABLE_OTA
 #include <ArduinoOTA.h>
@@ -125,11 +128,13 @@ TaskData_t TaskThreadData[NUMBEROFCORES];
 TaskHandle_t MqttPublishHandle;
 SemaphoreHandle_t xMutex;
 
-// Internal Variables, do not change these!
-const char *get_pool_api[] = {"https://server.duinocoin.com/getPool"};
-const char *miner_version = "Official ESP32 Miner 2.79";
+const char * DEVICE = "ESP32";
+const char * POOLPICKER_URL[] = {"https://server.duinocoin.com/getPool"};
+const char * MINER_BANNER = "Official ESP32 Miner";
+const char * MINER_VER = "3.0";
 String pool_name = "";
 String host = "";
+String node_id = "";
 int port = 0;
 int walletid = 0;
 volatile int wifi_state = 0;
@@ -140,7 +145,148 @@ char rigname_auto[23];
 int mqttUpdateTrigger = 0;
 String mqttRigTopic = "";
 
-// Wifi and Mqtt Clients
+const char WEBSITE[] PROGMEM = R"=====(
+<!DOCTYPE html>
+<html>
+<!--
+    Duino-Coin self-hosted dashboard
+    MIT licensed
+    Duino-Coin official 2019-2021
+    https://github.com/revoxhere/duino-coin
+    https://duinocoin.com
+-->
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Duino-Coin @@DEVICE@@ dashboard</title>
+    <link rel="stylesheet" href="https://server.duinocoin.com/assets/css/mystyles.css">
+    <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
+    <link rel="icon" type="image/png" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
+</head>
+
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">
+                <img class="icon" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
+                @@DEVICE@@ <small>(@@ID@@)</small>
+            </h1>
+            <p class="subtitle">
+                Self-hosted, lightweight, official dashboard for your <strong>Duino-Coin</strong> miner
+            </p>
+        </div>
+        <br>
+        <div class="container">
+            <div class="columns">
+                <div class="column">
+                    <div class="box">
+                        <p class="subtitle">
+                            Mining statistics
+                        </p>
+                        <div class="columns is-multiline">
+                            <div class="column" style="min-width:15em">
+                                <div class="title is-size-5 mb-0">
+                                    @@HASHRATE@@kH/s
+                                </div>
+                                <div class="heading is-size-5">
+                                    Hashrate
+                                </div>
+                            </div>
+                            <div class="column" style="min-width:15em">
+                                <div class="title is-size-5 mb-0">
+                                    @@DIFF@@
+                                </div>
+                                <div class="heading is-size-5">
+                                    Difficulty
+                                </div>
+                            </div>
+                            <div class="column" style="min-width:15em">
+                                <div class="title is-size-5 mb-0">
+                                    @@SHARES@@
+                                </div>
+                                <div class="heading is-size-5">
+                                    Shares
+                                </div>
+                            </div>
+                            <div class="column" style="min-width:15em">
+                                <div class="title is-size-5 mb-0">
+                                    @@NODE@@
+                                </div>
+                                <div class="heading is-size-5">
+                                    Node
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="box">
+                        <p class="subtitle">
+                            Device information
+                        </p>
+                        <div class="columns is-multiline">
+                            <div class="column" style="min-width:15em">
+                                <div class="title is-size-5 mb-0">
+                                    @@DEVICE@@
+                                </div>
+                                <div class="heading is-size-5">
+                                    Device type
+                                </div>
+                            </div>
+                            <div class="column" style="min-width:15em">
+                                <div class="title is-size-5 mb-0">
+                                    @@ID@@
+                                </div>
+                                <div class="heading is-size-5">
+                                    Device ID
+                                </div>
+                            </div>
+                            <div class="column" style="min-width:15em">
+                                <div class="title is-size-5 mb-0">
+                                    @@MEMORY@@
+                                </div>
+                                <div class="heading is-size-5">
+                                    Free memory
+                                </div>
+                            </div>
+                            <div class="column" style="min-width:15em">
+                                <div class="title is-size-5 mb-0">
+                                    @@VERSION@@
+                                </div>
+                                <div class="heading is-size-5">
+                                    Miner version
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+            <div class="has-text-centered">
+                <div class="title is-size-6 mb-0">
+                    Hosted on
+                    <a href="http://@@IP_ADDR@@">
+                        http://<b>@@IP_ADDR@@</b>
+                    </a>
+                    &bull;
+                    <a href="https://duinocoin.com">
+                        duinocoin.com
+                    </a>
+                    &bull;
+                    <a href="https://github.com/revoxhere/duino-coin">
+                        github.com/revoxhere/duino-coin
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>
+)=====";
+
+WebServer server(80);
 WiFiClient wifiMqttClient;
 PubSubClient mqttClient(wifiMqttClient);
 
@@ -152,61 +298,6 @@ void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
     digitalWrite(pin, state ^= HIGH);
     delay(80);
   }
-}
-
-// Communication Functions
-void UpdatePool() {
-  String input = "";
-  int waitTime = 1;
-  int poolIndex = 0;
-  int poolSize = sizeof(get_pool_api) / sizeof(char*);
-
-  while (input == "") {
-    Serial.println("Fetching mining node from the poolpicker in " + String(waitTime) + "s");
-    input = httpGetString(get_pool_api[poolIndex]);
-    poolIndex += 1;
-
-    // Check if pool index needs to roll over
-    if (poolIndex >= poolSize) {
-      poolIndex %= poolSize;
-      delay(waitTime * 1000);
-
-      // Increase wait time till a maximum of 32 seconds (addresses: Limit connection requests on failure in ESP boards #1041)
-      waitTime *= 2;
-      if ( waitTime > 32 )
-        waitTime = 32;
-    }
-  }
-
-  // Setup pool with new input
-  UpdateHostPort(input);
-}
-
-void UpdateHostPort(String input) {
-  // Thanks @ricaun for the code
-  StaticJsonDocument<256> doc;
-  DeserializationError error = deserializeJson(doc, input);
-
-  if (error) {
-    Serial.print(F("JSON deserialization failed - error: "));
-    Serial.println(error.f_str());
-    return;
-  }
-
-  const char *name = doc["name"];
-  const char *h = doc["ip"];
-  int p = doc["port"];
-
-  host = h;
-  port = p;
-
-  // Send to MQTT
-  mqttClient.publish((mqttRigTopic + "pool_name").c_str(), name);
-  mqttClient.publish((mqttRigTopic + "pool_ip").c_str(), h);
-  mqttClient.publish((mqttRigTopic + "pool_port").c_str(), String(p).c_str());
-
-  // Send to Serial
-  Serial.println("Poolpicker selected the best mining node: " + String(name));
 }
 
 String httpGetString(String URL) {
@@ -228,8 +319,63 @@ String httpGetString(String URL) {
   return payload;
 }
 
-void HandleMqttConnection()
-{
+void UpdateHostPort(String input) {
+  // Thanks @ricaun for the code
+  StaticJsonDocument<256> doc;
+  DeserializationError error = deserializeJson(doc, input);
+
+  if (error) {
+    Serial.print(F("JSON deserialization failed - error: "));
+    Serial.println(error.f_str());
+    return;
+  }
+
+  const char *name = doc["name"];
+  const char *h = doc["ip"];
+  int p = doc["port"];
+
+  host = h;
+  port = p;
+  node_id = String(name);
+
+  // Send to MQTT
+  mqttClient.publish((mqttRigTopic + "pool_name").c_str(), name);
+  mqttClient.publish((mqttRigTopic + "pool_ip").c_str(), h);
+  mqttClient.publish((mqttRigTopic + "pool_port").c_str(), String(p).c_str());
+
+  // Send to Serial
+  Serial.println("Poolpicker selected the best mining node: " + String(name));
+}
+
+// Communication Functions
+void UpdatePool() {
+  String input = "";
+  int waitTime = 1;
+  int poolIndex = 0;
+  int poolSize = sizeof(POOLPICKER_URL) / sizeof(char*);
+
+  while (input == "") {
+    Serial.println("Fetching mining node from the poolpicker in " + String(waitTime) + "s");
+    input = httpGetString(POOLPICKER_URL[poolIndex]);
+    poolIndex += 1;
+
+    // Check if pool index needs to roll over
+    if (poolIndex >= poolSize) {
+      poolIndex %= poolSize;
+      delay(waitTime * 1000);
+
+      // Increase wait time till a maximum of 32 seconds (addresses: Limit connection requests on failure in ESP boards #1041)
+      waitTime *= 2;
+      if ( waitTime > 32 )
+        waitTime = 32;
+    }
+  }
+
+  // Setup pool with new input
+  UpdateHostPort(input);
+}
+
+void HandleMqttConnection() {
   // Check Connection
   if (!mqttClient.connected()) {
     // Setup MQTT Client
@@ -237,16 +383,16 @@ void HandleMqttConnection()
     mqttClient.setServer(mqtt_server, mqtt_port);
 
     // Setup Rig Topic
-    mqttRigTopic = "duinocoin/" + String(rig_identifier) + "/";
+    mqttRigTopic = "duinocoin/" + String(RIG_IDENTIFIER) + "/";
 
     // Try to connect
-    if (mqttClient.connect(rig_identifier, (mqttRigTopic + "state").c_str(), 0, true, String(0).c_str())) {
+    if (mqttClient.connect(RIG_IDENTIFIER, (mqttRigTopic + "state").c_str(), 0, true, String(0).c_str())) {
       // Connection Succesfull
       Serial.println("Succesfully connected to MQTT server");
 
       // Output connection info
       mqttClient.publish((mqttRigTopic + "ip").c_str(), WiFi.localIP().toString().c_str());
-      mqttClient.publish((mqttRigTopic + "name").c_str(), String(rig_identifier).c_str());
+      mqttClient.publish((mqttRigTopic + "name").c_str(), String(RIG_IDENTIFIER).c_str());
     }
     else {
       // Connection Failed
@@ -257,6 +403,36 @@ void HandleMqttConnection()
   // Default MQTT Loop
   mqttClient.loop();
 }
+
+void dashboard() {
+  Serial.println("Handling HTTP client");
+
+  String s = WEBSITE;
+  s.replace("@@IP_ADDR@@", WiFi.localIP().toString());
+
+  int avgDiff = 0;
+  int totHash = 0;
+  int totShares = 0;
+  for (int i = 0; i < NUMBEROFCORES; i++) {
+        avgDiff += TaskThreadData[i].difficulty;
+        totHash += TaskThreadData[i].hashrate;
+        totShares += TaskThreadData[i].shares;
+  }
+  avgDiff /= NUMBEROFCORES;
+  
+  s.replace("@@HASHRATE@@", String(totHash / 1000));
+  s.replace("@@DIFF@@", String(avgDiff / 100));
+  s.replace("@@SHARES@@", String(totShares));
+  s.replace("@@NODE@@", String(node_id));
+
+  s.replace("@@DEVICE@@", String(DEVICE));
+  s.replace("@@ID@@", String(RIG_IDENTIFIER));
+  s.replace("@@MEMORY@@", String(ESP.getFreeHeap()));
+  s.replace("@@VERSION@@", String(MINER_VER));
+
+  server.send(200, "text/html", s);
+}
+
 
 void WiFireconnect(void *pvParameters) {
   int n = 0;
@@ -269,6 +445,8 @@ void WiFireconnect(void *pvParameters) {
 #ifdef ENABLE_OTA
     ArduinoOTA.handle();
 #endif
+
+    server.handleClient();
 
     if (ota_state)  // If OTA is working, reset the watchdog
       esp_task_wdt_reset();
@@ -283,8 +461,20 @@ void WiFireconnect(void *pvParameters) {
       // Write Data to Serial
       Serial.println("\n\nSuccessfully connected to WiFi");
       Serial.println("Local IP address: " + WiFi.localIP().toString());
-      Serial.println("Duino rig identifier: " + String(rig_identifier));
+      Serial.println("Rig name: " + String(RIG_IDENTIFIER));
       Serial.println();
+
+      if (!MDNS.begin(RIG_IDENTIFIER)) {
+        Serial.println("mDNS unavailable");
+      }
+      MDNS.addService("http", "tcp", 80);
+      Serial.print("Configured mDNS for dashboard on http://" 
+                    + String(RIG_IDENTIFIER)
+                    + ".local (or http://"
+                    + WiFi.localIP().toString()
+                    + ")");
+      server.on("/", dashboard);
+      server.begin();
 
       // Notify Setup Complete
       blink(BLINK_SETUP_COMPLETE);// Sucessfull connection with wifi network
@@ -313,7 +503,7 @@ void WiFireconnect(void *pvParameters) {
         Serial.print(n);
         Serial.println(F(" networks found"));
         for (int i = 0; i < n; ++i) {
-          // Print wifi_ssid and RSSI for each network found
+          // Print SSID and RSSI for each network found
           Serial.print(i + 1);
           Serial.print(F(": "));
           Serial.print(WiFi.SSID(i));
@@ -334,7 +524,7 @@ void WiFireconnect(void *pvParameters) {
       Serial.println("ESP32 will reset itself after " + String(WDT_TIMEOUT) +
                      " seconds if can't connect to the network");
 
-      Serial.print("Connecting to: " + String(wifi_ssid));
+      Serial.print("Connecting to: " + String(SSID));
       WiFi.reconnect();
     }
 
@@ -420,9 +610,9 @@ void TaskMining(void *pvParameters) {
       esp_task_wdt_reset();
 
       // We are connected and are able to request a job
-      Serial.println(String(taskCoreName + " asking for a new job for user: " + username));
+      Serial.println(String(taskCoreName + " asking for a new job for user: " + DUCO_USER));
       jobClient.flush();
-      jobClient.print("JOB," + String(username) + ",ESP32" + MSGNEWLINE);
+      jobClient.print("JOB," + String(DUCO_USER) + ",ESP32" + MSGNEWLINE);
       while (!jobClient.available()) {
         if (!jobClient.connected()) break;
         delay(10);
@@ -504,7 +694,7 @@ void TaskMining(void *pvParameters) {
           jobClient.flush();
           jobClient.print(
             String(nonceCalc) + MSGDELIMITER + String(TaskThreadData[taskId].hashrate) + MSGDELIMITER +
-            String(miner_version) + MSGDELIMITER + String(rig_identifier) + MSGDELIMITER +
+            String(MINER_BANNER) + " " + String(MINER_VER) + MSGDELIMITER + String(RIG_IDENTIFIER) + MSGDELIMITER +
             "DUCOID" + String((char *)chip_id) + MSGDELIMITER + String(walletid) + MSGNEWLINE);
           jobClient.flush();
 
@@ -552,11 +742,11 @@ void TaskMining(void *pvParameters) {
 
 void setup() {
   Serial.begin(500000);  // Start serial connection
-  Serial.println("\n\nDuino-Coin " + String(miner_version));
+  Serial.println("\n\nDuino-Coin " + String(MINER_BANNER));
 
   WiFi.mode(WIFI_STA);  // Setup ESP in client mode
   btStop();
-  WiFi.begin(wifi_ssid, wifi_password);  // Connect to wifi
+  WiFi.begin(SSID, WIFI_PASS);  // Connect to wifi
 
   uint64_t chipid = ESP.getEfuseMac();  // Getting chip chip_id
   uint16_t chip =
@@ -568,14 +758,13 @@ void setup() {
   walletid = random(0, 2811);
 
   // Autogenerate ID if required
-  if ( strcmp(rig_identifier, "Auto") == 0 ) {
+  if ( strcmp(RIG_IDENTIFIER, "Auto") == 0 ) {
     snprintf(rigname_auto, 23, "ESP32-%04X%08X", chip, (uint32_t)chipid);
-    rig_identifier = &rigname_auto[0];
+    RIG_IDENTIFIER = &rigname_auto[0];
   }
 
   ota_state = false;
-
-#ifdef ENABLE_OTA
+  #ifdef ENABLE_OTA
   ArduinoOTA
   .onStart([]() {
     String type;
@@ -586,7 +775,7 @@ void setup() {
 
     // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS
     // using SPIFFS.end()
-    Serial.println("Start updating " + type);
+    Serial.println("Updating " + type);
     ota_state = true;
   })
   .onEnd([]() {
@@ -614,9 +803,9 @@ void setup() {
     esp_restart();
   });
 
-  ArduinoOTA.setHostname(rig_identifier);
+  ArduinoOTA.setHostname(RIG_IDENTIFIER);
   ArduinoOTA.begin();
-#endif
+  #endif
 
   esp_task_wdt_init(WDT_TIMEOUT, true);  // Init Watchdog timer
   pinMode(LED_BUILTIN, OUTPUT);
@@ -634,13 +823,13 @@ void setup() {
   delay(250);
 
   // If MQTT is enabled create a sending thread
-#ifdef ENABLE_MQTT
+  #ifdef ENABLE_MQTT
   Serial.println("Creating mqtt thread on core: " + String(mqttCore));
   xTaskCreatePinnedToCore(
     MqttPublishCode, "MqttPublishCode", 10000, NULL, 1, &MqttPublishHandle,
     mqttCore); //create a task with lowest priority and executed on core 1
   delay(250);
-#endif
+  #endif
 
   // Create Mining Threads
   for ( int i = 0; i < NUMBEROFCORES; i++ ) {
