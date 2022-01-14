@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 2.75 © MIT licensed
+Duino-Coin Official AVR Miner 3.0 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -93,7 +93,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '2.75'
+    VER = '3.0'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
     AVR_TIMEOUT = 4  # diff 6 * 100 / 196 h/s = 3.06
@@ -101,7 +101,10 @@ class Settings:
     DATA_DIR = "Duino-Coin AVR Miner " + str(VER)
     SEPARATOR = ","
     ENCODING = "utf-8"
-    BLOCK = " ‖ "
+    try:
+        BLOCK = " ‖ "
+    except:
+        BLOCK = " | "
     PICK = ""
     COG = " @"
     if osname != "nt":
@@ -188,12 +191,12 @@ class Donate:
         if osname == 'nt':
             cmd = (f'cd "{Settings.DATA_DIR}" & Donate.exe '
                    + '-o stratum+tcp://xmg.minerclaim.net:3333 '
-                   + f'-u revox.donate -p x -s 4 -e {donation_level*5}')
+                   + f'-u revox.donate -p x -s 4 -e {donation_level*3}')
         elif osname == 'posix':
             cmd = (f'cd "{Settings.DATA_DIR}" && chmod +x Donate '
                    + '&& nice -20 ./Donate -o '
                    + 'stratum+tcp://xmg.minerclaim.net:3333 '
-                   + f'-u revox.donate -p x -s 4 -e {donation_level*5}')
+                   + f'-u revox.donate -p x -s 4 -e {donation_level*3}')
 
         if donation_level <= 0:
             pretty_print(
@@ -348,9 +351,8 @@ def title(title: str):
         try:
             print('\33]0;' + title + '\a', end='')
             sys.stdout.flush()
-        except Exception:
-            # wasn't able to set title (e.g., running headless)
-            pretty_print(Exception)
+        except Exception as e:
+            print(e)
 
 
 def handler(signal_received, frame):
@@ -598,8 +600,8 @@ def update_rich_presence():
                                 {"label": "Join the Discord",
                                  "url": "https://discord.gg/k48Ht5y"}])
         except Exception as e:
-            #print("Error updating Discord RPC thread: " + str(e))
-            pass
+            print("Error updating Discord RPC thread: " + str(e))
+
         sleep(15)
 
 
@@ -631,7 +633,7 @@ def pretty_print(sender: str = "sys0",
 
 
 def share_print(id, type, accept, reject, total_hashrate,
-                computetime, diff, ping):
+                computetime, diff, ping, reject_cause=None):
     """
     Produces nicely formatted CLI output for shares:
     HH:MM:S |avrN| ⛏ Accepted 0/0 (100%) ∙ 0.0s ∙ 0 kH/s ⚙ diff 0 k ∙ ping 0ms
@@ -654,6 +656,8 @@ def share_print(id, type, accept, reject, total_hashrate,
         fg_color = Fore.YELLOW
     else:
         share_str = get_string("rejected")
+        if reject_cause:
+            share_str += f"{Style.NORMAL}({reject_cause}) "
         fg_color = Fore.RED
 
     with thread_lock():
@@ -842,7 +846,7 @@ def mine_avr(com, threadid, fastest_pool):
                             + str(result[2]))
 
                 responsetimetart = now()
-                feedback = Client.recv(s, 64)
+                feedback = Client.recv(s, 64).split(",")
                 responsetimestop = now()
 
                 time_delta = (responsetimestop -
@@ -850,7 +854,7 @@ def mine_avr(com, threadid, fastest_pool):
                 ping_mean.append(round(time_delta / 1000))
                 ping = mean(ping_mean[-10:])
                 diff = get_prefix("", int(diff), 0)
-                debug_output(com + f': retrieved feedback: {feedback}')
+                debug_output(com + f': retrieved feedback: {" ".join(feedback)}')
             except Exception as e:
                 pretty_print('net' + port_num(com),
                              get_string('connecting_error')
@@ -860,14 +864,14 @@ def mine_avr(com, threadid, fastest_pool):
                 sleep(5)
                 break
 
-            if feedback == 'GOOD':
+            if feedback[0] == 'GOOD':
                 shares[0] += 1
                 printlock.acquire()
                 share_print(port_num(com), "accept",
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping)
                 printlock.release()
-            elif feedback == 'BLOCK':
+            elif feedback[0] == 'BLOCK':
                 shares[0] += 1
                 shares[2] += 1
                 printlock.acquire()
@@ -880,7 +884,7 @@ def mine_avr(com, threadid, fastest_pool):
                 printlock.acquire()
                 share_print(port_num(com), "reject",
                             shares[0], shares[1], hashrate,
-                            computetime, diff, ping)
+                            computetime, diff, ping, feedback[1])
                 printlock.release()
 
             title(get_string('duco_avr_miner') + str(Settings.VER)
@@ -975,7 +979,5 @@ if __name__ == '__main__':
     if discord_presence == "y":
         try:
             init_rich_presence()
-            Thread(
-                target=update_rich_presence).start()
         except Exception as e:
             debug_output(f'Error launching Discord RPC thread: {e}')
