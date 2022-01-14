@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 2.75 © MIT licensed
+Duino-Coin Official PC Miner 3.0 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
 """
 
+from threading import Semaphore
 from time import time, sleep, strptime, ctime
 from hashlib import sha1
 from socket import socket
 
-from multiprocessing import Lock as thread_lock
 from multiprocessing import cpu_count, current_process
 from multiprocessing import Process, Manager
 from threading import Thread
@@ -21,6 +21,7 @@ from os import execl, mkdir, _exit
 from subprocess import DEVNULL, Popen, check_call
 import pip
 import sys
+import struct
 import os
 import json
 
@@ -34,6 +35,8 @@ from signal import SIGINT, signal
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 from configparser import ConfigParser
 configparser = ConfigParser()
+
+printlock = Semaphore(value=1)
 
 
 def handler(signal_received, frame):
@@ -98,7 +101,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 2.75
+    VER = 3.0
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -111,7 +114,11 @@ class Settings:
     REPORT_TIME = 120
     DONATE_LVL = 0
 
-    BLOCK = " ‖ "
+    try:
+        # Raspberry Pi latin users can't display this character
+        BLOCK = " ‖ "
+    except:
+        BLOCK = " | "
     PICK = ""
     COG = " @"
     if (os.name != "nt"
@@ -129,24 +136,43 @@ class Algorithms:
     https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf
     """
     def DUCOS1(last_h: str, exp_h: str, diff: int, eff: int):
-        time_start = time()
-        base_hash = sha1(last_h.encode('ascii'))
+        try:
+            import libducohasher
+            fasthash_supported = True
+        except:
+            fasthash_supported = False
 
-        for nonce in range(100 * diff + 1):
-            temp_h = base_hash.copy()
-            temp_h.update(str(nonce).encode('ascii'))
-            d_res = temp_h.hexdigest()
+        if fasthash_supported:
+            time_start = time()
 
-            if eff != 0:
-                if nonce % 5000 == 0:
-                    sleep(eff / 100)
+            hasher = libducohasher.DUCOHasher(bytes(last_h, encoding='ascii'))
+            nonce = hasher.DUCOS1(
+                bytes(bytearray.fromhex(exp_h)), diff, int(eff))
 
-            if d_res == exp_h:
-                time_elapsed = time() - time_start
-                hashrate = nonce / time_elapsed
-                return [nonce, hashrate]
+            time_elapsed = time() - time_start
+            hashrate = nonce / time_elapsed
 
-        return [0, 0]
+            return [nonce, hashrate]
+        else:
+            time_start = time()
+            base_hash = sha1(last_h.encode('ascii'))
+
+            for nonce in range(100 * diff + 1):
+                temp_h = base_hash.copy()
+                temp_h.update(str(nonce).encode('ascii'))
+                d_res = temp_h.hexdigest()
+
+                if eff != 0:
+                    if nonce % 5000 == 0:
+                        sleep(eff / 100)
+
+                if d_res == exp_h:
+                    time_elapsed = time() - time_start
+                    hashrate = nonce / time_elapsed
+
+                    return [nonce, hashrate]
+
+            return [0, 0]
 
 
 class Client:
@@ -167,32 +193,50 @@ class Client:
         data = s.recv(limit).decode(Settings.ENCODING).rstrip("\n")
         return data
 
-    def fetch_pool():
+    def fetch_pool(retry_count=1):
         """
         Fetches the best pool from the /getPool API endpoint
         """
+
         while True:
-            pretty_print(" " + get_string("connection_search"),
-                         "warning", "net0")
+            if retry_count > 60:
+                retry_count = 60
+
             try:
+                pretty_print(get_string("connection_search"),
+                             "info", "net0")
                 response = requests.get(
                     "https://server.duinocoin.com/getPool",
-                    timeout=5).json()
+                    timeout=10).json()
+
                 if response["success"] == True:
+                    pretty_print(get_string("connecting_node")
+                                 + response["name"],
+                                 "info", "net0")
+
                     NODE_ADDRESS = response["ip"]
                     NODE_PORT = response["port"]
+
                     return (NODE_ADDRESS, NODE_PORT)
+
                 elif "message" in response:
                     pretty_print(f"Warning: {response['message']}"
-                                 + ", retrying in 15s", "warning", "net0")
-                    sleep(15)
+                                 + f", retrying in {retry_count*2}s",
+                                 "warning", "net0")
+
                 else:
-                    raise Exception(
-                        "no response - IP ban or connection error")
+                    raise Exception("no response - IP ban or connection error")
             except Exception as e:
-                pretty_print(f"Error fetching mining node: {e}"
-                             + ", retrying in 15s", "error", "net0")
-                sleep(15)
+                if "Expecting value" in str(e):
+                    pretty_print(get_string("node_picker_unavailable")
+                                 + f"{retry_count*2}s {Style.RESET_ALL}({e})",
+                                 "warning", "net0")
+                else:
+                    pretty_print(get_string("node_picker_error")
+                                 + f"{retry_count*2}s {Style.RESET_ALL}({e})",
+                                 "error", "net0")
+            sleep(retry_count * 2)
+            retry_count += 1
 
 
 class Donate:
@@ -207,6 +251,7 @@ class Donate:
                     with open(f"{Settings.DATA_DIR}/Donate.exe",
                               'wb') as f:
                         f.write(r.content)
+                    return
             elif os.name == "posix":
                 if osprocessor() == "aarch64":
                     url = ('https://server.duinocoin.com/'
@@ -214,15 +259,19 @@ class Donate:
                 elif osprocessor() == "armv7l":
                     url = ('https://server.duinocoin.com/'
                            + 'donations/DonateExecutableAARCH32')
-                else:
+                elif osprocessor() == "x86_64":
                     url = ('https://server.duinocoin.com/'
                            + 'donations/DonateExecutableLinux')
+                else:
+                    pretty_print(f"Donate executable unavailable: {os.name} {osprocessor()}")
+                    return
                 if not Path(
                         f"{Settings.DATA_DIR}/Donate").is_file():
                     r = requests.get(url, timeout=10)
                     with open(f"{Settings.DATA_DIR}/Donate",
                               "wb") as f:
                         f.write(r.content)
+                    return
 
     def start(donation_level):
         if os.name == 'nt':
@@ -269,8 +318,8 @@ def get_prefix(symbol: str,
     return val + symbol
 
 
-def periodic_report(start_time, end_time,
-                    shares, hashrate, uptime):
+def periodic_report(start_time, end_time, shares,
+                    blocks, hashrate, uptime):
     """
     Displays nicely formated uptime stats
     """
@@ -283,6 +332,8 @@ def periodic_report(start_time, end_time,
                  + str(shares) + get_string("report_body2")
                  + str(round(shares/seconds, 1))
                  + get_string("report_body3")
+                 + get_string("report_body7")
+                 + str(blocks)
                  + get_string("report_body4")
                  + str(get_prefix("H/s", hashrate, 2))
                  + get_string("report_body5")
@@ -312,6 +363,8 @@ def calculate_uptime(start_time):
 def pretty_print(msg: str = None,
                  state: str = "success",
                  sender: str = "sys0"):
+    global printlock
+
     """
     Produces nicely formatted CLI output for messages:
     HH:MM:S |sender| msg
@@ -325,12 +378,14 @@ def pretty_print(msg: str = None,
 
     if state == "success":
         fg_color = Fore.GREEN
+    elif state == "info":
+        fg_color = Fore.BLUE
     elif state == "error":
         fg_color = Fore.RED
     else:
         fg_color = Fore.YELLOW
 
-    with thread_lock():
+    with printlock:
         print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
               + Style.BRIGHT + bg_color + " " + sender + " "
               + Back.RESET + " " + fg_color + msg.strip())
@@ -340,7 +395,7 @@ def share_print(id, type,
                 accept, reject,
                 hashrate, total_hashrate,
                 computetime, diff, ping,
-                back_color):
+                back_color, reject_cause=None):
     """
     Produces nicely formatted CLI output for shares:
     HH:MM:S |cpuN| ⛏ Accepted 0/0 (100%) ∙ 0.0s ∙ 0 kH/s ⚙ diff 0 k ∙ ping 0ms
@@ -356,17 +411,19 @@ def share_print(id, type,
         fg_color = Fore.YELLOW
     else:
         share_str = get_string("rejected")
+        if reject_cause:
+            share_str += f"{Style.NORMAL}({reject_cause}) "
         fg_color = Fore.RED
 
-    with thread_lock():
+    with printlock:
         print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
               + Fore.WHITE + Style.BRIGHT + back_color + Fore.RESET
-              + " cpu" + str(id) + " " + Back.RESET
-              + fg_color + Settings.PICK + share_str + Fore.RESET
-              + str(accept) + "/" + str(accept + reject) + Fore.YELLOW
-              + " (" + str(round(accept / (accept + reject) * 100)) + "%)"
+              + f" cpu{id} " + Back.RESET + fg_color + Settings.PICK
+              + share_str + Fore.RESET + f"{accept}/{(accept + reject)}"
+              + Fore.YELLOW
+              + f" ({(round(accept / (accept + reject) * 100))}%)"
               + Style.NORMAL + Fore.RESET
-              + " ∙ " + str("%04.1f" % float(computetime)) + "s"
+              + f" ∙ {('%04.1f' % float(computetime))}s"
               + Style.NORMAL + " ∙ " + Fore.BLUE + Style.BRIGHT
               + str(total_hashrate) + Fore.RESET + Style.NORMAL
               + Settings.COG + f" diff {diff} ∙ " + Fore.CYAN
@@ -382,7 +439,7 @@ def get_string(string_name):
     elif string_name in lang_file["english"]:
         return lang_file["english"][string_name]
     else:
-        return "String not found: " + string_name
+        return string_name
 
 
 class Miner:
@@ -414,8 +471,8 @@ class Miner:
 
         if lang != "english":
             print(Style.DIM + Fore.YELLOW + Settings.BLOCK
-                  + Style.NORMAL + Fore.RESET + lang.capitalize()
-                  + " translation: " + Fore.YELLOW
+                  + Style.NORMAL + Fore.RESET
+                  + get_string("translation") + Fore.YELLOW
                   + get_string("translation_autor"))
 
         try:
@@ -464,7 +521,7 @@ class Miner:
             with open(Settings.DATA_DIR + Settings.TRANSLATIONS_FILE,
                       "wb") as f:
                 f.write(requests.get(Settings.TRANSLATIONS,
-                                     timeout=5).content)
+                                     timeout=10).content)
 
         with open(Settings.DATA_DIR + Settings.TRANSLATIONS_FILE, "r",
                   encoding=Settings.ENCODING) as file:
@@ -625,12 +682,12 @@ class Miner:
         return configparser["PC Miner"]
 
     def m_connect(id, pool):
-        retry_counter = 0
+        retry_count = 0
         while True:
             try:
-                if retry_counter > 3:
+                if retry_count > 3:
                     pool = Client.fetch_pool()
-                    retry_counter = 0
+                    retry_count = 0
 
                 socket_connection = Client.connect(pool)
                 POOL_VER = Client.recv(5)
@@ -663,11 +720,11 @@ class Miner:
                 pretty_print(get_string('connecting_error')
                              + Style.NORMAL + f' (connection err: {e})',
                              'error', 'net0')
-                retry_counter += 1
+                retry_count += 1
                 sleep(10)
 
     def mine(id: int, user_settings: list,
-             pool: tuple,
+             blocks: int, pool: tuple,
              accept: int, reject: int,
              hashrate: list,
              single_miner_id: str):
@@ -757,7 +814,8 @@ class Miner:
                                                 back_color)
 
                                 elif feedback[0] == "BLOCK":
-                                    reject.value += 1
+                                    accept.value += 1
+                                    blocks.value += 1
                                     share_print(id, "block",
                                                 accept.value, reject.value,
                                                 result[1], total_hashrate,
@@ -770,17 +828,17 @@ class Miner:
                                                 accept.value, reject.value,
                                                 result[1], total_hashrate,
                                                 computetime, job[2], ping,
-                                                back_color)
+                                                back_color, feedback[1])
 
                                 if id == 0:
                                     end_time = time()
                                     elapsed_time = end_time - last_report
-                                    if elapsed_time >= Settings.REPORT_TIME:
+                                    if elapsed_time >= int(user_settings["report_sec"]):
                                         r_shares = accept.value - last_shares
                                         uptime = calculate_uptime(
                                             mining_start_time)
                                         periodic_report(last_report, end_time,
-                                                        r_shares,
+                                                        r_shares, blocks.value,
                                                         sum(hashrate.values()),
                                                         uptime)
                                         last_report = time()
@@ -830,50 +888,121 @@ class Discord_rp:
             sleep(15)
 
 
+class Fasthash:
+    def init():
+        try:
+            """
+            Check wheter libducohash fasthash is available
+            to speed up the DUCOS1 work, created by @HGEpro
+            """
+            import libducohasher
+            pretty_print(get_string("fasthash_available"), "info")
+        except Exception as e:
+            pretty_print(
+                ("Fasthash accelerations are not available for your OS.\n"
+                 + "If you wish to compile them for your system, visit:\n"
+                 + "https://github.com/revoxhere/duino-coin/wiki/"
+                 + "How-to-compile-fasthash-accelerations\n"
+                 + f"(Libducohash couldn't be loaded: {str(e)}"
+                 ).replace("\n", "\n\t\t"), 'warning', 'sys0')
+
+    def load():
+        if os.name == 'nt':
+            if not Path("libducohasher.pyd").is_file():
+                pretty_print(get_string("fasthash_download"), "info")
+                url = ('https://server.duinocoin.com/'
+                       + 'fasthash/libducohashWindows.pyd')
+                r = requests.get(url, timeout=10)
+                with open(f"libducohasher.pyd", 'wb') as f:
+                    f.write(r.content)
+                return
+        elif os.name == "posix":
+            if osprocessor() == "aarch64":
+                url = ('https://server.duinocoin.com/'
+                       + 'fasthash/libducohashPi4.so')
+            elif osprocessor() == "armv7l":
+                url = ('https://server.duinocoin.com/'
+                       + 'fasthash/libducohashPi4_32.so')
+            elif osprocessor() == "armv6l":
+                url = ('https://server.duinocoin.com/'
+                       + 'fasthash/libducohashPiZero.so')
+            elif osprocessor() == "x86_64":
+                url = ('https://server.duinocoin.com/'
+                       + 'fasthash/libducohashLinux.so')
+            else:
+                pretty_print(
+                    ("Fasthash accelerations are not available for your OS.\n"
+                     + "If you wish to compile them for your system, visit:\n"
+                     + "https://github.com/revoxhere/duino-coin/wiki/"
+                     + "How-to-compile-fasthash-accelerations\n"
+                     + f"(Invalid processor architecture: {osprocessor()}"
+                     ).replace("\n", "\n\t\t"), 'warning', 'sys0')
+                return
+            if not Path("libducohasher.so").is_file():
+                pretty_print(get_string("fasthash_download"), "info")
+                r = requests.get(url, timeout=10)
+                with open("libducohasher.so", "wb") as f:
+                    f.write(r.content)
+                return
+        else:
+            pretty_print(
+                ("Fasthash accelerations are not available for your OS.\n"
+                 + "If you wish to compile them for your system, visit:\n"
+                 + "https://github.com/revoxhere/duino-coin/wiki/"
+                 + "How-to-compile-fasthash-accelerations\n"
+                 + f"(Invalid OS: {os.name}"
+                 ).replace("\n", "\n\t\t"), 'warning', 'sys0')
+            return
+
+
 Miner.preload()
 p_list = []
 mining_start_time = time()
+
 if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
+    signal(SIGINT, handler)
 
     cpu = cpuinfo.get_cpu_info()
     accept = Manager().Value("i", 0)
     reject = Manager().Value("i", 0)
+    blocks = Manager().Value("i", 0)
     hashrate = Manager().dict()
 
-    signal(SIGINT, handler)
     user_settings = Miner.load_cfg()
     Miner.greeting()
-    fastest_pool = Client.fetch_pool()
+
+    Fasthash.load()
+    Fasthash.init()
 
     Donate.load(int(user_settings["donate"]))
     Donate.start(int(user_settings["donate"]))
 
     """
-    Generate a random number that's used only to
-    make the wallets display one miner with many threads
-    instead of many separate miners clogging it up
-    (like it was before release 2.7.3)
+    Generate a random number that's used to
+    group miners with many threads in the wallet
     """
     single_miner_id = randint(0, 2811)
+
     threads = int(user_settings["threads"])
-    if threads > 8:
-        threads = 8
+    if threads > 12:
+        threads = 12
         pretty_print(Style.BRIGHT
                      + get_string("max_threads_notice"))
 
+    fastest_pool = Client.fetch_pool()
+
     for i in range(threads):
         p = Process(target=Miner.mine,
-                    args=[i, user_settings,
+                    args=[i, user_settings, blocks,
                           fastest_pool, accept, reject,
                           hashrate, single_miner_id])
         p_list.append(p)
         p.start()
         sleep(0.05)
 
-    if user_settings["discord_rp"] == 'y':
-        Discord_rp.connect()
+    Discord_rp.connect()
 
     for p in p_list:
         p.join()
