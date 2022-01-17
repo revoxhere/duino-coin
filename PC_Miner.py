@@ -30,6 +30,8 @@ from pathlib import Path
 from re import sub
 from random import choice
 from platform import machine as osprocessor
+from platform import python_version_tuple
+from platform import python_version
 
 from signal import SIGINT, signal
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
@@ -263,7 +265,9 @@ class Donate:
                     url = ('https://server.duinocoin.com/'
                            + 'donations/DonateExecutableLinux')
                 else:
-                    pretty_print(f"Donate executable unavailable: {os.name} {osprocessor()}")
+                    pretty_print(
+                        "Donate executable unavailable: "
+                        + f"{os.name} {osprocessor()}")
                     return
                 if not Path(
                         f"{Settings.DATA_DIR}/Donate").is_file():
@@ -898,13 +902,22 @@ class Fasthash:
             import libducohasher
             pretty_print(get_string("fasthash_available"), "info")
         except Exception as e:
-            pretty_print(
-                ("Fasthash accelerations are not available for your OS.\n"
-                 + "If you wish to compile them for your system, visit:\n"
-                 + "https://github.com/revoxhere/duino-coin/wiki/"
-                 + "How-to-compile-fasthash-accelerations\n"
-                 + f"(Libducohash couldn't be loaded: {str(e)}"
-                 ).replace("\n", "\n\t\t"), 'warning', 'sys0')
+            if int(python_version_tuple()[1]) <= 6:
+                pretty_print(
+                    (f"Your Python version is too old ({python_version()}).\n"
+                     + "Fasthash accelerations and other features may not work"
+                     + " on your outdated installation.\n"
+                     + "We suggest updating your python to version 3.7 or higher."
+                     ).replace("\n", "\n\t\t"), 'warning', 'sys0')
+            else:
+                pretty_print(
+                    ("Fasthash accelerations are not available for your OS.\n"
+                     + "If you wish to compile them for your system, visit:\n"
+                     + "https://github.com/revoxhere/duino-coin/wiki/"
+                     + "How-to-compile-fasthash-accelerations\n"
+                     + f"(Libducohash couldn't be loaded: {str(e)})"
+                     ).replace("\n", "\n\t\t"), 'warning', 'sys0')
+            sleep(15)
 
     def load():
         if os.name == 'nt':
@@ -935,8 +948,9 @@ class Fasthash:
                      + "If you wish to compile them for your system, visit:\n"
                      + "https://github.com/revoxhere/duino-coin/wiki/"
                      + "How-to-compile-fasthash-accelerations\n"
-                     + f"(Invalid processor architecture: {osprocessor()}"
+                     + f"(Invalid processor architecture: {osprocessor()})"
                      ).replace("\n", "\n\t\t"), 'warning', 'sys0')
+                sleep(15)
                 return
             if not Path("libducohasher.so").is_file():
                 pretty_print(get_string("fasthash_download"), "info")
@@ -950,8 +964,9 @@ class Fasthash:
                  + "If you wish to compile them for your system, visit:\n"
                  + "https://github.com/revoxhere/duino-coin/wiki/"
                  + "How-to-compile-fasthash-accelerations\n"
-                 + f"(Invalid OS: {os.name}"
+                 + f"(Invalid OS: {os.name})"
                  ).replace("\n", "\n\t\t"), 'warning', 'sys0')
+            sleep(15)
             return
 
 
