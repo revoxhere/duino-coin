@@ -34,6 +34,7 @@ from subprocess import DEVNULL, Popen, check_call, call
 from threading import Thread
 from threading import Lock as thread_lock
 from threading import Semaphore
+import os
 printlock = Semaphore(value=1)
 
 
