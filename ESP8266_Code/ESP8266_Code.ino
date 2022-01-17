@@ -418,7 +418,7 @@ void ConnectToServer() {
   if (client.connected())
     return;
 
-  Serial.println("Connecting to the Duino-Coin server...");
+  Serial.println("\n\nConnecting to the Duino-Coin server...");
   while (!client.connect(host, port));
 
   waitForClientData();
