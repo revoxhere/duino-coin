@@ -40,6 +40,7 @@ uintDiff ducos1result = 0;
 // 40+40+20+3 is the maximum size of a job
 const uint16_t job_maxsize = 104;  
 uint8_t job[job_maxsize];
+Sha1Wrapper Sha1_base;
 
 void setup() {
   // Prepare built-in led pin as output
@@ -67,9 +68,11 @@ uintDiff ducos1a(String lastblockhash, String newblockhash,
     // If the difficulty is too high for AVR architecture then return 0
     if (difficulty > 655) return 0;
   #endif
+  Sha1_base.init();
+  Sha1_base.print(lastblockhash);
   for (uintDiff ducos1res = 0; ducos1res < difficulty * 100 + 1; ducos1res++) {
-    Sha1.init();
-    Sha1.print(lastblockhash + String(ducos1res));
+    Sha1 = Sha1_base;
+    Sha1.print(String(ducos1res));
     // Get SHA1 result
     uint8_t *hash_bytes = Sha1.result();
     if (memcmp(hash_bytes, job, SHA1_HASH_LEN * sizeof(char)) == 0) {
