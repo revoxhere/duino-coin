@@ -97,7 +97,7 @@ You can ask for a specific **start** difficulty: `JOB,username,diff` where diff 
 * `LOW` - used for mining on Web Miner, RPis, PC
 * `MEDIUM` - used for mining on PC
 * `NET` - used for mining on PC (network difficulty)
-* `EXTREME` - not used anywhere officially
+* `EXTREME` - usted for mining on high efficiency hardware (like GPUs) 
 
 When sending the mining result you can pass the hashrate count and the name of the miner along with rig name to display in the API.<br>
 Example: sending `6801,250000,My Cool Miner v4.20,House Miner` indicates that result 6801 was found, the hashrate was 250000H/s (250kH/s)
