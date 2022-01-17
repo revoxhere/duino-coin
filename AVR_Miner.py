@@ -97,7 +97,7 @@ class Settings:
     VER = '3.0'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
-    AVR_TIMEOUT = 5
+    AVR_TIMEOUT = 7 # diff 16 * 100 / 258 h/s = 6.2 s
     BAUDRATE = 115200
     DATA_DIR = "Duino-Coin AVR Miner " + str(VER)
     SEPARATOR = ","
@@ -482,7 +482,7 @@ def load_config():
             'identifier':       rig_identifier,
             'debug':            'n',
             "soc_timeout":      45,
-            "avr_timeout":      4,
+            "avr_timeout":      7,
             "discord_presence": "y",
             "periodic_report":  60,
             "shuffle_ports":    "y"}
