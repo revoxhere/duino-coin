@@ -96,18 +96,21 @@ class Settings:
     VER = '3.0'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
-    AVR_TIMEOUT = 4  # diff 6 * 100 / 196 h/s = 3.06
+    AVR_TIMEOUT = 5
     BAUDRATE = 115200
     DATA_DIR = "Duino-Coin AVR Miner " + str(VER)
     SEPARATOR = ","
     ENCODING = "utf-8"
     try:
+        # Raspberry Pi latin users can't display this character
         BLOCK = " ‖ "
     except:
         BLOCK = " | "
     PICK = ""
     COG = " @"
-    if osname != "nt":
+    if (osname != "nt"
+        or bool(osname == "nt"
+                and os.environ.get("WT_SESSION"))):
         # Windows' cmd does not support emojis, shame!
         PICK = " ⛏"
         COG = " ⚙"
@@ -133,17 +136,23 @@ class Client:
 
     def fetch_pool():
         while True:
-            pretty_print("net0", " " + get_string("connection_search"),
-                         "warning")
+            pretty_print("net0", get_string("connection_search"),
+                         "info")
             try:
                 response = requests.get(
                     "https://server.duinocoin.com/getPool",
-                    timeout=5).json()
+                    timeout=10).json()
+
                 if response["success"] == True:
+                    pretty_print("net0", get_string("connecting_node")
+                                 + response["name"],
+                                 "info")
+
                     NODE_ADDRESS = response["ip"]
                     NODE_PORT = response["port"]
-                    debug_output(f"Fetched pool: {response['name']}")
+                    
                     return (NODE_ADDRESS, NODE_PORT)
+
                 elif "message" in response:
                     pretty_print(f"Warning: {response['message']}"
                                  + ", retrying in 15s", "warning", "net0")
@@ -152,9 +161,14 @@ class Client:
                     raise Exception(
                         "no response - IP ban or connection error")
             except Exception as e:
-                pretty_print("net0",
-                             f"Error fetching mining node: {e}"
-                             + ", retrying in 15s", "error")
+                if "Expecting value" in str(e):
+                    pretty_print("net0", get_string("node_picker_unavailable")
+                                 + f"{retry_count*2}s {Style.RESET_ALL}({e})",
+                                 "warning")
+                else:
+                    pretty_print("net0", get_string("node_picker_error")
+                                 + f"{retry_count*2}s {Style.RESET_ALL}({e})",
+                                 "error")
                 sleep(15)
 
 
@@ -166,7 +180,7 @@ class Donate:
                         f"{Settings.DATA_DIR}/Donate.exe").is_file():
                     url = ('https://server.duinocoin.com/'
                            + 'donations/DonateExecutableWindows.exe')
-                    r = requests.get(url, timeout=10)
+                    r = requests.get(url, timeout=15)
                     with open(f"{Settings.DATA_DIR}/Donate.exe",
                               'wb') as f:
                         f.write(r.content)
@@ -182,7 +196,7 @@ class Donate:
                            + 'donations/DonateExecutableLinux')
                 if not Path(
                         f"{Settings.DATA_DIR}/Donate").is_file():
-                    r = requests.get(url, timeout=10)
+                    r = requests.get(url, timeout=15)
                     with open(f"{Settings.DATA_DIR}/Donate",
                               "wb") as f:
                         f.write(r.content)
@@ -213,7 +227,7 @@ class Donate:
             donateExecutable = Popen(cmd, shell=True, stderr=DEVNULL)
             pretty_print('sys0',
                          get_string('thanks_donation').replace("\n", "\n\t\t"),
-                         'warning')
+                         'error')
 
 
 shares = [0, 0, 0]
@@ -302,7 +316,7 @@ def get_string(string_name: str):
     elif string_name in lang_file['english']:
         return lang_file['english'][string_name]
     else:
-        return ' String not found: ' + string_name
+        return string_name
 
 
 def get_prefix(symbol: str,
@@ -616,11 +630,13 @@ def pretty_print(sender: str = "sys0",
         bg_color = Back.BLUE
     elif sender.startswith("avr"):
         bg_color = Back.MAGENTA
-    elif sender.startswith("sys"):
+    else:
         bg_color = Back.GREEN
 
     if state == "success":
         fg_color = Fore.GREEN
+    elif state == "info":
+        fg_color = Fore.BLUE
     elif state == "error":
         fg_color = Fore.RED
     else:
@@ -665,7 +681,7 @@ def share_print(id, type, accept, reject, total_hashrate,
               + Fore.WHITE + Style.BRIGHT + Back.MAGENTA + Fore.RESET
               + " avr" + str(id) + " " + Back.RESET
               + fg_color + Settings.PICK + share_str + Fore.RESET
-              + str(accept) + "/" + str(accept + reject) + Fore.YELLOW
+              + str(accept) + "/" + str(accept + reject) + Fore.MAGENTA
               + " (" + str(round(accept / (accept + reject) * 100)) + "%)"
               + Style.NORMAL + Fore.RESET
               + " ∙ " + str("%04.1f" % float(computetime)) + "s"
@@ -879,12 +895,18 @@ def mine_avr(com, threadid, fastest_pool):
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping)
                 printlock.release()
-            else:
+            elif feedback[0] == 'BAD':
                 shares[1] += 1
                 printlock.acquire()
                 share_print(port_num(com), "reject",
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping, feedback[1])
+                printlock.release()
+            else:
+                printlock.acquire()
+                share_print(port_num(com), "reject",
+                            shares[0], shares[1], hashrate,
+                            computetime, diff, ping, feedback)
                 printlock.release()
 
             title(get_string('duco_avr_miner') + str(Settings.VER)
