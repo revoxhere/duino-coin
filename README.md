@@ -79,7 +79,7 @@ These commands are only available after a successfull login:
 
 #### Ping
 
-After sending `PING` the srver will return `Pong!` as fast as it can
+After sending `PING` the server will return `Pong!` as fast as it can
 
 #### User balance
 
