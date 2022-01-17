@@ -833,6 +833,9 @@ def mine_avr(com, threadid, fastest_pool):
                     retry_counter += 1
                     continue
 
+            if retry_counter > 3:
+                break
+
             try:
                 computetime = round(int(result[1], 2) / 1000000, 3)
                 num_res = int(result[0], 2)
