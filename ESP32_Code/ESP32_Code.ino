@@ -575,7 +575,7 @@ void TaskMining(void *pvParameters) {
     }
 
     // Setup WiFi Client and connection details
-    Serial.println(String(taskCoreName + " is connecting to the Duino-Coin server..."));
+    Serial.println("\n\n" + String(taskCoreName) + " is connecting to the Duino-Coin server...");
     WiFiClient jobClient;
     jobClient.setTimeout(15);
     jobClient.flush();
