@@ -113,7 +113,7 @@ class Settings:
     SETTINGS_FILE = "/Settings.cfg"
 
     SOC_TIMEOUT = 15
-    REPORT_TIME = 120
+    REPORT_TIME = 5*60
     DONATE_LVL = 0
 
     try:
@@ -249,7 +249,7 @@ class Donate:
                         f"{Settings.DATA_DIR}/Donate.exe").is_file():
                     url = ('https://server.duinocoin.com/'
                            + 'donations/DonateExecutableWindows.exe')
-                    r = requests.get(url, timeout=10)
+                    r = requests.get(url, timeout=15)
                     with open(f"{Settings.DATA_DIR}/Donate.exe",
                               'wb') as f:
                         f.write(r.content)
@@ -271,7 +271,7 @@ class Donate:
                     return
                 if not Path(
                         f"{Settings.DATA_DIR}/Donate").is_file():
-                    r = requests.get(url, timeout=10)
+                    r = requests.get(url, timeout=15)
                     with open(f"{Settings.DATA_DIR}/Donate",
                               "wb") as f:
                         f.write(r.content)
@@ -281,12 +281,12 @@ class Donate:
         if os.name == 'nt':
             cmd = (f'cd "{Settings.DATA_DIR}" & Donate.exe '
                    + '-o stratum+tcp://xmg.minerclaim.net:3333 '
-                   + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
+                   + f'-u revox.donate -p x -s 4 -e {donation_level*5}')
         elif os.name == 'posix':
             cmd = (f'cd "{Settings.DATA_DIR}" && chmod +x Donate '
                    + '&& nice -20 ./Donate -o '
                    + 'stratum+tcp://xmg.minerclaim.net:3333 '
-                   + f'-u revox.donate -p x -s 4 -e {donation_level*10}')
+                   + f'-u revox.donate -p x -s 4 -e {donation_level*5}')
 
         if donation_level <= 0:
             pretty_print(
