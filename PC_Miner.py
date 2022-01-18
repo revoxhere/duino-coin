@@ -223,8 +223,8 @@ class Client:
 
                 elif "message" in response:
                     pretty_print(f"Warning: {response['message']}")
-                                 + f", retrying in {retry_count*2}s",
-                                 "warning", "net0")
+                    + (f", retrying in {retry_count*2}s",
+                    "warning", "net0")
 
                 else:
                     raise Exception("no response - IP ban or connection error")
