@@ -57,6 +57,8 @@ const char* USERNAME = "my_cool_username";
 const char* RIG_IDENTIFIER = "Auto";
 // Change false to true if using 160 MHz clock mode to not get the first share rejected
 const bool USE_HIGHER_DIFF = false;
+// Change false to true if you want to update hashrate in browser without reloading page
+const bool WEB_HASH_UPDATER = false;
 
 /* Do not change the lines below. These lines are static and dynamic variables
    that will be used by the program for counters and measurements. */
@@ -114,7 +116,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                         <div class="columns is-multiline">
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    @@HASHRATE@@kH/s
+                                    <span id="hashratex">@@HASHRATE@@</span>kH/s
                                 </div>
                                 <div class="heading is-size-5">
                                     Hashrate
@@ -207,6 +209,22 @@ const char WEBSITE[] PROGMEM = R"=====(
                 </div>
             </div>
         </div>
+        <script>
+            setInterval(function(){
+                getData();
+            }, 3000);
+            
+            function getData() {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("hashratex").innerHTML = this.responseText;
+                    }
+                };
+                xhttp.open("GET", "hashrateread", true);
+                xhttp.send();
+            }
+        </script>
     </section>
 </body>
 
@@ -214,6 +232,11 @@ const char WEBSITE[] PROGMEM = R"=====(
 )=====";
 
 ESP8266WebServer server(80);
+
+void hashupdater(){ //update hashrate every 3 sec in browser without reloading page
+  server.send(200, "text/plane", String(hashrate / 1000));
+  Serial.println("Update hashrate on page");
+};
 
 void UpdateHostPort(String input) {
   // Thanks @ricaun for the code
@@ -488,6 +511,7 @@ void setup() {
                 + WiFi.localIP().toString()
                 + ")");
   server.on("/", dashboard);
+  if (WEB_HASH_UPDATER) server.on("/hashrateread", hashupdater);
   server.begin();
 
   blink(BLINK_SETUP_COMPLETE);
