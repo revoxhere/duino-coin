@@ -222,7 +222,7 @@ class Client:
                     return (NODE_ADDRESS, NODE_PORT)
 
                 elif "message" in response:
-                    pretty_print(f"Warning: {response['message']}"
+                    pretty_print(f"Warning: {response['message']}")
                                  + f", retrying in {retry_count*2}s",
                                  "warning", "net0")
 
