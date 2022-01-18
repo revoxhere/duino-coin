@@ -397,7 +397,7 @@ def pretty_print(msg: str = None,
 
 def share_print(id, type,
                 accept, reject,
-                hashrate, total_hashrate,
+                total_hashrate,
                 computetime, diff, ping,
                 back_color, reject_cause=None):
     """
@@ -598,7 +598,6 @@ class Miner:
 
             algorithm = "DUCO-S1"
 
-            intensity = None
             intensity = sub(r"\D", "",
                             input(Style.NORMAL +
                                   get_string("ask_intensity") +
@@ -813,7 +812,7 @@ class Miner:
                                     accept.value += 1
                                     share_print(id, "accept",
                                                 accept.value, reject.value,
-                                                result[1], total_hashrate,
+                                                total_hashrate,
                                                 computetime, job[2], ping,
                                                 back_color)
 
@@ -822,7 +821,7 @@ class Miner:
                                     blocks.value += 1
                                     share_print(id, "block",
                                                 accept.value, reject.value,
-                                                result[1], total_hashrate,
+                                                total_hashrate,
                                                 computetime, job[2], ping,
                                                 back_color)
 
@@ -830,7 +829,7 @@ class Miner:
                                     reject.value += 1
                                     share_print(id, "reject",
                                                 accept.value, reject.value,
-                                                result[1], total_hashrate,
+                                                total_hashrate,
                                                 computetime, job[2], ping,
                                                 back_color, feedback[1])
 
