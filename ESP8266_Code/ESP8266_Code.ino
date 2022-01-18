@@ -34,8 +34,8 @@ On linux that file can be found in the following location:
   To install/upgrade it, go to the below link and
   follow the instructions of the readme file:
   https://github.com/esp8266/Arduino */
-#include <Crypto.h>  // experimental SHA1 crypto library
-using namespace experimental::crypto;
+#include <bearssl/bearssl.h>
+#include <TypeConversion.h>
 
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -494,6 +494,10 @@ void setup() {
 }
 
 void loop() {
+  br_sha1_context sha1_ctx, sha1_ctx_base;
+  uint8_t hashArray[20];
+  String duco_numeric_result_str;
+  
   // 1 minute watchdog
   lwdtFeed();
 
@@ -514,6 +518,8 @@ void loop() {
   int job_len = last_block_hash.length() + expected_hash.length() + String(difficulty).length();
   Serial.println("Received a correct job with size of " + String(job_len) + " bytes");
   expected_hash.toUpperCase();
+  br_sha1_init(&sha1_ctx_base);
+  br_sha1_update(&sha1_ctx_base, last_block_hash.c_str(), last_block_hash.length());
 
   float start_time = micros();
   max_micros_elapsed(start_time, 0);
@@ -522,7 +528,11 @@ void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   for (unsigned int duco_numeric_result = 0; duco_numeric_result < difficulty; duco_numeric_result++) {
     // Difficulty loop
-    result = SHA1::hash(last_block_hash + String(duco_numeric_result));
+    sha1_ctx = sha1_ctx_base;
+    duco_numeric_result_str = String(duco_numeric_result);
+    br_sha1_update(&sha1_ctx, duco_numeric_result_str.c_str(), duco_numeric_result_str.length());
+    br_sha1_out(&sha1_ctx, hashArray);
+    result = experimental::TypeConversion::uint8ArrayToHexString(hashArray, 20);
     if (result == expected_hash) {
       // If result is found
       unsigned long elapsed_time = micros() - start_time;
