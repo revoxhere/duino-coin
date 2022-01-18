@@ -6,7 +6,7 @@ https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
 """
 
-from os import _exit, execl, mkdir
+from os import _exit, mkdir
 from os import name as osname
 from os import path
 from os import system as ossystem
@@ -26,8 +26,6 @@ from datetime import datetime
 from statistics import mean
 from signal import SIGINT, signal
 from time import ctime, sleep, strptime, time
-from random import choice
-import select
 import pip
 
 from subprocess import DEVNULL, Popen, check_call, call
