@@ -638,7 +638,7 @@ void TaskMining(void *pvParameters) {
 
       // Global Definitions
       unsigned int job_size_task_one = 100;
-      unsigned char *expectedHashBytes = (unsigned char *)malloc(job_size_task_one * sizeof(unsigned char));
+      unsigned char expectedHashBytes[100];
 
       // Clear expectedHashBytes
       memset(expectedHashBytes, 0, job_size_task_one);
