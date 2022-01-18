@@ -866,8 +866,8 @@ class Discord_rp:
             RPC.connect()
             Thread(target=Discord_rp.update).start()
         except Exception as e:
-            #print("Error launching Discord RPC thread: " + str(e))
-            pass
+            pretty_print(get_string("Error launching Discord RPC thread: " + str(e)))
+          
 
     def update():
         while True:
@@ -887,8 +887,7 @@ class Discord_rp:
                                     {"label": "Join the Discord",
                                      "url": "https://discord.gg/k48Ht5y"}])
             except Exception as e:
-                #print("Error updating Discord RPC thread: " + str(e))
-                pass
+                pretty_print(get_string("Error updating Discord RPC thread: " + str(e)))
             sleep(15)
 
 
