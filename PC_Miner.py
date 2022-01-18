@@ -189,7 +189,7 @@ class Client:
 
     def send(msg: str):
         sent = s.sendall(str(msg).encode(Settings.ENCODING))
-        return True
+        return sent
 
     def recv(limit: int = 128):
         data = s.recv(limit).decode(Settings.ENCODING).rstrip("\n")
