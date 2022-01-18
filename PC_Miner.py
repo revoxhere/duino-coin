@@ -189,7 +189,7 @@ class Client:
 
     def send(msg: str):
         sent = s.sendall(str(msg).encode(Settings.ENCODING))
-        return True
+        return sent
 
     def recv(limit: int = 128):
         data = s.recv(limit).decode(Settings.ENCODING).rstrip("\n")
@@ -223,8 +223,8 @@ class Client:
 
                 elif "message" in response:
                     pretty_print(f"Warning: {response['message']}")
-                                 + f", retrying in {retry_count*2}s",
-                                 "warning", "net0")
+                    + (f", retrying in {retry_count*2}s",
+                    "warning", "net0")
 
                 else:
                     raise Exception("no response - IP ban or connection error")
@@ -397,7 +397,7 @@ def pretty_print(msg: str = None,
 
 def share_print(id, type,
                 accept, reject,
-                hashrate, total_hashrate,
+                total_hashrate,
                 computetime, diff, ping,
                 back_color, reject_cause=None):
     """
@@ -598,7 +598,6 @@ class Miner:
 
             algorithm = "DUCO-S1"
 
-            intensity = None
             intensity = sub(r"\D", "",
                             input(Style.NORMAL +
                                   get_string("ask_intensity") +
@@ -720,7 +719,7 @@ class Miner:
                                      "warning", "net" + str(id))
                         sleep(5)
                 break
-            except:
+            except Exception as e:
                 pretty_print(get_string('connecting_error')
                              + Style.NORMAL + f' (connection err: {e})',
                              'error', 'net0')
@@ -813,7 +812,7 @@ class Miner:
                                     accept.value += 1
                                     share_print(id, "accept",
                                                 accept.value, reject.value,
-                                                result[1], total_hashrate,
+                                                total_hashrate,
                                                 computetime, job[2], ping,
                                                 back_color)
 
@@ -822,7 +821,7 @@ class Miner:
                                     blocks.value += 1
                                     share_print(id, "block",
                                                 accept.value, reject.value,
-                                                result[1], total_hashrate,
+                                                total_hashrate,
                                                 computetime, job[2], ping,
                                                 back_color)
 
@@ -830,7 +829,7 @@ class Miner:
                                     reject.value += 1
                                     share_print(id, "reject",
                                                 accept.value, reject.value,
-                                                result[1], total_hashrate,
+                                                total_hashrate,
                                                 computetime, job[2], ping,
                                                 back_color, feedback[1])
 
@@ -855,7 +854,8 @@ class Miner:
                         sleep(5)
                         break
             except Exception as e:
-                pass
+                pretty_print(get_string("error_while_mining")
+                                     + " " + str(e), "error", "net" + str(id))
 
 
 class Discord_rp:
@@ -866,8 +866,8 @@ class Discord_rp:
             RPC.connect()
             Thread(target=Discord_rp.update).start()
         except Exception as e:
-            #print("Error launching Discord RPC thread: " + str(e))
-            pass
+            pretty_print(get_string("Error launching Discord RPC thread: " + str(e)))
+          
 
     def update():
         while True:
@@ -887,8 +887,7 @@ class Discord_rp:
                                     {"label": "Join the Discord",
                                      "url": "https://discord.gg/k48Ht5y"}])
             except Exception as e:
-                #print("Error updating Discord RPC thread: " + str(e))
-                pass
+                pretty_print(get_string("Error updating Discord RPC thread: " + str(e)))
             sleep(15)
 
 

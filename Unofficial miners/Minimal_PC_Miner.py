@@ -9,14 +9,10 @@ import os
 from socket import socket
 import sys  # Only python3 included libraries
 import time
-import ssl
-import select
-from json import load as jsonload
 import requests
 
 
 soc = socket()
-
 
 
 def current_time():
