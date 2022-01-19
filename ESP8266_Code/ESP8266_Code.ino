@@ -59,6 +59,8 @@ const char* RIG_IDENTIFIER = "Auto";
 const bool USE_HIGHER_DIFF = false;
 // Change false to true if you want to update hashrate in browser without reloading page
 const bool WEB_HASH_UPDATER = false;
+// Change true to false if you want to disable led blinking(But the LED will work in the beginning until esp connects to the pool)
+const bool LED_BLINKING = true;
 
 /* Do not change the lines below. These lines are static and dynamic variables
    that will be used by the program for counters and measurements. */
@@ -367,11 +369,13 @@ void SetupOTA() {
 }
 
 void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
-  uint8_t state = HIGH;
+  if (LED_BLINKING){
+    uint8_t state = HIGH;
 
-  for (int x = 0; x < (count << 1); ++x) {
-    digitalWrite(pin, state ^= HIGH);
-    delay(50);
+    for (int x = 0; x < (count << 1); ++x) {
+      digitalWrite(pin, state ^= HIGH);
+      delay(50);
+    }
   }
 }
 
@@ -563,7 +567,7 @@ void loop() {
       float elapsed_time_s = elapsed_time * .000001f;
       hashrate = duco_numeric_result / elapsed_time_s;
       share_count++;
-      digitalWrite(LED_BUILTIN, LOW);
+      blink(BLINK_SHARE_FOUND);
 
       client.print(String(duco_numeric_result)
                    + ","
