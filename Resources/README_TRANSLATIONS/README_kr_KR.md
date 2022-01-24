@@ -54,7 +54,7 @@ Duino-Coin은 Arduinos, ESP8266/32 보드, 라즈베리 파이, 컴퓨터 등으
 
 | 주요 특징 | 기술 사양 | 지원가능한 보드 |
 |-|-|-|
-| 💻 다수의 플랫폼에 지원<br>👥 빠르게 성장하는 커뮤니티<br>💱 용이한 사용 및 교환<br>(DUCO Exchange, Node-S, JustSwap, SushiSwap에서)<br>🌎 어디서든지 사용 가능<br>:new: 완전히 독창적 및 오픈 소스 프로젝트<br>🌳 초보자 및 친환경적<br>💰 효율적인 비용과 쉬운 채굴 | ⚒️ 알고리즘: DUCO-S1, XXHASH, 이외 <br>추가 예정 (PoS 포함)<br>♐ 보상: 채굴자에게 공정한 보상을 제공하는<br>"Kolka" 시스템<br>⚡ 거래 시간: 즉시<br>🪙 코인 공급량: 무제한<br>(2020년 12월 이전: 350k 코인)<br>(향후 새로운 한도 계획 예정)<br>🔤 시세: DUCO (ᕲ)<br>🔢 소수점: 최대 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini 등)<br>📶 ESP8266s<br>(NodeMCU, Wemos 등)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM 등)<br>🍓 라즈베리 파이<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 오렌지 파이<br>(Zero, Zero 2, PC, Plus 등)<br>⚡ Teensy 4.1 보드 |
+| 💻 다수의 플랫폼에 지원<br>👥 빠르게 성장하는 커뮤니티<br>💱 용이한 사용 및 교환<br>(DUCO Exchange, Node-S, JustSwap, SushiSwap에서)<br>🌎 어디서든지 사용 가능<br>:new: 완전히 독창적인 오픈 소스 프로젝트<br>🌳 초보자 친화적 및 친환경적<br>💰 효율적인 비용과 쉬운 채굴 | ⚒️ 알고리즘: DUCO-S1, XXHASH, 이외 <br>추가 예정 (PoS 포함)<br>♐ 보상: 채굴자에게 공정한 보상을 제공하는<br>"Kolka" 시스템<br>⚡ 거래 시간: 즉시<br>🪙 코인 공급량: 무제한<br>(2020년 12월 이전: 350k 코인)<br>(향후 새로운 한도 계획 예정)<br>🔤 시세: DUCO (ᕲ)<br>🔢 소수점: 최대 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini 등)<br>📶 ESP8266s<br>(NodeMCU, Wemos 등)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM 등)<br>🍓 라즈베리파이<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 오렌지 파이<br>(Zero, Zero 2, PC, Plus 등)<br>⚡ Teensy 4.1 보드 |
 
 
 ## 시작하기
@@ -68,7 +68,7 @@ FAQ 및 문제 해결 도움말은 [Wikis](https://github.com/revoxhere/duino-co
 
 ### 설치 매뉴얼
 
-#### Linux
+#### Linux (데비안 계열)
 
 ```BASH
 sudo apt update
@@ -97,10 +97,10 @@ Duino-Coin은 하이브리드 통화입니다. 즉, wDUCO로 변환될 수 있�
 
 ## 개발
 
-Contribution을 통해 오픈소스 커뮤니티를 배우고, 영감을 주고, 창조할 수 있는 놀라운 장소로 만들 수 있습니다.<br>
+Contribution(기여)을 통해 오픈소스 커뮤니티를 배우고, 영감을 주고, 창조할 수 있는 놀라운 장소로 만들 수 있습니다.<br>
 Duino-Coin 프로젝트에 대한 기여해 주시면 감사하겠습니다.
 
-어떻게 contribution할 수 있나요?
+프로젝트에 어떻게 contribution(기여)할 수 있나요?
 
 *   프로젝트 fork
 *   기능 branch 만들기
@@ -244,7 +244,7 @@ Duino-Coin은 대부분 MIT 라이센스에 따라 배포됩니다. 자세한 �
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR 개발자)
 
 
-Duino-Coin 프로젝트 개발에 도움을 준 모든 [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) 에게 크나큰 감사드립니다.
+Duino-Coin 프로젝트 개발에 도움을 준 모든 [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) 에게 크나큰 감사를 드립니다.
 
 
 <hr>
