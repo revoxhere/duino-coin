@@ -1016,7 +1016,8 @@ if __name__ == "__main__":
         p.start()
         sleep(0.05)
 
-    Discord_rp.connect()
+    if user_settings["discord_rp"] == 'y':
+        Discord_rp.connect()
 
     for p in p_list:
         p.join()
