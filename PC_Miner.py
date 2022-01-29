@@ -127,8 +127,14 @@ class Settings:
         or bool(os.name == "nt"
                 and os.environ.get("WT_SESSION"))):
         # Windows' cmd does not support emojis, shame!
-        PICK = " ⛏"
-        COG = " ⚙"
+        # And some codecs same, for example the Latin-1 encoding don`t support emoji
+        try:
+            "⛏ ⚙".encode(sys.stdout.encoding) # if the terminal support emoji
+            PICK = " ⛏"
+            COG = " ⚙"
+        except UnicodeEncodeError: # else
+            PICK = ""
+            COG = " @"
 
 
 class Algorithms:
