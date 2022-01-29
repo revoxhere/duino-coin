@@ -18,7 +18,7 @@ from datetime import datetime
 from random import randint
 
 from os import execl, mkdir, _exit
-from subprocess import DEVNULL, Popen, check_call
+from subprocess import DEVNULL, Popen, check_call, PIPE
 import pip
 import sys
 import struct
@@ -52,7 +52,11 @@ def handler(signal_received, frame):
             + Fore.RESET
             + get_string("goodbye"),
             "warning")
-    _exit(0)
+
+    if sys.platform == "win32":
+        _exit(0)
+    else: 
+        Popen("kill $(ps awux | grep PC_Miner | grep -v grep | awk '{print $2}')", shell=True, stdout=PIPE)
 
 
 def install(package):

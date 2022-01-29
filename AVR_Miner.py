@@ -28,7 +28,7 @@ from signal import SIGINT, signal
 from time import ctime, sleep, strptime, time
 import pip
 
-from subprocess import DEVNULL, Popen, check_call, call
+from subprocess import DEVNULL, Popen, check_call, call, PIPE
 from threading import Thread
 from threading import Lock as thread_lock
 from threading import Semaphore
@@ -379,7 +379,11 @@ def handler(signal_received, frame):
         'sys0', get_string('sigint_detected')
         + Style.NORMAL + Fore.RESET
         + get_string('goodbye'), 'warning')
-    _exit(0)
+
+    if sys.platform == "win32":
+        _exit(0)
+    else: 
+        Popen("kill $(ps awux | grep PC_Miner | grep -v grep | awk '{print $2}')", shell=True, stdout=PIPE)
 
 
 # Enable signal handler
