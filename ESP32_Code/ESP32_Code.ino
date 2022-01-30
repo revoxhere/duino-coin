@@ -30,6 +30,8 @@ const char *RIG_IDENTIFIER = "Auto";
 #define BLINK_CLIENT_CONNECT 3
 #define BLINK_RESET_DEVICE   5
 
+const bool LED_BLINKING = true;
+
 // Define watchdog timer seconds
 #define WDT_TIMEOUT 60
 
@@ -292,11 +294,14 @@ PubSubClient mqttClient(wifiMqttClient);
 
 // Util Functions
 void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
-  uint8_t state = LOW;
+  if (LED_BLINKING)
+  {
+    uint8_t state = LOW;
 
-  for (int x = 0; x < (count << 1); ++x) {
-    digitalWrite(pin, state ^= HIGH);
-    delay(80);
+    for (int x = 0; x < (count << 1); ++x) {
+      digitalWrite(pin, state ^= HIGH);
+      delay(80);
+    }
   }
 }
 
