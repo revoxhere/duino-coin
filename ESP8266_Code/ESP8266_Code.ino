@@ -594,6 +594,12 @@ void loop() {
       break;
     }
     if (max_micros_elapsed(micros(), 500000))
+    {
       handleSystemEvents();
+    }
+    else
+    {
+      delay(0);
+    }
   }
 }
