@@ -265,7 +265,7 @@
         "report_body2":" 공유량 (",
         "report_body3":" 공유량/s)",
         "report_body4":"\n\t\t‖ 이 hashrate ",
-        "report_body5":"\n\t\t‖ 이 기간동안, 해결 양 ",
+        "report_body5":"\n\t\t‖ 이 기간동안, 해결하신 양 ",
         "report_body6":" 해시들",
         "total_mining_time":"\n\t\t‖ 총 채굴 기간: "
     },
