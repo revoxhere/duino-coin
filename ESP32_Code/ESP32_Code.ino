@@ -639,7 +639,7 @@ void TaskMining(void *pvParameters) {
       String expectedHash = jobClient.readStringUntil(MSGDELIMITER);
       TaskThreadData[taskId].difficulty = jobClient.readStringUntil(MSGNEWLINE).toInt() * 100;
       jobClient.flush();
-      digitalWrite(LED_BUILTIN, LOW);
+      if (LED_BLINKING) digitalWrite(LED_BUILTIN, LOW);
 
       // Global Definitions
       unsigned int job_size_task_one = 100;
@@ -717,7 +717,7 @@ void TaskMining(void *pvParameters) {
           String feedback = jobClient.readStringUntil(MSGNEWLINE);
           jobClient.flush();
           TaskThreadData[taskId].shares++;
-          digitalWrite(LED_BUILTIN, HIGH);
+          if (LED_BLINKING) digitalWrite(LED_BUILTIN, HIGH);
 
           // Validate Hashrate
           if ( TaskThreadData[taskId].hashrate < 4000 && !ignoreHashrate) {
