@@ -168,11 +168,11 @@ class Client:
             except Exception as e:
                 if "Expecting value" in str(e):
                     pretty_print("net0", get_string("node_picker_unavailable")
-                                 + f"{retry_count*2}s {Style.RESET_ALL}({e})",
+                                 + f"15s {Style.RESET_ALL}({e})",
                                  "warning")
                 else:
                     pretty_print("net0", get_string("node_picker_error")
-                                 + f"{retry_count*2}s {Style.RESET_ALL}({e})",
+                                 + f"15s {Style.RESET_ALL}({e})",
                                  "error")
                 sleep(15)
 
