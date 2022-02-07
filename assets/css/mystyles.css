@@ -12840,7 +12840,9 @@ table th {
 
 @media (prefers-color-scheme: dark) {
   .footer {
-    background-color: #121212; } }
+    background-color: #121212; }
+  #copyright {
+    color: #DBDBDB; } }
 
 
 footer {
