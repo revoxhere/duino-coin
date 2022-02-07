@@ -32,8 +32,8 @@
     <meta property="twitter:title" content="Community Duino-Coin app list">
     <meta property="twitter:description" content="Browse verified community-created apps and faucets for Duino-Coin">
     <!-- CSS -->
-    <link rel="preload" href="assets/css/mystyles.css" as="style">
-    <link rel="stylesheet" type="text/css" href="assets/css/mystyles.css">
+    <link rel="preload" href="assets/css/mystyles.css?v=2" as="style">
+    <link rel="stylesheet" type="text/css" href="assets/css/mystyles.css?v=2">
     <!-- Jquery and FA -->
     <link rel="preload" href="assets/js/all.min.js" as="script">
     <script src="assets/js/all.min.js"></script>
@@ -771,12 +771,41 @@
     </div>
     <!-- FOOTER -->
     <footer class="footer">
-        <div class="content has-text-centered">
-            <p>
-                <strong>Duino-Coin</strong> by <a href="https://revoxhere.github.io">Robert "revox" Piotrowski </a> from the <b>Duino team</b> 2019-2022
-                <br/>Hosted by <a href="https://kk.dev">Kristian "Tech1k" Kramer </a> from the <b>Duino team</b> 2020-2022
-                <br/>This page is open-source. You can improve it <a href="https://github.com/revoxhere/duino-coin/tree/gh-pages">here</a>
-            </p>
+        <div class="footercontent content has-text-centered has-text-white">
+            <div class="columns">
+                <div class="column">
+                    <h6 id="footerheader">Resources</h6>
+                    <ul>
+                        <li><a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Whitepaper</a></li>
+                        <li><a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#branding">Branding</a></li>
+                        <li><a href="https://github.com/revoxhere/duino-coin/tree/useful-tools">API Docs</a></li>
+                        <li><a href="apps.html">Apps and faucets</a></li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h6 id="footerheader">Duino Team</h6>
+                    <ul>
+                        <li><a href="team.html">Meet our team</a></li>
+                        <li><a href="donate.html">Donate</a></li>
+                        <li><a href="https://store.duinocoin.com">Merch</a></li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h6 id="footerheader">More</h6>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="legal.html">Legal</a></li>
+                    </ul>
+                </div>
+            </div>
+            <a href="https://twitter.com/DuinoCoin" class="fab fa-twitter" id="twitter-icon"></a>
+            <a href="https://www.reddit.com/r/Duinocoin/" class="fab fa-reddit" id="reddit-icon"></a>
+            <a href="https://duinocoin.com/discord" class="fab fa-discord" id="discord-icon"></a>
+            <a href="https://github.com/revoxhere/duino-coin" class="fab fa-github" id="github-icon"></a>
+            <br/><br/>
+            <div class="footercontent content has-text-centered has-text-black">
+                <p id="copyright">Copyright © 2019 - 2022 Revox & Tech1k</p>
+            </div>
         </div>
     </footer>
 </body>

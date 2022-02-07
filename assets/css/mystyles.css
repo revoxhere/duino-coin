@@ -12841,3 +12841,96 @@ table th {
 @media (prefers-color-scheme: dark) {
   .footer {
     background-color: #121212; } }
+
+
+footer {
+  box-shadow: 0 10px 16px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%) !important;
+}
+.footercontent ul {
+  padding: 0;
+  margin: 0;
+}
+ .footercontent ul li {
+  list-style-type: none;
+  text-align: center;
+  padding: 5px;
+}
+.footercontent ul li a {
+  font-size: 18px;
+  color: grey;
+}
+.footercontent ul li a:hover {
+  color: #ddd;
+}
+#footerheader {
+  text-align: center;
+  font-size: 30px !important;
+  margin-bottom: 25px !important;
+}
+#twitter-icon {
+  width: 42px;
+  height: 42px;
+  padding: 12px;
+  font-size: 20px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 5px;
+  color: white;
+  border-radius: 50%;
+  background: #55ACEE;
+}
+#twitter-icon:hover {
+  transition: 0.5s;
+  opacity: 0.7;
+}
+#reddit-icon {
+  width: 42px;
+  height: 42px;
+  padding: 12px;
+  font-size: 20px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 5px;
+  color: white;
+  border-radius: 50%;
+  background: #FF4500;
+}
+#reddit-icon:hover {
+  transition: 0.5s;
+  opacity: 0.7;
+}
+#discord-icon {
+  width: 42px;
+  height: 42px;
+  padding: 12px;
+  font-size: 20px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 5px;
+  color: white;
+  border-radius: 50%;
+  background: #5663F7;
+}
+#discord-icon:hover {
+  transition: 0.5s;
+  opacity: 0.7;
+}
+#github-icon {
+  width: 42px;
+  height: 42px;
+  padding: 12px;
+  font-size: 20px;
+  text-align: center;
+  text-decoration: none;
+  margin: 5px 5px;
+  color: white;
+  border-radius: 50%;
+  background: #000000;
+}
+#github-icon:hover {
+  transition: 0.5s;
+  opacity: 0.7;
+}
+#copyright {
+  font-size: 18px;
+}
