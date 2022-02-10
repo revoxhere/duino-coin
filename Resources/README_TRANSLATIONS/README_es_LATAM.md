@@ -206,7 +206,6 @@ El código fuente del servidor, documentación para las peticiones a la API y li
   *   [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) panel de control y solucionador de problemas por Lulaschkas
   *   [duco-miners](https://github.com/dansinclair25/duco-miners) panel de control de minado CLI por dansinclair25
   *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) por SandUhrGucker
-  *   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) Para Chrome y Derivados por LDarki
   *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) Sitio Web para Estadisticas de cuenta por siunus
   *   [duino-tools](https://github.com/kyngs/duino-tools) Escrito en Java por kyngs
   *   [Duino Stats](https://github.com/Bilaboz/duino-stats) bot oficial de Discord por Bilaboz
