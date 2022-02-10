@@ -175,6 +175,7 @@ Server source code, documentation for API calls and official libraries for devel
   Please note that these softwares are not developed by us and we do not give any guarantees that use of them will not result in an account getting banned. Treat them as a curiosity. It's worth noting that using [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch **will get you banned**.
 
   ### Other miners known to work with Duino-Coin:
+  *   [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Arduino Ethernet shield Miner by Pumafron
   *   [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - STM8S firmware for mining DUCO by BBS215
   *   [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - miner for LabVIEW family by ericddm
   *   [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - a JavaScript miner which you can easily implement in your site by Hoiboy19
@@ -187,7 +188,7 @@ Server source code, documentation for API calls and official libraries for devel
   *   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - MicroPython miner for ESP boards by fabiopolancoe
   *   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Python miner for Nintendo 3DS by PhereloHD & HGEpro
   *   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Miner in Docker by Alicia426
-  *   [NodeJS-DuinoCoin-Miner](https://github.com/DarkThinking/NodeJS-DuinoCoin-Miner/) - simple NodeJS miner by DarkThinking
+  *   [NodeJS-DuinoCoin-Miner](https://github.com/LDarki/NodeJS-DuinoCoin-Miner/) - simple NodeJS miner by LDarki
   *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - pure C miner by phantom32 & revoxhere
   *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
   *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
@@ -209,7 +210,6 @@ Server source code, documentation for API calls and official libraries for devel
   *   [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) and troubleshooting helper by Lulaschkas
   *   [duco-miners](https://github.com/dansinclair25/duco-miners) CLI mining dashboard made by dansinclair25
   *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
-  *   [DUCO Browser Extension](https://github.com/LDarki/DucoExtension) for Chrome and derivatives by LDarki
   *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) account statistics website by siunus
   *   [duino-tools](https://github.com/kyngs/duino-tools) written in Java by kyngs
   *   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
