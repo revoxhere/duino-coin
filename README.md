@@ -236,7 +236,8 @@ Some third-party included files may have different licenses - please check their
 13. A user's DUCOs may be burnt if a violation can be proven.<br/>
 14. These terms of service can change at any time without prior notice.<br/>
 15. Having alt accounts without a rational reason (e.g. for multi-mining) are not allowed.<br/>
-16. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+16. Sending transactions that promote other services, or advertising in any other way is not allowed on the network.<br/>
+17. Every user using Duino-Coin agrees to comply with the above rules.<br/>
 
 
 ## Privacy policy
