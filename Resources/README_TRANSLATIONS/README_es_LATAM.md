@@ -238,7 +238,8 @@ Algunos archivos de terceros incluídos pueden tener distintas licencias - por f
 13. Los DUCOs de un usuario pueden ser quemados si una violación puede ser probada.<br/>
 14. Estos términos de servicio pueden cambiar en cualquier momento sin previo aviso.<br/>
 15. Tener cuentas secundarias sin un motivo racional (Ej. para multi-minado) no está permitido.<br/>
-16. Cada usuario utilizando Duino-Coin está de acuerdo a cumplir con las reglas dictadas anteriormente.<br/>
+16. Enviar transacciones para promover servicios, o hacer publicidad de  otra manera no esta permitida en la red.<br/>
+17. Cada usuario utilizando Duino-Coin está de acuerdo a cumplir con las reglas dictadas anteriormente.<br/>
 
 
 ## Políticas de Privacidad
