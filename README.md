@@ -96,6 +96,7 @@ cd
 wget https://raw.githubusercontent.com/Grantrocks/duino-coin/master/Tools/duco-install-rpi.sh
 sudo chmod a+x duco-install-rpi.sh
 ````
+
 #### Windows
 
 1. Download and install [Python 3](https://www.python.org/downloads/) (make sure you add Python and Pip to your PATH)
