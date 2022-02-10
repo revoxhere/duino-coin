@@ -1,3 +1,4 @@
+#!/bin/sh
 echo "Installing Duino Coin On Your Raspberry Pi"
 sleep 1
 sudo apt update
