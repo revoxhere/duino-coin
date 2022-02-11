@@ -173,7 +173,8 @@ El código fuente del servidor, documentación para las peticiones a la API y li
   Ten en cuenta que estos programas no estan siendo desarrollados por nosotros y que nosotros no damos ninguna garantía de que usarlos no resultarán en un baneo de cuenta. Tratelos como una curiosidad. Vale la pena decir que usar [nonceMiner](https://github.com/colonelwatch/nonceMiner) por colonelwatch **te bloqueará la cuenta**.
 
   ### Otros mineros que trabajan con Duino-Coin:
-  *   [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - STM8S firmware para minar DUCO by BBS215
+  *   [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Minero Arduino Ethernet Shield por Pumafron
+  *   [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - STM8S firmware para minar DUCO por BBS215
   *   [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - Minero para familia LabVIEW por ericddm
   *   [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - Un minero JavaScript que es facil de poner en tu sitio web por Hoiboy19
   *   [Mineuino](https://github.com/VatsaDev/Mineuino) - Monetizador de sitio web por VatsaDev

@@ -57,6 +57,8 @@ const char* USERNAME = "my_cool_username";
 const char* RIG_IDENTIFIER = "Auto";
 // Change false to true if using 160 MHz clock mode to not get the first share rejected
 const bool USE_HIGHER_DIFF = false;
+// Change false to true if you want to host the dashboard page
+const bool WEB_DASHBOARD = true;
 // Change false to true if you want to update hashrate in browser without reloading page
 const bool WEB_HASH_UPDATER = false;
 // Change true to false if you want to disable led blinking(But the LED will work in the beginning until esp connects to the pool)
@@ -505,18 +507,20 @@ void setup() {
   if (USE_HIGHER_DIFF) START_DIFF = "ESP8266H";
   else START_DIFF = "ESP8266";
 
-  if (!MDNS.begin(RIG_IDENTIFIER)) {
-    Serial.println("mDNS unavailable");
+  if(WEB_DASHBOARD) {
+    if (!MDNS.begin(RIG_IDENTIFIER)) {
+      Serial.println("mDNS unavailable");
+    }
+    MDNS.addService("http", "tcp", 80);
+    Serial.print("Configured mDNS for dashboard on http://" 
+                  + String(RIG_IDENTIFIER)
+                  + ".local (or http://"
+                  + WiFi.localIP().toString()
+                  + ")");
+    server.on("/", dashboard);
+    if (WEB_HASH_UPDATER) server.on("/hashrateread", hashupdater);
+    server.begin();
   }
-  MDNS.addService("http", "tcp", 80);
-  Serial.print("Configured mDNS for dashboard on http://" 
-                + String(RIG_IDENTIFIER)
-                + ".local (or http://"
-                + WiFi.localIP().toString()
-                + ")");
-  server.on("/", dashboard);
-  if (WEB_HASH_UPDATER) server.on("/hashrateread", hashupdater);
-  server.begin();
 
   blink(BLINK_SETUP_COMPLETE);
 }
@@ -532,7 +536,7 @@ void loop() {
   // OTA handlers
   VerifyWifi();
   ArduinoOTA.handle();
-  server.handleClient();
+  if(WEB_DASHBOARD) server.handleClient();
 
   ConnectToServer();
   Serial.println("Asking for a new job for user: " + String(USERNAME));
