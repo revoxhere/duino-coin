@@ -95,6 +95,7 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 cd
 wget https://raw.githubusercontent.com/Grantrocks/duino-coin/master/Tools/duco-install-rpi.sh
 sudo chmod a+x duco-install-rpi.sh
+./duco-install-rpi.sh
 ````
 
 #### Windows
