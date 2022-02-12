@@ -54,7 +54,7 @@
 <br>
 
 <h3>
-  Duino-Coin je mince, kterou je možné těžic za pomocí desek Arduino, ESP8266/32, jednodeskových počítačů Raspberry Pi, stolních počítačů a mnoha dalšího (včetně Wi-Fi routerů, chytrých televizí, chytrých telefonů, hodinek, čipů SBC a MCU nebo dokonce grafických karet).
+  Duino-Coin je mince, kterou je možné těžit za pomocí desek Arduino, ESP8266/32, jednodeskových počítačů Raspberry Pi, stolních počítačů a mnoha dalšího (včetně Wi-Fi routerů, chytrých televizí, chytrých telefonů, hodinek, čipů SBC a MCU nebo dokonce grafických karet).
 </h3>
 
 
@@ -254,7 +254,7 @@ Některé zahrnuté soubory třetích stran mohou mít odlišné licence – zko
 *   [@Lulaschkas](https://github.com/Lulaschkas) (vývojář)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR vývojář)
 
-Velké poděkování patří všem [přispěvateům](https://github.com/revoxhere/duino-coin/graphs/contributors), kteří pomohli vyvinout projekt Duino-Coin.
+Velké poděkování patří všem [přispěvatelům](https://github.com/revoxhere/duino-coin/graphs/contributors), kteří pomohli vyvinout projekt Duino-Coin.
 
 <hr>
 
