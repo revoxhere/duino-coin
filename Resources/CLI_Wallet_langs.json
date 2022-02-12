@@ -329,7 +329,116 @@
         "donate_4": " (revox, DUCO hlavný developer)",
         "donate_5": " (wDUCO developer)"
     },
+    "czech": {
+        "translation_autor": "fpetru",
+        "cant_connect_to_server": "Nelze se připojit k serveru. Pravděpodobně na něm probíhá údržba nebo je dočasně nedostupný.\nZkusím to znovu za 15 sekund.",
+        "cant_recieve_pool_ip_and_port": " Nelze získat adresu poolu a IP adresu.\nUkončuji za 15 sekund.",
+        "server_message": "zpráva serveru: ",
+        "success": "Úspěch!",
+        "cancelled": "Zrušeno...",
+        "duco_commands": " DUCO příkazy:",
+        "wrapper_commands": " příkazy týkající se wrapperu:",
 
+        "base64_not_installed": "Base64 není nainstalován. Ručně prosím nainstalujte \"base64\"\nUkončuji za 15s.",
+        "tronpy_not_installed": "Tronpy není nainstalován. Ručně prosím prvek nainstalujte pomocí: python3 -m pip install tronpy.\nWrapper je deaktivován, protože prvek tronpy není nainstalovaný.",
+        "tronpy_not_installed_2": "Tronpy není nainstalován. Ručně prosím prvek nainstalujte pomocí: python3 -m pip install tronpy.",
+        "cryptography_not_installed": "Cryptography není nainstalován. Ručně prosím prvek nainstalujte pomocí: python3 -m pip install cryptography.\nUkončuji za 15s.",
+        "secrets_not_installed": "Secrets není nainstalován. Ručně prosím prvek nainstalujte pomocí: python3 -m pip install secrets.\nUkončuji za 15s.",
+        "websocket_not_installed": "Websocket-client není nainstalován. Ručně prosím prvek nainstalujte pomocí: python3 -m pip install websocket-client.\nUkončuji za 15s.",
+        "colorama_not_installed": "Colorama není nainstalován. Ručně prosím prvek nainstalujte pomocí: python3 -m pip install colorama.\nUkončuji za 15s.",
+
+        "first_run": "Duino-Coin CLI Peněženka první spuštění\n",
+        "select_option": "Vyber si z těchto možností",
+        "choice_input": "  1 - Přihlásit se\n  2 - Registrovat se\n  3 - Zavřít peněženku\n",
+        "choice_input_wrapper": "1 - Generovat nový klíč\n2 - Vložit existující klíč \n3 - Zrušit\n",
+        "value_not_numeric": "Chyba, hodnota musí být číselná",
+
+        "enter_username": "Vlož své uživatelské jméno: ",
+        "enter_email": "Vlož svou e-mailovou adresu: ",
+        "enter_password": "Vlož své heslo (skryté kvůli bezpečnosti): ",
+        "confirm_password": "Potvrď své heslo (skryté kvůli bezpečnosti): ",
+        "enter_current_password": "Vlož své aktuální heslo: ",
+        "enter_new_password": "Vlož své nové heslo: ",
+
+        "agree_requirments": "Registrací účtu souhlasíš se smluvními podmínkami a podmínkami ochrany osobních údajů, které nalezneš na ",
+
+        "register_success": "Účet úspěšně založen",
+        "register_failed": "Účet nemohl být založen, důvod: ",
+
+        "login_success": "Úspěšné přihlášení",
+        "login_failed": "Neúspěšné přihlášení, důvod: ",
+
+        "decrypt_private_key": "Heslo pro dešifrování provátního klíče: ",
+        "encrypt_private_key": "Vlož heslo pro dešifrování privátního klíče: ",
+        "invalid_passphrase_wrapper": "Nesprávné heslo, deaktivuji wrapper pro tuto relaci",
+        "input_private_key": "Vlož svůj vlastní privátní klíč: ",
+        "incorrect_key": "Vložen nesprávný klíč",
+        "incorrect_value": "Vložena nesprávná hodnota",
+
+        "cli_wallet_text": "\nDuino-Coin CLI peněženka",
+        "you_have": "Na účtě máš ",
+        "which_is_about": "Což je okolo ",
+        "duco_price": "aktuální kurz DUCO: ",
+
+        "pending_unwraps": "Zbývající wrapy ",
+        "tron_address": "Tron adresa for odeslání wDUCO: ",
+        "trx_balance": "TRX zůstatek (využitelné na poplatky): ",
+
+        "how_encrypt_private_key": "Jak chceš zašifrovat svůj privátní kvlíč v rámci konfiguračního souboru?",
+        "encryption_choice": "1 - Zašifrovat Duino-Coin heslem\n2 - Použít vlastní heslo (bezpečnější)",
+
+        "amount_to_wrap": "Zadej množší k wrapu (minimálně 10 DUCO): ",
+        "no_amount_numeric": "NE, Hodnota musí být číselná... přerušuji",
+        "enter_tron_address_or_local": "Zadej Tron adresu nebo nech prázdné pole pro použití místní peněženky: ",
+
+        "error_min_10_duco": "Chyba, minimální částka pro wrap je 10 DUCO",
+        "error_unsufficient_balance": "Chyba, nedostatečný zůstatek",
+        "error_wrong_passphrase": "Wrapper deaktivován, zadal jsi špatné heslo",
+        "error_configure_wrapperconf": "Wrapper deaktivován, konfiguruj ho příkazem `wrapperconf`",
+        "error_not_enough_energy_or_trx": "Chyba, musíš mít dostatek energie nebo TRX",
+
+        "enter_amount_unwrap": "Zadej množství k unwrapu wDUCO na DUCO: ",
+        "initiating_unwrap": "Zahajuji unwrap...\nTXid :",
+        "error_initiating_unwrap": "Objevila se chyba při zahájení unwrapu, přerušuji",
+        "amount_over_pending_values": "Množství převyšuje čekající hodnoty, používám čekající hodnoty k ušetření TRX poplatků",
+        "transaction_send_txid": "Transakce odeslána, txid :",
+        "finished_unwrapping": "Unwrap dokončen",
+
+        "confirm_export_private_key": "Napiš YES k potvrzení exportu privátního klíče : ",
+        "private_key": "Privátní klíč: ",
+        "cancelled_invalid_confirmation": "Zrušeno, neplatné potvrzení",
+
+        "help_list_command": "Napiš `help` pro zobrazení dostupných příkazů",
+        "duco_console": "DUCO Console ᕲ ",
+
+        "enter_recipients_name": "Napiš jméno příjemce: ",
+        "enter_amount_transfer": "Napiš množství k převodu: ",
+        "enter_tron_recipients_name": "Napiš příjemcovu TRON adresu: ",
+        "enter_tron_amount_transfer": "Napiš množství k převodu: ",
+        "amount_numeric": "Hodnota by měla být číselná ...přerušuji",
+
+        "tron_transaction_submitted": "Trasakce odeslána k potvrzení do TRON sítě\nTXID:",
+        "tron_successful_transaction": "Úspěšná transakce",
+        "tron_error_transaction": "Chyba při potvrzování transakce",
+
+        "see_you_soon": " Přijďte zas!",
+        "sigint_detected": "\nSIGINT detekován - Elegantně ukončuji program.",
+
+        "about_1": "Duino-Coin CLI peněženka byla vytvořena s <3 Duino-Coin komunitou",
+        "about_2": "Toto je verze ",
+        "about_3": "A je distribuována pod MIT licencí",
+        "about_4": "Verze serveru: ",
+        "about_5": "Server běží na verzi ",
+        "about_6": ", ale klient používá verzi ",
+        "about_7": ", stáhni si nejnovější verzi",
+        "about_8": "Klient je aktuální",
+
+        "donate_1": "Pokud chceš, přispěj nám na udržování DUCO a wDUCO. Wrapování a unwrapování nás stojí peníze, které za vás platíme na poplatcích",
+        "donate_2": "TRON a tokeny: ",
+        "donate_3": " (wraperova adresa)",
+        "donate_4": " (revox, vedoucí vývojář Duino-Coinu)",
+        "donate_5": " (wDUCO vývojář)"
+    },
     "dutch": {
         "translation_autor": "Bram (or sys-256 or Hoiboy19)",
         "cant_connect_to_server": "Kan geen verbinding maken met de server. Hij is waarschijnlijk in onderhoud of tijdelijk down.\nWe proberen het opnieuw over 15 seconden.",
