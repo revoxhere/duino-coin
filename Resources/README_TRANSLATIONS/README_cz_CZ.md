@@ -61,7 +61,7 @@
 
 | Klíčové vlastnosti | Technické specifikace | (Některé z mnohých) podporovaných desek |
 |-|-|-|
-| 💻 Podpora širokého množství plaforem<br>👥 Rychle rostoucí komunita<br>💱 Jednoduché použití a možnost směny<br>(na burzách DUCO Exchange, Node-S, JustSwap, SushiSwap)<br>🌎 Dostupný po celém světě<br>:new: Unikátní a plně open source projekt<br>🌳 Přívětivý pro začátečníky a šetrné k přírodě<br>💰 Nízkonákladový a snadný k těžbě | ⚒️ Algoritmus: DUCO-S1<br>♐ Odměňování: skrze "Kolka" systém<br>pomáhající odměňovat těžaře spravedlivě<br>⚡ Rychlost transakcí: okamžitá<br>🪙 Mincí v oběhu: Někonečně<br>(před prosincem 2020: 350k mincí)<br>(do budoucna plánovány nové limity)<br>🔤 Značka: DUCO (ᕲ)<br>🔢 Decimaly: až 20 | ♾️ Arduina<br>(Uno, Nano, Mega, Due, Pro Mini, a tak dále)<br>📶 ESP8266 desky<br>(NodeMCU, Wemos, a tak dále)<br>📶 ESP32 desky<br>(ESP-WROOM, ESP32-CAM, a tak dále)<br>🍓 počítače Raspberry Pi<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pi počítače<br>(Zero, Zero 2, PC, Plus, atď.)<br>⚡ Teensy 4.1 desky |
+| 💻 Podpora širokého množství plaforem<br>👥 Rychle rostoucí komunita<br>💱 Jednoduché použití a možnost směny<br>(na burzách DUCO Exchange, Node-S, JustSwap, SushiSwap)<br>🌎 Dostupný po celém světě<br>:new: Unikátní a plně open source projekt<br>🌳 Přívětivý pro začátečníky a šetrný k přírodě<br>💰 Nízkonákladový a snadný k těžbě | ⚒️ Algoritmus: DUCO-S1<br>♐ Odměňování: skrze "Kolka" systém<br>pomáhající odměňovat těžaře spravedlivě<br>⚡ Rychlost transakcí: okamžitá<br>♾️ Mincí v oběhu: Nekonečně<br>(před prosincem 2020: 350k mincí)<br>(do budoucna plánovány nové limity)<br>🔤 Značka: DUCO (ᕲ)<br>🔢 Decimaly: až 20 | ♾️ Arduina<br>(Uno, Nano, Mega, Due, Pro Mini, a tak dále)<br>📶 ESP8266 desky<br>(NodeMCU, Wemos, a tak dále)<br>📶 ESP32 desky<br>(ESP-WROOM, ESP32-CAM, a tak dále)<br>🍓 počítače Raspberry Pi<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pi počítače<br>(Zero, Zero 2, PC, Plus, a tak dále.)<br>⚡ Teensy 4.1 desky |
 
 
 ## První kroky
@@ -99,12 +99,12 @@ Potom můžete spustit požadovaný program (stačí dvakrát kliknout na soubor
 
 ## DUCO & wDUCO
 
-Duino-Coin je hybridní měna, což znamená, že může být směněna (zabalena) na token wDUCO v síti [Tron](https://tron.network). V součastnosti to nemá mnoho využití, kromě ukládání peněz do decentralizované externí peněženky nebo směna wDUCO za jiný token na JustSwap. Návod k použití tokenu wDUCO je dostupný na [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
+Duino-Coin je hybridní měna, což znamená, že může být zabalena do tokenu wDUCO v síti [Tron](https://tron.network). V současnosti nemá mnoho využití, kromě ukládání peněz do decentralizované externí peněženky nebo směna wDUCO za jiný token na JustSwap. Návod k použití tokenu wDUCO je dostupný na [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
 
 
 ## Vývoj projektu
 
-Díky možnosti komunitního přispívání je Duino Coin projekt, se kterým se můžete učit, inspirovat se a tvořit.<br>
+Díky možnosti komunitního přispívání je Duino Coin projektem, se kterým se můžete učit, inspirovat se a tvořit.<br>
 Všech vašich kontribucí na GitHubu si velmi vážíme.
 
 Jak pomoct projekt vylepšovat?
@@ -122,10 +122,10 @@ Zdrojový kód serveru, dokumentace pro volání API a oficiální knihovny pro 
 
 <details>
   <summary>
-    Protože je tato tabulka velmi dlouhá, je v základu sbalená. Klikněte na tento text, abyste ji viděli celou.
+    Protože je tato tabulka velmi dlouhá, je v základu sbalená. Klikněte na tento text, abyste ji viděli celou
   </summary>
 
-  ### Mějte na paměti, že odměny za těžbu závisí na mnoha faktorech a níže zobrazená tabulka je pouze pro orientační účely.
+  ### Mějte na paměti, že odměny za těžbu závisí na mnoha faktorech a níže zobrazená tabulka je pouze pro orientační účely
   
   | Zařízení/CPU/SBC/MCU/čip                                | Průměrný hashrate<br>(všechna jádra) | Těžební<br>vlákna | Spotřeba energie<br> | Průměr<br>DUCO/den |
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
@@ -162,10 +162,9 @@ Zdrojový kód serveru, dokumentace pro volání API a oficiální knihovny pro 
   <summary>
     Protože je tato tabulka velmi dlouhá, je v základu sbalená. Klikněte na tento text, abyste ji viděli celou
   </summary>
-  
   Mějte na paměti, že tyto programy nejsou vyvinuté přímo námi a nemůžeme tak garantovat, že jejich využívání nebude mít za důsledek blokaci vašeho účtu. Berte je tedy spíš jako zajímavost.
   
-  Upozorňujeme, že pokud budete využívat [nonceMiner](https://github.com/colonelwatch/nonceMiner) od Colonelwatch **budete zabanovaní**.
+  Upozorňujeme, že pokud budete využívat [nonceMiner](https://github.com/colonelwatch/nonceMiner) od Colonelwatch **budete zablokováni**.
 
   ### Ostatní těžební programy fungující s Duino-Coinem:
   *   [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - STM8S firmware pro těžbu DUCO od BBS215
@@ -215,7 +214,7 @@ Zdrojový kód serveru, dokumentace pro volání API a oficiální knihovny pro 
 ## Licence
 
 Duino-Coin je z většiny distribuovaný pod licencí MIT. Další informace naleznete v souboru „LICENSE“.
-Některé zahrnuté soubory třetích stran mohou mít odlišné licence – zkontrolujte si jejich znění v souboru „LICENSE“ (běžně na vrchu souborů zdrojového kódu).
+Některé zahrnuté soubory třetích stran mohou mít odlišné licence – zkontrolujte si jejich znění v souboru „LICENSE“ u příslušných repozitářů (běžně na vrchu souborů zdrojového kódu).
 
 ## Smluvní podmínky
 1. Duino Coiny ("DUCO") získávají těžaři procesem nazývaným těžba.<br/>
@@ -226,8 +225,8 @@ Některé zahrnuté soubory třetích stran mohou mít odlišné licence – zko
 6. Každý těžař, který bude opakovaně používat jinou obtížnost, než je vhodná pro jeho zařízení, může být dočasně zablokován.<br/>
 7. Blokací se rozumí znepřístupnění vytěžených mincí společně s odstraněním účtu těžaře.<br/>
 8. Směnit je možné pouze legálně získané mince.<br/>
-9. Účty těžařů mohou být dočasně pozastaveny za účelem prověřování („prověřování“) porušení smluvních podmínek („porušení“ nebo „zneužití“).<br/>
-10. Žádost o sněmu podaná na oficiální DUCO-Exchange („oficiální burza“) se může po dobu prověřování odložit nebo zrušit. <br/>
+9. Účty těžařů mohou být dočasně pozastaveny za účelem prověřování (dále jen „prověřování“) porušení smluvních podmínek (dále jen „porušení“ nebo „zneužití“).<br/>
+10. Žádost o sněmu podaná na oficiální DUCO-Exchange (dále jen „oficiální burza“) se může po dobu prověřování odložit nebo zrušit. <br/>
 11. Žádosti o sněmu odeslané skrz oficiální burzu mohou být odmítnuté z důvodu porušení smluvních podmínek a/nebo nízkého financování burzy.<br/>
 12. Těžba pomocí bezplatných cloudových služeb (nebo bezplatných VPS služeb – např. Repl.it, GitHub Actions atd.) není povolená, protože je nespravedlivá vůči ostatním těžařům.<br />
 13. Pokud se prokáže porušení těchto podmínek, těžařovy mince mohou být spáleny.<br/>
