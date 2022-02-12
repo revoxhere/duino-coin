@@ -305,6 +305,8 @@ try:
             lang = 'korean'
         elif locale.startswith("id"):
             lang = "indonesian"
+        elif locale.startswith("cz"):
+            lang = "czech"
         else:
             lang = 'english'
     else:
