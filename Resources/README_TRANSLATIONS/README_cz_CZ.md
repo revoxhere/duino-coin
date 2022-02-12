@@ -98,7 +98,7 @@ Potom můžete spustit požadovaný program (stačí dvakrát kliknout na soubor
 
 ## DUCO & wDUCO
 
-Duino-Coin je hybridní měna, což znamená, že může být směněna (zabalena) na token wDUCO v síti [Tron](https://tron.network). V součastnosti to nemá mnoho využití, kromě ukládání peněz do decentralizované externí peněženky nebo sněmna wDUCO za jiný token na JustSwap. Návod k použití tokenu wDUCO je dostupný na [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
+Duino-Coin je hybridní měna, což znamená, že může být směněna (zabalena) na token wDUCO v síti [Tron](https://tron.network). V součastnosti to nemá mnoho využití, kromě ukládání peněz do decentralizované externí peněženky nebo směna wDUCO za jiný token na JustSwap. Návod k použití tokenu wDUCO je dostupný na [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
 
 
 ## Vývoj projektu
@@ -222,10 +222,10 @@ Některé zahrnuté soubory třetích stran mohou mít odlišné licence – zko
 3. Těžbu je možné realizovat využívání procesorů AVR desek (např. desky Arduino), jednodeskových počítačů (např. Raspberry Pi), desek ESP32/8266 s využitím oficiálních těžebních programů (další oficiálně povolené těžební nástroje jsou popsané v horní části README).<br/>
 4. Těžba na GPU, FPGA a jiném vysoce výkonném hardwaru je povolená, ale pouze s využitím obtížnosti „EXTREME“.<br/>
 5. Všichni těžaři, kteří zvolí obtížnost, která není vhodná pro jejich typ těžebního přístroje, (zkontrolujte si na <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">zoznam ťažkostí</a>) se automaticky přesunou na správnou úroveň obtížnosti.<br/>
-6. Každý těžař, který bude opakovaně používat nižší obtížnost, než je vhodná pro jeho zařízení, může být dočasně zablokován.<br/>
+6. Každý těžař, který bude opakovaně používat jinou obtížnost, než je vhodná pro jeho zařízení, může být dočasně zablokován.<br/>
 7. Blokací se rozumí znepřístupnění vytěžených mincí společně s odstraněním účtu těžaře.<br/>
-8. Na výmenu sú oprávnené iba legálne získané mince.<br/>
-9. Účty těžařů mohou být dočasně pozastaveny za účelem prověřování („prověřování“) porušení smluvních podmínek („porušení“ alebo „zneužití“).<br/>
+8. Směnit je možné pouze legálně získané mince.<br/>
+9. Účty těžařů mohou být dočasně pozastaveny za účelem prověřování („prověřování“) porušení smluvních podmínek („porušení“ nebo „zneužití“).<br/>
 10. Žádost o sněmu podaná na oficiální DUCO-Exchange („oficiální burza“) se může po dobu prověřování odložit nebo zrušit. <br/>
 11. Žádosti o sněmu odeslané skrz oficiální burzu mohou být odmítnuté z důvodu porušení smluvních podmínek a/nebo nízkého financování burzy.<br/>
 12. Těžba pomocí bezplatných cloudových služeb (nebo bezplatných VPS služeb – např. Repl.it, GitHub Actions atd.) není povolená, protože je nespravedlivá vůči ostatním těžařům.<br />
@@ -237,8 +237,8 @@ Některé zahrnuté soubory třetích stran mohou mít odlišné licence – zko
 
 ## Zásady ochrany osobních údajů
 1. Na hlavním serveru ukládáme pouze uživatelská jména, hashovaná hesla (pomocí bcrypt), data vytvoření účtů a e-maily uživatelů.<br/>
-2. E-maily nejsou veřejné dostupné a používají se pouze ke kontaktování uživatele v případě potřeby, na potvrzení směny na <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a > a příležitostný newsletter (plánovaný do budoucna).<br/>
-3. Zůstatky, transakce a údaje související s těžbou sjou veřejně dostupné ve veřejném <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON API </a>.<br/>
+2. E-maily nejsou veřejné dostupné a používají se pouze ke kontaktování uživatele v případě potřeby, pro potvrzení směny na <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a > a příležitostný newsletter (plánovaný do budoucna).<br/>
+3. Zůstatky, transakce a údaje související s těžbou jsou veřejně dostupné ve veřejném <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON API </a>.<br/>
 4. Po předcházejícím upozornění se zásady ochrany osobních údajů mohou změnit.
 
 
