@@ -92,6 +92,20 @@ python3 -m pip install -r requirements.txt # Install pip dependencies
 
 After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py`).
 
+#### Raspberry Pi
+
+Note: If this script doesn't work try installing manually.
+
+```BASH
+# Download the script file
+wget https://raw.githubusercontent.com/revoxhere/duino-coin/master/Tools/duco-install-rpi.sh
+
+# Change the file permissions
+sudo chmod a+x duco-install-rpi.sh
+
+# Run the script
+./duco-install-rpi.sh
+```
 
 #### Windows
 
