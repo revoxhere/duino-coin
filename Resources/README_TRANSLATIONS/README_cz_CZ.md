@@ -160,7 +160,7 @@ Zdrojový kód serveru, dokumentace pro volání API a oficiální knihovny pro 
 
 <details>
   <summary>
-    Protože je tato tabulka velmi dlouhá, je v základu sbalená. Klikněte na tento text, abyste ji viděli celou
+    Protože je tento úsek velmi dlouhý, je v základu sbalený. Klikněte na tento text, abyste úsek viděli celý
   </summary>
   Mějte na paměti, že tyto programy nejsou vyvinuté přímo námi a nemůžeme tak garantovat, že jejich využívání nebude mít za důsledek blokaci vašeho účtu. Berte je tedy spíš jako zajímavost.
   
@@ -221,7 +221,7 @@ Některé zahrnuté soubory třetích stran mohou mít odlišné licence – zko
 2. Těžbou se rozumí využívání algoritmu DUCO-S1 (jako je to vysvětlené v <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaperu</a>), ve kterém nalezení správného výsledku dá těžaři odměnu.<br/>
 3. Těžbu je možné realizovat využívání procesorů AVR desek (např. desky Arduino), jednodeskových počítačů (např. Raspberry Pi), desek ESP32/8266 s využitím oficiálních těžebních programů (další oficiálně povolené těžební nástroje jsou popsané v horní části README).<br/>
 4. Těžba na GPU, FPGA a jiném vysoce výkonném hardwaru je povolená, ale pouze s využitím obtížnosti „EXTREME“.<br/>
-5. Všichni těžaři, kteří zvolí obtížnost, která není vhodná pro jejich typ těžebního přístroje, (zkontrolujte si na <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">zoznam ťažkostí</a>) se automaticky přesunou na správnou úroveň obtížnosti.<br/>
+5. Všichni těžaři, kteří zvolí obtížnost, která není vhodná pro jejich typ těžebního přístroje, (zkontrolujte si na <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">seznam obtížností</a>) se automaticky přesunou na správnou úroveň obtížnosti.<br/>
 6. Každý těžař, který bude opakovaně používat jinou obtížnost, než je vhodná pro jeho zařízení, může být dočasně zablokován.<br/>
 7. Blokací se rozumí znepřístupnění vytěžených mincí společně s odstraněním účtu těžaře.<br/>
 8. Směnit je možné pouze legálně získané mince.<br/>
