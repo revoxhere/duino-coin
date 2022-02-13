@@ -97,6 +97,17 @@ python3 -m pip install -r requirements.txt # Instalar dependencias pip
 
 Luego de hacer esto, ya puedes ejecutar el programa deseado (Ej. `python3 PC_Miner.py`).
 
+#### Windows
+
+1. Descarga e instala [Python 3](https://www.python.org/downloads/) (Asegúrate de tener añadidos PIP y Python a tu PATH)
+2. Descarga [el repositorio de Duino-Coin](https://github.com/revoxhere/duino-coin/archive/master.zip)
+3. Extrae el archivo zip que descargaste y abre la carpeta con la consola de comandos (CMD)
+4. En el (CMD) pon `py -m pip install -r requirements.txt` para instalar las dependencias PIP requeridas
+
+Luego de hacer esto, ya puedes ejecutar el programa deseado (haciendo doble click en el archivo `.py` o poniendo `py PC_Miner.py` en la consola de comandos).
+
+### Instalación automatica
+
 #### Raspberry Pi
 
 Nota: Si este script no funciona instanta instalarlo manualmente.
@@ -112,14 +123,6 @@ sudo chmod a+x duco-install-rpi.sh
 ./duco-install-rpi.sh
 ```
 
-#### Windows
-
-1. Descarga e instala [Python 3](https://www.python.org/downloads/) (Asegúrate de tener añadidos PIP y Python a tu PATH)
-2. Descarga [el repositorio de Duino-Coin](https://github.com/revoxhere/duino-coin/archive/master.zip)
-3. Extrae el archivo zip que descargaste y abre la carpeta con la consola de comandos (CMD)
-4. En el (CMD) pon `py -m pip install -r requirements.txt` para instalar las dependencias PIP requeridas
-
-Luego de hacer esto, ya puedes ejecutar el programa deseado (haciendo doble click en el archivo `.py` o poniendo `py PC_Miner.py` en la consola de comandos).
 
 ## DUCO & wDUCO
 
