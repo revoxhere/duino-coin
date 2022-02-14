@@ -2,7 +2,7 @@ import sys
 import subprocess
 from configparser import ConfigParser
 
-MINER_VER = '2.49'  # Version number
+MINER_VER = '3.0'  # Version number
 RESOURCES_DIR = 'AVRMiner_' + str(MINER_VER) + '_resources'
 
 config = ConfigParser()

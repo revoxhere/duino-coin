@@ -32,7 +32,7 @@
         "donate_warning": "\nKami tidak mengambil sedikitpun biaya dari hasil miningmu.\nKamu akan sangat membantu kami merawat server dan biaya exchanges yang murah dengan berdonasi.\nKunjungi ",
         "learn_more_donate": " untuk mempelajari lebih lanjut mengenai bagaimana kamu bisa membantu :)",
         "starting_donation": "Memulai proses donasi",
-        "thanks_donation":" Terima kasih untuk menjadi donatur yang luar biasa ❤️ \nDonasimu akan membantu kami merawat server dan memungkinkan pengembangan lebih lanjut",
+        "thanks_donation": " Terima kasih untuk menjadi donatur yang luar biasa ❤️ \nDonasimu akan membantu kami merawat server dan memungkinkan pengembangan lebih lanjut",
         "data_error": " Terdapat kesalahan ketika mengambil data dari GitHub! Mencoba lagi dalam 10detik.",
         "connected": " Tersambung",
         "connected_server": " ke server Duino-Coin master (v",
@@ -78,10 +78,9 @@
         "report_body6": " hashes",
         "report_body7": "\n\t\t‖ Block ditemukan: ",
         "total_mining_time": "\n\t\t‖ Total waktu miner menyala: ",
-
         "node_picker_unavailable": "Pemilih Node tidak merespon dengan baik - mencoba lagi dalam ",
         "node_picker_error": "Kesalahan Fatal mengambil server dari pemilih node - mencoba lagi dalam ",
-        "connecting_node":" mining node yang dipakai: "   
+        "connecting_node": " mining node yang dipakai: "
     },
     "czech": {
         "translation_autor": "fpetru",
@@ -116,7 +115,7 @@
         "donate_warning": "\nZ tvé těžby si nebereme žádné poplatky.\nMůžeš nám pomoci udržovat server, pokud nám přispěješ.\nNavštiv ",
         "learn_more_donate": " abys zjistil, jak nám můžeš pomoci :)",
         "starting_donation": "Zahajuji darovací proces",
-        "thanks_donation":" Díky, že ses rozhodl nám přispět <3 \nTvůj příspěvěk nám pomůže udržovat server a projekt dále vyvíjet",
+        "thanks_donation": " Díky, že ses rozhodl nám přispět <3 \nTvůj příspěvěk nám pomůže udržovat server a projekt dále vyvíjet",
         "data_error": " Chyba při získávání dat GitHubu! Zkusím to znovu za 10s.",
         "connected": " Připojeno",
         "connected_server": " k hlavnímu Duino-Coin serveru (v",
@@ -162,10 +161,9 @@
         "report_body6": " hashů",
         "report_body7": "\n\t\t‖ Bloků nalezeno: ",
         "total_mining_time": "\n\t\t‖ Celková doba těžby: ",
-
         "node_picker_unavailable": "Výběrčí uzlů nejspíš nedopovídá tak, jak by měl - zkusím to znovu za ",
         "node_picker_error": "Fatální chyba při získávání serveru od výběrčího uzlů - zkusím to znovu za ",
-        "connecting_node":" Získaný těžební uzel: "
+        "connecting_node": " Získaný těžební uzel: "
     },
     "korean": {
         "translation_autor": "hotmoist, roroxxn, hj-k66 ",
@@ -675,7 +673,7 @@
         "donate_warning": "\nWe don't take any fees from your mining.\nYou can really help us maintain the server and low-fee exchanges by donating.\nVisit ",
         "learn_more_donate": " to learn more about how you can help :)",
         "starting_donation": "Starting donation process",
-        "thanks_donation":" Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development",
+        "thanks_donation": " Thank You for being an awesome donator ❤️ \nYour donation will help us maintain the server and allow further development",
         "data_error": " Error retrieving data from GitHub! Retrying in 10s.",
         "connected": " Connected",
         "connected_server": " to master Duino-Coin server (v",
@@ -721,10 +719,9 @@
         "report_body6": " hashes",
         "report_body7": "\n\t\t‖ Blocks found: ",
         "total_mining_time": "\n\t\t‖ Total miner uptime: ",
-
         "node_picker_unavailable": "Node picker doesn't seem to be responding properly - retrying in ",
         "node_picker_error": "Fatal error fetching server from the node picker - retrying in ",
-        "connecting_node":" Retrieved mining node: "
+        "connecting_node": " Retrieved mining node: "
     },
     "italian": {
         "translation_autor": "Il mastro Stefanuzzo (no spaces on GitHub)",

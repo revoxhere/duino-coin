@@ -209,7 +209,7 @@
 		"tray_show": "Tampilkan window",
 		"tray_exit": "Exit window"
 	},
-  "korean": {
+	"korean": {
 		"translation_author": "cnu-cse student k.h.e",
 		"welcome_message": "\nDuino-Coin\nTkinter GUI Wallet에 오신 것을 환영합니다",
 		"warning": "경고",
@@ -314,7 +314,7 @@
 		"tray_show": "윈도우 창 열기",
 		"tray_exit": "윈도우 창 종료"
 	},
-        "slovak": {
+	"slovak": {
 		"translation_author": "backo",
 		"welcome_message": "Vitajte v\nDuino-Coin\nTkinter GUI peňaženke",
 		"warning": "Varovanie",
@@ -1031,7 +1031,8 @@
 		"wallet_version": "Walletversion",
 		"minute": "Minute",
 		"hour": "Stunde",
-		"day": "Tag","config_dev_warning": "In Zukunft wird es mehr Optionen geben.",
+		"day": "Tag",
+		"config_dev_warning": "In Zukunft wird es mehr Optionen geben.",
 		"your_miners": "Deine Miner",
 		"session": "Sitzung",
 		"wrapper_success": "Erfolgreich umwickelt!",
@@ -1779,7 +1780,7 @@
 		"tray_show": "Malkaŝi fenestro",
 		"tray_exit": "Fermi aplikaĵo"
 	},
-	"chinese_simplified":{
+	"chinese_simplified": {
 		"translation_autor": "suifengtec",
 		"welcome_message": "欢迎使用\nDuino-Coin\nTkinter 版钱包",
 		"warning": "警告",
