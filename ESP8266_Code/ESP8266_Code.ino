@@ -57,7 +57,7 @@ const char* USERNAME = "my_cool_username";
 const char* RIG_IDENTIFIER = "Auto";
 // Change false to true if using 160 MHz clock mode to not get the first share rejected
 const bool USE_HIGHER_DIFF = false;
-// Change false to true if you want to host the dashboard page
+// Change true to false if you don't want to host the dashboard page
 const bool WEB_DASHBOARD = true;
 // Change false to true if you want to update hashrate in browser without reloading page
 const bool WEB_HASH_UPDATER = false;
