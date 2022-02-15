@@ -140,7 +140,7 @@ wDUCO to DUCO "zwrapowane" na sieci innej kryptowaluty - Tron. Aktualnie nie ma 
 
 ### Konfiguracja Wrappera wDUCO
 
-1. Otwórz swój GUI (graficzny) or CLI (konsolowy) Portfel DUCO
+1. Otwórz swój GUI (graficzny) lub CLI (konsolowy) Portfel DUCO
 2. Jeżeli używasz portfela GUI:
     1. Otwórz ustawienia
     2. Kliknij na przycisk **Ustawienia Wrappera**
