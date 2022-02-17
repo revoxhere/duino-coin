@@ -97,6 +97,23 @@ Jakmile je instalace hotová, můžete spustit jakýkoliv program z balíčku (n
 
 Potom můžete spustit požadovaný program (stačí dvakrát kliknout na soubor s koncovkou `.py` nebo do příkazového řádku napsat `py PC_Miner.py`).
 
+### Automatická instalace
+
+#### Raspberry Pi
+
+Poznámka: Pokud vám tento skript nebude fungovat, zkuste manuální instalaci
+
+```BASH
+# Stáhněte si soubor skriptu
+wget https://raw.githubusercontent.com/revoxhere/duino-coin/master/Tools/duco-install-rpi.sh
+
+# Změňte oprávnění souboru
+sudo chmod a+x duco-install-rpi.sh
+
+# Spusťte skript
+./duco-install-rpi.sh
+```
+
 ## DUCO & wDUCO
 
 Duino-Coin je hybridní měna, což znamená, že může být zabalena do tokenu wDUCO v síti [Tron](https://tron.network). V současnosti nemá mnoho využití, kromě ukládání peněz do decentralizované externí peněženky nebo směna wDUCO za jiný token na JustSwap. Návod k použití tokenu wDUCO je dostupný na [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
@@ -261,3 +278,4 @@ Velké poděkování patří všem [přispěvatelům](https://github.com/revoxhe
 Odkaz na projekt: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
 <br/>
 Odkaz na webové stránky: [https://duinocoin.com/](https://duinocoin.com/)
+Stav Duino-Coin služeb: [https://status.duinocoin.com](https://status.duinocoin.com)
