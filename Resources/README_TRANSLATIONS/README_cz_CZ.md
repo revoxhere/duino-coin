@@ -277,5 +277,6 @@ Velké poděkování patří všem [přispěvatelům](https://github.com/revoxhe
 
 Odkaz na projekt: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
 <br/>
-Odkaz na webové stránky: [https://duinocoin.com/](https://duinocoin.com/)
+Odkaz na webové stránky: [https://duinocoin.com/](https://duinocoin.com/) 
+</br>
 Stav Duino-Coin služeb: [https://status.duinocoin.com](https://status.duinocoin.com)
