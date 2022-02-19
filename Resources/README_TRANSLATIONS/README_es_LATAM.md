@@ -68,7 +68,7 @@
 
 | Características Clave	| Especificaciones Técnicas	| (Algunas de las tantas) Placas Soportadas |
 |-|-|-|
-| 💻 Soportado por un gran número de plataformas<br>👥 Una comunidad de rápido crecimiento<br>💱 Facil de usar e intercambiar<br>(en DUCO Exchange, Node-S, JustSwap, SushiSwap)<br>🌎 Disponible donde sea<br>:new: Projecto totalmente original y de código abierto<br>🌳 Amistoso con el medio-ambiente y los principiantes<br>💰 De bajo costo y facil minado | ⚒️ Algoritmo: DUCO-S1<br>♐ Recompensas: Soportadas por el "Sistema Kolka"<br>ayudando a recompenzar adecuadamente a los mineros<br>⚡ Tiempo de transacción: Instantáneo<br>🪙 Suministro de monedas: Infinito<br>(Con quema de monedas)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Decimales: Hasta 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Placas Teensy 4.1 |
+| 💻 Soportado por un gran número de plataformas<br>👥 Una comunidad de rápido crecimiento<br>💱 Facil de usar e intercambiar<br>(en DUCO Exchange, Node-S, JustSwap, SushiSwap)<br>🌎 Disponible donde sea<br>:new: Projecto totalmente original y de código abierto<br>🌳 Amigable con el medio-ambiente y los principiantes<br>💰 De bajo costo y facil minado | ⚒️ Algoritmo: DUCO-S1<br>♐ Recompensas: Soportadas por el "Sistema Kolka"<br>ayudando a recompenzar adecuadamente a los mineros<br>⚡ Tiempo de transacción: Instantáneo<br>🪙 Suministro de monedas: Infinito<br>(Con quema de monedas)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Decimales: Hasta 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Placas Teensy 4.1 |
 
 
 ## Para Comenzar
@@ -102,15 +102,15 @@ Luego de hacer esto, ya puedes ejecutar el programa deseado (Ej. `python3 PC_Min
 1. Descarga e instala [Python 3](https://www.python.org/downloads/) (Asegúrate de tener añadidos PIP y Python a tu PATH)
 2. Descarga [el repositorio de Duino-Coin](https://github.com/revoxhere/duino-coin/archive/master.zip)
 3. Extrae el archivo zip que descargaste y abre la carpeta con la consola de comandos (CMD)
-4. En el (CMD) pon `py -m pip install -r requirements.txt` para instalar las dependencias PIP requeridas
+4. En el (CMD) escribe `python3 -m pip install -r requirements.txt` o `python -m pip install -r requirements.txt` y presiona ENTER, para instalar las dependencias PIP requeridas
 
-Luego de hacer esto, ya puedes ejecutar el programa deseado (haciendo doble click en el archivo `.py` o poniendo `py PC_Miner.py` en la consola de comandos).
+Luego de hacer esto, ya puedes ejecutar el programa deseado (haciendo doble click en el archivo `.py` o poniendo `python3 PC_Miner.py` en la cmd).
 
 ### Instalación automatica
 
 #### Raspberry Pi
 
-Nota: Si este script no funciona instanta instalarlo manualmente.
+Nota: Si este script no funciona instenta instalarlo manualmente.
 
 ```BASH
 # Descarga el script
