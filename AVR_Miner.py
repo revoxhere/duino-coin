@@ -959,16 +959,16 @@ def periodic_report(start_time, end_time, shares,
 
 def calculate_uptime(start_time):
     uptime = time() - start_time
-    if uptime <= 59:
-        return str(round(uptime)) + get_string('uptime_seconds')
-    elif uptime == 60:
-        return str(round(uptime // 60)) + get_string('uptime_minute')
-    elif uptime >= 60:
-        return str(round(uptime // 60)) + get_string('uptime_minutes')
-    elif uptime == 3600:
-        return str(round(uptime // 3600)) + get_string('uptime_hour')
-    elif uptime >= 3600:
-        return str(round(uptime // 3600)) + get_string('uptime_hours')
+    if uptime >= 7200: # 2 hours, plural
+        return str(uptime // 3600) + get_string('uptime_hours')
+    elif uptime >= 3600: # 1 hour, not plural
+        return str(uptime // 3600) + get_string('uptime_hour')
+    elif uptime >= 120: # 2 minutes, plural
+        return str(uptime // 60) + get_string('uptime_minutes')
+    elif uptime >= 60: # 1 minute, not plural
+        return str(uptime // 60) + get_string('uptime_minute')
+    else: # less than 1 minute
+        return str(round(uptime)) + get_string('uptime_seconds')    
 
 
 if __name__ == '__main__':
