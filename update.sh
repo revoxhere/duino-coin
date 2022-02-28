@@ -1,8 +1,10 @@
-sudo apt update && apt upgrade -y
-apt install git
+#!/bin/sh
+sudo apt update && sudo apt upgrade -y
+sudo apt install git
 cd 
 rm -rf duino-coin
 git clone https://github.com/revoxhere/duino-coin.git
 cd duino-coin
+python3 -m pip install -r requirements.txt
 chmod +x update.sh
 clear
