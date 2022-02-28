@@ -5,3 +5,4 @@ rm -rf duino-coin
 git clone https://github.com/revoxhere/duino-coin.git
 cd duino-coin
 chmod +x update.sh
+clear
