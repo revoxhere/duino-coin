@@ -18,7 +18,9 @@ from configparser import ConfigParser
 from pathlib import Path
 
 from json import load as jsonload
+import json
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
+import zipfile
 
 from re import sub
 from socket import socket
@@ -100,6 +102,8 @@ class Settings:
     DATA_DIR = "Duino-Coin AVR Miner " + str(VER)
     SEPARATOR = ","
     ENCODING = "utf-8"
+    TEMP_FOLDER = "Temp"
+
     try:
         # Raspberry Pi latin users can't display this character
         BLOCK = " ‖ "
@@ -120,6 +124,82 @@ class Settings:
             PICK = ""
             COG = " @"
 
+def check_updates():
+    """
+    Function that checks if the miner is updated.
+    Downloads the new version and restarts the miner.
+    """
+    try:
+        git_json = requests.get("https://api.github.com/repos/revoxhere/duino-coin/releases/latest")
+        data = json.loads(git_json.text) # Get latest version
+
+        zip_file = "Duino-Coin_" + data["tag_name"] + "_linux.zip"
+
+        if sys.platform == "win32":
+            zip_file = "Duino-Coin_" + data["tag_name"] + "_windows.zip"
+
+        if float(Settings.VER) < float(data["tag_name"]): # If is outdated
+
+            update = input(Style.BRIGHT + get_string("new_version"))
+
+            if update == "Y" or update == "y":
+                pretty_print(get_string("updating"), "warning", "sys")
+
+                if not os.path.exists(Settings.TEMP_FOLDER): # Make the Temp folder
+                    os.makedirs(Settings.TEMP_FOLDER) 
+
+                file_path = os.path.join(Settings.TEMP_FOLDER, zip_file)
+
+                r = requests.get("https://github.com/revoxhere/duino-coin/releases/download/" + data["tag_name"] + "/" + zip_file, stream=True)
+                if r.ok:
+                    start = time()
+                    dl = 0
+                    file_size = int(r.headers["Content-Length"]) # Get file size
+                    print("Saving to", os.path.abspath(file_path))
+                    with open(file_path, 'wb') as f: 
+                        for chunk in r.iter_content(chunk_size=1024 * 8): # Download file in chunks of 8KB
+                            if chunk:
+                                dl += len(chunk)
+                                done = int(50 * dl / file_size)
+                                sys.stdout.write(
+                                    "\r%s [%s%s] %s %s" % (
+                                        str(int(100 * dl / file_size)) + "%", 
+                                        '#' * done, 
+                                        ' ' * (50-done),
+                                        str(round(os.path.getsize(file_path) / 1024 / 1024, 2)) + " MB ",
+                                        str((dl // (time() - start)) // 1024) + " KB/s")) # ProgressBar
+                                sys.stdout.flush()
+                                f.write(chunk)
+                                f.flush()
+                                os.fsync(f.fileno())
+                    print("\nDownload complete!")
+                    print("Unpacking...")
+                    with zipfile.ZipFile(file_path, 'r') as zip_ref: # Unzip the file
+                        for file in zip_ref.infolist():
+                            if "AVR_Miner" in file.filename:
+                                if sys.platform == "win32":
+                                    file.filename = "AVR_Miner_"+data["tag_name"]+".exe" # Rename the file
+                                else:
+                                    file.filename = "AVR_Miner_"+data["tag_name"] 
+                                zip_ref.extract(file, ".")
+                    print("Unpacking complete!")
+                    os.remove(file_path) # Delete the zip file
+                    os.rmdir(Settings.TEMP_FOLDER) # Delete the temp folder
+
+                    if sys.platform == "win32":
+                        os.startfile(os.getcwd() + "\\AVR_Miner_"+data["tag_name"]+".exe") # Start the miner
+                    else: # os.startfile is only for windows
+                        os.system(os.getcwd() + "/AVR_Miner_"+data["tag_name"]) 
+                    sys.exit() # Exit the program
+                else:  # HTTP status code 4XX/5XX
+                    print("Download failed: status code {}\n{}".format(r.status_code, r.text))
+            else:
+                print("Update aborted!")
+        else:
+            print("The Miner is up to date")
+    except Exception as e:
+        print(e)
+        sys.exit()
 
 class Client:
     """
@@ -974,6 +1054,11 @@ def calculate_uptime(start_time):
 if __name__ == '__main__':
     init(autoreset=True)
     title(f"{get_string('duco_avr_miner')}{str(Settings.VER)})")
+
+    if sys.platform == "win32":
+        os.system('') # Enable VT100 Escape Sequence for WINDOWS 10 Ver. 1607
+
+    check_updates()
 
     try:
         load_config()

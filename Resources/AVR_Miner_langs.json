@@ -80,7 +80,9 @@
         "total_mining_time": "\n\t\t‖ Total waktu miner menyala: ",
         "node_picker_unavailable": "Pemilih Node tidak merespon dengan baik - mencoba lagi dalam ",
         "node_picker_error": "Kesalahan Fatal mengambil server dari pemilih node - mencoba lagi dalam ",
-        "connecting_node": " mining node yang dipakai: "
+        "connecting_node": " mining node yang dipakai: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "czech": {
         "translation_autor": "fpetru",
@@ -163,7 +165,9 @@
         "total_mining_time": "\n\t\t‖ Celková doba těžby: ",
         "node_picker_unavailable": "Výběrčí uzlů nejspíš nedopovídá tak, jak by měl - zkusím to znovu za ",
         "node_picker_error": "Fatální chyba při získávání serveru od výběrčího uzlů - zkusím to znovu za ",
-        "connecting_node": " Získaný těžební uzel: "
+        "connecting_node": " Získaný těžební uzel: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "korean": {
         "translation_autor": "hotmoist, roroxxn, hj-k66 ",
@@ -242,7 +246,9 @@
         "report_body4": "\n\t\t‖ 이 hashrate ",
         "report_body5": "\n\t\t‖ 이 기간동안, 해결한 양 ",
         "report_body6": " 해시들",
-        "total_mining_time": "\n\t\t‖ 총 채굴 기간: "
+        "total_mining_time": "\n\t\t‖ 총 채굴 기간: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "polish": {
         "translation_autor": "revox",
@@ -321,7 +327,9 @@
         "report_body4": "\n\t\t‖ Z szybkością ",
         "report_body5": "\n\t\t‖ Podczas tego czasu rozwiązałeś ",
         "report_body6": " hashy",
-        "total_mining_time": "\n\t\t‖ Koparka działa przez: "
+        "total_mining_time": "\n\t\t‖ Koparka działa przez: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "russian": {
         "translation_autor": "5Q",
@@ -384,7 +392,9 @@
         "mining_not_exist": " не сущетсует.",
         "mining_not_exist_warning": " Убедитесь в том, что вы правильно ввели имя пользователя. Пожалуйста, проверьте ваш файл настроек. Пробуем еще раз через 10с",
         "load_config_error": " Ошибка загрузки файла настроек (",
-        "load_config_error_warning": "/Miner_config.cfg). Попробуйте удалить его и перезапустить настройку. Выход через 10с"
+        "load_config_error_warning": "/Miner_config.cfg). Попробуйте удалить его и перезапустить настройку. Выход через 10с",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "spanish": {
         "translation_autor": "HGEpro",
@@ -447,7 +457,9 @@
         "mining_not_exist": " no existe.",
         "mining_not_exist_warning": " Comprueba que has introducido el nombre de usuario correctamente. Porfavor, comprueba tu archivo de configuración. Reintentando en 10s",
         "load_config_error": " Error cargando el archivo de configuración (",
-        "load_config_error_warning": "/Miner_config.cfg). Prueba eliminándolo y volviendo a ejecutar la configuración. Saliendo en 10s"
+        "load_config_error_warning": "/Miner_config.cfg). Prueba eliminándolo y volviendo a ejecutar la configuración. Saliendo en 10s",
+        "new_version": "Hay una nueva version del minero, Quieres actualizarlo? [Y/n] ? ",
+        "updating": "El minero esta desactualizado. Actualizando...."
     },
     "german": {
         "translation_autor": "BastelPichi, lulkas, EinWildesPanda",
@@ -511,7 +523,9 @@
         "mining_not_exist_warning": " Stelle sicher, dass der Benutzername korrekt geschrieben wurde. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s",
         "load_config_error": " Fehler beim Laden der Konfigurationsdatei (",
         "load_config_error_warning": "/Miner_config.cfg). Versuche sie zu entfernen und neu zu konfigurieren. Miner schließt in 10s",
-        "connection_search": "Suche nach der schnellsten Verbindung zu dem Server"
+        "connection_search": "Suche nach der schnellsten Verbindung zu dem Server",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "french": {
         "translation_autor": "Bilaboz",
@@ -575,7 +589,9 @@
         "mining_not_exist_warning": " Vérifiez que vous avez correctement entré votre nom d'utilisateur dans le fichier de configuration. Nouvel essai dans 10s",
         "load_config_error": " Erreur durant le chargement du fichier de configuration (",
         "load_config_error_warning": "/Miner_config.cfg). Essayer de le supprimer et relancer le mineur. Fermeture du programme dans 10s",
-        "connection_search": "Recherche du serveur le plus rapide"
+        "connection_search": "Recherche du serveur le plus rapide",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "slovak": {
         "translation_autor": "JoyBed",
@@ -638,7 +654,9 @@
         "mining_not_exist": " Neexistuje.",
         "mining_not_exist_warning": " Skontrolujte ci mate spravne zadane meno. Skontrolujte konfiguracny subor. Odznova o 10s",
         "load_config_error": " chyba nacitavania konfiguracneho suboru (",
-        "load_config_error_warning": "/Miner_config.cfg). Skuste ho odstranit a spustit odznova konfiguraciu. Ukoncenie o 10s"
+        "load_config_error_warning": "/Miner_config.cfg). Skuste ho odstranit a spustit odznova konfiguraciu. Ukoncenie o 10s",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "english": {
         "translation_autor": "Duino-Coin developers",
@@ -721,7 +739,9 @@
         "total_mining_time": "\n\t\t‖ Total miner uptime: ",
         "node_picker_unavailable": "Node picker doesn't seem to be responding properly - retrying in ",
         "node_picker_error": "Fatal error fetching server from the node picker - retrying in ",
-        "connecting_node": " Retrieved mining node: "
+        "connecting_node": " Retrieved mining node: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "italian": {
         "translation_autor": "Il mastro Stefanuzzo (no spaces on GitHub)",
@@ -786,7 +806,9 @@
         "load_config_error": " Errore nel caricare il file di configurazione (",
         "load_config_error_warning": "/Miner_config.cfg). Prova a rimuovero e a rieseguire la configurazione. Uscita in 10s",
         "local_transactions_list": "Lista delle Transazioni Locali",
-        "local_transactions_list_warning": "Avviso Lista delle Transazioni Locali"
+        "local_transactions_list_warning": "Avviso Lista delle Transazioni Locali",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "chinese_simplified": {
         "translation_autor": "suifengtec",
@@ -851,7 +873,9 @@
         "load_config_error": " 载入配置文件时出错了 (",
         "load_config_error_warning": "/Miner_config.cfg)。请尝试删除它,再次配置。将在10秒内退出",
         "local_transactions_list": "本地交易列表",
-        "local_transactions_list_warning": "本地交易列表提示"
+        "local_transactions_list_warning": "本地交易列表提示",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "portuguese": {
         "translation_autor": "bonsai e gsrbr",
@@ -930,7 +954,9 @@
         "report_body4": "\n\t\t‖ Com o hashrate de ",
         "report_body5": "\n\t\t‖ Neste período de tempo, você resolveu ",
         "report_body6": " hashes",
-        "total_mining_time": "\n\t\t‖ Tempo de atividade total do minerador: "
+        "total_mining_time": "\n\t\t‖ Tempo de atividade total do minerador: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "turkish": {
         "translation_autor": "Scatchie - mkursadulusoy",
@@ -1011,7 +1037,9 @@
         "report_body4": "\n\t\t‖ Toplam hashrate ",
         "report_body5": "\n\t\t‖ Bu zaman boyunca çözülen hash miktarı: ",
         "report_body6": " hashes",
-        "total_mining_time": "\n\t\t‖ Toplam madencilik zamanı: "
+        "total_mining_time": "\n\t\t‖ Toplam madencilik zamanı: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "azerbaijani": {
         "translation_autor": "Muhabbet Kuşu",
@@ -1075,7 +1103,9 @@
         "mining_not_exist_warning": " İstifadəçi adını düzgün daxil etdiyinizə əmin olun. Zəhmət olmasa ayarlar faylını yoxlayın. 10 saniyədə yenidən cəhd ediliyor.",
         "load_config_error": " Ayarlar faylı yüklənərkən xəta baş verdi (",
         "load_config_error_warning": "/Miner_config.cfg). Faylın silinmesini və yenidən konfiquratorun işləməsini sınayın. 10 saniyədə yenidən cəhd ediliyor",
-        "connection_search": "Serverlərə ən sürətli bağlantı axtarılıyor"
+        "connection_search": "Serverlərə ən sürətli bağlantı axtarılıyor",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "thai": {
         "translation_autor": "naphob",
@@ -1154,7 +1184,9 @@
         "report_body4": "\n\t\t‖ ด้วยแฮชเรท ",
         "report_body5": "\n\t\t‖ ในช่วงเวลานี้, คุณได้แก้ไป ",
         "report_body6": " แฮช",
-        "total_mining_time": "\n\t\t‖ เวลาที่ตัวขุดทำงานทั้งหมด: "
+        "total_mining_time": "\n\t\t‖ เวลาที่ตัวขุดทำงานทั้งหมด: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "dutch": {
         "translation_autor": "Frank",
@@ -1233,6 +1265,8 @@
         "report_body4": "\n\t\t‖ Met een hashrate van ",
         "report_body5": "\n\t\t‖ In deze periode heb je ",
         "report_body6": " hashes opgelost",
-        "total_mining_time": "\n\t\t‖ Totale mining tijd: "
+        "total_mining_time": "\n\t\t‖ Totale mining tijd: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     }
 }
