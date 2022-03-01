@@ -37,6 +37,8 @@ from platform import python_version
 from signal import SIGINT, signal
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 from configparser import ConfigParser
+import psutil
+
 configparser = ConfigParser()
 
 printlock = Semaphore(value=1)
@@ -156,6 +158,13 @@ def check_updates():
         if sys.platform == "win32":
             zip_file = "Duino-Coin_" + data["tag_name"] + "_windows.zip"
 
+        process = psutil.Process(os.getpid())
+
+        running_script = False # If the process is from script
+
+        if "python" in process.name():
+            running_script = True
+
         if float(Settings.VER) < float(data["tag_name"]): # If is outdated
 
             update = input(Style.BRIGHT + get_string("new_version"))
@@ -167,21 +176,32 @@ def check_updates():
                     os.makedirs(Settings.TEMP_FOLDER) 
 
                 file_path = os.path.join(Settings.TEMP_FOLDER, zip_file)
+                download_url = "https://github.com/revoxhere/duino-coin/releases/download/" + data["tag_name"] + "/" + zip_file
 
-                r = requests.get("https://github.com/revoxhere/duino-coin/releases/download/" + data["tag_name"] + "/" + zip_file, stream=True)
+                if running_script:
+                    file_path = os.path.join(".", "PC_Miner_"+data["tag_name"]+".py")
+                    download_url = "https://raw.githubusercontent.com/revoxhere/duino-coin/master/PC_Miner.py"
+                    
+                r = requests.get(download_url, stream=True)
                 if r.ok:
                     start = time()
                     dl = 0
                     file_size = int(r.headers["Content-Length"]) # Get file size
                     print("Saving to", os.path.abspath(file_path))
                     with open(file_path, 'wb') as f: 
-                        for chunk in r.iter_content(chunk_size=1024 * 8): # Download file in chunks of 8KB
+                        for chunk in r.iter_content(chunk_size=1024 * 8): # Download file in chunks
                             if chunk:
                                 dl += len(chunk)
                                 done = int(50 * dl / file_size)
+                                dl_perc = str(int(100 * dl / file_size))
+
+                                if running_script:
+                                    done = int(12.5 * dl / file_size)
+                                    dl_perc = str(int(22.5 * dl / file_size))
+
                                 sys.stdout.write(
                                     "\r%s [%s%s] %s %s" % (
-                                        str(int(100 * dl / file_size)) + "%", 
+                                        dl_perc + "%", 
                                         '#' * done, 
                                         ' ' * (50-done),
                                         str(round(os.path.getsize(file_path) / 1024 / 1024, 2)) + " MB ",
@@ -191,23 +211,29 @@ def check_updates():
                                 f.flush()
                                 os.fsync(f.fileno())
                     print("\nDownload complete!")
-                    print("Unpacking...")
-                    with zipfile.ZipFile(file_path, 'r') as zip_ref: # Unzip the file
-                        for file in zip_ref.infolist():
-                            if "PC_Miner" in file.filename:
-                                if sys.platform == "win32":
-                                    file.filename = "PC_Miner_"+data["tag_name"]+".exe" # Rename the file
-                                else:
-                                    file.filename = "PC_Miner_"+data["tag_name"] 
-                                zip_ref.extract(file, ".")
-                    print("Unpacking complete!")
-                    os.remove(file_path) # Delete the zip file
-                    os.rmdir(Settings.TEMP_FOLDER) # Delete the temp folder
+                    if not running_script:
+                        print("Unpacking...")
+                        with zipfile.ZipFile(file_path, 'r') as zip_ref: # Unzip the file
+                            for file in zip_ref.infolist():
+                                if "PC_Miner" in file.filename:
+                                    if sys.platform == "win32":
+                                        file.filename = "PC_Miner_"+data["tag_name"]+".exe" # Rename the file
+                                    else:
+                                        file.filename = "PC_Miner_"+data["tag_name"] 
+                                    zip_ref.extract(file, ".")
+                        print("Unpacking complete!")
+                        os.remove(file_path) # Delete the zip file
+                        os.rmdir(Settings.TEMP_FOLDER) # Delete the temp folder
 
-                    if sys.platform == "win32":
-                        os.startfile(os.getcwd() + "\\PC_Miner_"+data["tag_name"]+".exe") # Start the miner
-                    else: # os.startfile is only for windows
-                        os.system(os.getcwd() + "/PC_Miner_"+data["tag_name"]) 
+                        if sys.platform == "win32":
+                            os.startfile(os.getcwd() + "\\PC_Miner_"+data["tag_name"]+".exe") # Start the miner
+                        else: # os.startfile is only for windows
+                            os.system(os.getcwd() + "/PC_Miner_"+data["tag_name"]) 
+                    else:
+                        if sys.platform == "win32":
+                            os.system(file_path)
+                        else:
+                            os.system("python3 " + file_path)
                     sys.exit() # Exit the program
                 else:  # HTTP status code 4XX/5XX
                     print("Download failed: status code {}\n{}".format(r.status_code, r.text))
