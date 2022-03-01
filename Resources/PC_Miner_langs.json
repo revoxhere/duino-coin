@@ -88,7 +88,9 @@
         "fasthash_download": "Mengunduh modul fasthash acceleration",
         "node_picker_unavailable": "Pemilih Node tidak merespon dengan baik - mencoba lagi dalam ",
         "node_picker_error": "Kesalahan Fatal mengambil server dari pemilih node - mencoba lagi dalam ",
-        "connecting_node": " mining node yang dipakai: "
+        "connecting_node": " mining node yang dipakai: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "english": {
         "translation_autor": "Duino-Coin developers",
@@ -179,7 +181,9 @@
         "fasthash_download": "Downloading fasthash accelerations module",
         "node_picker_unavailable": "Node picker doesn't seem to be responding properly - retrying in ",
         "node_picker_error": "Fatal error fetching server from the node picker - retrying in ",
-        "connecting_node": " Retrieved mining node: "
+        "connecting_node": " Retrieved mining node: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "korean": {
         "translation_autor": "hotmoist, roroxxn, hj-k66, dnjswndbf",
@@ -265,7 +269,9 @@
         "report_body4": "\n\t\t‖ 이 hashrate ",
         "report_body5": "\n\t\t‖ 이 기간동안, 해결하신 양 ",
         "report_body6": " 해시들",
-        "total_mining_time": "\n\t\t‖ 총 채굴 기간: "
+        "total_mining_time": "\n\t\t‖ 총 채굴 기간: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "farsi": {
         "translation_autor": "Syamakszk",
@@ -351,7 +357,9 @@
         "report_body4": "\n\t\t‖ With the hashrate of ",
         "report_body5": "\n\t\t‖ In this time period, شما موفق شدید ",
         "report_body6": " hashes",
-        "total_mining_time": "\n\t\t‖ تمام وقت کارکرد: "
+        "total_mining_time": "\n\t\t‖ تمام وقت کارکرد: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "slovak": {
         "translation_autor": "backo",
@@ -437,7 +445,9 @@
         "report_body4": "\n\t\t‖ s hashratom ",
         "report_body5": "\n\t\t‖ V tomto časovom období ste vyriešili ",
         "report_body6": " hashes",
-        "total_mining_time": "\n\t\t‖ Celková doba prevádzky: "
+        "total_mining_time": "\n\t\t‖ Celková doba prevádzky: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "italian": {
         "translation_autor": "Il mastro Stefanuzzo",
@@ -506,7 +516,9 @@
         "mining_not_exist_warning": " Assicurati di aver inserito il nome utente correttamente. Per favore controlla il tuo file di configurazione. Nuovo tentativo in 10s",
         "max_threads_notice": "Minare Duino-Coin con un sacco di thread causerà un peggioramento del profitto - thread di mining diminuiti a 8",
         "max_hashrate_notice": "Minare Duino-Coin con un equipaggiamento potente potrebbe non essere molto profittevole per te - suggeriamo di provare Coin Magi (https://xmg.network) - la nostra moneta \"sorella\"",
-        "recommended": "raccomandato"
+        "recommended": "raccomandato",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "polish": {
         "translation_autor": "revox",
@@ -597,7 +609,9 @@
         "fasthash_download": "Pobieranie modułu akceleracji fasthash",
         "node_picker_unavailable": "Menedżer do wyboru serwerów nie odpowiada - ponowna próba za ",
         "node_picker_error": "Błąd przy wyborze serwera - ponowna próba za ",
-        "connecting_node": " Wybrano najszybszy serwer: "
+        "connecting_node": " Wybrano najszybszy serwer: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "spanish": {
         "translation_autor": "HGEpro",
@@ -662,7 +676,9 @@
         "error_while_mining": " Error durante el minado - probablemente un error de conexión - reiniciando en 5s.",
         "mining_user": " Usuario ",
         "mining_not_exist": " no existe.",
-        "mining_not_exist_warning": " Asegurate de haber ingresado el nombre de usuario correcto. Revisa el archivo de configuraciones. Reintentando en 10s"
+        "mining_not_exist_warning": " Asegurate de haber ingresado el nombre de usuario correcto. Revisa el archivo de configuraciones. Reintentando en 10s",
+        "new_version": "Hay una nueva version del minero, Quieres actualizarlo? [Y/n] ? ",
+        "updating": "El minero esta desactualizado. Actualizando...."
     },
     "french": {
         "translation_autor": "Bilaboz",
@@ -728,7 +744,9 @@
         "mining_user": " L'utilisateur ",
         "mining_not_exist": " n'existe pas.",
         "mining_not_exist_warning": " Vérifiez que vous avez correctement entré votre nom d'utilisateur dans le fichier de configuration. Nouvel essai dans 10s",
-        "connection_search": "Recherche du serveur le plus rapide"
+        "connection_search": "Recherche du serveur le plus rapide",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "russian": {
         "translation_autor": "5Q",
@@ -793,7 +811,9 @@
         "error_while_mining": " Ошибка во время майнинга - скорее всего, ошибка подключения - перезапуск через 5с.",
         "mining_user": " Пользователь ",
         "mining_not_exist": " не существует.",
-        "mining_not_exist_warning": " Убедитесь в том, что вы правильно ввели имя пользователя. Пожалуйста, проверьте ваш файл настроек. Пробуем еще раз через 10с"
+        "mining_not_exist_warning": " Убедитесь в том, что вы правильно ввели имя пользователя. Пожалуйста, проверьте ваш файл настроек. Пробуем еще раз через 10с",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "ukrainian": {
         "translation_autor": "osmolenko",
@@ -884,7 +904,9 @@
         "fasthash_download": "Завантаження модуля прискорення fasthash",
         "node_picker_unavailable": "Схоже, засіб вибору вузлів не відповідає належним чином - повторимо через ",
         "node_picker_error": "Фатальна помилка отримання сервера із засобу вибору вузлів - повторимо через ",
-        "connecting_node": " Отриманий вузол майнінгу: "
+        "connecting_node": " Отриманий вузол майнінгу: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "german": {
         "translation_autor": "BastelPichi, EinWildesPanda",
@@ -950,7 +972,9 @@
         "mining_user": " Benutzer ",
         "mining_not_exist": " existiert nicht.",
         "mining_not_exist_warning": " Stelle sicher, dass du den Nutzernamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s",
-        "connection_search": "Suche nach der schnellsten Verbindung zu dem Server"
+        "connection_search": "Suche nach der schnellsten Verbindung zu dem Server",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "chinese_simplified": {
         "translation_autor": "suifengtec",
@@ -1016,7 +1040,9 @@
         "error_while_mining": " 挖矿时出错-最有可能是连接错误-将在5秒钟内重新启动。",
         "mining_user": " 用户 ",
         "mining_not_exist": " 不存在。",
-        "mining_not_exist_warning": " 确保您正确输入了用户名。请检查您的配置文件。 将在10秒内重试"
+        "mining_not_exist_warning": " 确保您正确输入了用户名。请检查您的配置文件。 将在10秒内重试",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "turkish": {
         "translation_autor": "Scatchie",
@@ -1083,7 +1109,9 @@
         "mining_user": " Kullanıcı ",
         "mining_not_exist": " mevcut değil.",
         "mining_not_exist_warning": " Kullanıcı adınızı doğru girdiğinizden emin olun. Lütfen ayar dosyanızı kontrol edin. 10 saniye içerisinde yeniden deneniyor",
-        "connection_search": "Sunuculara bağlanmak için en hızlı bağlantı aranıyor"
+        "connection_search": "Sunuculara bağlanmak için en hızlı bağlantı aranıyor",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "portuguese": {
         "translation_autor": "bonsai e gsrbr",
@@ -1168,7 +1196,9 @@
         "report_body4": "\n\t\t‖ Com o hashrate de ",
         "report_body5": "\n\t\t‖ Neste período de tempo, você resolveu ",
         "report_body6": " hashes",
-        "total_mining_time": "\n\t\t‖ Tempo de atividade total do minerador: "
+        "total_mining_time": "\n\t\t‖ Tempo de atividade total do minerador: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "maltese": {
         "translation_autor": "IdotMaster1/MattyInnit",
@@ -1230,7 +1260,9 @@
         "mining_not_exist": "mhux irreġistrat.",
         "mining_not_exist_warning": "Kun żgur li ddaħħal l-username sewwa. Iċċekkja l-fajl tal-konfigurazzjoni tiegħek. Erġa 'pprova f'10s",
         "load_config_error": "Problema bit-tagħbija tal-fajl tal-konfigurazzjoni (",
-        "load_config_error_warning": "/Miner_config.cfg). Ipprova neħħih u erġa 'ibda l-iskavatur. Agħlaq f'10 sekondi"
+        "load_config_error_warning": "/Miner_config.cfg). Ipprova neħħih u erġa 'ibda l-iskavatur. Agħlaq f'10 sekondi",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "thai": {
         "translation_autor": "naphob",
@@ -1316,7 +1348,9 @@
         "report_body4": "\n\t\t‖ ด้วยแฮชเรท ",
         "report_body5": "\n\t\t‖ ในช่วงเวลานี้, คุณได้แก้ไป ",
         "report_body6": " แฮช",
-        "total_mining_time": "\n\t\t‖ เวลาที่ตัวขุดทำงานทั้งหมด: "
+        "total_mining_time": "\n\t\t‖ เวลาที่ตัวขุดทำงานทั้งหมด: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     },
     "czech": {
         "translation_autor": "fpetru",
@@ -1407,6 +1441,8 @@
         "fasthash_download": "Stahuji fasthash akcelerační modul",
         "node_picker_unavailable": "Výběrčí uzlů nejspíš nepracuje správně - zkusím to znovu za ",
         "node_picker_error": "Fatální chyba při vybírání uzlů - zkusím to znovu za ",
-        "connecting_node": " Získaný těžební uzel: "
+        "connecting_node": " Získaný těžební uzel: ",
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating...."
     }
 }
