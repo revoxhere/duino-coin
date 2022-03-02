@@ -6,3 +6,4 @@ pypresence
 tronpy
 cryptography
 websocket-client
+psutil
