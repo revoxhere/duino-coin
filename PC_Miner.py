@@ -251,7 +251,7 @@ class Algorithms:
     For more info about the implementation refer to the Duino whitepaper:
     https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf
     """
-    def DUCOS1(last_h: str, exp_h: str, diff: int, eff: int):
+    def DUCOS1(last_h: str, exp_h: str, diff: int, eff: int,  id: int, sleep_prosent: float):
         try:
             import libducohasher
             fasthash_supported = True
@@ -268,9 +268,14 @@ class Algorithms:
             time_elapsed = time() - time_start
             hashrate = nonce / time_elapsed
 
+            should_sleep_time = (sleep_prosent/100.0) * time_elapsed
+            if should_sleep_time > 0.0:
+                pretty_print(msg="sleep {:.1f}s".format(should_sleep_time), sender="cpu{}".format(id))
+                sleep(should_sleep_time)
             return [nonce, hashrate]
         else:
             time_start = time()
+            sleep_time = 0.0
             base_hash = sha1(last_h.encode('ascii'))
 
             for nonce in range(100 * diff + 1):
@@ -280,14 +285,28 @@ class Algorithms:
 
                 if eff != 0:
                     if nonce % 5000 == 0:
-                        sleep(eff / 100)
+                        time_elapsed = time() - time_start
+                        should_sleep_time = ((sleep_prosent/100.0) * time_elapsed)  - sleep_time
+                        if should_sleep_time > 0.0:
+                            pretty_print(msg="nonce sleep {:.1f}s".format(should_sleep_time), sender="cpu{}".format(id))
+                            sleep(should_sleep_time)
+                            sleep_time += should_sleep_time
 
                 if d_res == exp_h:
                     time_elapsed = time() - time_start
                     hashrate = nonce / time_elapsed
+                    should_sleep_time = ((sleep_prosent/100.0) * time_elapsed)  - sleep_time
+                    if should_sleep_time > 0.0:
+                        pretty_print(msg="sleep {:.1f}s".format(should_sleep_time), sender="cpu{}".format(id))
+                        sleep(should_sleep_time)
 
                     return [nonce, hashrate]
 
+            time_elapsed = time() - time_start
+            should_sleep_time = ((sleep_prosent/100.0) * time_elapsed)  - sleep_time
+            if should_sleep_time > 0.0:
+                pretty_print(msg="sleep {:.1f}s".format(should_sleep_time), sender="cpu{}".format(id))
+                sleep(should_sleep_time)
             return [0, 0]
 
 
@@ -863,6 +882,16 @@ class Miner:
 
         last_report = time()
         r_shares, last_shares = 0, 0
+        # keep track of work time
+        # and sleep time and sleep as much to get full sleeping
+        eff_setting = int(user_settings["intensity"])
+        if eff_setting >=  100:
+            sleep_prosent=0.0
+        else:
+            sleep_prosent=100.0-float(eff_setting)
+        start_time=time()
+        sleep_time=0
+
         while True:
             try:
                 Miner.m_connect(id, pool)
@@ -903,8 +932,9 @@ class Miner:
                                 eff = 3
 
                             result = Algorithms.DUCOS1(
-                                job[0], job[1], int(job[2]), eff)
+                                job[0], job[1], int(job[2]), eff, id, sleep_prosent)
                             computetime = time() - time_start
+                            sleeptime = 0
 
                             hashrate[id] = result[1]
                             total_hashrate = sum(hashrate.values())
@@ -971,6 +1001,7 @@ class Miner:
                                      + " " + str(e), "error", "net" + str(id))
                         sleep(5)
                         break
+                    elapsed_time = time() - start_time
             except Exception as e:
                 pretty_print(get_string("error_while_mining")
                                      + " " + str(e), "error", "net" + str(id))
