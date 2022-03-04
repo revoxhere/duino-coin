@@ -171,7 +171,7 @@ html {
   transform-origin: center;
   width: 0.625em; }
 
-.box:not(:last-child), .content:not(:last-child), .notification:not(:last-child), .progress:not(:last-child), .table:not(:last-child), .table-container:not(:last-child), .title:not(:last-child),
+.exchange_box:not(:last-child), .content:not(:last-child), .notification:not(:last-child), .progress:not(:last-child), .table:not(:last-child), .table-container:not(:last-child), .title:not(:last-child),
 .subtitle:not(:last-child), .block:not(:last-child), .breadcrumb:not(:last-child), .level:not(:last-child), .message:not(:last-child), .pagination:not(:last-child), .tabs:not(:last-child) {
   margin-bottom: 1.5rem; }
 
@@ -4242,19 +4242,13 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
     font-size: 1.5rem; }
 
 /* Bulma Elements */
-.box {
+.exchange_box {
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 0.25em 1em -0.125em rgba(7, 7, 7, 0.15), 0 0px 0 1px rgba(7, 7, 7, 0.05);
   color: #302D43;
   display: block;
   padding: 1.25rem; }
-
-a.box:hover, a.box:focus {
-  box-shadow: 0 0.5em 1em -0.125em rgba(7, 7, 7, 0.1), 0 0 0 1px #5E68FF; }
-
-a.box:active {
-  box-shadow: inset 0 1px 2px rgba(7, 7, 7, 0.2), 0 0 0 1px #5E68FF; }
 
 .button {
   background-color: #ffffff;
@@ -7863,7 +7857,7 @@ a {
   text-decoration: none; }
   a strong {
     color: currentColor; }
-  a:hover {
+    a:hover {
     color: #363636; }
 
 code {
@@ -7941,7 +7935,7 @@ table th {
     color: #b5b5b5; }
   a {
     color: #5E68FF; }
-    a:hover {
+      a:hover {
       color: #dbdbdb; }
   code {
     background-color: #242424;
@@ -8051,14 +8045,10 @@ table th {
     color: #fafafa !important; }
   .has-background-white-bis-dark {
     background-color: #fafafa !important; }
-  .box {
+  .exchange_box {
     background-color: #0a0a0a;
     box-shadow: 0 0.25em 1em -0.125em rgba(0, 0, 0, 0.15), 0 0px 0 1px rgba(0, 0, 0, 0.05);
     color: #b5b5b5; }
-  a.box:hover, a.box:focus {
-    box-shadow: 0 2px 3px rgba(255, 255, 255, 0.1), 0 0 0 1px #5E68FF; }
-  a.box:active {
-    box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2), 0 0 0 1px #5E68FF; }
   .button {
     background-color: #0a0a0a;
     border-color: #444;

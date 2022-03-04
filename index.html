@@ -46,11 +46,20 @@
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js" as="script">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js"></script>
     <style>
-    a>figure {
+
+    .fix-link a {
+        color: transparent;
+    }
+
+    .exchange_box {
+        cursor: pointer;
+    }
+
+    .exchange_box figure {
         transition: 0.2s all;
     }
 
-    a>figure:hover {
+    .exchange_box:hover figure {
         transform: scale(1.1);
     }
 
@@ -506,55 +515,45 @@
                         Exchanges
                     </p>
                     <div class="columns is-multiline">
-                        <div class="column is-one-third has-text-centered">
-                            <div class="box">
-                                <a href="https://exchange.duinocoin.com/">
+                        <div class="column is-half has-text-centered fix-link">
+                            <a href="https://exchange.duinocoin.com/">
+                                <div class="exchange_box">
                                     <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
                                         <img src="assets/icons/ducoexchange.png">
                                     </figure>
-                                </a>
-                                <p class="heading mt-3 is-size-4">DUCO Exchange</p>
-                            </div>
+                                    <p class="heading mt-3 is-size-4 subtitle">DUCO Exchange</p>
+                                </div>
+                            </a>
                         </div>
-                        <div class="column is-one-third has-text-centered">
-                            <div class="box">
-                                <a href="http://www.node-s.co.za/duco_exchange/home">
-                                    <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
-                                        <img src="assets/icons/nodes.png">
-                                    </figure>
-                                </a>
-                                <p class="heading mt-3 is-size-4">Node-S</p>
-                            </div>
-                        </div>
-                        <div class="column is-one-third has-text-centered">
-                            <div class="box">
-                                <a href="https://pancakeswap.finance/swap?inputCurrency=0xcf572ca0ab84d8ce1652b175e930292e2320785b">
+                        <div class="column is-half has-text-centered fix-link">
+                            <a href="https://pancakeswap.finance/swap?inputCurrency=0xcf572ca0ab84d8ce1652b175e930292e2320785b">
+                                <div class="exchange_box">
                                     <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
                                         <img src="assets/icons/pancake.png">
                                     </figure>
-                                </a>
-                                <p class="heading mt-3 is-size-4">PancakeSwap</p>
-                            </div>
+                                    <p class="heading mt-3 is-size-4 subtitle">PancakeSwap</p>
+                                </div>
+                            </a>
                         </div>
-                        <div class="column is-half has-text-centered">
-                            <div class="box">
-                                <a href="https://sunswap.com/#/scan/detail/TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U">
+                        <div class="column is-half has-text-centered fix-link">
+                            <a href="https://sunswap.com/#/scan/detail/TWYaXdxA12JywrUdou3PFD1fvx2PWjqK9U">
+                                <div class="exchange_box">
                                     <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
                                         <img src="assets/icons/sunswap.png">
                                     </figure>
-                                </a>
-                                <p class="heading mt-3 is-size-4">SunSwap</p>
-                            </div>
+                                    <p class="heading mt-3 is-size-4 subtitle">SunSwap</p>
+                                </div>
+                            </a>
                         </div>
-                        <div class="column is-half has-text-centered">
-                            <div class="box">
-                                <a href="https://medium.com/@johnny.mnemonic/guide-to-swapping-duino-coin-on-sushi-com-12bca3192ea2">
+                        <div class="column is-half has-text-centered fix-link">
+                            <a href="https://medium.com/@johnny.mnemonic/guide-to-swapping-duino-coin-on-sushi-com-12bca3192ea2">
+                                <div class="exchange_box">
                                     <figure class="image is-128x128" style="margin-left: auto;margin-right:auto;">
                                         <img src="assets/icons/sushi.png">
                                     </figure>
-                                </a>
-                                <p class="heading mt-3 is-size-4">SushiSwap</p>
-                            </div>
+                                    <p class="heading mt-3 is-size-4 subtitle">SushiSwap</p>
+                                </div>
+                            </a>
                         </div>
                     </div>
                     <p class="subtitle has-text-right">
