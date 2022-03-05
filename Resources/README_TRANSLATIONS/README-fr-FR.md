@@ -54,7 +54,7 @@
 <br><br>
 
 <h3>
-    Duino-coin est un coin qui peut être miné avec des cartes microcontrôleurs de type Arduinos, des Esp8266/32, des Raspberrypis,
+    Duino-coin est un coin qui peut être miné avec des microcontrôleurs de type Arduinos, des Esp8266/32, des Raspberrypis,
     des ordinateurs et bien d'autres équipements (routeurs Wifi, TV players, Smartphones, Smartwatches, SBCs, GPUs).
 </h3>
 <br>
@@ -107,7 +107,7 @@ Comment nous aider?
 
 *   Forker le projet sur github
 *   Créer une nouvelle branche
-*   Committer ses changements
+*   Commit ses changements
 *   Assurez vous que tout fonctionne correctement
 *   Ouvrir une pull request
 
@@ -196,11 +196,11 @@ Le code source du serveur, la documentation de l'API et toutes les librairies po
 *   [DuinoCoinI2C](https://github.com/ricaun/DuinoCoinI2C) - Utilisation d'un ESP8266/ESP32 comme maître pour un rig d'Arduinos par ricaun
 *   [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) - Tableau de bord et d'aide au dépannage par Lulaschkas
 *   [duco-miners](https://github.com/dansinclair25/duco-miners) Tableau de bord en ligne de commande (CLI) réalisé par dansinclair25
-*   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) Icon Duco-Coin au format ttf par SandUhrGucker
+*   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) Icone Duco-Coin au format ttf par SandUhrGucker
 *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) - Site web présentant des statistique par compte par siunus
 *   [duino-tools](https://github.com/kyngs/duino-tools) écrit en JAVA par kyngs
-*   [Duino Stats](https://github.com/Bilaboz/duino-stats) Discord bot officiel par Bilaboz
-*   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI portefeuille par viktor02
+*   [Duino Stats](https://github.com/Bilaboz/duino-stats) Bot Discord officiel par Bilaboz
+*   [DuCoWallet](https://github.com/viktor02/DuCoWallet) Portefeuille GUI par viktor02
 *   [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - Widget Duino-Coin (iOS) par Naphob
 
   Vous pouvez consulter une liste d'application similaire sur notre site web : [website](https://duinocoin.com/apps).
@@ -224,7 +224,7 @@ Certaines parties du programme, incluant des fichiers, peuvent être soumises à
 9.  Un compte peut être suspendu temporairement pour vérifier qu'il respecte bien les conditions d'utilisation et ne procède pas des violations de ces mêmes règles.<br/>
 10. Un ordre de change, ou une procédure d'échange en cours, fait(e) sur la plateforme DUCO-Exchange ("plateforme officielle d'échange") pourra être supprimé ou refusé durant la période de vérification (voir point 9).<br/>
 11. Un ordre de change ou une procédure d'échange, fait(e) sur la plateforme officielle d'échange pourra être refusé en cas de non respect des règles d'utilisation ou par manque de fonds propres.<br/>
-12. Le minage via des services d'hébergement sur le cloud, ou des services de VPS gratuits (ex : Repl.it, GitHub Actions, etc.) n'est pas autorisé, dans la mesure où il ne respecte l'égalité entre les utilisateurs.<br />
+12. Le minage via des services d'hébergement gratuits sur le cloud, ou des services de VPS gratuits (ex : Repl.it, GitHub Actions, etc.) n'est pas autorisé, dans la mesure où il ne respecte l'égalité entre les utilisateurs.<br />
 13. Tout utilisateur dont il est prouvé qu'il a tenté d'enfreindre les règles d'utilisation sera banni.<br/>
 14. Ces thermes d'utilisation peuvent être modifier sans préavis.<br/>
 15. Posséder plusieurs comptes sur la plateforme sans raisons rationnelles (ex : pour faire du minage optimisé sur différents comptes) décrites au préalable par l'utilisateur n'est pas autorisé.<br/>
