@@ -63,7 +63,7 @@
 |-|-|-|
 | 💻 Pris en charge d'un grand nombre d'appareils<br>👥 Communauté à forte croissance<br>💱 Utilisation & échanges faciles<br>(sur DUCO Exchange, Node-S, JustSwap, SushiSwap)<br>🌎 Disponible partout<br>🆕 Projet innovateur & open-source<br>🌳 Débutants & eco-friendly<br>💰 Coût réduit & facile à miner | ⚒️ Algorithme : DUCO-S1<br>♐ Récompenses : assurées par "Kolka system"<br>Assistant pour récompenser équitablement les mineurs<br>⚡ Transactions : Instantanées<br>🤑 Minage de coins : sans limite<br>(Limiter à : 350k coins avant décembre 2020)<br>(Nouvelle limite planifiée pour le futur)<br>🔤 Symbole: DUCO (ᕲ)<br>🔢 Décimales: supérieures à 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Teensy 4.1 boards |
 
-## Par où commencer?
+## Par où commencer `?`
 
 ### la meilleure façon de démarrer avec le Duino-Coin est de télécharger la [dernière version](https://github.com/revoxhere/duino-coin/releases/latest) pour votre OS.<br>
 
@@ -86,10 +86,10 @@ Aprés ça, vous êtes prêt à démarrer le logiciel (e.g. `python3 PC_Miner.py
 
 #### Sous Windows
 
-1. Télecharger et installer [Python 3](https://www.python.org/downloads/) (assurez vous d'ajouter Python et Pip à votre PATH).
-2. Télecharger le contenu du [repository Duino-Coin](https://github.com/revoxhere/duino-coin/archive/master.zip).
-3. Extraire le zip téléchargé et accéder au chemin du répertoire où se trouve l'archive décompressée via un terminal.
-4. Taper `py -m pip install -r requirements.txt` dans le terminal afin d'installer les dépendances nécessaires au fonctionnement de pip.
+1.  Télecharger et installer [Python 3](https://www.python.org/downloads/) (assurez vous d'ajouter Python et Pip à votre PATH).
+2.  Télecharger le contenu du [repository Duino-Coin](https://github.com/revoxhere/duino-coin/archive/master.zip).
+3.  Extraire le zip téléchargé et accéder au chemin du répertoire où se trouve l'archive décompressée via un terminal.
+4.  Taper `py -m pip install -r requirements.txt` dans le terminal afin d'installer les dépendances nécessaires au fonctionnement de pip.
 
 Après cela, vous pouvez lancer le logiciel (en double-cliquant simplement sur le fichier `.py` ou taper `py PC_Miner.py` dans un terminal.
 
@@ -186,22 +186,22 @@ Le code source du serveur, la documentation de l'API et toutes les librairies po
 
 ### Autres outils disponibles
 
-* [Duino Miner](https://github.com/g7ltt/Duino-Miner) - Mineur Arduino Nano  pour DUCO / fichiers et documentation par g7ltt
-* [DUINO Mining Rig](https://repalmakershop.com/pages/duino-mining-rig) - fichiers 3D, design de PCB, et instructions pour créer votre propre rig Duino par ReP_AL
-* [DuinoCoin-balance-Home-Assistant](https://github.com/NL647/DuinoCoin-balance-Home-Assistant) - addon solde pour "home assistant" permettant d'afficher votre solde par NL647
-* [Duino Coin Status Monitor](https://github.com/TSltd/duino_coin) - interface utilisateur pour écran 128x64 SSD1306 OLED et ESP8266 par TSltd
-* [ducopanel](https://github.com/ponsato/ducopanel) - GUI pour le contrôle de mineurs par ponsato
-* [Duino AVR Monitor](https://www.microsoft.com/store/apps/9NJ7HPFSR9V5) - GUI Windows gestionnaire et pillotage d'appareils et cartes AVR minant du Duino-Coin par niknak
-* [Duino-Coin Arduino library](https://github.com/ricaun/arduino-DuinoCoin) - Librairie Arduino par ricaun
-* [DuinoCoinI2C](https://github.com/ricaun/DuinoCoinI2C) - Utilisation d'un ESP8266/ESP32 comme maître pour un rig d'Arduinos par ricaun
-* [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) - Tableau de bord et d'aide au dépannage par Lulaschkas
-* [duco-miners](https://github.com/dansinclair25/duco-miners) Tableau de bord en ligne de commande (CLI) réalisé par dansinclair25
-* [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) Icon Duco-Coin au format ttf par SandUhrGucker
-* [DUCO Monitor](https://siunus.github.io/duco-monitor/) - Site web présentant des statistique par compte par siunus
-* [duino-tools](https://github.com/kyngs/duino-tools) écrit en JAVA par kyngs
-* [Duino Stats](https://github.com/Bilaboz/duino-stats) Discord bot officiel par Bilaboz
-* [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI portefeuille par viktor02
-* [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - Widget Duino-Coin (iOS) par Naphob
+*   [Duino Miner](https://github.com/g7ltt/Duino-Miner) - Mineur Arduino Nano  pour DUCO / fichiers et documentation par g7ltt
+*   [DUINO Mining Rig](https://repalmakershop.com/pages/duino-mining-rig) - fichiers 3D, design de PCB, et instructions pour créer votre propre rig Duino par ReP_AL
+*   [DuinoCoin-balance-Home-Assistant](https://github.com/NL647/DuinoCoin-balance-Home-Assistant) - addon solde pour "home assistant" permettant d'afficher votre solde par NL647
+*   [Duino Coin Status Monitor](https://github.com/TSltd/duino_coin) - interface utilisateur pour écran 128x64 SSD1306 OLED et ESP8266 par TSltd
+*   [ducopanel](https://github.com/ponsato/ducopanel) - GUI pour le contrôle de mineurs par ponsato
+*   [Duino AVR Monitor](https://www.microsoft.com/store/apps/9NJ7HPFSR9V5) - GUI Windows gestionnaire et pillotage d'appareils et cartes AVR minant du Duino-Coin par niknak
+*   [Duino-Coin Arduino library](https://github.com/ricaun/arduino-DuinoCoin) - Librairie Arduino par ricaun
+*   [DuinoCoinI2C](https://github.com/ricaun/DuinoCoinI2C) - Utilisation d'un ESP8266/ESP32 comme maître pour un rig d'Arduinos par ricaun
+*   [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) - Tableau de bord et d'aide au dépannage par Lulaschkas
+*   [duco-miners](https://github.com/dansinclair25/duco-miners) Tableau de bord en ligne de commande (CLI) réalisé par dansinclair25
+*   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) Icon Duco-Coin au format ttf par SandUhrGucker
+*   [DUCO Monitor](https://siunus.github.io/duco-monitor/) - Site web présentant des statistique par compte par siunus
+*   [duino-tools](https://github.com/kyngs/duino-tools) écrit en JAVA par kyngs
+*   [Duino Stats](https://github.com/Bilaboz/duino-stats) Discord bot officiel par Bilaboz
+*   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI portefeuille par viktor02
+*   [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - Widget Duino-Coin (iOS) par Naphob
 
   Vous pouvez consulter une liste d'application similaire sur notre site web : [website](https://duinocoin.com/apps).
 </details>
@@ -213,42 +213,42 @@ Certaines parties du programme, incluant des fichiers, peuvent être soumises à
 
 ## Conditions générales et règles d'utilisation
 
-1. Les Duino-Coins (ou "DUCOs") sont la propriété des mineurs de coins suivant un processus dit de "minage".<br/>
-2. Le minage est fondé sur l'utilisation de l'algorithme DUCO-S1, comme décrit dans notre livret blanc (<a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>). L'algorithme DUCO-S1 permet d'attribuer des récompenses aux utilisateurs trouvant une solution correcte à un problème mathématique.<br/>
-3. Le minage peut être effectué en utilisant des processeurs, des microcontrôleurs (ex : cartes Arduinos), des Single Board Computers (ex : cartes Raspberry Pi), des cartes wifi de type ESP32/8266 et un programme de minage officiel - voir plus haut dans le fichier README).<br/>
-4. Le minage dit "GPU" (réalisé à l'aide cartes graphique), le minage FPGAs, et tout type de minage avec des appareils a forte puissance est autorisé, mais l'utilisateur se verra attribué des niveau de difficulté `EXTREME`.<br/>
-5. Tout utilisateur utilisant un niveau de difficulté qui ne correspond pas avec son matériel (voir <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">liste des taux de difficulté</a>) verra son niveau de difficulté réajusté automatiquement vers un niveau de difficulté correspondant à sa capacité matérielle réelle.<br/>
-6. Tout utilisateur qui tentera d'utiliser ou de biaiser le taux de difficulté à la baisse pourra voir son compte temporairement bloqué.<br/>
-7. Bannir signifie empêcher un utilisateur d'accéder à ces coins, et peut aller jusqu'à la suppression du compte du dit utilisateur.<br/>
-8. Seuls les coins gagnés légalement, dans le respect des règles énoncée ci-joint, sont éligibles à l'échange.<br/>
-9. Un compte peut être suspendu temporairement pour vérifier qu'il respecte bien les conditions d'utilisation et ne procède pas des violations de ces mêmes règles.<br/>
-10. Un ordre de change, ou une procédure d'échange en cours, fait(e) sur la plateforme DUCO-Exchange ("plateforme officielle d'échange") pourra être supprimé ou refusé durant la période de vérification (voir point 9).<br/>
-11. Un ordre de change ou une procédure d'échange, fait(e) sur la plateforme officielle d'échange pourra être refusé en cas de non respect des règles d'utilisation ou par manque de fonds propres.<br/>
-12. Le minage via des services d'hébergement sur le cloud, ou des services de VPS gratuits (ex : Repl.it, GitHub Actions, etc.) n'est pas autorisé, dans la mesure où il ne respecte l'égalité entre les utilisateurs.<br />
-13. Tout utilisateur dont il est prouvé qu'il a tenté d'enfreindre les règles d'utilisation sera banni.<br/>
-14. Ces thermes d'utilisation peuvent être modifier sans préavis.<br/>
-15. Posséder plusieurs comptes sur la plateforme sans raisons rationnelles (ex : pour faire du minage optimisé sur différents comptes) décrites au préalable par l'utilisateur n'est pas autorisé.<br/>
-16. Envoyer des transactions en faisant la promotion d'autres services, ou faire de la publicité pour des tiers, quelle qu'en soit la forme, via le réseau Duino-Coin, n'est pas autorisé.<br/>
-17. Tout utilisateur utilisant Duino-Coin s'engage à respecter les règles décrites ci-dessus.<br/>
+1.  Les Duino-Coins (ou "DUCOs") sont la propriété des mineurs de coins suivant un processus dit de "minage".<br/>
+2.  Le minage est fondé sur l'utilisation de l'algorithme DUCO-S1, comme décrit dans notre livret blanc (<a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>). L'algorithme DUCO-S1 permet d'attribuer des récompenses aux utilisateurs trouvant une solution correcte à un problème mathématique.<br/>
+3.  Le minage peut être effectué en utilisant des processeurs, des microcontrôleurs (ex : cartes Arduinos), des Single Board Computers (ex : cartes Raspberry Pi), des cartes wifi de type ESP32/8266 et un programme de minage officiel - voir plus haut dans le fichier README).<br/>
+4.  Le minage dit "GPU" (réalisé à l'aide cartes graphique), le minage FPGAs, et tout type de minage avec des appareils a forte puissance est autorisé, mais l'utilisateur se verra attribué des niveau de difficulté `EXTREME`.<br/>
+5.  Tout utilisateur utilisant un niveau de difficulté qui ne correspond pas avec son matériel (voir <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">liste des taux de difficulté</a>) verra son niveau de difficulté réajusté automatiquement vers un niveau de difficulté correspondant à sa capacité matérielle réelle.<br/>
+6.  Tout utilisateur qui tentera d'utiliser ou de biaiser le taux de difficulté à la baisse pourra voir son compte temporairement bloqué.<br/>
+7.  Bannir signifie empêcher un utilisateur d'accéder à ces coins, et peut aller jusqu'à la suppression du compte du dit utilisateur.<br/>
+8.  Seuls les coins gagnés légalement, dans le respect des règles énoncée ci-joint, sont éligibles à l'échange.<br/>
+9.  Un compte peut être suspendu temporairement pour vérifier qu'il respecte bien les conditions d'utilisation et ne procède pas des violations de ces mêmes règles.<br/>
+10.  Un ordre de change, ou une procédure d'échange en cours, fait(e) sur la plateforme DUCO-Exchange ("plateforme officielle d'échange") pourra être supprimé ou refusé durant la période de vérification (voir point 9).<br/>
+11.  Un ordre de change ou une procédure d'échange, fait(e) sur la plateforme officielle d'échange pourra être refusé en cas de non respect des règles d'utilisation ou par manque de fonds propres.<br/>
+12.  Le minage via des services d'hébergement sur le cloud, ou des services de VPS gratuits (ex : Repl.it, GitHub Actions, etc.) n'est pas autorisé, dans la mesure où il ne respecte l'égalité entre les utilisateurs.<br />
+13.  Tout utilisateur dont il est prouvé qu'il a tenté d'enfreindre les règles d'utilisation sera banni.<br/>
+14.  Ces thermes d'utilisation peuvent être modifier sans préavis.<br/>
+15.  Posséder plusieurs comptes sur la plateforme sans raisons rationnelles (ex : pour faire du minage optimisé sur différents comptes) décrites au préalable par l'utilisateur n'est pas autorisé.<br/>
+16.  Envoyer des transactions en faisant la promotion d'autres services, ou faire de la publicité pour des tiers, quelle qu'en soit la forme, via le réseau Duino-Coin, n'est pas autorisé.<br/>
+17.  Tout utilisateur utilisant Duino-Coin s'engage à respecter les règles décrites ci-dessus.<br/>
 
 ## Politique de confidentialité
 
-1. Seul(e)s les noms d'utilisateurs, les mots de passe hashés (avec bcrypt), dates de créations du compte et l'adresse e-mail de l'utilisateur sont stocké(e)s sur notre serveur principal. Ces données constituent les "données utilisateur".<br/>
-2. Le email utilisateur n'est pas disponible au publique. Ils est réservé uniquement pour contacter l'utilisateur en cas de besoin, ou confirmer un échange sur la plateforme d'échange <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a>, occasionnellement pour recevoir notre newsletter (prévue dans un futur proche).<br/>
-3. Les soldes, transactions et autres données de minage sont publiques et disponible via notre <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">API JSON</a>.<br/>
-4. Notre politique de confidentialité peut être modifiée sans préavis.
+1.  Seul(e)s les noms d'utilisateurs, les mots de passe hashés (avec bcrypt), dates de créations du compte et l'adresse e-mail de l'utilisateur sont stocké(e)s sur notre serveur principal. Ces données constituent les "données utilisateur".<br/>
+2.  Le email utilisateur n'est pas disponible au publique. Ils est réservé uniquement pour contacter l'utilisateur en cas de besoin, ou confirmer un échange sur la plateforme d'échange <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a>, occasionnellement pour recevoir notre newsletter (prévue dans un futur proche).<br/>
+3.  Les soldes, transactions et autres données de minage sont publiques et disponible via notre <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">API JSON</a>.<br/>
+4.  Notre politique de confidentialité peut être modifiée sans préavis.
 
 ## Active project maintainers
 
-* [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Lead dev Python, fondateur du projet)
-* [@Bilaboz](https://github.com/bilaboz/) (Lead dev NodeJS)
-* [@connorhess](https://github.com/connorhess) (Lead dev Python, Node-S owner)
-* [@JoyBed](https://github.com/JoyBed) (Lead dev AVR)
-* [@Yennefer](https://www.instagram.com/vlegle/) (Lead manager réseaux sociaux)
-* [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster et DUCO Developpeur)
-* [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) Dev)
-* [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
-* [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
+*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Lead dev Python, fondateur du projet)
+*   [@Bilaboz](https://github.com/bilaboz/) (Lead dev NodeJS)
+*   [@connorhess](https://github.com/connorhess) (Lead dev Python, Node-S owner)
+*   [@JoyBed](https://github.com/JoyBed) (Lead dev AVR)
+*   [@Yennefer](https://www.instagram.com/vlegle/) (Lead manager réseaux sociaux)
+*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster et DUCO Developpeur)
+*   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) Dev)
+*   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
+*   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
 
 Mille merci à tous les contributeurs [contributeurs](https://github.com/revoxhere/duino-coin/graphs/contributors) qui nous aides à développer le projet Duino-Coin.
 
