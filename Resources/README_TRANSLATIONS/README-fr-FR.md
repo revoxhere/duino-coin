@@ -63,7 +63,7 @@
 |-|-|-|
 | 💻 Pris en charge d'un grand nombre d'appareils<br>👥 Communauté à forte croissance<br>💱 Utilisation & échanges faciles<br>(sur DUCO Exchange, Node-S, JustSwap, SushiSwap)<br>🌎 Disponible partout<br>🆕 Projet innovateur & open-source<br>🌳 Débutants & eco-friendly<br>💰 Coût réduit & facile à miner | ⚒️ Algorithme : DUCO-S1<br>♐ Récompenses : assurées par "Kolka system"<br>Assistant pour récompenser équitablement les mineurs<br>⚡ Transactions : Instantanées<br>🤑 Minage de coins : sans limite<br>(Limiter à : 350k coins avant décembre 2020)<br>(Nouvelle limite planifiée pour le futur)<br>🔤 Symbole: DUCO (ᕲ)<br>🔢 Décimales: supérieures à 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Teensy 4.1 boards |
 
-## Par où commencer `?`
+## Par où commencer
 
 ### la meilleure façon de démarrer avec le Duino-Coin est de télécharger la [dernière version](https://github.com/revoxhere/duino-coin/releases/latest) pour votre OS.<br>
 
@@ -179,10 +179,10 @@ Le code source du serveur, la documentation de l'API et toutes les librairies po
 *   [Go Miner](https://github.com/yippiez/go-miner) - Mineur en Go par yippiez
 *   [ducominer](https://github.com/its5Q/ducominer) - par its5Q
 *   [Répertoire des mineurs non-officiels](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
-   * [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) - Mineur en Julia par revoxhere
-   * [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) - Mineur en Ruby par revoxhere
-   * [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) - Mineur minimaliste en Python (algo DUCO-S1) par revoxhere
-   * [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) - Mineur pour cartes Teensy par joaquinbvw.
+ -   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) - Mineur en Julia par revoxhere
+ -   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) - Mineur en Ruby par revoxhere
+ -   [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) - Mineur minimaliste en Python (algo DUCO-S1) par revoxhere
+ -   [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) - Mineur pour cartes Teensy par joaquinbvw.
 
 ### Autres outils disponibles
 
@@ -213,15 +213,15 @@ Certaines parties du programme, incluant des fichiers, peuvent être soumises à
 
 ## Conditions générales et règles d'utilisation
 
-1. Les Duino-Coins (ou "DUCOs") sont la propriété des mineurs de coins suivant un processus dit de "minage".<br/>
-2. Le minage est fondé sur l'utilisation de l'algorithme DUCO-S1, comme décrit dans notre livret blanc (<a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>). L'algorithme DUCO-S1 permet d'attribuer des récompenses aux utilisateurs trouvant une solution correcte à un problème mathématique.<br/>
-3. Le minage peut être effectué en utilisant des processeurs, des microcontrôleurs (ex : cartes Arduinos), des Single Board Computers (ex : cartes Raspberry Pi), des cartes wifi de type ESP32/8266 et un programme de minage officiel - voir plus haut dans le fichier README).<br/>
-4. Le minage dit "GPU" (réalisé à l'aide cartes graphique), le minage FPGAs, et tout type de minage avec des appareils a forte puissance est autorisé, mais l'utilisateur se verra attribué des niveau de difficulté `EXTREME`.<br/>
-5. Tout utilisateur utilisant un niveau de difficulté qui ne correspond pas avec son matériel (voir <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">liste des taux de difficulté</a>) verra son niveau de difficulté réajusté automatiquement vers un niveau de difficulté correspondant à sa capacité matérielle réelle.<br/>
-6. Tout utilisateur qui tentera d'utiliser ou de biaiser le taux de difficulté à la baisse pourra voir son compte temporairement bloqué.<br/>
-7. Bannir signifie empêcher un utilisateur d'accéder à ces coins, et peut aller jusqu'à la suppression du compte du dit utilisateur.<br/>
-8. Seuls les coins gagnés légalement, dans le respect des règles énoncée ci-joint, sont éligibles à l'échange.<br/>
-9. Un compte peut être suspendu temporairement pour vérifier qu'il respecte bien les conditions d'utilisation et ne procède pas des violations de ces mêmes règles.<br/>
+1.  Les Duino-Coins (ou "DUCOs") sont la propriété des mineurs de coins suivant un processus dit de "minage".<br/>
+2.  Le minage est fondé sur l'utilisation de l'algorithme DUCO-S1, comme décrit dans notre livret blanc (<a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>). L'algorithme DUCO-S1 permet d'attribuer des récompenses aux utilisateurs trouvant une solution correcte à un problème mathématique.<br/>
+3.  Le minage peut être effectué en utilisant des processeurs, des microcontrôleurs (ex : cartes Arduinos), des Single Board Computers (ex : cartes Raspberry Pi), des cartes wifi de type ESP32/8266 et un programme de minage officiel - voir plus haut dans le fichier README).<br/>
+4.  Le minage dit "GPU" (réalisé à l'aide cartes graphique), le minage FPGAs, et tout type de minage avec des appareils a forte puissance est autorisé, mais l'utilisateur se verra attribué des niveau de difficulté `EXTREME`.<br/>
+5.  Tout utilisateur utilisant un niveau de difficulté qui ne correspond pas avec son matériel (voir <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">liste des taux de difficulté</a>) verra son niveau de difficulté réajusté automatiquement vers un niveau de difficulté correspondant à sa capacité matérielle réelle.<br/>
+6.  Tout utilisateur qui tentera d'utiliser ou de biaiser le taux de difficulté à la baisse pourra voir son compte temporairement bloqué.<br/>
+7.  Bannir signifie empêcher un utilisateur d'accéder à ces coins, et peut aller jusqu'à la suppression du compte du dit utilisateur.<br/>
+8.  Seuls les coins gagnés légalement, dans le respect des règles énoncée ci-joint, sont éligibles à l'échange.<br/>
+9.  Un compte peut être suspendu temporairement pour vérifier qu'il respecte bien les conditions d'utilisation et ne procède pas des violations de ces mêmes règles.<br/>
 10. Un ordre de change, ou une procédure d'échange en cours, fait(e) sur la plateforme DUCO-Exchange ("plateforme officielle d'échange") pourra être supprimé ou refusé durant la période de vérification (voir point 9).<br/>
 11. Un ordre de change ou une procédure d'échange, fait(e) sur la plateforme officielle d'échange pourra être refusé en cas de non respect des règles d'utilisation ou par manque de fonds propres.<br/>
 12. Le minage via des services d'hébergement sur le cloud, ou des services de VPS gratuits (ex : Repl.it, GitHub Actions, etc.) n'est pas autorisé, dans la mesure où il ne respecte l'égalité entre les utilisateurs.<br />
@@ -233,10 +233,10 @@ Certaines parties du programme, incluant des fichiers, peuvent être soumises à
 
 ## Politique de confidentialité
 
-1. Seul(e)s les noms d'utilisateurs, les mots de passe hashés (avec bcrypt), dates de créations du compte et l'adresse e-mail de l'utilisateur sont stocké(e)s sur notre serveur principal. Ces données constituent les "données utilisateur".<br/>
-2. Le email utilisateur n'est pas disponible au publique. Ils est réservé uniquement pour contacter l'utilisateur en cas de besoin, ou confirmer un échange sur la plateforme d'échange <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a>, occasionnellement pour recevoir notre newsletter (prévue dans un futur proche).<br/>
-3. Les soldes, transactions et autres données de minage sont publiques et disponible via notre <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">API JSON</a>.<br/>
-4. Notre politique de confidentialité peut être modifiée sans préavis.
+1.  Seul(e)s les noms d'utilisateurs, les mots de passe hashés (avec bcrypt), dates de créations du compte et l'adresse e-mail de l'utilisateur sont stocké(e)s sur notre serveur principal. Ces données constituent les "données utilisateur".<br/>
+2.  Le email utilisateur n'est pas disponible au publique. Ils est réservé uniquement pour contacter l'utilisateur en cas de besoin, ou confirmer un échange sur la plateforme d'échange <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a>, occasionnellement pour recevoir notre newsletter (prévue dans un futur proche).<br/>
+3.  Les soldes, transactions et autres données de minage sont publiques et disponible via notre <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">API JSON</a>.<br/>
+4.  Notre politique de confidentialité peut être modifiée sans préavis.
 
 ## Active project maintainers
 
