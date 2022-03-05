@@ -179,10 +179,10 @@ Le code source du serveur, la documentation de l'API et toutes les librairies po
 *   [Go Miner](https://github.com/yippiez/go-miner) - Mineur en Go par yippiez
 *   [ducominer](https://github.com/its5Q/ducominer) - par its5Q
 *   [Répertoire des mineurs non-officiels](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
- -   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) - Mineur en Julia par revoxhere
- -   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) - Mineur en Ruby par revoxhere
- -   [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) - Mineur minimaliste en Python (algo DUCO-S1) par revoxhere
- -   [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) - Mineur pour cartes Teensy par joaquinbvw.
+    * [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) - Mineur en Julia par revoxhere
+    * [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) - Mineur en Ruby par revoxhere
+    * [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) - Mineur minimaliste en Python (algo DUCO-S1) par revoxhere
+    * [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) - Mineur pour cartes Teensy par joaquinbvw.
 
 ### Autres outils disponibles
 
