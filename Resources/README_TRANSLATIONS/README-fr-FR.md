@@ -86,8 +86,8 @@ Aprés ça, vous êtes prêt à démarrer le logiciel (e.g. `python3 PC_Miner.py
 
 #### Sous Windows
 
-1. Télecharger et installer [Python 3](https://www.python.org/downloads/) (assurez vous d'ajouter Python et Pip à votre PATH)
-2. Télecharger le contenu du [repository Duino-Coin](https://github.com/revoxhere/duino-coin/archive/master.zip)
+1. Télecharger et installer [Python 3](https://www.python.org/downloads/) (assurez vous d'ajouter Python et Pip à votre PATH).
+2. Télecharger le contenu du [repository Duino-Coin](https://github.com/revoxhere/duino-coin/archive/master.zip).
 3. Extraire le zip téléchargé et accéder au chemin du répertoire où se trouve l'archive décompressée via un terminal.
 4. Taper `py -m pip install -r requirements.txt` dans le terminal afin d'installer les dépendances nécessaires au fonctionnement de pip.
 
@@ -105,11 +105,11 @@ C'est pourquoi, toute contribution au projet Duino-coin est vivement appréciée
 
 Comment nous aider?
 
-* Forker le projet sur github
-* Créer une nouvelle branche
-* Committer ses changements
-* Assurez vous que tout fonctionne correctement
-* Ouvrir une pull request
+*   Forker le projet sur github
+*   Créer une nouvelle branche
+*   Committer ses changements
+*   Assurez vous que tout fonctionne correctement
+*   Ouvrir une pull request
 
 Le code source du serveur, la documentation de l'API et toutes les librairies pour développer votre propre duino-coin sont disponibles sur la branche [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools).
 
@@ -161,28 +161,28 @@ Le code source du serveur, la documentation de l'API et toutes les librairies po
 
 ### Autres applications de minage connues pour fonctionner avec le Duino-Coin
 
-* [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Arduino Ethernet shield Miner par Pumafron
-* [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - STM8S firmware pour le minage de DUCO par BBS215
-* [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - Mineur pour LabVIEW family by ericddm
-* [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - un mineur javascript facilement implémentable sur votre site par Hoiboy19
-* [Mineuino](https://github.com/VatsaDev/Mineuino) - Monétiser son site - Installer un webminer par VatsaDev
-* [hauchel's duco-related stuff repository](https://github.com/hauchel/duco/) - Collection de codes pour miner sur des microcontrôleurs non répertoriés.
-* [duino-coin-php-miner](https://github.com/ricardofiorani/duino-coin-php-miner) - Mineur dockerisé en PHP par ricardofiorani
-* [duino-coin-kodi](https://github.com/SandUhrGucker/duino-coin-kodi) - Addon pour miner des DUCO avec Kodi Media Center par SandUhrGucker
-* [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - Script en Python pour miner des Duino-Coins sur des routeurs Wifi par BastelPichi
-* [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - Mineur pour multiples appareils sous Androïd utilisant le moins possible de connection par DoctorEenot
-* [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - Mineur en MicroPython pour cartes ESP boards par fabiopolancoe
-* [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Mineur en Python pour Nintendo 3DS par PhereloHD & HGEpro
-* [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Mineur Docker par Alicia426
-* [NodeJS-DuinoCoin-Miner](https://github.com/LDarki/NodeJS-DuinoCoin-Miner/) - Mineur NodeJs simplifié par LDarki
-* [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - Pur C mineur par phantom32 & revoxhere
-* [Go Miner](https://github.com/yippiez/go-miner) - Mineur en Go par yippiez
-* [ducominer](https://github.com/its5Q/ducominer) - par its5Q
-* [Répertoire des mineurs non-officiels](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
-  * [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) - Mineur en Julia par revoxhere
-  * [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) - Mineur en Ruby par revoxhere
-  * [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) - Mineur minimaliste en Python (algo DUCO-S1) par revoxhere
-  * [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) - Mineur pour cartes Teensy par joaquinbvw.
+*   [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Arduino Ethernet shield Miner par Pumafron
+*   [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - STM8S firmware pour le minage de DUCO par BBS215
+*   [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - Mineur pour LabVIEW family by ericddm
+*   [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - un mineur javascript facilement implémentable sur votre site par Hoiboy19
+*   [Mineuino](https://github.com/VatsaDev/Mineuino) - Monétiser son site - Installer un webminer par VatsaDev
+*   [hauchel's duco-related stuff repository](https://github.com/hauchel/duco/) - Collection de codes pour miner sur des microcontrôleurs non répertoriés.
+*   [duino-coin-php-miner](https://github.com/ricardofiorani/duino-coin-php-miner) - Mineur dockerisé en PHP par ricardofiorani
+*   [duino-coin-kodi](https://github.com/SandUhrGucker/duino-coin-kodi) - Addon pour miner des DUCO avec Kodi Media Center par SandUhrGucker
+*   [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - Script en Python pour miner des Duino-Coins sur des routeurs Wifi par BastelPichi
+*   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - Mineur pour multiples appareils sous Androïd utilisant le moins possible de connection par DoctorEenot
+*   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - Mineur en MicroPython pour cartes ESP boards par fabiopolancoe
+*   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Mineur en Python pour Nintendo 3DS par PhereloHD & HGEpro
+*   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Mineur Docker par Alicia426
+*   [NodeJS-DuinoCoin-Miner](https://github.com/LDarki/NodeJS-DuinoCoin-Miner/) - Mineur NodeJs simplifié par LDarki
+*   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - Pur C mineur par phantom32 & revoxhere
+*   [Go Miner](https://github.com/yippiez/go-miner) - Mineur en Go par yippiez
+*   [ducominer](https://github.com/its5Q/ducominer) - par its5Q
+*   [Répertoire des mineurs non-officiels](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
+   *   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) - Mineur en Julia par revoxhere
+   *   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) - Mineur en Ruby par revoxhere
+   *   [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) - Mineur minimaliste en Python (algo DUCO-S1) par revoxhere
+   *   [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) - Mineur pour cartes Teensy par joaquinbvw.
 
 ### Autres outils disponibles
 
