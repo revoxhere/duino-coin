@@ -773,10 +773,7 @@
         "updating": "The miner is outdated. Updating....",
         "ask_mining_key": "Entrez votre clé de minage (mining key) - (Cela est seulement nécessaire si vous avez activé cette option dans le webwallet): ",
         "mining_key_required": "Une clé de minage (mining key) est nécessaire pour miner sur ce compte",
-        "invalid_mining_key": "La clé de minage fournie est invalide!",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "invalid_mining_key": "La clé de minage fournie est invalide!"
     },
     "russian": {
         "translation_autor": "5Q",
