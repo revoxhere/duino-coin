@@ -21,7 +21,7 @@ from os import execl, mkdir, _exit
 from subprocess import DEVNULL, Popen, check_call, PIPE
 import pip
 import sys
-import struct
+import base64 as b64
 import os
 import json
 import zipfile
@@ -35,7 +35,7 @@ from platform import python_version_tuple
 from platform import python_version
 
 from signal import SIGINT, signal
-from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
+from locale import getdefaultlocale
 from configparser import ConfigParser
 import psutil
 
@@ -181,6 +181,7 @@ def check_updates():
 
                     configparser["PC Miner"] = {
                         "username":    configparser["PC Miner"]["username"],
+                        "mining_key":   configparser["PC_Miner"]["mining_key"],
                         "intensity":   configparser["PC Miner"]["intensity"],
                         "threads":     configparser["PC Miner"]["threads"],
                         "start_diff":  configparser["PC Miner"]["start_diff"],
@@ -275,6 +276,7 @@ def check_updates():
     except Exception as e:
         print(e)
         sys.exit()
+
 
 class Algorithms:
     """
@@ -591,6 +593,45 @@ def get_string(string_name):
         return string_name
 
 
+def check_mining_key(user_settings):
+    if user_settings["mining_key"] != "None":
+        key = b64.b64decode(user_settings["mining_key"]).decode('ascii')
+    else:
+        key = ''
+
+    response = requests.get(
+        "https://server.duinocoin.com/mining_key"
+            + "?u=" + user_settings["username"]
+            + "&k=" + key,
+        timeout=10
+    ).json()
+
+    if not response["success"]:
+        if user_settings["mining_key"] == "None":
+            pretty_print(
+                get_string("mining_key_required"),
+                "warning"
+            )
+
+            mining_key = input("Enter your mining key: ")
+            user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('ascii')
+            configparser["PC_Miner"] = user_settings
+
+            with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
+                      "w") as configfile:
+                configparser.write(configfile)
+                print(Style.RESET_ALL + get_string("config_saved"))
+            sleep(1.5)
+            check_mining_key(user_settings)
+        else:
+            pretty_print(
+                get_string("invalid_mining_key"),
+                "error"
+            )
+            sleep(120)
+            check_mining_key(user_settings)
+
+
 class Miner:
     def greeting():
         diff_str = get_string("net_diff_short")
@@ -745,6 +786,12 @@ class Miner:
             if not username:
                 username = choice(["revox", "Bilaboz", "JoyBed", "Connor2"])
 
+            mining_key = input(Style.RESET_ALL + get_string("ask_mining_key") + Style.BRIGHT)
+            if not mining_key:
+                mining_key = "None"
+            else:
+                mining_key = b64.b64encode(mining_key.encode("utf-8")).decode('utf-8')
+
             algorithm = "DUCO-S1"
 
             intensity = sub(r"\D", "",
@@ -813,6 +860,7 @@ class Miner:
 
             configparser["PC Miner"] = {
                 "username":    username,
+                "mining_key":  mining_key,
                 "intensity":   intensity,
                 "threads":     threads,
                 "start_diff":  start_diff,
@@ -1139,6 +1187,7 @@ if __name__ == "__main__":
     hashrate = Manager().dict()
 
     user_settings = Miner.load_cfg()
+    check_mining_key(user_settings)
     Miner.greeting()
 
     Fasthash.load()
