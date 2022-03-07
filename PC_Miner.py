@@ -172,6 +172,37 @@ def check_updates():
             if update == "Y" or update == "y":
                 pretty_print(get_string("updating"), "warning", "sys")
 
+                DATA_DIR = "Duino-Coin PC Miner " + str(data["tag_name"]) # Create new version config folder
+                if not Path(DATA_DIR).is_dir():
+                    mkdir(DATA_DIR)
+
+                try :
+                    configparser.read(str(Settings.DATA_DIR) + '/Settings.cfg') # read the previous config
+
+                    configparser["PC Miner"] = {
+                        "username":    configparser["PC Miner"]["username"],
+                        "intensity":   configparser["PC Miner"]["intensity"],
+                        "threads":     configparser["PC Miner"]["threads"],
+                        "start_diff":  configparser["PC Miner"]["start_diff"],
+                        "donate":      int(configparser["PC Miner"]["donate"]),
+                        "identifier":  configparser["PC Miner"]["identifier"],
+                        "algorithm":   configparser["PC Miner"]["algorithm"],
+                        "language":    configparser["PC Miner"]["language"],
+                        "soc_timeout": int(configparser["PC Miner"]["soc_timeout"]),
+                        "report_sec":  int(configparser["PC Miner"]["report_sec"]),
+                        "discord_rp":  configparser["PC Miner"]["discord_rp"]
+                    }
+
+                    with open(str(DATA_DIR) # save it on the new version folder
+                            + '/Settings.cfg', 'w') as configfile:
+                        configparser.write(configfile)
+                    
+                    print(Style.RESET_ALL + get_string("config_saved"))
+
+                except Exception as e:
+                    print(Style.BRIGHT + "There is a error trying to save the config file: " + str(e))
+                    print("The config file isn't saved on the new version folder")
+
                 if not os.path.exists(Settings.TEMP_FOLDER): # Make the Temp folder
                     os.makedirs(Settings.TEMP_FOLDER) 
 
