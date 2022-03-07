@@ -183,7 +183,10 @@
         "node_picker_error": "Fatal error fetching server from the node picker - retrying in ",
         "connecting_node": " Retrieved mining node: ",
         "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating...."
+        "updating": "The miner is outdated. Updating....",
+        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
+        "mining_key_required": "Mining key is required to mine on this account",
+        "invalid_mining_key": "The mining key you provided is invalid!"
     },
     "korean": {
         "translation_autor": "hotmoist, roroxxn, hj-k66, dnjswndbf",
@@ -746,7 +749,10 @@
         "mining_not_exist_warning": " Vérifiez que vous avez correctement entré votre nom d'utilisateur dans le fichier de configuration. Nouvel essai dans 10s",
         "connection_search": "Recherche du serveur le plus rapide",
         "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating...."
+        "updating": "The miner is outdated. Updating....",
+        "ask_mining_key": "Entrez votre clé de minage (mining key) - (Cela est seulement nécessaire si vous avez activé cette option dans le webwallet): ",
+        "mining_key_required": "Une clé de minage (mining key) est nécessaire pour miner sur ce compte",
+        "invalid_mining_key": "La clé de minage fournie est invalide!"
     },
     "russian": {
         "translation_autor": "5Q",
