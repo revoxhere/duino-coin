@@ -10,7 +10,7 @@ datetimenow = datetime.now()
 with open("src/userinfo") as userinfo:
     username = userinfo.read().rstrip()
 '''
-username = input("Enter your username hare: ")
+username = input("Enter your username here: ")
 # DEBUG: for debuging (remove the hashtag to sea the results)
 #print(username)
 
