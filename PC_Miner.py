@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 3.0 © MIT licensed
+Duino-Coin Official PC Miner 3.1 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -110,7 +110,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 3.0
+    VER = 3.1
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -1187,11 +1187,12 @@ if __name__ == "__main__":
     hashrate = Manager().dict()
 
     user_settings = Miner.load_cfg()
-    check_mining_key(user_settings)
     Miner.greeting()
 
     Fasthash.load()
     Fasthash.init()
+    
+    check_mining_key(user_settings)
 
     Donate.load(int(user_settings["donate"]))
     Donate.start(int(user_settings["donate"]))
