@@ -3,7 +3,7 @@
 # Duino-Coin Tkinter GUI Wallet (v2.52)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2019-2021
+# © Duino-Coin Community 2019-2022
 ##########################################
 import sys
 from base64 import b64decode, b64encode

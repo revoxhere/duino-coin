@@ -5,7 +5,7 @@
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
   Official code for ESP32 boards                     version 3.1
 
-  Duino-Coin Team & Community 2019-2021 © MIT Licensed
+  Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
   https://github.com/revoxhere/duino-coin
 
@@ -155,7 +155,7 @@ const char WEBSITE[] PROGMEM = R"=====(
 <!--
     Duino-Coin self-hosted dashboard
     MIT licensed
-    Duino-Coin official 2019-2021
+    Duino-Coin official 2019-2022
     https://github.com/revoxhere/duino-coin
     https://duinocoin.com
 -->

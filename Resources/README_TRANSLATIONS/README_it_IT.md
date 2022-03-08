@@ -1,7 +1,7 @@
 <!--
 *** Official Duino Coin Italian README
 *** translation by octospacc, 2022
-*** original by revoxhere, 2019-2021
+*** original by revoxhere, 2019-2022
 -->
 
 <a href="https://duinocoin.com">

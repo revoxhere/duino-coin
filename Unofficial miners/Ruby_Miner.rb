@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # Minimal version of Duino-Coin PC Miner, useful for developing own apps
-# revox 2020-2021
+# revox 2020-2022
 require 'socket'
 require 'digest'
 require 'net/http'
@@ -15,7 +15,7 @@ minerId = "None" # Custom miner identifier
 $VERBOSE = nil
 
 puts("\n ‖ Minimal DUCO-S1 Ruby Miner")
-puts(" ‖ Duino-Coin community 2020-2021")
+puts(" ‖ Duino-Coin community 2020-2022")
 puts(" ‖ https://github.com/revoxhere/duino-coin\n\n")
 
 # Server IP file url

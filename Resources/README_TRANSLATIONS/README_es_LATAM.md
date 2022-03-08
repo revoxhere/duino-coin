@@ -1,6 +1,6 @@
 <!--
 *** oficial Duino Coin LATAM README
-*** by revoxhere, 2019-2021
+*** by revoxhere, 2019-2022
 *** translated by Technopy311
 
 *** Last update by LDarki

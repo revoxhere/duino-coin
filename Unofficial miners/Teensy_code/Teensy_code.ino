@@ -6,7 +6,7 @@
 // | |__| | |_| | | | | | (_) |     | |___| (_) | | | | |
 // |_____/ \__,_|_|_| |_|\___/       \_____\___/|_|_| |_|
 //  Code for Teensy 4.1 boards v2.4
-//  © Duino-Coin Community 2019-2021
+//  © Duino-Coin Community 2019-2022
 //  Distributed under MIT License
 //////////////////////////////////////////////////////////
 //  https://github.com/joaquinbvw - Teensy 4.1 code

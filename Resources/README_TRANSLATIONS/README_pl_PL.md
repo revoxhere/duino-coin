@@ -1,6 +1,6 @@
 <!--
 *** Official Duino Coin README
-*** by revox, 2019-2021
+*** by revox, 2019-2022
 -->
 
 <p align = "center">

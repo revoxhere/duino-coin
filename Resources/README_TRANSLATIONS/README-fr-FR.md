@@ -1,6 +1,6 @@
 <!--
 *** README Duino Coin Officiel
-*** par revoxhere, 2019-2021
+*** par revoxhere, 2019-2022
 -->
 <a href="https://duinocoin.com">
   <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" width="215px" align="right" />
