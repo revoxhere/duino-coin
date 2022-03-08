@@ -1195,7 +1195,10 @@ if __name__ == "__main__":
     Fasthash.load()
     Fasthash.init()
     
-    check_mining_key(user_settings)
+    try:
+        check_mining_key(user_settings)
+    except Exception as e:
+        print("Error checking mining key:", e)
 
     Donate.load(int(user_settings["donate"]))
     Donate.start(int(user_settings["donate"]))
