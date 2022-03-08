@@ -953,7 +953,10 @@ class Miner:
                                         + Settings.SEPARATOR
                                         + str(user_settings["username"])
                                         + Settings.SEPARATOR
-                                        + str(user_settings["start_diff"]))
+                                        + str(user_settings["start_diff"])
+                                        + Settings.SEPARATOR
+                                        + str(user_settings["mining_key"])
+                            )
 
                             job = Client.recv().split(Settings.SEPARATOR)
                             if len(job) == 3:
