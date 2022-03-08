@@ -3,7 +3,7 @@
 Duino-Coin Official AVR Miner 3.1 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
-Duino-Coin Team & Community 2019-2021
+Duino-Coin Team & Community 2019-2022
 """
 
 from os import _exit, mkdir
@@ -733,7 +733,7 @@ def greeting():
         + Style.BRIGHT + get_string('banner')
         + Style.RESET_ALL + Fore.MAGENTA
         + f' {Settings.VER}' + Fore.RESET
-        + ' 2019-2021')
+        + ' 2019-2022')
 
     print(
         Style.DIM + Fore.MAGENTA
