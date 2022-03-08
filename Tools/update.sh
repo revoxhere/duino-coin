@@ -6,5 +6,5 @@ rm -rf duino-coin
 git clone https://github.com/revoxhere/duino-coin.git
 cd duino-coin
 python3 -m pip install -r requirements.txt
-chmod +x update.sh
+chmod +x Tools/update.sh
 clear
