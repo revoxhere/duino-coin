@@ -181,7 +181,7 @@ def check_updates():
 
                     configparser["PC Miner"] = {
                         "username":    configparser["PC Miner"]["username"],
-                        "mining_key":   configparser["PC_Miner"]["mining_key"],
+                        "mining_key":   configparser["PC Miner"]["mining_key"],
                         "intensity":   configparser["PC Miner"]["intensity"],
                         "threads":     configparser["PC Miner"]["threads"],
                         "start_diff":  configparser["PC Miner"]["start_diff"],
@@ -615,7 +615,7 @@ def check_mining_key(user_settings):
 
             mining_key = input("Enter your mining key: ")
             user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('ascii')
-            configparser["PC_Miner"] = user_settings
+            configparser["PC Miner"] = user_settings
 
             with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
                       "w") as configfile:
