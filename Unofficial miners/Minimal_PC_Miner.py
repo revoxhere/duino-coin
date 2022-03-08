@@ -21,6 +21,7 @@ def current_time():
     return current_time
 
 username = input('Username?\n> ')
+mining_key = input("Mining key? ['None' for no key]\n> ')
 diff_choice = input(
     'Use lower difficulty? (Y/N) [Leave empty for default of True]\n> ')
 if diff_choice.lower == "n":
@@ -62,13 +63,16 @@ while True:
                 soc.send(bytes(
                     "JOB,"
                     + str(username)
-                    + ",MEDIUM",
+                    + ",LOW,"
+                    + str(mining_key),
                     encoding="utf8"))
             else:
                 # Send job request
                 soc.send(bytes(
                     "JOB,"
-                    + str(username),
+                    + str(username)
+                    + ",MEDIUM,"
+                    + str(mining_key),
                     encoding="utf8"))
 
             # Receive work
