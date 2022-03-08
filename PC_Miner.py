@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 3.0 © MIT licensed
+Duino-Coin Official PC Miner 3.1 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -110,7 +110,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 3.0
+    VER = 3.1
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -181,7 +181,7 @@ def check_updates():
 
                     configparser["PC Miner"] = {
                         "username":    configparser["PC Miner"]["username"],
-                        "mining_key":   configparser["PC_Miner"]["mining_key"],
+                        "mining_key":   configparser["PC Miner"]["mining_key"],
                         "intensity":   configparser["PC Miner"]["intensity"],
                         "threads":     configparser["PC Miner"]["threads"],
                         "start_diff":  configparser["PC Miner"]["start_diff"],
@@ -615,7 +615,7 @@ def check_mining_key(user_settings):
 
             mining_key = input("Enter your mining key: ")
             user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('ascii')
-            configparser["PC_Miner"] = user_settings
+            configparser["PC Miner"] = user_settings
 
             with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
                       "w") as configfile:
@@ -953,7 +953,10 @@ class Miner:
                                         + Settings.SEPARATOR
                                         + str(user_settings["username"])
                                         + Settings.SEPARATOR
-                                        + str(user_settings["start_diff"]))
+                                        + str(user_settings["start_diff"])
+                                        + Settings.SEPARATOR
+                                        + str(user_settings["mining_key"])
+                            )
 
                             job = Client.recv().split(Settings.SEPARATOR)
                             if len(job) == 3:
@@ -1187,11 +1190,15 @@ if __name__ == "__main__":
     hashrate = Manager().dict()
 
     user_settings = Miner.load_cfg()
-    check_mining_key(user_settings)
     Miner.greeting()
 
     Fasthash.load()
     Fasthash.init()
+    
+    try:
+        check_mining_key(user_settings)
+    except Exception as e:
+        print("Error checking mining key:", e)
 
     Donate.load(int(user_settings["donate"]))
     Donate.start(int(user_settings["donate"]))

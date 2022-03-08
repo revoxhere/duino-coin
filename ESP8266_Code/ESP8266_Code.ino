@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  ( 
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for ESP8266 boards                   version 3.0
+  Official code for ESP8266 boards                   version 3.1
 
   Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
@@ -53,8 +53,10 @@ const char* SSID = "My cool wifi name";
 const char* PASSWORD = "My secret wifi pass";
 // Change the part in brackets to your Duino-Coin username
 const char* USERNAME = "my_cool_username";
-// Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate)
+// Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
 const char* RIG_IDENTIFIER = "Auto";
+// Change the part in brackets to your mining key (if you enabled it in the wallet)
+const char* MINER_KEY = "None";
 // Change false to true if using 160 MHz clock mode to not get the first share rejected
 const bool USE_HIGHER_DIFF = false;
 // Change true to false if you don't want to host the dashboard page
@@ -69,7 +71,7 @@ const bool LED_BLINKING = true;
 const char * DEVICE = "ESP8266";
 const char * POOLPICKER_URL[] = {"https://server.duinocoin.com/getPool"};
 const char * MINER_BANNER = "Official ESP8266 Miner";
-const char * MINER_VER = "3.0";
+const char * MINER_VER = "3.1";
 unsigned int share_count = 0;
 unsigned int port = 0;
 unsigned int difficulty = 0;
@@ -540,7 +542,7 @@ void loop() {
 
   ConnectToServer();
   Serial.println("Asking for a new job for user: " + String(USERNAME));
-  client.print("JOB," + String(USERNAME) + "," + String(START_DIFF));
+  client.print("JOB," + String(USERNAME) + "," + String(START_DIFF) + "," + String(MINER_KEY));
 
   waitForClientData();
   String last_block_hash = getValue(client_buffer, SEP_TOKEN, 0);

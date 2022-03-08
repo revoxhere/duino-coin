@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 3.0 © MIT licensed
+Duino-Coin Official AVR Miner 3.1 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2021
@@ -34,6 +34,9 @@ from subprocess import DEVNULL, Popen, check_call, call
 from threading import Thread
 from threading import Lock as thread_lock
 from threading import Semaphore
+
+import base64 as b64
+
 import os
 import psutil
 printlock = Semaphore(value=1)
@@ -95,7 +98,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '3.0'
+    VER = '3.1'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
     AVR_TIMEOUT = 7 # diff 16 * 100 / 258 h/s = 6.2 s
@@ -171,7 +174,8 @@ def check_updates():
                         "avr_timeout":      float(config["AVR Miner"]["avr_timeout"]),
                         "discord_presence": config["AVR Miner"]["discord_presence"],
                         "periodic_report":  int(config["AVR Miner"]["periodic_report"]),
-                        "shuffle_ports":    config["AVR Miner"]["shuffle_ports"]
+                        "shuffle_ports":    config["AVR Miner"]["shuffle_ports"],
+                        "mining_key":       config["AVR Miner"]["mining_key"]
                     }
 
                     with open(str(DATA_DIR) # save it on the new version folder
@@ -255,6 +259,49 @@ def check_updates():
     except Exception as e:
         print(e)
         sys.exit()
+
+def check_mining_key(user_settings):
+    user_settings = user_settings["AVR Miner"]
+
+    if user_settings["mining_key"] != "None":
+        key = b64.b64decode(user_settings["mining_key"]).decode('ascii')
+    else:
+        key = ''
+
+    response = requests.get(
+        "https://server.duinocoin.com/mining_key"
+            + "?u=" + user_settings["username"]
+            + "&k=" + key,
+        timeout=10
+    ).json()
+
+    if not response["success"]:
+        if user_settings["mining_key"] == "None":
+            pretty_print(
+                "sys0",
+                get_string("mining_key_required"),
+                "warning")
+
+            mining_key = input("Enter your mining key: ")
+            user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('ascii')
+            configparser["AVR Miner"] = user_settings
+
+            with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
+                      "w") as configfile:
+                configparser.write(configfile)
+                print("sys0",
+                    Style.RESET_ALL + get_string("config_saved"),
+                    "info")
+            sleep(1.5)
+            check_mining_key(user_settings)
+        else:
+            pretty_print(
+                "sys0",
+                get_string("invalid_mining_key"),
+                "error")
+            sleep(120)
+            check_mining_key(user_settings)
+
 
 class Client:
     """
@@ -553,6 +600,14 @@ def load_config():
             + get_string('ask_username')
             + Fore.RESET + Style.BRIGHT)
 
+        mining_key = input(Style.RESET_ALL + Fore.YELLOW
+                           + get_string("ask_mining_key")
+                           + Fore.RESET + Style.BRIGHT)
+        if not mining_key:
+            mining_key = "None"
+        else:
+            mining_key = b64.b64encode(mining_key.encode("utf-8")).decode('utf-8')
+
         print(Style.RESET_ALL + Fore.YELLOW
               + get_string('ports_message'))
         portlist = serial.tools.list_ports.comports(include_links=True)
@@ -629,7 +684,8 @@ def load_config():
             "avr_timeout":      7,
             "discord_presence": "y",
             "periodic_report":  60,
-            "shuffle_ports":    "y"}
+            "shuffle_ports":    "y",
+            "mining_key":       mining_key}
 
         with open(str(Settings.DATA_DIR)
                   + '/Settings.cfg', 'w') as configfile:
@@ -931,7 +987,9 @@ def mine_avr(com, threadid, fastest_pool):
                             + Settings.SEPARATOR
                             + str(username)
                             + Settings.SEPARATOR
-                            + 'AVR')
+                            + 'AVR'
+                            + Settings.SEPARATOR
+                            + config["AVR Miner"]["mining_key"])
                 job = Client.recv(s, 128).split(Settings.SEPARATOR)
                 debug_output(com + f": Received: {job[0]}")
 
@@ -1132,6 +1190,11 @@ if __name__ == '__main__':
         debug_output('Greeting displayed')
     except Exception as e:
         debug_output(f'Error displaying greeting message: {e}')
+
+    try:
+        check_mining_key(config)
+    except Exception as e:
+        debug_output(f'Error checking miner key: {e}')
 
     if donation_level > 0:
         try:

@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for ESP32 boards                     version 3.0
+  Official code for ESP32 boards                     version 3.1
 
   Duino-Coin Team & Community 2019-2021 © MIT Licensed
   https://duinocoin.com
@@ -20,8 +20,10 @@ const char *SSID = "My cool Wi-Fi";
 const char *WIFI_PASS = "My secret pass";
 // Change the part in brackets to your Duino-Coin username
 const char *DUCO_USER = "my_cool_username";
-// Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate)
+// Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
 const char *RIG_IDENTIFIER = "Auto";
+// Change the part in brackets to your mining key (if you enabled it in the wallet)
+const char* MINER_KEY = "None";
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 2
 
@@ -133,7 +135,7 @@ SemaphoreHandle_t xMutex;
 const char * DEVICE = "ESP32";
 const char * POOLPICKER_URL[] = {"https://server.duinocoin.com/getPool"};
 const char * MINER_BANNER = "Official ESP32 Miner";
-const char * MINER_VER = "3.0";
+const char * MINER_VER = "3.1";
 String pool_name = "";
 String host = "";
 String node_id = "";
@@ -617,7 +619,7 @@ void TaskMining(void *pvParameters) {
       // We are connected and are able to request a job
       Serial.println(String(taskCoreName + " asking for a new job for user: " + DUCO_USER));
       jobClient.flush();
-      jobClient.print("JOB," + String(DUCO_USER) + ",ESP32" + MSGNEWLINE);
+      jobClient.print("JOB," + String(DUCO_USER) + ",ESP32," + String(MINER_KEY) + MSGNEWLINE);
       while (!jobClient.available()) {
         if (!jobClient.connected()) break;
         delay(10);
