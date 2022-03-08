@@ -50,6 +50,8 @@ daily_income = result2['daily_2m']
 print("")
 print("------------------------------------------------------------------------")
 print("")
+print("Profile")
+print("")
 
 #userinfo (profile)
 print("Username: " + str(mainuser))
@@ -65,7 +67,8 @@ print("Date and Time: " + str(datetimenow))
 print("")
 print("------------------------------------------------------------------------")
 print("")
-
+print("Miner Info")
+print("")
 # display the miners info (total display upto 10)
 if minerlist == 0:
     print("No Miners Active")
