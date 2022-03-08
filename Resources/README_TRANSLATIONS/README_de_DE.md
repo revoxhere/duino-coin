@@ -1,6 +1,6 @@
 <!-- Translate up to line 118 so far :)
 *** Offizielles Duino Coin README
-*** by revox,BastelPichi, 2019-2021
+*** by revox,BastelPichi, 2019-2022
 -->
 
 <p align = "center">

@@ -1,7 +1,7 @@
 // Duino-coin miner for STM32 and AVR chip family
 // https://duinocoin.com/
 
-// by: pankleks 2021
+// by: pankleks 2022
 // v: 1.2
 // https://github.com/pankleks
 // MIT License

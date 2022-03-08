@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # Minimal version of Duino-Coin PC Miner, useful for developing own apps.
-# Created by revox 2020-2021
+# Created by revox 2020-2022
 # Modifications made by Robert Furr (robtech21) and YeahNotSewerSide
-# Mining Pools added by mkursadulusoy - 2021-09-06
+# Mining Pools added by mkursadulusoy - 2022-09-06
 
 import hashlib
 import os

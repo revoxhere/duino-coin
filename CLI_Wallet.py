@@ -3,7 +3,7 @@
 # Duino-Coin CLI Wallet (v2.7.1)
 # https://github.com/revoxhere/duino-coin
 # Distributed under MIT license
-# © Duino-Coin Community 2021
+# © Duino-Coin Community 2022
 ##########################################
 import configparser
 import datetime

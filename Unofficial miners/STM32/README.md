@@ -14,9 +14,9 @@ Happy mining!:)
 
 # Changelog
 
-- 1.0   7/1/2021
+- 1.0   7/1/2022
     - base
-- 1.1   7/25/2021
+- 1.1   7/25/2022
     - improved performance of SHA1 calculation ~22% (STM32F401 -> ~16800 H/s)
     - now can be build and deployed on AVR chips too (tested on Arduino NANO -> ~282 H/s)
     - switch to ArduinoUniqueID library for better compability
