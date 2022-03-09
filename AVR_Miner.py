@@ -42,6 +42,10 @@ import psutil
 printlock = Semaphore(value=1)
 
 
+# Python <3.5 check
+f"Your Python version is too old. Duino-Coin Miner requires version 3.6 or above. Update your packages and try again"
+
+
 def install(package):
     try:
         pip.main(["install",  package])
@@ -989,7 +993,8 @@ def mine_avr(com, threadid, fastest_pool):
                             + Settings.SEPARATOR
                             + 'AVR'
                             + Settings.SEPARATOR
-                            + config["AVR Miner"]["mining_key"])
+                            + str(b64.b64decode(config["AVR Miner"]"mining_key").decode())
+                )
                 job = Client.recv(s, 128).split(Settings.SEPARATOR)
                 debug_output(com + f": Received: {job[0]}")
 
