@@ -978,7 +978,7 @@ class Miner:
                                         + Settings.SEPARATOR
                                         + str(user_settings["start_diff"])
                                         + Settings.SEPARATOR
-                                        + str(user_settings["mining_key"])
+                                        + str(b64.b64decode(mining_keyuser_settings["mining_key"]).decode())
                             )
 
                             job = Client.recv().split(Settings.SEPARATOR)
