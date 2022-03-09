@@ -606,6 +606,17 @@ def check_mining_key(user_settings):
         timeout=10
     ).json()
 
+    if response["success"] and not response["has_key"]: # if the user doesn't have a mining key
+        user_settings["mining_key"] = None
+        configparser["PC Miner"] = user_settings
+
+        with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
+            "w") as configfile:
+            configparser.write(configfile)
+            print(Style.RESET_ALL + get_string("config_saved"))
+        sleep(1.5)   
+        return
+
     if not response["success"]:
         if user_settings["mining_key"] == "None":
             pretty_print(
@@ -628,9 +639,21 @@ def check_mining_key(user_settings):
                 get_string("invalid_mining_key"),
                 "error"
             )
-            sleep(120)
-            check_mining_key(user_settings)
 
+            retry = input("You want to retry? (y/n): ")
+            if retry == "y" or retry == "Y":
+                mining_key = input("Enter your mining key: ")
+                user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('ascii')
+                configparser["PC Miner"] = user_settings
+
+                with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
+                        "w") as configfile:
+                    configparser.write(configfile)
+                    print(Style.RESET_ALL + get_string("config_saved"))
+                sleep(1.5)
+                check_mining_key(user_settings)
+            else:
+                return
 
 class Miner:
     def greeting():
