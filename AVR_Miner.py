@@ -993,7 +993,7 @@ def mine_avr(com, threadid, fastest_pool):
                             + Settings.SEPARATOR
                             + 'AVR'
                             + Settings.SEPARATOR
-                            + str(b64.b64decode(config["AVR Miner"]"mining_key").decode())
+                            + str(b64.b64decode(config["AVR Miner"]["mining_key"]).decode())
                 )
                 job = Client.recv(s, 128).split(Settings.SEPARATOR)
                 debug_output(com + f": Received: {job[0]}")
