@@ -973,6 +973,12 @@ class Miner:
                 while True:
                     try:
                         while True:
+
+                            if user_settings["mining_key"] != "None":
+                                key = b64.b64decode(user_settings["mining_key"]).decode()
+                            else:
+                                key = user_settings["mining_key"]
+
                             job_req = "JOB"
                             Client.send(job_req
                                         + Settings.SEPARATOR
@@ -980,7 +986,7 @@ class Miner:
                                         + Settings.SEPARATOR
                                         + str(user_settings["start_diff"])
                                         + Settings.SEPARATOR
-                                        + str(b64.b64decode(user_settings["mining_key"]).decode())
+                                        + str(key)
                             )
 
                             job = Client.recv().split(Settings.SEPARATOR)

@@ -986,6 +986,12 @@ def mine_avr(com, threadid, fastest_pool):
 
         while True:
             try:
+
+                if config["AVR Miner"]["mining_key"] != "None":
+                    key = b64.b64decode(config["AVR Miner"]["mining_key"]).decode()
+                else:
+                    key = config["AVR Miner"]["mining_key"]
+
                 debug_output(com + ': Requesting job')
                 Client.send(s, 'JOB'
                             + Settings.SEPARATOR
@@ -993,7 +999,7 @@ def mine_avr(com, threadid, fastest_pool):
                             + Settings.SEPARATOR
                             + 'AVR'
                             + Settings.SEPARATOR
-                            + str(b64.b64decode(config["AVR Miner"]["mining_key"]).decode())
+                            + str(key)
                 )
                 job = Client.recv(s, 128).split(Settings.SEPARATOR)
                 debug_output(com + f": Received: {job[0]}")
