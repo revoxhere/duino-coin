@@ -279,6 +279,19 @@ def check_mining_key(user_settings):
         timeout=10
     ).json()
 
+    if response["success"] and not response["has_key"]: # if the user doesn't have a mining key
+        user_settings["mining_key"] = None
+        config["AVR Miner"] = user_settings
+
+        with open(Settings.DATA_DIR + '/Settings.cfg',
+            "w") as configfile:
+            config.write(configfile)
+            print("sys0",
+                Style.RESET_ALL + get_string("config_saved"),
+                "info")
+        sleep(1.5)   
+        return
+
     if not response["success"]:
         if user_settings["mining_key"] == "None":
             pretty_print(
@@ -288,23 +301,38 @@ def check_mining_key(user_settings):
 
             mining_key = input("Enter your mining key: ")
             user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('ascii')
-            configparser["AVR Miner"] = user_settings
+            config["AVR Miner"] = user_settings
 
-            with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
+            with open(Settings.DATA_DIR + '/Settings.cfg',
                       "w") as configfile:
-                configparser.write(configfile)
+                config.write(configfile)
                 print("sys0",
                     Style.RESET_ALL + get_string("config_saved"),
                     "info")
             sleep(1.5)
-            check_mining_key(user_settings)
+            check_mining_key(config)
         else:
             pretty_print(
                 "sys0",
                 get_string("invalid_mining_key"),
                 "error")
-            sleep(120)
-            check_mining_key(user_settings)
+
+            retry = input("You want to retry? (y/n): ")
+            if retry == "y" or retry == "Y":
+                mining_key = input("Enter your mining key: ")
+                user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('ascii')
+                config["AVR Miner"] = user_settings
+
+                with open(Settings.DATA_DIR + '/Settings.cfg',
+                        "w") as configfile:
+                    config.write(configfile)
+                print("sys0",
+                    Style.RESET_ALL + get_string("config_saved"),
+                    "info")
+                sleep(1.5)
+                check_mining_key(config)
+            else:
+                return
 
 
 class Client:
