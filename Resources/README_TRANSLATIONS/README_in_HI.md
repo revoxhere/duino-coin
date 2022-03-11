@@ -279,7 +279,7 @@ sudo chmod a+x duco-install-rpi.sh
 
 उन सभी [योगदानकर्ताओं] (https://github.com/revoxhere/duino-coin/graphs/contributors) को बहुत-बहुत धन्यवाद जिन्होंने डुइनो-कॉइन परियोजना को विकसित करने में मदद की।
 
-<घंटा>
+<hr>
 
 प्रोजेक्ट लिंक: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
 <br/>
