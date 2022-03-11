@@ -40,6 +40,8 @@
     <img src="https://img.shields.io/badge/italiano-ff0ae3.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_cz_CZ.md">
     <img src="https://img.shields.io/badge/%C4%8Desky-ff4b4c.svg?style=for-the-badge" /></a>
+  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_in_HI.md">
+    <img src="https://img.shields.io/badge/-%E0%A4%B9%E0%A4%BF%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%80-orange?style=for-the-badge" /></a>
 </h1>
 <a href="https://wallet.duinocoin.com">
   <img src="https://img.shields.io/badge/Online Wallet-a202ff.svg?style=for-the-badge&logo=Web" /></a>
