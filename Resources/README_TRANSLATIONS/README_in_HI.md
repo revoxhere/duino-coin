@@ -68,87 +68,87 @@
 | 💻 बड़ी संख्या में प्लेटफार्मों द्वारा समर्थित<br>👥 एक तेजी से बढ़ता समुदाय <br>💱 प्रयोग करने में आसान और विनिमय <br>(DUCO Exchange, Node-S, JustSwap, SushiSwap पर) <br>🌎हर जगह उपलब्ध <br>:new: पूरी तरह से मूल और ओपन-सोर्स प्रोजेक्ट <br>🌳 शुरुआती और पर्यावरण के अनुकूल <br>💰 लागत प्रभावी और आसान | ⚒️ एल्गोरिथम: DUCO-S1<br>♐ पुरस्कार: "कोलका प्रणाली" द्वारा समर्थित<br>खनिकों को उचित रूप से पुरस्कृत करने में मदद करना<br>⚡ लेन-देन का समय: तत्काल<br>🪙 सिक्का आपूर्ति: अनंत<br>(जलने के साथ)<br>🔤 टिकर: DUCO (ᕲ)<br>🔢 दशमलव: 20 तक | ️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, आदि)<br>📶 ESP8266s<br>(NodeMCU, Wemos, आदि)<br>📶 ESP32s<br>(ESP-WROOM, ESP32 -CAM, आदि)<br>🍓 रास्पबेरी पीआईएस<br>(1, 2, जीरो (डब्ल्यू/डब्ल्यूएच), 3, 4, पिको, 400)<br>🍊 ऑरेंज पीआईएस<br>(जीरो, जीरो 2, पीसी, प्लस, आदि)<br>⚡ टेन्सी 4.1 बोर्ड |
 
 
-## Getting started
+## शुरू करना
 
-#### The easiest way to get started with Duino-Coin is to download [the latest release](https://github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
-After downloading the release, unzip it and launch the desired program.<br>
-There are no dependencies required.
+#### डुइनो-कॉइन के साथ आरंभ करने का सबसे आसान तरीका [नवीनतम रिलीज] डाउनलोड करना है(https://github.com/revoxhere/duino-coin/releases/latest) आपके OS के लिए।<br>
+रिलीज़ को डाउनलोड करने के बाद, इसे अनज़िप करें और वांछित प्रोग्राम लॉन्च करें। <br>
+कोई dependenices की आवश्यकता नहीं है।
 
-If you need help, you can take a look at the official getting started guides located <a href="https://duinocoin.com/getting-started">on the official website</a>.<br>
-FAQ and troubleshooting help can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
+यदि आपको सहायता की आवश्यकता है, तो आप <a href="https://duinocoin.com/getting-started">आधिकारिक वेबसाइट पर</a> स्थित आधिकारिक आरंभिक मार्गदर्शिका देख सकते हैं। <br>
+[विकिस](https://github.com/revoxhere/duino-coin/wiki) में अक्सर पूछे जाने वाले प्रश्न और समस्या निवारण सहायता मिल सकती है।<br>
 
 
-### Manual installation
+### मैनुअल स्थापना
 
-#### Linux
+#### लिनक्स
 
 ```BASH
 sudo apt update
-sudo apt install python3 python3-pip git python3-pil python3-pil.imagetk -y # Install dependencies
-git clone https://github.com/revoxhere/duino-coin # Clone Duino-Coin repository
+sudo apt install python3 python3-pip git python3-pil python3-pil.imagetk -y # निर्भरता स्थापित करें
+git clone https://github.com/revoxhere/duino-coin # क्लोन डुइनो-सिक्का
 cd duino-coin
-python3 -m pip install -r requirements.txt # Install pip dependencies
+python3 -m pip install -r requirements.txt # pip निर्भरता स्थापित करें
 ````
 
-After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py`).
+ऐसा करने के बाद, आप सॉफ़्टवेयर लॉन्च करने के लिए तैयार हैं (उदाहरण के लिए `python3 PC_Miner.py`)।
 
-#### Windows
+#### खिड़कियाँ
 
-1. Download and install [Python 3](https://www.python.org/downloads/) (make sure you add Python and Pip to your PATH)
-2. Download [the Duino-Coin repository](https://github.com/revoxhere/duino-coin/archive/master.zip)
-3. Extract the zip archive you've downloaded and open the folder in command prompt
-4. In command prompt type `py -m pip install -r requirements.txt` to install required pip dependencies
+1. [पायथन 3] (https://www.python.org/downloads/) डाउनलोड और इंस्टॉल करें (सुनिश्चित करें कि आप अपने पथ में पायथन और पिप जोड़ते हैं)
+2. डाउनलोड करें [डुइनो-कॉइन रिपॉजिटरी](https://github.com/revoxhere/duino-coin/archive/master.zip)
+3. आपके द्वारा डाउनलोड किया गया ज़िप संग्रह निकालें और कमांड प्रॉम्प्ट में फ़ोल्डर खोलें
+4. आवश्यक पाइप निर्भरता स्थापित करने के लिए कमांड प्रॉम्प्ट में `py -m pip install -r requirements.txt` टाइप करें
 
-After doing this, you are good to go with launching the software (just double click on desired `.py` files or type `py PC_Miner.py` in the command prompt).
+ऐसा करने के बाद, आप सॉफ़्टवेयर लॉन्च करने के लिए तैयार हैं (बस वांछित `.py` फ़ाइलों पर डबल क्लिक करें या कमांड प्रॉम्प्ट में `py PC_Miner.py` टाइप करें)।
 
-### Automatic installation
+### स्वचालित स्थापना
 
-#### Raspberry Pi
+#### रास्पबेरी पाई
 
-Note: If this script doesn't work try installing manually.
+नोट: यदि यह स्क्रिप्ट काम नहीं करती है तो मैन्युअल रूप से इंस्टॉल करने का प्रयास करें।
 
-```BASH
-# Download the script file
+``` BASH
+# स्क्रिप्ट फ़ाइल डाउनलोड करें
 wget https://raw.githubusercontent.com/revoxhere/duino-coin/master/Tools/duco-install-rpi.sh
 
-# Change the file permissions
+# फ़ाइल अनुमतियाँ बदलें
 sudo chmod a+x duco-install-rpi.sh
 
-# Run the script
+# स्क्रिप्ट चलाएँ
 ./duco-install-rpi.sh
 ```
 
-## DUCO & wDUCO
+## डुको और डब्ल्यूडीयूसीओ
 
-Duino-Coin is a hybrid currency, meaning that it can be converted to wDUCO which is DUCO wrapped on the [Tron](https://tron.network) network (as a token). Currently there aren't many uses for it, other than just storing funds in an external wallet or exchanging wDUCO to another token on JustSwap. A tutorial on using wDUCO is available in the [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
-
-
-## Development
-
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create.<br>
-Any contributions you make to the Duino-Coin project are greatly appreciated.
-
-How to help?
-
-*   Fork the Project
-*   Create your feature branch
-*   Commit your changes
-*   Make sure everything works as intended
-*   Open a pull request
-
-Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch.
+डुइनो-कॉइन एक संकर मुद्रा है, जिसका अर्थ है कि इसे wDUCO में परिवर्तित किया जा सकता है जो DUCO है जो [ट्रॉन] (https://tron.network) नेटवर्क (टोकन के रूप में) पर लिपटा हुआ है। वर्तमान में इसके लिए कई उपयोग नहीं हैं, केवल बाहरी वॉलेट में धन जमा करने या जस्टस्वैप पर डब्ल्यूडीयूसीओ को दूसरे टोकन में बदलने के अलावा। WDUCO का उपयोग करने पर एक ट्यूटोरियल [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial) में उपलब्ध है।
 
 
-## Benchmarks of officially tested devices and boards
+## विकास
 
-<details>
-  <summary>
-    Since that table is getting really long, it's collapsed by default. Click this text to expand it!
-  </summary>
+योगदान वे हैं जो ओपन सोर्स समुदाय को सीखने, प्रेरित करने और बनाने के लिए एक अद्भुत जगह बनाते हैं।<br>
+डुइनो-कॉइन परियोजना में आपके द्वारा किए गए किसी भी योगदान की बहुत सराहना की जाती है।
 
-  ### Please note that the rewards depend on a lot of factors and the table below is just for orientation purposes.
+मदद कैसे करें?
+
+* परियोजना का कांटा
+* अपनी फीचर शाखा बनाएं
+* अपने परिवर्तन प्रतिबद्ध करें
+* सुनिश्चित करें कि सब कुछ इरादा के अनुसार काम करता है
+* एक पुल अनुरोध खोलें
+
+सर्वर स्रोत कोड, एपीआई कॉल के लिए दस्तावेज़ीकरण और डुइनो-कॉइन के लिए अपने स्वयं के ऐप विकसित करने के लिए आधिकारिक पुस्तकालय [उपयोगी उपकरण](https://github.com/revoxhere/duino-coin/tree/useful-tools) शाखा में उपलब्ध हैं। .
+
+
+## आधिकारिक तौर पर परीक्षण किए गए उपकरणों और बोर्डों के बेंचमार्क
+
+<विवरण>
+   <सारांश>
+     चूंकि वह तालिका वास्तव में लंबी हो रही है, यह डिफ़ॉल्ट रूप से ढह गई है। इसे विस्तृत करने के लिए इस पाठ पर क्लिक करें!
+   </सारांश>
+
+   ### कृपया ध्यान दें कि पुरस्कार कई कारकों पर निर्भर करते हैं और नीचे दी गई तालिका केवल अभिविन्यास उद्देश्यों के लिए है।
   
-  | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
+  | डिवाइस/सीपीयू/एसबीसी/एमसीयू/चिप                                  | औसत हैश दर<br>(सभी धागे)            | खनन<br>धागे        | शक्ति<br>उपयोग    | औसत<br>DUCO/दिन |
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
   | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 196 H/s                           | 1                 | 0.2 W          | 9-10                |
   | Teensy 4.1 (soft cryptography)                            | 80 kH/s                           | 1                 | 0.5 W          | -                   |
@@ -173,116 +173,116 @@ Server source code, documentation for API calls and official libraries for devel
   | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | 3.7                 |
   | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 67 W           | 15.44               |
 
-  All tests were performed using the DUCO-S1 algorithm. This table will be actively updated.
-</details>
+सभी परीक्षण DUCO-S1 एल्गोरिथम का उपयोग करके किए गए थे। यह तालिका सक्रिय रूप से अपडेट की जाएगी।
+</विवरण>
 
 
-## Community-made softwares
+## समुदाय निर्मित सॉफ्टवेयर
 
-<details>
-  <summary>
-    Since that list is getting really long, it's collapsed by default. Click this text to expand it
-  </summary>
+<विवरण>
+   <सारांश>
+     चूंकि वह सूची वास्तव में लंबी होती जा रही है, इसलिए यह डिफ़ॉल्ट रूप से संक्षिप्त हो जाती है। इसका विस्तार करने के लिए इस पाठ पर क्लिक करें
+   </सारांश>
   
-  Please note that these softwares are not developed by us and we do not give any guarantees that use of them will not result in an account getting banned. Treat them as a curiosity. It's worth noting that using [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch **will get you banned**.
+   कृपया ध्यान दें कि ये सॉफ़्टवेयर हमारे द्वारा विकसित नहीं किए गए हैं और हम इस बात की कोई गारंटी नहीं देते हैं कि इनके उपयोग से किसी खाते को प्रतिबंधित नहीं किया जाएगा। उन्हें एक जिज्ञासा के रूप में व्यवहार करें। यह ध्यान देने योग्य है कि कर्नलवॉच द्वारा [nonceMiner](https://github.com/colonelwatch/nonceMiner) का उपयोग करने पर **आपको प्रतिबंधित कर दिया जाएगा**।
 
-  ### Other miners known to work with Duino-Coin:
-  *   [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Arduino Ethernet shield Miner by Pumafron
-  *   [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - STM8S firmware for mining DUCO by BBS215
-  *   [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - miner for LabVIEW family by ericddm
-  *   [Duino-JS](https://github.com/Hoiboy19/Duino-JS) - a JavaScript miner which you can easily implement in your site by Hoiboy19
-  *   [Duinotize](https://github.com/mobilegmYT/Duinotize) - Duino website monetizer by mobilegmYT
-  *   [hauchel's duco-related stuff repository](https://github.com/hauchel/duco/) - Collection of various codes for mining DUCO on other microcontrollers
-  *   [duino-coin-php-miner](https://github.com/ricardofiorani/duino-coin-php-miner) Dockerized Miner in PHP by ricardofiorani
-  *   [duino-coin-kodi](https://github.com/SandUhrGucker/duino-coin-kodi) - Mining addon for Kodi Media Center by SandUhrGucker
-  *   [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - Python script to mine Duino-Coin on routers by BastelPichi
-  *   [Duino-Coin_Android_Cluster Miner](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - mine with less connections on multiple devices by DoctorEenot
-  *   [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - MicroPython miner for ESP boards by fabiopolancoe
-  *   [DUCO Miner for Nintendo 3DS](https://github.com/BunkerInnovations/duco-3ds) - Python miner for Nintendo 3DS by PhereloHD & HGEpro
-  *   [Dockerized DUCO Miner](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - Miner in Docker by Alicia426
-  *   [NodeJS-DuinoCoin-Miner](https://github.com/LDarki/NodeJS-DuinoCoin-Miner/) - simple NodeJS miner by LDarki
-  *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - pure C miner by phantom32 & revoxhere
-  *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
-  *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
-  *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
-      *   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) by revoxhere
-      *   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) by revoxhere
-      *   [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) by revoxhere
-      *   [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) by joaquinbvw
+   ### डुइनो-कॉइन के साथ काम करने के लिए जाने जाने वाले अन्य खनिक:
+  * [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - प्यूमाफ्रॉन द्वारा Arduino इथरनेट शील्ड माइनर
+  * [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - BBS215 द्वारा DUCO खनन के लिए STM8S फर्मवेयर
+  * [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - ericddm द्वारा लैबव्यू परिवार के लिए माइनर
+  * [डुइनो-जेएस](https://github.com/Hoiboy19/Duino-JS) - एक जावास्क्रिप्ट माइनर जिसे आप आसानी से Hoiboy19 द्वारा अपनी साइट में लागू कर सकते हैं
+  * [डुइनोटाइज़](https://github.com/mobilegmYT/Duinotize) - mobilegmYT द्वारा डुइनो वेबसाइट मुद्रीकरण
+  * [हौचेल का डुको-संबंधित सामान भंडार](https://github.com/hauchel/duco/) - अन्य माइक्रोकंट्रोलर पर DUCO खनन के लिए विभिन्न कोड का संग्रह
+  * [duino-coin-php-miner](https://github.com/ricardofiorani/duino-coin-php-miner) ricardofiorani द्वारा PHP में Dockerized Miner
+  * [duino-coin-kodi](https://github.com/SandUhrGucker/duino-coin-kodi) - SandUhrGucker द्वारा कोडी मीडिया सेंटर के लिए माइनिंग एडऑन
+  * [MineCryptoOnWifiRouter](https://github.com/BastelPichi/MineCryptoOnWifiRouter) - BastelPichi द्वारा राउटर पर डुइनो-कॉइन को माइन करने के लिए पायथन स्क्रिप्ट
+  * [डुइनो-कॉइन_एंड्रॉइड_क्लस्टर माइनर](https://github.com/DoctorEenot/DuinoCoin_android_cluster) - डॉक्टरईनोट द्वारा कई उपकरणों पर कम कनेक्शन के साथ मेरा
+  * [ESPython DUCO Miner](https://github.com/fabiopolancoe/ESPython-DUCO-Miner) - fabiopolancoe द्वारा ESP बोर्डों के लिए माइक्रोपायथन माइनर
+  * [निंटेंडो 3DS के लिए DUCO माइनर](https://github.com/BunkerInnovations/duco-3ds) - PhereloHD और HGEpro द्वारा निन्टेंडो 3DS के लिए पायथन माइनर
+  * [डॉकराइज़्ड डुको माइनर](https://github.com/Alicia426/Dockerized_DUCO_Miner_minimal) - एलिसिया426 द्वारा डॉकर में माइनर
+  * [NodeJS-DuinoCoin-Miner](https://github.com/LDarki/NodeJS-DuinoCoin-Miner/) - LDarki द्वारा सरल NodeJS माइनर
+  * [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - phantom32 और revoxhere द्वारा शुद्ध सी माइनर
+  * [गो माइनर] (https://github.com/yippiez/go-miner) यिप्पीज़ द्वारा
+  * [डुकोमिनर](https://github.com/its5Q/ducominer) इसके5Q . द्वारा
+  * [अनौपचारिक खनिक निर्देशिका](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
+      * [जूलिया माइनर](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) revoxhere द्वारा
+      * [रूबी माइनर](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) revoxhere द्वारा
+      * [मिनिमल पायथन माइनर (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) revoxhere द्वारा
+      * [Arduino IDE के लिए टेन्सी 4.1 कोड](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) joaquinbvw द्वारा
 
-  ### Other tools:
-  *   [Duino Miner](https://github.com/g7ltt/Duino-Miner) - Arduino Nano based DUCO miner files and documentation by g7ltt
-  *   [DUINO Mining Rig](https://repalmakershop.com/pages/duino-mining-rig) - 3D files, PCB designs and instructions for creating your own Duino rig by ReP_AL
-  *   [DuinoCoin-balance-Home-Assistant](https://github.com/NL647/DuinoCoin-balance-Home-Assistant) - addon for home assistant displaying your balance by NL647
-  *   [Duino Coin Status Monitor](https://github.com/TSltd/duino_coin) for 128x64 SSD1306 OLED and ESP8266 by TSltd
-  *   [ducopanel](https://github.com/ponsato/ducopanel) - a GUI app for controling your Duino-Coin miners by ponsato
-  *   [Duino AVR Monitor](https://www.microsoft.com/store/apps/9NJ7HPFSR9V5) - GUI Windows App for monitoring AVR devices mining DUCO by niknak
-  *   [Duino-Coin Arduino library](https://github.com/ricaun/arduino-DuinoCoin) by ricaun
-  *   [DuinoCoinI2C](https://github.com/ricaun/DuinoCoinI2C) - Use ESP8266/ESP32 as a master for Arduinos by ricaun
-  *   [Duino-Coin Mining Dashboard](https://lulaschkas.github.io/duco-mining-dashboard/) and troubleshooting helper by Lulaschkas
-  *   [duco-miners](https://github.com/dansinclair25/duco-miners) CLI mining dashboard made by dansinclair25
-  *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
-  *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) account statistics website by siunus
-  *   [duino-tools](https://github.com/kyngs/duino-tools) written in Java by kyngs
-  *   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
-  *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI Wallet by viktor02
-  *   [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - a Duino-Coin iOS widget by Naphob 
+  ### अन्य उपकरण:
+  * [डुइनो माइनर](https://github.com/g7ltt/Duino-Miner) - Arduino नैनो आधारित DUCO माइनर फ़ाइलें और g7ltt द्वारा दस्तावेज़ीकरण
+  * [DUINO माइनिंग रिग](https://repalmakershop.com/pages/duino-mining-rig) - 3D फाइलें, PCB डिजाइन और ReP_AL द्वारा अपना खुद का डुइनो रिग बनाने के निर्देश
+  * [डुइनोकॉइन-बैलेंस-होम-असिस्टेंट](https://github.com/NL647/DuinoCoin-balance-Home-Assistant) - NL647 द्वारा अपना बैलेंस दिखाने वाले होम असिस्टेंट के लिए एडऑन
+  * [डुइनो कॉइन स्टेटस मॉनिटर](https://github.com/TSltd/duino_coin) 128x64 SSD1306 OLED और TSltd द्वारा ESP8266 के लिए
+  * [डुकोपैनल](https://github.com/ponsato/ducopanel) - पोन्साटो द्वारा अपने डुइनो-कॉइन खनिकों को नियंत्रित करने के लिए एक जीयूआई ऐप
+  * [डुइनो एवीआर मॉनिटर](https://www.microsoft.com/store/apps/9NJ7HPFSR9V5) - निकनक द्वारा DUCO खनन AVR उपकरणों की निगरानी के लिए GUI विंडोज ऐप
+  * [डुइनो-कॉइन अरुडिनो लाइब्रेरी](https://github.com/ricaun/arduino-DuinoCoin) ricaun द्वारा
+  * [DuinoCoinI2C](https://github.com/ricaun/DuinoCoinI2C) - ricaun द्वारा Arduinos के लिए एक मास्टर के रूप में ESP8266/ESP32 का उपयोग करें
+  * [डुइनो-कॉइन माइनिंग डैशबोर्ड](https://lulaschkas.github.io/duco-mining-dashboard/) और Lulaschkas द्वारा समस्या निवारण सहायक
+  * [डुको-माइनर्स](https://github.com/dansinclair25/duco-miners) dansinclair25 द्वारा बनाया गया CLI माइनिंग डैशबोर्ड
+  * [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) SandUhrGucker द्वारा
+  * [DUCO Monitor](https://siunus.github.io/duco-monitor/) खाता सांख्यिकी वेबसाइट siunus द्वारा
+  * [duino-tools](https://github.com/kyngs/duino-tools) जावा में kyngs द्वारा लिखा गया है
+  * [डुइनो आँकड़े](https://github.com/Bilaboz/duino-stats) बिलाबोज़ द्वारा आधिकारिक डिस्कॉर्ड बॉट
+  * [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI वॉलेट viktor02 द्वारा
+  * [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - नेफोब द्वारा एक डुइनो-कॉइन आईओएस विजेट
 
-  You may also view a similar list on the [website](https://duinocoin.com/apps).
-</details>
-
-
-## License
-
-Duino-Coin is mostly distributed under the MIT License. See the `LICENSE` file for more information.
-Some third-party included files may have different licenses - please check their `LICENSE` statements (usually at the top of the source code files).
+आप [वेबसाइट](https://duinocoin.com/apps) पर भी इसी तरह की सूची देख सकते हैं।
+</विवरण>
 
 
-## Terms of service
-1. Duino-Coins ("DUCOs") are earned by miners with a process called mining.<br/>
-2. Mining is described as using DUCO-S1 algorithm (as explained in the <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
-3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README).<br/>
-4. Mining on GPUs, FPGAs and other high-efficiency hardware is allowed, but using only the `EXTREME` mining difficulty.<br/>
-5. Any users using miners on difficulty not suited for their hardware (see the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">difficulty list</a>) will be automatically throttled by being moved to correct difficulty tier.<br/>
-6. Any user that keeps trying to use lower difficulty than it's suited for may get temporarily blocked.<br/>
-7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
-8. Only coins earned legally are eligible for the exchange.<br/>
-9. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
-10. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
-11. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
-12. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed as it's unfair for others.<br />
-13. A user's DUCOs may be burnt if a violation can be proven.<br/>
-14. These terms of service can change at any time without prior notice.<br/>
-15. Having alt accounts without a rational reason (e.g. for multi-mining) are not allowed.<br/>
-16. Sending transactions that promote other services, or advertising in any other way is not allowed on the network.<br/>
-17. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+## लाइसेंस
+
+डुइनो-सिक्का ज्यादातर एमआईटी लाइसेंस के तहत वितरित किया जाता है। अधिक जानकारी के लिए `लाइसेंस` फ़ाइल देखें।
+कुछ तृतीय-पक्ष शामिल फ़ाइलों के अलग-अलग लाइसेंस हो सकते हैं - कृपया उनके `LICENSE` कथनों की जांच करें (आमतौर पर स्रोत कोड फ़ाइलों के शीर्ष पर)।
 
 
-## Privacy policy
-1. On the master server we only store usernames, hashed passwords (with the help of bcrypt), account creation dates and e-mails of users as their data.<br/>
-2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
-3. Balances, transactions and mining-related data is publicly available in the public <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
-4. The privacy policy may be changed in the future with a prior notification.
+## सेवा की शर्तें
+1. डुइनो-सिक्के ("DUCOs") खनिकों द्वारा खनन नामक एक प्रक्रिया के साथ अर्जित किए जाते हैं।<br/>
+2. खनन को DUCO-S1 एल्गोरिथम का उपयोग करने के रूप में वर्णित किया गया है (जैसा कि <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino- सिक्का श्वेतपत्र</a>), जिसमें गणितीय समस्या का सही परिणाम खोजने से खनिक को इनाम मिलता है।<br/>
+3. खनन आधिकारिक तौर पर सीपीयू, एवीआर बोर्ड (जैसे अरुडिनो बोर्ड), सिंगल-बोर्ड कंप्यूटर (जैसे रास्पबेरी पाई बोर्ड), ईएसपी 32/8266 बोर्ड का उपयोग करके आधिकारिक खनिकों के उपयोग के साथ किया जा सकता है (अन्य आधिकारिक तौर पर स्वीकृत खनिकों का वर्णन ऊपरी भाग में किया गया है) README)।<br/>
+4. GPU, FPGAs और अन्य उच्च दक्षता वाले हार्डवेयर पर खनन की अनुमति है, लेकिन केवल `EXTREME` खनन कठिनाई का उपयोग करके।<br/>
+5. कोई भी उपयोगकर्ता कठिनाई पर खनिकों का उपयोग कर रहा है जो उनके हार्डवेयर के अनुकूल नहीं है (देखें <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">कठिनाई सूची</a> a>) कठिनाई स्तर को ठीक करने के लिए ले जाकर स्वचालित रूप से थ्रॉटल हो जाएगा।<br/>
+6. कोई भी उपयोगकर्ता जो इसके लिए उपयुक्त से कम कठिनाई का उपयोग करने का प्रयास करता रहता है, अस्थायी रूप से अवरुद्ध हो सकता है।<br/>
+7. प्रतिबंध लगाने में एक खाते को हटाने के साथ-साथ उपयोगकर्ता को उसके सिक्कों तक पहुँचने से रोकना शामिल है।<br/>
+8. केवल कानूनी रूप से अर्जित सिक्के ही एक्सचेंज के लिए पात्र हैं।<br/>
+9. जांच के लिए खातों को अस्थायी रूप से निलंबित किया जा सकता है ("जांच") ToS उल्लंघन ("उल्लंघन" या "दुरुपयोग")।<br/>
+10. आधिकारिक DUCO-Exchange ("ऑफ़िकल एक्सचेंज") को किए गए एक विनिमय अनुरोध में देरी हो सकती है और/या जांच के दौरान इसे अस्वीकार कर दिया जा सकता है। <br/>
+11. टीओएस उल्लंघनों और/या कम फंडिंग के कारण आधिकारिक एक्सचेंज को किए गए एक्सचेंज अनुरोध अस्वीकार किए जा सकते हैं।<br/>
+12. मुफ़्त क्लाउड होस्टिंग सेवाओं (या मुफ़्त VPS सेवाओं - जैसे Repl.it, GitHub Actions, आदि) के साथ खनन की अनुमति नहीं है क्योंकि यह दूसरों के लिए अनुचित है।<br />
+13. उल्लंघन साबित होने पर उपयोगकर्ता के DUCO को जलाया जा सकता है।<br/>
+14. ये सेवा की शर्तें बिना किसी पूर्व सूचना के किसी भी समय बदल सकती हैं।<br/>
+15. बिना किसी तर्कसंगत कारण (जैसे बहु-खनन के लिए) के वैकल्पिक खाते रखने की अनुमति नहीं है।<br/>
+16. अन्य सेवाओं को बढ़ावा देने वाले लेन-देन भेजने, या किसी अन्य तरीके से विज्ञापन देने की नेटवर्क पर अनुमति नहीं है।<br/>
+17. डुइनो-कॉइन का उपयोग करने वाला प्रत्येक उपयोगकर्ता उपरोक्त नियमों का पालन करने के लिए सहमत है।<br/>
 
 
-## Active project maintainers
+## गोपनीयता नीति
+1. मास्टर सर्वर पर हम केवल यूजरनेम, हैशेड पासवर्ड (बीक्रिप्ट की मदद से), अकाउंट बनाने की तारीखें और यूजर्स के ई-मेल्स को उनके डेटा के रूप में स्टोर करते हैं।<br/>
+2. ई-मेल सार्वजनिक रूप से उपलब्ध नहीं हैं और केवल जरूरत पड़ने पर उपयोगकर्ता से संपर्क करने के लिए उपयोग किए जाते हैं, <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a पर एक्सचेंजों की पुष्टि करते हैं। > और एक सामयिक समाचार पत्र प्राप्त करना (भविष्य के लिए नियोजित)।<br/>
+3. शेष राशि, लेन-देन और खनन से संबंधित डेटा सार्वजनिक रूप से उपलब्ध है <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs </a>.<br/>
+4. भविष्य में पूर्व सूचना के साथ गोपनीयता नीति को बदला जा सकता है।
 
-*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Lead Python dev, project founder)
-*   [@Bilaboz](https://github.com/bilaboz/) (Lead NodeJS dev)
-*   [@connorhess](https://github.com/connorhess) (Lead Python dev, Node-S owner)
-*   [@JoyBed](https://github.com/JoyBed) (Lead AVR dev)
-*   [@Yennefer](https://www.instagram.com/vlegle/) (Lead social manager)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer)
-*   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-*   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
-*   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
 
-Big thanks to all the [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped to develop the Duino-Coin project.
+## सक्रिय परियोजना अनुरक्षक
 
-<hr>
+* [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (लीड पायथन देव, परियोजना संस्थापक)
+* [@Bilaboz](https://github.com/bilaboz/) (लीड NodeJS देव)
+* [@connorhess](https://github.com/connorhess) (लीड पायथन देव, नोड-एस के मालिक)
+* [@JoyBed](https://github.com/JoyBed) (लीड AVR देव)
+* [@Yennefer](https://www.instagram.com/vlegle/) (लीड सोशल मैनेजर)
+* [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (लीड वेबमास्टर और DUCO डेवलपर)
+* [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) देव)
+* [@Lulaschkas](https://github.com/Lulaschkas) (देव)
+* [@joaquinbvw](https://github.com/joaquinbvw) (एवीआर देव)
 
-Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
+उन सभी [योगदानकर्ताओं] (https://github.com/revoxhere/duino-coin/graphs/contributors) को बहुत-बहुत धन्यवाद जिन्होंने डुइनो-कॉइन परियोजना को विकसित करने में मदद की।
+
+<घंटा>
+
+प्रोजेक्ट लिंक: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
 <br/>
-Website Link: [https://duinocoin.com/](https://duinocoin.com/)
+वेबसाइट लिंक: [https://duinocoin.com/](https://duinocoin.com/)
 <br/>
-Duino-Coin Status Page: [https://status.duinocoin.com](https://status.duinocoin.com)
+डुइनो-कॉइन स्थिति पृष्ठ: [https://status.duinocoin.com](https://status.duinocoin.com)
