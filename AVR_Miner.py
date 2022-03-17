@@ -114,6 +114,7 @@ class Settings:
 
     try:
         # Raspberry Pi latin users can't display this character
+        "‖".encode(sys.stdout.encoding)
         BLOCK = " ‖ "
     except:
         BLOCK = " | "
