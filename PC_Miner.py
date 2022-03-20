@@ -598,7 +598,7 @@ def get_string(string_name):
 
 def check_mining_key(user_settings):
     if user_settings["mining_key"] != "None":
-        key = b64.b64decode(user_settings["mining_key"]).decode('ascii')
+        key = b64.b64decode(user_settings["mining_key"]).decode('utf-8')
     else:
         key = ''
 
@@ -610,7 +610,7 @@ def check_mining_key(user_settings):
     ).json()
 
     if response["success"] and not response["has_key"]: # if the user doesn't have a mining key
-        user_settings["mining_key"] = None
+        user_settings["mining_key"] = "None"
         configparser["PC Miner"] = user_settings
 
         with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
@@ -628,7 +628,7 @@ def check_mining_key(user_settings):
             )
 
             mining_key = input("Enter your mining key: ")
-            user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('ascii')
+            user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('utf-8')
             configparser["PC Miner"] = user_settings
 
             with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
@@ -646,7 +646,7 @@ def check_mining_key(user_settings):
             retry = input("You want to retry? (y/n): ")
             if retry == "y" or retry == "Y":
                 mining_key = input("Enter your mining key: ")
-                user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('ascii')
+                user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('utf-8')
                 configparser["PC Miner"] = user_settings
 
                 with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
@@ -976,7 +976,7 @@ class Miner:
                         while True:
 
                             if user_settings["mining_key"] != "None":
-                                key = b64.b64decode(user_settings["mining_key"]).decode()
+                                key = b64.b64decode(user_settings["mining_key"]).decode('utf-8')
                             else:
                                 key = user_settings["mining_key"]
 
