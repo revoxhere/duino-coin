@@ -37,7 +37,6 @@ from platform import python_version
 from signal import SIGINT, signal
 from locale import getdefaultlocale
 from configparser import ConfigParser
-import psutil
 
 configparser = ConfigParser()
 printlock = Semaphore(value=1)
@@ -95,7 +94,6 @@ except ModuleNotFoundError:
           + "python3 -m pip install py-cpuinfo")
     install("py-cpuinfo")
 
-
 try:
     from pypresence import Presence
 except ModuleNotFoundError:
@@ -104,6 +102,15 @@ except ModuleNotFoundError:
           + "If it fails, please manually execute "
           + "python3 -m pip install pypresence")
     install("pypresence")
+
+try:
+    import psutil
+except ModuleNotFoundError:
+    print("Psutil is not installed. "
+          + "Miner will try to automatically install it "
+          + "If it fails, please manually execute "
+          + "python3 -m pip install psutil")
+    install("psutil")
 
 
 class Settings:
