@@ -38,7 +38,6 @@ from threading import Semaphore
 import base64 as b64
 
 import os
-import psutil
 printlock = Semaphore(value=1)
 
 
@@ -92,6 +91,14 @@ except ModuleNotFoundError:
           + "python3 -m pip install pypresence")
     install("pypresence")
 
+try:
+    import psutil
+except ModuleNotFoundError:
+    print("Psutil is not installed. "
+          + "Miner will try to automatically install it "
+          + "If it fails, please manually execute "
+          + "python3 -m pip install psutil")
+    install("psutil")
 
 def now():
     return datetime.now()
