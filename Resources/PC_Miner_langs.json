@@ -1515,11 +1515,11 @@
         "node_picker_unavailable": "ऐसा लगता है कि नोड पिकर ठीक से प्रतिक्रिया नहीं दे रहा है - पुनः प्रयास कर रहा है ",
         "node_picker_error": "नोड पिकर से सर्वर लाने में गंभीर त्रुटि - पुनः प्रयास कर रहा है ",
         "connecting_node": " पुनर्प्राप्त खनन नोड: ",
-        "new_version": "एक नया संस्करण उपलब्ध है, आप माइनर को अपडेट करना चाहते हैं [Y/n] ? ",
-        "updating": "खनिक पुराना है। अपडेट हो रहा है....",
-        "ask_mining_key": "अपनी खनन कुंजी दर्ज करें (केवल तभी आवश्यक है जब आपने वेबवॉलेट में इस विकल्प को सक्रिय किया हो - स्किप करने के लिए एंटर दबाएं): ",
-        "mining_key_required": "इस खाते पर खनन करने के लिए खनन कुंजी की आवश्यकता है",
-        "invalid_mining_key": "आपके द्वारा प्रदान की गई खनन कुंजी अमान्य है!"
+        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
+        "updating": "The miner is outdated. Updating....",
+        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
+        "mining_key_required": "Mining key is required to mine on this account",
+        "invalid_mining_key": "The mining key you provided is invalid!"
     },
     "czech": {
         "translation_autor": "fpetru",
