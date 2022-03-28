@@ -206,6 +206,7 @@ Server source code, documentation for API calls and official libraries for devel
   *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - pure C miner by phantom32 & revoxhere
   *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
   *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
+  *   [goduino](https://github.com/X3NOOO/goduino) by X3NO
   *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
       *   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) by revoxhere
       *   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) by revoxhere
