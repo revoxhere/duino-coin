@@ -255,16 +255,19 @@ Some third-party included files may have different licenses - please check their
 12. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed as it's unfair for others.<br />
 13. A user's DUCOs may be burnt if a violation can be proven.<br/>
 14. These terms of service can change at any time without prior notice.<br/>
-15. Having alt accounts without a rational reason (e.g. for multi-mining) are not allowed.<br/>
-16. Sending transactions that promote other services, or advertising in any other way is not allowed on the network.<br/>
-17. Every user using Duino-Coin agrees to comply with the above rules.<br/>
+15. Having alt accounts without a rational reason (e.g. for multi-mining) are not allowed - multiple accounts used on a single computer/network will be blocked, unless whitelisted.<br/>
+16. Sending transactions that promote other services or advertise something in any form is not allowed.<br/>
+17. Sending a lot of transactions in a short amount of time can trigger the Kolka system which will rate limit and/or block the user.<br />
+18. Community-made softwares need to comply with the rules (terms of service, difficulty tiers, etc.) - abusing the system will lead to blocking of the software and/or the user(s).<br />
+19. Accounts proven to be misleading in name or usage (impersonation, fake bots, etc.) are not allowed.<br />
+20. Every Duino-Coin user agrees to comply with the above rules. Improper behavior will lead to blocking of the account.<br/>
 
 
 ## Privacy policy
-1. On the master server we only store usernames, hashed passwords (with the help of bcrypt), account creation dates and e-mails of users as their data.<br/>
+1. On the master server we only store usernames, hashed passwords (with the help of bcrypt), account creation dates, last login times and e-mails of users as their data.<br/>
 2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
-3. Balances, transactions and mining-related data is publicly available in the public <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
-4. The privacy policy may be changed in the future with a prior notification.
+3. Balances, transactions and mining-related data is publicly available in the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
+4. The privacy policy may be changed in the future, although users will receive a notification prior to the changes.
 
 
 ## Active project maintainers
