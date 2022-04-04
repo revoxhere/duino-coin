@@ -964,7 +964,7 @@
         "invalid_mining_key": "The mining key you provided is invalid!"
     },
     "german": {
-        "translation_autor": "BastelPichi, EinWildesPanda",
+        "translation_autor": "BastelPichi, EinWildesPanda, f0xqw3rt2",
         "translation": "Deutsche Übersetzung: ",
         "sigint_detected": " SIGINT erkannt - Schließe Miner.",
         "goodbye": " Bis Bald!",
@@ -1028,11 +1028,11 @@
         "mining_not_exist": " existiert nicht.",
         "mining_not_exist_warning": " Stelle sicher, dass du den Nutzernamen korrekt geschrieben hast. Überprüfe deine Konfigurationsdatei. Neuversuch in 10s",
         "connection_search": "Suche nach der schnellsten Verbindung zu dem Server",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "Eine neue Version ist verfügbar, möchtest du den Miner updaten [Y/n] ?",
+        "updating": "Der Miner ist nicht aktuell. Aktualisierung....",
+        "ask_mining_key": "Mining-Key eingeben (nur notwendig, wenn du diese Option in deinem Webwallet aktiviert hast - drücke Enter zum überspringen): ",
+        "mining_key_required": "Es wird ein Mining-Key benötigt, um an diesem Account zu minen",
+        "invalid_mining_key": "Der eingegebene Mining-Key ist ungültig!"
     },
     "chinese_simplified": {
         "translation_autor": "suifengtec",
