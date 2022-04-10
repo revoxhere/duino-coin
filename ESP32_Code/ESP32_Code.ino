@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for ESP32 boards                     version 3.1
+  Official code for ESP32 boards                    version 3.18
 
   Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
@@ -21,11 +21,22 @@ const char *WIFI_PASS = "My secret pass";
 // Change the part in brackets to your Duino-Coin username
 const char *DUCO_USER = "my_cool_username";
 // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
-const char *RIG_IDENTIFIER = "Auto";
+const char *RIG_IDENTIFIER = "None";
 // Change the part in brackets to your mining key (if you enabled it in the wallet)
 const char* MINER_KEY = "None";
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 2
+// Uncomment the line below if you wish to use a DHT sensor (Duino IoT beta)
+// #define USE_DHT
+#ifdef USE_DHT
+  // Install "DHT sensor library" if you get an error
+  #include <DHT.h>
+  // Change 2 to the pin you've connected your sensor to
+  #define DHTPIN 2
+  // Set DHT11 or DHT22 accordingly
+  #define DHTTYPE DHT11
+  DHT dht(DHTPIN, DHTTYPE);
+#endif
 
 #define BLINK_SHARE_FOUND    1
 #define BLINK_SETUP_COMPLETE 2
@@ -135,7 +146,7 @@ SemaphoreHandle_t xMutex;
 const char * DEVICE = "ESP32";
 const char * POOLPICKER_URL[] = {"https://server.duinocoin.com/getPool"};
 const char * MINER_BANNER = "Official ESP32 Miner";
-const char * MINER_VER = "3.1";
+const char * MINER_VER = "3.18";
 String pool_name = "";
 String host = "";
 String node_id = "";
@@ -619,7 +630,18 @@ void TaskMining(void *pvParameters) {
       // We are connected and are able to request a job
       Serial.println(String(taskCoreName + " asking for a new job for user: " + DUCO_USER));
       jobClient.flush();
-      jobClient.print("JOB," + String(DUCO_USER) + ",ESP32," + String(MINER_KEY) + MSGNEWLINE);
+
+      #ifndef USE_DHT
+        jobClient.print("JOB," + String(DUCO_USER) + ",ESP32," + String(MINER_KEY) + MSGNEWLINE);
+      #endif
+      #ifdef USE_DHT
+        int temp = dht.readTemperature();
+        int hum = dht.readHumidity();
+        Serial.println("DHT readings: " + String(temp) + "*C, " + String(hum) + "%");
+        jobClient.print("JOB," + String(DUCO_USER) + ",ESP32," + String(MINER_KEY) + "," +
+                        String(temp) + "@" + String(hum) +  MSGNEWLINE);
+      #endif
+      
       while (!jobClient.available()) {
         if (!jobClient.connected()) break;
         delay(10);
@@ -750,6 +772,13 @@ void TaskMining(void *pvParameters) {
 void setup() {
   Serial.begin(500000);  // Start serial connection
   Serial.println("\n\nDuino-Coin " + String(MINER_BANNER));
+
+  #ifdef USE_DHT
+    Serial.println("Initializing DHT sensor");
+    dht.begin();
+    Serial.println("Test reading: " + String(dht.readHumidity()) + "% humidity");
+    Serial.println("Test reading: temperature " + String(dht.readTemperature()) + "*C");
+  #endif
 
   WiFi.mode(WIFI_STA);  // Setup ESP in client mode
   btStop();
