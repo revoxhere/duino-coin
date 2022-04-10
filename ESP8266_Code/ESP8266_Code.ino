@@ -252,7 +252,7 @@ const char WEBSITE[] PROGMEM = R"=====(
 ESP8266WebServer server(80);
 
 void hashupdater(){ //update hashrate every 3 sec in browser without reloading page
-  server.send(200, "text/plane", String(hashrate / 1000));
+  server.send(200, "text/plain", String(hashrate / 1000));
   Serial.println("Update hashrate on page");
 };
 
