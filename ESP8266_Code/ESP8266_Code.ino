@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  ( 
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for ESP8266 boards                   version 3.1
+  Official code for ESP8266 boards                  version 3.18
 
   Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
@@ -14,9 +14,9 @@
 */
 
 /* If optimizations cause problems, change them to -O0 (the default)
-NOTE: For even better optimizations also edit your Crypto.h file.
-On linux that file can be found in the following location:
-~/.arduino15//packages/esp8266/hardware/esp8266/3.0.2/cores/esp8266/ */
+  NOTE: For even better optimizations also edit your Crypto.h file.
+  On linux that file can be found in the following location:
+  ~/.arduino15//packages/esp8266/hardware/esp8266/3.0.2/cores/esp8266/ */
 #pragma GCC optimize ("-Ofast")
 
 /* If during compilation the line below causes a
@@ -46,6 +46,18 @@ On linux that file can be found in the following location:
 #include <Ticker.h>
 #include <ESP8266WebServer.h>
 
+// Uncomment the line below if you wish to use a DHT sensor (Duino IoT beta)
+// #define USE_DHT
+#ifdef USE_DHT
+  // Install "DHT sensor library" if you get an error
+  #include <DHT.h>
+  // Change D3 to the pin you've connected your sensor to
+  #define DHTPIN D3
+  // Set DHT11 or DHT22 accordingly
+  #define DHTTYPE DHT11
+  DHT dht(DHTPIN, DHTTYPE);
+#endif
+
 namespace {
 // Change the part in brackets to your WiFi name
 const char* SSID = "My cool wifi name";
@@ -54,7 +66,7 @@ const char* PASSWORD = "My secret wifi pass";
 // Change the part in brackets to your Duino-Coin username
 const char* USERNAME = "my_cool_username";
 // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
-const char* RIG_IDENTIFIER = "Auto";
+const char* RIG_IDENTIFIER = "None";
 // Change the part in brackets to your mining key (if you enabled it in the wallet)
 const char* MINER_KEY = "None";
 // Change false to true if using 160 MHz clock mode to not get the first share rejected
@@ -71,7 +83,7 @@ const bool LED_BLINKING = true;
 const char * DEVICE = "ESP8266";
 const char * POOLPICKER_URL[] = {"https://server.duinocoin.com/getPool"};
 const char * MINER_BANNER = "Official ESP8266 Miner";
-const char * MINER_VER = "3.1";
+const char * MINER_VER = "3.18";
 unsigned int share_count = 0;
 unsigned int port = 0;
 unsigned int difficulty = 0;
@@ -493,9 +505,17 @@ void setup() {
   Serial.println("\nDuino-Coin " + String(MINER_VER));
   pinMode(LED_BUILTIN, OUTPUT);
 
+  #ifdef USE_DHT
+    Serial.println("Initializing DHT sensor");
+    dht.begin();
+    Serial.println("Test reading: " + String(dht.readHumidity()) + "% humidity");
+    Serial.println("Test reading: temperature " + String(dht.readTemperature()) + "*C");
+  #endif
+
   // Autogenerate ID if required
   chipID = String(ESP.getChipId(), HEX);
-  if( strcmp(RIG_IDENTIFIER, "Auto") == 0 ){
+  
+  if(strcmp(RIG_IDENTIFIER, "Auto") == 0 ){
     AutoRigName = "ESP8266-" + chipID;
     AutoRigName.toUpperCase();
     RIG_IDENTIFIER = AutoRigName.c_str();
@@ -542,7 +562,23 @@ void loop() {
 
   ConnectToServer();
   Serial.println("Asking for a new job for user: " + String(USERNAME));
-  client.print("JOB," + String(USERNAME) + "," + String(START_DIFF) + "," + String(MINER_KEY));
+
+  #ifndef USE_DHT
+    client.print("JOB," + 
+                 String(USERNAME) + SEP_TOKEN +
+                 String(START_DIFF) + SEP_TOKEN +
+                 String(MINER_KEY) + END_TOKEN);
+  #endif
+  #ifdef USE_DHT
+    int temp = dht.readTemperature();
+    int hum = dht.readHumidity();
+    Serial.println("DHT readings: " + String(temp) + "*C, " + String(hum) + "%");
+    client.print("JOB," + 
+                 String(USERNAME) + SEP_TOKEN +
+                 String(START_DIFF) + SEP_TOKEN +
+                 String(MINER_KEY) + SEP_TOKEN +
+                 String(temp) + "@" + String(hum) + END_TOKEN);
+  #endif
 
   waitForClientData();
   String last_block_hash = getValue(client_buffer, SEP_TOKEN, 0);
@@ -550,7 +586,7 @@ void loop() {
   difficulty = getValue(client_buffer, SEP_TOKEN, 2).toInt() * 100 + 1;
 
   int job_len = last_block_hash.length() + expected_hash.length() + String(difficulty).length();
-  Serial.println("Received a correct job with size of " + String(job_len) + " bytes");
+  Serial.println("Received job with size of " + String(job_len) + " bytes");
   expected_hash.toUpperCase();
   br_sha1_init(&sha1_ctx_base);
   br_sha1_update(&sha1_ctx_base, last_block_hash.c_str(), last_block_hash.length());
@@ -574,7 +610,6 @@ void loop() {
       hashrate = duco_numeric_result / elapsed_time_s;
       share_count++;
       blink(BLINK_SHARE_FOUND);
-
       client.print(String(duco_numeric_result)
                    + ","
                    + String(hashrate)
@@ -585,7 +620,8 @@ void loop() {
                    + ","
                    + String(RIG_IDENTIFIER)
                    + ",DUCOID"
-                   + String(chipID));
+                   + String(chipID)
+                   + "\n");
 
       waitForClientData();
       Serial.println(client_buffer
@@ -599,12 +635,10 @@ void loop() {
                      + "s)");
       break;
     }
-    if (max_micros_elapsed(micros(), 500000))
-    {
+    if (max_micros_elapsed(micros(), 500000)) {
       handleSystemEvents();
     }
-    else
-    {
+    else {
       delay(0);
     }
   }
