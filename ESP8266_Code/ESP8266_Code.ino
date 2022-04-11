@@ -87,162 +87,208 @@ unsigned int share_count = 0;
 unsigned int port = 0;
 unsigned int difficulty = 0;
 float hashrate = 0;
+#ifdef USE_DHT
+  int temp = 0;
+  int hum = 0;
+#endif
 String AutoRigName = "";
 String host = "";
 String node_id = "";
 
 const char WEBSITE[] PROGMEM = R"=====(
-<!DOCTYPE html>
-<html>
-<!--
-    Duino-Coin self-hosted dashboard
-    MIT licensed
-    Duino-Coin official 2019-2022
-    https://github.com/revoxhere/duino-coin
-    https://duinocoin.com
--->
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Duino-Coin %DEVICE% dashboard</title>
-    <link rel="stylesheet" href="https://server.duinocoin.com/assets/css/mystyles.css">
-    <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
-    <link rel="icon" type="image/png" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
-</head>
-<body>
-    <section class="section">
-        <div class="container">
-            <h1 class="title">
-                <img class="icon" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
-                %DEVICE% <small>(%ID%)</small>
-            </h1>
-            <p class="subtitle">
-                Self-hosted, lightweight, official dashboard for your <strong>Duino-Coin</strong> miner
-            </p>
-        </div>
-        <br>
-        <div class="container">
-            <div class="columns">
-                <div class="column">
-                    <div class="box">
-                        <p class="subtitle">
-                            Mining statistics
-                        </p>
-                        <div class="columns is-multiline">
-                            <div class="column" style="min-width:15em">
-                                <div class="title is-size-5 mb-0">
-                                    <span id="hashratex">%HASHRATE%</span>kH/s
-                                </div>
-                                <div class="heading is-size-5">
-                                    Hashrate
-                                </div>
-                            </div>
-                            <div class="column" style="min-width:15em">
-                                <div class="title is-size-5 mb-0">
-                                    %DIFF%
-                                </div>
-                                <div class="heading is-size-5">
-                                    Difficulty
-                                </div>
-                            </div>
-                            <div class="column" style="min-width:15em">
-                                <div class="title is-size-5 mb-0">
-                                    %SHARES%
-                                </div>
-                                <div class="heading is-size-5">
-                                    Shares
-                                </div>
-                            </div>
-                            <div class="column" style="min-width:15em">
-                                <div class="title is-size-5 mb-0">
-                                    %NODE%
-                                </div>
-                                <div class="heading is-size-5">
-                                    Node
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="column">
-                    <div class="box">
-                        <p class="subtitle">
-                            Device information
-                        </p>
-                        <div class="columns is-multiline">
-                            <div class="column" style="min-width:15em">
-                                <div class="title is-size-5 mb-0">
-                                    %DEVICE%
-                                </div>
-                                <div class="heading is-size-5">
-                                    Device type
-                                </div>
-                            </div>
-                            <div class="column" style="min-width:15em">
-                                <div class="title is-size-5 mb-0">
-                                    %ID%
-                                </div>
-                                <div class="heading is-size-5">
-                                    Device ID
-                                </div>
-                            </div>
-                            <div class="column" style="min-width:15em">
-                                <div class="title is-size-5 mb-0">
-                                    %MEMORY%
-                                </div>
-                                <div class="heading is-size-5">
-                                    Free memory
-                                </div>
-                            </div>
-                            <div class="column" style="min-width:15em">
-                                <div class="title is-size-5 mb-0">
-                                    %VERSION%
-                                </div>
-                                <div class="heading is-size-5">
-                                    Miner version
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <br>
-            <div class="has-text-centered">
-                <div class="title is-size-6 mb-0">
-                    Hosted on
-                    <a href="http://%IP_ADDR%">
-                        http://<b>%IP_ADDR%</b>
-                    </a>
-                    &bull;
-                    <a href="https://duinocoin.com">
-                        duinocoin.com
-                    </a>
-                    &bull;
-                    <a href="https://github.com/revoxhere/duino-coin">
-                        github.com/revoxhere/duino-coin
-                    </a>
-                </div>
-            </div>
-        </div>
-        <script>
-            setInterval(function(){
-                getData();
-            }, 3000);
+  <!DOCTYPE html>
+  <html>
+  <!--
+      Duino-Coin self-hosted dashboard
+      MIT licensed
+      Duino-Coin official 2019-2022
+      https://github.com/revoxhere/duino-coin
+      https://duinocoin.com
+  -->
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Duino-Coin %DEVICE% dashboard</title>
+      <link rel="stylesheet" href="https://server.duinocoin.com/assets/css/mystyles.css">
+      <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
+      <link rel="icon" type="image/png" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
+  </head>
+  <body>
+      <section class="section">
+          <div class="container">
+              <h1 class="title">
+                  <img class="icon" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
+                  %DEVICE% <small>(%ID%)</small>
+              </h1>
+              <p class="subtitle">
+                  Self-hosted, lightweight, official dashboard for your <strong>Duino-Coin</strong> miner
+              </p>
+          </div>
+          <br>
+          <div class="container">
+              <div class="columns">
+                  <div class="column">
+                      <div class="box">
+                          <p class="subtitle">
+                              Mining statistics
+                          </p>
+                          <div class="columns is-multiline">
+                              <div class="column" style="min-width:15em">
+                                  <div class="title is-size-5 mb-0">
+                                      <span id="hashratex">%HASHRATE%</span>kH/s
+                                  </div>
+                                  <div class="heading is-size-5">
+                                      Hashrate
+                                  </div>
+                              </div>
+                              <div class="column" style="min-width:15em">
+                                  <div class="title is-size-5 mb-0">
+                                      %DIFF%
+                                  </div>
+                                  <div class="heading is-size-5">
+                                      Difficulty
+                                  </div>
+                              </div>
+                              <div class="column" style="min-width:15em">
+                                  <div class="title is-size-5 mb-0">
+                                      %SHARES%
+                                  </div>
+                                  <div class="heading is-size-5">
+                                      Shares
+                                  </div>
+                              </div>
+                              <div class="column" style="min-width:15em">
+                                  <div class="title is-size-5 mb-0">
+                                      %NODE%
+                                  </div>
+                                  <div class="heading is-size-5">
+                                      Node
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="box" id='iotbox' style='display: none'>
+                          <p class="subtitle">
+                              IoT statistics
+                          </p>
+                          <div class="columns is-multiline">
+                              <div class="column" style="min-width:15em">
+                                  <div class="title is-size-5 mb-0">
+                                      <span id="tempx">%TEMP%</span>
+                                  </div>
+                                  <div class="heading is-size-5">
+                                      Temperature
+                                  </div>
+                              </div>
+                              <div class="column" style="min-width:15em">
+                                  <div class="title is-size-5 mb-0">
+                                      <span id="humdx">%HUMD%</span>
+                                  </div>
+                                  <div class="heading is-size-5">
+                                      Humidity
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="column">
+                      <div class="box">
+                          <p class="subtitle">
+                              Device information
+                          </p>
+                          <div class="columns is-multiline">
+                              <div class="column" style="min-width:15em">
+                                  <div class="title is-size-5 mb-0">
+                                      %DEVICE%
+                                  </div>
+                                  <div class="heading is-size-5">
+                                      Device type
+                                  </div>
+                              </div>
+                              <div class="column" style="min-width:15em">
+                                  <div class="title is-size-5 mb-0">
+                                      %ID%
+                                  </div>
+                                  <div class="heading is-size-5">
+                                      Device ID
+                                  </div>
+                              </div>
+                              <div class="column" style="min-width:15em">
+                                  <div class="title is-size-5 mb-0">
+                                      %MEMORY%
+                                  </div>
+                                  <div class="heading is-size-5">
+                                      Free memory
+                                  </div>
+                              </div>
+                              <div class="column" style="min-width:15em">
+                                  <div class="title is-size-5 mb-0">
+                                      %VERSION%
+                                  </div>
+                                  <div class="heading is-size-5">
+                                      Miner version
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <br>
+              <div class="has-text-centered">
+                  <div class="title is-size-6 mb-0">
+                      Hosted on
+                      <a href="http://%IP_ADDR%">
+                          http://<b>%IP_ADDR%</b>
+                      </a>
+                      &bull;
+                      <a href="https://duinocoin.com">
+                          duinocoin.com
+                      </a>
+                      &bull;
+                      <a href="https://github.com/revoxhere/duino-coin">
+                          github.com/revoxhere/duino-coin
+                      </a>
+                  </div>
+              </div>
+          </div>
+          <script>
+              setInterval(function(){
+                  getHRData();
+                  getIoTData()
+              }, 3000);
 
-            function getData() {
-                var xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4 && this.status == 200) {
-                        document.getElementById("hashratex").innerHTML = this.responseText;
-                    }
-                };
-                xhttp.open("GET", "hashrateread", true);
-                xhttp.send();
-            }
-        </script>
-    </section>
-</body>
-</html>
+              function getHRData() {
+                  var xhttp = new XMLHttpRequest();
+                  xhttp.onreadystatechange = function() {
+                      if (this.readyState == 4 && this.status == 200) {
+                          document.getElementById("hashratex").innerHTML = this.responseText;
+                      }
+                  };
+                  xhttp.open("GET", "hashrateread", true);
+                  xhttp.send();
+              }
+
+              boxflag = false;
+              function getIoTData() {
+                  var xhttp = new XMLHttpRequest();
+                  xhttp.onreadystatechange = function() {
+                      if (this.readyState == 4 && this.status == 200) {
+                          if (!boxflag) {
+                            document.getElementById("iotbox").style.display = "";
+                            boxflag = true;
+                          }
+                          json = JSON.parse(this.responseText);
+                          document.getElementById("tempx").innerHTML = json["temp"];
+                          document.getElementById("humdx").innerHTML = json["humd"];
+                      }
+                  };
+                  xhttp.open("GET", "iotread", true);
+                  xhttp.send();
+              }
+          </script>
+      </section>
+  </body>
+  </html>
 )=====";
 
 AsyncWebServer server(80);
@@ -482,6 +528,11 @@ String dashboard(const String& var) {
   else if (var == "ID") return String(RIG_IDENTIFIER);
   else if (var == "MEMORY") return String(ESP.getFreeHeap());
   else if (var == "VERSION") return String(MINER_VER);
+
+  #ifdef USE_DHT
+    if (var == "TEMP") return String(temp);
+    else if (var == "HUMD") return String(hum);
+  #endif
 }
 
 } // namespace
@@ -533,6 +584,12 @@ void setup() {
         request->send(200, "text/plain", String(hashrate / 1000));
       });
     }
+    if (WEB_IOT_UPDATER) {
+      server.on("/iotread", HTTP_GET, [](AsyncWebServerRequest *request){
+        String string = "{\"temp\": \""+String(temp)+"°C\", \"humd\": \""+String(hum)+"%\"}";
+        request->send(200, "application/json", string);
+      });
+    }
     server.begin();
   }
 
@@ -561,8 +618,8 @@ void loop() {
                  String(MINER_KEY) + END_TOKEN);
   #endif
   #ifdef USE_DHT
-    int temp = dht.readTemperature();
-    int hum = dht.readHumidity();
+    temp = dht.readTemperature();
+    hum = dht.readHumidity();
     Serial.println("DHT readings: " + String(temp) + "*C, " + String(hum) + "%");
     client.print("JOB," +
                  String(USERNAME) + SEP_TOKEN +
