@@ -51,7 +51,7 @@
   // Install "DHT sensor library" if you get an error
   #include <DHT.h>
   // Change D3 to the pin you've connected your sensor to
-  #define DHTPIN D5
+  #define DHTPIN D3
   // Set DHT11 or DHT22 accordingly
   #define DHTTYPE DHT11
   DHT dht(DHTPIN, DHTTYPE);
@@ -74,6 +74,8 @@ const bool USE_HIGHER_DIFF = false;
 const bool WEB_DASHBOARD = true;
 // Change false to true if you want to update hashrate in browser without reloading page
 const bool WEB_HASH_UPDATER = false;
+// Change false to true if you want to update IoT info in browser without reloading page (Require USE_DHT enable)
+const bool WEB_IOT_UPDATER = false;
 // Change true to false if you want to disable led blinking(But the LED will work in the beginning until esp connects to the pool)
 const bool LED_BLINKING = true;
 
@@ -584,12 +586,14 @@ void setup() {
         request->send(200, "text/plain", String(hashrate / 1000));
       });
     }
-    if (WEB_IOT_UPDATER) {
-      server.on("/iotread", HTTP_GET, [](AsyncWebServerRequest *request){
-        String string = "{\"temp\": \""+String(temp)+"°C\", \"humd\": \""+String(hum)+"%\"}";
-        request->send(200, "application/json", string);
-      });
-    }
+    #ifdef USE_DHT
+       if (WEB_IOT_UPDATER) {
+         server.on("/iotread", HTTP_GET, [](AsyncWebServerRequest *request){
+           String string = "{\"temp\": \""+String(temp)+"°C\", \"humd\": \""+String(hum)+"%\"}";
+           request->send(200, "application/json", string);
+         });
+       }
+    #endif
     server.begin();
   }
 
