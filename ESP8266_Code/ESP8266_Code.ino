@@ -1,14 +1,12 @@
 /*
-   ____  __  __  ____  _  _  _____       ___  _____  ____  _  _ 
+   ____  __  __  ____  _  _  _____       ___  _____  ____  _  _
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
-   )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  ( 
+   )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
   Official code for ESP8266 boards                  version 3.18
-
   Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
   https://github.com/revoxhere/duino-coin
-
   If you don't know where to start, visit official website and navigate to
   the Getting Started page. Have fun mining!
 */
@@ -22,8 +20,8 @@
 /* If during compilation the line below causes a
   "fatal error: arduinoJson.h: No such file or directory"
   message to occur; it means that you do NOT have the
-  ArduinoJSON library installed. To install it, 
-  go to the below link and follow the instructions: 
+  ArduinoJSON library installed. To install it,
+  go to the below link and follow the instructions:
   https://github.com/revoxhere/duino-coin/issues/832 */
 #include <ArduinoJson.h>
 
@@ -44,7 +42,8 @@
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
 #include <Ticker.h>
-#include <ESP8266WebServer.h>
+#include <ESPAsyncTCP.h>
+#include <ESPAsyncWebServer.h>
 
 // Uncomment the line below if you wish to use a DHT sensor (Duino IoT beta)
 // #define USE_DHT
@@ -52,7 +51,7 @@
   // Install "DHT sensor library" if you get an error
   #include <DHT.h>
   // Change D3 to the pin you've connected your sensor to
-  #define DHTPIN D3
+  #define DHTPIN D5
   // Set DHT11 or DHT22 accordingly
   #define DHTTYPE DHT11
   DHT dht(DHTPIN, DHTTYPE);
@@ -102,22 +101,20 @@ const char WEBSITE[] PROGMEM = R"=====(
     https://github.com/revoxhere/duino-coin
     https://duinocoin.com
 -->
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Duino-Coin @@DEVICE@@ dashboard</title>
+    <title>Duino-Coin %DEVICE% dashboard</title>
     <link rel="stylesheet" href="https://server.duinocoin.com/assets/css/mystyles.css">
     <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
     <link rel="icon" type="image/png" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
 </head>
-
 <body>
     <section class="section">
         <div class="container">
             <h1 class="title">
                 <img class="icon" src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
-                @@DEVICE@@ <small>(@@ID@@)</small>
+                %DEVICE% <small>(%ID%)</small>
             </h1>
             <p class="subtitle">
                 Self-hosted, lightweight, official dashboard for your <strong>Duino-Coin</strong> miner
@@ -134,7 +131,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                         <div class="columns is-multiline">
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    <span id="hashratex">@@HASHRATE@@</span>kH/s
+                                    <span id="hashratex">%HASHRATE%</span>kH/s
                                 </div>
                                 <div class="heading is-size-5">
                                     Hashrate
@@ -142,7 +139,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                             </div>
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    @@DIFF@@
+                                    %DIFF%
                                 </div>
                                 <div class="heading is-size-5">
                                     Difficulty
@@ -150,7 +147,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                             </div>
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    @@SHARES@@
+                                    %SHARES%
                                 </div>
                                 <div class="heading is-size-5">
                                     Shares
@@ -158,7 +155,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                             </div>
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    @@NODE@@
+                                    %NODE%
                                 </div>
                                 <div class="heading is-size-5">
                                     Node
@@ -175,7 +172,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                         <div class="columns is-multiline">
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    @@DEVICE@@
+                                    %DEVICE%
                                 </div>
                                 <div class="heading is-size-5">
                                     Device type
@@ -183,7 +180,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                             </div>
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    @@ID@@
+                                    %ID%
                                 </div>
                                 <div class="heading is-size-5">
                                     Device ID
@@ -191,7 +188,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                             </div>
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    @@MEMORY@@
+                                    %MEMORY%
                                 </div>
                                 <div class="heading is-size-5">
                                     Free memory
@@ -199,7 +196,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                             </div>
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    @@VERSION@@
+                                    %VERSION%
                                 </div>
                                 <div class="heading is-size-5">
                                     Miner version
@@ -213,8 +210,8 @@ const char WEBSITE[] PROGMEM = R"=====(
             <div class="has-text-centered">
                 <div class="title is-size-6 mb-0">
                     Hosted on
-                    <a href="http://@@IP_ADDR@@">
-                        http://<b>@@IP_ADDR@@</b>
+                    <a href="http://%IP_ADDR%">
+                        http://<b>%IP_ADDR%</b>
                     </a>
                     &bull;
                     <a href="https://duinocoin.com">
@@ -231,7 +228,7 @@ const char WEBSITE[] PROGMEM = R"=====(
             setInterval(function(){
                 getData();
             }, 3000);
-            
+
             function getData() {
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
@@ -245,23 +242,17 @@ const char WEBSITE[] PROGMEM = R"=====(
         </script>
     </section>
 </body>
-
 </html>
 )=====";
 
-ESP8266WebServer server(80);
-
-void hashupdater(){ //update hashrate every 3 sec in browser without reloading page
-  server.send(200, "text/plain", String(hashrate / 1000));
-  Serial.println("Update hashrate on page");
-};
+AsyncWebServer server(80);
 
 void UpdateHostPort(String input) {
   // Thanks @ricaun for the code
   DynamicJsonDocument doc(256);
   deserializeJson(doc, input);
   const char* name = doc["name"];
-  
+
   host = String((const char*)doc["ip"]);
   port = int(doc["port"]);
   node_id = String(name);
@@ -274,10 +265,10 @@ String httpGetString(String URL) {
   WiFiClientSecure client;
   client.setInsecure();
   HTTPClient http;
-  
+
   if (http.begin(client, URL)) {
     int httpCode = http.GET();
-    
+
     if (httpCode == HTTP_CODE_OK) payload = http.getString();
     else Serial.printf("Error fetching node from poolpicker: %s\n", http.errorToString(httpCode).c_str());
 
@@ -479,23 +470,18 @@ bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
   return false;
 }
 
-void dashboard() {
-  Serial.println("Handling HTTP client");
+String dashboard(const String& var) {
+  if (var == "IP_ADDR") return WiFi.localIP().toString();
 
-  String s = WEBSITE;
-  s.replace("@@IP_ADDR@@", WiFi.localIP().toString());
-  
-  s.replace("@@HASHRATE@@", String(hashrate / 1000));
-  s.replace("@@DIFF@@", String(difficulty / 100));
-  s.replace("@@SHARES@@", String(share_count));
-  s.replace("@@NODE@@", String(node_id));
+  else if (var == "HASHRATE") return String(hashrate / 1000);
+  else if (var == "DIFF") return String(difficulty / 100);
+  else if (var == "SHARES") return String(share_count);
+  else if (var == "NODE") return String(node_id);
 
-  s.replace("@@DEVICE@@", String(DEVICE));
-  s.replace("@@ID@@", String(RIG_IDENTIFIER));
-  s.replace("@@MEMORY@@", String(ESP.getFreeHeap()));
-  s.replace("@@VERSION@@", String(MINER_VER));
-
-  server.send(200, "text/html", s);
+  else if (var == "DEVICE") return String(DEVICE);
+  else if (var == "ID") return String(RIG_IDENTIFIER);
+  else if (var == "MEMORY") return String(ESP.getFreeHeap());
+  else if (var == "VERSION") return String(MINER_VER);
 }
 
 } // namespace
@@ -514,7 +500,7 @@ void setup() {
 
   // Autogenerate ID if required
   chipID = String(ESP.getChipId(), HEX);
-  
+
   if(strcmp(RIG_IDENTIFIER, "Auto") == 0 ){
     AutoRigName = "ESP8266-" + chipID;
     AutoRigName.toUpperCase();
@@ -534,13 +520,19 @@ void setup() {
       Serial.println("mDNS unavailable");
     }
     MDNS.addService("http", "tcp", 80);
-    Serial.print("Configured mDNS for dashboard on http://" 
+    Serial.print("Configured mDNS for dashboard on http://"
                   + String(RIG_IDENTIFIER)
                   + ".local (or http://"
                   + WiFi.localIP().toString()
                   + ")");
-    server.on("/", dashboard);
-    if (WEB_HASH_UPDATER) server.on("/hashrateread", hashupdater);
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send_P(200, "text/html", WEBSITE, dashboard);
+    });
+    if (WEB_HASH_UPDATER) {
+      server.on("/hashrateread", HTTP_GET, [](AsyncWebServerRequest *request){
+        request->send(200, "text/plain", String(hashrate / 1000));
+      });
+    }
     server.begin();
   }
 
@@ -551,20 +543,19 @@ void loop() {
   br_sha1_context sha1_ctx, sha1_ctx_base;
   uint8_t hashArray[20];
   String duco_numeric_result_str;
-  
+
   // 1 minute watchdog
   lwdtFeed();
 
   // OTA handlers
   VerifyWifi();
   ArduinoOTA.handle();
-  if(WEB_DASHBOARD) server.handleClient();
 
   ConnectToServer();
   Serial.println("Asking for a new job for user: " + String(USERNAME));
 
   #ifndef USE_DHT
-    client.print("JOB," + 
+    client.print("JOB," +
                  String(USERNAME) + SEP_TOKEN +
                  String(START_DIFF) + SEP_TOKEN +
                  String(MINER_KEY) + END_TOKEN);
@@ -573,7 +564,7 @@ void loop() {
     int temp = dht.readTemperature();
     int hum = dht.readHumidity();
     Serial.println("DHT readings: " + String(temp) + "*C, " + String(hum) + "%");
-    client.print("JOB," + 
+    client.print("JOB," +
                  String(USERNAME) + SEP_TOKEN +
                  String(START_DIFF) + SEP_TOKEN +
                  String(MINER_KEY) + SEP_TOKEN +
