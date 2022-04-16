@@ -244,23 +244,24 @@ Some third-party included files may have different licenses - please check their
 1. Duino-Coins ("DUCOs") are earned by miners with a process called mining.<br/>
 2. Mining is described as using DUCO-S1 algorithm (as explained in the <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
 3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README).<br/>
-4. Mining on GPUs, FPGAs and other high-efficiency hardware is allowed, but using only the `EXTREME` mining difficulty.<br/>
-5. Any users using miners on difficulty not suited for their hardware (see the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">difficulty list</a>) will be automatically throttled by being moved to correct difficulty tier.<br/>
-6. Any user that keeps trying to use lower difficulty than it's suited for may get temporarily blocked.<br/>
-7. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
-8. Only coins earned legally are eligible for the exchange.<br/>
-9. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
-10. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
-11. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
-12. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed as it's unfair for others.<br />
-13. A user's DUCOs may be burnt if a violation can be proven.<br/>
-14. These terms of service can change at any time without prior notice.<br/>
-15. Having alt accounts without a rational reason (e.g. for multi-mining) are not allowed - multiple accounts used on a single computer/network will be blocked, unless whitelisted.<br/>
-16. Sending transactions that promote other services or advertise something in any form is not allowed.<br/>
-17. Sending a lot of transactions in a short amount of time can trigger the Kolka system which will rate limit and/or block the user.<br />
-18. Community-made softwares need to comply with the rules (terms of service, difficulty tiers, etc.) - abusing the system will lead to blocking of the software and/or the user(s).<br />
-19. Accounts proven to be misleading in name or usage (impersonation, fake bots, etc.) are not allowed.<br />
-20. Every Duino-Coin user agrees to comply with the above rules. Improper behavior will lead to blocking of the account.<br/>
+4. All miners need to use the difficulty tier made and suitable for them.
+5. Mining on GPUs, FPGAs and other high-efficiency hardware is allowed, but using only the `EXTREME` mining difficulty.<br/>
+6. Any users using miners on difficulty not suited for their hardware (see the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">difficulty list</a>) will be automatically throttled by being moved to correct difficulty tier.<br/>
+7. Any user that keeps trying to use lower difficulty than it's suited for may get temporarily blocked or permanently banned.<br/>
+8. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
+9. Only coins earned legally are eligible for the exchange.<br/>
+10. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
+11. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
+12. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
+13. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed as it's unfair for others.<br />
+14. A user's DUCOs may be burnt if a violation can be proven.<br/>
+15. These terms of service can change at any time without prior notice.<br/>
+16. Having alt accounts without a rational reason (e.g. for multi-mining) are not allowed - multiple accounts used on a single computer/network will be blocked, unless whitelisted.<br/>
+17. Sending transactions that promote other services or advertise something in any form is not allowed.<br/>
+18. Sending a lot of transactions in a short amount of time can trigger the Kolka system which will rate limit and/or block the user.<br />
+19. Community-made softwares need to comply with the rules (terms of service, difficulty tiers, etc.) - abusing the system will lead to blocking of the software and/or the user(s).<br />
+20. Accounts proven to be misleading in name or usage (impersonation, fake bots, etc.) are not allowed.<br />
+21. Every Duino-Coin user agrees to comply with the above rules. Improper behavior will lead to blocking of the account.<br/>
 
 
 ## Privacy policy
