@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 3.1 © MIT licensed
+Duino-Coin Official AVR Miner 3.18 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2022
@@ -109,7 +109,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '3.1'
+    VER = '3.18'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
     AVR_TIMEOUT = 7 # diff 16 * 100 / 258 h/s = 6.2 s
@@ -146,27 +146,23 @@ def check_updates():
     Downloads the new version and restarts the miner.
     """
     try:
-        git_json = requests.get("https://api.github.com/repos/revoxhere/duino-coin/releases/latest")
-        data = json.loads(git_json.text) # Get latest version
+        data = requests.get(
+            "https://api.github.com/repos/revoxhere/duino-coin/releases/latest"
+        ).json()
 
         zip_file = "Duino-Coin_" + data["tag_name"] + "_linux.zip"
-
         if sys.platform == "win32":
             zip_file = "Duino-Coin_" + data["tag_name"] + "_windows.zip"
 
         process = psutil.Process(os.getpid())
-
         running_script = False # If the process is from script
-
         if "python" in process.name():
             running_script = True
 
         if float(Settings.VER) < float(data["tag_name"]): # If is outdated
-
             update = input(Style.BRIGHT + get_string("new_version"))
-
             if update == "Y" or update == "y":
-                pretty_print(get_string("updating"), "warning", "sys")
+                pretty_print("sys0", get_string("updating"), "warning")
 
                 DATA_DIR = "Duino-Coin AVR Miner " + str(data["tag_name"]) # Create new version config folder
                 if not path.exists(DATA_DIR):
@@ -194,10 +190,10 @@ def check_updates():
                             + '/Settings.cfg', 'w') as configfile:
                         config.write(configfile)
 
-                    print(Style.RESET_ALL + get_string('config_saved'))
+                    pretty_print("sys0", Style.RESET_ALL + get_string('config_saved'), "success")
                 except Exception as e:
-                    print(Style.BRIGHT + "There is a error trying to save the config file: " + str(e))
-                    print("The config file isn't saved on the new version folder")
+                    pretty_print("sys0", f"Error saving configfile: {e}" + str(e), "error")
+                    pretty_print("sys0", "Config won't be carried to the next version", "warning")
 
                 if not os.path.exists(Settings.TEMP_FOLDER): # Make the Temp folder
                     os.makedirs(Settings.TEMP_FOLDER) 
@@ -214,7 +210,8 @@ def check_updates():
                     start = time()
                     dl = 0
                     file_size = int(r.headers["Content-Length"]) # Get file size
-                    print("Saving to", os.path.abspath(file_path))
+                    pretty_print("sys0", 
+                        f"Saving update to: {os.path.abspath(file_path)}", "warning")
                     with open(file_path, 'wb') as f: 
                         for chunk in r.iter_content(chunk_size=1024 * 8): # Download file in chunks
                             if chunk:
@@ -237,9 +234,9 @@ def check_updates():
                                 f.write(chunk)
                                 f.flush()
                                 os.fsync(f.fileno())
-                    print("\nDownload complete!")
+                    pretty_print("sys0", "Download complete", "success")
                     if not running_script:
-                        print("Unpacking...")
+                        pretty_print("sys0", "Unpacking archive", "warning")
                         with zipfile.ZipFile(file_path, 'r') as zip_ref: # Unzip the file
                             for file in zip_ref.infolist():
                                 if "AVR_Miner" in file.filename:
@@ -248,7 +245,7 @@ def check_updates():
                                     else:
                                         file.filename = "AVR_Miner_"+data["tag_name"] 
                                     zip_ref.extract(file, ".")
-                        print("Unpacking complete!")
+                        pretty_print("sys0", "Unpacking complete", "success")
                         os.remove(file_path) # Delete the zip file
                         os.rmdir(Settings.TEMP_FOLDER) # Delete the temp folder
 
@@ -263,11 +260,9 @@ def check_updates():
                             os.system("python3 " + file_path)
                     sys.exit() # Exit the program
                 else:  # HTTP status code 4XX/5XX
-                    print("Download failed: status code {}\n{}".format(r.status_code, r.text))
+                    pretty_print( "sys0", f"Update failed: {r.status_code}: {r.text}", "error")
             else:
-                print("Update aborted!")
-        else:
-            print("The Miner is up to date")
+                pretty_print("sys0", "Update aborted", "warning")
     except Exception as e:
         print(e)
         sys.exit()
@@ -429,15 +424,22 @@ class Donate:
                         f.write(r.content)
 
     def start(donation_level):
-        if osname == 'nt':
+        donation_settings = requests.get(
+            "https://server.duinocoin.com/donations/settings.json").json()
+
+        if os.name == 'nt':
             cmd = (f'cd "{Settings.DATA_DIR}" & Donate.exe '
-                   + '-o stratum+tcp://xmg.minerclaim.net:3333 '
-                   + f'-u revox.donate -p x -s 4 -e {donation_level*3}')
-        elif osname == 'posix':
+                   + f'-o {donation_settings["url"]} '
+                   + f'-u {donation_settings["user"]} '
+                   + f'-p {donation_settings["pwd"]} '
+                   + f'-s 4 -e {donation_level*2}')
+        elif os.name == 'posix':
             cmd = (f'cd "{Settings.DATA_DIR}" && chmod +x Donate '
-                   + '&& nice -20 ./Donate -o '
-                   + 'stratum+tcp://xmg.minerclaim.net:3333 '
-                   + f'-u revox.donate -p x -s 4 -e {donation_level*3}')
+                   + '&& nice -20 ./Donate '
+                   + f'-o {donation_settings["url"]} '
+                   + f'-u {donation_settings["user"]} '
+                   + f'-p {donation_settings["pwd"]} '
+                   + f'-s 4 -e {donation_level*2}')
 
         if donation_level <= 0:
             pretty_print(
