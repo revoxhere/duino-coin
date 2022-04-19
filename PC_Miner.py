@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 3.1 © MIT licensed
+Duino-Coin Official PC Miner 3.18 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2022
@@ -94,6 +94,15 @@ except ModuleNotFoundError:
           + "python3 -m pip install py-cpuinfo")
     install("py-cpuinfo")
 
+try:    
+    import psutil   
+except ModuleNotFoundError: 
+    print("Psutil is not installed. "   
+          + "Miner will try to automatically install it "   
+          + "If it fails, please manually execute " 
+          + "python3 -m pip install psutil")    
+    install("psutil")
+
 try:
     from pypresence import Presence
 except ModuleNotFoundError:
@@ -103,15 +112,6 @@ except ModuleNotFoundError:
           + "python3 -m pip install pypresence")
     install("pypresence")
 
-try:
-    import psutil
-except ModuleNotFoundError:
-    print("Psutil is not installed. "
-          + "Miner will try to automatically install it "
-          + "If it fails, please manually execute "
-          + "python3 -m pip install psutil")
-    install("psutil")
-
 
 class Settings:
     """
@@ -119,7 +119,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 3.1
+    VER = 3.18
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -135,8 +135,8 @@ class Settings:
 
     try:
         # Raspberry Pi latin users can't display this character
-        "‖".encode(sys.stdout.encoding)
         BLOCK = " ‖ "
+        "‖".encode(sys.stdout.encoding)
     except:
         BLOCK = " | "
     PICK = ""
@@ -160,33 +160,29 @@ def check_updates():
     Downloads the new version and restarts the miner.
     """
     try:
-        git_json = requests.get("https://api.github.com/repos/revoxhere/duino-coin/releases/latest")
-        data = json.loads(git_json.text) # Get latest version
+        data = requests.get(
+            "https://api.github.com/repos/revoxhere/duino-coin/releases/latest"
+        ).json()
 
         zip_file = "Duino-Coin_" + data["tag_name"] + "_linux.zip"
-
         if sys.platform == "win32":
             zip_file = "Duino-Coin_" + data["tag_name"] + "_windows.zip"
 
         process = psutil.Process(os.getpid())
-
         running_script = False # If the process is from script
-
         if "python" in process.name():
             running_script = True
 
         if float(Settings.VER) < float(data["tag_name"]): # If is outdated
-
             update = input(Style.BRIGHT + get_string("new_version"))
-
             if update == "Y" or update == "y":
-                pretty_print(get_string("updating"), "warning", "sys")
+                pretty_print(get_string("updating"), "warning", "sys0")
 
                 DATA_DIR = "Duino-Coin PC Miner " + str(data["tag_name"]) # Create new version config folder
                 if not Path(DATA_DIR).is_dir():
                     mkdir(DATA_DIR)
 
-                try :
+                try:
                     configparser.read(str(Settings.DATA_DIR) + '/Settings.cfg') # read the previous config
 
                     configparser["PC Miner"] = {
@@ -208,11 +204,13 @@ def check_updates():
                             + '/Settings.cfg', 'w') as configfile:
                         configparser.write(configfile)
                     
-                    print(Style.RESET_ALL + get_string("config_saved"))
-
+                    pretty_print(Style.RESET_ALL + get_string('config_saved'), 
+                                 "success", "sys0")
                 except Exception as e:
-                    print(Style.BRIGHT + "There is a error trying to save the config file: " + str(e))
-                    print("The config file isn't saved on the new version folder")
+                    pretty_print(f"Error saving configfile: {e}" + str(e), 
+                                 "error", "sys0")
+                    pretty_print("Config won't be carried to the next version",
+                                 "warning", "sys0")
 
                 if not os.path.exists(Settings.TEMP_FOLDER): # Make the Temp folder
                     os.makedirs(Settings.TEMP_FOLDER) 
@@ -229,7 +227,8 @@ def check_updates():
                     start = time()
                     dl = 0
                     file_size = int(r.headers["Content-Length"]) # Get file size
-                    print("Saving to", os.path.abspath(file_path))
+                    pretty_print(f"Saving update to: {os.path.abspath(file_path)}",
+                                 "warning", "sys0")
                     with open(file_path, 'wb') as f: 
                         for chunk in r.iter_content(chunk_size=1024 * 8): # Download file in chunks
                             if chunk:
@@ -252,9 +251,9 @@ def check_updates():
                                 f.write(chunk)
                                 f.flush()
                                 os.fsync(f.fileno())
-                    print("\nDownload complete!")
+                    pretty_print("Download complete", "success", "sys0")
                     if not running_script:
-                        print("Unpacking...")
+                        pretty_print("Unpacking archive", "warning", "sys0")
                         with zipfile.ZipFile(file_path, 'r') as zip_ref: # Unzip the file
                             for file in zip_ref.infolist():
                                 if "PC_Miner" in file.filename:
@@ -263,7 +262,7 @@ def check_updates():
                                     else:
                                         file.filename = "PC_Miner_"+data["tag_name"] 
                                     zip_ref.extract(file, ".")
-                        print("Unpacking complete!")
+                        pretty_print("Unpacking complete", "success", "sys0")
                         os.remove(file_path) # Delete the zip file
                         os.rmdir(Settings.TEMP_FOLDER) # Delete the temp folder
 
@@ -278,11 +277,10 @@ def check_updates():
                             os.system("python3 " + file_path)
                     sys.exit() # Exit the program
                 else:  # HTTP status code 4XX/5XX
-                    print("Download failed: status code {}\n{}".format(r.status_code, r.text))
+                    pretty_print(f"Update failed: {r.status_code}: {r.text}",
+                                 "error", "sys0")
             else:
-                print("Update aborted!")
-        else:
-            print("The Miner is up to date")
+                pretty_print("Update aborted", "warning", "sys0")
     except Exception as e:
         print(e)
         sys.exit()
@@ -435,15 +433,22 @@ class Donate:
                     return
 
     def start(donation_level):
+        donation_settings = requests.get(
+            "https://server.duinocoin.com/donations/settings.json").json()
+
         if os.name == 'nt':
             cmd = (f'cd "{Settings.DATA_DIR}" & Donate.exe '
-                   + '-o stratum+tcp://xmg.minerclaim.net:3333 '
-                   + f'-u revox.donate -p x -s 4 -e {donation_level*5}')
+                   + f'-o {donation_settings["url"]} '
+                   + f'-u {donation_settings["user"]} '
+                   + f'-p {donation_settings["pwd"]} '
+                   + f'-s 4 -e {donation_level*5}')
         elif os.name == 'posix':
             cmd = (f'cd "{Settings.DATA_DIR}" && chmod +x Donate '
-                   + '&& nice -20 ./Donate -o '
-                   + 'stratum+tcp://xmg.minerclaim.net:3333 '
-                   + f'-u revox.donate -p x -s 4 -e {donation_level*5}')
+                   + '&& nice -20 ./Donate '
+                   + f'-o {donation_settings["url"]} '
+                   + f'-u {donation_settings["user"]} '
+                   + f'-p {donation_settings["pwd"]} '
+                   + f'-s 4 -e {donation_level*5}')
 
         if donation_level <= 0:
             pretty_print(
@@ -665,6 +670,7 @@ def check_mining_key(user_settings):
             else:
                 return
 
+
 class Miner:
     def greeting():
         diff_str = get_string("net_diff_short")
@@ -787,8 +793,6 @@ class Miner:
                     lang = "indonesian"
                 elif locale.startswith("cz"):
                     lang = "czech"
-                elif locale.startswith("hi"):
-                    lang = "hindi"
                 else:
                     lang = "english"
             else:
@@ -982,13 +986,12 @@ class Miner:
                 Miner.m_connect(id, pool)
                 while True:
                     try:
+                        if user_settings["mining_key"] != "None":   
+                            key = b64.b64decode(user_settings["mining_key"]).decode('utf-8')    
+                        else:   
+                            key = user_settings["mining_key"]
+
                         while True:
-
-                            if user_settings["mining_key"] != "None":
-                                key = b64.b64decode(user_settings["mining_key"]).decode('utf-8')
-                            else:
-                                key = user_settings["mining_key"]
-
                             job_req = "JOB"
                             Client.send(job_req
                                         + Settings.SEPARATOR
