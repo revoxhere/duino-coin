@@ -168,7 +168,7 @@ def check_updates():
                 if not path.exists(DATA_DIR):
                     mkdir(DATA_DIR)
 
-                try :
+                try:
                     config.read(str(Settings.DATA_DIR) + '/Settings.cfg') # read the previous config
 
                     config["AVR Miner"] = {
