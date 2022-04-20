@@ -37,6 +37,15 @@ const char* MINER_KEY = "None";
   #define DHTTYPE DHT11
   DHT dht(DHTPIN, DHTTYPE);
 #endif
+// Uncomment the line below if you wish to use an AHT10 or AHT20 sensor (Duino IoT beta)
+// #define USE_AHT
+#ifdef USE_AHT
+  // Install "Adafruit AHTX0 Library" if you get an error
+  #include <Adafruit_AHTX0.h>
+  // AHT10/AHT20 should be connected to ESP32 default I2C pins
+  // i.e. (I2C_SDA: GPIO_21 and I2C_SCL: GPIO_22)
+  Adafruit_AHTX0 aht;
+#endif
 
 #define BLINK_SHARE_FOUND    1
 #define BLINK_SETUP_COMPLETE 2
@@ -631,15 +640,20 @@ void TaskMining(void *pvParameters) {
       Serial.println(String(taskCoreName + " asking for a new job for user: " + DUCO_USER));
       jobClient.flush();
 
-      #ifndef USE_DHT
+      #if !(defined(USE_DHT) || defined(USE_AHT))
         jobClient.print("JOB," + String(DUCO_USER) + ",ESP32," + String(MINER_KEY) + MSGNEWLINE);
-      #endif
-      #ifdef USE_DHT
+      #elif defined(USE_DHT)
         int temp = dht.readTemperature();
         int hum = dht.readHumidity();
         Serial.println("DHT readings: " + String(temp) + "*C, " + String(hum) + "%");
         jobClient.print("JOB," + String(DUCO_USER) + ",ESP32," + String(MINER_KEY) + "," +
                         String(temp) + "@" + String(hum) +  MSGNEWLINE);
+      #elif defined(USE_AHT)
+        sensors_event_t hum, temp;
+        aht.getEvent(&hum, &temp);
+        Serial.println("AHT readings: " + String(temp.temperature) + "*C, " + String(hum.relative_humidity) + "% rH");
+        jobClient.print("JOB," + String(DUCO_USER) + ",ESP32," + String(MINER_KEY) + "," +
+                        String(temp.temperature) + "@" + String(hum.relative_humidity) +  MSGNEWLINE);
       #endif
       
       while (!jobClient.available()) {
@@ -778,6 +792,16 @@ void setup() {
     dht.begin();
     Serial.println("Test reading: " + String(dht.readHumidity()) + "% humidity");
     Serial.println("Test reading: temperature " + String(dht.readTemperature()) + "*C");
+  #elif defined(USE_AHT)
+    Serial.println("Initializing AHT sensor");
+    if (! aht.begin()) {
+      Serial.println("Could not find AHT Sensor. Check wiring?");
+      while (1) delay(10);
+    }
+    sensors_event_t hum, temp;
+    aht.getEvent(&hum, &temp);
+    Serial.println("Test reading: " + String(hum.relative_humidity) + "% humidity");
+    Serial.println("Test reading: temperature " + String(temp.temperature) + "*C");
   #endif
 
   WiFi.mode(WIFI_STA);  // Setup ESP in client mode
