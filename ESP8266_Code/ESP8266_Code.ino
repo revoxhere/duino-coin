@@ -205,6 +205,26 @@ const char WEBSITE[] PROGMEM = R"=====(
                                     Miner version
                                 </div>
                             </div>
+)====="
+#ifdef USE_DHT
+"                            <div class=\"column\" style=\"min-width:15em\">"
+"                                <div class=\"title is-size-5 mb-0\">"
+"                                    @@TEMP@@ °C"
+"                                </div>"
+"                                <div class=\"heading is-size-5\">"
+"                                    Temperature"
+"                                </div>"
+"                            </div>"
+"                            <div class=\"column\" style=\"min-width:15em\">"
+"                                <div class=\"title is-size-5 mb-0\">"
+"                                    @@HUM@@ %"
+"                                </div>"
+"                                <div class=\"heading is-size-5\">"
+"                                    Humidity"
+"                                </div>"
+"                            </div>"
+#endif
+  R"=====(
                         </div>
                     </div>
                 </div>
@@ -494,7 +514,12 @@ void dashboard() {
   s.replace("@@ID@@", String(RIG_IDENTIFIER));
   s.replace("@@MEMORY@@", String(ESP.getFreeHeap()));
   s.replace("@@VERSION@@", String(MINER_VER));
-
+#ifdef USE_DHT
+  int temp = dht.readTemperature();
+  int hum = dht.readHumidity();
+  s.replace("@@TEMP@@", String(temp));
+  s.replace("@@HUM@@", String(hum));
+#endif
   server.send(200, "text/html", s);
 }
 
