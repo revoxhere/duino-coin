@@ -52,7 +52,7 @@
   // Install "DHT sensor library" if you get an error
   #include <DHT.h>
   // Change D3 to the pin you've connected your sensor to
-  #define DHTPIN D3
+  #define DHTPIN 3
   // Set DHT11 or DHT22 accordingly
   #define DHTTYPE DHT11
   DHT dht(DHTPIN, DHTTYPE);
