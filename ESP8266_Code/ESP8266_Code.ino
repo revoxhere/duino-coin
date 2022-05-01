@@ -46,9 +46,67 @@
 #include <Ticker.h>
 #include <ESP8266WebServer.h>
 
+// Uncomment the line below if you wish to register for IOT updates with an MQTT broker
+// #define USE_MQTT
+
 // Uncomment the line below if you wish to use a DHT sensor (Duino IoT beta)
 // #define USE_DHT
+
+#ifdef USE_MQTT
+  #include <PubSubClient.h>
+  // update below mqtt broker parameters
+  #define mqtt_server "your_mqtt_server"
+  #define mqtt_port 1883
+  #define mqtt_user "your_mqtt_username"
+  #define mqtt_password "your_super_secret_mqtt_password"
+  // update humidity_topic to your mqtt humidity topic
+  #define humidity_topic "sensor/humidity"
+  // update temperature_topic to your mqtt temperature topic
+  #define temperature_topic "sensor/temperature"
+  
+  WiFiClient espClient;
+  PubSubClient mqttClient(espClient);
+
+  void mqttReconnect() {
+    // Loop until we're reconnected
+    while (!mqttClient.connected()) {
+      Serial.print("Attempting MQTT connection...");
+      // Attempt to connect
+      // If you do not want to use a username and password, change next line to
+      // if (mqttClient.connect("ESP8266Client")) {
+      if (mqttClient.connect("ESP8266Client", mqtt_user, mqtt_password)) {
+        Serial.println("connected");
+      } else {
+        Serial.print("failed, rc=");
+        Serial.print(mqttClient.state());
+        Serial.println(" try again in 5 seconds");
+        // Wait 5 seconds before retrying
+        delay(5000);
+      }
+    }
+  }
+  
+  bool checkBound(float newValue, float prevValue, float maxDiff) {
+    return !isnan(newValue) &&
+           (newValue < prevValue - maxDiff || newValue > prevValue + maxDiff);
+  }
+  
+  long lastMsg = 0;
+  float diff = 0.01; // change this to the minimum difference considered for update
+
+#endif
+
 #ifdef USE_DHT
+  
+  float temp = 0.0;
+  float hum = 0.0;
+  float temp_weight = 0.9; // 1 for absolute new value, 0-1 for smoothing the new reading with previous value
+  float temp_min_value = -20.0;
+  float temp_max_value = 70.0;
+  float hum_weight = 0.9; // 1 for absolute new value, 0-1 for smoothing the new reading with previous value
+  float hum_min_value = 0.1;
+  float hum_max_value = 100.0;
+    
   // Install "DHT sensor library" if you get an error
   #include <DHT.h>
   // Change D3 to the pin you've connected your sensor to
@@ -515,8 +573,6 @@ void dashboard() {
   s.replace("@@MEMORY@@", String(ESP.getFreeHeap()));
   s.replace("@@VERSION@@", String(MINER_VER));
 #ifdef USE_DHT
-  int temp = dht.readTemperature();
-  int hum = dht.readHumidity();
   s.replace("@@TEMP@@", String(temp));
   s.replace("@@HUM@@", String(hum));
 #endif
@@ -530,6 +586,10 @@ void setup() {
   Serial.println("\nDuino-Coin " + String(MINER_VER));
   pinMode(LED_BUILTIN, OUTPUT);
 
+  #ifdef USE_MQTT
+    mqttClient.setServer(mqtt_server, mqtt_port);
+  #endif
+  
   #ifdef USE_DHT
     Serial.println("Initializing DHT sensor");
     dht.begin();
@@ -595,8 +655,51 @@ void loop() {
                  String(MINER_KEY) + END_TOKEN);
   #endif
   #ifdef USE_DHT
-    int temp = dht.readTemperature();
-    int hum = dht.readHumidity();
+    float newTemp = dht.readTemperature();
+    float newHum = dht.readHumidity();
+    if ((temp >= temp_min_value) && (temp <= temp_max_value)) {
+      if ((newTemp >= temp_min_value) && (newTemp <= temp_max_value)) {
+        newTemp = temp_weight * newTemp + (1.0f - temp_weight) * temp; // keep weighted measurement value
+      } else {
+        newTemp = temp; // keep current temp
+      }
+    } // else - keep newTemp as is
+
+    if ((hum >= hum_min_value) && (hum <= hum_max_value)) {
+      if ((newHum >= hum_min_value) && (newHum <= hum_max_value)) {
+        newHum = hum_weight * newHum + (1.0 - hum_weight) * hum; // keep weighted measurement value
+      } else {
+        newHum = hum; // keep current hum
+      }
+    } // else - keep newHum as is
+  #endif
+  
+  #ifdef USE_MQTT
+  
+  if (!mqttClient.connected()) {
+    mqttReconnect();
+  }
+  mqttClient.loop();
+  
+  long now = millis();
+  if (now - lastMsg > 1000) {
+    lastMsg = now;
+    #ifdef USE_DHT
+    if (checkBound(newTemp, temp, diff)) {
+      temp = newTemp;
+      mqttClient.publish(temperature_topic, String(temp).c_str(), true);
+    }
+    if (checkBound(newHum, hum, diff)) {
+      hum = newHum;
+      mqttClient.publish(humidity_topic, String(hum).c_str(), true);
+    }
+    #endif
+  }
+
+  #endif
+  
+  #ifdef USE_DHT
+
     Serial.println("DHT readings: " + String(temp) + "*C, " + String(hum) + "%");
     client.print("JOB," + 
                  String(USERNAME) + SEP_TOKEN +
