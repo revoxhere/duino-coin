@@ -110,7 +110,7 @@
   // Install "DHT sensor library" if you get an error
   #include <DHT.h>
   // Change D3 to the pin you've connected your sensor to
-  #define DHTPIN 2
+  #define DHTPIN D3
   // Set DHT11 or DHT22 accordingly
   #define DHTTYPE DHT11
   DHT dht(DHTPIN, DHTTYPE);
@@ -687,14 +687,10 @@ void loop() {
     #ifdef USE_DHT
     if (checkBound(newTemp, temp, diff)) {
       temp = newTemp;
-      Serial.print("New temperature:");
-      Serial.println(String(temp).c_str());
       mqttClient.publish(temperature_topic, String(temp).c_str(), true);
     }
     if (checkBound(newHum, hum, diff)) {
       hum = newHum;
-      Serial.print("New humidity:");
-      Serial.println(String(hum).c_str());
       mqttClient.publish(humidity_topic, String(hum).c_str(), true);
     }
     #endif
