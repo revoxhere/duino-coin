@@ -59,6 +59,8 @@
   #define mqtt_port 1883
   #define mqtt_user "your_mqtt_username"
   #define mqtt_password "your_super_secret_mqtt_password"
+  #define mqtt_temperature_delta_time 900000
+
   // update humidity_topic to your mqtt humidity topic
   #define humidity_topic "sensor/humidity"
   // update temperature_topic to your mqtt temperature topic
@@ -100,10 +102,10 @@
   
   float temp = 0.0;
   float hum = 0.0;
-  float temp_weight = 0.9; // 1 for absolute new value, 0-1 for smoothing the new reading with previous value
+  float temp_weight = 0.3; // 1 for absolute new value, 0-1 for smoothing the new reading with previous value
   float temp_min_value = -20.0;
   float temp_max_value = 70.0;
-  float hum_weight = 0.9; // 1 for absolute new value, 0-1 for smoothing the new reading with previous value
+  float hum_weight = 0.3; // 1 for absolute new value, 0-1 for smoothing the new reading with previous value
   float hum_min_value = 0.1;
   float hum_max_value = 100.0;
     
@@ -680,21 +682,24 @@ void loop() {
     mqttReconnect();
   }
   mqttClient.loop();
-  
-  long now = millis();
-  if (now - lastMsg > 1000) {
-    lastMsg = now;
     #ifdef USE_DHT
     if (checkBound(newTemp, temp, diff)) {
       temp = newTemp;
-      mqttClient.publish(temperature_topic, String(temp).c_str(), true);
+      Serial.print("New temperature:");
+      Serial.println(String(temp).c_str());
     }
     if (checkBound(newHum, hum, diff)) {
       hum = newHum;
-      mqttClient.publish(humidity_topic, String(hum).c_str(), true);
+      Serial.print("New humidity:");
+      Serial.println(String(hum).c_str());
+    }
+    long now = millis();
+    if (now - lastMsg > mqtt_temperature_delta_time) {
+      lastMsg = now;
+      mqttClient.publish(temperature_topic, String(temp).c_str(), true);
+      mqttClient.publish(humidity_topic, String(hum).c_str(), true); 
     }
     #endif
-  }
 
   #endif
   
