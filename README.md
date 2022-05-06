@@ -152,10 +152,10 @@ Server source code, documentation for API calls and official libraries for devel
   
   | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
-  | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 196 H/s                           | 1                 | 0.2 W          | 9-10                |
+  | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 258 H/s                           | 1                 | 0.2 W          | 10-13                |
   | Teensy 4.1 (soft cryptography)                            | 80 kH/s                           | 1                 | 0.5 W          | -                   |
-  | NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 10 kH/s (160MHz) 4.9 kH/s (80Mhz) | 1                 | 0.6 W          | 6-7                 |
-  | ESP32                                                     | 33 kH/s                           | 2                 | 1 W            | 8-9                 |
+  | NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 9-10 kH/s (160MHz) 5 kH/s (80Mhz) | 1                 | 0.6 W          | 3-6                 |
+  | ESP32                                                     | 40-42 kH/s                        | 2                 | 1 W            | 6-9                 |
   | Raspberry Pi Zero                                         | 18 kH/s                           | 1                 | 1.1 W          | -                   |
   | Raspberry Pi 3                                            | 440 kH/s                          | 4                 | 5.1 W          | 4-5                 |
   | Raspberry Pi 4                                            | 740 kH/s (32bit)                  | 4                 | 6.4 W          | 10                  |
@@ -175,7 +175,7 @@ Server source code, documentation for API calls and official libraries for devel
   | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | 3.7                 |
   | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 67 W           | 15.44               |
 
-  All tests were performed using the DUCO-S1 algorithm. This table will be actively updated.
+  All tests were performed using the DUCO-S1 algorithm **without fasthash accelerations**. This table will be actively updated.
 </details>
 
 
