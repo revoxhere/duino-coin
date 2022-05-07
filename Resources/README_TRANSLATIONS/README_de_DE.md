@@ -292,4 +292,4 @@ Link zur Internetseite: [https://duinocoin.com/](https://duinocoin.com/)
 <br/>
 Duino-Coin Status-Seite: [https://status.duinocoin.com](https://status.duinocoin.com)
 
-<h5>Translated version of this document! There is no guarantee for this tranlation to be 100% accurate.</h5>
+<h5>Translated version of this document! There is no guarantee for this translation to be 100% accurate.</h5>
