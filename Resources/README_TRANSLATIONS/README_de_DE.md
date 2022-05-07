@@ -1,6 +1,6 @@
 <!--
-*** Official Duino Coin README
-*** by revoxhere, 2019-2022
+*** Translated Duino Coin README (de_DE)
+*** by revoxhere and Techcrafter, 2019-2022
 -->
 
 <a href="https://duinocoin.com">
