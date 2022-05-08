@@ -93,7 +93,11 @@
         "updating": "The miner is outdated. Updating....",
         "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
         "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "invalid_mining_key": "The mining key you provided is invalid!",
+        "running_on_rpi": "The miner seems to be running on a Raspberry Pi.",
+        "running_on_rpi2": "Onboard status LEDs will light up accordingly to the mining process status",
+        "discord_launch_error": "Error launching Discord RPC thread:",
+        "discord_update_error": "Error updating Discord RPC statistics:"
     },
     "indonesian": {
         "translation_autor": "rezafauzan945",
