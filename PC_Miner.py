@@ -652,7 +652,8 @@ def check_mining_key(user_settings):
         timeout=10
     ).json()
 
-    if response["success"] and not response["has_key"]: # if the user doesn't have a mining key
+    if response["success"] and not response["has_key"]:
+        # If user doesn't have a mining key
         user_settings["mining_key"] = "None"
         configparser["PC Miner"] = user_settings
 
