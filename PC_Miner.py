@@ -38,6 +38,8 @@ from signal import SIGINT, signal
 from locale import getdefaultlocale
 from configparser import ConfigParser
 
+import io
+
 configparser = ConfigParser()
 printlock = Semaphore(value=1)
 
@@ -57,10 +59,18 @@ def handler(signal_received, frame):
             + get_string("goodbye"),
             "warning")
 
+    if running_on_rpi:
+        # Reset onboard status LEDs
+        os.system(
+            'echo mmc0 | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
+        os.system(
+            'echo 1 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
+
     if sys.platform == "win32":
         _exit(0)
     else: 
-        Popen("kill $(ps awux | grep PC_Miner | grep -v grep | awk '{print $2}')", shell=True, stdout=PIPE)
+        Popen("kill $(ps awux | grep PC_Miner | grep -v grep | awk '{print $2}')",
+              shell=True, stdout=PIPE)
 
 
 def install(package):
@@ -569,13 +579,33 @@ def share_print(id, type,
     total_hashrate = get_prefix("H/s", total_hashrate, 2)
     diff = get_prefix("", int(diff), 0)
 
+    def _blink_builtin(led="green"):
+        if led == "green":
+            os.system(
+                'echo 1 | sudo tee /sys/class/leds/led0/brightness >/dev/null 2>&1')
+            sleep(0.1)
+            os.system(
+                'echo 0 | sudo tee /sys/class/leds/led0/brightness >/dev/null 2>&1')
+        else:
+            os.system(
+                'echo 1 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
+            sleep(0.1)
+            os.system(
+                'echo 0 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
+
     if type == "accept":
+        if running_on_rpi:
+            _blink_builtin()
         share_str = get_string("accepted")
         fg_color = Fore.GREEN
     elif type == "block":
+        if running_on_rpi:
+            _blink_builtin()
         share_str = get_string("block_found")
         fg_color = Fore.YELLOW
     else:
+        if running_on_rpi:
+            _blink_builtin("red")
         share_str = get_string("rejected")
         if reject_cause:
             share_str += f"{Style.NORMAL}({reject_cause}) "
@@ -1110,7 +1140,9 @@ class Discord_rp:
             RPC.connect()
             Thread(target=Discord_rp.update).start()
         except Exception as e:
-            pretty_print(get_string("Error launching Discord RPC thread: " + str(e)))
+            pretty_print(
+                get_string("discord_launch_error" +
+                Style.NORMAL + Fore.RESET + " " + str(e)))
           
 
     def update():
@@ -1125,13 +1157,15 @@ class Discord_rp:
                            large_image="ducol",
                            large_text="Duino-Coin, "
                            + "a coin that can be mined with almost everything"
-                           + ", including AVR boards",
-                           buttons=[{"label": "Visit duinocoin.com",
+                           + ", including Arduino boards",
+                           buttons=[{"label": "Learn more",
                                      "url": "https://duinocoin.com"},
-                                    {"label": "Join the Discord",
+                                    {"label": "Join the Duino Discord",
                                      "url": "https://discord.gg/k48Ht5y"}])
             except Exception as e:
-                pretty_print(get_string("Error updating Discord RPC thread: " + str(e)))
+                pretty_print(
+                    get_string("discord_update_error" +
+                    Style.NORMAL + Fore.RESET + " " + str(e)))
             sleep(15)
 
 
@@ -1139,7 +1173,7 @@ class Fasthash:
     def init():
         try:
             """
-            Check wheter libducohash fasthash is available
+            Check whether libducohash fasthash is available
             to speed up the DUCOS1 work, created by @HGEpro
             """
             import libducohasher
@@ -1238,6 +1272,24 @@ if __name__ == "__main__":
 
     Fasthash.load()
     Fasthash.init()
+
+    try:
+        with io.open('/sys/firmware/devicetree/base/model', 'r') as m:
+            if 'raspberry pi' in m.read().lower():
+                running_on_rpi = True
+                pretty_print(
+                    get_string("running_on_rpi") +
+                    Style.NORMAL + Fore.RESET + " " +
+                    get_string("running_on_rpi2"), "success")
+    except:
+        running_on_rpi = False
+
+    if running_on_rpi:
+        # Prepare onboard LEDs to be controlled
+        os.system(
+            'echo gpio | sudo tee /sys/class/leds/led1/trigger >/dev/null 2>&1')
+        os.system(
+            'echo gpio | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
     
     try:
         check_mining_key(user_settings)
