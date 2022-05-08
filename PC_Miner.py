@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 3.18 © MIT licensed
+Duino-Coin Official PC Miner 3.19 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2022
@@ -40,6 +40,7 @@ from configparser import ConfigParser
 
 import io
 
+running_on_rpi = False
 configparser = ConfigParser()
 printlock = Semaphore(value=1)
 
@@ -129,7 +130,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 3.18
+    VER = 3.19
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -664,13 +665,11 @@ def check_mining_key(user_settings):
 
     if not response["success"]:
         if user_settings["mining_key"] == "None":
-            pretty_print(
-                get_string("mining_key_required"),
-                "warning"
-            )
-
-            mining_key = input("Enter your mining key: ")
-            user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('utf-8')
+            pretty_print(get_string("mining_key_required"), "warning")
+            mining_key = input("\t\t" + get_string("ask_mining_key")
+                               + Style.BRIGHT + Fore.YELLOW)
+            user_settings["mining_key"] = b64.b64encode(
+                mining_key.encode("utf-8")).decode('utf-8')
             configparser["PC Miner"] = user_settings
 
             with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
@@ -680,15 +679,12 @@ def check_mining_key(user_settings):
             sleep(1.5)
             check_mining_key(user_settings)
         else:
-            pretty_print(
-                get_string("invalid_mining_key"),
-                "error"
-            )
-
-            retry = input("You want to retry? (y/n): ")
-            if retry == "y" or retry == "Y":
-                mining_key = input("Enter your mining key: ")
-                user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('utf-8')
+            pretty_print(get_string("invalid_mining_key"), "error")
+            retry = input(get_string("key_retry"))
+            if not retry or retry == "y" or retry == "Y":
+                mining_key = input(get_string("ask_mining_key"))
+                user_settings["mining_key"] = b64.b64encode(
+                    mining_key.encode("utf-8")).decode('utf-8')
                 configparser["PC Miner"] = user_settings
 
                 with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
