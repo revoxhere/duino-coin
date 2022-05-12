@@ -1,7 +1,7 @@
 /*
-   ____  __  __  ____  _  _  _____       ___  _____  ____  _  _ 
+   ____  __  __  ____  _  _  _____       ___  _____  ____  _  _
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
-   )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  ( 
+   )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
   Official code for ESP8266 boards                  version 3.18
 
@@ -46,39 +46,82 @@
 #include <Ticker.h>
 #include <ESP8266WebServer.h>
 
-// Uncomment the line below if you wish to register for IOT updates with an MQTT broker
-// #define USE_MQTT
-
 // Uncomment the line below if you wish to use a DHT sensor (Duino IoT beta)
 // #define USE_DHT
 
-#ifdef USE_MQTT
-  #include <PubSubClient.h>
-  // update below mqtt broker parameters
-  #define mqtt_server "your_mqtt_server"
-  #define mqtt_port 1883
-  #define mqtt_user "your_mqtt_username"
-  #define mqtt_password "your_super_secret_mqtt_password"
-  #define mqtt_temperature_delta_time 900000
+// Uncomment the line below if you wish to register for IOT updates with an MQTT broker
+// #define USE_MQTT
 
-  // update humidity_topic to your mqtt humidity topic
+// If you don't know what MQTT means check this link:
+// https://www.techtarget.com/iotagenda/definition/MQTT-MQ-Telemetry-Transport
+
+#ifdef USE_DHT
+  float temp = 0.0;
+  float hum = 0.0;
+
+  // Install "DHT sensor library" if you get an error
+  #include <DHT.h>
+  // Change D3 to the pin you've connected your sensor to
+  #define DHTPIN D3
+  // Set DHT11 or DHT22 accordingly
+  #define DHTTYPE DHT11
+
+  DHT dht(DHTPIN, DHTTYPE);
+#endif
+
+#ifdef USE_MQTT
+  // Install "PubSubClient" if you get an error
+  #include <PubSubClient.h>
+
+  long lastMsg = 0;
+
+  // Change the part in brackets to your MQTT broker address
+  #define mqtt_server "broker.hivemq.com"
+  // broker.hivemq.com is for testing purposes, change it to your broker address
+
+  // Change the part in brackets to your MQTT broker port
+  #define mqtt_port 1883
+  // If you want to use user and password for your MQTT broker, uncomment the line below
+  // #define mqtt_use_credentials
+
+  // Change the part in brackets to your MQTT broker username
+  #define mqtt_user "My cool mqtt username"
+  // Change the part in brackets to your MQTT broker password
+  #define mqtt_password "My secret mqtt pass"
+
+  // Change this if you want to send data to the topic every X milliseconds
+  #define mqtt_update_time 5000
+
+  // Change the part in brackets to your MQTT humidity topic
   #define humidity_topic "sensor/humidity"
-  // update temperature_topic to your mqtt temperature topic
+  // Change the part in brackets to your MQTT temperature topic
   #define temperature_topic "sensor/temperature"
-  
+
   WiFiClient espClient;
   PubSubClient mqttClient(espClient);
 
-  void mqttReconnect() {
+  void mqttReconnect()
+  {
     // Loop until we're reconnected
-    while (!mqttClient.connected()) {
+    while (!mqttClient.connected())
+    {
       Serial.print("Attempting MQTT connection...");
+
+      // Create a random client ID
+      String clientId = "ESP8266Client-";
+      clientId += String(random(0xffff), HEX);
+
       // Attempt to connect
-      // If you do not want to use a username and password, change next line to
-      // if (mqttClient.connect("ESP8266Client")) {
-      if (mqttClient.connect("ESP8266Client", mqtt_user, mqtt_password)) {
+      #ifdef mqtt_use_credentials
+        if (mqttClient.connect("ESP8266Client", mqtt_user, mqtt_password))
+      #else
+        if (mqttClient.connect(clientId.c_str()))
+      #endif
+      {
         Serial.println("connected");
-      } else {
+      }
+      else
+      {
         Serial.print("failed, rc=");
         Serial.print(mqttClient.state());
         Serial.println(" try again in 5 seconds");
@@ -87,56 +130,28 @@
       }
     }
   }
-  
-  bool checkBound(float newValue, float prevValue, float maxDiff) {
-    return !isnan(newValue) &&
-           (newValue < prevValue - maxDiff || newValue > prevValue + maxDiff);
-  }
-  
-  long lastMsg = 0;
-  float diff = 0.01; // change this to the minimum difference considered for update
-
 #endif
 
-#ifdef USE_DHT
-  
-  float temp = 0.0;
-  float hum = 0.0;
-  float temp_weight = 0.3; // 1 for absolute new value, 0-1 for smoothing the new reading with previous value
-  float temp_min_value = -20.0;
-  float temp_max_value = 70.0;
-  float hum_weight = 0.3; // 1 for absolute new value, 0-1 for smoothing the new reading with previous value
-  float hum_min_value = 0.1;
-  float hum_max_value = 100.0;
-    
-  // Install "DHT sensor library" if you get an error
-  #include <DHT.h>
-  // Change D3 to the pin you've connected your sensor to
-  #define DHTPIN D3
-  // Set DHT11 or DHT22 accordingly
-  #define DHTTYPE DHT11
-  DHT dht(DHTPIN, DHTTYPE);
-#endif
-
-namespace {
-// Change the part in brackets to your WiFi name
-const char* SSID = "My cool wifi name";
-// Change the part in brackets to your WiFi password
-const char* PASSWORD = "My secret wifi pass";
-// Change the part in brackets to your Duino-Coin username
-const char* USERNAME = "my_cool_username";
-// Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
-const char* RIG_IDENTIFIER = "None";
-// Change the part in brackets to your mining key (if you enabled it in the wallet)
-const char* MINER_KEY = "None";
-// Change false to true if using 160 MHz clock mode to not get the first share rejected
-const bool USE_HIGHER_DIFF = false;
-// Change true to false if you don't want to host the dashboard page
-const bool WEB_DASHBOARD = true;
-// Change false to true if you want to update hashrate in browser without reloading page
-const bool WEB_HASH_UPDATER = false;
-// Change true to false if you want to disable led blinking(But the LED will work in the beginning until esp connects to the pool)
-const bool LED_BLINKING = true;
+namespace
+{
+  // Change the part in brackets to your WiFi name
+  const char *SSID = "My cool wifi name";
+  // Change the part in brackets to your WiFi password
+  const char *PASSWORD = "My secret wifi pass";
+  // Change the part in brackets to your Duino-Coin username
+  const char *USERNAME = "my_cool_username";
+  // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
+  const char *RIG_IDENTIFIER = "None";
+  // Change the part in brackets to your mining key (if you enabled it in the wallet)
+  const char *MINER_KEY = "None";
+  // Change false to true if using 160 MHz clock mode to not get the first share rejected
+  const bool USE_HIGHER_DIFF = false;
+  // Change true to false if you don't want to host the dashboard page
+  const bool WEB_DASHBOARD = true;
+  // Change false to true if you want to update hashrate in browser without reloading page
+  const bool WEB_HASH_UPDATER = false;
+  // Change true to false if you want to disable led blinking(But the LED will work in the beginning until esp connects to the pool)
+  const bool LED_BLINKING = true;
 
 /* Do not change the lines below. These lines are static and dynamic variables
    that will be used by the program for counters and measurements. */
@@ -162,7 +177,6 @@ const char WEBSITE[] PROGMEM = R"=====(
     https://github.com/revoxhere/duino-coin
     https://duinocoin.com
 -->
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -171,7 +185,6 @@ const char WEBSITE[] PROGMEM = R"=====(
     <link rel="shortcut icon" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
     <link rel="icon" type="image/png" href="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true">
 </head>
-
 <body>
     <section class="section">
         <div class="container">
@@ -325,7 +338,6 @@ const char WEBSITE[] PROGMEM = R"=====(
         </script>
     </section>
 </body>
-
 </html>
 )=====";
 
@@ -656,24 +668,17 @@ void loop() {
                  String(START_DIFF) + SEP_TOKEN +
                  String(MINER_KEY) + END_TOKEN);
   #endif
-  #ifdef USE_DHT
-    float newTemp = dht.readTemperature();
-    float newHum = dht.readHumidity();
-    if ((temp >= temp_min_value) && (temp <= temp_max_value)) {
-      if ((newTemp >= temp_min_value) && (newTemp <= temp_max_value)) {
-        newTemp = temp_weight * newTemp + (1.0f - temp_weight) * temp; // keep weighted measurement value
-      } else {
-        newTemp = temp; // keep current temp
-      }
-    } // else - keep newTemp as is
 
-    if ((hum >= hum_min_value) && (hum <= hum_max_value)) {
-      if ((newHum >= hum_min_value) && (newHum <= hum_max_value)) {
-        newHum = hum_weight * newHum + (1.0 - hum_weight) * hum; // keep weighted measurement value
-      } else {
-        newHum = hum; // keep current hum
-      }
-    } // else - keep newHum as is
+  #ifdef USE_DHT
+    temp = dht.readTemperature();
+    hum = dht.readHumidity();
+
+    Serial.println("DHT readings: " + String(temp) + "*C, " + String(hum) + "%");
+    client.print("JOB," + 
+                 String(USERNAME) + SEP_TOKEN +
+                 String(START_DIFF) + SEP_TOKEN +
+                 String(MINER_KEY) + SEP_TOKEN +
+                 String(temp) + "@" + String(hum) + END_TOKEN);
   #endif
   
   #ifdef USE_MQTT
@@ -683,34 +688,14 @@ void loop() {
   }
   mqttClient.loop();
     #ifdef USE_DHT
-    if (checkBound(newTemp, temp, diff)) {
-      temp = newTemp;
-      Serial.print("New temperature:");
-      Serial.println(String(temp).c_str());
-    }
-    if (checkBound(newHum, hum, diff)) {
-      hum = newHum;
-      Serial.print("New humidity:");
-      Serial.println(String(hum).c_str());
-    }
     long now = millis();
-    if (now - lastMsg > mqtt_temperature_delta_time) {
+    if (now - lastMsg > mqtt_update_time) {
       lastMsg = now;
       mqttClient.publish(temperature_topic, String(temp).c_str(), true);
       mqttClient.publish(humidity_topic, String(hum).c_str(), true); 
     }
     #endif
 
-  #endif
-  
-  #ifdef USE_DHT
-
-    Serial.println("DHT readings: " + String(temp) + "*C, " + String(hum) + "%");
-    client.print("JOB," + 
-                 String(USERNAME) + SEP_TOKEN +
-                 String(START_DIFF) + SEP_TOKEN +
-                 String(MINER_KEY) + SEP_TOKEN +
-                 String(temp) + "@" + String(hum) + END_TOKEN);
   #endif
 
   waitForClientData();
