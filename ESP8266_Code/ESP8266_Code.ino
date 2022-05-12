@@ -79,7 +79,7 @@
   #define mqtt_server "broker.hivemq.com"
   // broker.hivemq.com is for testing purposes, change it to your broker address
 
-  // Change the part in brackets to your MQTT broker port
+  // Change this to your MQTT broker port
   #define mqtt_port 1883
   // If you want to use user and password for your MQTT broker, uncomment the line below
   // #define mqtt_use_credentials
