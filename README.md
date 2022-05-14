@@ -261,7 +261,8 @@ Some third-party included files may have different licenses - please check their
 18. Sending a lot of transactions in a short amount of time can trigger the Kolka system which will rate limit and/or block the user.<br />
 19. Community-made softwares need to comply with the rules (terms of service, difficulty tiers, etc.) - abusing the system will lead to blocking of the software and/or the user(s).<br />
 20. Accounts proven to be misleading in name or usage (impersonation, fake bots, etc.) are not allowed.<br />
-21. Every Duino-Coin user agrees to comply with the above rules. Improper behavior will lead to blocking of the account.<br/>
+21. Sending an offensive and/or unrelated verification picture and/or description will lead to immediate blocking of the account.
+22. Every Duino-Coin user agrees to comply with the above rules. Improper behavior will lead to blocking of the account.<br/>
 
 
 ## Privacy policy
