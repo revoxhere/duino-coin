@@ -60,13 +60,13 @@
 <br>
 
 <h3>
-  Duino-Coin ist eine Kryptowährung, die sich auf Arduino's, ESP8266/32 Boards, Raspberry Pi's, Computern und vielen anderen Geräten minen lässt, wie beispielsweise W-LAN Routern, SmartTV's, Smartphones, Smartwatches, SBC's, MCU's und sogar GPU's!
+  Duino-Coin ist eine Kryptowährung, die sich auf Arduinos, ESP8266/32 Boards, Raspberry Pis, Computern und vielen anderen Geräten minen lässt, wie beispielsweise W-LAN Routern, SmartTVs, Smartphones, Smartwatches, SBCs, MCUs und sogar GPUs!
 </h3>
 
 
 | Eigenschaften | Technische Spezifikationen | (Einige der vielen) unterstützten Boards |
 |-|-|-|
-| 💻 Von zahlreichen Platformen unterstützt<br>👥 Eine schnell wachsende Community<br>💱 Einfach zu benutzen und zu tauschen (zum Beispiel beim DUCO Exchange, Node-S, JustSwap oder SushiSwap)<br>🌎 Überall verfügbar<br>:new: Komplett einzigartiges und zudem quelloffenes Projekt<br>🌳 Anfänger- und umweltfreundlich<br>💰 Kosteneffektiv und einfach zu minen | ⚒️ Algorithmus: DUCO-S1<br>♐ Belohnungen: Nach dem "Kolka system", welches Miner fair belohnen soll<br>⚡ Transaktionszeit: Sofort<br>🪙 Supply: Unendlich (mit Burning)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Nachkommastellen: bis zu 20 | ♾️ Arduino's<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266's<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32's<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pi's<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pi's<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Teensy 4.1 Boards |
+| 💻 Von zahlreichen Platformen unterstützt<br>👥 Eine schnell wachsende Community<br>💱 Einfach zu benutzen und zu tauschen (zum Beispiel beim DUCO Exchange, Node-S, JustSwap oder SushiSwap)<br>🌎 Überall verfügbar<br>:new: Komplett einzigartiges und zudem quelloffenes Projekt<br>🌳 Anfänger- und umweltfreundlich<br>💰 Kosteneffektiv und einfach zu minen | ⚒️ Algorithmus: DUCO-S1<br>♐ Belohnungen: Nach dem "Kolka system", welches Miner fair belohnen soll<br>⚡ Transaktionszeit: Sofort<br>🪙 Supply: Unendlich (mit Burning)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Nachkommastellen: bis zu 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Teensy 4.1 Boards |
 
 
 ## Loslegen
@@ -76,7 +76,7 @@ Nachdem diese heruntergeladen wurde, kann das Programm einfach entpackt und ausg
 Die Installation von Abhängigkeiten ist nicht notwendig.
 
 Für weitere Hilfe gibt es einen offiziellen Ratgeber in englischer Sprache <a href="https://duinocoin.com/getting-started">auf der offiziellen Internetseite</a>.<br>
-Ein FAQ und nützliche Tips zur Problembehandlung gibt es (ebenfalls auf Englisch) in den [Wiki's](https://github.com/revoxhere/duino-coin/wiki).<br>
+Ein FAQ und nützliche Tips zur Problembehandlung gibt es (ebenfalls auf Englisch) in den [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
 
 
 ### Manuelle Installation
@@ -121,7 +121,7 @@ sudo chmod a+x duco-install-rpi.sh
 
 ## DUCO & wDUCO
 
-Duino-Coin ist eine Hybrid-Währung, was bedeutet, dass diese in wDUCO umgewandelt werden kann. Dies ist DUCO (als ein Token) auf das [Tron](https://tron.network) Netwerk gewrapt. Aktuell gibt es keinen großen Nutzen dafür, außer seine Ersparnisse in einem externen Wallet zu lagern oder die wDUCO's in einen anderen Token auf JustSwap umzutauschen. Ein Tutorial zur Benutzung von wDUCO gibt es (in englischer Sprache) im [wDUCO Wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
+Duino-Coin ist eine Hybrid-Währung, was bedeutet, dass diese in wDUCO umgewandelt werden kann. Dies ist DUCO (als ein Token) auf das [Tron](https://tron.network) Netwerk gewrapt. Aktuell gibt es keinen großen Nutzen dafür, außer seine Ersparnisse in einem externen Wallet zu lagern oder die wDUCOs in einen anderen Token auf JustSwap umzutauschen. Ein Tutorial zur Benutzung von wDUCO gibt es (in englischer Sprache) im [wDUCO Wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
 
 
 ## Entwicklung
@@ -242,9 +242,9 @@ Einige Dateien von Dritten sind eventuell unter anderen Lizenzen veröffentlicht
 ## Nutzungsbedingungen
 1. Duino-Coins ("DUCOs") werden durch Miner in einem Prozess namens 'mining' erhalten.<br/>
 2. Mining ist in der Nutzung des DUCO-S1 Algorithmuses definiert (wie hier im <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper ausgeführt</a>), wo für die Lösung eines mathematischen Problems eine Belohnung ausgeschüttet wird.<br/>
-3. Mining kann offiziell mit CPU's, AVR Boards (z.B. Arduino Boards), Einplatinencomputern (z.B. Raspberry Pi Boards) und ESP8266/32 Boards mittels der Nutzung von offizieller Mining-Software durchgeführt werden (andere offiziell erlaubte Miner sind in dem oberen Teil der README aufgeführt).<br/>
+3. Mining kann offiziell mit CPUs, AVR Boards (z.B. Arduino Boards), Einplatinencomputern (z.B. Raspberry Pi Boards) und ESP8266/32 Boards mittels der Nutzung von offizieller Mining-Software durchgeführt werden (andere offiziell erlaubte Miner sind in dem oberen Teil der README aufgeführt).<br/>
 4. Alle Miner müssen die für sie geschaffene/zutreffende Schwierigkeit verwenden.
-5. Mining mit GPU's, FPGA's und anderer Hochleistungshardware ist erlaubt, aber nur mit der `EXTREME` Mining-Schwierigkeit.<br/>
+5. Mining mit GPUs, FPGAs und anderer Hochleistungshardware ist erlaubt, aber nur mit der `EXTREME` Mining-Schwierigkeit.<br/>
 6. Alle Nutzer welche nicht die ihrer Hardware entsprechende Schwierigkeit nutzen (siehe dafür die <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">Schwierigkeits-Liste</a>), werden automatisch durch eine Verschiebung auf die korrekte Schwierigkeit ausgebremst.<br/>
 7. Jeder Nutzer der fortlaufend versucht eine für die Hardware zu niedrige Mining-Schwierigkeit zu benutzen, kann temporär oder permanent gebannt werden.<br/>
 8. Bannen involviert die Sperrung des Kontozugangs, sowie das Löschen des Kontos.<br/>
@@ -253,7 +253,7 @@ Einige Dateien von Dritten sind eventuell unter anderen Lizenzen veröffentlicht
 11. Eine dem offiziellen DUCO-Exchange ("the offical exchange") gestellte Tauschanfrage, kann während Nachforschungen betrieben werden, verzögert oder abgelehnt werden.<br/>
 12. Dem DUCO-Exchange aufgegebene Tauschanfragen können aufgrund von Verstößen gegen die Nutzungsbedingungen oder wegen einem zu geringen Vorkommen an entsprechenden Coins oder ähnlichem abgelehnt werden.<br/>
 13. Das Minen mit kostenfreien Cloud-Services (oder kostenfreien Virtual Private Servers, wie z.B. Repl.it, GitHub Actions, etc.) ist nicht erlaubt, da es gegenüber anderen unfair ist.<br />
-14. Die DUCO's eines Nutzers können verbrannt ("burnt") werden, falls sich ein Verstoß herausstellen sollte.<br/>
+14. Die DUCOs eines Nutzers können verbrannt ("burnt") werden, falls sich ein Verstoß herausstellen sollte.<br/>
 15. Diese Nutzungsbedingungen können sich jederzeit ohne vorherige Ankündigung ändern.<br/>
 16. Aus rationalen Gründen (wie beispielsweise zum Multi-Mining) mehr als ein Nutzerkonto zu besitzen, ist nicht erlaubt. Mehrere Konten, welche auf einem einzigen Computer oder Netwerk genutzt werden, werden blockiert, es sei denn, sie sind hiervon ausgeschlossen ("whitelisted").<br/>
 17. Das Senden von Transaktionen zu Werbezwecken ist nicht erlaubt.<br/>
@@ -266,7 +266,7 @@ Einige Dateien von Dritten sind eventuell unter anderen Lizenzen veröffentlicht
 ## Datenschutzerklärung
 1. Auf dem Hauptserver werden nur Nutzernamen, gehashte Passwörter (mit der Hilfe von bcrypt), Konto Erstellungs-Zeitpunkte, letzte Login-Zeitpunkte und E-Mail Adressen von Nutzern als deren Daten gespeichert.<br/>
 2. E-Mail Adressen sind nicht öffentlich zugänglich und werden nur genutzt, um den Nutzer falls nötig zu kontaktieren, um Tauschanfragen beim <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> zu bestätigen und um (zukünftig) gelegentlich eine Newsletter zuzustellen.<br/>
-3. Kontostände, Transaktionen und zum Mining gehörende Daten sind öffentlich zugänglich/abrufbar über die <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON API's</a>.<br/>
+3. Kontostände, Transaktionen und zum Mining gehörende Daten sind öffentlich zugänglich/abrufbar über die <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
 4. Die Datenschutzerklärung kann zukünftig geändert werden, jedoch werden die Nutzer zuvor davon in Kenntnis gesetzt.
 
 
