@@ -133,7 +133,7 @@ class Settings:
     VER = 3.19
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
-                    + "revoxhere/"
+                    + "fucker/"
                     + "duino-coin/master/Resources/"
                     + "PC_Miner_langs.json")
     TRANSLATIONS_FILE = "/Translations.json"
