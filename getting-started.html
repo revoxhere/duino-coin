@@ -33,8 +33,8 @@
     <meta property="twitter:title" content="Get started with Duino-Coin">
     <meta property="twitter:description" content="Easy to follow tutorials that help newcomers start using Duino-Coin.">
     <!-- CSS -->
-    <link rel="preload" href="assets/css/mystyles.css?v=3" as="style">
-    <link rel="stylesheet" type="text/css" href="assets/css/mystyles.css?v=3">
+    <link rel="preload" href="assets/css/mystyles.css?v=4" as="style">
+    <link rel="stylesheet" type="text/css" href="assets/css/mystyles.css?v=4">
     <!-- Jquery and FA -->
     <link rel="preload" href="assets/js/all.min.js" as="script">
     <script src="assets/js/all.min.js"></script>
@@ -674,11 +674,11 @@
                         Before you click upload, you need to change a few things here. Near the top you should see lines which you need to edit according to your needs:
                         <br><br>
                         <code>
-                            const char* SSID = "WiFi name"; // Change this to your WiFi SSID
+                            const char* SSID = "WiFi name"; // Change this to your WiFi network SSID
                         </code>
                         <br>
                         <code>
-                            const char* PASSWORD = "WiFi password"; // Change this to your WiFi password
+                            const char* PASSWORD = "WiFi password"; // Change this to your WiFi network password
                         </code>
                         <br>
                         <code>
@@ -686,7 +686,11 @@
                         </code>
                         <br>
                         <code>
-                            const char* RIG_IDENTIFIER = "None"; // Change this if you want a custom miner identifier
+                            const char* RIG_IDENTIFIER = "None"; // Change this if you want a custom miner name (use Auto to autogenerate, None for no name)
+                        </code>
+                        <br>
+                        <code>
+                            const char* MINER_KEY = "None"; // Change this to your Duino-Coin mining key (if you have enabled it in your Wallet, if not - leave it as None)
                         </code>
                         <br><br>
                         After changing them, select your board (<b>Tools > Board > Generic ESP8266 Module</b> (or ESP32 Module)), port (<b>Tools > Port</b>...) and upload the code to your board.
@@ -815,8 +819,7 @@
                     <span class="subtitle">
                         <b>Other options</b><br>
                         Duino-Coins can be also wrapped as tokens on other chains: bscDUCO on Binance Smart Chain, celoDUCO on Celo Chain and maticDUCO on Matic Chain.<br>
-                        For example, to swap DUCO to maticDUCO, simply send your Duino-Coins to account named <code>maticDUCO</code> and as the memo (message) put your matic address. If everything goes well you will receive maticDUCO in your metamask wallet in seconds.<br>
-                        Same procedure applies to the rest of tokenized DUCO versions.
+                        To wrap your coins, simply click the "Wrap coins" button in the send funds section in your wallet and fill in all the fields.
                     </span>
                 </div>
             </div>
@@ -850,17 +853,6 @@
                             <img class="image" src="assets/images/exchange-fill.png">
                         </a>
                         <p class="subtitle is-size-6 mt-1"><i>DUCO to XMG exchange form in DUCO Exchange</i></p>
-                    </div>
-                    <span class="subtitle">
-                        <b>Node-S Exchange</b><br>
-                        You can exchange <b>Duino-Coins</b> to <b>Paypal (USD)</b> in the third-party
-                        <a href="http://www.node-s.co.za/duco_exchange/home"><b>Node-S Exchange</b></a>.
-                    </span>
-                    <div class="column" align="center">
-                        <a href="http://www.node-s.co.za/duco_exchange/home" target="_blank">
-                            <img class="image" src="assets/images/nodes-main.png">
-                        </a>
-                        <p class="subtitle is-size-6 mt-1"><i>Node-S exchange</i></p>
                     </div>
                     <span class="subtitle">
                         <b>SunSwap Exchange</b><br>
@@ -1000,13 +992,13 @@
                     </ul>
                 </div>
             </div>
-            <a href="https://twitter.com/DuinoCoin" class="fab fa-twitter" id="twitter-icon"></a>
-            <a href="https://www.reddit.com/r/Duinocoin/" class="fab fa-reddit" id="reddit-icon"></a>
-            <a href="https://duinocoin.com/discord" class="fab fa-discord" id="discord-icon"></a>
-            <a href="https://github.com/revoxhere/duino-coin" class="fab fa-github" id="github-icon"></a>
+            <a href="https://twitter.com/DuinoCoin"><span class="fab fa-twitter" id="twitter-icon"></a>
+            <a href="https://www.reddit.com/r/Duinocoin/"><span class="fab fa-reddit" id="reddit-icon"></a>
+            <a href="https://duinocoin.com/discord"><span class="fab fa-discord" id="discord-icon"></a>
+            <a href="https://github.com/revoxhere/duino-coin"><span class="fab fa-github" id="github-icon"></a>
             <br/><br/>
             <div class="footercontent content has-text-centered has-text-black">
-                <p id="copyright">Copyright © 2019 - 2022 <a href="https://revoxhere.github.io">Revox</a> & <a href="https://kk.dev">Tech1k</a></p>
+                <p id="copyright">Copyright © 2019 - 2022 <a href="https://duinocoin.com/team.html">the <b>Duino-Coin Team</b></a></p>
             </div>
         </div>
     </footer>
