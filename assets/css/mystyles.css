@@ -12848,7 +12848,7 @@ footer {
   padding: 5px;
 }
 .footercontent ul li a {
-  font-size: 18px;
+  font-size: 16px;
   color: grey;
 }
 .footercontent ul li a:hover {
@@ -12856,7 +12856,7 @@ footer {
 }
 #footerheader {
   text-align: center;
-  font-size: 30px !important;
+  font-size: 20px !important;
   margin-bottom: 25px !important;
 }
 #twitter-icon {
@@ -12926,3 +12926,18 @@ footer {
 #copyright {
   font-size: 18px;
 }
+
+/* Bulma Elements */
+.box {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 0.25em 1em -0.125em rgba(7, 7, 7, 0.15), 0 0px 0 1px rgba(7, 7, 7, 0.05);
+  color: #302D43;
+  display: block;
+  padding: 1.25rem; }
+
+a.box:hover, a.box:focus {
+  box-shadow: 0 0.5em 1em -0.125em rgba(7, 7, 7, 0.1), 0 0 0 1px #5E68FF; }
+
+a.box:active {
+  box-shadow: inset 0 1px 2px rgba(7, 7, 7, 0.2), 0 0 0 1px #5E68FF; }
