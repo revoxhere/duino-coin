@@ -654,8 +654,8 @@ def check_mining_key(user_settings):
 
     if response["success"] and not response["has_key"]:
         # If user doesn't have a mining key
+
         user_settings["mining_key"] = "None"
-        configparser["PC Miner"] = user_settings
 
         with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
             "w") as configfile:
