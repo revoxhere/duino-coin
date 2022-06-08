@@ -45,23 +45,24 @@
   <img src="https://img.shields.io/badge/release-latest-ff640a.svg?style=for-the-badge" /></a>
 <br>
 
-# Duino 코인 한글 번역 
+# Duino 코인 한글 번역본
 
 <h3>
-Duino-Coin은 Arduinos, ESP8266/32 보드, 라즈베리 파이, 컴퓨터 등으로 채굴할 수 있는 코인입니다(Wi-Fi 라우터, 스마트 TV, 스마트폰, 스마트워치, SBC, MCU 또는 GPU 포함).
+Duino-Coin은 Arduinos, ESP8266/32 보드, 라즈베리 파이, 컴퓨터 등으로 채굴할 수 있는 코인입니다 (Wi-Fi 라우터, 스마트 TV, 스마트폰, 스마트워치, SBC, MCU 또는 GPU 포함).
 </h3>
 
 
-| 주요 특징 | 기술 사양 | 지원가능한 보드 |
+| 주요 특징 | 사용된 기술 | 지원되는 보드 |
 |-|-|-|
-| 💻 다수의 플랫폼에 지원<br>👥 빠르게 성장하는 커뮤니티<br>💱 용이한 사용 및 교환<br>(DUCO Exchange, Node-S, JustSwap, SushiSwap에서)<br>🌎 어디서든지 사용 가능<br>:new: 완전히 독창적인 오픈 소스 프로젝트<br>🌳 초보자 친화적 및 친환경적<br>💰 효율적인 비용과 쉬운 채굴 | ⚒️ 알고리즘: DUCO-S1, XXHASH, 이외 <br>추가 예정 (PoS 포함)<br>♐ 보상: 채굴자에게 공정한 보상을 제공하는<br>"Kolka" 시스템<br>⚡ 거래 시간: 즉시<br>🪙 코인 공급량: 무제한<br>(2020년 12월 이전: 350k 코인)<br>(향후 새로운 한도 계획 예정)<br>🔤 시세: DUCO (ᕲ)<br>🔢 소수점: 최대 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini 등)<br>📶 ESP8266s<br>(NodeMCU, Wemos 등)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM 등)<br>🍓 라즈베리파이<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 오렌지 파이<br>(Zero, Zero 2, PC, Plus 등)<br>⚡ Teensy 4.1 보드 |
+| 💻 다양한 플랫폼 지원<br>👥 빠르게 성장하는 커뮤니티<br>💱 쉬운 사용 및 교환<br>(DUCO Exchange, Node-S, JustSwap, SushiSwap에서)<br>🌎 어디서든지 사용 가능<br>:new: 완전히 독창적인 오픈 소스 프로젝트<br>🌳 초보자 친화적 및 친환경적<br>💰 효율적인 비용과 쉬운 채굴 | ⚒️ 알고리즘: DUCO-S1, XXHASH, 이외 <br>추가 예정 (PoS 포함)<br>♐ 보상: 채굴자에게 공정한 보상을 제공하는<br>"Kolka" 시스템<br>⚡ 거래 시간: 즉시<br>🪙 코인 공급량: 무제한<br>(2020년 12월 이전: 350k 코인)<br>(향후 새로운 한도 계획 예정)<br>🔤 시세: DUCO (ᕲ)<br>🔢 소수점: 최대 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini 등)<br>📶 ESP8266s<br>(NodeMCU, Wemos 등)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM 등)<br>🍓 라즈베리파이<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 오렌지 파이<br>(Zero, Zero 2, PC, Plus 등)<br>⚡ Teensy 4.1 보드 |
 
 
 ## 시작하기
 
 #### Duino-Coin을 시작하는 가장 쉬운 방법은 OS에 대한 [최신 릴리스](https://github.com/revoxhere/duino-coin/releases/latest)를 다운로드하는 것 입니다.<br>
-릴리스를 다운로드한 후 압축을 풀고 원하는 프로그램을 실행합니다.<br>
-이 과정에서는 dependency가 요구되지 않습니다.
+운영체제(윈도우 혹은 리눅스 등)에 맞는 릴리스를 다운로드한 후 압축을 풀고 원하는 프로그램을 실행합니다.<br>
+이 과정에서는 추가로 다른 프로그램을 설치할 필요가 없습니다.
+
 
 도움이 필요하면 공식 웹사이트에 있는 <a href="https://duinocoin.com/getting-started">공식 시작 가이드</a>를 참조하세요.<br>
 FAQ 및 문제 해결 도움말은 [Wikis](https://github.com/revoxhere/duino-coin/wiki)에서 찾을 수 있습니다.<br>
@@ -221,14 +222,14 @@ Duino-Coin은 대부분 MIT 라이센스에 따라 배포됩니다. 자세한 �
 12. 무료 클라우드 호스팅 서비스(또는 무료 VPS 서비스 - 예: Repl.it, GitHub Actions 등)로 채굴하는 것은 불공정하므로 허용되지 않습니다.<br/>
 13. 위반 사항이 입증될 경우 사용자의 DUCO가 소멸될 수 있습니다.<br/>
 14. 이 서비스 약관은 사전 통지 없이 언제든지 변경될 수 있습니다.<br/>
-15. 합리적인 이유(예: 다중 채굴) 없이 부계정을 갖는 것은 허용되지 않습니다.<br/>
+15. 여러 계정으로 코인을 채굴하는 것 등의 합리적이지 않은 이유로 부계정을 갖는 것은 허용되지 않습니다.<br/>
 16. Duino-Coin을 사용하는 모든 사용자는 위의 규칙을 준수하는 데 동의합니다.<br/>
 
 
 ## 개인 정보 정책
 1. master 서버에는 사용자의 이름, 해시된 비밀번호(bcrypt를 이용), 계정 생성 날짜 및 사용자의 이메일만 데이터로 저장됩니다.<br/>
 2. 이메일은 공개적으로 사용할 수 없으며, <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> 에서 교환을 확인하고 비정기적인 뉴스레터(향후 계획)를 수신하는 등 필요시 사용자에게 연락할 때만 사용됩니다.<br/>
-3. 잔액, 거래 및 마이닝 관련 데이터는  <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a> 에서 공개적으로 사용할 수 있습니다. </br>
+3. 잔액, 거래 및 채굴 관련 데이터는  <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a> 에서 공개적으로 사용할 수 있습니다. </br>
 4. 개인 정보 정책은 추후 사전 공지를 통해 변경될 수 있습니다.
 
 ## 주요 프로젝트 관리자
@@ -244,7 +245,7 @@ Duino-Coin은 대부분 MIT 라이센스에 따라 배포됩니다. 자세한 �
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR 개발자)
 
 
-Duino-Coin 프로젝트 개발에 도움을 준 모든 [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) 에게 크나큰 감사를 드립니다.
+Duino-Coin 프로젝트 개발에 도움을 주신 모든 [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) 에게 크나큰 감사를 드립니다.
 
 
 <hr>
