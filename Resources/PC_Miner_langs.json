@@ -100,7 +100,7 @@
         "discord_update_error": "Error updating Discord RPC statistics:",
         "key_retry": "Do you want to retry? (Y/n): ",
         "incorrect_username": "The username you provided doesn't exist!",
-        "system_threads_notice": "You're trying to use more threads than you have, this will cause unintended side effects such as your system becoming unresponsive. Starting in 10s",
+        "system_threads_notice": "Warning: you're trying to use more threads than you have.\n\t\tThis will cause unintended side effects such as your system becoming unresponsive.\n\t\tStarting in 10s",
         "using_config": "Config file: "
     },
     "indonesian": {
@@ -642,7 +642,7 @@
         "mining_key_required": "Hasło do kopania jest wymagane do kopania na tym koncie",
         "invalid_mining_key": "Podane hasło do kopania jest nieprawidłowe!",
         "incorrect_username": "Podana nazwa użytkownika nie istnieje!",
-        "system_threads_notice": "Próbujesz uruchomić więcej wątków niż twoje urządzenie fizycznie posiada. Może to spowodować zawieszenie się systemu lub problemy z konsolą. Uruchamiam koparkę za 10s",
+        "system_threads_notice": "Uwaga: próbujesz uruchomić więcej wątków niż twoje urządzenie fizycznie posiada.\n\t\tMoże to spowodować zawieszenie się systemu lub problemy z konsolą.\n\t\tUruchamiam koparkę za 10s",
         "using_config": "Plik konfiguracyjny: "
     },
     "spanish": {
