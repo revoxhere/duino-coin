@@ -98,7 +98,8 @@
         "running_on_rpi2": "Onboard status LEDs will light up accordingly to the mining process status",
         "discord_launch_error": "Error launching Discord RPC thread:",
         "discord_update_error": "Error updating Discord RPC statistics:",
-        "key_retry": "Do you want to retry? (Y/n): "
+        "key_retry": "Do you want to retry? (Y/n): ",
+        "incorrect_username": "The username you provided doesn't exist!"
     },
     "indonesian": {
         "translation_autor": "rezafauzan945",
@@ -633,11 +634,12 @@
         "node_picker_unavailable": "Menedżer do wyboru serwerów nie odpowiada - ponowna próba za ",
         "node_picker_error": "Błąd przy wyborze serwera - ponowna próba za ",
         "connecting_node": " Wybrano najszybszy serwer: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "Znalezino nową wersję, chcesz zaktualizować koparkę? [Y/n] ? ",
+        "updating": "Koparka jest nieaktualna, aktualizacja w trakcie....",
+        "ask_mining_key": "Wprowadź swoje hasło do kopania (mining key) (tylko jeżeli ustawiłeś je w portfelu internetowym - w przeciwnym razie wciśnij enter aby pominąć): ",
+        "mining_key_required": "Hasło do kopania jest wymagane do kopania na tym koncie",
+        "invalid_mining_key": "Podane hasło do kopania jest nieprawidłowe!",
+        "incorrect_username": "Podana nazwa użytkownika nie istnieje!"
     },
     "spanish": {
         "translation_autor": "HGEpro",
