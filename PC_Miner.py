@@ -58,7 +58,7 @@ def handler(signal_received, frame):
             + get_string("goodbye"),
             "warning")
 
-    if running_on_rpi:
+    if running_on_rpi and user_settings["raspi_leds"] == "y":
         # Reset onboard status LEDs
         os.system(
             'echo mmc0 | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
@@ -149,6 +149,7 @@ class Settings:
     SOC_TIMEOUT = 20
     REPORT_TIME = 5*60
     DONATE_LVL = 0
+    RASPI_LEDS = "y"
 
     try:
         # Raspberry Pi latin encoding users can't display this character
@@ -601,17 +602,17 @@ def share_print(id, type,
                 'echo 0 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
 
     if type == "accept":
-        if running_on_rpi:
+        if running_on_rpi and user_settings["raspi_leds"] == "y":
             _blink_builtin()
         share_str = get_string("accepted")
         fg_color = Fore.GREEN
     elif type == "block":
-        if running_on_rpi:
+        if running_on_rpi and user_settings["raspi_leds"] == "y":
             _blink_builtin()
         share_str = get_string("block_found")
         fg_color = Fore.YELLOW
     else:
-        if running_on_rpi:
+        if running_on_rpi and user_settings["raspi_leds"] == "y":
             _blink_builtin("red")
         share_str = get_string("rejected")
         if reject_cause:
@@ -957,6 +958,7 @@ class Miner:
                 "language":    lang,
                 "soc_timeout": Settings.SOC_TIMEOUT,
                 "report_sec":  Settings.REPORT_TIME,
+                "raspi_leds":  Settings.RASPI_LEDS,
                 "discord_rp":  "y"}
 
             with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
@@ -1292,23 +1294,24 @@ if __name__ == "__main__":
     Fasthash.load()
     Fasthash.init()
 
-    try:
-        with io.open('/sys/firmware/devicetree/base/model', 'r') as m:
-            if 'raspberry pi' in m.read().lower():
-                running_on_rpi = True
-                pretty_print(
-                    get_string("running_on_rpi") +
-                    Style.NORMAL + Fore.RESET + " " +
-                    get_string("running_on_rpi2"), "success")
-    except:
-        running_on_rpi = False
+    if user_settings["raspi_leds"] == "y":
+        try:
+            with io.open('/sys/firmware/devicetree/base/model', 'r') as m:
+                if 'raspberry pi' in m.read().lower():
+                    running_on_rpi = True
+                    pretty_print(
+                        get_string("running_on_rpi") +
+                        Style.NORMAL + Fore.RESET + " " +
+                        get_string("running_on_rpi2"), "success")
+        except:
+            running_on_rpi = False
 
-    if running_on_rpi:
-        # Prepare onboard LEDs to be controlled
-        os.system(
-            'echo gpio | sudo tee /sys/class/leds/led1/trigger >/dev/null 2>&1')
-        os.system(
-            'echo gpio | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
+        if running_on_rpi:
+            # Prepare onboard LEDs to be controlled
+            os.system(
+                'echo gpio | sudo tee /sys/class/leds/led1/trigger >/dev/null 2>&1')
+            os.system(
+                'echo gpio | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
     
     try:
         check_mining_key(user_settings)
