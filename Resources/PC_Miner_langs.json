@@ -99,7 +99,8 @@
         "discord_launch_error": "Error launching Discord RPC thread:",
         "discord_update_error": "Error updating Discord RPC statistics:",
         "key_retry": "Do you want to retry? (Y/n): ",
-        "incorrect_username": "The username you provided doesn't exist!"
+        "incorrect_username": "The username you provided doesn't exist!",
+        "system_threads_notice": "You're trying to use more threads than you have, this will cause unintended side effects such as your system becoming unresponsive. Starting in 10s"
     },
     "indonesian": {
         "translation_autor": "rezafauzan945",
@@ -639,7 +640,8 @@
         "ask_mining_key": "Wprowadź swoje hasło do kopania (mining key) (tylko jeżeli ustawiłeś je w portfelu internetowym - w przeciwnym razie wciśnij enter aby pominąć): ",
         "mining_key_required": "Hasło do kopania jest wymagane do kopania na tym koncie",
         "invalid_mining_key": "Podane hasło do kopania jest nieprawidłowe!",
-        "incorrect_username": "Podana nazwa użytkownika nie istnieje!"
+        "incorrect_username": "Podana nazwa użytkownika nie istnieje!",
+        "system_threads_notice": "Próbujesz uruchomić więcej wątków niż twoje urządzenie fizycznie posiada. Może to spowodować zawieszenie się systemu lub problemy z konsolą. Uruchamiam koparkę za 10s"
     },
     "spanish": {
         "translation_autor": "HGEpro",
