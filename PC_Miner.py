@@ -901,7 +901,9 @@ class Miner:
 
             if int(threads) > 16:
                 threads = 16
-                print(Fore.BLUE + get_string("max_threads_notice") + Fore.RESET)
+                print(Style.BRIGHT + Fore.BLUE 
+                        + get_string("max_threads_notice") 
+                        + Style.RESET_ALL)
             elif int(threads) < 1:
                 threads = 1
 
@@ -981,7 +983,7 @@ class Miner:
                     Client.send("MOTD")
                     motd = Client.recv(512).replace("\n", "\n\t\t")
 
-                    pretty_print("MOTD: " + Fore.RESET + Style.NORMAL
+                    pretty_print(get_string("motd") + Fore.RESET + Style.NORMAL
                                  + str(motd), "success", "net" + str(id))
 
                     if float(POOL_VER) <= Settings.VER:
