@@ -85,7 +85,11 @@
         "updating": "The miner is outdated. Updating....",
         "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
         "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "invalid_mining_key": "The mining key you provided is invalid!",
+        "incorrect_username": "The username you provided doesn't exist!",
+        "system_threads_notice": "Warning: you're trying to use more threads than you have.\n\t\tThis will cause unintended side effects such as your system becoming unresponsive.\n\t\tStarting in 10s",
+        "using_config": "Config file: ",
+        "motd": "Server message of the day: "
     },
     "indonesian": {
         "translation_autor": "rezafauzan945",
@@ -416,8 +420,15 @@
         "report_body5": "\n\t\t‖ Podczas tego czasu rozwiązałeś ",
         "report_body6": " hashy",
         "total_mining_time": "\n\t\t‖ Koparka działa przez: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating...."
+        "new_version": "Znalezino nową wersję, chcesz zaktualizować koparkę? [Y/n] ? ",
+        "updating": "Koparka jest nieaktualna, aktualizacja w trakcie....",
+        "ask_mining_key": "Wprowadź swoje hasło do kopania (mining key) (tylko jeżeli ustawiłeś je w portfelu internetowym - w przeciwnym razie wciśnij enter aby pominąć): ",
+        "mining_key_required": "Hasło do kopania jest wymagane do kopania na tym koncie",
+        "invalid_mining_key": "Podane hasło do kopania jest nieprawidłowe!",
+        "incorrect_username": "Podana nazwa użytkownika nie istnieje!",
+        "system_threads_notice": "Uwaga: próbujesz uruchomić więcej wątków niż twoje urządzenie fizycznie posiada.\n\t\tMoże to spowodować zawieszenie się systemu lub problemy z konsolą.\n\t\tUruchamiam koparkę za 10s",
+        "using_config": "Plik konfiguracyjny: ",
+        "motd": "Serwerowa wiadomość dnia: "
     },
     "russian": {
         "translation_autor": "5Q",
