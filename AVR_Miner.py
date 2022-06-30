@@ -1023,7 +1023,7 @@ def mine_avr(com, threadid, fastest_pool):
                         motd = motd.replace("\n", "\n\t\t")
 
                     pretty_print("net" + str(threadid),
-                                 " MOTD: " + Fore.RESET
+                                 get_string("motd") + Fore.RESET
                                  + Style.NORMAL + str(motd),
                                  "success")
                 break
