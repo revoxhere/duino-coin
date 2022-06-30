@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 3.18 © MIT licensed
+Duino-Coin Official AVR Miner 3.2 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2022
@@ -109,7 +109,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '3.18'
+    VER = '3.2'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
     AVR_TIMEOUT = 7 # diff 16 * 100 / 258 h/s = 6.2 s
@@ -637,10 +637,20 @@ def load_config():
             + Fore.YELLOW + get_string('wallet') + Fore.RESET
             + get_string('register_warning'))
 
-        username = input(
-            Style.RESET_ALL + Fore.YELLOW
-            + get_string('ask_username')
-            + Fore.RESET + Style.BRIGHT)
+        correct_username = False
+        while not correct_username:
+            username = input(
+                Style.RESET_ALL + Fore.YELLOW
+                + get_string('ask_username')
+                + Fore.RESET + Style.BRIGHT)
+            if not username:
+                username = choice(["revox", "Bilaboz"])
+
+            r = requests.get(f"https://server.duinocoin.com/users/{username}", 
+                             timeout=Settings.SOC_TIMEOUT).json()
+            correct_username = r["success"]
+            if not correct_username:
+                print(get_string("incorrect_username"))
 
         mining_key = input(Style.RESET_ALL + Fore.YELLOW
                            + get_string("ask_mining_key")
@@ -817,6 +827,13 @@ def greeting():
             + Settings.BLOCK + Style.NORMAL
             + Fore.RESET + get_string('rig_identifier')
             + Style.BRIGHT + Fore.YELLOW + rig_identifier)
+
+    print(
+        Style.DIM + Fore.MAGENTA
+        + Settings.BLOCK + Style.NORMAL
+        + Fore.RESET + get_string("using_config")
+        + Style.BRIGHT + Fore.YELLOW 
+        + str(Settings.DATA_DIR + '/Settings.cfg'))
 
     print(
         Style.DIM + Fore.MAGENTA
