@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 3.19 © MIT licensed
+Duino-Coin Official PC Miner 3.2 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2022
 """
 
-from threading import Semaphore
 from time import time, sleep, strptime, ctime
 from hashlib import sha1
 from socket import socket
 
 from multiprocessing import cpu_count, current_process
-from multiprocessing import Process, Manager
+from multiprocessing import Process, Manager, Semaphore
 from threading import Thread
 from datetime import datetime
 from random import randint
@@ -26,7 +25,6 @@ import os
 import json
 import zipfile
 
-import requests
 from pathlib import Path
 from re import sub
 from random import choice
@@ -85,6 +83,14 @@ def install(package):
 
     execl(sys.executable, sys.executable, *sys.argv)
 
+try:
+    import requests
+except ModuleNotFoundError:
+    print("Requests is not installed. "
+          + "Miner will try to automatically install it "
+          + "If it fails, please manually execute "
+          + "python3 -m pip install requests")
+    install("requests")
 
 try:
     from colorama import Back, Fore, Style, init
@@ -130,7 +136,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 3.19
+    VER = 3.2
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -140,12 +146,12 @@ class Settings:
     SETTINGS_FILE = "/Settings.cfg"
     TEMP_FOLDER = "Temp"
 
-    SOC_TIMEOUT = 15
+    SOC_TIMEOUT = 20
     REPORT_TIME = 5*60
     DONATE_LVL = 0
 
     try:
-        # Raspberry Pi latin users can't display this character
+        # Raspberry Pi latin encoding users can't display this character
         BLOCK = " ‖ "
         "‖".encode(sys.stdout.encoding)
     except:
@@ -156,7 +162,7 @@ class Settings:
         or bool(os.name == "nt"
                 and os.environ.get("WT_SESSION"))):
         # Windows' cmd does not support emojis, shame!
-        # And some codecs same, for example the Latin-1 encoding don`t support emoji
+        # Same for different encodinsg, for example the latin encoding doesn't support them
         try:
             "⛏ ⚙".encode(sys.stdout.encoding) # if the terminal support emoji
             PICK = " ⛏"
@@ -375,7 +381,7 @@ class Client:
                              "info", "net0")
                 response = requests.get(
                     "https://server.duinocoin.com/getPool",
-                    timeout=10).json()
+                    timeout=Settings.SOC_TIMEOUT).json()
 
                 if response["success"] == True:
                     pretty_print(get_string("connecting_node")
@@ -415,7 +421,7 @@ class Donate:
                         f"{Settings.DATA_DIR}/Donate.exe").is_file():
                     url = ('https://server.duinocoin.com/'
                            + 'donations/DonateExecutableWindows.exe')
-                    r = requests.get(url, timeout=15)
+                    r = requests.get(url, timeout=Settings.SOC_TIMEOUT)
                     with open(f"{Settings.DATA_DIR}/Donate.exe",
                               'wb') as f:
                         f.write(r.content)
@@ -437,7 +443,7 @@ class Donate:
                     return
                 if not Path(
                         f"{Settings.DATA_DIR}/Donate").is_file():
-                    r = requests.get(url, timeout=15)
+                    r = requests.get(url, timeout=Settings.SOC_TIMEOUT)
                     with open(f"{Settings.DATA_DIR}/Donate",
                               "wb") as f:
                         f.write(r.content)
@@ -539,9 +545,8 @@ def calculate_uptime(start_time):
 
 def pretty_print(msg: str = None,
                  state: str = "success",
-                 sender: str = "sys0"):
-    global printlock
-
+                 sender: str = "sys0",
+                 printlock=printlock):
     """
     Produces nicely formatted CLI output for messages:
     HH:MM:S |sender| msg
@@ -564,15 +569,16 @@ def pretty_print(msg: str = None,
 
     with printlock:
         print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-              + Style.BRIGHT + bg_color + " " + sender + " "
-              + Back.RESET + " " + fg_color + msg.strip())
+            + Style.BRIGHT + bg_color + " " + sender + " "
+            + Back.RESET + " " + fg_color + msg.strip())
 
 
 def share_print(id, type,
                 accept, reject,
                 total_hashrate,
                 computetime, diff, ping,
-                back_color, reject_cause=None):
+                back_color, reject_cause=None,
+                printlock=printlock):
     """
     Produces nicely formatted CLI output for shares:
     HH:MM:S |cpuN| ⛏ Accepted 0/0 (100%) ∙ 0.0s ∙ 0 kH/s ⚙ diff 0 k ∙ ping 0ms
@@ -649,7 +655,7 @@ def check_mining_key(user_settings):
         "https://server.duinocoin.com/mining_key"
             + "?u=" + user_settings["username"]
             + "&k=" + key,
-        timeout=10
+        timeout=Settings.SOC_TIMEOUT
     ).json()
 
     if response["success"] and not response["has_key"]:
@@ -759,6 +765,11 @@ class Miner:
                   + Style.BRIGHT + Fore.YELLOW + user_settings["identifier"])
 
         print(Style.DIM + Fore.YELLOW + Settings.BLOCK
+              + Style.NORMAL + Fore.RESET + get_string("using_config")
+              + Style.BRIGHT + Fore.YELLOW
+              + str(Settings.DATA_DIR + Settings.SETTINGS_FILE))
+
+        print(Style.DIM + Fore.YELLOW + Settings.BLOCK
               + Style.NORMAL + Fore.RESET + str(greeting)
               + ", " + Style.BRIGHT + Fore.YELLOW
               + str(user_settings["username"]) + "!\n")
@@ -777,7 +788,7 @@ class Miner:
             with open(Settings.DATA_DIR + Settings.TRANSLATIONS_FILE,
                       "wb") as f:
                 f.write(requests.get(Settings.TRANSLATIONS,
-                                     timeout=10).content)
+                                     timeout=Settings.SOC_TIMEOUT).content)
 
         with open(Settings.DATA_DIR + Settings.TRANSLATIONS_FILE, "r",
                   encoding=Settings.ENCODING) as file:
@@ -838,19 +849,29 @@ class Miner:
         Loads miner settings file or starts the config tool
         """
         if not Path(Settings.DATA_DIR + Settings.SETTINGS_FILE).is_file():
-            print(get_string("basic_config_tool")
+            print(Style.BRIGHT 
+                  + get_string("basic_config_tool")
                   + Settings.DATA_DIR
                   + get_string("edit_config_file_warning")
                   + "\n"
+                  + Style.RESET_ALL
                   + get_string("dont_have_account")
                   + Fore.YELLOW
                   + get_string("wallet")
                   + Fore.RESET
                   + get_string("register_warning"))
 
-            username = input(get_string("ask_username") + Style.BRIGHT)
-            if not username:
-                username = choice(["revox", "Bilaboz", "JoyBed", "Connor2"])
+            correct_username = False
+            while not correct_username:
+                username = input(get_string("ask_username") + Style.BRIGHT)
+                if not username:
+                    username = choice(["revox", "Bilaboz"])
+
+                r = requests.get(f"https://server.duinocoin.com/users/{username}", 
+                             timeout=Settings.SOC_TIMEOUT).json()
+                correct_username = r["success"]
+                if not correct_username:
+                    print(get_string("incorrect_username"))
 
             mining_key = input(Style.RESET_ALL + get_string("ask_mining_key") + Style.BRIGHT)
             if not mining_key:
@@ -878,11 +899,9 @@ class Miner:
             if not threads:
                 threads = cpu_count()
 
-            if int(threads) > 8:
-                threads = 8
-                pretty_print(
-                    Style.BRIGHT
-                    + get_string("max_threads_notice"))
+            if int(threads) > 16:
+                threads = 16
+                print(Fore.BLUE + get_string("max_threads_notice") + Fore.RESET)
             elif int(threads) < 1:
                 threads = 1
 
@@ -993,7 +1012,8 @@ class Miner:
              blocks: int, pool: tuple,
              accept: int, reject: int,
              hashrate: list,
-             single_miner_id: str):
+             single_miner_id: str,
+             printlock):
         """
         Main section that executes the functionalities from the sections above.
         """
@@ -1085,7 +1105,7 @@ class Miner:
                                                 accept.value, reject.value,
                                                 total_hashrate,
                                                 computetime, job[2], ping,
-                                                back_color)
+                                                back_color, printlock)
 
                                 elif feedback[0] == "BLOCK":
                                     accept.value += 1
@@ -1094,7 +1114,7 @@ class Miner:
                                                 accept.value, reject.value,
                                                 total_hashrate,
                                                 computetime, job[2], ping,
-                                                back_color)
+                                                back_color, printlock)
 
                                 elif feedback[0] == "BAD":
                                     reject.value += 1
@@ -1102,7 +1122,7 @@ class Miner:
                                                 accept.value, reject.value,
                                                 total_hashrate,
                                                 computetime, job[2], ping,
-                                                back_color, feedback[1])
+                                                back_color, feedback[1], printlock)
 
                                 if id == 0:
                                     end_time = time()
@@ -1199,7 +1219,7 @@ class Fasthash:
                 pretty_print(get_string("fasthash_download"), "info")
                 url = ('https://server.duinocoin.com/'
                        + 'fasthash/libducohashWindows.pyd')
-                r = requests.get(url, timeout=10)
+                r = requests.get(url, timeout=Settings.SOC_TIMEOUT)
                 with open(f"libducohasher.pyd", 'wb') as f:
                     f.write(r.content)
                 return
@@ -1228,7 +1248,7 @@ class Fasthash:
                 return
             if not Path("libducohasher.so").is_file():
                 pretty_print(get_string("fasthash_download"), "info")
-                r = requests.get(url, timeout=10)
+                r = requests.get(url, timeout=Settings.SOC_TIMEOUT)
                 with open("libducohasher.so", "wb") as f:
                     f.write(r.content)
                 return
@@ -1303,10 +1323,15 @@ if __name__ == "__main__":
     single_miner_id = randint(0, 2811)
 
     threads = int(user_settings["threads"])
-    if threads > 12:
-        threads = 12
+    if threads > 16:
+        threads = 16
         pretty_print(Style.BRIGHT
                      + get_string("max_threads_notice"))
+    if threads > cpu_count():
+        pretty_print(Style.BRIGHT
+                     + get_string("system_threads_notice"),
+                     "warning")
+        sleep(10)
 
     fastest_pool = Client.fetch_pool()
 
@@ -1314,10 +1339,11 @@ if __name__ == "__main__":
         p = Process(target=Miner.mine,
                     args=[i, user_settings, blocks,
                           fastest_pool, accept, reject,
-                          hashrate, single_miner_id])
+                          hashrate, single_miner_id, 
+                          printlock])
         p_list.append(p)
         p.start()
-        sleep(0.05)
+        sleep(0.5)
 
     if user_settings["discord_rp"] == 'y':
         Discord_rp.connect()
