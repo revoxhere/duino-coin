@@ -648,14 +648,14 @@ def get_string(string_name):
 
 def check_mining_key(user_settings):
     if user_settings["mining_key"] != "None":
-        key = b64.b64decode(user_settings["mining_key"]).decode('utf-8')
+        key = '&k=' + b64.b64decode(user_settings["mining_key"]).decode('utf-8')
     else:
         key = ''
 
     response = requests.get(
         "https://server.duinocoin.com/mining_key"
             + "?u=" + user_settings["username"]
-            + "&k=" + key,
+            + key,
         timeout=Settings.SOC_TIMEOUT
     ).json()
 
