@@ -75,7 +75,7 @@
 
 #### La forma fácil para comenzar con Duino-Coin es descargar [la ultima versión](https://github.com/revoxhere/duino-coin/releases/latest) para tu Sistema Operativo (SO).
 
-Después de descargar la versión, extráe y ejecuta el programa deseado.<br>
+Después de descargar la versión, extrae y ejecuta el programa deseado.<br>
 No hay dependencias extras requeridas.
 
 Si necesitas ayuda, puedes mirar las guías oficiales para comenzar <a href="https://duinocoin.com/getting-started">en el sitio web oficial</a>.<br>
@@ -110,7 +110,7 @@ Luego de hacer esto, ya puedes ejecutar el programa deseado (haciendo doble clic
 
 #### Raspberry Pi
 
-Nota: Si este script no funciona instenta instalarlo manualmente.
+Nota: Si este script no funciona intenta instalarlo manualmente.
 
 ```BASH
 # Descarga el script
