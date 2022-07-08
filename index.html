@@ -46,7 +46,7 @@
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js" as="script">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js"></script>
     <style>
-
+    @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
     .fix-link a {
         color: transparent;
     }
@@ -55,12 +55,13 @@
         cursor: pointer;
     }
 
-    .exchange_box, figure {
+    .exchange_box,
+    figure {
         transition: 0.2s all;
     }
 
     figure:hover {
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
 
     .navbar-item:hover {
@@ -68,7 +69,7 @@
     }
 
     .button:hover {
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
 
     #wavecontainer {
@@ -280,6 +281,15 @@
                     <div class="buttons">
                         <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf" class="button is-success">
                             <span><i class="fa fa-book"></i>&nbsp;Read our Whitepaper</span>
+                        </a>
+                        <a href="https://bitcourier.co.uk/news/duino-coin-interview" class="button">
+                            <span>
+                                Read about us on
+                            </span>&nbsp;
+                            <span class="icon">
+                                <img src="/assets/images/bitcourier.png"></img>
+                            </span>&nbsp;
+                            <span class="has-text-weight-bold" style="font-family:'VT323', monospace;">BITCOURIER</span>
                         </a>
                     </div>
                 </div>
@@ -616,7 +626,7 @@
             <a href="https://www.reddit.com/r/Duinocoin/"><span class="fab fa-reddit" id="reddit-icon"></a>
             <a href="https://duinocoin.com/discord"><span class="fab fa-discord" id="discord-icon"></a>
             <a href="https://github.com/revoxhere/duino-coin"><span class="fab fa-github" id="github-icon"></a>
-            <br/><br/>
+            <br /><br />
             <div class="footercontent content has-text-centered has-text-black">
                 <p id="copyright">Copyright © 2019 - 2022 <a href="https://duinocoin.com/team.html">the <b>Duino-Coin Team</b></a></p>
             </div>
@@ -735,4 +745,5 @@ $(window).on('load', function() {
     $("#pageloader").fadeOut();
 });
 </script>
+
 </html>
