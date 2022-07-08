@@ -700,14 +700,18 @@ void loop() {
 
   waitForClientData();
   String last_block_hash = getValue(client_buffer, SEP_TOKEN, 0);
-  String expected_hash = getValue(client_buffer, SEP_TOKEN, 1);
+  String expected_hash_str = getValue(client_buffer, SEP_TOKEN, 1);
   difficulty = getValue(client_buffer, SEP_TOKEN, 2).toInt() * 100 + 1;
 
   if (USE_HIGHER_DIFF) system_update_cpu_freq(160);
-  
-  int job_len = last_block_hash.length() + expected_hash.length() + String(difficulty).length();
+
+  int job_len = last_block_hash.length() + expected_hash_str.length() + String(difficulty).length();
+
   Serial.println("Received job with size of " + String(job_len) + " bytes");
-  expected_hash.toUpperCase();
+  
+  uint8_t expected_hash[20];
+  experimental::TypeConversion::hexStringToUint8Array(expected_hash_str, expected_hash, 20);
+
   br_sha1_init(&sha1_ctx_base);
   br_sha1_update(&sha1_ctx_base, last_block_hash.c_str(), last_block_hash.length());
 
@@ -720,10 +724,11 @@ void loop() {
     // Difficulty loop
     sha1_ctx = sha1_ctx_base;
     duco_numeric_result_str = String(duco_numeric_result);
+
     br_sha1_update(&sha1_ctx, duco_numeric_result_str.c_str(), duco_numeric_result_str.length());
     br_sha1_out(&sha1_ctx, hashArray);
-    result = experimental::TypeConversion::uint8ArrayToHexString(hashArray, 20);
-    if (result == expected_hash) {
+
+    if (memcmp(expected_hash, hashArray, 20) == 0) {
       // If result is found
       unsigned long elapsed_time = micros() - start_time;
       float elapsed_time_s = elapsed_time * .000001f;
