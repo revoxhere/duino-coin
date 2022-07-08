@@ -18,7 +18,7 @@ from configparser import ConfigParser
 from pathlib import Path
 
 from json import load as jsonload
-import json
+from random import choice
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 import zipfile
 
