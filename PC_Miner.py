@@ -648,14 +648,14 @@ def get_string(string_name):
 
 def check_mining_key(user_settings):
     if user_settings["mining_key"] != "None":
-        key = b64.b64decode(user_settings["mining_key"]).decode('utf-8')
+        key = '&k=' + b64.b64decode(user_settings["mining_key"]).decode('utf-8')
     else:
         key = ''
 
     response = requests.get(
         "https://server.duinocoin.com/mining_key"
             + "?u=" + user_settings["username"]
-            + "&k=" + key,
+            + key,
         timeout=Settings.SOC_TIMEOUT
     ).json()
 
@@ -676,6 +676,7 @@ def check_mining_key(user_settings):
             pretty_print(get_string("mining_key_required"), "warning")
             mining_key = input("\t\t" + get_string("ask_mining_key")
                                + Style.BRIGHT + Fore.YELLOW)
+            if mining_key == "": mining_key = "None" #replace empty input with "None" key
             user_settings["mining_key"] = b64.b64encode(
                 mining_key.encode("utf-8")).decode('utf-8')
             configparser["PC Miner"] = user_settings
@@ -691,6 +692,7 @@ def check_mining_key(user_settings):
             retry = input(get_string("key_retry"))
             if not retry or retry == "y" or retry == "Y":
                 mining_key = input(get_string("ask_mining_key"))
+                if mining_key == "": mining_key = "None" #replace empty input with "None" key
                 user_settings["mining_key"] = b64.b64encode(
                     mining_key.encode("utf-8")).decode('utf-8')
                 configparser["PC Miner"] = user_settings

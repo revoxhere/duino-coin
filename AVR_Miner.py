@@ -18,7 +18,7 @@ from configparser import ConfigParser
 from pathlib import Path
 
 from json import load as jsonload
-import json
+from random import choice
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 import zipfile
 
@@ -271,14 +271,14 @@ def check_mining_key(user_settings):
     user_settings = user_settings["AVR Miner"]
 
     if user_settings["mining_key"] != "None":
-        key = b64.b64decode(user_settings["mining_key"]).decode('utf-8')
+        key = "&k=" + b64.b64decode(user_settings["mining_key"]).decode('utf-8')
     else:
         key = ''
 
     response = requests.get(
         "https://server.duinocoin.com/mining_key"
             + "?u=" + user_settings["username"]
-            + "&k=" + key,
+            + key,
         timeout=10
     ).json()
 
