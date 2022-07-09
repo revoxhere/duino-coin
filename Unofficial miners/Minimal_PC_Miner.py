@@ -9,7 +9,8 @@ import os
 from socket import socket
 import sys  # Only python3 included libraries
 import time
-import requests
+from urllib.request import Request, urlopen
+from json import loads
 
 
 soc = socket()
@@ -32,9 +33,7 @@ else:
 def fetch_pools():
     while True:
         try:
-            response = requests.get(
-                "https://server.duinocoin.com/getPool"
-            ).json()
+            response = loads(urlopen(Request("https://server.duinocoin.com/getPool")).read().decode())
             NODE_ADDRESS = response["ip"]
             NODE_PORT = response["port"]
 
