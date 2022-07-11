@@ -280,7 +280,7 @@ Algunos archivos de terceros incluídos pueden tener distintas licencias - por f
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Desarrollador)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (Desarrollador de AVR)
 
-Grandes gracias a todos los [contribuyentes](https://github.com/revoxhere/duino-coin/graphs/contributors) que ayudaron al desarrollo de Duino-Coin.
+Muchas gracias a todos los [contribuyentes](https://github.com/revoxhere/duino-coin/graphs/contributors) que han ayudado al desarrollo de Duino-Coin.
 
 <hr>
 
