@@ -264,23 +264,23 @@ Algunos archivos de terceros incluídos pueden tener distintas licencias - por f
 ## Políticas de Privacidad
 1. En el servidor maestro solo son guardados nombres de usuarios, contraseñas encryptadas (con la ayuda de bcrypt) y e-mails de los usuarios así como la información de su cuenta.<br/>
 2. Los e-mails no son disponibles públicamente y son solo utilizados para contactar al usuario cuando es necesario, confirmar intercambios en <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> y recibir un boletín informativo ocasional (planeado para el futuro).<br/>
-3. Balances, transacciones e información relacionada al minado está totalmente disponible para el público <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
+3. Balances, transacciones e información relacionada al minado está totalmente disponible para el público <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">API JSON</a>.<br/>
 4. La política de privacidad puede ser cambiada en el futuro con notificación previa.
 
 
 ## Mantenedores activos del proyecto
 
-*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Python dev Jefe, fundador del proyecto)
-*   [@Bilaboz](https://github.com/bilaboz/) (NodeJS dev Jefe)
-*   [@connorhess](https://github.com/connorhess) (Python dev Jefe, Dueño de Node-S)
-*   [@JoyBed](https://github.com/JoyBed) (AVR dev Jefe)
+*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Desarrollador jefe en Python, fundador del proyecto)
+*   [@Bilaboz](https://github.com/bilaboz/) (Desarrollador jefe en NodeJS)
+*   [@connorhess](https://github.com/connorhess) (Desarrollador jefe en python, Dueño de Node-S)
+*   [@JoyBed](https://github.com/JoyBed) (Desarrollador jefe de AVR)
 *   [@Yennefer](https://www.instagram.com/vlegle/) (Manager Social Jefe)
 *   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster Jefe y Desarrollador de DUCO)
-*   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-*   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
-*   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
+*   [@ygboucherk](https://github.com/ygboucherk) (Desarrollador de [wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2))
+*   [@Lulaschkas](https://github.com/Lulaschkas) (Desarrollador)
+*   [@joaquinbvw](https://github.com/joaquinbvw) (Desarrollador de AVR)
 
-Grandes gracias a todos los [contribuyentes](https://github.com/revoxhere/duino-coin/graphs/contributors) que ayudaron al desarrollo de Duino-Coin.
+Muchas gracias a todos los [contribuyentes](https://github.com/revoxhere/duino-coin/graphs/contributors) que han ayudado al desarrollo de Duino-Coin.
 
 <hr>
 
