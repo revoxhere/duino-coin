@@ -89,7 +89,9 @@
         "incorrect_username": "The username you provided doesn't exist!",
         "system_threads_notice": "Warning: you're trying to use more threads than you have.\n\t\tThis will cause unintended side effects such as your system becoming unresponsive.\n\t\tStarting in 10s",
         "using_config": "Config file: ",
-        "motd": "Server message of the day: "
+        "motd": "Server message of the day: ",
+        "hashrate_test": "Hashrate test ended with ",
+        "hashrate_test_diff": ", assigned starting difficulty: "
     },
     "indonesian": {
         "translation_autor": "rezafauzan945",
