@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 3.2 © MIT licensed
+Duino-Coin Official AVR Miner 3.25 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2022
@@ -109,10 +109,10 @@ def port_num(com):
 
 
 class Settings:
-    VER = '3.2'
+    VER = '3.25'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
-    AVR_TIMEOUT = 7 # diff 16 * 100 / 258 h/s = 6.2 s
+    AVR_TIMEOUT = 10
     BAUDRATE = 115200
     DATA_DIR = "Duino-Coin AVR Miner " + str(VER)
     SEPARATOR = ","
@@ -182,7 +182,6 @@ def check_updates():
                         "avr_timeout":      float(config["AVR Miner"]["avr_timeout"]),
                         "discord_presence": config["AVR Miner"]["discord_presence"],
                         "periodic_report":  int(config["AVR Miner"]["periodic_report"]),
-                        "shuffle_ports":    config["AVR Miner"]["shuffle_ports"],
                         "mining_key":       config["AVR Miner"]["mining_key"]
                     }
 
@@ -463,7 +462,6 @@ shares = [0, 0, 0]
 hashrate_mean = []
 ping_mean = []
 diff = 0
-shuffle_ports = "y"
 donator_running = False
 job = ''
 debug = 'n'
@@ -623,7 +621,6 @@ def load_config():
     global debug
     global rig_identifier
     global discord_presence
-    global shuffle_ports
     global SOC_TIMEOUT
 
     if not Path(str(Settings.DATA_DIR) + '/Settings.cfg').is_file():
@@ -733,10 +730,9 @@ def load_config():
             'identifier':       rig_identifier,
             'debug':            'n',
             "soc_timeout":      45,
-            "avr_timeout":      7,
+            "avr_timeout":      10,
             "discord_presence": "y",
             "periodic_report":  60,
-            "shuffle_ports":    "y",
             "mining_key":       mining_key}
 
         with open(str(Settings.DATA_DIR)
@@ -758,7 +754,6 @@ def load_config():
         Settings.SOC_TIMEOUT = int(config["AVR Miner"]["soc_timeout"])
         Settings.AVR_TIMEOUT = float(config["AVR Miner"]["avr_timeout"])
         discord_presence = config["AVR Miner"]["discord_presence"]
-        shuffle_ports = config["AVR Miner"]["shuffle_ports"]
         Settings.REPORT_TIME = int(config["AVR Miner"]["periodic_report"])
         hashrate_list = [0] * len(avrport)
 
@@ -961,13 +956,14 @@ def mine_avr(com, threadid, fastest_pool):
             try:
                 ser.close()
                 pretty_print('sys' + port_num(com),
-                             f"Closed COM port {com}", 'success')
+                             f"No response from the board. Closed port {com}",
+                             'success')
                 sleep(2)
             except:
                 pass
             try:
                 ser = Serial(com, baudrate=int(Settings.BAUDRATE),
-                             timeout=float(Settings.AVR_TIMEOUT))
+                             timeout=int(Settings.AVR_TIMEOUT))
                 """
                 Sleep after opening the port to make
                 sure the board resets properly after
@@ -1039,9 +1035,58 @@ def mine_avr(com, threadid, fastest_pool):
                      + get_string('mining_algorithm') + str(com) + ')',
                      'success')
 
+        # Perform a hash test to assign the starting diff
+        prev_hash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
+        exp_hash = "d0beba883d7e8cd119ea2b0e09b78f60f29e0968"
+        exp_result = 50
         while True:
             try:
+                debug_output(com + ': Sending hash test to the board')
+                ser.write(bytes(str(prev_hash
+                                    + Settings.SEPARATOR
+                                    + exp_hash
+                                    + Settings.SEPARATOR
+                                    + "10"
+                                    + Settings.SEPARATOR),
+                                encoding=Settings.ENCODING))
+                debug_output(com + ': Reading hash test from the board')
+                result = ser.read_until(b'\n').decode().strip().split(',')
+                ser.flush()
 
+                if result[0] and result[1]:
+                    _ = int(result[0], 2)
+                    debug_output(com + f': Result: {result[0]}')
+                else:
+                    raise Exception("No data received from the board")
+                if int(result[0], 2) != exp_result:
+                   raise Exception(com + f': Incorrect result received!')
+
+                computetime = round(int(result[1], 2) / 1000000, 5)
+                num_res = int(result[0], 2)
+                hashrate_test = round(num_res / computetime, 2)
+                break
+            except Exception as e:
+                debug_outpu(str(e))
+
+        start_diff = "AVR"
+        if hashrate_test > 5500:
+            start_diff = "ESP8266"
+        elif hashrate_test > 3000:
+            start_diff = "DUE"
+        elif hashrate_test > 1000:
+            start_diff = "ARM"
+        elif hashrate_test > 300:
+            start_diff = "MEGA"
+
+        pretty_print('sys' + port_num(com), 
+                    get_string('hashrate_test') 
+                    + get_prefix("H/s", hashrate_test, 2)
+                    + Fore.RESET
+                    + get_string('hashrate_test_diff') 
+                    + start_diff)
+
+        while True:
+            try:
                 if config["AVR Miner"]["mining_key"] != "None":
                     key = b64.b64decode(config["AVR Miner"]["mining_key"]).decode()
                 else:
@@ -1052,7 +1097,7 @@ def mine_avr(com, threadid, fastest_pool):
                             + Settings.SEPARATOR
                             + str(username)
                             + Settings.SEPARATOR
-                            + 'AVR'
+                            + start_diff
                             + Settings.SEPARATOR
                             + str(key)
                 )
@@ -1089,7 +1134,6 @@ def mine_avr(com, threadid, fastest_pool):
                                     encoding=Settings.ENCODING))
                     debug_output(com + ': Reading result from the board')
                     result = ser.read_until(b'\n').decode().strip().split(',')
-                    ser.flush()
 
                     if result[0] and result[1]:
                         _ = int(result[0], 2)
@@ -1099,6 +1143,7 @@ def mine_avr(com, threadid, fastest_pool):
                         raise Exception("No data received from AVR")
                 except Exception as e:
                     debug_output(com + f': Retrying data read: {e}')
+                    ser.flush()
                     retry_counter += 1
                     continue
 
@@ -1106,7 +1151,7 @@ def mine_avr(com, threadid, fastest_pool):
                 break
 
             try:
-                computetime = round(int(result[1], 2) / 1000000, 3)
+                computetime = round(int(result[1], 2) / 1000000, 5)
                 num_res = int(result[0], 2)
                 hashrate_t = round(num_res / computetime, 2)
 
