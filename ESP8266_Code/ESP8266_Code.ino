@@ -703,6 +703,8 @@ void loop() {
   String expected_hash = getValue(client_buffer, SEP_TOKEN, 1);
   difficulty = getValue(client_buffer, SEP_TOKEN, 2).toInt() * 100 + 1;
 
+  if (USE_HIGHER_DIFF) system_update_cpu_freq(160);
+  
   int job_len = last_block_hash.length() + expected_hash.length() + String(difficulty).length();
   Serial.println("Received job with size of " + String(job_len) + " bytes");
   expected_hash.toUpperCase();
