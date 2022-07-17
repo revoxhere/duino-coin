@@ -79,10 +79,7 @@ There are no dependencies required.
 If you need help, you can take a look at the official getting started guides located <a href="https://duinocoin.com/getting-started">on the official website</a>.<br>
 FAQ and troubleshooting help can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
 
-
-### Manual installation
-
-#### Linux
+#### Linux (manual installation)
 
 ```BASH
 sudo apt update
@@ -94,7 +91,7 @@ python3 -m pip install -r requirements.txt # Install pip dependencies
 
 After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py`).
 
-#### Windows
+#### Windows (manual installation)
 
 1. Download and install [Python 3](https://www.python.org/downloads/) (make sure you add Python and Pip to your PATH)
 2. Download [the Duino-Coin repository](https://github.com/revoxhere/duino-coin/archive/master.zip)
@@ -103,27 +100,17 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 
 After doing this, you are good to go with launching the software (just double click on desired `.py` files or type `py PC_Miner.py` in the command prompt).
 
-### Automatic installation
-
-#### Raspberry Pi
-
-Note: If this script doesn't work try installing manually.
+#### Raspberry Pi (automatic installation)
 
 ```BASH
-# Download the script file
 wget https://raw.githubusercontent.com/revoxhere/duino-coin/master/Tools/duco-install-rpi.sh
-
-# Change the file permissions
 sudo chmod a+x duco-install-rpi.sh
-
-# Run the script
 ./duco-install-rpi.sh
 ```
 
-## DUCO & wDUCO
+## DUCO, wDUCO, bscDUCO, maticDUCO & celoDUCO
 
-Duino-Coin is a hybrid currency, meaning that it can be converted to wDUCO which is DUCO wrapped on the [Tron](https://tron.network) network (as a token). Currently there aren't many uses for it, other than just storing funds in an external wallet or exchanging wDUCO to another token on JustSwap. A tutorial on using wDUCO is available in the [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial).
-
+Duino-Coin is a hybrid currency providing support both to centralized and decentralized ways of storing funds. Duino-Coins can be converted to wDUCO, bscDUCO or others which are the same Duino-Coins but "wrapped" (stored) on other networks as tokens. An example tutorial on using wDUCO is available in the [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial). Coins can be wrapped directly from your web Wallet - click the Wrap Coins button to start.
 
 ## Development
 
@@ -143,12 +130,7 @@ Server source code, documentation for API calls and official libraries for devel
 
 ## Benchmarks of officially tested devices and boards
 
-<details>
-  <summary>
-    Since that table is getting really long, it's collapsed by default. Click this text to expand it!
-  </summary>
-
-  ### Please note that the rewards depend on a lot of factors and the table below is just for orientation purposes.
+### Please note that the rewards depend on a lot of factors and the table below is just for orientation purposes.
   
   | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
@@ -179,18 +161,13 @@ Server source code, documentation for API calls and official libraries for devel
   | AMD Ryzen R1505G **(fasthash)**                           | 8.5 MH/s                          | 4                 | 35 W           | -                   |   
   | Intel Core i7-11370H **(fasthash)**                       | 17.3 MH/s                         | 8                 | 35 W           | 4.28                |
 
-  All tests were performed using the DUCO-S1 algorithm **without fasthash accelerations** unless stated otherwise. This table will be actively updated.
-</details>
+All tests were performed using the DUCO-S1 algorithm **without fasthash accelerations** unless stated otherwise. This table will be actively updated.
+
 
 
 ## Community-made softwares
 
-<details>
-  <summary>
-    Since that list is getting really long, it's collapsed by default. Click this text to expand it
-  </summary>
-  
-  Please note that these softwares are not developed by us and we do not give any guarantees that use of them will not result in an account getting banned. Treat them as a curiosity. It's worth noting that using [nonceMiner](https://github.com/colonelwatch/nonceMiner) by colonelwatch **will get you banned**.
+### Please note that these softwares are not developed by us and we do not give any guarantees that use of them will not result in an account getting banned. Treat them as a curiosity. 
 
   ### Other miners known to work with Duino-Coin:
   *   [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Arduino Ethernet shield Miner by Pumafron
@@ -234,8 +211,7 @@ Server source code, documentation for API calls and official libraries for devel
   *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI Wallet by viktor02
   *   [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - a Duino-Coin iOS widget by Naphob 
 
-  You may also view a similar list on the [website](https://duinocoin.com/apps).
-</details>
+ You may also view a similar list on the [website](https://duinocoin.com/apps).
 
 
 ## License
