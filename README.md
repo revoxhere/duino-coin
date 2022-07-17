@@ -154,28 +154,28 @@ Server source code, documentation for API calls and official libraries for devel
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
   | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 258 H/s                           | 1                 | 0.2 W          | 15-20               |
   | Raspberry Pi Pico                                         | 5 kH/s                            | 1                 | 0.3 W          | 10                  |
-  | Teensy 4.1 (soft cryptography)                            | 80 kH/s                           | 1                 | 0.5 W          | -                   |
+  | Teensy 4.1 (soft cryptography)                            | 80 kH/s                           | 1                 | 0.5 W          | ?                   |
   | NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 9-10 kH/s (160MHz) 5 kH/s (80Mhz) | 1                 | 0.6 W          | 3-6                 |
   | ESP32                                                     | 40-42 kH/s                        | 2                 | 1 W            | 6-9                 |
-  | Raspberry Pi Zero                                         | 18 kH/s                           | 1                 | 1.1 W          | -                   |
+  | Raspberry Pi Zero                                         | 18 kH/s                           | 1                 | 1.1 W          | ?                   |
   | Raspberry Pi 3 **(32bit)**                                | 440 kH/s                          | 4                 | 5.1 W          | 4-5                 |
-  | Raspberry Pi 4 **(32bit)**                                | 740 kH/s                          | 4                 | 6.4 W          | -                   |
+  | Raspberry Pi 4 **(32bit)**                                | 740 kH/s                          | 4                 | 6.4 W          | ?                   |
   | Raspberry Pi 4 **(64bit, fasthash)**                      | 6.8 MH/s                          | 4                 | 6.4 W          | 5                   |
   | ODROID XU4                                                | 1.0 MH/s                          | 8                 | 5 W            | 6                   |
-  | Atomic Pi                                                 | 690 kH/s                          | 4                 | 6 W            | -                   |
-  | Orange Pi Zero 2                                          | 740 kH/s                          | 4                 | 2.55 W         | -                   |
-  | Khadas Vim 2 Pro                                          | 1.12 MH/s                         | 8                 | 6.2 W          | -                   |
-  | Libre Computers Tritium H5CC                              | 480 kH/s                          | 4                 | 5 W            | -                   |
-  | Libre Computers Le Potato                                 | 410 kH/s                          | 4                 | 5 W            | -                   |
-  | Pine64 ROCK64                                             | 640 kH/s                          | 4                 | 5 W            | -                   |
-  | Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | -              | 3.3                 |
-  | Intel Core i5-2430M                                       | 1.18 MH/s                         | 4                 | -              | 6.5                 |
-  | Intel Core i5-3230M                                       | 1.52 MH/s                         | 4                 | -              | 7.2                 |
-  | Intel Core i5-5350U                                       | 1.35 MH/s                         | 4                 | -              | 6.0                 |
-  | Intel Core i5-7200U                                       | 1.62 MH/s                         | 4                 | -              | 7.5                 |
-  | Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | -              | 9.1                 |   
-  | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | 3.7                 |
-  | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 67 W           | 15.44               |
+  | Atomic Pi                                                 | 690 kH/s                          | 4                 | 6 W            | ?                   |
+  | Orange Pi Zero 2                                          | 740 kH/s                          | 4                 | 2.55 W         | ?                   |
+  | Khadas Vim 2 Pro                                          | 1.12 MH/s                         | 8                 | 6.2 W          | ?                   |
+  | Libre Computers Tritium H5CC                              | 480 kH/s                          | 4                 | 5 W            | ?                   |
+  | Libre Computers Le Potato                                 | 410 kH/s                          | 4                 | 5 W            | ?                   |
+  | Pine64 ROCK64                                             | 640 kH/s                          | 4                 | 5 W            | ?                   |
+  | Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | 53 W           | 3.3                 |
+  | Intel Core i5-2430M                                       | 1.18 MH/s                         | 4                 | 35 W           | 6.5                 |
+  | Intel Core i5-3230M                                       | 1.52 MH/s                         | 4                 | 35 W           | 7.2                 |
+  | Intel Core i5-5350U                                       | 1.35 MH/s                         | 4                 | 15 W           | 6.0                 |
+  | Intel Core i5-7200U                                       | 1.62 MH/s                         | 4                 | 15 W           | 7.5                 |
+  | Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | 45 W           | 9.1                 |   
+  | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | 54 W           | 3.7                 |
+  | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 65 W           | 15.44               |
   | AMD Ryzen R1505G **(fasthash)**                           | 8.5 MH/s                          | 4                 | 35 W           | -                   |   
   | Intel Core i7-11370H **(fasthash)**                       | 17.3 MH/s                         | 8                 | 35 W           | 4.28                |
 
