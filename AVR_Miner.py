@@ -1066,7 +1066,7 @@ def mine_avr(com, threadid, fastest_pool):
                 hashrate_test = round(num_res / computetime, 2)
                 break
             except Exception as e:
-                debug_outpu(str(e))
+                debug_output(str(e))
 
         start_diff = "AVR"
         if hashrate_test > 5500:
