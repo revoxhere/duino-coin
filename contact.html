@@ -309,26 +309,14 @@
                         <p class="title is-size-4">
                             Leave us a message
                         </p>
-                        <form method="post" action="submit" name="contactform" autocomplete="off">
-                            <div class="field">
-                                <label class="label">
-                                    Name
-                                    <small class="has-text-danger">*</small>
-                                </label>
-                                <div class="control has-icons-left">
-                                    <input class="input" type="text" name="name" placeholder="Your name" required>
-                                    <span class="icon is-small is-left">
-                                        <i class="fas fa-user"></i>
-                                    </span>
-                                </div>
-                            </div>
+                        <form onsubmit="send()">
                             <div class="field">
                                 <label class="label">
                                     Duino-Coin username
                                     <small class="has-text-danger">*</small>
                                 </label>
                                 <div class="control has-icons-left">
-                                    <input class="input" type="text" name="username" placeholder="Your username (optional)" required>
+                                    <input class="input" type="text" id="username" placeholder="Your username" required>
                                     <span class="icon is-small is-left">
                                         <i class="fas fa-user"></i>
                                     </span>
@@ -340,19 +328,10 @@
                                     <small class="has-text-danger">*</small>
                                 </label>
                                 <div class="control has-icons-left">
-                                    <input class="input" type="email" name="email" placeholder="Your email address" required>
+                                    <input class="input" type="email" id="email" placeholder="Your email address" required>
                                     <span class="icon is-small is-left">
                                         <i class="fas fa-envelope"></i>
                                     </span>
-                                </div>
-                            </div>
-                            <div class="field">
-                                <label class="label">
-                                    Subject
-                                    <small class="has-text-danger">*</small>
-                                </label>
-                                <div class="control">
-                                    <input class="input" type="text" name="subject" placeholder="Subject" required>
                                 </div>
                             </div>
                             <div class="field">
@@ -361,15 +340,17 @@
                                     <small class="has-text-danger">*</small>
                                 </label>
                                 <div class="control">
-                                    <textarea class="textarea" placeholder="Your message..." name="message" required></textarea>
+                                    <textarea class="textarea" placeholder="Your message..." id="message" required></textarea>
                                 </div>
                             </div>
-                            <div class="form-group" align="left">
-                                <div class="h-captcha" id="h-captcha" data-sitekey="efd592d1-21ad-4905-9f8a-87d8e01193aa"></div>
-                            </div>
+                            <center>
+                                <div align="center">
+                                    <div class="h-captcha" id="h-captcha" data-sitekey="c7a50b3f-7379-4caa-9e3e-d7a169349262"></div>
+                                </div>
+                            </center>
                             <div class="field is-grouped">
                                 <div class="control is-expanded">
-                                    <button class="button is-link is-fullwidth" type="submit" value="Send">Send</button>
+                                    <button class="button is-link is-fullwidth" type="submit">Send</button>
                                 </div>
                             </div>
                         </form>
@@ -434,6 +415,23 @@ function copy(text) {
     navigator.clipboard.writeText(text);
 }
 
+function send() {
+    captcha = document.getElementsByName("h-captcha-response")[0].value
+    message = document.getElementById("message").value
+    email = document.getElementById("email").value
+    username = document.getElementById("username").value
+
+    fetch(`https://server.duinocoin.com/contact_form?captcha=${captcha}&message=${message}&email=${email}&username=${username}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+            alert("Your message has been submitted");
+        } else {
+            alert(data.message);
+        }
+      });
+}
+
 /* On page loaded */
 $(window).on('load', function() {
     const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
@@ -447,12 +445,11 @@ $(window).on('load', function() {
             });
         });
     }
-    const hcaptcha = document.getElementById("h-captcha");
-    hcaptcha.required = true;
-    hcaptcha.oninvalid = function(e) {
-        alert("Please complete the captcha.");
-    }
     $("#pageloader").fadeOut();
+});
+
+$("form").submit(function(e) {
+    e.preventDefault(); // <==stop page refresh==>
 });
 </script>
 
