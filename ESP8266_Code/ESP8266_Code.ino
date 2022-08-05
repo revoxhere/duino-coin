@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for ESP8266 boards                  version 3.18
+  Official code for ESP8266 boards                   version 3.3
 
   Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
@@ -135,22 +135,22 @@
 namespace
 {
   // Change the part in brackets to your WiFi name
-  const char *SSID = "My cool wifi name";
+  const char *SSID = "my_cool_wifi";
   // Change the part in brackets to your WiFi password
-  const char *PASSWORD = "My secret wifi pass";
+  const char *PASSWORD = "my_wifi_password";
   // Change the part in brackets to your Duino-Coin username
   const char *USERNAME = "my_cool_username";
   // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
   const char *RIG_IDENTIFIER = "None";
-  // Change the part in brackets to your mining key (if you enabled it in the wallet)
+  // Change the part in brackets to your mining key (if you have enabled it in the wallet)
   const char *MINER_KEY = "None";
-  // Change false to true if using 160 MHz clock mode to not get the first share rejected
-  const bool USE_HIGHER_DIFF = false;
-  // Change true to false if you don't want to host the dashboard page
-  const bool WEB_DASHBOARD = true;
-  // Change false to true if you want to update hashrate in browser without reloading page
+  // Set to true to use the 160 MHz overclock mode (and not get the first share rejected)
+  const bool USE_HIGHER_DIFF = true;
+  // Set to true if you want to host the dashboard page (available on ESPs IP address)
+  const bool WEB_DASHBOARD = false;
+  // Set to true if you want to update hashrate in browser without reloading the page
   const bool WEB_HASH_UPDATER = false;
-  // Change true to false if you want to disable led blinking(But the LED will work in the beginning until esp connects to the pool)
+  // Set to false if you want to disable the onboard led blinking when finding shares
   const bool LED_BLINKING = true;
 
 /* Do not change the lines below. These lines are static and dynamic variables
@@ -158,7 +158,7 @@ namespace
 const char * DEVICE = "ESP8266";
 const char * POOLPICKER_URL[] = {"https://server.duinocoin.com/getPool"};
 const char * MINER_BANNER = "Official ESP8266 Miner";
-const char * MINER_VER = "3.18";
+const char * MINER_VER = "3.3";
 unsigned int share_count = 0;
 unsigned int port = 0;
 unsigned int difficulty = 0;
@@ -413,7 +413,7 @@ String START_DIFF = "";
 // Loop WDT... please don't feed me...
 // See lwdtcb() and lwdtFeed() below
 Ticker lwdTimer;
-#define LWD_TIMEOUT   60000
+#define LWD_TIMEOUT   20000
 
 unsigned long lwdCurrentMillis = 0;
 unsigned long lwdTimeOutMillis = LWD_TIMEOUT;
@@ -423,7 +423,6 @@ unsigned long lwdTimeOutMillis = LWD_TIMEOUT;
 
 #define LED_BUILTIN 2
 
-#define BLINK_SHARE_FOUND    1
 #define BLINK_SETUP_COMPLETE 2
 #define BLINK_CLIENT_CONNECT 3
 #define BLINK_RESET_DEVICE   5
@@ -484,6 +483,8 @@ void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
       digitalWrite(pin, state ^= HIGH);
       delay(50);
     }
+  } else {
+    digitalWrite(LED_BUILTIN, HIGH);
   }
 }
 
@@ -554,7 +555,7 @@ void ConnectToServer() {
     return;
 
   Serial.println("\n\nConnecting to the Duino-Coin server...");
-  while (!client.connect(host, port));
+  while (!client.connect(host.c_str(), port));
 
   waitForClientData();
   Serial.println("Connected to the server. Server version: " + client_buffer );
@@ -625,8 +626,8 @@ void setup() {
 
   lwdtFeed();
   lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
-  if (USE_HIGHER_DIFF) START_DIFF = "ESP8266H";
-  else START_DIFF = "ESP8266";
+  if (USE_HIGHER_DIFF) START_DIFF = "ESP8266NH";
+  else START_DIFF = "ESP8266N";
 
   if(WEB_DASHBOARD) {
     if (!MDNS.begin(RIG_IDENTIFIER)) {
@@ -707,8 +708,8 @@ void loop() {
 
   int job_len = last_block_hash.length() + expected_hash_str.length() + String(difficulty).length();
 
-  Serial.println("Received job with size of " + String(job_len) + " bytes");
-  
+  Serial.println("Received job with size of " + String(job_len) + " bytes: " + last_block_hash + " " + expected_hash_str + " " + difficulty);
+ 
   uint8_t expected_hash[20];
   experimental::TypeConversion::hexStringToUint8Array(expected_hash_str, expected_hash, 20);
 
@@ -719,7 +720,7 @@ void loop() {
   max_micros_elapsed(start_time, 0);
 
   String result = "";
-  digitalWrite(LED_BUILTIN, HIGH);
+  if (LED_BLINKING) digitalWrite(LED_BUILTIN, LOW);
   for (unsigned int duco_numeric_result = 0; duco_numeric_result < difficulty; duco_numeric_result++) {
     // Difficulty loop
     sha1_ctx = sha1_ctx_base;
@@ -730,11 +731,11 @@ void loop() {
 
     if (memcmp(expected_hash, hashArray, 20) == 0) {
       // If result is found
+      if (LED_BLINKING) digitalWrite(LED_BUILTIN, HIGH);
       unsigned long elapsed_time = micros() - start_time;
       float elapsed_time_s = elapsed_time * .000001f;
       hashrate = duco_numeric_result / elapsed_time_s;
       share_count++;
-      blink(BLINK_SHARE_FOUND);
       client.print(String(duco_numeric_result)
                    + ","
                    + String(hashrate)
@@ -762,9 +763,6 @@ void loop() {
     }
     if (max_micros_elapsed(micros(), 500000)) {
       handleSystemEvents();
-    }
-    else {
-      delay(0);
     }
   }
 }
