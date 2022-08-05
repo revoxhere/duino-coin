@@ -261,7 +261,7 @@
         "node_picker_error": "Fatální chyba při získávání serveru od výběrčího uzlů - zkusím to znovu za ",
         "connecting_node": " Získaný těžební uzel: ",
         "new_version": "Je dostupná nová verze programu. Chceš ho hned teď aktualizovat [Y/n] ? ",
-        "updating": "Těžící program je zastaralý. Instaluji aktualizaci...."
+        "updating": "Těžící program je zastaralý. Instaluji aktualizaci....",
         "ask_mining_key": "Zadej svůj těžební klíč (jen pokud sis ho dříve nastavil ve webové peněžence - stiskni enter k přeskočení): ",
         "mining_key_required": "Těžební klíč je nutný pro těžbu na tomto účtě",
         "invalid_mining_key": "Zadaný těžební klíč není správný",
