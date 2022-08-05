@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for ESP32 boards                    version 3.18
+  Official code for ESP32 boards                     version 3.3
 
   Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
@@ -15,9 +15,9 @@
 
 /***************** START OF MINER CONFIGURATION SECTION *****************/
 // Change the part in brackets to your WiFi name
-const char *SSID = "My cool Wi-Fi";
+const char *SSID = "my_cool_wifi";
 // Change the part in brackets to your WiFi password
-const char *WIFI_PASS = "My secret pass";
+const char *WIFI_PASS = "my_wifi_password";
 // Change the part in brackets to your Duino-Coin username
 const char *DUCO_USER = "my_cool_username";
 // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
@@ -47,7 +47,6 @@ const char* MINER_KEY = "None";
   Adafruit_AHTX0 aht;
 #endif
 
-#define BLINK_SHARE_FOUND    1
 #define BLINK_SETUP_COMPLETE 2
 #define BLINK_CLIENT_CONNECT 3
 #define BLINK_RESET_DEVICE   5
@@ -76,8 +75,11 @@ const int mqtt_port = 1883;
 /* If you're using the ESP32-CAM board or other board
   that doesn't support OTA (Over-The-Air programming)
   comment the ENABLE_OTA definition line (#define ENABLE_OTA)
-   NOTE: enabling OTA support could decrease hashrate (up to 40%) */
+   NOTE: enabling OTA support may decrease the hashrate */
 // #define ENABLE_OTA
+
+/* If you don't want to use the web dashboard comment the line below */
+#define WEB_DASHBOARD
 
 /* If you don't want to use the Serial interface comment
   the ENABLE_SERIAL definition line (#define ENABLE_SERIAL)*/
@@ -155,7 +157,7 @@ SemaphoreHandle_t xMutex;
 const char * DEVICE = "ESP32";
 const char * POOLPICKER_URL[] = {"https://server.duinocoin.com/getPool"};
 const char * MINER_BANNER = "Official ESP32 Miner";
-const char * MINER_VER = "3.18";
+const char * MINER_VER = "3.3";
 String pool_name = "";
 String host = "";
 String node_id = "";
@@ -469,11 +471,13 @@ void WiFireconnect(void *pvParameters) {
   for (;;) {
     wifi_state = WiFi.status();
 
-#ifdef ENABLE_OTA
-    ArduinoOTA.handle();
-#endif
-
-    server.handleClient();
+    #ifdef ENABLE_OTA
+        ArduinoOTA.handle();
+    #endif
+    
+    #ifdef WEB_DASHBOARD
+        server.handleClient();
+    #endif
 
     if (ota_state)  // If OTA is working, reset the watchdog
       esp_task_wdt_reset();
@@ -491,17 +495,19 @@ void WiFireconnect(void *pvParameters) {
       Serial.println("Rig name: " + String(RIG_IDENTIFIER));
       Serial.println();
 
-      if (!MDNS.begin(RIG_IDENTIFIER)) {
-        Serial.println("mDNS unavailable");
-      }
-      MDNS.addService("http", "tcp", 80);
-      Serial.print("Configured mDNS for dashboard on http://" 
-                    + String(RIG_IDENTIFIER)
-                    + ".local (or http://"
-                    + WiFi.localIP().toString()
-                    + ")");
-      server.on("/", dashboard);
-      server.begin();
+      #ifdef WEB_DASHBOARD
+        if (!MDNS.begin(RIG_IDENTIFIER)) {
+          Serial.println("mDNS unavailable");
+        }
+        MDNS.addService("http", "tcp", 80);
+        Serial.print("Configured mDNS for dashboard on http://" 
+                      + String(RIG_IDENTIFIER)
+                      + ".local (or http://"
+                      + WiFi.localIP().toString()
+                      + ")");
+        server.on("/", dashboard);
+        server.begin();
+      #endif
 
       // Notify Setup Complete
       blink(BLINK_SETUP_COMPLETE);// Sucessfull connection with wifi network
@@ -700,6 +706,7 @@ void TaskMining(void *pvParameters) {
       bool ignoreHashrate = false;
 
       // Try to find the nonce which creates the expected hash
+      digitalWrite(LED_BUILTIN, HIGH);
       for (unsigned long nonceCalc = 0; nonceCalc <= TaskThreadData[taskId].difficulty; nonceCalc++) {
         // Define hash under Test
         hashUnderTest = previousHash + String(nonceCalc);
@@ -716,12 +723,13 @@ void TaskMining(void *pvParameters) {
 
         // Check if we have found the nonce for the expected hash
         if ( memcmp( shaResult, expectedHashBytes, sizeof(shaResult) ) == 0 ) {
-          // Found the nonce submit it to the server
-          Serial.println(String(taskCoreName + " found a correct hash using nonce: " + nonceCalc ));
-
+          // Found the nonce - submit it to the server
+          digitalWrite(LED_BUILTIN, LOW);
+          
           // Calculate mining time
           float elapsedTime = (micros() - startTime) / 1000.0 / 1000.0; // Total elapsed time in seconds
           TaskThreadData[taskId].hashrate = nonceCalc / elapsedTime;
+          Serial.println(String(taskCoreName + " found a correct hash (" + elapsedTime + "s)"));
 
           // Validate connection
           if (!jobClient.connected()) {
@@ -757,20 +765,9 @@ void TaskMining(void *pvParameters) {
           TaskThreadData[taskId].shares++;
           if (LED_BLINKING) digitalWrite(LED_BUILTIN, HIGH);
 
-          // Validate Hashrate
-          if ( TaskThreadData[taskId].hashrate < 4000 && !ignoreHashrate) {
-            // Hashrate is low so restart esp
-            Serial.println(String(taskCoreName + " has low hashrate: " + (TaskThreadData[taskId].hashrate / 1000) + "kH/s, job feedback: " + feedback + " - restarting..."));
-            jobClient.flush();
-            jobClient.stop();
-            blink(BLINK_RESET_DEVICE);
-            esp_restart();
-          }
-          else {
-            // Print statistics
-            Serial.println(String(taskCoreName + " retrieved job feedback: " + feedback + ", hashrate: " + (TaskThreadData[taskId].hashrate / 1000) + "kH/s, share #" + TaskThreadData[taskId].shares));
-          }
-
+          // Print statistics
+          Serial.println(String(taskCoreName + " retrieved job feedback: " + feedback + ", hashrate: " + (TaskThreadData[taskId].hashrate / 1000) + "kH/s, share #" + TaskThreadData[taskId].shares));
+          
           // Stop current loop and ask for a new job
           break;
         }
