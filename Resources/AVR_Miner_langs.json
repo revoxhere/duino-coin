@@ -237,7 +237,7 @@
         "retrying": " Zkusím to znovu za 10s",
         "mining_user": " Uživatel ",
         "mining_not_exist": " neexistuje.",
-        "mining_not_exist_warning": " Ujisti se, že jsi zadal uživatelské jméno správně. Zkontroluj prosím soubor konfigurace. Zkusím to znovu za 10s",
+        "mining_not_exist_warning": " Ujisti se, že jsi zadal uživatelské jméno správně. Zkontroluj prosím soubor konfigurace. Zkusím to znovu za 10 sekund",
         "load_config_error": " Chyba při načítání konfiguračního souboru (",
         "load_config_error_warning": "/Miner_config.cfg). Zkus ho odstranit a program spustit znovu. Zavírám za 10s",
         "connection_search": "Hledám nejrychlejší těžební uzel",
@@ -260,8 +260,17 @@
         "node_picker_unavailable": "Výběrčí uzlů nejspíš nedopovídá tak, jak by měl - zkusím to znovu za ",
         "node_picker_error": "Fatální chyba při získávání serveru od výběrčího uzlů - zkusím to znovu za ",
         "connecting_node": " Získaný těžební uzel: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating...."
+        "new_version": "Je dostupná nová verze programu. Chceš ho hned teď aktualizovat [Y/n] ? ",
+        "updating": "Těžící program je zastaralý. Instaluji aktualizaci...."
+        "ask_mining_key": "Zadej svůj těžební klíč (jen pokud sis ho dříve nastavil ve webové peněžence - stiskni enter k přeskočení): ",
+        "mining_key_required": "Těžební klíč je nutný pro těžbu na tomto účtě",
+        "invalid_mining_key": "Zadaný těžební klíč není správný",
+        "incorrect_username": "Zadané uživatelské jméno neexistuje",
+        "system_threads_notice": "Varování: pokoušíš se k těžbě využít více jader, než které máš ve své těžební desce.\n\t\tTento krok způsobí nežádoucí efekty jako neresponzivnost systému.\n\t\tTěžba začne za 10s",
+        "using_config": "Konfigurační soubor: ",
+        "motd": "Serverová zpráva dne: ",
+        "hashrate_test": "Test hashratu skončil s výsledkem ",
+        "hashrate_test_diff": ", systém přiřadil těžební obtížnost: "
     },
     "korean": {
         "translation_autor": "hotmoist, roroxxn, hj-k66 ",
