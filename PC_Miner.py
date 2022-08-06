@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 3.2 © MIT licensed
+Duino-Coin Official PC Miner 3.3 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2022
@@ -136,7 +136,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 3.2
+    VER = 3.3
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -1217,7 +1217,6 @@ class Fasthash:
                      + "How-to-compile-fasthash-accelerations\n"
                      + f"(Libducohash couldn't be loaded: {str(e)})"
                      ).replace("\n", "\n\t\t"), 'warning', 'sys0')
-            sleep(15)
 
     def load():
         if os.name == 'nt':
@@ -1250,7 +1249,6 @@ class Fasthash:
                      + "How-to-compile-fasthash-accelerations\n"
                      + f"(Invalid processor architecture: {osprocessor()})"
                      ).replace("\n", "\n\t\t"), 'warning', 'sys0')
-                sleep(15)
                 return
             if not Path("libducohasher.so").is_file():
                 pretty_print(get_string("fasthash_download"), "info")
@@ -1266,7 +1264,6 @@ class Fasthash:
                  + "How-to-compile-fasthash-accelerations\n"
                  + f"(Invalid OS: {os.name})"
                  ).replace("\n", "\n\t\t"), 'warning', 'sys0')
-            sleep(15)
             return
 
 
