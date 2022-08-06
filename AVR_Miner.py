@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 3.25 © MIT licensed
+Duino-Coin Official AVR Miner 3.3 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2022
@@ -109,7 +109,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '3.25'
+    VER = '3.3'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
     AVR_TIMEOUT = 10
