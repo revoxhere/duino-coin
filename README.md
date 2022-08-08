@@ -160,6 +160,8 @@ Server source code, documentation for API calls and official libraries for devel
   | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 65 W           | 15.44               |
   | AMD Ryzen R1505G **(fasthash)**                           | 8.5 MH/s                          | 4                 | 35 W           | -                   |   
   | Intel Core i7-11370H **(fasthash)**                       | 17.3 MH/s                         | 8                 | 35 W           | 4.28                |
+  | Realtek RTD1295                                           | 490 kH/s                          | 4                 | -              | -                   |
+  | Realtek RTD1295 **(fasthash)**                            | 3.89 MH/s                         | 4                 | -              | -                   |
 
 All tests were performed using the DUCO-S1 algorithm **without fasthash accelerations** unless stated otherwise. This table will be actively updated.
 
