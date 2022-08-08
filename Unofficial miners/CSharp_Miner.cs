@@ -12,6 +12,7 @@ class Program
     static Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
     static string username = "CleoSk";
     static string difficulty = "LOW";
+
     static async Task Main(string[] args)
     {
         await ConnectToPool();
@@ -40,7 +41,7 @@ class Program
 
     static string[] JobRequest()
     {
-        Send($"JOB,{username},{difficulty},halk");
+        Send($"JOB,{username},{difficulty}");
         return Receive().Split(",");
     }
 
