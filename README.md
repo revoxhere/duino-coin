@@ -151,6 +151,8 @@ Server source code, documentation for API calls and official libraries for devel
   | Libre Computers Le Potato                                 | 410 kH/s                          | 4                 | 5 W            | ?                   |
   | Pine64 ROCK64                                             | 640 kH/s                          | 4                 | 5 W            | ?                   |
   | Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | 53 W           | 3.3                 |
+  | RTX 3060 ti(no gpu miner avaible)                         | 420+ MH/s                         | 1                 | 160            | -                   |
+  | Intel Core I7-10700KF                                     | 25+ MH/s                          | 5                 | ~60            | -                   |
   | Intel Core i5-2430M                                       | 1.18 MH/s                         | 4                 | 35 W           | 6.5                 |
   | Intel Core i5-3230M                                       | 1.52 MH/s                         | 4                 | 35 W           | 7.2                 |
   | Intel Core i5-5350U                                       | 1.35 MH/s                         | 4                 | 15 W           | 6.0                 |
