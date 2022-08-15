@@ -105,7 +105,7 @@
         "motd": "Server message of the day: "
     },
     "indonesian": {
-        "translation_autor": "rezafauzan945",
+        "translation_autor": "rezafauzan945 x BITIW",
         "translation": "Terjemahan bahasa indonesia: ",
         "sigint_detected": " SIGINT terdeteksi - Keluar dengan lancar.",
         "goodbye": " Sampai jumpa lagi!",
@@ -194,14 +194,14 @@
         "node_picker_unavailable": "Pemilih Node tidak merespon dengan baik - mencoba lagi dalam ",
         "node_picker_error": "Kesalahan Fatal mengambil server dari pemilih node - mencoba lagi dalam ",
         "connecting_node": " mining node yang dipakai: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "Versi baru tersedia, Anda ingin memperbarui penambang [Y/n] ? ",
+        "updating": "Penambang sudah ketinggalan zaman. Memperbarui....",
+        "ask_mining_key": "Masukkan kunci penambangan Anda (hanya diperlukan jika Anda mengaktifkan opsi ini di dompet web - tekan enter untuk melewati): ",
+        "mining_key_required": "Kunci penambangan diperlukan untuk menambang di akun ini",
+        "invalid_mining_key": "Kunci penambangan yang Anda berikan tidak valid!"
     },
     "korean": {
-        "translation_autor": "hotmoist, roroxxn, hj-k66, dnjswndbf",
+        "translation_autor": "hotmoist, roroxxn, hj-k66, dnjswndbf, BITIW",
         "translation": "한국어 번역: ",
         "sigint_detected": " SIGINT 탐지 - 정상적으로 종료 중.",
         "goodbye": " 또 만나요!",
@@ -285,14 +285,14 @@
         "report_body5": "\n\t\t‖ 이 기간동안, 해결하신 양 ",
         "report_body6": " 해시들",
         "total_mining_time": "\n\t\t‖ 총 채굴 기간: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "새 버전을 사용할 수 있습니다. 광부를 업데이트하고 싶습니다. [Y/n] ? ",
+        "updating": "광부가 구식입니다. 업데이트 중....",
+        "ask_mining_key": "마이닝 키를 입력하십시오(웹 지갑에서 이 옵션을 활성화한 경우에만 필요합니다. 건너뛰려면 Enter 키를 누르십시오).: ",
+        "mining_key_required": "이 계정에서 채굴하려면 채굴 키가 필요합니다",
+        "invalid_mining_key": "제공한 마이닝 키가 잘못되었습니다.!"
     },
     "farsi": {
-        "translation_autor": "Syamakszk",
+        "translation_autor": "Syamakszk x BITIW",
         "translation": "ترجمه فارسی: ",
         "sigint_detected": " شناسایی شد- با ظرافت خارج شد.",
         "goodbye": " به زودی می بینمت!",
@@ -376,14 +376,14 @@
         "report_body5": "\n\t\t‖ In this time period, شما موفق شدید ",
         "report_body6": " hashes",
         "total_mining_time": "\n\t\t‖ تمام وقت کارکرد: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "نسخه جدیدی در دسترس است، می‌خواهید ماینر را به‌روزرسانی کنید [Y/n] ? ",
+        "updating": "ماینر قدیمی است. در حال بروز رسانی....",
+        "ask_mining_key": "کلید استخراج خود را وارد کنید (فقط در صورتی لازم است که این گزینه را در کیف پول وب فعال کرده باشید - برای رد شدن، enter را فشار دهید): ",
+        "mining_key_required": "کلید ماینینگ برای استخراج در این حساب مورد نیاز است",
+        "invalid_mining_key": "کلید استخراجی که ارائه کردید نامعتبر است!"
     },
     "slovak": {
-        "translation_autor": "backo",
+        "translation_autor": "backo x BITIW",
         "translation": "Slovenský preklad: ",
         "sigint_detected": " SIGINT detekovaný – ukončuje sa.",
         "goodbye": " Dovidenia!",
@@ -467,14 +467,14 @@
         "report_body5": "\n\t\t‖ V tomto časovom období ste vyriešili ",
         "report_body6": " hashes",
         "total_mining_time": "\n\t\t‖ Celková doba prevádzky: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "K dispozícii je nová verzia, chcete aktualizovať baníka [Y/n] ? ",
+        "updating": "Baník je zastaraný. Aktualizuje sa....",
+        "ask_mining_key": "Zadajte svoj kľúč na ťažbu (vyžaduje sa iba vtedy, ak ste túto možnosť aktivovali vo webovej peňaženke – preskočíte stlačením klávesu Enter): ",
+        "mining_key_required": "Na ťažbu na tomto účte je potrebný ťažobný kľúč",
+        "invalid_mining_key": "Zadaný ťažobný kľúč je neplatný!"
     },
     "italian": {
-        "translation_autor": "Il mastro Stefanuzzo",
+        "translation_autor": "Il mastro Stefanuzzo x BITIW",
         "translation": "Traduzione italiana: ",
         "sigint_detected": " SIGINT rilevato - Uscita dal programma.",
         "goodbye": " A presto!",
@@ -541,11 +541,11 @@
         "max_threads_notice": "Minare Duino-Coin con un sacco di thread causerà un peggioramento del profitto - thread di mining diminuiti a 16",
         "max_hashrate_notice": "Minare Duino-Coin con un equipaggiamento potente potrebbe non essere molto profittevole per te - suggeriamo di provare Coin Magi (https://xmg.network) - la nostra moneta \"sorella\"",
         "recommended": "raccomandato",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "È disponibile una nuova versione, si desidera aggiornare il minatore [Y/n] ? ",
+        "updating": "Il minatore è obsoleto. In aggiornamento....",
+        "ask_mining_key": "Inserisci la tua chiave di mining (richiesto solo se hai attivato questa opzione nel portafoglio web - premi invio per saltare): ",
+        "mining_key_required": "La chiave di mining è necessaria per eseguire il mining su questo account",
+        "invalid_mining_key": "La chiave di mining che hai fornito non è valida!"
     },
     "polish": {
         "translation_autor": "revox",
@@ -811,7 +811,7 @@
         "invalid_mining_key": "La clé de minage fournie est invalide!"
     },
     "russian": {
-        "translation_autor": "5Q",
+        "translation_autor": "5Q x BITIW",
         "translation": "Русский перевод: ",
         "sigint_detected": " Обнаружен SIGINT - завершаем работу.",
         "goodbye": " До скорой встречи!",
@@ -874,14 +874,14 @@
         "mining_user": " Пользователь ",
         "mining_not_exist": " не существует.",
         "mining_not_exist_warning": " Убедитесь в том, что вы правильно ввели имя пользователя. Пожалуйста, проверьте ваш файл настроек. Пробуем еще раз через 10с",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "Доступна новая версия. Желаете обновится? [Y/n] ? ",
+        "updating": "Майнер устарел, Обновление...",
+        "ask_mining_key": "Введите ваш ключ для майнинга:(Вводите только если включили эту функцию в веб кошельке, иначе - пропускайте): ",
+        "mining_key_required": "Что бы майнить на этом аккаунте, нужен ключ для майнинга!",
+        "invalid_mining_key": "Введённый ключ не верный!"
     },
     "ukrainian": {
-        "translation_autor": "osmolenko",
+        "translation_autor": "osmolenko x BITIW",
         "translation": "Український переклад: ",
         "sigint_detected": " Знайдено SIGINT - завершую роботу.",
         "goodbye": " До скорої зустрічі!",
@@ -970,11 +970,11 @@
         "node_picker_unavailable": "Схоже, засіб вибору вузлів не відповідає належним чином - повторимо через ",
         "node_picker_error": "Фатальна помилка отримання сервера із засобу вибору вузлів - повторимо через ",
         "connecting_node": " Отриманий вузол майнінгу: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "Доступна нова версія, ви хочете оновити майнер [Y/n] ? ",
+        "updating": "Майнер застарів. Оновлення....",
+        "ask_mining_key": "Введіть свій ключ для Майнінг (потрібно тільки в тому випадку, якщо ви активували цю опцію в веб-гаманці-натисніть enter, щоб пропустити): ",
+        "mining_key_required": "Для Майнінг на цьому обліковому записі потрібно ключ Майнінг!",
+        "invalid_mining_key": "Наданий Вами ключ Майнінг недійсний!"
     },
     "german": {
         "translation_autor": "BastelPichi, EinWildesPanda, f0xqw3rt2",
@@ -1048,7 +1048,7 @@
         "invalid_mining_key": "Der eingegebene Mining-Key ist ungültig!"
     },
     "chinese_simplified": {
-        "translation_autor": "suifengtec",
+        "translation_autor": "suifengtec x BITIW",
         "translation": "中文翻译：",
         "sigint_detected": "检测到 SIGINT - 优雅退出.",
         "goodbye": " 待会儿见!",
@@ -1112,11 +1112,11 @@
         "mining_user": " 用户 ",
         "mining_not_exist": " 不存在。",
         "mining_not_exist_warning": " 确保您正确输入了用户名。请检查您的配置文件。 将在10秒内重试",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "有新版本可用，您要更新矿机吗？ [Y/n] ? ",
+        "updating": "矿机已经过时了。 更新....",
+        "ask_mining_key": "输入您的挖矿密钥（仅当您在网络钱包中激活此选项时才需要 - 按 Enter 跳过）: ",
+        "mining_key_required": "在这个账户上挖矿需要挖矿密钥!",
+        "invalid_mining_key": "您提供的挖矿密钥无效!"
     },
     "turkish": {
         "translation_autor": "Scatchie",
@@ -1184,14 +1184,14 @@
         "mining_not_exist": " mevcut değil.",
         "mining_not_exist_warning": " Kullanıcı adınızı doğru girdiğinizden emin olun. Lütfen ayar dosyanızı kontrol edin. 10 saniye içerisinde yeniden deneniyor",
         "connection_search": "Sunuculara bağlanmak için en hızlı bağlantı aranıyor",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "Yeni bir sürüm mevcut, madenciyi güncellemek istiyorsunuz [Y/n] ? ",
+        "updating": "Madenci modası geçmiş. güncelleniyor....",
+        "ask_mining_key": "Madencilik anahtarınızı girin (yalnızca bu seçeneği web cüzdanında etkinleştirdiyseniz gereklidir - atlamak için enter tuşuna basın): ",
+        "mining_key_required": "Bu hesapta madencilik yapmak için madencilik anahtarı gerekiyor",
+        "invalid_mining_key": "Sağladığınız madencilik anahtarı geçersiz!"
     },
     "portuguese": {
-        "translation_autor": "bonsai e gsrbr",
+        "translation_autor": "bonsai e gsrbr x BITIW",
         "translation": "Tradução em português: ",
         "sigint_detected": " SIGINT detectado - Saindo corretamente.",
         "goodbye": " Até!",
@@ -1274,14 +1274,14 @@
         "report_body5": "\n\t\t‖ Neste período de tempo, você resolveu ",
         "report_body6": " hashes",
         "total_mining_time": "\n\t\t‖ Tempo de atividade total do minerador: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "Uma nova versão está disponível, você deseja atualizar o minerador [Y/n] ? ",
+        "updating": "O mineiro está desatualizado. Atualizando....",
+        "ask_mining_key": "Digite sua chave de mineração (necessário apenas se você ativou esta opção na carteira da web - pressione enter para pular): ",
+        "mining_key_required": "A chave de mineração é necessária para minerar nesta conta",
+        "invalid_mining_key": "A chave de mineração que você forneceu é inválida!"
     },
     "maltese": {
-        "translation_autor": "IdotMaster1/MattyInnit",
+        "translation_autor": "IdotMaster1/MattyInnit x BITIW",
         "translation": "Traduzzjoni bil-Malti: ",
         "sigint_detected": "SIGINT misjub - Itfi l-iskavatur.",
         "goodbye": "Narawk dalwaqt!",
@@ -1342,13 +1342,13 @@
         "load_config_error": "Problema bit-tagħbija tal-fajl tal-konfigurazzjoni (",
         "load_config_error_warning": "/Miner_config.cfg). Ipprova neħħih u erġa 'ibda l-iskavatur. Agħlaq f'10 sekondi",
         "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "updating": "Il-minatur huwa skadut. Aġġornament....",
+        "ask_mining_key": "Daħħal iċ-ċavetta tal-minjieri tiegħek (meħtieġ biss jekk attivajt din l-għażla fil-kartiera tal-web - agħfas enter biex taqbeż): ",
+        "mining_key_required": "Ċavetta tal-minjieri hija meħtieġa biex minjieri fuq dan il-kont",
+        "invalid_mining_key": "Iċ-ċavetta tal-minjieri li pprovdejt hija invalida!"
     },
     "thai": {
-        "translation_autor": "naphob",
+        "translation_autor": "naphob x BITIW",
         "translation": "แปลไทย: ",
         "sigint_detected": " ตรวจพบ SIGINT - จบการใช้งานอย่่างปลอดภัย",
         "goodbye": " แล้วพบกันใหม่",
@@ -1432,14 +1432,14 @@
         "report_body5": "\n\t\t‖ ในช่วงเวลานี้, คุณได้แก้ไป ",
         "report_body6": " แฮช",
         "total_mining_time": "\n\t\t‖ เวลาที่ตัวขุดทำงานทั้งหมด: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "มีเวอร์ชันใหม่แล้ว คุณต้องการอัปเดต miner [Y/n] ? ",
+        "updating": "คนขุดแร่ล้าสมัย กำลังอัปเดต....",
+        "ask_mining_key": "ป้อนรหัสการขุดของคุณ (จำเป็นเฉพาะเมื่อคุณเปิดใช้งานตัวเลือกนี้ใน webwallet - กด Enter เพื่อข้าม): ",
+        "mining_key_required": "ต้องใช้รหัสการขุดเพื่อขุดในบัญชีนี้",
+        "invalid_mining_key": "คีย์การขุดที่คุณระบุไม่ถูกต้อง!"
     },
     "hindi": {
-        "translation_autor": "korrykatti",
+        "translation_autor": "korrykatti x BITIW",
         "translation": "हिन्दी",
         "sigint_detected": " SIGINT का पता चला - बाहर निकल रहा है",
         "goodbye": " जल्द ही फिर मिलेंगे!",
@@ -1528,14 +1528,14 @@
         "node_picker_unavailable": "ऐसा लगता है कि नोड पिकर ठीक से प्रतिक्रिया नहीं दे रहा है - पुनः प्रयास कर रहा है ",
         "node_picker_error": "नोड पिकर से सर्वर लाने में गंभीर त्रुटि - पुनः प्रयास कर रहा है ",
         "connecting_node": " पुनर्प्राप्त खनन नोड: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "एक नया संस्करण उपलब्ध है, आप माइनर को अपडेट करना चाहते हैं [Y/n] ? ",
+        "updating": "खनिक पुराना है। अद्यतन करने....",
+        "ask_mining_key": "अपनी खनन कुंजी दर्ज करें (केवल तभी आवश्यक है जब आपने वेबवॉलेट में इस विकल्प को सक्रिय किया हो - स्किप करने के लिए एंटर दबाएं): ",
+        "mining_key_required": "इस खाते पर खनन कुंजी की आवश्यकता है",
+        "invalid_mining_key": "आपके द्वारा प्रदान की गई खनन कुंजी अमान्य है!"
     },
     "czech": {
-        "translation_autor": "fpetru",
+        "translation_autor": "fpetru x BITIW",
         "translation": "Český překlad: ",
         "sigint_detected": " SIGINT zaznamenán - Elegantně ukončuji operaci.",
         "goodbye": "Brzy zase naviděnou!",
@@ -1624,10 +1624,10 @@
         "node_picker_unavailable": "Výběrčí uzlů nejspíš nepracuje správně - zkusím to znovu za ",
         "node_picker_error": "Fatální chyba při vybírání uzlů - zkusím to znovu za ",
         "connecting_node": " Získaný těžební uzel: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "Je k dispozici nová verze, chcete aktualizovat horník [Y/n] ? ",
+        "updating": "Miner je zastaralý. Aktualizace....",
+        "ask_mining_key": "Zadejte svůj klíč k těžbě (vyžadováno pouze v případě, že jste tuto možnost aktivovali ve webové peněžence – přeskočte stisknutím klávesy Enter): ",
+        "mining_key_required": "K těžbě na tomto účtu je vyžadován těžební klíč",
+        "invalid_mining_key": "Zadaný těžební klíč je neplatný!"
     }
 }
