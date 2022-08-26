@@ -134,16 +134,16 @@
 
 namespace
 {
-  // Change the part in brackets to your WiFi name
-  const char *SSID = "my_cool_wifi";
-  // Change the part in brackets to your WiFi password
-  const char *PASSWORD = "my_wifi_password";
   // Change the part in brackets to your Duino-Coin username
-  const char *USERNAME = "my_cool_username";
+  const char *USERNAME = "USERNAME";
+   // Change the part in brackets to your mining key (if you have enabled it in the wallet)
+  const char *MINER_KEY = "MINER_KEY";
+  // Change the part in brackets to your WiFi name
+  const char *SSID = "WIFI_NAME";
+  // Change the part in brackets to your WiFi password
+  const char *PASSWORD = "WIFI_PASSWORD";
   // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
   const char *RIG_IDENTIFIER = "None";
-  // Change the part in brackets to your mining key (if you have enabled it in the wallet)
-  const char *MINER_KEY = "None";
   // Set to true to use the 160 MHz overclock mode (and not get the first share rejected)
   const bool USE_HIGHER_DIFF = true;
   // Set to true if you want to host the dashboard page (available on ESPs IP address)
