@@ -14,16 +14,16 @@
 */
 
 /***************** START OF MINER CONFIGURATION SECTION *****************/
-// Change the part in brackets to your WiFi name
-const char *SSID = "my_cool_wifi";
-// Change the part in brackets to your WiFi password
-const char *WIFI_PASS = "my_wifi_password";
 // Change the part in brackets to your Duino-Coin username
-const char *DUCO_USER = "my_cool_username";
+const char *DUCO_USER = "USERNAME";
+// Change the part in brackets to your mining key (if you enabled it in the wallet)
+const char* MINER_KEY = "MINER_KEY";
+// Change the part in brackets to your WiFi name
+const char *SSID = "WIFI_NAME";
+// Change the part in brackets to your WiFi password
+const char *WIFI_PASS = "WIFI_PASSWORD";
 // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
 const char *RIG_IDENTIFIER = "None";
-// Change the part in brackets to your mining key (if you enabled it in the wallet)
-const char* MINER_KEY = "None";
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 2
 // Uncomment the line below if you wish to use a DHT sensor (Duino IoT beta)
