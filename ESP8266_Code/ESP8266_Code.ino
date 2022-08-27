@@ -135,9 +135,9 @@
 namespace
 {
   // Change the part in brackets to your Duino-Coin username
-  const char *USERNAME = "USERNAME";
+  const char *DUCO_USER = "USERNAME";
    // Change the part in brackets to your mining key (if you have enabled it in the wallet)
-  const char *MINER_KEY = "MINER_KEY";
+  const char *MINER_KEY = "MINING_KEY";
   // Change the part in brackets to your WiFi name
   const char *SSID = "WIFI_NAME";
   // Change the part in brackets to your WiFi password
@@ -661,11 +661,11 @@ void loop() {
   if(WEB_DASHBOARD) server.handleClient();
 
   ConnectToServer();
-  Serial.println("Asking for a new job for user: " + String(USERNAME));
+  Serial.println("Asking for a new job for user: " + String(DUCO_USER));
 
   #ifndef USE_DHT
     client.print("JOB," + 
-                 String(USERNAME) + SEP_TOKEN +
+                 String(DUCO_USER) + SEP_TOKEN +
                  String(START_DIFF) + SEP_TOKEN +
                  String(MINER_KEY) + END_TOKEN);
   #endif
@@ -676,7 +676,7 @@ void loop() {
 
     Serial.println("DHT readings: " + String(temp) + "*C, " + String(hum) + "%");
     client.print("JOB," + 
-                 String(USERNAME) + SEP_TOKEN +
+                 String(DUCO_USER) + SEP_TOKEN +
                  String(START_DIFF) + SEP_TOKEN +
                  String(MINER_KEY) + SEP_TOKEN +
                  String(temp) + "@" + String(hum) + END_TOKEN);
