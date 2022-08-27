@@ -17,7 +17,7 @@
 // Change the part in brackets to your Duino-Coin username
 const char *DUCO_USER = "USERNAME";
 // Change the part in brackets to your mining key (if you enabled it in the wallet)
-const char* MINER_KEY = "MINER_KEY";
+const char* MINER_KEY = "MINING_KEY";
 // Change the part in brackets to your WiFi name
 const char *SSID = "WIFI_NAME";
 // Change the part in brackets to your WiFi password
