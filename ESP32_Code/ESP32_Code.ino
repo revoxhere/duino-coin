@@ -78,8 +78,8 @@ const int mqtt_port = 1883;
    NOTE: enabling OTA support may decrease the hashrate */
 // #define ENABLE_OTA
 
-/* If you don't want to use the web dashboard comment the line below */
-#define WEB_DASHBOARD
+/* If you want to use the web dashboard uncomment the line below */
+// #define WEB_DASHBOARD
 
 /* If you don't want to use the Serial interface comment
   the ENABLE_SERIAL definition line (#define ENABLE_SERIAL)*/
