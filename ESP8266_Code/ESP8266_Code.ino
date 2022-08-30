@@ -22,8 +22,8 @@
 /* If during compilation the line below causes a
   "fatal error: arduinoJson.h: No such file or directory"
   message to occur; it means that you do NOT have the
-  ArduinoJSON library installed. To install it, 
-  go to the below link and follow the instructions: 
+  ArduinoJSON library installed. To install it,
+  go to the below link and follow the instructions:
   https://github.com/revoxhere/duino-coin/issues/832 */
 #include <ArduinoJson.h>
 
@@ -35,7 +35,7 @@
   follow the instructions of the readme file:
   https://github.com/esp8266/Arduino */
 #include <bearssl/bearssl.h>
-#include <TypeConversion.h>
+//#include <TypeConversion.h>
 
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -56,102 +56,102 @@
 // https://www.techtarget.com/iotagenda/definition/MQTT-MQ-Telemetry-Transport
 
 #ifdef USE_DHT
-  float temp = 0.0;
-  float hum = 0.0;
+float temp = 0.0;
+float hum = 0.0;
 
-  // Install "DHT sensor library" if you get an error
-  #include <DHT.h>
-  // Change D3 to the pin you've connected your sensor to
-  #define DHTPIN D3
-  // Set DHT11 or DHT22 accordingly
-  #define DHTTYPE DHT11
+// Install "DHT sensor library" if you get an error
+#include <DHT.h>
+// Change D3 to the pin you've connected your sensor to
+#define DHTPIN D3
+// Set DHT11 or DHT22 accordingly
+#define DHTTYPE DHT11
 
-  DHT dht(DHTPIN, DHTTYPE);
+DHT dht(DHTPIN, DHTTYPE);
 #endif
 
 #ifdef USE_MQTT
-  // Install "PubSubClient" if you get an error
-  #include <PubSubClient.h>
+// Install "PubSubClient" if you get an error
+#include <PubSubClient.h>
 
-  long lastMsg = 0;
+long lastMsg = 0;
 
-  // Change the part in brackets to your MQTT broker address
-  #define mqtt_server "broker.hivemq.com"
-  // broker.hivemq.com is for testing purposes, change it to your broker address
+// Change the part in brackets to your MQTT broker address
+#define mqtt_server "broker.hivemq.com"
+// broker.hivemq.com is for testing purposes, change it to your broker address
 
-  // Change this to your MQTT broker port
-  #define mqtt_port 1883
-  // If you want to use user and password for your MQTT broker, uncomment the line below
-  // #define mqtt_use_credentials
+// Change this to your MQTT broker port
+#define mqtt_port 1883
+// If you want to use user and password for your MQTT broker, uncomment the line below
+// #define mqtt_use_credentials
 
-  // Change the part in brackets to your MQTT broker username
-  #define mqtt_user "My cool mqtt username"
-  // Change the part in brackets to your MQTT broker password
-  #define mqtt_password "My secret mqtt pass"
+// Change the part in brackets to your MQTT broker username
+#define mqtt_user "My cool mqtt username"
+// Change the part in brackets to your MQTT broker password
+#define mqtt_password "My secret mqtt pass"
 
-  // Change this if you want to send data to the topic every X milliseconds
-  #define mqtt_update_time 5000
+// Change this if you want to send data to the topic every X milliseconds
+#define mqtt_update_time 5000
 
-  // Change the part in brackets to your MQTT humidity topic
-  #define humidity_topic "sensor/humidity"
-  // Change the part in brackets to your MQTT temperature topic
-  #define temperature_topic "sensor/temperature"
+// Change the part in brackets to your MQTT humidity topic
+#define humidity_topic "sensor/humidity"
+// Change the part in brackets to your MQTT temperature topic
+#define temperature_topic "sensor/temperature"
 
-  WiFiClient espClient;
-  PubSubClient mqttClient(espClient);
+WiFiClient espClient;
+PubSubClient mqttClient(espClient);
 
-  void mqttReconnect()
+void mqttReconnect()
+{
+  // Loop until we're reconnected
+  while (!mqttClient.connected())
   {
-    // Loop until we're reconnected
-    while (!mqttClient.connected())
+    Serial.print("Attempting MQTT connection...");
+
+    // Create a random client ID
+    String clientId = "ESP8266Client-";
+    clientId += String(random(0xffff), HEX);
+
+    // Attempt to connect
+#ifdef mqtt_use_credentials
+    if (mqttClient.connect("ESP8266Client", mqtt_user, mqtt_password))
+#else
+    if (mqttClient.connect(clientId.c_str()))
+#endif
     {
-      Serial.print("Attempting MQTT connection...");
-
-      // Create a random client ID
-      String clientId = "ESP8266Client-";
-      clientId += String(random(0xffff), HEX);
-
-      // Attempt to connect
-      #ifdef mqtt_use_credentials
-        if (mqttClient.connect("ESP8266Client", mqtt_user, mqtt_password))
-      #else
-        if (mqttClient.connect(clientId.c_str()))
-      #endif
-      {
-        Serial.println("connected");
-      }
-      else
-      {
-        Serial.print("failed, rc=");
-        Serial.print(mqttClient.state());
-        Serial.println(" try again in 5 seconds");
-        // Wait 5 seconds before retrying
-        delay(5000);
-      }
+      Serial.println("connected");
+    }
+    else
+    {
+      Serial.print("failed, rc=");
+      Serial.print(mqttClient.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
     }
   }
+}
 #endif
 
 namespace
 {
-  // Change the part in brackets to your Duino-Coin username
-  const char *DUCO_USER = "USERNAME";
-   // Change the part in brackets to your mining key (if you have enabled it in the wallet)
-  const char *MINER_KEY = "MINING_KEY";
-  // Change the part in brackets to your WiFi name
-  const char *SSID = "WIFI_NAME";
-  // Change the part in brackets to your WiFi password
-  const char *PASSWORD = "WIFI_PASSWORD";
-  // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
-  const char *RIG_IDENTIFIER = "None";
-  // Set to true to use the 160 MHz overclock mode (and not get the first share rejected)
-  const bool USE_HIGHER_DIFF = true;
-  // Set to true if you want to host the dashboard page (available on ESPs IP address)
-  const bool WEB_DASHBOARD = false;
-  // Set to true if you want to update hashrate in browser without reloading the page
-  const bool WEB_HASH_UPDATER = false;
-  // Set to false if you want to disable the onboard led blinking when finding shares
-  const bool LED_BLINKING = true;
+// Change the part in brackets to your Duino-Coin username
+const char *DUCO_USER = "USERNAME";
+// Change the part in brackets to your mining key (if you have enabled it in the wallet)
+const char *MINER_KEY = "MINING_KEY";
+// Change the part in brackets to your WiFi name
+const char *SSID = "WIFI_NAME";
+// Change the part in brackets to your WiFi password
+const char *PASSWORD = "WIFI_PASSWORD";
+// Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
+const char *RIG_IDENTIFIER = "None";
+// Set to true to use the 160 MHz overclock mode (and not get the first share rejected)
+const bool USE_HIGHER_DIFF = true;
+// Set to true if you want to host the dashboard page (available on ESPs IP address)
+const bool WEB_DASHBOARD = false;
+// Set to true if you want to update hashrate in browser without reloading the page
+const bool WEB_HASH_UPDATER = false;
+// Set to false if you want to disable the onboard led blinking when finding shares
+const bool LED_BLINKING = true;
 
 /* Do not change the lines below. These lines are static and dynamic variables
    that will be used by the program for counters and measurements. */
@@ -596,6 +596,20 @@ void dashboard() {
 
 } // namespace
 
+// https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TypeConversion.cpp
+const char base36Chars[36] PROGMEM = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+const uint8_t base36CharValues[75] PROGMEM {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, // 0 to 9
+          10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 0, 0, 0, 0, 0, 0, // Upper case letters
+          10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35  // Lower case letters
+};
+uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, const uint32_t arrayLength) {
+    assert(hexString.length() >= arrayLength * 2); 
+    for (uint32_t i = 0; i < arrayLength; ++i) {
+        uint8Array[i] = (pgm_read_byte(base36CharValues + hexString.charAt(i * 2) - '0') << 4) + pgm_read_byte(base36CharValues + hexString.charAt(i * 2 + 1) - '0');
+    }
+    return uint8Array;
+}
+
 void setup() {
   Serial.begin(500000);
   Serial.println("\nDuino-Coin " + String(MINER_VER));
@@ -709,9 +723,9 @@ void loop() {
   int job_len = last_block_hash.length() + expected_hash_str.length() + String(difficulty).length();
 
   Serial.println("Received job with size of " + String(job_len) + " bytes: " + last_block_hash + " " + expected_hash_str + " " + difficulty);
- 
+
   uint8_t expected_hash[20];
-  experimental::TypeConversion::hexStringToUint8Array(expected_hash_str, expected_hash, 20);
+  hexStringToUint8Array(expected_hash_str, expected_hash, 20);
 
   br_sha1_init(&sha1_ctx_base);
   br_sha1_update(&sha1_ctx_base, last_block_hash.c_str(), last_block_hash.length());
