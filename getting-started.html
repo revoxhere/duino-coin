@@ -622,8 +622,8 @@
                                             <div class="column">
                                                 <label class="b-checkbox checkbox">
                                                     <input type="checkbox" id="esp32_dashboard">
-                                                        <span class="check"></span>
-                                                        <span class="control-label">Enable web dashboard <small>(may reduce performance)</small></span>
+                                                    <span class="check"></span>
+                                                    <span class="control-label">Enable web dashboard <small>(may reduce performance)</small></span>
                                                 </label>
                                             </div>
                                             <div class="column">
@@ -908,8 +908,8 @@
                                             <div class="column">
                                                 <label class="b-checkbox checkbox">
                                                     <input type="checkbox" id="esp8266_dashboard">
-                                                        <span class="check"></span>
-                                                        <span class="control-label">Enable web dashboard <small>(may reduce performance)</small></span>
+                                                    <span class="check"></span>
+                                                    <span class="control-label">Enable web dashboard <small>(may reduce performance)</small></span>
                                                 </label>
                                             </div>
                                             <div class="column">
@@ -923,7 +923,7 @@
                                                 <label class="b-checkbox checkbox">
                                                     <input type="checkbox" checked id="esp8266_oc">
                                                     <span class="check"></span>
-                                                    <span class="control-label">Use faster  clock mode <small>(recommended)</small></span>
+                                                    <span class="control-label">Use faster clock mode <small>(recommended)</small></span>
                                                 </label>
                                             </div>
                                         </div>
@@ -3047,18 +3047,6 @@ function save(data, filename) {
     }
 }
 
-ESP32_CODE = "";
-$.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP32_Code/ESP32_Code.ino',
-    function(data, textStatus, jqXHR) {
-        ESP32_CODE = data;
-    });
-
-ESP8266_CODE = "";
-$.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP8266_Code/ESP8266_Code.ino',
-    function(data, textStatus, jqXHR) {
-        ESP8266_CODE = data;
-    });
-
 function get_esp32_code() {
     username = $("#esp32_username").val();
     miner_pass = $("#esp32_key").val();
@@ -3077,35 +3065,38 @@ function get_esp32_code() {
     }
 
     $("#esp32_download_button").addClass("is-loading");
-    setTimeout(function() {
-        if (rig_id) {
-            ESP32_CODE = ESP32_CODE.replace(
-                `const char *RIG_IDENTIFIER = "None";`, 
-                `const char *RIG_IDENTIFIER = "${rig_id}";`);
-        }
-        if (!enable_led) {
-            ESP32_CODE = ESP32_CODE.replace(
-                `const bool LED_BLINKING = true;`, 
-                `const bool LED_BLINKING = false;`);
-        }
-        if (enable_dash) {
-            ESP32_CODE = ESP32_CODE.replace(
-                `// #define WEB_DASHBOARD`, 
-                `#define WEB_DASHBOARD`);
-        }
-        if (enable_ota) {
-            ESP32_CODE = ESP32_CODE.replace(
-                `// #define ENABLE_OTA`, 
-                `#define ENABLE_OTA`);
-        }
+    $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP32_Code/ESP32_Code.ino',
+        function(data, textStatus, jqXHR) {
+            ESP32_CODE = data;
 
-        ESP32_CODE = ESP32_CODE.replace(`"USERNAME"`, `"${username}"`);
-        ESP32_CODE = ESP32_CODE.replace(`"MINING_KEY"`, `"${miner_pass}"`);
-        ESP32_CODE = ESP32_CODE.replace(`"WIFI_NAME"`, `"${wifi_name}"`);
-        ESP32_CODE = ESP32_CODE.replace(`"WIFI_PASSWORD"`, `"${wifi_password}"`);
-        save(ESP32_CODE, `ESP32_Code_v${latest_release}-${username}.ino`)
-        $("#esp32_download_button").removeClass("is-loading");
-    }, 500);
+            if (rig_id) {
+                ESP32_CODE = ESP32_CODE.replace(
+                    `const char *RIG_IDENTIFIER = "None";`,
+                    `const char *RIG_IDENTIFIER = "${rig_id}";`);
+            }
+            if (!enable_led) {
+                ESP32_CODE = ESP32_CODE.replace(
+                    `const bool LED_BLINKING = true;`,
+                    `const bool LED_BLINKING = false;`);
+            }
+            if (enable_dash) {
+                ESP32_CODE = ESP32_CODE.replace(
+                    `// #define WEB_DASHBOARD`,
+                    `#define WEB_DASHBOARD`);
+            }
+            if (enable_ota) {
+                ESP32_CODE = ESP32_CODE.replace(
+                    `// #define ENABLE_OTA`,
+                    `#define ENABLE_OTA`);
+            }
+
+            ESP32_CODE = ESP32_CODE.replace(`"USERNAME"`, `"${username}"`);
+            ESP32_CODE = ESP32_CODE.replace(`"MINING_KEY"`, `"${miner_pass}"`);
+            ESP32_CODE = ESP32_CODE.replace(`"WIFI_NAME"`, `"${wifi_name}"`);
+            ESP32_CODE = ESP32_CODE.replace(`"WIFI_PASSWORD"`, `"${wifi_password}"`);
+            save(ESP32_CODE, `ESP32_Code_v${latest_release}-${username}.ino`)
+            $("#esp32_download_button").removeClass("is-loading");
+        });
 }
 
 
@@ -3127,36 +3118,38 @@ function get_esp8266_code() {
     }
 
     $("#esp8266_download_button").addClass("is-loading");
-    setTimeout(function() {
-        if (rig_id) {
-            ESP8266_CODE = ESP8266_CODE.replace(
-                `const char *RIG_IDENTIFIER = "None";`, 
-                `const char *RIG_IDENTIFIER = "${rig_id}";`);
-        }
-        if (!enable_led) {
-            ESP8266_CODE = ESP8266_CODE.replace(
-                `const bool LED_BLINKING = true;`, 
-                `const bool LED_BLINKING = false;`);
-        }
-        if (!enable_overclock) {
-            ESP8266_CODE = ESP8266_CODE.replace(
-                `const bool USE_HIGHER_DIFF = true;`, 
-                `const bool USE_HIGHER_DIFF = false;`);
-        }
-        if (enable_dash) {
-            ESP8266_CODE = ESP8266_CODE.replace(
-                `const bool WEB_DASHBOARD = false;`, 
-                `const bool WEB_DASHBOARD = true;`);
-        }
+    $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP8266_Code/ESP8266_Code.ino',
+        function(data, textStatus, jqXHR) {
+            ESP8266_CODE = data;
 
-        ESP8266_CODE = ESP8266_CODE.replace(`"USERNAME"`, `"${username}"`);
-        ESP8266_CODE = ESP8266_CODE.replace(`"MINING_KEY"`, `"${miner_pass}"`);
-        ESP8266_CODE = ESP8266_CODE.replace(`"WIFI_NAME"`, `"${wifi_name}"`);
-        ESP8266_CODE = ESP8266_CODE.replace(`"WIFI_PASSWORD"`, `"${wifi_password}"`);
-        save(ESP8266_CODE, `ESP8266_Code_v${latest_release}-${username}.ino`)
-        $("#esp8266_download_button").removeClass("is-loading");
-    }, 500);
+            if (rig_id) {
+                ESP8266_CODE = ESP8266_CODE.replace(
+                    `const char *RIG_IDENTIFIER = "None";`,
+                    `const char *RIG_IDENTIFIER = "${rig_id}";`);
+            }
+            if (!enable_led) {
+                ESP8266_CODE = ESP8266_CODE.replace(
+                    `const bool LED_BLINKING = true;`,
+                    `const bool LED_BLINKING = false;`);
+            }
+            if (!enable_overclock) {
+                ESP8266_CODE = ESP8266_CODE.replace(
+                    `const bool USE_HIGHER_DIFF = true;`,
+                    `const bool USE_HIGHER_DIFF = false;`);
+            }
+            if (enable_dash) {
+                ESP8266_CODE = ESP8266_CODE.replace(
+                    `const bool WEB_DASHBOARD = false;`,
+                    `const bool WEB_DASHBOARD = true;`);
+            }
 
+            ESP8266_CODE = ESP8266_CODE.replace(`"USERNAME"`, `"${username}"`);
+            ESP8266_CODE = ESP8266_CODE.replace(`"MINING_KEY"`, `"${miner_pass}"`);
+            ESP8266_CODE = ESP8266_CODE.replace(`"WIFI_NAME"`, `"${wifi_name}"`);
+            ESP8266_CODE = ESP8266_CODE.replace(`"WIFI_PASSWORD"`, `"${wifi_password}"`);
+            save(ESP8266_CODE, `ESP8266_Code_v${latest_release}-${username}.ino`)
+            $("#esp8266_download_button").removeClass("is-loading");
+        });
 }
 
 function login() {
