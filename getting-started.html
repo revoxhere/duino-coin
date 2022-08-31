@@ -537,7 +537,7 @@
                                     <p class="subtitle">
                                         <span class="tag is-warning">3</span>&nbsp;
                                         <b>Install ESP32 support</b> for <b>Arduino IDE</b>.
-                                        Click <i>Tools</i> on the top of the program, hover on the <i>Board: XXX</i> field and open the <i>Boards Manager</i> window.
+                                        Click <i>Tools</i> on the top of the program, hover on the <i>Board: XXX</i> field and open the <i>Boards Manager...</i> window.
                                     </p>
                                     <p class="subtitle">
                                         In the search box type <b>esp32</b> - a package by <b>Espressif Systems</b> should come up. Select <b>version 2.0.1</b> and click the <b>Install</b> button.
@@ -551,8 +551,27 @@
                                 </div>
                             </div>
                             <hr>
+                            <div class="columns">
+                                <div class="column">
+                                    <p class="subtitle">
+                                        <span class="tag is-warning">4</span>&nbsp;
+                                        <b>Install ArduinoJson</b> library.
+                                        Click <i>Sketch</i> on the top of the program, hover on the <i>Include Library</i> field and click the <i>Manage Libraries...</i> entry.
+                                    </p>
+                                    <p class="subtitle">
+                                        In the search box type <b>ArduinoJson</b> - a package by <b>Benoit Blanchon</b> should come up. <b>Install</b> the newest version.
+                                    </p>
+                                    <p class="subtitle">
+                                        When the library finishes installing you can click the <i>Close</i> button.
+                                    </p>
+                                </div>
+                                <div class="column">
+                                    <img src="/assets/images/arduinojson.gif">
+                                </div>
+                            </div>
+                            <hr>
                             <p class="subtitle">
-                                <span class="tag is-warning">4</span>&nbsp;
+                                <span class="tag is-warning">5</span>&nbsp;
                                 <b>Prepare your Duino-Coin miner code</b> to your board.
                                 Below are fields that you should fill in. <b>They will change required variables in the code</b> so you don't have to do it manually (and possibly mess something up).
                             </p>
@@ -576,6 +595,14 @@
                                     </div>
                                     <div class="field">
                                         <p class="control has-icons-left has-icons-right">
+                                            <input class="input" id="esp32_name" type="text" placeholder="Miner name (leave blank for default)">
+                                            <span class="icon is-small is-left">
+                                                <i class="fas fa-file-alt"></i>
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <p class="control has-icons-left has-icons-right">
                                             <input class="input" id="esp32_wifi" type="text" placeholder="Wi-Fi network name (SSID)">
                                             <span class="icon is-small is-left">
                                                 <i class="fas fa-wifi"></i>
@@ -589,6 +616,31 @@
                                                 <i class="fas fa-lock"></i>
                                             </span>
                                         </p>
+                                    </div>
+                                    <div class="field">
+                                        <div class="columns">
+                                            <div class="column">
+                                                <label class="b-checkbox checkbox">
+                                                    <input type="checkbox" id="esp32_dashboard">
+                                                        <span class="check"></span>
+                                                        <span class="control-label">Enable web dashboard <small>(may reduce performance)</small></span>
+                                                </label>
+                                            </div>
+                                            <div class="column">
+                                                <label class="b-checkbox checkbox">
+                                                    <input type="checkbox" checked id="esp32_led">
+                                                    <span class="check"></span>
+                                                    <span class="control-label">Use unboard status LED</span>
+                                                </label>
+                                            </div>
+                                            <div class="column">
+                                                <label class="b-checkbox checkbox">
+                                                    <input type="checkbox" id="esp32_ota">
+                                                    <span class="check"></span>
+                                                    <span class="control-label">Enable wireless (OTA) updates <small>(may reduce performance)</small></span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                     <p class="subtitle">
                                         Below you can find a button to download a <b>ready-to-use</b> ESP32 code <b>with your settings</b> from the input fields above.
@@ -617,7 +669,7 @@
                             <div class="columns">
                                 <div class="column">
                                     <p class="subtitle">
-                                        <span class="tag is-warning">5</span>&nbsp;
+                                        <span class="tag is-warning">6</span>&nbsp;
                                         <b>Upload miner code</b> to your board.<br>
                                         Make sure to <b>plug in the board to your computer</b> using a USB cable, choose <b>ESP32 Dev board</b> in the <i>Tools</i>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<i>Board</i>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<i>ESP32 Arduino</i> dropdown and <b>select a COM port</b> in <i>Tools</i>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<i>Port</i> list. No need to change anything else - just click the "<span class="tag" style="background:#4CB5B8 !important"><i class="fa fa-arrow-right" style="color:rgb(1,97,100)"></i></span>" upload button and wait until it finishes.
                                     </p>
@@ -638,7 +690,7 @@
                             <div class="columns">
                                 <div class="column">
                                     <p class="subtitle">
-                                        <span class="tag is-warning">6</span>&nbsp;
+                                        <span class="tag is-warning">7</span>&nbsp;
                                         <b>Verify the miner</b> working in serial monitor.<br>
                                         When the code finishes uploading, you can always check what the ESP is doing by opening the <b>serial monitor</b>. You can use the key combination <b>Ctrl</b> + <b>Shift</b> + <b>M</b> to bring it up, or click on <b>Tools</b>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<b>Serial Monitor</b>.
                                     </p>
@@ -771,7 +823,7 @@
                                     <p class="subtitle">
                                         <span class="tag is-warning">3</span>&nbsp;
                                         <b>Install ESP8266 support</b> for <b>Arduino IDE</b>.
-                                        Click <i>Tools</i> on the top of the program, hover on the <i>Board: XXX</i> field and open the <i>Boards Manager</i> window.
+                                        Click <i>Tools</i> on the top of the program, hover on the <i>Board: XXX</i> field and open the <i>Boards Manager...</i> window.
                                     </p>
                                     <p class="subtitle">
                                         In the search box type <b>esp8266</b> - a package by <b>ESP8266 Community</b> should come up - select the newest version and click the <b>Install</b> button to (obviously) install it.
@@ -785,8 +837,27 @@
                                 </div>
                             </div>
                             <hr>
+                            <div class="columns">
+                                <div class="column">
+                                    <p class="subtitle">
+                                        <span class="tag is-warning">4</span>&nbsp;
+                                        <b>Install ArduinoJson</b> library.
+                                        Click <i>Sketch</i> on the top of the program, hover on the <i>Include Library</i> field and click the <i>Manage Libraries...</i> entry.
+                                    </p>
+                                    <p class="subtitle">
+                                        In the search box type <b>ArduinoJson</b> - a package by <b>Benoit Blanchon</b> should come up. <b>Install</b> the newest version.
+                                    </p>
+                                    <p class="subtitle">
+                                        When the library finishes installing you can click the <i>Close</i> button.
+                                    </p>
+                                </div>
+                                <div class="column">
+                                    <img src="/assets/images/arduinojson.gif">
+                                </div>
+                            </div>
+                            <hr>
                             <p class="subtitle">
-                                <span class="tag is-warning">4</span>&nbsp;
+                                <span class="tag is-warning">5</span>&nbsp;
                                 <b>Prepare your Duino-Coin miner code</b> to your board.
                                 Below are fields that you should fill in. <b>They will change required variables in the code</b> so you don't have to do it manually (and possibly mess something up).
                             </p>
@@ -810,6 +881,14 @@
                                     </div>
                                     <div class="field">
                                         <p class="control has-icons-left has-icons-right">
+                                            <input class="input" id="esp8266_name" type="text" placeholder="Miner name (leave blank for default)">
+                                            <span class="icon is-small is-left">
+                                                <i class="fas fa-file-alt"></i>
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <div class="field">
+                                        <p class="control has-icons-left has-icons-right">
                                             <input class="input" id="esp8266_wifi" type="text" placeholder="Wi-Fi network name (SSID)">
                                             <span class="icon is-small is-left">
                                                 <i class="fas fa-wifi"></i>
@@ -823,6 +902,31 @@
                                                 <i class="fas fa-lock"></i>
                                             </span>
                                         </p>
+                                    </div>
+                                    <div class="field">
+                                        <div class="columns">
+                                            <div class="column">
+                                                <label class="b-checkbox checkbox">
+                                                    <input type="checkbox" id="esp8266_dashboard">
+                                                        <span class="check"></span>
+                                                        <span class="control-label">Enable web dashboard <small>(may reduce performance)</small></span>
+                                                </label>
+                                            </div>
+                                            <div class="column">
+                                                <label class="b-checkbox checkbox">
+                                                    <input type="checkbox" checked id="esp8266_led">
+                                                    <span class="check"></span>
+                                                    <span class="control-label">Use unboard status LED</span>
+                                                </label>
+                                            </div>
+                                            <div class="column">
+                                                <label class="b-checkbox checkbox">
+                                                    <input type="checkbox" checked id="esp8266_oc">
+                                                    <span class="check"></span>
+                                                    <span class="control-label">Use faster  clock mode <small>(recommended)</small></span>
+                                                </label>
+                                            </div>
+                                        </div>
                                     </div>
                                     <p class="subtitle">
                                         Below you can find a button to download a <b>ready-to-use</b> ESP8266 code <b>with your settings</b> from the input fields above.
@@ -851,7 +955,7 @@
                             <div class="columns">
                                 <div class="column">
                                     <p class="subtitle">
-                                        <span class="tag is-warning">5</span>&nbsp;
+                                        <span class="tag is-warning">6</span>&nbsp;
                                         <b>Upload miner code</b> to your board.<br>
                                         Make sure to <b>plug in the board to your computer</b> using a USB cable, choose <b>Generic ESP8266 Module</b> in the <i>Tools</i>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<i>Board</i>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<i>ESP8266 Boards</i> dropdown and <b>select a COM port</b> in <i>Tools</i>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<i>Port</i> list. No need to change anything else - just click the "<span class="tag" style="background:#4CB5B8 !important"><i class="fa fa-arrow-right" style="color:rgb(1,97,100)"></i></span>" upload button and wait until it finishes.
                                     </p>
@@ -872,7 +976,7 @@
                             <div class="columns">
                                 <div class="column">
                                     <p class="subtitle">
-                                        <span class="tag is-warning">6</span>&nbsp;
+                                        <span class="tag is-warning">7</span>&nbsp;
                                         <b>Verify the miner</b> working in serial monitor.<br>
                                         When the code finishes uploading, you can always check what the ESP is doing by opening the <b>serial monitor</b>. You can use the key combination <b>Ctrl</b> + <b>Shift</b> + <b>M</b> to bring it up, or click on <b>Tools</b>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<b>Serial Monitor</b>.
                                     </p>
@@ -2960,6 +3064,10 @@ function get_esp32_code() {
     miner_pass = $("#esp32_key").val();
     wifi_name = $("#esp32_wifi").val();
     wifi_password = $("#esp32_wifi_pass").val();
+    rig_id = $("#esp32_name").val();
+    enable_dash = $('#esp32_dashboard').is(':checked');
+    enable_led = $('#esp32_led').is(':checked');
+    enable_ota = $('#esp32_ota').is(':checked');
 
     if (!miner_pass) miner_pass = "None";
     if (!wifi_password) wifi_password = "";
@@ -2970,6 +3078,27 @@ function get_esp32_code() {
 
     $("#esp32_download_button").addClass("is-loading");
     setTimeout(function() {
+        if (rig_id) {
+            ESP32_CODE = ESP32_CODE.replace(
+                `const char *RIG_IDENTIFIER = "None";`, 
+                `const char *RIG_IDENTIFIER = "${rig_id}";`);
+        }
+        if (!enable_led) {
+            ESP32_CODE = ESP32_CODE.replace(
+                `const bool LED_BLINKING = true;`, 
+                `const bool LED_BLINKING = false;`);
+        }
+        if (enable_dash) {
+            ESP32_CODE = ESP32_CODE.replace(
+                `// #define WEB_DASHBOARD`, 
+                `#define WEB_DASHBOARD`);
+        }
+        if (enable_ota) {
+            ESP32_CODE = ESP32_CODE.replace(
+                `// #define ENABLE_OTA`, 
+                `#define ENABLE_OTA`);
+        }
+
         ESP32_CODE = ESP32_CODE.replace(`"USERNAME"`, `"${username}"`);
         ESP32_CODE = ESP32_CODE.replace(`"MINING_KEY"`, `"${miner_pass}"`);
         ESP32_CODE = ESP32_CODE.replace(`"WIFI_NAME"`, `"${wifi_name}"`);
@@ -2985,6 +3114,10 @@ function get_esp8266_code() {
     miner_pass = $("#esp8266_key").val();
     wifi_name = $("#esp8266_wifi").val();
     wifi_password = $("#esp8266_wifi_pass").val();
+    rig_id = $("#esp8266_name").val();
+    enable_dash = $('#esp8266_dashboard').is(':checked');
+    enable_led = $('#esp8266_led').is(':checked');
+    enable_overclock = $('#esp8266_oc').is(':checked');
 
     if (!miner_pass) miner_pass = "None";
     if (!wifi_password) wifi_password = "";
@@ -2995,6 +3128,27 @@ function get_esp8266_code() {
 
     $("#esp8266_download_button").addClass("is-loading");
     setTimeout(function() {
+        if (rig_id) {
+            ESP8266_CODE = ESP8266_CODE.replace(
+                `const char *RIG_IDENTIFIER = "None";`, 
+                `const char *RIG_IDENTIFIER = "${rig_id}";`);
+        }
+        if (!enable_led) {
+            ESP8266_CODE = ESP8266_CODE.replace(
+                `const bool LED_BLINKING = true;`, 
+                `const bool LED_BLINKING = false;`);
+        }
+        if (!enable_overclock) {
+            ESP8266_CODE = ESP8266_CODE.replace(
+                `const bool USE_HIGHER_DIFF = true;`, 
+                `const bool USE_HIGHER_DIFF = false;`);
+        }
+        if (enable_dash) {
+            ESP8266_CODE = ESP8266_CODE.replace(
+                `const bool WEB_DASHBOARD = false;`, 
+                `const bool WEB_DASHBOARD = true;`);
+        }
+
         ESP8266_CODE = ESP8266_CODE.replace(`"USERNAME"`, `"${username}"`);
         ESP8266_CODE = ESP8266_CODE.replace(`"MINING_KEY"`, `"${miner_pass}"`);
         ESP8266_CODE = ESP8266_CODE.replace(`"WIFI_NAME"`, `"${wifi_name}"`);
