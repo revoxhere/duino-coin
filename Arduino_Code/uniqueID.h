@@ -19,7 +19,7 @@
 #elif defined(ARDUINO_ARCH_SAMD)
 #elif defined(ARDUINO_ARCH_STM32)
 #elif defined(TEENSYDUINO)
-#elif defined(ARDUINO_ARCH_MBED_RP2040)
+#elif defined(ARDUINO_ARCH_MBED_RP2040) || defined(ARDUINO_ARCH_RP2040)
 //#include <pico/unique_id.h>
 #elif defined(ARDUINO_ARCH_MEGAAVR)
 #else
@@ -57,7 +57,7 @@
 #elif defined(TEENSYDUINO)
 #define UniqueIDsize 16
 #define UniqueIDbuffer 16
-#elif defined(ARDUINO_ARCH_MBED_RP2040)
+#elif defined(ARDUINO_ARCH_MBED_RP2040) || defined(ARDUINO_ARCH_RP2040)
 #define UniqueIDsize 32
 #define UniqueIDbuffer 32
 #elif defined(ARDUINO_ARCH_MEGAAVR)
