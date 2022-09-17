@@ -45,6 +45,8 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69"></script>
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js" as="script">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <style>
     @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 
@@ -236,7 +238,7 @@
             </div>
         </div>
     </nav>
-    <section class="hero is-medium mt-5-mobile">
+    <section class="hero is-medium mt-5-mobile" data-aos="fade-right">
         <div class="hero-body">
             <div class="columns is-vcentered">
                 <div class="column is-2"></div>
@@ -273,7 +275,7 @@
     </section>
     <section class="hero is-medium">
         <div class="hero-body" id="explore">
-            <div class="columns is-centered">
+            <div class="columns is-centered" data-aos="fade-left">
                 <div class="column is-2"></div>
                 <div class="column">
                     <p class="title has-text-weight-bold is-size-2">
@@ -302,7 +304,7 @@
         </div>
     </section>
     <section class="hero is-small">
-        <div class="hero-body" id="explore">
+        <div class="hero-body" id="explore" data-aos="flip-up">
             <div class="columns">
                 <div class="column is-2"></div>
                 <div class="column">
@@ -365,7 +367,7 @@
         </div>
     </section>
     <section class="hero is-medium">
-        <div class="hero-body" id="explore">
+        <div class="hero-body" id="explore" data-aos="zoom-in">
             <div class="columns is-centered">
                 <div class="column is-2"></div>
                 <div class="column">
@@ -521,7 +523,7 @@
         </div>
     </section>
     <section class="hero is-medium">
-        <div class="hero-body" id="explore">
+        <div class="hero-body" id="explore" data-aos="zoom-in">
             <div class="columns" id="exchanges">
                 <div class="column is-2"></div>
                 <div class="column">
@@ -600,7 +602,7 @@
         </div>
     </section>
     <section class="hero is-small">
-        <div class="hero-body" id="explore">
+        <div class="hero-body" id="explore" data-aos="zoom-out-up">
             <div class="columns" id="exchanges">
                 <div class="column is-2"></div>
                 <div class="column has-text-centered">
@@ -767,6 +769,7 @@ $(window).on('load', function() {
         });
     }
     $("#pageloader").fadeOut();
+    AOS.init();
 });
 </script>
 
