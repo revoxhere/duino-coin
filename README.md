@@ -89,7 +89,7 @@ sudo apt install python3 python3-pip git python3-pil python3-pil.imagetk -y # In
 git clone https://github.com/revoxhere/duino-coin # Clone Duino-Coin repository
 cd duino-coin
 python3 -m pip install -r requirements.txt # Install pip dependencies
-````
+```
 
 After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py`).
 
@@ -236,8 +236,8 @@ Some third-party included files may have different licenses - please check their
 8. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
 9. Only coins earned legally are eligible for the exchange.<br/>
 10. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
-11. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
-12. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
+11. An exchange request made to the official DUCO-Exchange ("the official exchange") may be delayed and/or declined during investigations. <br/>
+12. Exchange requests made to the official exchange may be declined due to ToS violations and/or low funding.<br/>
 13. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed as it's unfair for others.<br />
 14. A user's DUCOs may be burnt if a violation can be proven.<br/>
 15. These terms of service can change at any time without prior notice.<br/>
