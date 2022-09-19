@@ -509,6 +509,8 @@ try:
             lang = 'german'
         elif locale.startswith('fr'):
             lang = 'french'
+        elif locale.startswith('jp'):
+            lang = 'japanese'
         elif locale.startswith('tr'):
             lang = 'turkish'
         elif locale.startswith('it'):
