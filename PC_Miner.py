@@ -806,6 +806,8 @@ class Miner:
                     lang = "polish"
                 elif locale.startswith("fr"):
                     lang = "french"
+                elif locale.startswith("jp"):
+                    lang = "japanese"
                 elif locale.startswith("fa"):
                     lang = "farsi"
                 elif locale.startswith("mt"):
