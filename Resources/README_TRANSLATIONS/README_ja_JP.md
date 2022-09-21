@@ -169,7 +169,8 @@ Duino-Coinプロジェクトへの貢献は大歓迎です。
 
 ### これらのソフトウェアは私たちによって開発されたものではないことに注意してください。あくまで好奇心でご利用ください。
 
-  ### Other miners known to work with Duino-Coin:
+  ### Duino-Coinと連携することが知られている他のマイナー"
+
   *   :point_right: [**RP2040-HAT-MINING-C**](https://github.com/Wiznet/RP2040-HAT-MINING-C) - **WIZnet RP2040** mining stack
   *   [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Arduino Ethernet shield Miner by Pumafron
   *   [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - STM8S firmware for mining DUCO by BBS215
@@ -194,7 +195,7 @@ Duino-Coinプロジェクトへの貢献は大歓迎です。
       *   [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) by revoxhere
       *   [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) by joaquinbvw
 
-  ### Other tools:
+  ### その他のツール:
   *   [Duino Miner](https://github.com/g7ltt/Duino-Miner) - Arduino Nano based DUCO miner files and documentation by g7ltt
   *   [DUINO Mining Rig](https://repalmakershop.com/pages/duino-mining-rig) - 3D files, PCB designs and instructions for creating your own Duino rig by ReP_AL
   *   [DuinoCoin-balance-Home-Assistant](https://github.com/NL647/DuinoCoin-balance-Home-Assistant) - addon for home assistant displaying your balance by NL647
@@ -212,16 +213,17 @@ Duino-Coinプロジェクトへの貢献は大歓迎です。
   *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI Wallet by viktor02
   *   [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - a Duino-Coin iOS widget by Naphob 
 
- You may also view a similar list on the [website](https://duinocoin.com/apps).
+ 
+ [ウェブサイト](https://duinocoin.com/apps)で同様のリストを見ることもできます。
 
 
-## License
+## ライセンス
 
 Duino-Coin is mostly distributed under the MIT License. See the `LICENSE` file for more information.
 Some third-party included files may have different licenses - please check their `LICENSE` statements (usually at the top of the source code files).
 
 
-## Terms of service
+## 利用規約
 1. Duino-Coins ("DUCOs") are earned by miners with a process called mining.<br/>
 2. Mining is described as using DUCO-S1 algorithm (as explained in the <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a>), in which finding a correct result to a mathematical problem gives the miner a reward.<br/>
 3. Mining can be officially done using CPUs, AVR boards (e.g. Arduino boards), Single-board computers (e.g. Raspberry Pi boards), ESP32/8266 boards with the usage of official miners (other officially allowed miners are described in the upper part of README).<br/>
@@ -246,14 +248,14 @@ Some third-party included files may have different licenses - please check their
 22. Every Duino-Coin user agrees to comply with the above rules. Improper behavior will lead to blocking of the account.<br/>
 
 
-## Privacy policy
+## 個人情報保護方針
 1. On the master server we only store usernames, hashed passwords (with the help of bcrypt), account creation dates, last login times and e-mails of users as their data.<br/>
 2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
 3. Balances, transactions and mining-related data is publicly available in the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
 4. The privacy policy may be changed in the future, although users will receive a notification prior to the changes.
 
 
-## Active project maintainers
+## 活動中のプロジェクトメンテナ
 
 *   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Lead Python dev, project founder)
 *   [@Bilaboz](https://github.com/bilaboz/) (Lead NodeJS dev)
@@ -265,12 +267,12 @@ Some third-party included files may have different licenses - please check their
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
 
-Big thanks to all the [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped to develop the Duino-Coin project.
+Duino-Coinプロジェクトの発展にご協力いただいたすべての[contributors](https://github.com/revoxhere/duino-coin/graphs/contributors)に大感謝です。
 
 <hr>
 
-Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
+プロジェクトリンク: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
 <br/>
-Website Link: [https://duinocoin.com/](https://duinocoin.com/)
+ウェブサイトリンク: [https://duinocoin.com/](https://duinocoin.com/)
 <br/>
-Duino-Coin Status Page: [https://status.duinocoin.com](https://status.duinocoin.com)
+Duino-Coin ステータスページ: [https://status.duinocoin.com](https://status.duinocoin.com)
