@@ -60,13 +60,13 @@
 <br>
 
 <h3>
-  Duino-Coin is a coin that can be mined with Arduinos, ESP8266/32 boards, Raspberry Pis, computers, and many more 
-  (including Wi-Fi routers, smart TVs, smartphones, smartwatches, SBCs, MCUs or even GPUs)
+  Duino-Coinは、Arduino、ESP8266/32ボード、Raspberry Pi、コンピュータ、その他多くのデバイスでマイニングできるコインです。
+  (Wi-Fiルーター、スマートテレビ、スマートフォン、スマートウォッチ、SBC、MCU、またはGPUも含みます）。
 </h3>
 
 
-| Key features | Technical specifications | (Some of many) supported boards |
-|-|-|-|
+| Key features                                                                                                                                                                                                                                                                                    | Technical specifications                                                                                                                                                                                                    | (Some of many) supported boards                                                                                                                                                                                                                                              |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 💻 Supported by a large number of platforms<br>👥 A fast-growing community<br>💱 Easy to use & exchange<br>(on DUCO Exchange, Node-S, JustSwap, SushiSwap)<br>🌎 Available everywhere<br>:new: Fully original & open-source project<br>🌳 Beginner & eco-friendly<br>💰 Cost-effective & easy to mine | ⚒️ Algorithm: DUCO-S1<br>♐ Rewards: supported by "Kolka system"<br>helping to reward miners fairly<br>⚡ Transaction time: Instant<br>🪙 Coin supply: Infinite<br>(with burning)<br>🔤 Ticker: DUCO (ᕲ)<br>🔢 Decimals: up to 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, etc.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, etc.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, etc.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, etc.)<br>⚡ Teensy 4.1 boards |
 
 
@@ -133,7 +133,7 @@ Server source code, documentation for API calls and official libraries for devel
 ### Please note that the rewards depend on a lot of factors and the table below is just for orientation purposes.
   
   | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
-  |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
+  | --------------------------------------------------------- | --------------------------------- | ----------------- | -------------- | ------------------- |
   | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 258 H/s                           | 1                 | 0.2 W          | 15-20               |
   | Raspberry Pi Pico                                         | 5 kH/s                            | 1                 | 0.3 W          | 10                  |
   | Teensy 4.1 (soft cryptography)                            | 80 kH/s                           | 1                 | 0.5 W          | ?                   |
@@ -155,10 +155,10 @@ Server source code, documentation for API calls and official libraries for devel
   | Intel Core i5-3230M                                       | 1.52 MH/s                         | 4                 | 35 W           | 7.2                 |
   | Intel Core i5-5350U                                       | 1.35 MH/s                         | 4                 | 15 W           | 6.0                 |
   | Intel Core i5-7200U                                       | 1.62 MH/s                         | 4                 | 15 W           | 7.5                 |
-  | Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | 45 W           | 9.1                 |   
+  | Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | 45 W           | 9.1                 |
   | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | 54 W           | 3.7                 |
   | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 65 W           | 15.44               |
-  | AMD Ryzen R1505G **(fasthash)**                           | 8.5 MH/s                          | 4                 | 35 W           | -                   |   
+  | AMD Ryzen R1505G **(fasthash)**                           | 8.5 MH/s                          | 4                 | 35 W           | -                   |
   | Intel Core i7-11370H **(fasthash)**                       | 17.3 MH/s                         | 8                 | 35 W           | 4.28                |
   | Realtek RTD1295                                           | 490 kH/s                          | 4                 | -              | -                   |
   | Realtek RTD1295 **(fasthash)**                            | 3.89 MH/s                         | 4                 | -              | -                   |
