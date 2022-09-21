@@ -115,23 +115,21 @@ Duino-Coinは、中央集権的な資金保管方法と非中央集権的な資�
 
 ## 開発
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create.<br>
-Any contributions you make to the Duino-Coin project are greatly appreciated.
+オープンソースコミュニティが、学び、刺激し、創造するための素晴らしい場所であるのは、貢献のおかげです。
+Duino-Coinプロジェクトへの貢献は大歓迎です。
 
-How to help?
+どのように支援するのか？
 
-*   Fork the Project
-*   Create your feature branch
-*   Commit your changes
-*   Make sure everything works as intended
-*   Open a pull request
+* プロジェクトをフォークする
+* あなたの機能ブランチを作成する
+* 変更をコミットする
+* すべてが意図したとおりに動作することを確認する
+* プルリクエストを出す
+* サーバーのソースコード、APIコールのドキュメント、デュイノ・コイン用のアプリを開発するための公式ライブラリは、[useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools)ブランチに用意されています。
 
-Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch.
+## 公式にテストされたデバイスとボードのベンチマーク
 
-
-## Benchmarks of officially tested devices and boards
-
-### Please note that the rewards depend on a lot of factors and the table below is just for orientation purposes.
+### 報酬は多くの要因に依存し、以下の表は単なるオリエンテーションのためのものであることに注意してください。
   
   | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
   | --------------------------------------------------------- | --------------------------------- | ----------------- | -------------- | ------------------- |
@@ -164,13 +162,12 @@ Server source code, documentation for API calls and official libraries for devel
   | Realtek RTD1295                                           | 490 kH/s                          | 4                 | -              | -                   |
   | Realtek RTD1295 **(fasthash)**                            | 3.89 MH/s                         | 4                 | -              | -                   |
 
-All tests were performed using the DUCO-S1 algorithm **without fasthash accelerations** unless stated otherwise. This table will be actively updated.
+特に明記しない限り、すべてのテストは DUCO-S1 アルゴリズムを使用して **fasthash アクセラレーションを使用せずに**実行されました。
 
 
+## コミュニティで作成されたソフトウェア
 
-## Community-made softwares
-
-### Please note that these softwares are not developed by us and we do not give any guarantees that use of them will not result in an account getting banned. Treat them as a curiosity. 
+### これらのソフトウェアは私たちによって開発されたものではないことに注意してください。あくまで好奇心でご利用ください。
 
   ### Other miners known to work with Duino-Coin:
   *   :point_right: [**RP2040-HAT-MINING-C**](https://github.com/Wiznet/RP2040-HAT-MINING-C) - **WIZnet RP2040** mining stack
