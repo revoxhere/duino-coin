@@ -248,10 +248,10 @@ Duino-Coin は多くの場合 MIT ライセンスの下で配布されていま�
 
 
 ## 個人情報保護方針
-1. On the master server we only store usernames, hashed passwords (with the help of bcrypt), account creation dates, last login times and e-mails of users as their data.<br/>
-2. E-mails are not publicly available and are only used for contacting user when needed, confirming exchanges on the <a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> and receiving an occasional newsletter (planned for the future).<br/>
-3. Balances, transactions and mining-related data is publicly available in the <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>
-4. The privacy policy may be changed in the future, although users will receive a notification prior to the changes.
+1. マスターサーバーには、ユーザー名、ハッシュ化されたパスワード（bcryptの助けを借りて）、アカウント作成日、最終ログイン時間、ユーザーの電子メールのみをデータとして保存します。<br />
+2. 電子メールは一般に公開されず、必要なときにユーザーに連絡したり、DUCO-Exchangeでの交換を確認したり、時折ニュースレターを受信するためにのみ使用されます（将来的に予定されています）。<br />
+3. 残高、取引、およびマイニング関連のデータは、<a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON API</a> で公開されています。<br />
+4. プライバシーポリシーは将来的に変更される可能性がありますが、変更前にユーザーに通知されます。<br />
 
 
 ## 活動中のプロジェクトメンテナ
