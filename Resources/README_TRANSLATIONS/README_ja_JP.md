@@ -169,7 +169,7 @@ Duino-Coinプロジェクトへの貢献は大歓迎です。
 
 ### これらのソフトウェアは私たちによって開発されたものではないことに注意してください。あくまで好奇心でご利用ください。
 
-  ### Duino-Coinと連携することが知られている他のマイナー"
+  ### Duino-Coinと連携することが知られている他のマイナー
 
   *   :point_right: [**RP2040-HAT-MINING-C**](https://github.com/Wiznet/RP2040-HAT-MINING-C) - **WIZnet RP2040** mining stack
   *   [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Arduino Ethernet shield Miner by Pumafron
