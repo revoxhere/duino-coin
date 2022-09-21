@@ -72,7 +72,7 @@
 
 ## はじめに
 
-#### デュノ・コインを始めるには、お使いのOSに対応した[最新のリリース](https://github.com/revoxhere/duino-coin/releases/latest)をダウンロードするのが最も簡単な方法です。<br>
+#### Duino-Coinを始めるには、お使いのOSに対応した[最新のリリース](https://github.com/revoxhere/duino-coin/releases/latest)をダウンロードするのが最も簡単な方法です。<br>
 ダウンロード後、zipファイルを解凍し、必要なプログラムを起動してください。
 依存関係は必要ありません。
 
