@@ -223,28 +223,28 @@ Duino-Coin は多くの場合 MIT ライセンスの下で配布されていま�
 
 
 ## 利用規約
-1. Duino-Coins（以下、「DUCO」）は、採掘者が採掘と呼ばれる作業により獲得します。<br/>
-2. マイニングは、DUCO-S1アルゴリズム（<a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a> で説明されています）を使用し、数学的問題に対して正しい結果を見つけると、採掘者に報酬が与えられると説明されています。<br/>
-3. マイニングは、CPU、AVRボード（Arduinoボードなど）、シングルボードコンピュータ（Raspberry Piボードなど）、ESP32/8266ボードを使って、公式マイナーを使用することで公式に行えます（その他の公式に許可されたマイナーはREADME上部に記載されています）。<br/>
-4. すべてのマイナーは、自分に適した難易度レベルを使用する必要があります。<br/>
-5. GPU、FPGA、その他の高効率ハードウェアでの採掘は許可されていますが、採掘難易度は「EXTREME」のみを使用します。<br/>
-6. ハードウェアに適していない難易度でマイナーを使用しているユーザー (<a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">難易度リスト</a>を参照) ) は、正しい難易度に移動させられることで自動的に調整されます。<br/>
-7. 適切な難易度よりも低い難易度を使用しようとし続けるユーザーは、一時的にブロックされるか、永久に追放される可能性があります。<br/>
-10. Banning involves blocking the user from accessing his coins along with the removal of an account.<br/>
-11. Only coins earned legally are eligible for the exchange.<br/>
-12. Accounts may be suspended temporarily to investigate ("investigations") ToS violations ("violation" or "abuse").<br/>
-13. An exchange request made to the offical DUCO-Exchange ("the offical exchange") may be delayed and/or declined during investigations. <br/>
-14. Exchange requests made to the offical exchange may be declined due to ToS violations and/or low funding.<br/>
-15. Mining with free cloud hosting services (or free VPS services - e.g. Repl.it, GitHub Actions, etc.) is not allowed as it's unfair for others.<br />
-16. A user's DUCOs may be burnt if a violation can be proven.<br/>
-17. These terms of service can change at any time without prior notice.<br/>
-18. Having alt accounts without a rational reason (e.g. for multi-mining) are not allowed - multiple accounts used on a single computer/network will be blocked, unless whitelisted.<br/>
-19. Sending transactions that promote other services or advertise something in any form is not allowed.<br/>
-20. Sending a lot of transactions in a short amount of time can trigger the Kolka system which will rate limit and/or block the user.<br />
-21. Community-made softwares need to comply with the rules (terms of service, difficulty tiers, etc.) - abusing the system will lead to blocking of the software and/or the user(s).<br />
-22. Accounts proven to be misleading in name or usage (impersonation, fake bots, etc.) are not allowed.<br />
-23. Sending an offensive and/or unrelated verification picture and/or description will lead to immediate blocking of the account.
-24. Every Duino-Coin user agrees to comply with the above rules. Improper behavior will lead to blocking of the account.<br/>
+1. Duino-Coins（以下、「DUCO」）は、採掘者が採掘と呼ばれる作業により獲得します。<br />
+2. マイニングは、DUCO-S1アルゴリズム（<a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin Whitepaper</a> で説明されています）を使用し、数学的問題に対して正しい結果を見つけると、採掘者に報酬が与えられると説明されています。<br />
+3. マイニングは、CPU、AVRボード（Arduinoボードなど）、シングルボードコンピュータ（Raspberry Piボードなど）、ESP32/8266ボードを使って、公式マイナーを使用することで公式に行えます（その他の公式に許可されたマイナーはREADME上部に記載されています）。<br />
+4. すべてのマイナーは、自分に適した難易度レベルを使用する必要があります。<br />
+5. GPU、FPGA、その他の高効率ハードウェアでの採掘は許可されていますが、採掘難易度は「EXTREME」のみを使用します。<br />
+6. ハードウェアに適していない難易度でマイナーを使用しているユーザー (<a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">難易度リスト</a>を参照) ) は、正しい難易度に移動させられることで自動的に調整されます。<br />
+7. 適切な難易度よりも低い難易度を使用しようとし続けるユーザーは、一時的にブロックされるか、永久に追放される可能性があります。<br />
+8. 禁止には、アカウントの削除とともにユーザーが自分のコインにアクセスできないようにすることが含まれます。<br />
+9. 合法的に獲得したコインのみが交換の対象となります。<br />
+10. アカウントは、ToS 違反 (「違反」または「悪用」) を調査 (「調査」) するために一時的に停止される場合があります。<br />
+11. DUCO-Exchange（以下、「公式交換所」）への交換リクエストは、調査中に遅延または拒否されることがあります。<br />
+12. 公式取引所への交換リクエストは、ToS違反や資金不足のために拒否される場合があります。<br />
+13. 無料のクラウドホスティングサービス（または無料のVPSサービス - Repl.it, GitHub Actionsなど）を使用したマイニングは、他の人にとって不公平になるため許可されていません。<br />
+14. 違反が証明された場合、ユーザーのDUCOは消失する可能性があります。<br />
+15. この利用規約は、事前の予告なく変更されることがあります。<br />
+16. 合理的な理由なく複数のアカウントを持つことは許されません（例：マルチマイニングのため） - 1つのコンピュータ/ネットワークで使用される複数のアカウントは、ホワイトリストに登録されていない限りブロックされます。<br />
+17. 他のサービスを宣伝したり、何かを広告するような取引を送ることは、いかなる形であれ禁止されています。<br />
+18. 短時間に大量のトランザクションを送信すると、Kolkaシステムがユーザーをレート制限および/またはブロックする可能性があります。<br />
+19. コミュニティで作られたソフトウェアは、ルール（利用規約、難易度など）を遵守する必要があります。システムを悪用すると、ソフトウェアやユーザがブロックされます。<br />
+20. 名前や使用方法に誤解を招くことが証明されたアカウント (なりすまし、偽のボットなど) は許可されません。<br />
+21. 攻撃的で無関係な画像や説明文を送信した場合、そのアカウントは直ちにブロックされます。<br />
+22. すべてのDuino-Coinユーザーは、上記のルールに従うことに同意するものとします。不適切な行為を行った場合、アカウントはブロックされます。<br />
 
 
 ## 個人情報保護方針
