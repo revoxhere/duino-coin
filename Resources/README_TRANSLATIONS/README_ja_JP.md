@@ -65,31 +65,31 @@
 </h3>
 
 
-| Key features                                                                                                                                                                                                                                                                                         | Technical specifications                                                                                                                                                                                                    | (Some of many) supported boards                                                                                                                                                                                                                                              |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Key features                                                                                                                                                                                                                                                                                                                             | Technical specifications                                                                                                                                                                                             | (Some of many) supported boards                                                                                                                                                                                                                                                     |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 💻 数多くのプラットフォームでサポートされています<br>👥 急成長しているコミュニティ<br>💱 使いやすく交換しやすい<br>（DUCO Exchange, Node-S, JustSwap, SushiSwapで交換可能）<br>🌎 どこででも利用可能です<br>:new: 完全にオリジナルなオープンソースプロジェクトです<br>🌳 初心者にやさしく、環境にもやさしい<br>💰 費用対効果が高く採掘しやすい | ⚒️ アルゴリズム: DUCO-S1<br>♐ 報酬: 公平な報酬を得るために「Kolkaシステム」による支援があります<br>⚡ 取引時間: 即時<br>🪙 コイン供給量: 無制限（焼却あり）<br>🔤 ティッカーシンボル: DUCO (ᕲ)<br>🔢 小数点以下: 20桁まで | ♾️ Arduino<br>(Uno, Nano, Mega, Due, Pro Mini, その他.)<br>📶 ESP8266<br>(NodeMCU, Wemos, その他.)<br>📶 ESP32<br>(ESP-WROOM, ESP32-CAM, その他.)<br>🍓 Raspberry Pi<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pi<br>(Zero, Zero 2, PC, Plus, その他.)<br>⚡ Teensy 4.1 ボード |
 
 
-## Getting started
+## はじめに
 
-#### The easiest way to get started with Duino-Coin is to download [the latest release](https://github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
-After downloading the release, unzip it and launch the desired program.<br>
-There are no dependencies required.
+#### デュノ・コインを始めるには、お使いのOSに対応した[最新のリリース](https://github.com/revoxhere/duino-coin/releases/latest)をダウンロードするのが最も簡単な方法です。<br>
+ダウンロード後、zipファイルを解凍し、必要なプログラムを起動してください。
+依存関係は必要ありません。
 
-If you need help, you can take a look at the official getting started guides located <a href="https://duinocoin.com/getting-started">on the official website</a>.<br>
-FAQ and troubleshooting help can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
+ヘルプが必要な場合は、<a href="https://duinocoin.com/getting-started">公式ウェブサイト</a>にある公式スタートガイドをご覧ください。
+FAQやトラブルシューティングのヘルプは[Wiki](https://github.com/revoxhere/duino-coin/wiki)で見ることができます。
 
-#### Linux (manual installation)
+#### Linux (手動インストール)
 
 ```BASH
 sudo apt update
-sudo apt install python3 python3-pip git python3-pil python3-pil.imagetk -y # Install dependencies
-git clone https://github.com/revoxhere/duino-coin # Clone Duino-Coin repository
+sudo apt install python3 python3-pip git python3-pil python3-pil.imagetk -y # 依存関係のインストール
+git clone https://github.com/revoxhere/duino-coin # Duino-Coinリポジトリをクローン 
 cd duino-coin
-python3 -m pip install -r requirements.txt # Install pip dependencies
+python3 -m pip install -r requirements.txt # pipの依存関係をインストール
 ````
 
-After doing this, you are good to go with launching the software (e.g. `python3 PC_Miner.py`).
+この後、ソフトウエアの起動を行います（例：`python3 PC_Miner.py`）。
 
 #### Windows (manual installation)
 
