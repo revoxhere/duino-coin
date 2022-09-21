@@ -92,7 +92,7 @@ python3 -m pip install -r requirements.txt # pipの依存関係をインスト�
 この後、ソフトウエアの起動を行います（例：`python3 PC_Miner.py`）。
 
 
-#### Windows (manual installation)
+#### Windows (手動インストール)
 
 1. [Python 3](https://www.python.org/downloads/)をダウンロードし、インストールします（PATH に Python と Pip を追加してください）。
 2. [Duino-Coin リポジトリ](https://github.com/revoxhere/duino-coin/archive/master.zip)をダウンロードします。
@@ -100,8 +100,6 @@ python3 -m pip install -r requirements.txt # pipの依存関係をインスト�
 4. コマンドプロンプトで `py -m pip install -r requirements.txt` と入力し、必要なpipの依存関係をインストールします。
 
 この後、ソフトウェアを起動してください（目的の.pyファイルをダブルクリックするか、コマンドプロンプトで`python PC_Miner.py`と入力するだけです）。
-
-After doing this, you are good to go with launching the software (just double click on desired `.py` files or type `py PC_Miner.py` in the command prompt).
 
 #### Raspberry Pi (自動インストール)
 
@@ -113,9 +111,9 @@ sudo chmod a+x duco-install-rpi.sh
 
 ## DUCO, wDUCO, bscDUCO, maticDUCO & celoDUCO
 
-Duino-Coin is a hybrid currency providing support both to centralized and decentralized ways of storing funds. Duino-Coins can be converted to wDUCO, bscDUCO or others which are the same Duino-Coins but "wrapped" (stored) on other networks as tokens. An example tutorial on using wDUCO is available in the [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial). Coins can be wrapped directly from your web Wallet - click the Wrap Coins button to start.
+Duino-Coinは、中央集権的な資金保管方法と非中央集権的な資金保管方法の両方をサポートするハイブリッド通貨です。Duino-Coin は wDUCO や bscDUCO など、同じ Duino-Coin でありながら他のネットワークにトークンとして「包む」（保存する）ことができる通貨に変換することができます。wDUCOの使い方のチュートリアルの例は、[wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial)に掲載されています。コインはウェブウォレットから直接ラッピングすることができます。
 
-## Development
+## 開発
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create.<br>
 Any contributions you make to the Duino-Coin project are greatly appreciated.
