@@ -91,16 +91,19 @@ python3 -m pip install -r requirements.txt # pipの依存関係をインスト�
 
 この後、ソフトウエアの起動を行います（例：`python3 PC_Miner.py`）。
 
+
 #### Windows (manual installation)
 
-1. Download and install [Python 3](https://www.python.org/downloads/) (make sure you add Python and Pip to your PATH)
-2. Download [the Duino-Coin repository](https://github.com/revoxhere/duino-coin/archive/master.zip)
-3. Extract the zip archive you've downloaded and open the folder in command prompt
-4. In command prompt type `py -m pip install -r requirements.txt` to install required pip dependencies
+1. [Python 3](https://www.python.org/downloads/)をダウンロードし、インストールします（PATH に Python と Pip を追加してください）。
+2. [Duino-Coin リポジトリ](https://github.com/revoxhere/duino-coin/archive/master.zip)をダウンロードします。
+3. ダウンロードしたzipアーカイブを解凍し、そのフォルダをコマンドプロンプトで開きます。
+4. コマンドプロンプトで `py -m pip install -r requirements.txt` と入力し、必要なpipの依存関係をインストールします。
+
+この後、ソフトウェアを起動してください（目的の.pyファイルをダブルクリックするか、コマンドプロンプトで`python PC_Miner.py`と入力するだけです）。
 
 After doing this, you are good to go with launching the software (just double click on desired `.py` files or type `py PC_Miner.py` in the command prompt).
 
-#### Raspberry Pi (automatic installation)
+#### Raspberry Pi (自動インストール)
 
 ```BASH
 wget https://raw.githubusercontent.com/revoxhere/duino-coin/master/Tools/duco-install-rpi.sh
