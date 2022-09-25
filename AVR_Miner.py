@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 3.3 © MIT licensed
+Duino-Coin Official AVR Miner 3.33 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2022
@@ -109,7 +109,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '3.3'
+    VER = '3.33'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
     AVR_TIMEOUT = 10
@@ -1071,12 +1071,18 @@ def mine_avr(com, threadid, fastest_pool):
                 debug_output(str(e))
 
         start_diff = "AVR"
-        if hashrate_test > 5500:
+        if hashrate_test > 6000:
+            start_diff = "ESP8266H"
+            
+        elif hashrate_test > 4500:
             start_diff = "ESP8266"
-        elif hashrate_test > 3000:
-            start_diff = "DUE"
+            
         elif hashrate_test > 1000:
+            start_diff = "DUE"
+            
+        elif hashrate_test > 500:
             start_diff = "ARM"
+            
         elif hashrate_test > 300:
             start_diff = "MEGA"
 
