@@ -30,7 +30,7 @@
     <img src="https://img.shields.io/badge/-bahasa Indonesia-ff0ae3.svg?style=for-the-badge" /></a>
     <img src = "https://img.shields.io/badge/-Korean-blueviolet.svg?style=for-the-badge"></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_ja_JP.md">
-    <img src="https://img.shields.io/badge/-Japanese-orange?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/badge/-日本語-orange?style=for-the-badge" /></a>
 <br>
 
   <a href="https://wallet.duinocoin.com">
