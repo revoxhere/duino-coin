@@ -44,7 +44,7 @@
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_in_HI.md">
     <img src="https://img.shields.io/badge/-Hindi-orange?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_ja_JP.md">
-    <img src="https://img.shields.io/badge/-Japanese-orange?style=for-the-badge" /></a>
+    <img src="https://img.shields.io/badge/-日本語-orange?style=for-the-badge" /></a>
 </h1>
 <a href="https://wallet.duinocoin.com">
   <img src="https://img.shields.io/badge/Online Wallet-a202ff.svg?style=for-the-badge&logo=Web" /></a>
@@ -70,7 +70,7 @@
 
 | 主な特徴 | 技術仕様 | (多数の中の一部)対応ボード |
 |-|-|-|
-| 💻 多くのプラットフォームでサポート<br>👥 急成長するコミュニティ<br>💱 簡単な操作と交換<br>(DUCO Exchange、Node-S、JustSwap、SushiSwap）<br>🌎 どこでも購入可能<br>:new: 完全オリジナル＆オープンソースプロジェクト<br>🌳 ビギナーズ＆エコ<br>💰 コストパフォーマンスが高く、採掘が容易 | ⚒️ アルゴリズム: DUCO-S1<br>♐ リワード: "Kolkaシステム"でサポート<br>フェアな報酬を得ることができる<br>⚡ トランザクション時間: インスタント<br>🪙 コインの供給: 無限大<br>(バーン付き)<br>🔤 ティッカー: DUCO (ᕲ)<br>🔢 小数点: 最大20 | ♾️ Arduino<br>(Uno、Nano、Mega、Due、Pro Miniなどなど。)<br>📶 ESP8266<br>(NodeMCU、Wemosなどなど。)<br>📶 ESP32<br>(ESP-WROOM、ESP32-CAMなどなど。)<br>🍓 Raspberry Pi<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pi<br>(Zero、Zero 2、PC、Plusなどなど。)<br>⚡ Teensy 4.1 boards |
+| 💻 多くのプラットフォームでサポート<br>👥 急成長するコミュニティ<br>💱 簡単な操作と交換<br>(DUCO Exchange、Node-S、JustSwap、SushiSwap）<br>🌎 どこでも購入可能<br>:new: 完全オリジナル＆オープンソースプロジェクト<br>🌳 ビギナーズ＆エコ<br>💰 コストパフォーマンスが高く、マイニングが容易 | ⚒️ アルゴリズム: DUCO-S1<br>♐ リワード: "Kolkaシステム"でサポート<br>フェアな報酬を得ることができる<br>⚡ トランザクション時間: インスタント<br>🪙 コインの供給: 無限大<br>(バーン付き)<br>🔤 ティッカー: DUCO (ᕲ)<br>🔢 小数点: 最大20 | ♾️ Arduino<br>(Uno、Nano、Mega、Due、Pro Miniなどなど。)<br>📶 ESP8266<br>(NodeMCU、Wemosなどなど。)<br>📶 ESP32<br>(ESP-WROOM、ESP32-CAMなどなど。)<br>🍓 Raspberry Pi<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pi<br>(Zero、Zero 2、PC、Plusなどなど。)<br>⚡ Teensy 4.1 boards |
 
 
 ## はじめに
@@ -174,7 +174,7 @@ Duino-Coinへのコントリビュートは大いに歓迎されます。
 
 ### これらのソフトウェアは弊社が開発したものではなく、これらのソフトウェアを使用した結果、アカウントが使用禁止にならないことを保証するものではありませんのでご注意ください。あくまで好奇心でご利用ください。
 
-  ### Other miners known to work with Duino-Coin:
+  ### Duino-Coinと連携していることが知られている他のマイナー:
   *   :point_right: [**RP2040-HAT-MINING-C**](https://github.com/Wiznet/RP2040-HAT-MINING-C) - **WIZnet RP2040** mining stack
   *   [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Arduino Ethernet shield Miner by Pumafron
   *   [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - STM8S firmware for mining DUCO by BBS215
@@ -199,7 +199,7 @@ Duino-Coinへのコントリビュートは大いに歓迎されます。
       *   [Minimal Python Miner (DUCO-S1)](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Minimal_PC_Miner.py) by revoxhere
       *   [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) by joaquinbvw
 
-  ### Other tools:
+  ### その他ツール:
   *   [Duino Miner](https://github.com/g7ltt/Duino-Miner) - Arduino Nano based DUCO miner files and documentation by g7ltt
   *   [DUINO Mining Rig](https://repalmakershop.com/pages/duino-mining-rig) - 3D files, PCB designs and instructions for creating your own Duino rig by ReP_AL
   *   [DuinoCoin-balance-Home-Assistant](https://github.com/NL647/DuinoCoin-balance-Home-Assistant) - addon for home assistant displaying your balance by NL647
