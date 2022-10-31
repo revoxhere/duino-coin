@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 3.3 © MIT licensed
+Duino-Coin Official PC Miner 3.31 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2022
@@ -136,7 +136,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 3.3
+    VER = 3.31
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -1089,6 +1089,13 @@ class Miner:
 
                             hashrate[id] = result[1]
                             total_hashrate = sum(hashrate.values())
+                            prep_identifier = user_settings['identifier']
+                            if running_on_rpi:
+                                if prep_identifier != "None":
+                                    prep_identifier += " - RPi"
+                                else:
+                                    prep_identifier = "Raspberry Pi"
+                                    
                             while True:
                                 Client.send(f"{result[0]}"
                                             + Settings.SEPARATOR
@@ -1097,7 +1104,7 @@ class Miner:
                                             + "Official PC Miner"
                                             + f" {Settings.VER}"
                                             + Settings.SEPARATOR
-                                            + f"{user_settings['identifier']}"
+                                            + f"{prep_identifier}"
                                             + Settings.SEPARATOR
                                             + Settings.SEPARATOR
                                             + f"{single_miner_id}")
