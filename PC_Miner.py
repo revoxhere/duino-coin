@@ -301,7 +301,6 @@ def check_updates():
                 pretty_print("Update aborted", "warning", "sys0")
     except Exception as e:
         print(e)
-        sys.exit()
 
 
 class Algorithms:
