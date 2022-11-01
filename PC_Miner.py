@@ -57,7 +57,10 @@ def handler(signal_received, frame):
             + Fore.RESET
             + get_string("goodbye"),
             "warning")
-
+    
+    if not "raspi_leds" in user_settings:
+        user_settings["raspi_leds"] = "y"
+    
     if running_on_rpi and user_settings["raspi_leds"] == "y":
         # Reset onboard status LEDs
         os.system(
@@ -599,7 +602,10 @@ def share_print(id, type,
             sleep(0.1)
             os.system(
                 'echo 0 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
-
+    
+    if not "raspi_leds" in user_settings:
+        user_settings["raspi_leds"] = "y"
+    
     if type == "accept":
         if running_on_rpi and user_settings["raspi_leds"] == "y":
             _blink_builtin()
@@ -1300,7 +1306,10 @@ if __name__ == "__main__":
 
     Fasthash.load()
     Fasthash.init()
-
+    
+    if not "raspi_leds" in user_settings:
+        user_settings["raspi_leds"] = "y"
+    
     if user_settings["raspi_leds"] == "y":
         try:
             with io.open('/sys/firmware/devicetree/base/model', 'r') as m:
