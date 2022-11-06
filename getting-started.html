@@ -3006,12 +3006,11 @@ const background = document.getElementById('background');
     path: 'assets/animations/particle_bg.json'
 });*/
 
-latest_release = "3.3";
 fetch('https://api.github.com/repos/revoxhere/duino-coin/releases').then(data => data.json()).then(
     (data) => {
         latest_release = data[0]["tag_name"]
-    });
-$(".release_ver").text(latest_release);
+        $(".release_ver").text(latest_release);
+});
 
 $(".linux_release_link").attr("href", `https://github.com/revoxhere/duino-coin/releases/latest/download/Duino-Coin_${latest_release}_linux.zip`);
 $(".windows_release_link").attr("href", `https://github.com/revoxhere/duino-coin/releases/latest/download/Duino-Coin_${latest_release}_windows.zip`);
