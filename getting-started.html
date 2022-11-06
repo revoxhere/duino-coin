@@ -3006,15 +3006,19 @@ const background = document.getElementById('background');
     path: 'assets/animations/particle_bg.json'
 });*/
 
-fetch('https://api.github.com/repos/revoxhere/duino-coin/releases').then(data => data.json()).then(
-    (data) => {
-        latest_release = data[0]["tag_name"]
-        $(".release_ver").text(latest_release);
-});
+let latest_release = "3.33";
+$.getJSON('https://api.github.com/repos/revoxhere/duino-coin/releases',
+    function(data) {
+        latest_release = data[0]["tag_name"];
+        console.log(latest_release);
 
-$(".linux_release_link").attr("href", `https://github.com/revoxhere/duino-coin/releases/latest/download/Duino-Coin_${latest_release}_linux.zip`);
-$(".windows_release_link").attr("href", `https://github.com/revoxhere/duino-coin/releases/latest/download/Duino-Coin_${latest_release}_windows.zip`);
-$(".source_release_link").attr("href", `https://github.com/revoxhere/duino-coin/archive/refs/tags/${latest_release}.zip`);
+        $(".release_ver").text(latest_release);
+
+        $(".linux_release_link").attr("href", `https://github.com/revoxhere/duino-coin/releases/latest/download/Duino-Coin_${latest_release}_linux.zip`);
+        $(".windows_release_link").attr("href", `https://github.com/revoxhere/duino-coin/releases/latest/download/Duino-Coin_${latest_release}_windows.zip`);
+        $(".source_release_link").attr("href", `https://github.com/revoxhere/duino-coin/archive/refs/tags/${latest_release}.zip`);
+    }
+);
 
 function download(url, fileName) {
     var xhr = new XMLHttpRequest();
