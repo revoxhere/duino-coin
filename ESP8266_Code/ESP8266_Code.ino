@@ -427,6 +427,49 @@ unsigned long lwdTimeOutMillis = LWD_TIMEOUT;
 #define BLINK_CLIENT_CONNECT 3
 #define BLINK_RESET_DEVICE   5
 
+template <unsigned int max_digits>
+class Counter {
+public:
+    Counter() { reset(); }
+
+    void reset() {
+        memset(buffer, '0', max_digits);
+        buffer[max_digits] = '\0';
+        val = 0;
+        len = 1;
+    }
+
+    Counter & operator++() {
+        inc_string(max_digits - 1);
+        ++val;
+        return *this;
+    }
+
+    operator unsigned int () const { return val; }
+    const char * c_str() const { return buffer + max_digits - len; }
+    size_t strlen() const { return len; }
+
+protected:
+    inline void inc_string(int pos) {
+        if (pos < 0)
+            return;
+
+        if (buffer[pos] < '9') {
+            buffer[pos]++;
+        } else {
+            buffer[pos] = '0';
+            inc_string(pos - 1);
+        }
+
+        len = max(max_digits - pos, len);
+    }
+
+protected:
+    char buffer[max_digits + 1];
+    unsigned int val;
+    size_t len;
+};
+
 void SetupWifi() {
   Serial.println("Connecting to: " + String(SSID));
   WiFi.mode(WIFI_STA); // Setup ESP in client mode
@@ -516,6 +559,23 @@ void handleSystemEvents(void) {
   VerifyWifi();
   ArduinoOTA.handle();
   yield();
+}
+
+// https://stackoverflow.com/questions/9072320/split-string-into-string-array
+String getValue(String data, char separator, int index)
+{
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int max_index = data.length() - 1;
+
+  for (int i = 0; i <= max_index && found <= index; i++) {
+    if (data.charAt(i) == separator || i == max_index) {
+      found++;
+      strIndex[0] = strIndex[1] + 1;
+      strIndex[1] = (i == max_index) ? i + 1 : i;
+    }
+  }
+  return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
 
 void waitForClientData(void) {
@@ -674,8 +734,7 @@ void setup() {
 void loop() {
   br_sha1_context sha1_ctx, sha1_ctx_base;
   uint8_t hashArray[20];
-  String duco_numeric_result_str;
-  
+
   // 1 minute watchdog
   lwdtFeed();
 
@@ -742,12 +801,11 @@ void loop() {
 
   String result = "";
   if (LED_BLINKING) digitalWrite(LED_BUILTIN, LOW);
-  for (unsigned int duco_numeric_result = 0; duco_numeric_result < job.difficulty; duco_numeric_result++) {
+  for (Counter<8> counter; counter < difficulty; ++counter) {
     // Difficulty loop
     sha1_ctx = sha1_ctx_base;
-    duco_numeric_result_str = String(duco_numeric_result);
 
-    br_sha1_update(&sha1_ctx, duco_numeric_result_str.c_str(), duco_numeric_result_str.length());
+    br_sha1_update(&sha1_ctx, counter.c_str(), counter.strlen());
     br_sha1_out(&sha1_ctx, hashArray);
 
     if (memcmp(job.expected_hash, hashArray, 20) == 0) {
@@ -755,9 +813,9 @@ void loop() {
       if (LED_BLINKING) digitalWrite(LED_BUILTIN, HIGH);
       unsigned long elapsed_time = micros() - start_time;
       float elapsed_time_s = elapsed_time * .000001f;
-      hashrate = duco_numeric_result / elapsed_time_s;
+      hashrate = counter / elapsed_time_s;
       share_count++;
-      client.print(String(duco_numeric_result)
+      client.print(String(counter)
                    + ","
                    + String(hashrate)
                    + ","
@@ -774,7 +832,7 @@ void loop() {
       Serial.println(client_buffer
                      + " share #"
                      + String(share_count)
-                     + " (" + String(duco_numeric_result) + ")"
+                     + " (" + String(counter) + ")"
                      + " hashrate: "
                      + String(hashrate / 1000, 2)
                      + " kH/s ("
