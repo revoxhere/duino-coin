@@ -39,7 +39,6 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
-#include <ArduinoOTA.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
 #include <Ticker.h>
@@ -65,12 +64,18 @@
 // Comment out to disable the onboard led blinking when finding shares
 #define LED_BLINKING
 
+// Comment out to disable OTA upgrades
+#define USE_OTA
+
 
 #ifdef WEB_DASHBOARD
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
 #endif
 
+#ifdef USE_OTA
+#include <ArduinoOTA.h>
+#endif
 
 #ifdef USE_DHT
 float temp = 0.0;
@@ -461,6 +466,7 @@ void SetupWifi() {
   UpdatePool();
 }
 
+#ifdef USE_OTA
 void SetupOTA() {
   // Prepare OTA handler
   ArduinoOTA.onStart([]() {
@@ -484,6 +490,7 @@ void SetupOTA() {
   ArduinoOTA.setHostname(RIG_IDENTIFIER); // Give port a name not just address
   ArduinoOTA.begin();
 }
+#endif
 
 void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
 #ifdef LED_BLINKING
@@ -523,7 +530,9 @@ void VerifyWifi() {
 
 void handleSystemEvents(void) {
   VerifyWifi();
+#ifdef USE_OTA
   ArduinoOTA.handle();
+#endif
   yield();
 }
 
@@ -624,7 +633,10 @@ void setup() {
   }
 
   SetupWifi();
+
+#ifdef USE_OTA
   SetupOTA();
+#endif
 
   lwdtFeed();
   lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
@@ -687,7 +699,10 @@ void loop() {
 
   // OTA handlers
   VerifyWifi();
+
+#ifdef USE_OTA
   ArduinoOTA.handle();
+#endif
 
 #ifdef WEB_DASHBOARD
   server.handleClient();
