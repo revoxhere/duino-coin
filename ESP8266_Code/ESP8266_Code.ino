@@ -53,12 +53,14 @@
 // If you don't know what MQTT means check this link:
 // https://www.techtarget.com/iotagenda/definition/MQTT-MQ-Telemetry-Transport
 
-// Uncomment out the line below to disable the web dashboard
+// Uncomment to disable the web dashboard
 // #define WEB_DASHBOARD
 
-// Uncomment out the line below to disable the update hashrate in browser without reloading the page
+// Uncomment to disable the update hashrate in browser without reloading the page
 // #define WEB_HASH_UPDATER
 
+// Uncomment to use the 160 MHz overclock mode, comment out to run at 80 MHz
+#define USE_HIGHER_DIFF
 
 #ifdef WEB_DASHBOARD
 #include <ESP8266mDNS.h>
@@ -143,6 +145,12 @@ void mqttReconnect()
 }
 #endif
 
+#ifdef USE_HIGHER_DIFF
+#define START_DIFF "ESP8266NH"
+#else
+#define START_DIFF "ESP8266N"
+#endif
+
 namespace
 {
 // Change the part in brackets to your Duino-Coin username
@@ -155,8 +163,6 @@ const char *SSID = "WIFI_NAME";
 const char *PASSWORD = "WIFI_PASSWORD";
 // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
 const char *RIG_IDENTIFIER = "None";
-// Set to true to use the 160 MHz overclock mode (and not get the first share rejected)
-const bool USE_HIGHER_DIFF = true;
 // Set to false if you want to disable the onboard led blinking when finding shares
 const bool LED_BLINKING = true;
 
@@ -411,7 +417,6 @@ void UpdatePool() {
 WiFiClient client;
 String client_buffer = "";
 String chipID = "";
-String START_DIFF = "";
 
 // Loop WDT... please don't feed me...
 // See lwdtcb() and lwdtFeed() below
@@ -621,8 +626,6 @@ void setup() {
 
   lwdtFeed();
   lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
-  if (USE_HIGHER_DIFF) START_DIFF = "ESP8266NH";
-  else START_DIFF = "ESP8266N";
 
 #ifdef WEB_DASHBOARD
   if (!MDNS.begin(RIG_IDENTIFIER)) {
@@ -732,7 +735,9 @@ void loop() {
   String expected_hash_str = getValue(client_buffer, SEP_TOKEN, 1);
   difficulty = getValue(client_buffer, SEP_TOKEN, 2).toInt() * 100 + 1;
 
-  if (USE_HIGHER_DIFF) system_update_cpu_freq(160);
+#ifdef USE_HIGHER_DIFF
+  system_update_cpu_freq(160);
+#endif
 
   int job_len = last_block_hash.length() + expected_hash_str.length() + String(difficulty).length();
 
