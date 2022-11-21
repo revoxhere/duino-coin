@@ -62,6 +62,10 @@
 // Uncomment to use the 160 MHz overclock mode, comment out to run at 80 MHz
 #define USE_HIGHER_DIFF
 
+// Comment out to disable the onboard led blinking when finding shares
+#define LED_BLINKING
+
+
 #ifdef WEB_DASHBOARD
 #include <ESP8266mDNS.h>
 #include <ESP8266WebServer.h>
@@ -163,8 +167,6 @@ const char *SSID = "WIFI_NAME";
 const char *PASSWORD = "WIFI_PASSWORD";
 // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
 const char *RIG_IDENTIFIER = "None";
-// Set to false if you want to disable the onboard led blinking when finding shares
-const bool LED_BLINKING = true;
 
 /* Do not change the lines below. These lines are static and dynamic variables
    that will be used by the program for counters and measurements. */
@@ -484,16 +486,15 @@ void SetupOTA() {
 }
 
 void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
-  if (LED_BLINKING){
+#ifdef LED_BLINKING
     uint8_t state = HIGH;
-
     for (int x = 0; x < (count << 1); ++x) {
-      digitalWrite(pin, state ^= HIGH);
-      delay(50);
+        digitalWrite(pin, state ^= HIGH);
+        delay(50);
     }
-  } else {
+#else
     digitalWrite(LED_BUILTIN, HIGH);
-  }
+#endif
 }
 
 void RestartESP(String msg) {
@@ -567,7 +568,8 @@ void ConnectToServer() {
 
   waitForClientData();
   Serial.println("Connected to the server. Server version: " + client_buffer );
-  blink(BLINK_CLIENT_CONNECT); // Sucessfull connection with the server
+
+  blink(BLINK_CLIENT_CONNECT); // Successfull connection with the server
 }
 
 bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
@@ -753,7 +755,11 @@ void loop() {
   max_micros_elapsed(start_time, 0);
 
   String result = "";
-  if (LED_BLINKING) digitalWrite(LED_BUILTIN, LOW);
+
+#ifdef LED_BLINKING
+  digitalWrite(LED_BUILTIN, LOW);
+#endif
+
   for (unsigned int duco_numeric_result = 0; duco_numeric_result < difficulty; duco_numeric_result++) {
     // Difficulty loop
     sha1_ctx = sha1_ctx_base;
@@ -764,7 +770,9 @@ void loop() {
 
     if (memcmp(expected_hash, hashArray, 20) == 0) {
       // If result is found
-      if (LED_BLINKING) digitalWrite(LED_BUILTIN, HIGH);
+#ifdef LED_BLINKING
+      digitalWrite(LED_BUILTIN, HIGH);
+#endif
       unsigned long elapsed_time = micros() - start_time;
       float elapsed_time_s = elapsed_time * .000001f;
       hashrate = duco_numeric_result / elapsed_time_s;
