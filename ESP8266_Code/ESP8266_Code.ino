@@ -38,13 +38,11 @@
 //#include <TypeConversion.h>
 
 #include <ESP8266WiFi.h>
-#include <ESP8266mDNS.h>
 #include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
 #include <Ticker.h>
-#include <ESP8266WebServer.h>
 
 // Uncomment the line below if you wish to use a DHT sensor (Duino IoT beta)
 // #define USE_DHT
@@ -54,6 +52,19 @@
 
 // If you don't know what MQTT means check this link:
 // https://www.techtarget.com/iotagenda/definition/MQTT-MQ-Telemetry-Transport
+
+// Uncomment out the line below to disable the web dashboard
+// #define WEB_DASHBOARD
+
+// Uncomment out the line below to disable the update hashrate in browser without reloading the page
+// #define WEB_HASH_UPDATER
+
+
+#ifdef WEB_DASHBOARD
+#include <ESP8266mDNS.h>
+#include <ESP8266WebServer.h>
+#endif
+
 
 #ifdef USE_DHT
 float temp = 0.0;
@@ -146,10 +157,6 @@ const char *PASSWORD = "WIFI_PASSWORD";
 const char *RIG_IDENTIFIER = "None";
 // Set to true to use the 160 MHz overclock mode (and not get the first share rejected)
 const bool USE_HIGHER_DIFF = true;
-// Set to true if you want to host the dashboard page (available on ESPs IP address)
-const bool WEB_DASHBOARD = false;
-// Set to true if you want to update hashrate in browser without reloading the page
-const bool WEB_HASH_UPDATER = false;
 // Set to false if you want to disable the onboard led blinking when finding shares
 const bool LED_BLINKING = true;
 
@@ -167,6 +174,7 @@ String AutoRigName = "";
 String host = "";
 String node_id = "";
 
+#ifdef WEB_DASHBOARD
 const char WEBSITE[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html>
@@ -324,7 +332,6 @@ const char WEBSITE[] PROGMEM = R"=====(
             setInterval(function(){
                 getData();
             }, 3000);
-            
             function getData() {
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
@@ -342,11 +349,7 @@ const char WEBSITE[] PROGMEM = R"=====(
 )=====";
 
 ESP8266WebServer server(80);
-
-void hashupdater(){ //update hashrate every 3 sec in browser without reloading page
-  server.send(200, "text/plain", String(hashrate / 1000));
-  Serial.println("Update hashrate on page");
-};
+#endif
 
 void UpdateHostPort(String input) {
   // Thanks @ricaun for the code
@@ -572,28 +575,6 @@ bool max_micros_elapsed(unsigned long current, unsigned long max_elapsed) {
   return false;
 }
 
-void dashboard() {
-  Serial.println("Handling HTTP client");
-
-  String s = WEBSITE;
-  s.replace("@@IP_ADDR@@", WiFi.localIP().toString());
-  
-  s.replace("@@HASHRATE@@", String(hashrate / 1000));
-  s.replace("@@DIFF@@", String(difficulty / 100));
-  s.replace("@@SHARES@@", String(share_count));
-  s.replace("@@NODE@@", String(node_id));
-
-  s.replace("@@DEVICE@@", String(DEVICE));
-  s.replace("@@ID@@", String(RIG_IDENTIFIER));
-  s.replace("@@MEMORY@@", String(ESP.getFreeHeap()));
-  s.replace("@@VERSION@@", String(MINER_VER));
-#ifdef USE_DHT
-  s.replace("@@TEMP@@", String(temp));
-  s.replace("@@HUM@@", String(hum));
-#endif
-  server.send(200, "text/html", s);
-}
-
 } // namespace
 
 // https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TypeConversion.cpp
@@ -643,20 +624,50 @@ void setup() {
   if (USE_HIGHER_DIFF) START_DIFF = "ESP8266NH";
   else START_DIFF = "ESP8266N";
 
-  if(WEB_DASHBOARD) {
-    if (!MDNS.begin(RIG_IDENTIFIER)) {
+#ifdef WEB_DASHBOARD
+  if (!MDNS.begin(RIG_IDENTIFIER)) {
       Serial.println("mDNS unavailable");
-    }
-    MDNS.addService("http", "tcp", 80);
-    Serial.print("Configured mDNS for dashboard on http://" 
-                  + String(RIG_IDENTIFIER)
-                  + ".local (or http://"
-                  + WiFi.localIP().toString()
-                  + ")");
-    server.on("/", dashboard);
-    if (WEB_HASH_UPDATER) server.on("/hashrateread", hashupdater);
-    server.begin();
+  } else {
+      MDNS.addService("http", "tcp", 80);
+      Serial.print("Configured mDNS for dashboard on http://" 
+              + String(RIG_IDENTIFIER)
+              + ".local (or http://"
+              + WiFi.localIP().toString()
+              + ")");
   }
+
+  server.on("/", [] {
+          Serial.println("Handling HTTP client");
+
+          String s = WEBSITE;
+          s.replace("@@IP_ADDR@@", WiFi.localIP().toString());
+
+          s.replace("@@HASHRATE@@", String(hashrate / 1000));
+          s.replace("@@DIFF@@", String(difficulty / 100));
+          s.replace("@@SHARES@@", String(share_count));
+          s.replace("@@NODE@@", String(node_id));
+
+          s.replace("@@DEVICE@@", String(DEVICE));
+          s.replace("@@ID@@", String(RIG_IDENTIFIER));
+          s.replace("@@MEMORY@@", String(ESP.getFreeHeap()));
+          s.replace("@@VERSION@@", String(MINER_VER));
+#ifdef USE_DHT
+          s.replace("@@TEMP@@", String(temp));
+          s.replace("@@HUM@@", String(hum));
+#endif
+          server.send(200, "text/html", s);
+          });
+
+#ifdef WEB_HASH_UPDATER
+  server.on("/hashrateread", [] {
+          //update hashrate every 3 sec in browser without reloading page
+          server.send(200, "text/plain", String(hashrate / 1000));
+          Serial.println("Update hashrate on page");
+  });
+#endif
+
+  server.begin();
+#endif
 
   blink(BLINK_SETUP_COMPLETE);
 }
@@ -672,17 +683,20 @@ void loop() {
   // OTA handlers
   VerifyWifi();
   ArduinoOTA.handle();
-  if(WEB_DASHBOARD) server.handleClient();
+
+#ifdef WEB_DASHBOARD
+  server.handleClient();
+#endif
 
   ConnectToServer();
   Serial.println("Asking for a new job for user: " + String(DUCO_USER));
 
-  #ifndef USE_DHT
-    client.print("JOB," + 
+#ifndef USE_DHT
+    client.print("JOB," +
                  String(DUCO_USER) + SEP_TOKEN +
                  String(START_DIFF) + SEP_TOKEN +
                  String(MINER_KEY) + END_TOKEN);
-  #endif
+#endif
 
   #ifdef USE_DHT
     temp = dht.readTemperature();
