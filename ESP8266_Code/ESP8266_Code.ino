@@ -518,23 +518,6 @@ void handleSystemEvents(void) {
   yield();
 }
 
-// https://stackoverflow.com/questions/9072320/split-string-into-string-array
-String getValue(String data, char separator, int index)
-{
-  int found = 0;
-  int strIndex[] = {0, -1};
-  int max_index = data.length() - 1;
-
-  for (int i = 0; i <= max_index && found <= index; i++) {
-    if (data.charAt(i) == separator || i == max_index) {
-      found++;
-      strIndex[0] = strIndex[1] + 1;
-      strIndex[1] = (i == max_index) ? i + 1 : i;
-    }
-  }
-  return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
-}
-
 void waitForClientData(void) {
   client_buffer = "";
 
@@ -609,6 +592,33 @@ uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, con
     }
     return uint8Array;
 }
+
+struct MiningJob
+{
+  String last_block_hash;
+  String expected_hash_str; 
+  uint8_t expected_hash[20];
+  unsigned int difficulty;
+
+  bool parse(char* job_str)
+  {
+    String tokens[3];
+    char *token = strtok(job_str, ",");
+    for (int i = 0; token != NULL && i < 3; i++)
+    {
+      tokens[i] = token;
+      token = strtok(NULL, ",");
+    }
+
+    last_block_hash = tokens[0];
+    expected_hash_str = tokens[1];
+    hexStringToUint8Array(expected_hash_str, expected_hash, 20);
+    difficulty = tokens[2].toInt() * 100 + 1;
+
+    return true;
+  }
+};
+
 
 void setup() {
   Serial.begin(500000);
@@ -714,21 +724,17 @@ void loop() {
   #endif
 
   waitForClientData();
-  String last_block_hash = getValue(client_buffer, SEP_TOKEN, 0);
-  String expected_hash_str = getValue(client_buffer, SEP_TOKEN, 1);
-  difficulty = getValue(client_buffer, SEP_TOKEN, 2).toInt() * 100 + 1;
+  Serial.println("Received job with size of " + String(client_buffer));
+
+  MiningJob job;
+  job.parse((char*)client_buffer.c_str());
+
+  Serial.println("Parsed job: " + job.last_block_hash + " " + job.expected_hash_str + " " + String(job.difficulty));
 
   if (USE_HIGHER_DIFF) system_update_cpu_freq(160);
 
-  int job_len = last_block_hash.length() + expected_hash_str.length() + String(difficulty).length();
-
-  Serial.println("Received job with size of " + String(job_len) + " bytes: " + last_block_hash + " " + expected_hash_str + " " + difficulty);
-
-  uint8_t expected_hash[20];
-  hexStringToUint8Array(expected_hash_str, expected_hash, 20);
-
   br_sha1_init(&sha1_ctx_base);
-  br_sha1_update(&sha1_ctx_base, last_block_hash.c_str(), last_block_hash.length());
+  br_sha1_update(&sha1_ctx_base, job.last_block_hash.c_str(), job.last_block_hash.length());
 
   float start_time = micros();
   max_micros_elapsed(start_time, 0);
@@ -743,7 +749,7 @@ void loop() {
     br_sha1_update(&sha1_ctx, duco_numeric_result_str.c_str(), duco_numeric_result_str.length());
     br_sha1_out(&sha1_ctx, hashArray);
 
-    if (memcmp(expected_hash, hashArray, 20) == 0) {
+    if (memcmp(job.expected_hash, hashArray, 20) == 0) {
       // If result is found
       if (LED_BLINKING) digitalWrite(LED_BUILTIN, HIGH);
       unsigned long elapsed_time = micros() - start_time;
