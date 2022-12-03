@@ -728,6 +728,7 @@ void loop() {
 
   MiningJob job;
   job.parse((char*)client_buffer.c_str());
+  difficulty = job.difficulty;
 
   Serial.println("Parsed job: " + job.last_block_hash + " " + job.expected_hash_str + " " + String(job.difficulty));
 
@@ -741,7 +742,7 @@ void loop() {
 
   String result = "";
   if (LED_BLINKING) digitalWrite(LED_BUILTIN, LOW);
-  for (unsigned int duco_numeric_result = 0; duco_numeric_result < difficulty; duco_numeric_result++) {
+  for (unsigned int duco_numeric_result = 0; duco_numeric_result < job.difficulty; duco_numeric_result++) {
     // Difficulty loop
     sha1_ctx = sha1_ctx_base;
     duco_numeric_result_str = String(duco_numeric_result);
