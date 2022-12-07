@@ -413,7 +413,7 @@ String START_DIFF = "";
 // Loop WDT... please don't feed me...
 // See lwdtcb() and lwdtFeed() below
 Ticker lwdTimer;
-#define LWD_TIMEOUT   20000
+#define LWD_TIMEOUT   90000
 
 unsigned long lwdCurrentMillis = 0;
 unsigned long lwdTimeOutMillis = LWD_TIMEOUT;
