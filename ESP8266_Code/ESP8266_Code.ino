@@ -439,29 +439,30 @@ public:
         len = 1;
     }
 
-    Counter & operator++() {
-        inc_string(max_digits - 1);
+    inline Counter & operator++() {
+        inc_string(buffer + max_digits - 1);
         ++val;
         return *this;
     }
 
-    operator unsigned int () const { return val; }
-    const char * c_str() const { return buffer + max_digits - len; }
-    size_t strlen() const { return len; }
+    inline operator unsigned int () const { return val; }
+    inline const char * c_str() const { return buffer + max_digits - len; }
+    inline size_t strlen() const { return len; }
 
 protected:
-    inline void inc_string(int pos) {
-        if (pos < 0)
-            return;
+    inline void inc_string(char * c) {
+        // In theory, the line below should be uncommented to avoid writing outside the buffer.  In practice however,
+        // with max_digits set to 10 or more, we can fit all possible unsigned 32-bit integers in the buffer.  The
+        // check is skipped to gain a small extra speed improvement.
+        // if (c >= buffer) return;
 
-        if (buffer[pos] < '9') {
-            buffer[pos]++;
+        if (*c < '9') {
+            *c += 1;
         } else {
-            buffer[pos] = '0';
-            inc_string(pos - 1);
+            *c = '0';
+            inc_string(c - 1);
+            len = max(max_digits - (c - buffer) + 1, len);
         }
-
-        len = max(max_digits - pos, len);
     }
 
 protected:
@@ -796,12 +797,12 @@ void loop() {
   br_sha1_init(&sha1_ctx_base);
   br_sha1_update(&sha1_ctx_base, job.last_block_hash.c_str(), job.last_block_hash.length());
 
-  float start_time = micros();
+  unsigned long start_time = micros();
   max_micros_elapsed(start_time, 0);
 
   String result = "";
   if (LED_BLINKING) digitalWrite(LED_BUILTIN, LOW);
-  for (Counter<8> counter; counter < difficulty; ++counter) {
+  for (Counter<10> counter; counter < difficulty; ++counter) {
     // Difficulty loop
     sha1_ctx = sha1_ctx_base;
 
