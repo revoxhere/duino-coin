@@ -443,7 +443,7 @@ void SetupWifi() {
     }
   }
 
-  Serial.println("\n\nnSuccessfully connected to WiFi");
+  Serial.println("\n\nSuccessfully connected to WiFi");
   Serial.println("Local IP address: " + WiFi.localIP().toString());
   Serial.println("Rig name: " + String(RIG_IDENTIFIER));
   Serial.println();
