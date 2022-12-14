@@ -42,9 +42,11 @@ running_on_rpi = False
 configparser = ConfigParser()
 printlock = Semaphore(value=1)
 
-# Python <3.5 check
-f"Your Python version is too old. Duino-Coin Miner requires version 3.6 or above. Update your packages and try again"
-
+# Python < 3.7 check
+python_version = python_version_tuple()
+if int(python_version_tuple()[0]) < 3 or (int(python_version_tuple()[0]) == 3 and int (python_version_tuple()[1]) <=6):
+    print("Your Python version is too old. Duino-Coin Miner requires version 3.7 or above. Update your packages and try again")
+    sys.exit(1)
 
 def handler(signal_received, frame):
     """
@@ -85,6 +87,7 @@ def install(package):
         check_call([sys.executable, '-m', 'pip', 'install', package])
 
     execl(sys.executable, sys.executable, *sys.argv)
+
 
 try:
     import requests
@@ -1216,21 +1219,13 @@ class Fasthash:
             import libducohasher
             pretty_print(get_string("fasthash_available"), "info")
         except Exception as e:
-            if int(python_version_tuple()[1]) <= 6:
-                pretty_print(
-                    (f"Your Python version is too old ({python_version()}).\n"
-                     + "Fasthash accelerations and other features may not work"
-                     + " on your outdated installation.\n"
-                     + "We suggest updating your python to version 3.7 or higher."
-                     ).replace("\n", "\n\t\t"), 'warning', 'sys0')
-            else:
-                pretty_print(
-                    ("Fasthash accelerations are not available for your OS.\n"
-                     + "If you wish to compile them for your system, visit:\n"
-                     + "https://github.com/revoxhere/duino-coin/wiki/"
-                     + "How-to-compile-fasthash-accelerations\n"
-                     + f"(Libducohash couldn't be loaded: {str(e)})"
-                     ).replace("\n", "\n\t\t"), 'warning', 'sys0')
+            pretty_print(
+                ("Fasthash accelerations are not available for your OS.\n"
+                    + "If you wish to compile them for your system, visit:\n"
+                    + "https://github.com/revoxhere/duino-coin/wiki/"
+                    + "How-to-compile-fasthash-accelerations\n"
+                    + f"(Libducohash couldn't be loaded: {str(e)})"
+                    ).replace("\n", "\n\t\t"), 'warning', 'sys0')
 
     def load():
         if os.name == 'nt':
