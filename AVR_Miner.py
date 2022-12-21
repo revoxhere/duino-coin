@@ -1044,6 +1044,10 @@ def mine_avr(com, threadid, fastest_pool):
         while True:
             try:
                 debug_output(com + ': Sending hash test to the board')
+
+                #start counting the time
+                hash_send_time = time()
+
                 ser.write(bytes(str(prev_hash
                                     + Settings.SEPARATOR
                                     + exp_hash
@@ -1055,6 +1059,11 @@ def mine_avr(com, threadid, fastest_pool):
                 result = ser.read_until(b'\n').decode().strip().split(',')
                 ser.flush()
 
+                hash_received_time = time()
+
+                #total elapsed time
+                total_elapsed_time = hash_received_time - hash_send_time
+
                 if result[0] and result[1]:
                     _ = int(result[0], 2)
                     debug_output(com + f': Result: {result[0]}')
@@ -1063,7 +1072,7 @@ def mine_avr(com, threadid, fastest_pool):
                 if int(result[0], 2) != exp_result:
                    raise Exception(com + f': Incorrect result received!')
 
-                computetime = round(int(result[1], 2) / 1000000, 5)
+                computetime = total_elapsed_time
                 num_res = int(result[0], 2)
                 hashrate_test = round(num_res / computetime, 2)
                 break
@@ -1133,6 +1142,9 @@ def mine_avr(com, threadid, fastest_pool):
 
                 try:
                     debug_output(com + ': Sending job to the board')
+
+                    hash_send_time = time()
+
                     ser.write(bytes(str(job[0]
                                         + Settings.SEPARATOR
                                         + job[1]
@@ -1142,6 +1154,9 @@ def mine_avr(com, threadid, fastest_pool):
                                     encoding=Settings.ENCODING))
                     debug_output(com + ': Reading result from the board')
                     result = ser.read_until(b'\n').decode().strip().split(',')
+
+                    #total elapsed time
+                     total_elapsed_time = hash_received_time - hash_send_time
 
                     if result[0] and result[1]:
                         _ = int(result[0], 2)
@@ -1159,7 +1174,7 @@ def mine_avr(com, threadid, fastest_pool):
                 break
 
             try:
-                computetime = round(int(result[1], 2) / 1000000, 5)
+                computetime = total_elapsed_time
                 num_res = int(result[0], 2)
                 hashrate_t = round(num_res / computetime, 2)
 
