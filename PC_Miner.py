@@ -24,6 +24,7 @@ import base64 as b64
 import os
 import json
 import zipfile
+import traceback
 
 from pathlib import Path
 from re import sub
@@ -603,9 +604,6 @@ def share_print(id, type,
             os.system(
                 'echo 0 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
     
-    if not "raspi_leds" in user_settings:
-        user_settings["raspi_leds"] = "y"
-    
     if type == "accept":
         if running_on_rpi and user_settings["raspi_leds"] == "y":
             _blink_builtin()
@@ -1030,7 +1028,6 @@ class Miner:
         """
         Main section that executes the functionalities from the sections above.
         """
-
         using_algo = get_string("using_algo")
         pretty_print(get_string("mining_thread") + str(id)
                      + get_string("mining_thread_starting")
@@ -1059,8 +1056,7 @@ class Miner:
                                         + Settings.SEPARATOR
                                         + str(user_settings["start_diff"])
                                         + Settings.SEPARATOR
-                                        + str(key)
-                            )
+                                        + str(key))
 
                             job = Client.recv().split(Settings.SEPARATOR)
                             if len(job) == 3:
@@ -1160,11 +1156,13 @@ class Miner:
                                 break
                             break
                     except Exception as e:
+                        print(traceback.format_exc())
                         pretty_print(get_string("error_while_mining")
                                      + " " + str(e), "error", "net" + str(id))
                         sleep(5)
                         break
             except Exception as e:
+                print(traceback.format_exc())
                 pretty_print(get_string("error_while_mining")
                                      + " " + str(e), "error", "net" + str(id))
 
@@ -1328,6 +1326,14 @@ if __name__ == "__main__":
                 'echo gpio | sudo tee /sys/class/leds/led1/trigger >/dev/null 2>&1')
             os.system(
                 'echo gpio | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
+
+            try:
+                from gpiozero import CPUTemperature
+                cpu = CPUTemperature()
+                print(cpu.temperature)
+            except:
+                install("gpiozero")
+                print("Restart to apply changes")
     
     try:
         check_mining_key(user_settings)
