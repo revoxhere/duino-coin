@@ -154,6 +154,7 @@ class Settings:
     REPORT_TIME = 5*60
     DONATE_LVL = 0
     RASPI_LEDS = "y"
+    RASPI_CPU_IOT = "y"
 
     try:
         # Raspberry Pi latin encoding users can't display this character
@@ -504,12 +505,21 @@ def get_prefix(symbol: str,
         val = str(round(val)) + " "
     return val + symbol
 
+def get_rpi_temperature():
+    output = Popen(args='cat /sys/class/thermal/thermal_zone0/temp',
+                    stdout=PIPE,
+                    shell=True).communicate()[0].decode()
+    return round(int(output) / 1000, 2)
+
 
 def periodic_report(start_time, end_time, shares,
                     blocks, hashrate, uptime):
     """
     Displays nicely formated uptime stats
     """
+    if running_on_rpi and user_settings["raspi_cpu_iot"] == "y":
+        raspi_iot_reading = f"{get_string('rpi_cpu_temp')} {get_rpi_temperature()}°C"
+
     seconds = round(end_time - start_time)
     pretty_print(get_string("periodic_mining_report")
                  + Fore.RESET + Style.NORMAL
@@ -527,7 +537,8 @@ def periodic_report(start_time, end_time, shares,
                  + str(int(hashrate*seconds))
                  + get_string("report_body6")
                  + get_string("total_mining_time")
-                 + str(uptime), "success")
+                 + str(uptime)
+                 + raspi_iot_reading, "success")
 
 
 def calculate_uptime(start_time):
@@ -954,19 +965,20 @@ class Miner:
                 donation_level = 0
 
             configparser["PC Miner"] = {
-                "username":    username,
-                "mining_key":  mining_key,
-                "intensity":   intensity,
-                "threads":     threads,
-                "start_diff":  start_diff,
-                "donate":      int(donation_level),
-                "identifier":  rig_id,
-                "algorithm":   algorithm,
-                "language":    lang,
-                "soc_timeout": Settings.SOC_TIMEOUT,
-                "report_sec":  Settings.REPORT_TIME,
-                "raspi_leds":  Settings.RASPI_LEDS,
-                "discord_rp":  "y"}
+                "username":      username,
+                "mining_key":    mining_key,
+                "intensity":     intensity,
+                "threads":       threads,
+                "start_diff":    start_diff,
+                "donate":        int(donation_level),
+                "identifier":    rig_id,
+                "algorithm":     algorithm,
+                "language":      lang,
+                "soc_timeout":   Settings.SOC_TIMEOUT,
+                "report_sec":    Settings.REPORT_TIME,
+                "raspi_leds":    Settings.RASPI_LEDS,
+                "raspi_cpu_iot": Settings.RASPI_CPU_IOT,
+                "discord_rp":    "y"}
 
             with open(Settings.DATA_DIR + Settings.SETTINGS_FILE,
                       "w") as configfile:
@@ -999,9 +1011,8 @@ class Miner:
                         pretty_print(get_string("connected") + Fore.RESET
                                      + Style.NORMAL +
                                      get_string("connected_server")
-                                     + str(POOL_VER) + ", " + pool[0] + ":"
-                                     + str(pool[1]) + ")", "success",
-                                     "net" + str(id))
+                                     + str(POOL_VER) + ", " + pool[0] +")",
+                                     "success", "net" + str(id))
                     else:
                         pretty_print(get_string("outdated_miner")
                                      + str(Settings.VER) + ") -"
@@ -1048,6 +1059,11 @@ class Miner:
                         else:   
                             key = user_settings["mining_key"]
 
+                        raspi_iot_reading = ""
+                        if user_settings["raspi_cpu_iot"] == "y" and running_on_rpi:
+                            # * instead of the degree symbol because nodes use basic encoding
+                            raspi_iot_reading = f"CPU temperature:{get_rpi_temperature()}*C"
+
                         while True:
                             job_req = "JOB"
                             Client.send(job_req
@@ -1056,7 +1072,9 @@ class Miner:
                                         + Settings.SEPARATOR
                                         + str(user_settings["start_diff"])
                                         + Settings.SEPARATOR
-                                        + str(key))
+                                        + str(key)
+                                        + Settings.SEPARATOR
+                                        + str(raspi_iot_reading))
 
                             job = Client.recv().split(Settings.SEPARATOR)
                             if len(job) == 3:
@@ -1176,8 +1194,9 @@ class Discord_rp:
             Thread(target=Discord_rp.update).start()
         except Exception as e:
             pretty_print(
-                get_string("discord_launch_error" +
-                Style.NORMAL + Fore.RESET + " " + str(e)))
+                get_string("discord_launch_error") +
+                Style.NORMAL + Fore.RESET + " " + str(e),
+                "warning")
           
 
     def update():
@@ -1200,7 +1219,8 @@ class Discord_rp:
             except Exception as e:
                 pretty_print(
                     get_string("discord_update_error" +
-                    Style.NORMAL + Fore.RESET + " " + str(e)))
+                    Style.NORMAL + Fore.RESET + " " + str(e)),
+                    "warning")
             sleep(15)
 
 
@@ -1307,6 +1327,8 @@ if __name__ == "__main__":
     
     if not "raspi_leds" in user_settings:
         user_settings["raspi_leds"] = "y"
+    if not "raspi_cpu_iot" in user_settings:
+        user_settings["raspi_cpu_iot"] = "y"
     
     if user_settings["raspi_leds"] == "y":
         try:
@@ -1327,13 +1349,16 @@ if __name__ == "__main__":
             os.system(
                 'echo gpio | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
 
-            try:
-                from gpiozero import CPUTemperature
-                cpu = CPUTemperature()
-                print(cpu.temperature)
-            except:
-                install("gpiozero")
-                print("Restart to apply changes")
+    if user_settings["raspi_cpu_iot"] == "y" and running_on_rpi:
+        try:
+            temp = get_rpi_temperature()
+            pretty_print(get_string("iot_on_rpi") +
+                         Style.NORMAL + Fore.RESET + " " +
+                         f"{get_string('iot_on_rpi2')} {temp}°C",
+                         "success")
+        except Exception as e:
+            print(e)
+            user_settings["raspi_cpu_iot"] = "n"
     
     try:
         check_mining_key(user_settings)
