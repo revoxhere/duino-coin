@@ -800,7 +800,8 @@ void setup() {
     Serial.println("Test reading: " + String(hum.relative_humidity) + "% humidity");
     Serial.println("Test reading: temperature " + String(temp.temperature) + "*C");
   #endif
-
+  
+  WiFi.setSleep(false); // Better network responsiveness
   WiFi.mode(WIFI_STA);  // Setup ESP in client mode
   btStop();
   WiFi.begin(SSID, WIFI_PASS);  // Connect to wifi
