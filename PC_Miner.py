@@ -517,6 +517,9 @@ def periodic_report(start_time, end_time, shares,
     """
     Displays nicely formated uptime stats
     """
+    
+    raspi_iot_reading = ""
+    
     if running_on_rpi and user_settings["raspi_cpu_iot"] == "y":
         raspi_iot_reading = f"{get_string('rpi_cpu_temp')} {get_rpi_temperature()}°C"
 
