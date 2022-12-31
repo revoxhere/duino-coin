@@ -3,7 +3,7 @@
 Duino-Coin Official PC Miner 3.33 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
-Duino-Coin Team & Community 2019-2022
+Duino-Coin Team & Community 2019-2023
 """
 
 from time import time, sleep, strptime, ctime
@@ -746,7 +746,7 @@ class Miner:
         print("\n" + Style.DIM + Fore.YELLOW + Settings.BLOCK + Fore.YELLOW
               + Style.BRIGHT + get_string("banner") + Style.RESET_ALL
               + Fore.MAGENTA + " (" + str(Settings.VER) + ") "
-              + Fore.RESET + "2019-2022")
+              + Fore.RESET + "2019-2023")
 
         print(Style.DIM + Fore.YELLOW + Settings.BLOCK + Style.NORMAL
               + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
