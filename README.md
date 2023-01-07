@@ -202,7 +202,6 @@ All tests were performed using the DUCO-S1 algorithm **without fasthash accelera
   *   [Duino Miner](https://github.com/g7ltt/Duino-Miner) - Arduino Nano based DUCO miner files and documentation by g7ltt
   *   [DUINO Mining Rig](https://repalmakershop.com/pages/duino-mining-rig) - 3D files, PCB designs and instructions for creating your own Duino rig by ReP_AL
   *   [DuinoCoin-balance-Home-Assistant](https://github.com/NL647/DuinoCoin-balance-Home-Assistant) - addon for home assistant displaying your balance by NL647
-  *   [Duino Coin Status Monitor](https://github.com/TSltd/duino_coin) for 128x64 SSD1306 OLED and ESP8266 by TSltd
   *   [ducopanel](https://github.com/ponsato/ducopanel) - a GUI app for controling your Duino-Coin miners by ponsato
   *   [Duino AVR Monitor](https://www.microsoft.com/store/apps/9NJ7HPFSR9V5) - GUI Windows App for monitoring AVR devices mining DUCO by niknak
   *   [Duino-Coin Arduino library](https://github.com/ricaun/arduino-DuinoCoin) by ricaun
@@ -211,7 +210,6 @@ All tests were performed using the DUCO-S1 algorithm **without fasthash accelera
   *   [duco-miners](https://github.com/dansinclair25/duco-miners) CLI mining dashboard made by dansinclair25
   *   [Duco-Coin Symbol Icon ttf](https://github.com/SandUhrGucker/Duco-Coin-Symbol-Icon-ttf-.h) by SandUhrGucker
   *   [DUCO Monitor](https://siunus.github.io/duco-monitor/) account statistics website by siunus
-  *   [duino-tools](https://github.com/kyngs/duino-tools) written in Java by kyngs
   *   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
   *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI Wallet by viktor02
   *   [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - a Duino-Coin iOS widget by Naphob 
