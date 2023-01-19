@@ -6,6 +6,21 @@ https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2023
 """
 
+################################################################################
+##### Code added to limit ram useage..
+import resource
+
+def limit_memory(maxsize):
+	soft, hard = resource.getrlimit(resource.RLIMIT_AS)
+	resource.setrlimit(resource.RLIMIT_AS, (maxsize, hard))
+
+__ram_lim = input("Do you want to limit ram size ?? (N/max) ")
+
+if __ram_lim.lower() != "n":
+    limit_memory(int(__ram_lim))
+##################################################################################
+
+
 from time import time, sleep, strptime, ctime
 from hashlib import sha1
 from socket import socket
