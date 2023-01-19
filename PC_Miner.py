@@ -39,6 +39,20 @@ from configparser import ConfigParser
 
 import io
 
+################################################################################
+##### Code added to limit ram use..
+import resource
+
+def limit_memory(maxsize):
+	soft, hard = resource.getrlimit(resource.RLIMIT_AS)
+	resource.setrlimit(resource.RLIMIT_AS, (maxsize, hard))
+
+__ram_lim = input("Do you want to limit ram size ?? (N/max) ")
+
+if __ram_lim.lower() != "n":
+    limit_memory(int(__ram_lim))
+##################################################################################
+
 running_on_rpi = False
 configparser = ConfigParser()
 printlock = Semaphore(value=1)
