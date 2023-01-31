@@ -112,7 +112,7 @@ typedef struct {
 
 // Uncomment the line below if you wish to use an BMP280 sensor (Duino IoT beta)
 #define USE_BMP280
-#ifdef USE_BMP280
+//#ifdef USE_BMP280
 // Install "Adafruit BMP280 Library" if you get an error
 # include <Adafruit_BMP280.h>
 # include <Wire.h>
