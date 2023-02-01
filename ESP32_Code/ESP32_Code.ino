@@ -26,6 +26,16 @@ const char *WIFI_PASS = "WIFI_PASSWORD";
 const char *RIG_IDENTIFIER = "None";
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 2
+
+template<typename T>
+class DuinoIoT {
+  T sensor;
+};
+
+typedef struct {
+  String val;
+} SensorData_t;
+
 // Uncomment the line below if you wish to use a DHT sensor (Duino IoT beta)
 // #define USE_DHT
 #ifdef USE_DHT
@@ -35,16 +45,114 @@ const char *RIG_IDENTIFIER = "None";
   #define DHTPIN 2
   // Set DHT11 or DHT22 accordingly
   #define DHTTYPE DHT11
-  DHT dht(DHTPIN, DHTTYPE);
+
+  template<>
+  class DuinoIoT<DHT> {
+
+    DHT sensor;
+
+    public:
+
+    DuinoIoT<DHT>() : sensor(DHTPIN, DHTTYPE) {}
+
+    void begin() {
+      Serial.println("Initializing DHT sensor");
+      sensor.begin();
+      Serial.println("Test reading: " + String(sensor.readTemperature()) + "*C " + String(sensor.readHumidity()) + "% humidity");
+    }
+
+    void getSensorData(SensorData_t *data) {
+      String temp = String(sensor.readTemperature());
+      String hum = String(sensor.readHumidity());
+      Serial.println("DHT readings: " + temp + "*C, " + hum + "%");
+      data->val = temp + "@" + hum;
+    }
+  };
+
+  DuinoIoT<DHT> duinoIoT;
 #endif
 // Uncomment the line below if you wish to use an AHT10 or AHT20 sensor (Duino IoT beta)
-// #define USE_AHT
+//#define USE_AHT
 #ifdef USE_AHT
   // Install "Adafruit AHTX0 Library" if you get an error
   #include <Adafruit_AHTX0.h>
   // AHT10/AHT20 should be connected to ESP32 default I2C pins
   // i.e. (I2C_SDA: GPIO_21 and I2C_SCL: GPIO_22)
-  Adafruit_AHTX0 aht;
+
+  template<>
+  class DuinoIoT<Adafruit_AHTX0> {
+
+    Adafruit_AHTX0 sensor;
+
+    public:
+
+    DuinoIoT<Adafruit_AHTX0>() : sensor() {}
+
+    void begin() {
+      Serial.println("Initializing AHT sensor");
+      if (! sensor.begin()) {
+        Serial.println("Could not find AHT Sensor. Check wiring?");
+        while (1) delay(10);
+      }
+      sensors_event_t hum, temp;
+      sensor.getEvent(&hum, &temp);
+      Serial.println("Test reading: " + String(temp.temperature) + "*C, " + String(hum.relative_humidity) + "% rH");
+    }
+
+    void getSensorData(SensorData_t *data) {
+      sensors_event_t hum, temp;
+      sensor.getEvent(&hum, &temp);
+      Serial.println("AHT readings: " + String(temp.temperature) + "*C, " + String(hum.relative_humidity) + "% rH");
+      data->val = String(temp.temperature) + "@" + String(hum.relative_humidity);
+    }
+  };
+
+  DuinoIoT<Adafruit_AHTX0> duinoIoT;
+#endif
+
+// Uncomment the line below if you wish to use an BMP280 sensor (Duino IoT beta)
+//#define USE_BMP280
+#ifdef USE_BMP280
+// Install "Adafruit BMP280 Library" if you get an error
+# include <Adafruit_BMP280.h>
+# include <Wire.h>
+# define I2C_SDA_PIN 22
+# define I2C_SCL_PIN 23
+# define BMP280_I2C_ADDR 0x76
+  template<>
+  class DuinoIoT<Adafruit_BMP280> {
+
+    Adafruit_BMP280 sensor;
+
+    public:
+
+    DuinoIoT<Adafruit_BMP280>() : sensor() {}
+
+    void begin() {
+      Serial.println("Initializing BMP280 sensor");
+      Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
+      if (!sensor.begin(BMP280_I2C_ADDR)) {
+        Serial.println("Could not find BMP280 Sensor. Check wiring?");
+        while (1); delay(10);
+      }
+      sensor.setSampling(Adafruit_BMP280::MODE_NORMAL,
+                    Adafruit_BMP280::SAMPLING_X2,
+                    Adafruit_BMP280::SAMPLING_X16,
+                    Adafruit_BMP280::FILTER_X16,
+                    Adafruit_BMP280::STANDBY_MS_500);
+
+      Serial.print(F("Test reading: "));Serial.print(sensor.readTemperature());Serial.print(sensor.readPressure());
+    }
+
+    void getSensorData(SensorData_t *data) {
+      String temp = String(sensor.readTemperature());
+      String pressure = String(sensor.readPressure() / 100.0F);
+      Serial.println("BMP280 readings: " + temp + "*C, " + pressure + " hPa");
+      data->val = "temperature:" + temp + "@pressure:" + pressure;
+    }
+  };
+
+  DuinoIoT<Adafruit_BMP280> duinoIoT;
 #endif
 
 #define BLINK_SETUP_COMPLETE 2
@@ -646,20 +754,13 @@ void TaskMining(void *pvParameters) {
       Serial.println(String(taskCoreName + " asking for a new job for user: " + DUCO_USER));
       jobClient.flush();
 
-      #if !(defined(USE_DHT) || defined(USE_AHT))
+      #if !(defined(USE_DHT) || defined(USE_AHT) || defined(USE_BMP280))
         jobClient.print("JOB," + String(DUCO_USER) + ",ESP32," + String(MINER_KEY) + MSGNEWLINE);
-      #elif defined(USE_DHT)
-        int temp = dht.readTemperature();
-        int hum = dht.readHumidity();
-        Serial.println("DHT readings: " + String(temp) + "*C, " + String(hum) + "%");
+      #else
+        SensorData_t data = {""};
+        duinoIoT.getSensorData(&data);
         jobClient.print("JOB," + String(DUCO_USER) + ",ESP32," + String(MINER_KEY) + "," +
-                        String(temp) + "@" + String(hum) +  MSGNEWLINE);
-      #elif defined(USE_AHT)
-        sensors_event_t hum, temp;
-        aht.getEvent(&hum, &temp);
-        Serial.println("AHT readings: " + String(temp.temperature) + "*C, " + String(hum.relative_humidity) + "% rH");
-        jobClient.print("JOB," + String(DUCO_USER) + ",ESP32," + String(MINER_KEY) + "," +
-                        String(temp.temperature) + "@" + String(hum.relative_humidity) +  MSGNEWLINE);
+                        data.val +  MSGNEWLINE);
       #endif
       
       while (!jobClient.available()) {
@@ -783,24 +884,9 @@ void TaskMining(void *pvParameters) {
 void setup() {
   Serial.begin(500000);  // Start serial connection
   Serial.println("\n\nDuino-Coin " + String(MINER_BANNER));
-
-  #ifdef USE_DHT
-    Serial.println("Initializing DHT sensor");
-    dht.begin();
-    Serial.println("Test reading: " + String(dht.readHumidity()) + "% humidity");
-    Serial.println("Test reading: temperature " + String(dht.readTemperature()) + "*C");
-  #elif defined(USE_AHT)
-    Serial.println("Initializing AHT sensor");
-    if (! aht.begin()) {
-      Serial.println("Could not find AHT Sensor. Check wiring?");
-      while (1) delay(10);
-    }
-    sensors_event_t hum, temp;
-    aht.getEvent(&hum, &temp);
-    Serial.println("Test reading: " + String(hum.relative_humidity) + "% humidity");
-    Serial.println("Test reading: temperature " + String(temp.temperature) + "*C");
-  #endif
-  
+#if (defined(USE_DHT) || defined(USE_AHT) || defined(USE_BMP280))
+  duinoIoT.begin();
+#endif
   WiFi.setSleep(false); // Better network responsiveness
   WiFi.mode(WIFI_STA);  // Setup ESP in client mode
   btStop();
