@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for ESP32 boards                     version 3.3
+  Official code for ESP32 boards                     version 3.4
 
   Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
@@ -265,7 +265,7 @@ SemaphoreHandle_t xMutex;
 const char * DEVICE = "ESP32";
 const char * POOLPICKER_URL[] = {"https://server.duinocoin.com/getPool"};
 const char * MINER_BANNER = "Official ESP32 Miner";
-const char * MINER_VER = "3.3";
+const char * MINER_VER = "3.4";
 String pool_name = "";
 String host = "";
 String node_id = "";
