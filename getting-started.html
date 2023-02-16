@@ -41,9 +41,13 @@
     <script src="assets/js/all.min.js"></script>
     <link rel="preload" href="assets/js/jquery.min.js" as="script">
     <script src="assets/js/jquery.min.js"></script>
+    <!-- Preconnect ReCaptcha resources -->
+    <!-- Prevent some errors [for example timeout] -->
+    <link rel="preconnect" href="https://www.google.com">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <!-- JS -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LdJ9XsgAAAAAMShiVvOtZ4cAbvvdkw7sHKQDV-6"></script>
     <!-- Others -->
-    <link rel="preload" href="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69" as="script">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-142187073-69"></script>
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js" as="script">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.8.1/lottie.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery.scrollto@2.1.3/jquery.scrollTo.min.js"></script>
@@ -287,7 +291,7 @@
                             </div>
                             <div class="column is-one-quarter is-hidden-touch">
                                 <figure class="image is-square">
-                                    <img src="/assets/images/connect.gif">
+                                    <img src="/assets/images/connect.gif" loading="lazy">
                                 </figure>
                             </div>
                         </div>
@@ -314,7 +318,7 @@
                                         </p>
                                     </div>
                                     <div class="field">
-                                        <button id="loginbutton" class="button no-anim is-fullwidth is-success is-outlined" onclick="login()">Login</button>
+                                        <button id="loginbutton" class="button no-anim is-fullwidth is-success is-outlined g-recaptcha" data-sitekey="6LdJ9XsgAAAAAMShiVvOtZ4cAbvvdkw7sHKQDV-6" data-callback="login">Login</button>
                                     </div>
                                 </div>
                                 <div class="column"></div>
@@ -333,7 +337,7 @@
                     <div class="columns is-mobile is-multiline">
                         <div class="column is-half-mobile">
                             <div class="box">
-                                <img src="/assets/images/computers.gif">
+                                <img src="/assets/images/computers.gif" loading="lazy">
                                 <p class="title is-size-4">
                                     <i class="fa fa-laptop"></i>
                                     PC
@@ -348,7 +352,7 @@
                         </div>
                         <div class="column is-half-mobile">
                             <div class="box">
-                                <img src="/assets/images/smartphones.gif">
+                                <img src="/assets/images/smartphones.gif" loading="lazy">
                                 <p class="title is-size-4">
                                     <i class="fa fa-mobile"></i>
                                     Smartphone
@@ -363,7 +367,7 @@
                         </div>
                         <div class="column is-half-mobile">
                             <div class="box">
-                                <img src="/assets/images/phones.gif">
+                                <img src="/assets/images/phones.gif" loading="lazy">
                                 <p class="title is-size-4">
                                     <i class="fa fa-phone"></i>
                                     Feature phone or limited device
@@ -379,7 +383,7 @@
                         </div>
                         <div class="column is-half-mobile">
                             <div class="box">
-                                <img src="/assets/images/pis.gif">
+                                <img src="/assets/images/pis.gif" loading="lazy">
                                 <p class="title is-size-4">
                                     <i class="fab fa-raspberry-pi"></i>
                                     Raspberry Pi
@@ -396,7 +400,7 @@
                     <div class="columns is-mobile is-multiline">
                         <div class="column is-half-mobile">
                             <div class="box">
-                                <img src="/assets/images/arduinos.gif">
+                                <img src="/assets/images/arduinos.gif" loading="lazy">
                                 <p class="title is-size-4">
                                     <i class="fa fa-infinity"></i>
                                     Arduino
@@ -411,7 +415,7 @@
                         </div>
                         <div class="column is-half-mobile">
                             <div class="box">
-                                <img src="/assets/images/esp8266s.gif">
+                                <img src="/assets/images/esp8266s.gif" loading="lazy">
                                 <p class="title is-size-4">
                                     <i class="fa fa-wifi"></i>
                                     ESP8266
@@ -426,7 +430,7 @@
                         </div>
                         <div class="column is-half-mobile">
                             <div class="box">
-                                <img src="/assets/images/esp32s.gif">
+                                <img src="/assets/images/esp32s.gif" loading="lazy">
                                 <p class="title is-size-4">
                                     <i class="fa fa-wifi"></i>
                                     ESP32
@@ -441,7 +445,7 @@
                         </div>
                         <div class="column is-half-mobile">
                             <div class="box">
-                                <img src="/assets/images/picos.gif">
+                                <img src="/assets/images/picos.gif" loading="lazy">
                                 <p class="title is-size-4">
                                     <i class="fab fa-raspberry-pi"></i>
                                     Raspberry Pi
@@ -529,7 +533,7 @@
                                     </p>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/arduino_url.gif">
+                                    <img src="/assets/images/arduino_url.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -548,7 +552,7 @@
                                     </p>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/esp32_install.gif">
+                                    <img src="/assets/images/esp32_install.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -567,7 +571,7 @@
                                     </p>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/arduinojson.gif">
+                                    <img src="/assets/images/arduinojson.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -684,7 +688,7 @@
                                     </div>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/esp32_upload.gif">
+                                    <img src="/assets/images/esp32_upload.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -703,7 +707,7 @@
                                     </p>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/esp32_working.gif">
+                                    <img src="/assets/images/esp32_working.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -815,7 +819,7 @@
                                     </p>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/arduino_url.gif">
+                                    <img src="/assets/images/arduino_url.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -834,7 +838,7 @@
                                     </p>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/esp8266_install.gif">
+                                    <img src="/assets/images/esp8266_install.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -853,7 +857,7 @@
                                     </p>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/arduinojson.gif">
+                                    <img src="/assets/images/arduinojson.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -970,7 +974,7 @@
                                     </div>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/esp8266_upload.gif">
+                                    <img src="/assets/images/esp8266_upload.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -989,7 +993,7 @@
                                     </p>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/esp8266_working.gif">
+                                    <img src="/assets/images/esp8266_working.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -1101,7 +1105,7 @@
                                     </p>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/arduino_url.gif">
+                                    <img src="/assets/images/arduino_url.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -1117,7 +1121,7 @@
                                     </p>
                                 </div>
                                 <div class="column">
-                                    <img src="/assets/images/pico_install.gif">
+                                    <img src="/assets/images/pico_install.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -1158,7 +1162,7 @@
                                     </div>
                                 </div>
                                 <div class="column is-one-third">
-                                    <img src="/assets/images/release_extract_windows.gif">
+                                    <img src="/assets/images/release_extract_windows.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -1173,7 +1177,7 @@
                                     </p>
                                 </div>
                                 <div class="column is-one-third">
-                                    <img src="/assets/images/pico_upload.gif">
+                                    <img src="/assets/images/pico_upload.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -1533,7 +1537,7 @@
                                     </div>
                                 </div>
                                 <div class="column is-one-third">
-                                    <img src="/assets/images/release_extract_windows.gif">
+                                    <img src="/assets/images/release_extract_windows.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -1552,7 +1556,7 @@
                                     </div>
                                 </div>
                                 <div class="column is-one-third">
-                                    <img src="/assets/images/arduino_upload.gif">
+                                    <img src="/assets/images/arduino_upload.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -1702,7 +1706,7 @@
                                     </div>
                                 </div>
                                 <div class="column is-one-third">
-                                    <img src="/assets/images/arduino_upload.gif">
+                                    <img src="/assets/images/arduino_upload.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -2028,7 +2032,7 @@
                                     </div>
                                 </div>
                                 <div class="column is-one-third">
-                                    <img src="/assets/images/release_extract_windows.gif">
+                                    <img src="/assets/images/release_extract_windows.gif" loading="lazy">
                                 </div>
                             </div>
                             <div class="columns">
@@ -2047,7 +2051,7 @@
                                     </p>
                                 </div>
                                 <div class="column is-one-third">
-                                    <img src="/assets/images/pcminer_start_windows.gif">
+                                    <img src="/assets/images/pcminer_start_windows.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -2694,7 +2698,7 @@
                                     </p>
                                 </div>
                                 <div class="column is-one-quarter">
-                                    <img src="/assets/images/get_connected.gif">
+                                    <img src="/assets/images/get_connected.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -2865,7 +2869,7 @@
                                     </div>
                                 </div>
                                 <div class="column is-one-third">
-                                    <img src="/assets/images/release_extract_windows.gif">
+                                    <img src="/assets/images/release_extract_windows.gif" loading="lazy">
                                 </div>
                             </div>
                             <div class="columns">
@@ -2879,7 +2883,7 @@
                                     </div>
                                 </div>
                                 <div class="column is-one-third">
-                                    <img src="/assets/images/pcminer_start_windows.gif">
+                                    <img src="/assets/images/pcminer_start_windows.gif" loading="lazy">
                                 </div>
                             </div>
                             <hr>
@@ -3156,7 +3160,7 @@ function get_esp8266_code() {
         });
 }
 
-function login() {
+function login(token) {
     password = document.getElementById("password").value;
     username = document.getElementById("username").value;
     loginbutton = document.getElementById("loginbutton");
@@ -3166,7 +3170,8 @@ function login() {
 
         fetch('https://server.duinocoin.com/v2/auth/' +
             encodeURIComponent(username.trim()) +
-            '?password=' + encodeURIComponent(btoa(password))
+            '?password=' + encodeURIComponent(btoa(password)) +
+            '&captcha=' + encodeURIComponent(token)
         ).then(data => data.json()).then(
             (data) => {
                 if (data.success) {
