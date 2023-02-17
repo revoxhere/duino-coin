@@ -25,6 +25,7 @@ import os
 import json
 import zipfile
 import traceback
+import logging
 
 from pathlib import Path
 from re import sub
@@ -42,6 +43,17 @@ import io
 running_on_rpi = False
 configparser = ConfigParser()
 printlock = Semaphore(value=1)
+
+
+
+# Config Logging
+logging.basicConfig(
+    level=logging.WARNING,
+    format='%(asctime)s %(message)s',
+    encoding='utf-8',
+    filename='Logs/pc_miner.log')
+
+
 
 # Python <3.5 check
 f"Your Python version is too old. Duino-Coin Miner requires version 3.6 or above. Update your packages and try again"
@@ -578,12 +590,16 @@ def pretty_print(msg: str = None,
 
     if state == "success":
         fg_color = Fore.GREEN
+        logging.debug(msg)
     elif state == "info":
         fg_color = Fore.BLUE
+        logging.info(msg)
     elif state == "error":
         fg_color = Fore.RED
+        logging.error(msg)
     else:
         fg_color = Fore.YELLOW
+        logging.warning(msg)
 
     with printlock:
         print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
@@ -1366,8 +1382,9 @@ if __name__ == "__main__":
     try:
         check_mining_key(user_settings)
     except Exception as e:
-        print("Error checking mining key:", e)
-
+        pretty_print('sys0',
+                     f"Error checking mining key {e}",
+                     'error')
     Donate.load(int(user_settings["donate"]))
     Donate.start(int(user_settings["donate"]))
 

@@ -38,7 +38,18 @@ from threading import Semaphore
 import base64 as b64
 
 import os
+import logging
+
 printlock = Semaphore(value=1)
+
+
+
+# Config Logging
+logging.basicConfig(
+    level=logging.WARNING,
+    format='%(asctime)s %(message)s',
+    encoding='utf-8',
+    filename='Logs/avr_miner.log')
 
 
 # Python <3.5 check
@@ -109,7 +120,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '3.4'
+    VER = "3.4"
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
     AVR_TIMEOUT = 10
@@ -576,6 +587,7 @@ def get_prefix(symbol: str,
 
 def debug_output(text: str):
     if debug == 'y':
+        logging.debug(text)
         print(Style.RESET_ALL + Fore.WHITE
               + now().strftime(Style.DIM + '%H:%M:%S.%f ')
               + Style.NORMAL + f'DEBUG: {text}')
@@ -892,12 +904,16 @@ def pretty_print(sender: str = "sys0",
 
     if state == "success":
         fg_color = Fore.GREEN
+        logging.debug(msg)
     elif state == "info":
         fg_color = Fore.BLUE
+        logging.info(msg)
     elif state == "error":
         fg_color = Fore.RED
+        logging.error(msg)
     else:
         fg_color = Fore.YELLOW
+        logging.warning(msg)
 
     with thread_lock():
         print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")

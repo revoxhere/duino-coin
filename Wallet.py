@@ -26,6 +26,7 @@ from tkinter import (END, LEFT, Button, E, Entry,
 from tkinter.font import Font
 from urllib.request import urlretrieve
 from webbrowser import open_new_tab
+import logging
 
 from requests import get
 
@@ -52,6 +53,16 @@ unpaid_balance = 0
 profitCheck = 0
 curr_bal = 0
 WS_URI = "ws://server.duinocoin.com:15808"
+
+
+
+# Config Logging
+logging.basicConfig(
+    level=logging.WARNING,
+    format='%(asctime)s %(message)s',
+    encoding='utf-8',
+    filename='Logs/wallet.log')
+
 
 
 def install(package):
@@ -309,10 +320,13 @@ class LoginFrame(Frame):
                 messagebox.showerror(
                     title=get_string("login_error"),
                     message=response[1])
+                logging.error(f"{get_string('login_error')}:\t{response[1]}")
         else:
             messagebox.showerror(
                 title=get_string("login_error"),
                 message=get_string("fill_the_blanks_warning"))
+            logging.warning(f"{get_string('login_error')}:\t{get_string('fill_the_blanks_warning')}")
+            
 
     def _registerprotocol(self):
         emailS = email.get()
@@ -346,14 +360,20 @@ class LoginFrame(Frame):
                     messagebox.showerror(
                         title=get_string("register_error"),
                         message=response[1])
+                    logging.error(f"{get_string('register_error')}:\t{response[1]}")
+                    
             else:
                 messagebox.showerror(
                     title=get_string("register_error"),
                     message=get_string("error_passwd_dont_match"))
+                logging.error(f"{get_string('register_error')}:\t{get_string('error_passwd_dont_match')}")
+                
         else:
             messagebox.showerror(
                 title=get_string("register_error"),
                 message=get_string("fill_the_blanks_warning"))
+            logging.warning(f"{get_string('register_error')}:\t{get_string('fill_the_blanks_warning')}")
+            
 
     def _register_btn_clicked(self):
         global username, password, confpassword, email, register
@@ -525,6 +545,7 @@ def loading_window():
         loading.iconphoto(True,
                           PhotoImage(file=resources + "duco_color.png"))
     except Exception:
+        logging.error("loading_window error")
         pass
     TEXT_FONT = Font(loading,
                      size=10,
@@ -647,6 +668,7 @@ def transactions_window(handler):
             selection = listbox.curselection()[0]
             openTransaction(gtxl[str(selection)]["Hash"])
         except IndexError:
+            logging.error("get_selection IndexError")
             pass
 
     listbox.bind("<Button-1>", get_selection)
@@ -1140,6 +1162,8 @@ def wrapper_window(handler):
         messagebox.showerror(
             title=get_string("wrapper_error_title"),
             message=get_string("wrapper_error"))
+        logging.error(f"{get_string('wrapper_error_title')}:\t{get_string('wrapper_error')}")
+        
     else:
         if TRONPY_ENABLED:
             pub_key = pubkeyfile.read()
@@ -1415,6 +1439,7 @@ def settings_window(handler):
         try:
             execl(sys.executable, sys.executable, *sys.argv)
         except Exception as e:
+            logging.error(e)
             print(e)
 
     def _cleartrs():
@@ -1455,6 +1480,8 @@ def settings_window(handler):
                             messagebox.showerror(
                                 title=get_string("change_passwd_error"),
                                 message=response[1])
+                            logging.error(f"{get_string('change_passwd_error')}:\t{response[1]}")
+                            
                         else:
                             messagebox.showinfo(
                                 title=get_string("change_passwd_ok"),
@@ -1468,6 +1495,7 @@ def settings_window(handler):
                                         cur.execute("DELETE FROM UserData")
                                         con.commit()
                                 except Exception as e:
+                                    logging.error(e)
                                     print(e)
                             except FileNotFoundError:
                                 pass
@@ -1476,14 +1504,20 @@ def settings_window(handler):
                         messagebox.showerror(
                             title=get_string("change_passwd_error"),
                             message=get_string("error_passwd_dont_match"))
+                        logging.warning(f"{get_string('change_passwd_error')}:\t{get_string('error_passwd_dont_match')}")
+                        
                 else:
                     messagebox.showerror(
                         title=get_string("change_passwd_error"),
                         message=get_string("fill_the_blanks_warning"))
+                    logging.warning(f"{get_string('change_passwd_error')}:\t{get_string('fill_the_blanks_warning')}")
+                    
             else:
                 messagebox.showerror(
                     title=get_string("change_passwd_error"),
                     message=get_string("same_passwd_error"))
+                logging.warning(f"{get_string('change_passwd_error')}:\t{get_string('same_passwd_error')}")
+                
 
         settingsWindow.destroy()
         changepassWindow = Toplevel()
@@ -1820,6 +1854,8 @@ def get_balance():
             gtxl = jsonloads(gtxl)
         except Exception as e:
             print("Error getting transaction list: " + str(e))
+            logging.error("Error getting transaction list: " + str(e))
+            
 
         if oldbalance != balance:
             difference = float(balance) - float(oldbalance)
@@ -1859,6 +1895,8 @@ def get_balance():
                     unpaid_balance += float(balance) - float(oldbalance)
     except Exception as e:
         print("Retrying in 3s. (" + str(e) + ")")
+        logging.error("Retrying in 3s. (" + str(e) + ")")
+        
     Timer(3, get_balance).start()
 
 
@@ -1923,6 +1961,7 @@ def update_balance_labels():
                 dailyprofittext.set("")
             profitCheck += 1
     except Exception:
+        logging.error('update_balance_labels')
         _exit(0)
     Timer(1, update_balance_labels).start()
 
@@ -1946,6 +1985,7 @@ def profit_calculator(start_bal):
                 round(hourly, 4),
                 round(daily, 2)]
     except Exception:
+        logging.error('profit_calculator')
         _exit(0)
     Timer(10, profit_calculator, [start_bal]).start()
 
@@ -1995,6 +2035,7 @@ def send_funds_protocol(handler):
                                          + response[2])
         else:
             MsgBox = messagebox.showwarning(response[0], response[1])
+            logging.warning(f"{response[0]}:\t{response[1]}")
     root.update()
 
 
@@ -2004,6 +2045,7 @@ def init_rich_presence():
         RPC = Presence(806985845320056884)
         RPC.connect()
     except Exception:  # Discord not launched
+        logging.warning("Discord not launched")
         pass
 
 
@@ -2028,6 +2070,7 @@ def update_rich_presence():
                     {"label": "Discord Server",
                      "url": "https://discord.gg/k48Ht5y"}])
         except Exception:  # Discord not launched
+            logging.warning("Discord not launched")
             pass
         sleep(15)
 
@@ -2661,9 +2704,11 @@ if __name__ == "__main__":
                     # Destroy loading dialog and start the main wallet window
                     loading.destroy()
                 except Exception:
+                    logging.warning("Destroy loading dialog and start the main wallet window error")
                     pass
                 root = Tk()
                 my_gui = Wallet(root)
             except Exception as e:
+                logging.exception(e)
                 print(e)
                 _exit(0)

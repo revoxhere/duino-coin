@@ -22,6 +22,15 @@ from base64 import b64decode, b64encode
 from platform import system as plsystem
 from locale import LC_ALL, getdefaultlocale, getlocale, setlocale
 from json import load as jsonload
+import logging
+
+
+# Config Logging
+logging.basicConfig(
+    level=logging.WARNING,
+    format='%(asctime)s %(message)s',
+    encoding='utf-8',
+    filename='Logs/cli_wallet.log')
 
 try:
     import requests
@@ -98,6 +107,7 @@ try:
         except Exception:
             # If it fails, fallback to english
             lang = "english"
+            logging.warning("autodetect language, fallback to english")
 except Exception as error:
     lang = "english"
 
@@ -109,6 +119,7 @@ def getString(string_name):
     elif string_name in lang_file["english"]:
         return lang_file["english"][string_name]
     else:
+        logging.warning("String not found: " + string_name)
         return "String not found: " + string_name
 
 
@@ -286,6 +297,7 @@ while True:
         print(Style.RESET_ALL
               + Fore.RED
               + getString("cant_connect_to_server"))
+        logging.error("cant_connect_to_server")
         time.sleep(15)
         os._exit(1)
 
@@ -293,6 +305,7 @@ while True:
         print(Style.RESET_ALL
               + Fore.RED
               + getString("cant_recieve_pool_ip_and_port"))
+        logging.error("cant_recieve_pool_ip_and_port")
         time.sleep(15)
         os._exit(1)
 
@@ -320,6 +333,7 @@ def reconnect():
         except:
             print(Style.RESET_ALL + Fore.RED
                   + getString("cant_connect_to_server"))
+            logging.error("cant_connect_to_server")
             time.sleep(15)
             os.system("python " + __file__)
         else:
@@ -397,6 +411,7 @@ while True:
                         os._exit(1)
                 except socket.timeout:
                     server_timeout = True
+                    logging.error("Server Timeout")
 
         if int(choice) == 2:
             print(Style.RESET_ALL
@@ -457,6 +472,8 @@ while True:
                               + getString("register_failed")
                               + Style.BRIGHT
                               + str(regiFeedback[1]))
+                        logging.error("register_failed")
+                        
                         time.sleep(15)
                         os._exit(1)
 
@@ -482,6 +499,8 @@ while True:
                         passphrase).decode("utf8")
                 except InvalidToken:
                     print(getString("invalid_passphrase_wrapper"))
+                    logging.error("invalid_passphrase_wrapper")
+                    
                     use_wrapper = False
                     wrong_passphrase = True
             else:
