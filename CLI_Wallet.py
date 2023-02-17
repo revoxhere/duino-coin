@@ -473,7 +473,7 @@ while True:
                               + Style.BRIGHT
                               + str(regiFeedback[1]))
                         logging.error("register_failed")
-                        
+
                         time.sleep(15)
                         os._exit(1)
 
@@ -500,7 +500,7 @@ while True:
                 except InvalidToken:
                     print(getString("invalid_passphrase_wrapper"))
                     logging.error("invalid_passphrase_wrapper")
-                    
+
                     use_wrapper = False
                     wrong_passphrase = True
             else:

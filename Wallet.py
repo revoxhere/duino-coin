@@ -55,14 +55,12 @@ curr_bal = 0
 WS_URI = "ws://server.duinocoin.com:15808"
 
 
-
 # Config Logging
 logging.basicConfig(
     level=logging.WARNING,
     format='%(asctime)s %(message)s',
     encoding='utf-8',
     filename='Logs/wallet.log')
-
 
 
 def install(package):
@@ -325,8 +323,8 @@ class LoginFrame(Frame):
             messagebox.showerror(
                 title=get_string("login_error"),
                 message=get_string("fill_the_blanks_warning"))
-            logging.warning(f"{get_string('login_error')}:\t{get_string('fill_the_blanks_warning')}")
-            
+            logging.warning(
+                f"{get_string('login_error')}:\t{get_string('fill_the_blanks_warning')}")
 
     def _registerprotocol(self):
         emailS = email.get()
@@ -360,20 +358,22 @@ class LoginFrame(Frame):
                     messagebox.showerror(
                         title=get_string("register_error"),
                         message=response[1])
-                    logging.error(f"{get_string('register_error')}:\t{response[1]}")
-                    
+                    logging.error(
+                        f"{get_string('register_error')}:\t{response[1]}")
+
             else:
                 messagebox.showerror(
                     title=get_string("register_error"),
                     message=get_string("error_passwd_dont_match"))
-                logging.error(f"{get_string('register_error')}:\t{get_string('error_passwd_dont_match')}")
-                
+                logging.error(
+                    f"{get_string('register_error')}:\t{get_string('error_passwd_dont_match')}")
+
         else:
             messagebox.showerror(
                 title=get_string("register_error"),
                 message=get_string("fill_the_blanks_warning"))
-            logging.warning(f"{get_string('register_error')}:\t{get_string('fill_the_blanks_warning')}")
-            
+            logging.warning(
+                f"{get_string('register_error')}:\t{get_string('fill_the_blanks_warning')}")
 
     def _register_btn_clicked(self):
         global username, password, confpassword, email, register
@@ -546,7 +546,7 @@ def loading_window():
                           PhotoImage(file=resources + "duco_color.png"))
     except Exception:
         logging.error("loading_window error")
-        pass
+
     TEXT_FONT = Font(loading,
                      size=10,
                      weight="bold")
@@ -1162,8 +1162,9 @@ def wrapper_window(handler):
         messagebox.showerror(
             title=get_string("wrapper_error_title"),
             message=get_string("wrapper_error"))
-        logging.error(f"{get_string('wrapper_error_title')}:\t{get_string('wrapper_error')}")
-        
+        logging.error(
+            f"{get_string('wrapper_error_title')}:\t{get_string('wrapper_error')}")
+
     else:
         if TRONPY_ENABLED:
             pub_key = pubkeyfile.read()
@@ -1480,8 +1481,9 @@ def settings_window(handler):
                             messagebox.showerror(
                                 title=get_string("change_passwd_error"),
                                 message=response[1])
-                            logging.error(f"{get_string('change_passwd_error')}:\t{response[1]}")
-                            
+                            logging.error(
+                                f"{get_string('change_passwd_error')}:\t{response[1]}")
+
                         else:
                             messagebox.showinfo(
                                 title=get_string("change_passwd_ok"),
@@ -1504,20 +1506,22 @@ def settings_window(handler):
                         messagebox.showerror(
                             title=get_string("change_passwd_error"),
                             message=get_string("error_passwd_dont_match"))
-                        logging.warning(f"{get_string('change_passwd_error')}:\t{get_string('error_passwd_dont_match')}")
-                        
+                        logging.warning(
+                            f"{get_string('change_passwd_error')}:\t{get_string('error_passwd_dont_match')}")
+
                 else:
                     messagebox.showerror(
                         title=get_string("change_passwd_error"),
                         message=get_string("fill_the_blanks_warning"))
-                    logging.warning(f"{get_string('change_passwd_error')}:\t{get_string('fill_the_blanks_warning')}")
-                    
+                    logging.warning(
+                        f"{get_string('change_passwd_error')}:\t{get_string('fill_the_blanks_warning')}")
+
             else:
                 messagebox.showerror(
                     title=get_string("change_passwd_error"),
                     message=get_string("same_passwd_error"))
-                logging.warning(f"{get_string('change_passwd_error')}:\t{get_string('same_passwd_error')}")
-                
+                logging.warning(
+                    f"{get_string('change_passwd_error')}:\t{get_string('same_passwd_error')}")
 
         settingsWindow.destroy()
         changepassWindow = Toplevel()
@@ -1855,7 +1859,6 @@ def get_balance():
         except Exception as e:
             print("Error getting transaction list: " + str(e))
             logging.error("Error getting transaction list: " + str(e))
-            
 
         if oldbalance != balance:
             difference = float(balance) - float(oldbalance)
@@ -1863,8 +1866,8 @@ def get_balance():
                 float(balance) - float(oldbalance)) + unpaid_balance
             if float(balance) != float(difference):
                 if (dif_with_unpaid >= MIN_TRANSACTION_VALUE
-                    or dif_with_unpaid < 0
-                    ):
+                        or dif_with_unpaid < 0
+                        ):
                     now = datetime.now()
                     difference = round(dif_with_unpaid, 8)
                     if (
@@ -1896,7 +1899,7 @@ def get_balance():
     except Exception as e:
         print("Retrying in 3s. (" + str(e) + ")")
         logging.error("Retrying in 3s. (" + str(e) + ")")
-        
+
     Timer(3, get_balance).start()
 
 
@@ -2665,7 +2668,7 @@ try:
     elif locale.startswith("th"):
         lang = "thai"
     elif locale.startswith("ko"):
-            lang = "korean"
+        lang = "korean"
     else:
         lang = "english"
 except IndexError:
@@ -2704,7 +2707,8 @@ if __name__ == "__main__":
                     # Destroy loading dialog and start the main wallet window
                     loading.destroy()
                 except Exception:
-                    logging.warning("Destroy loading dialog and start the main wallet window error")
+                    logging.warning(
+                        "Destroy loading dialog and start the main wallet window error")
                     pass
                 root = Tk()
                 my_gui = Wallet(root)
