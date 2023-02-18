@@ -3,7 +3,12 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for ESP32 boards                     version 3.4
+  Un-Official code for ESP32 boards                  version 3.4
+
+  The code modification contain only better way to select WiFi and save it.
+  No modification with mineing section was made!
+
+  Modification made by Tomáš Marek https://tommarekcze.github.io/
 
   Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
@@ -19,9 +24,9 @@ const char *DUCO_USER = "USERNAME";
 // Change the part in brackets to your mining key (if you enabled it in the wallet)
 const char* MINER_KEY = "None";
 // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
-const char *RIG_IDENTIFIER = "TEST-ESP32";
+const char *RIG_IDENTIFIER = "None";
 // Change this if your board has built-in led on non-standard pin
-#define LED_BUILTIN 4
+#define LED_BUILTIN 33
 
 template<typename T>
 class DuinoIoT {
@@ -163,9 +168,9 @@ const bool LED_BLINKING = true;
 // If optimizations cause problems, change them to -O0 (the default)
 #pragma GCC optimize ("-Ofast")
 
-#include "hwcrypto/sha.h" // Uncomment this line if you're using an older
+//#include "hwcrypto/sha.h" // Uncomment this line if you're using an older
 // version of the ESP32 core and sha_parellel_engine doesn't work for you
-//#include "sha/sha_parallel_engine.h"  // Include hardware accelerated hashing library
+#include "sha/sha_parallel_engine.h"  // Include hardware accelerated hashing library
 
 /* If you would like to use mqtt monitoring uncomment
    the ENABLE_MQTT defition line(#define ENABLE_MQTT).
@@ -570,7 +575,7 @@ void dashboard() {
 
 //Write to EEPROM
 void writeStringToEEPROM(int addrOffset, const String &strToWrite)
-{
+{ 
   byte len = strToWrite.length();
   EEPROM.write(addrOffset, len);
   for (int i = 0; i < len; i++)
@@ -595,6 +600,7 @@ String readStringFromEEPROM(int addrOffset)
 
 void WiFireconnect(void *pvParameters) {
   int n = 0;
+  int fail = 0;
   unsigned long previousMillis = 0;
   const long interval = 500;
   esp_task_wdt_add(NULL);
@@ -687,8 +693,8 @@ void WiFireconnect(void *pvParameters) {
       Serial.println("ESP32 will reset itself after " + String(WDT_TIMEOUT) +
                      " seconds if can't connect to the network");
 
-      Serial.print("Connecting to: " + readStringFromEEPROM(0));
-      WiFi.begin(ssid, password);
+      Serial.print("Connecting to: " + readStringFromEEPROM(0) + "\n");
+      WiFi.reconnect();
     }
 
     else if ((wifi_state == WL_CONNECTED) &&
@@ -701,68 +707,51 @@ void WiFireconnect(void *pvParameters) {
       // Don't reset watchdog timer
       unsigned long currentMillis = millis();
       if (currentMillis - previousMillis >= interval) {
-        previousMillis = currentMillis;
-        Serial.print(F("."));
-      }
+        if (fail != 30){
+          fail = fail + 1;
+          previousMillis = currentMillis;
+          Serial.print(F(".")); 
+        } else {
+          esp_task_wdt_reset();
+          
+          for (int i = 0; i < 512; i++) {
+           EEPROM.write(i, 0);
+           }
+          EEPROM.commit();
+          
+          Serial.println("\nWarning SSID or Password is Invalid!\nPlease Re-type your password\n");
+          Serial.println("\nType your WIFI SSID");
+    
+          String String2 = "";
+          while (String2 == "")
+          {
+            String2 = Serial.readString();
+          }
+    
+          String2.remove(String2.length() - 1, 1);
+          writeStringToEEPROM(0, String2);
+          Serial.println("Wifi SSID is " + readStringFromEEPROM(0));
+    
+          delay(200);
+          Serial.println("\nType your WIFI Password");
+    
+          String String3 = "";
+          while (String3 == "")
+          {
+            String3 = Serial.readString();
+          }
+    
+          String3.remove(String3.length() - 1, 1);
+          writeStringToEEPROM(100, String3);
+          Serial.println("You password is " + readStringFromEEPROM(100));
+          Serial.println("\nChanges successfully comited to EEPROM, Restarting ESP32.......\n");
+          delay(200);
+          esp_restart();
+        }
+       }
     }
     wifi_prev_state = wifi_state;
   }
-}
-
-void connectToWiFi(String SSID, String PWD) {
-  WiFi.setSleep(false); // Better network responsiveness
-  WiFi.mode(WIFI_STA);  // Setup ESP in client mode
-  Serial.print("Connecting to: ");
-  Serial.println(SSID);
-
-  WiFi.begin(SSID.c_str(), PWD.c_str());
-
-  int Fail = 0;
-
-  while (WiFi.status() != WL_CONNECTED) {
-    if (Fail != 10) {
-      Serial.print(".");
-      Fail = Fail + 1;
-      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on
-      delay(250);                       // wait for half a second
-      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off
-      delay(250);
-    }
-    else {
-      Serial.println("\nWarning SSID or Password is Invalid!\nPlease Re-type your password\n");
-      Serial.println("---Settings---");
-      Serial.println("Type your WIFI SSID");
-
-      String String2 = "";
-      while (String2 == "")
-      {
-        String2 = Serial.readString();
-      }
-
-      String2.remove(String2.length() - 1, 1);
-      writeStringToEEPROM(0, String2);
-      Serial.println("Wifi SSID is " + readStringFromEEPROM(0));
-
-      delay(200);
-      Serial.println("Type your WIFI Password");
-
-      String String3 = "";
-      while (String3 == "")
-      {
-        String3 = Serial.readString();
-      }
-
-      String3.remove(String3.length() - 1, 1);
-      writeStringToEEPROM(100, String3);
-      Serial.println("You password is " + readStringFromEEPROM(100));
-      SSID = readStringFromEEPROM(0);
-      PWD = readStringFromEEPROM(100);
-      delay(200);
-      connectToWiFi(readStringFromEEPROM(0), readStringFromEEPROM(100));
-    }
-  }
-  Serial.println("\nConnected, IP: ");
-  Serial.println(WiFi.localIP());
 }
 
 // Miner Code
@@ -967,12 +956,10 @@ void setup() {
   duinoIoT.begin();
 #endif
   btStop();
-  //Connect to Wifi modified function
-  
-  //connectToWiFi(readStringFromEEPROM(0), readStringFromEEPROM(100));
+ 
   WiFi.setSleep(false); // Better network responsiveness
   WiFi.mode(WIFI_STA);  // Setup ESP in client mode
-  WiFi.begin("Test", "AAA");
+  WiFi.begin(readStringFromEEPROM(0).c_str(), readStringFromEEPROM(100).c_str()); // Begin Wifi Connection with SSID and PASS from EEPROM 
 
   uint64_t chipid = ESP.getEfuseMac();  // Getting chip chip_id
   uint16_t chip =

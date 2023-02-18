@@ -15,15 +15,15 @@
 
 /***************** START OF MINER CONFIGURATION SECTION *****************/
 // Change the part in brackets to your Duino-Coin username
-const char *DUCO_USER = "tommarek";
+const char *DUCO_USER = "USERNAME";
 // Change the part in brackets to your mining key (if you enabled it in the wallet)
-const char* MINER_KEY = "None";
+const char* MINER_KEY = "MINING_KEY";
 // Change the part in brackets to your WiFi name
-const char *SSID = "MarekNet";
+const char *SSID = "WIFI_NAME";
 // Change the part in brackets to your WiFi password
-const char *WIFI_PASS = "LuckiMarek518";
+const char *WIFI_PASS = "WIFI_PASSWORD";
 // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
-const char *RIG_IDENTIFIER = "ESPO32Test";
+const char *RIG_IDENTIFIER = "None";
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 2
 
@@ -167,9 +167,9 @@ const bool LED_BLINKING = true;
 // If optimizations cause problems, change them to -O0 (the default)
 #pragma GCC optimize ("-Ofast")
 
-#include "hwcrypto/sha.h" // Uncomment this line if you're using an older
+// #include "hwcrypto/sha.h" // Uncomment this line if you're using an older
 // version of the ESP32 core and sha_parellel_engine doesn't work for you
-//#include "sha/sha_parallel_engine.h"  // Include hardware accelerated hashing library
+#include "sha/sha_parallel_engine.h"  // Include hardware accelerated hashing library
 
 /* If you would like to use mqtt monitoring uncomment
    the ENABLE_MQTT defition line(#define ENABLE_MQTT).
