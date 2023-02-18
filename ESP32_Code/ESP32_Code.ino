@@ -15,7 +15,7 @@
 
 /***************** START OF MINER CONFIGURATION SECTION *****************/
 // Change the part in brackets to your Duino-Coin username
-const char *DUCO_USER = "USERNAME";
+const char *DUCO_USER = "USRNAME";
 // Change the part in brackets to your mining key (if you enabled it in the wallet)
 const char* MINER_KEY = "MINING_KEY";
 // Change the part in brackets to your WiFi name
