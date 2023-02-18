@@ -3,32 +3,23 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Unofficial Multiwifi support code for ESP32 boards                     version 3.4
+  Official code for ESP32 boards                     version 3.4
 
-  Credits: Duino Coin and Revox - Base Code
-           tommarek  - Multi Wifi Support
-                
-
+  Duino-Coin Team & Community 2019-2022 © MIT Licensed
   https://duinocoin.com
   https://github.com/revoxhere/duino-coin
 
   If you don't know where to start, visit official website and navigate to
   the Getting Started page. Have fun mining!
-
-  Baud-Rate: 115200
-  
-  How multiwifi works?
-  After you upload program it will try connect to Wifi but failed and you must enter you Wifi SSID and WIfi Password
-  Then SSID and Password will be saved to EEPROM (So after you recconect your ESP you wont need enter SSID and Password agin)
 */
 
 /***************** START OF MINER CONFIGURATION SECTION *****************/
 // Change the part in brackets to your Duino-Coin username
-const char *DUCO_USER = "tommarek";
+const char *DUCO_USER = "USERNAME";
 // Change the part in brackets to your mining key (if you enabled it in the wallet)
-const char* MINER_KEY = "MINING_KEY";
+const char* MINER_KEY = "None";
 // Change the part in brackets if you want to set a custom miner name (use Auto to autogenerate, None for no name)
-const char *RIG_IDENTIFIER = "ESP Multiwifi";
+const char *RIG_IDENTIFIER = "TEST-ESP32";
 // Change this if your board has built-in led on non-standard pin
 #define LED_BUILTIN 4
 
@@ -202,7 +193,6 @@ const int mqtt_port = 1883;
    that will be used by the program for counters and measurements. */
 #ifndef ENABLE_SERIAL
 #define Serial DummySerial
-
 static class {
   public:
     void begin(...) {}
@@ -547,33 +537,6 @@ void HandleMqttConnection() {
   mqttClient.loop();
 }
 
-#include <EEPROM.h>
-
-//Write to EEPROM
-void writeStringToEEPROM(int addrOffset, const String &strToWrite)
-{
-  byte len = strToWrite.length();
-  EEPROM.write(addrOffset, len);
-  for (int i = 0; i < len; i++)
-  {
-    EEPROM.write(addrOffset + 1 + i, strToWrite[i]);
-  }
-  EEPROM.commit();
-}
-
-//Read to EEPROM
-String readStringFromEEPROM(int addrOffset)
-{
-  int newStrLen = EEPROM.read(addrOffset);
-  char data[newStrLen + 1];
-  for (int i = 0; i < newStrLen; i++)
-  {
-    data[i] = EEPROM.read(addrOffset + 1 + i);
-  }
-  data[newStrLen] = '\0';
-  return String(data);
-}
-
 void dashboard() {
   Serial.println("Handling HTTP client");
 
@@ -603,6 +566,32 @@ void dashboard() {
   server.send(200, "text/html", s);
 }
 
+#include <EEPROM.h>
+
+//Write to EEPROM
+void writeStringToEEPROM(int addrOffset, const String &strToWrite)
+{
+  byte len = strToWrite.length();
+  EEPROM.write(addrOffset, len);
+  for (int i = 0; i < len; i++)
+  {
+    EEPROM.write(addrOffset + 1 + i, strToWrite[i]);
+  }
+  EEPROM.commit();
+}
+
+//Read to EEPROM
+String readStringFromEEPROM(int addrOffset)
+{
+  int newStrLen = EEPROM.read(addrOffset);
+  char data[newStrLen + 1];
+  for (int i = 0; i < newStrLen; i++)
+  {
+    data[i] = EEPROM.read(addrOffset + 1 + i);
+  }
+  data[newStrLen] = '\0';
+  return String(data);
+}
 
 void WiFireconnect(void *pvParameters) {
   int n = 0;
@@ -698,8 +687,8 @@ void WiFireconnect(void *pvParameters) {
       Serial.println("ESP32 will reset itself after " + String(WDT_TIMEOUT) +
                      " seconds if can't connect to the network");
 
-      Serial.print("Connecting to: " + String(readStringFromEEPROM(0)));
-      WiFi.reconnect();
+      Serial.print("Connecting to: " + readStringFromEEPROM(0));
+      WiFi.begin(ssid, password);
     }
 
     else if ((wifi_state == WL_CONNECTED) &&
@@ -718,6 +707,62 @@ void WiFireconnect(void *pvParameters) {
     }
     wifi_prev_state = wifi_state;
   }
+}
+
+void connectToWiFi(String SSID, String PWD) {
+  WiFi.setSleep(false); // Better network responsiveness
+  WiFi.mode(WIFI_STA);  // Setup ESP in client mode
+  Serial.print("Connecting to: ");
+  Serial.println(SSID);
+
+  WiFi.begin(SSID.c_str(), PWD.c_str());
+
+  int Fail = 0;
+
+  while (WiFi.status() != WL_CONNECTED) {
+    if (Fail != 10) {
+      Serial.print(".");
+      Fail = Fail + 1;
+      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on
+      delay(250);                       // wait for half a second
+      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off
+      delay(250);
+    }
+    else {
+      Serial.println("\nWarning SSID or Password is Invalid!\nPlease Re-type your password\n");
+      Serial.println("---Settings---");
+      Serial.println("Type your WIFI SSID");
+
+      String String2 = "";
+      while (String2 == "")
+      {
+        String2 = Serial.readString();
+      }
+
+      String2.remove(String2.length() - 1, 1);
+      writeStringToEEPROM(0, String2);
+      Serial.println("Wifi SSID is " + readStringFromEEPROM(0));
+
+      delay(200);
+      Serial.println("Type your WIFI Password");
+
+      String String3 = "";
+      while (String3 == "")
+      {
+        String3 = Serial.readString();
+      }
+
+      String3.remove(String3.length() - 1, 1);
+      writeStringToEEPROM(100, String3);
+      Serial.println("You password is " + readStringFromEEPROM(100));
+      SSID = readStringFromEEPROM(0);
+      PWD = readStringFromEEPROM(100);
+      delay(200);
+      connectToWiFi(readStringFromEEPROM(0), readStringFromEEPROM(100));
+    }
+  }
+  Serial.println("\nConnected, IP: ");
+  Serial.println(WiFi.localIP());
 }
 
 // Miner Code
@@ -914,63 +959,6 @@ void TaskMining(void *pvParameters) {
   }
 }
 
-//Connect to wifi Function
-void connectToWiFi(String SSID, String PWD) {
-  WiFi.setSleep(false); // Better network responsiveness
-  WiFi.mode(WIFI_STA);  // Setup ESP in client mode
-  Serial.print("Connecting to: ");
-  Serial.println(SSID);
-
-  WiFi.begin(SSID.c_str(), PWD.c_str());
-
-  int Fail = 0;
-
-  while (WiFi.status() != WL_CONNECTED) {
-    if (Fail != 10) {
-      Serial.print(".");
-      Fail = Fail + 1;
-      digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on
-      delay(250);                       // wait for half a second
-      digitalWrite(LED_BUILTIN, LOW);    // turn the LED off
-      delay(250);
-    }
-    else {
-      Serial.println("\nWarning SSID or Password is Invalid!\nPlease Re-type your password\n");
-      Serial.println("---Settings---");
-      Serial.println("Type your WIFI SSID");
-
-      String String2 = "";
-      while (String2 == "")
-      {
-        String2 = Serial.readString();
-      }
-
-      String2.remove(String2.length() - 1, 1);
-      writeStringToEEPROM(0, String2);
-      Serial.println("Wifi SSID is " + readStringFromEEPROM(0));
-
-      delay(200);
-      Serial.println("Type your WIFI Password");
-
-      String String3 = "";
-      while (String3 == "")
-      {
-        String3 = Serial.readString();
-      }
-
-      String3.remove(String3.length() - 1, 1);
-      writeStringToEEPROM(100, String3);
-      Serial.println("You password is " + readStringFromEEPROM(100));
-      SSID = readStringFromEEPROM(0);
-      PWD = readStringFromEEPROM(100);
-      delay(200);
-      connectToWiFi(readStringFromEEPROM(0), readStringFromEEPROM(100));
-    }
-  }
-  Serial.println("\nConnected, IP: ");
-  Serial.println(WiFi.localIP());
-}
-
 void setup() {
   Serial.begin(115200);  // Start serial connection
   EEPROM.begin(255); // Start EEPROM
@@ -979,12 +967,13 @@ void setup() {
   duinoIoT.begin();
 #endif
   btStop();
-
   //Connect to Wifi modified function
   
-  connectToWiFi(readStringFromEEPROM(0), readStringFromEEPROM(100));
-  Serial.println("Passed wifi");
-  
+  //connectToWiFi(readStringFromEEPROM(0), readStringFromEEPROM(100));
+  WiFi.setSleep(false); // Better network responsiveness
+  WiFi.mode(WIFI_STA);  // Setup ESP in client mode
+  WiFi.begin("Test", "AAA");
+
   uint64_t chipid = ESP.getEfuseMac();  // Getting chip chip_id
   uint16_t chip =
     (uint16_t)(chipid >> 32);  // Preparing for printing a 64 bit value (it's
