@@ -1624,11 +1624,11 @@
         "node_picker_unavailable": "Výběrčí uzlů nejspíš nepracuje správně - zkusím to znovu za ",
         "node_picker_error": "Fatální chyba při vybírání uzlů - zkusím to znovu za ",
         "connecting_node": " Získaný těžební uzel: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "Je dostupná nová verze. Chceš aktualizovat těžební program [Y/n] ? ",
+        "updating": "Těžební program je zastaralý. Aktualizuji....",
+        "ask_mining_key": "Zadej svůj těžební klíč (požadováno v případech, kdy tato možnost byla nastavena ve webové peněžence - stiskni enter pro přeskočení): ",
+        "mining_key_required": "Těžební klíč je nutný pro těžbu na tomto účtu",
+        "invalid_mining_key": "Zadaný těžební klíč je neplatný!"
     },
     "japanese": {
         "translation_autor": "Ikko Ashimine",
