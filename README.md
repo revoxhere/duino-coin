@@ -213,6 +213,7 @@ All tests were performed using the DUCO-S1 algorithm **without fasthash accelera
   *   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
   *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI Wallet by viktor02
   *   [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - a Duino-Coin iOS widget by Naphob 
+  *   [Duino Lookup](https://axorax.github.io/duino-lookup/) by axorax
 
  You may also view a similar list on the [website](https://duinocoin.com/apps).
 
