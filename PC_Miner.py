@@ -1053,6 +1053,8 @@ class Miner:
         last_report = time()
         r_shares, last_shares = 0, 0
         while True:
+            accept.value = 0
+            reject.value = 0
             try:
                 Miner.m_connect(id, pool)
                 while True:
@@ -1177,13 +1179,11 @@ class Miner:
                                 break
                             break
                     except Exception as e:
-                        print(traceback.format_exc())
                         pretty_print(get_string("error_while_mining")
                                      + " " + str(e), "error", "net" + str(id))
                         sleep(5)
                         break
             except Exception as e:
-                print(traceback.format_exc())
                 pretty_print(get_string("error_while_mining")
                                      + " " + str(e), "error", "net" + str(id))
 
