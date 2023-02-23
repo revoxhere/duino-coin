@@ -238,6 +238,14 @@
                     </p>
                 </div>
             </div>
+            <div class="notification is-danger">
+                <p class="title is-size-5 mb-1">
+                    <i class="fa fa-exclamation-triangle"></i> Before you send a message
+                </p>
+                <p class="content">
+                    Please note that we will not respond to conversations in a language other than English or to questions for which answers can be easily found on our websites. Lack of culture of speech will also entail ignoring the correspondent.
+                </p>
+            </div>
             <div class="columns">
                 <div class="column">
                     <div class="box">
@@ -257,6 +265,15 @@
                                 <strong>
                                     <a href="https://discord.com/invite/kvBkccy">
                                         discord.gg/kvBkccy
+                                    </a>
+                                </strong>
+                            </p>
+                            <p>
+                                <i class="fab fa-fw fa-instagram"></i>
+                                Official Instagram:
+                                <strong>
+                                    <a href="https://www.instagram.com/duino_coin_official/">
+                                        @duino_coin_official
                                     </a>
                                 </strong>
                             </p>
@@ -394,7 +411,7 @@
             <a href="https://www.reddit.com/r/Duinocoin/"><span class="fab fa-reddit" id="reddit-icon"></a>
             <a href="https://duinocoin.com/discord"><span class="fab fa-discord" id="discord-icon"></a>
             <a href="https://github.com/revoxhere/duino-coin"><span class="fab fa-github" id="github-icon"></a>
-            <br/><br/>
+            <br /><br />
             <div class="footercontent content has-text-centered has-text-black">
                 <p id="copyright">Copyright © 2019 - 2023 <a href="https://duinocoin.com/team.html">the <b>Duino-Coin Team</b></a></p>
             </div>
@@ -422,14 +439,14 @@ function send() {
     username = document.getElementById("username").value
 
     fetch(`https://server.duinocoin.com/contact_form?captcha=${captcha}&message=${message}&email=${email}&username=${username}`)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-            alert("Your message has been submitted");
-        } else {
-            alert(data.message);
-        }
-      });
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.success) {
+                alert("Your message has been submitted");
+            } else {
+                alert(data.message);
+            }
+        });
 }
 
 /* On page loaded */
