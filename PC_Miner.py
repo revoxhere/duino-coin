@@ -72,7 +72,7 @@ def handler(signal_received, frame):
     if sys.platform == "win32":
         _exit(0)
     else: 
-        Popen("kill $(ps awux | grep PC_Miner | grep -v grep | awk '{print $2}')",
+        Popen("kill $(ps aux | grep PC_Miner | awk '{print $2}')",
               shell=True, stdout=PIPE)
 
 
