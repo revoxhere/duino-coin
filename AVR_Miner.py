@@ -161,7 +161,7 @@ def check_updates():
 
         if float(Settings.VER) < float(data["tag_name"]): # If is outdated
             update = input(Style.BRIGHT + get_string("new_version"))
-            if update == "Y" or update == "y":
+            if update.upper() == "Y":
                 pretty_print("sys0", get_string("updating"), "warning")
 
                 DATA_DIR = "Duino-Coin AVR Miner " + str(data["tag_name"]) # Create new version config folder
@@ -320,7 +320,7 @@ def check_mining_key(user_settings):
                 "error")
 
             retry = input("You want to retry? (y/n): ")
-            if retry == "y" or retry == "Y":
+            if retry.upper() == "Y":
                 mining_key = input("Enter your mining key: ")
                 user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('utf-8')
                 config["AVR Miner"] = user_settings
