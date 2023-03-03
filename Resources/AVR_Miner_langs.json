@@ -1268,7 +1268,7 @@
         "mining_algorithm": " gebruikte algoritme is DUCO-S1A (",
         "mining_avr_connection_error": " Fout tijdens het verbinden met de AVR! Opnieuw proberen in 10s",
         "mining_avr_not_responding": " Antwoord duurt langer dan verwacht, er wordt een nieuwe opdracht gestuurd ",
-        "internal_server_error": " Interne server fout.",
+        "internal_server_error": " Interne serverfout.",
         "retrying": " Opnieuw proberen in 10s",
         "mining_user": " Gebruiker ",
         "mining_not_exist": " bestaat niet.",
