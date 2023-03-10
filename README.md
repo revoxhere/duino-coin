@@ -192,6 +192,7 @@ All tests were performed using the DUCO-S1 algorithm **without fasthash accelera
   *   [d-cpuminer](https://github.com/phantom32-0/d-cpuminer) - pure C miner by phantom32 & revoxhere
   *   [Go Miner](https://github.com/yippiez/go-miner) by yippiez
   *   [ducominer](https://github.com/its5Q/ducominer) by its5Q
+  *   [duco.js](https://github.com/Axorax/duco.js) - **`Easily implement a duino coin miner to your website`** - by Axorax
   *   [Unofficial miners directory](https://github.com/revoxhere/duino-coin/tree/master/Unofficial%20miners)
       *   [Julia Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Julia_Miner.jl) by revoxhere
       *   [Ruby Miner](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Ruby_Miner.rb) by revoxhere
