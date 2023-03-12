@@ -963,7 +963,7 @@ void setup() {
   xMutex = xSemaphoreCreateMutex();
   xTaskCreatePinnedToCore(
     WiFireconnect, "WiFirec", 10000, NULL, NUMBEROFCORES + 2, &WiFirec,
-    mqttCore);  // create a task with highest priority and executed on core 0
+    wifiCore);  // create a task with highest priority and executed on core 0
   delay(250);
 
   // If MQTT is enabled create a sending thread
