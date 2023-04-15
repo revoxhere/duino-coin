@@ -31,9 +31,8 @@ from time import ctime, sleep, strptime, time
 import pip
 
 from subprocess import DEVNULL, Popen, check_call, call
-from threading import Thread
+from threading import Thread, Semaphore
 from threading import Lock as thread_lock
-from threading import Semaphore
 
 import base64 as b64
 
