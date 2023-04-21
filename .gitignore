@@ -2,6 +2,8 @@
 Wallet_*/
 PCMiner_*/
 AVRMiner_*/
+Duino-Coin PC Miner */
+Duino-Coin AVR Miner */
 
 # Byte-compiled and optimized files
 __pycache__/
@@ -63,4 +65,3 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-Duino-Coin PC Miner 3.4/Settings.cfg
