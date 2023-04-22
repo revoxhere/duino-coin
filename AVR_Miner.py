@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 3.4 © MIT licensed
+Duino-Coin Official AVR Miner 3.45 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2023
@@ -31,8 +31,9 @@ from time import ctime, sleep, strptime, time
 import pip
 
 from subprocess import DEVNULL, Popen, check_call, call
-from threading import Thread, Semaphore
+from threading import Thread
 from threading import Lock as thread_lock
+from threading import Semaphore
 
 import base64 as b64
 
@@ -108,7 +109,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '3.4'
+    VER = '3.45'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
     AVR_TIMEOUT = 10
@@ -160,7 +161,7 @@ def check_updates():
 
         if float(Settings.VER) < float(data["tag_name"]): # If is outdated
             update = input(Style.BRIGHT + get_string("new_version"))
-            if update.upper() == "Y":
+            if update == "Y" or update == "y":
                 pretty_print("sys0", get_string("updating"), "warning")
 
                 DATA_DIR = "Duino-Coin AVR Miner " + str(data["tag_name"]) # Create new version config folder
@@ -290,7 +291,6 @@ def check_mining_key(user_settings):
             print("sys0",
                 Style.RESET_ALL + get_string("config_saved"),
                 "info")
-        sleep(1.5)   
         return
 
     if not response["success"]:
@@ -310,7 +310,6 @@ def check_mining_key(user_settings):
                 print("sys0",
                     Style.RESET_ALL + get_string("config_saved"),
                     "info")
-            sleep(1.5)
             check_mining_key(config)
         else:
             pretty_print(
@@ -318,8 +317,8 @@ def check_mining_key(user_settings):
                 get_string("invalid_mining_key"),
                 "error")
 
-            retry = input("You want to retry? (y/n): ")
-            if retry.upper() == "Y":
+            retry = input("Do you want to retry? (y/n): ")
+            if retry == "y" or retry == "Y":
                 mining_key = input("Enter your mining key: ")
                 user_settings["mining_key"] = b64.b64encode(mining_key.encode("utf-8")).decode('utf-8')
                 config["AVR Miner"] = user_settings
@@ -650,12 +649,16 @@ def load_config():
             if not correct_username:
                 print(get_string("incorrect_username"))
 
-        mining_key = input(Style.RESET_ALL + Fore.YELLOW
+        response = requests.get(
+            "https://server.duinocoin.com/mining_key"
+                + "?u=" + username, timeout=10
+        ).json()
+
+        mining_key = "None"
+        if response["has_key"]:
+            mining_key = input(Style.RESET_ALL + Fore.YELLOW
                            + get_string("ask_mining_key")
                            + Fore.RESET + Style.BRIGHT)
-        if not mining_key:
-            mining_key = "None"
-        else:
             mining_key = b64.b64encode(mining_key.encode("utf-8")).decode('utf-8')
 
         print(Style.RESET_ALL + Fore.YELLOW
@@ -674,6 +677,7 @@ def load_config():
             port_names.append(port.device)
 
         avrport = ''
+        rig_identifier = ''
         while True:
             current_port = input(
                 Style.RESET_ALL + Fore.YELLOW
@@ -681,29 +685,33 @@ def load_config():
                 + Fore.RESET + Style.BRIGHT)
 
             if current_port in port_names:
+                confirm_identifier = input(
+                    Style.RESET_ALL + Fore.YELLOW
+                    + get_string('ask_rig_identifier')
+                    + Fore.RESET + Style.BRIGHT)
+                if confirm_identifier == 'y' or confirm_identifier == 'Y':
+                    current_identifier = input(
+                        Style.RESET_ALL + Fore.YELLOW
+                        + get_string('ask_rig_name')
+                        + Fore.RESET + Style.BRIGHT)
+                    rig_identifier += current_identifier
+                else:
+                    rig_identifier += "None"
+
                 avrport += current_port
                 confirmation = input(
                     Style.RESET_ALL + Fore.YELLOW
                     + get_string('ask_anotherport')
                     + Fore.RESET + Style.BRIGHT)
-
                 if confirmation == 'y' or confirmation == 'Y':
                     avrport += ','
+                    rig_identifier += ','
                 else:
                     break
             else:
                 print(Style.RESET_ALL + Fore.RED
                       + 'Please enter a valid COM port from the list above')
 
-        rig_identifier = input(
-            Style.RESET_ALL + Fore.YELLOW
-            + get_string('ask_rig_identifier')
-            + Fore.RESET + Style.BRIGHT)
-        if rig_identifier == 'y' or rig_identifier == 'Y':
-            rig_identifier = input(
-                Style.RESET_ALL + Fore.YELLOW
-                + get_string('ask_rig_name')
-                + Fore.RESET + Style.BRIGHT)
         else:
             rig_identifier = 'None'
 
@@ -741,6 +749,7 @@ def load_config():
             config.write(configfile)
 
         avrport = avrport.split(',')
+        rig_identifier = rig_identifier.split(',')
         print(Style.RESET_ALL + get_string('config_saved'))
         hashrate_list = [0] * len(avrport)
 
@@ -751,7 +760,7 @@ def load_config():
         avrport = avrport.replace(" ", "").split(',')
         donation_level = int(config["AVR Miner"]['donate'])
         debug = config["AVR Miner"]['debug']
-        rig_identifier = config["AVR Miner"]['identifier']
+        rig_identifier = config["AVR Miner"]['identifier'].split(',')
         Settings.SOC_TIMEOUT = int(config["AVR Miner"]["soc_timeout"])
         Settings.AVR_TIMEOUT = float(config["AVR Miner"]["avr_timeout"])
         discord_presence = config["AVR Miner"]["discord_presence"]
@@ -801,7 +810,7 @@ def greeting():
         + Settings.BLOCK + Style.NORMAL
         + Fore.RESET + get_string('avr_on_port')
         + Style.BRIGHT + Fore.YELLOW
-        + ' '.join(avrport))
+        + ', '.join(avrport))
 
     if osname == 'nt' or osname == 'posix':
         print(
@@ -910,10 +919,6 @@ def share_print(id, type, accept, reject, total_hashrate,
     Produces nicely formatted CLI output for shares:
     HH:MM:S |avrN| ⛏ Accepted 0/0 (100%) ∙ 0.0s ∙ 0 kH/s ⚙ diff 0 k ∙ ping 0ms
     """
-    try:
-        diff = get_prefix("", int(diff), 0)
-    except:
-        diff = "?"
 
     try:
         total_hashrate = get_prefix("H/s", total_hashrate, 2)
@@ -947,12 +952,13 @@ def share_print(id, type, accept, reject, total_hashrate,
               + f"ping {(int(ping))}ms")
 
 
-def mine_avr(com, threadid, fastest_pool):
+def mine_avr(com, threadid, fastest_pool, thread_rigid):
     global hashrate
     start_time = time()
     report_shares = 0
     last_report_share = 0
     while True:
+        shares = [0, 0, 0]
         while True:
             try:
                 ser.close()
@@ -1040,7 +1046,8 @@ def mine_avr(com, threadid, fastest_pool):
         prev_hash = "ba29a15896fd2d792d5c4b60668bf2b9feebc51d"
         exp_hash = "d0beba883d7e8cd119ea2b0e09b78f60f29e0968"
         exp_result = 50
-        while True:
+        retries = 0
+        while retries < 3:
             try:
                 debug_output(com + ': Sending hash test to the board')
                 ser.write(bytes(str(prev_hash
@@ -1068,20 +1075,27 @@ def mine_avr(com, threadid, fastest_pool):
                 break
             except Exception as e:
                 debug_output(str(e))
+                retries += 1
+        else:
+            pretty_print('sys' + port_num(com),
+                     f"Can't start mining on {com}" + Fore.RESET
+                     + f" - board keeps responding improperly. "
+                     + "Check if the code has been uploaded correctly "
+                     + "and your device is supported by Duino-Coin.", 
+                     'error')
+            break
 
         start_diff = "AVR"
-        if hashrate_test > 6000:
+        if hashrate_test > 12000:
+            start_diff = "ESP32"
+        elif hashrate_test > 6000:
             start_diff = "ESP8266H"
-            
         elif hashrate_test > 4500:
             start_diff = "ESP8266"
-            
         elif hashrate_test > 1000:
             start_diff = "DUE"
-            
         elif hashrate_test > 500:
             start_diff = "ARM"
-            
         elif hashrate_test > 300:
             start_diff = "MEGA"
 
@@ -1181,7 +1195,7 @@ def mine_avr(com, threadid, fastest_pool):
                             + Settings.SEPARATOR
                             + f'Official AVR Miner {Settings.VER}'
                             + Settings.SEPARATOR
-                            + str(rig_identifier)
+                            + str(thread_rigid)
                             + Settings.SEPARATOR
                             + str(result[2]))
 
@@ -1327,7 +1341,7 @@ if __name__ == '__main__':
         for port in avrport:
             Thread(target=mine_avr,
                    args=(port, threadid,
-                         fastest_pool)).start()
+                         fastest_pool, rig_identifier[threadid])).start()
             threadid += 1
     except Exception as e:
         debug_output(f'Error launching AVR thread(s): {e}')
