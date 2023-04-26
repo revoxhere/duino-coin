@@ -23,24 +23,26 @@ for default settings use -O0. -O may be a good tradeoff between both */
 /* For 8-bit microcontrollers we should use 16 bit variables since the
 difficulty is low, for all the other cases should be 32 bits. */
 #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
-typedef uint16_t uintDiff;
+typedef uint32_t uintDiff;
 #else
 typedef uint32_t uintDiff;
 #endif
 // Arduino identifier library - https://github.com/ricaun
 #include "uniqueID.h"
-#include "sha1.h"
 
-// Create globals
-String lastblockhash = "";
-String newblockhash = "";
+#include "duco_hash.h"
+
+String get_DUCOID() {
+  String ID = "DUCOID";
+  char buff[4];
+  for (size_t i = 0; i < 8; i++) {
+    sprintf(buff, "%02X", (uint8_t)UniqueID8[i]);
+    ID += buff;
+  }
+  return ID;
+}
+
 String DUCOID = "";
-uintDiff difficulty = 0;
-uintDiff ducos1result = 0;
-// 40+40+20+3 is the maximum size of a job
-const uint16_t job_maxsize = 104;  
-uint8_t job[job_maxsize];
-Sha1Wrapper Sha1_base;
 
 void setup() {
   // Prepare built-in led pin as output
@@ -54,83 +56,107 @@ void setup() {
   Serial.flush();
 }
 
-// DUCO-S1A hasher
-uintDiff ducos1a(String lastblockhash, String newblockhash,
-                 uintDiff difficulty) {
-  newblockhash.toUpperCase();
-  const char *c = newblockhash.c_str();
-  uint8_t final_len = newblockhash.length() >> 1;
-  for (uint8_t i = 0, j = 0; j < final_len; i += 2, j++)
-    job[j] = ((((c[i] & 0x1F) + 9) % 25) << 4) + ((c[i + 1] & 0x1F) + 9) % 25;
+void lowercase_hex_to_bytes(char const * hexDigest, uint8_t * rawDigest) {
+  for (uint8_t i = 0, j = 0; j < SHA1_HASH_LEN; i += 2, j += 1) {
+    uint8_t x = hexDigest[i];
+    uint8_t b = x >> 6;
+    uint8_t r = ((x & 0xf) | (b << 3)) + b;
 
-    // Difficulty loop
+    x = hexDigest[i + 1];
+    b = x >> 6;
+
+    rawDigest[j] = (r << 4) | (((x & 0xf) | (b << 3)) + b);
+  }
+}
+
+// DUCO-S1A hasher
+uintDiff ducos1a(char const * prevBlockHash, char const * targetBlockHash, uintDiff difficulty) {
   #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
     // If the difficulty is too high for AVR architecture then return 0
     if (difficulty > 655) return 0;
   #endif
-  Sha1_base.init();
-  Sha1_base.print(lastblockhash);
-  for (uintDiff ducos1res = 0; ducos1res < difficulty * 100 + 1; ducos1res++) {
-    Sha1 = Sha1_base;
-    Sha1.print(String(ducos1res));
-    // Get SHA1 result
-    uint8_t *hash_bytes = Sha1.result();
-    if (memcmp(hash_bytes, job, SHA1_HASH_LEN * sizeof(char)) == 0) {
-      // If expected hash is equal to the found hash, return the result
-      return ducos1res;
-    }
-  }
-  return 0;
+
+  uint8_t target[SHA1_HASH_LEN];
+  lowercase_hex_to_bytes(targetBlockHash, target);
+
+  uintDiff const maxNonce = difficulty * 100 + 1;
+  return ducos1a_mine(prevBlockHash, target, maxNonce);
 }
 
-String get_DUCOID() {
-  String ID = "DUCOID";
-  char buff[4];
-  for (size_t i = 0; i < 8; i++) {
-    sprintf(buff, "%02X", (uint8_t)UniqueID8[i]);
-    ID += buff;
+uintDiff ducos1a_mine(char const * prevBlockHash, uint8_t const * target, uintDiff maxNonce) {
+  static duco_hash_state_t hash;
+  duco_hash_init(&hash, prevBlockHash);
+
+  char nonceStr[10 + 1];
+  for (uintDiff nonce = 0; nonce < maxNonce; nonce++) {
+    ultoa(nonce, nonceStr, 10);
+
+    uint8_t const * hash_bytes = duco_hash_try_nonce(&hash, nonceStr);
+    if (memcmp(hash_bytes, target, SHA1_HASH_LEN) == 0) {
+      return nonce;
+    }
   }
-  return ID;
+
+  return 0;
 }
 
 void loop() {
   // Wait for serial data
-  if (Serial.available() > 0) {
-    memset(job, 0, job_maxsize);
-    // Read last block hash
-    lastblockhash = Serial.readStringUntil(',');
-    // Read expected hash
-    newblockhash = Serial.readStringUntil(',');
-    // Read difficulty
-    difficulty = strtoul(Serial.readStringUntil(',').c_str(), NULL, 10);
-    // Clearing the receive buffer reading one job.
-    while (Serial.available()) Serial.read();
-    // Turn on the built-in led
-    #if defined(ARDUINO_ARCH_AVR)
-        PORTB = PORTB | B00100000;
-    #else
-        digitalWrite(LED_BUILTIN, LOW);
-    #endif
-    // Start time measurement
-    uint32_t startTime = micros();
-    // Call DUCO-S1A hasher
-    ducos1result = ducos1a(lastblockhash, newblockhash, difficulty);
-    // Calculate elapsed time
-    uint32_t elapsedTime = micros() - startTime;
-    // Turn on the built-in led
-    #if defined(ARDUINO_ARCH_AVR)
-        PORTB = PORTB & B11011111;
-    #else
-        digitalWrite(LED_BUILTIN, HIGH);
-    #endif
-    // Clearing the receive buffer before sending the result.
-    while (Serial.available()) Serial.read();
-    // Send result back to the program with share time
-    Serial.print(String(ducos1result, 2) 
-                 + "," 
-                 + String(elapsedTime, 2) 
-                 + "," 
-                 + String(DUCOID) 
-                 + "\n");
+  if (Serial.available() <= 0) {
+    return;
   }
+
+  // Reserve 1 extra byte for comma separator (and later zero)
+  char lastBlockHash[40 + 1];
+  char newBlockHash[40 + 1];
+
+  // Read last block hash
+  if (Serial.readBytesUntil(',', lastBlockHash, 41) != 40) {
+    return;
+  }
+  lastBlockHash[40] = 0;
+
+  // Read expected hash
+  if (Serial.readBytesUntil(',', newBlockHash, 41) != 40) {
+    return;
+  }
+  newBlockHash[40] = 0;
+
+  // Read difficulty
+  uintDiff difficulty = strtoul(Serial.readStringUntil(',').c_str(), NULL, 10);
+  // Clearing the receive buffer reading one job.
+  while (Serial.available()) Serial.read();
+  // Turn on the built-in led
+  #if defined(ARDUINO_ARCH_AVR)
+      PORTB = PORTB | B00100000;
+  #else
+      digitalWrite(LED_BUILTIN, LOW);
+  #endif
+
+  // Start time measurement
+  uint32_t startTime = micros();
+
+  // Call DUCO-S1A hasher
+  uintDiff ducos1result = ducos1a(lastBlockHash, newBlockHash, difficulty);
+
+  // Calculate elapsed time
+  uint32_t elapsedTime = micros() - startTime;
+
+  // Turn on the built-in led
+  #if defined(ARDUINO_ARCH_AVR)
+      PORTB = PORTB & B11011111;
+  #else
+      digitalWrite(LED_BUILTIN, HIGH);
+  #endif
+
+  // Clearing the receive buffer before sending the result.
+  while (Serial.available()) Serial.read();
+
+  // Send result back to the program with share time
+  Serial.print(String(ducos1result, 2) 
+               + "," 
+               + String(elapsedTime, 2) 
+               + "," 
+               + String(DUCOID) 
+               + "\n");
 }
