@@ -853,6 +853,8 @@ class Miner:
                     lang = "indonesian"
                 elif locale.startswith("cz"):
                     lang = "czech"
+                elif locale.startswith("fi"):
+                    lang = "finnish"
                 else:
                     lang = "english"
             else:

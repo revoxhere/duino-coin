@@ -2623,6 +2623,8 @@ try:
         lang = "thai"
     elif locale.startswith("ko"):
             lang = "korean"
+    elif locale.startswith("fi"):
+            lang = "finnish"
     else:
         lang = "english"
 except IndexError:
