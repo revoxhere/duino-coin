@@ -1096,9 +1096,9 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
             start_diff = "ESP8266"
         elif hashrate_test > 1000:
             start_diff = "DUE"
-        elif hashrate_test > 500:
+        elif hashrate_test > 520:
             start_diff = "ARM"
-        elif hashrate_test > 300:
+        elif hashrate_test > 370:
             start_diff = "MEGA"
 
         pretty_print('sys' + port_num(com), 
