@@ -198,7 +198,7 @@ def check_updates():
 
         if float(Settings.VER) < float(data["tag_name"]): # If is outdated
             update = input(Style.BRIGHT + get_string("new_version"))
-            if update == "Y" or update == "y":
+            if update.lower() == "y" or update == "":
                 pretty_print(get_string("updating"), "warning", "sys0")
 
                 DATA_DIR = "Duino-Coin PC Miner " + str(data["tag_name"]) # Create new version config folder
