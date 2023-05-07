@@ -1037,6 +1037,7 @@
 		"session": "Sitzung",
 		"wrapper_success": "Erfolgreich umwickelt!",
 		"wrapper_amount_to_wrap": "Menge zum Umwickeln",
+		"email": "E-MAIL",
 		"wrapper_error_tronpy": "Tronpy-Fehler",
 		"translation_author_message": " Übersetzt von: ",
 		"notification_new_transaction": "Neue Transaktion",
