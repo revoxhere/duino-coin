@@ -1874,7 +1874,7 @@
         "system_threads_notice": "Varoitus: yrität käyttää enemmän säikeitä kuin sinulla on.\n\t\tTämä aiheuttaa ei-toivottuja sivuvaikutuksia, kuten järjestelmän vastaamattomuuden.\n\t\tAloitetaan 10s kuluttua",
         "using_config": "Käyttöasetustiedosto: ",
         "motd": "Palvelimen päivän viesti: "
-    },
+    }
 	"vietnamese": {
         "translation_autor": "JustSomeRandomGuy3",
         "translation": "Bản dịch Tiếng Việt bởi: ",
@@ -1886,7 +1886,7 @@
         "greeting_evening": "Chào buổi tối!",
         "greeting_back": "Mừng bạn quay lại!",
         "banner": "Duino-Coin © Py-thôn Miner Chính Thức",
-        "donation_level": "Cấp độ ủng hộ nhà phát triển: ",,
+        "donation_level": "Cấp độ ủng hộ nhà phát triển: ",
         "ask_algorithm": "Lựa chọn thuật toán đào bạn muốn dùng (1-2): ",
         "ask_difficulty": "Lựa chọn cấp độ đào bạn muốn dùng (1-3): ",
         "low_diff": "Cấp yếu (dành cho Raspberry Pis yếu (Zero/1/2/3) và máy tính cũ",
@@ -1976,7 +1976,8 @@
         "discord_update_error": "Lỗi khi cập nhật thống kê Discord RPC:",
         "key_retry": "Bạn có muốn thử lại không? (Y/n): ",
         "incorrect_username": "Người dùng bạn nhập không tồn tại!",
-        "system_threads_notice": "Cảnh báo: Bạn đang nhập số nhân nhiều hơn bạn đang có.\n\t\tNó sẽ tạo ra những tác dụng phụ như hệ thống không phản hồi\n\t\tBắt đầu sau 10 giây.",
+        "system_threads_notice": "Cảnh báo: Bạn đang nhập số nhân nhiều hơn bạn đang có.\n\t\tNó sẽ tạo ra những tác dụng phụ như hệ thống không phản hồi\n\t\Bắt đầu sau 10 giây.",
         "using_config": "Tệp cấu hình: ",
         "motd": "Hôm nay, server cho bạn câu nói: ",
+	}
 }
