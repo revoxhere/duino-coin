@@ -9,7 +9,7 @@ Duino-Coin Team & Community 2019-2023
 from os import _exit, mkdir
 from os import name as osname
 from os import path
-from os import system as ossystem
+from os import system as ossystem 
 from platform import machine as osprocessor
 from platform import system
 import sys
