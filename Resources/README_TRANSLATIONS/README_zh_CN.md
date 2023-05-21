@@ -36,8 +36,6 @@
     <img src="https://img.shields.io/badge/-日本語-orange?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_fi_FI.md">
     <img src="https://img.shields.io/badge/finnish-121212.svg?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_vi_VN.md">
-    <img src="https://img.shields.io/badge/-Ti%E1%BA%BFng%20Vi%E1%BB%87t-red?style=for-the-badge" /></a>
 </h1>
 <a href="https://wallet.duinocoin.com">
   <img src="https://img.shields.io/badge/Online Wallet-a202ff.svg?style=for-the-badge&logo=Web" /></a>
