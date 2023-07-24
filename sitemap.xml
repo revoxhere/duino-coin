@@ -32,7 +32,27 @@
 </url>
 <url>
   <loc>https://duinocoin.com/legal</loc>
-  <changefreq>weekly</changefreq>
+  <changefreq>monthly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://duinocoin.com/privacy</loc>
+  <changefreq>monthly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://duinocoin.com/terms</loc>
+  <changefreq>monthly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://duinocoin.com/disclaimer</loc>
+  <changefreq>monthly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://duinocoin.com/cookies</loc>
+  <changefreq>monthly</changefreq>
   <priority>0.80</priority>
 </url>
 </urlset>
