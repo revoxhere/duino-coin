@@ -1,6 +1,6 @@
 <!--
 *** Official Duino-Coin website README
-*** by Kristian and Revox, 2021
+*** by Kristian (Tech1k) and Revox, 2021-2023
 -->
 
 <a href="https://duinocoin.com">
@@ -24,7 +24,7 @@ The Duino-Coin website is distributed under the MIT License. See the `LICENSE` f
 
 ## Website maintainers
 * [@revox](https://github.com/revoxhere/) - robik123.345@gmail.com (Duino-Coin Founder)
-* [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster and DUCO Developer)
+* [@Tech1k](https://github.com/Tech1k/) - hello@kk.dev (Lead Webmaster and DUCO Developer)
 
 Also, big thanks to all the [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped with the Duino-Coin website.
 
