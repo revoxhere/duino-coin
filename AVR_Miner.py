@@ -6,6 +6,7 @@ https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2023
 """
 
+# Importing modules
 from os import _exit, mkdir
 from os import name as osname
 from os import path
@@ -44,7 +45,7 @@ printlock = Semaphore(value=1)
 # Python <3.5 check
 f"Your Python version is too old. Duino-Coin Miner requires version 3.6 or above. Update your packages and try again"
 
-
+# Installing required modules/packages
 def install(package):
     try:
         pip.main(["install",  package])
@@ -107,7 +108,7 @@ def now():
 def port_num(com):
     return str(''.join(filter(str.isdigit, com)))
 
-
+# Base data settings
 class Settings:
     VER = '3.5'
     SOC_TIMEOUT = 15
@@ -268,7 +269,7 @@ def check_updates():
 
 def check_mining_key(user_settings):
     user_settings = user_settings["AVR Miner"]
-
+    # Decode Mining key
     if user_settings["mining_key"] != "None":
         key = "&k=" + b64.b64decode(user_settings["mining_key"]).decode('utf-8')
     else:
@@ -348,11 +349,13 @@ class Client:
     def send(s, msg: str):
         sent = s.sendall(str(msg).encode(Settings.ENCODING))
         return True
-
+   
+    # Receive data back from response
     def recv(s, limit: int = 128):
         data = s.recv(limit).decode(Settings.ENCODING).rstrip("\n")
         return data
 
+    # Grab a pool to mine on
     def fetch_pool():
         while True:
             pretty_print("net0", get_string("connection_search"),
@@ -491,7 +494,7 @@ with open(Settings.DATA_DIR + '/Translations.json', 'r',
 if system() == 'Darwin':
     if getlocale()[0] is None:
         setlocale(LC_ALL, 'en_US.UTF-8')
-
+# Language settings
 try:
     if not Path(Settings.DATA_DIR + '/Settings.cfg').is_file():
         locale = getdefaultlocale()[0]
@@ -551,7 +554,7 @@ def get_string(string_name: str):
     else:
         return string_name
 
-
+# Rounding Hash
 def get_prefix(symbol: str,
                val: float,
                accuracy: int):
@@ -732,7 +735,8 @@ def load_config():
         if float(donation_level) < int(0):
             donation_level = 0
         donation_level = int(donation_level)
-
+         
+        # Defaults for config
         config["AVR Miner"] = {
             'username':         username,
             'avrport':          avrport,
@@ -774,6 +778,7 @@ def greeting():
     global greeting
     print(Style.RESET_ALL)
 
+    # Checking current time
     current_hour = strptime(ctime(time())).tm_hour
     if current_hour < 12:
         greeting = get_string('greeting_morning')
@@ -963,6 +968,7 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
         shares = [0, 0, 0]
         while True:
             try:
+                # Communicate with connected avr board
                 ser.close()
                 pretty_print('sys' + port_num(com),
                              f"No response from the board. Closed port {com}",
