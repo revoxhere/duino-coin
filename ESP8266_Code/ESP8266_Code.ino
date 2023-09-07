@@ -55,6 +55,9 @@
 // If you don't know what MQTT means check this link:
 // https://www.techtarget.com/iotagenda/definition/MQTT-MQ-Telemetry-Transport
 
+// Uncomment the line below if you wish to use Telnet connection
+#define USE_TELNET
+
 #ifdef USE_DHT
 float temp = 0.0;
 float hum = 0.0;
@@ -132,8 +135,17 @@ void mqttReconnect()
 }
 #endif
 
+#ifdef USE_TELNET
+uint8_t i;
+bool ConnectionEstablished; // Flag for successfully handled connection
+#define MAX_TELNET_CLIENTS 2
+WiFiServer TelnetServer(23);
+WiFiClient TelnetClient[MAX_TELNET_CLIENTS];
+#endif
+
 namespace
 {
+// Change the part in brackets to your Duino-Coin username
 // Change the part in brackets to your Duino-Coin username
 const char *DUCO_USER = "USERNAME";
 // Change the part in brackets to your mining key (if you have enabled it in the wallet)
@@ -152,12 +164,6 @@ const bool WEB_DASHBOARD = false;
 const bool WEB_HASH_UPDATER = false;
 // Set to false if you want to disable the onboard led blinking when finding shares
 const bool LED_BLINKING = true;
-
-uint8_t i;
-bool ConnectionEstablished; // Flag for successfully handled connection
-#define MAX_TELNET_CLIENTS 2
-WiFiServer TelnetServer(23);
-WiFiClient TelnetClient[MAX_TELNET_CLIENTS];
 
 /* Do not change the lines below. These lines are static and dynamic variables
    that will be used by the program for counters and measurements. */
@@ -363,6 +369,7 @@ const char WEBSITE[] PROGMEM = R"=====(
 </html>
 )=====";
 
+#ifdef USE_TELNET
 void TelnetMsg(String text)
 {
   for(i = 0; i < MAX_TELNET_CLIENTS; i++)
@@ -382,6 +389,7 @@ void TelnetMsg(String text)
 // changes from original
 
 void Telnet() {
+  String readTelnet;
   // Cleanup disconnected session
   for(i = 0; i < MAX_TELNET_CLIENTS; i++)
   {
@@ -452,6 +460,7 @@ void Telnet() {
     }
   }
 }
+#endif
 
 ESP8266WebServer server(80);
 
@@ -460,7 +469,7 @@ void hashupdater(){ //update hashrate every 3 sec in browser without reloading p
   Serial.println("Update hashrate on page");
 };
 
-void hashupdatershares(){ //update hashrate every 3 sec in browser without reloading page
+void hashupdatershares(){ //update hashrate every 15 sec in browser without reloading page
   server.send(200, "text/plain", String(share_count ));
   Serial.println("Update shares on page");
 };
@@ -633,7 +642,9 @@ void handleSystemEvents(void) {
   VerifyWifi();
   ArduinoOTA.handle();
   yield();
+  #ifdef USE_TELNET
   Telnet();  // Handle telnet connections
+  #endif
 }
 
 void waitForClientData(void) {
@@ -766,8 +777,10 @@ void setup() {
   SetupWifi();
   SetupOTA();
   Serial.println("Starting Telnet server");
+  #ifdef USE_TELNET
   TelnetServer.begin();
   TelnetServer.setNoDelay(true);
+  #endif
   lwdtFeed();
   lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
   if (USE_HIGHER_DIFF) START_DIFF = "ESP8266NH";
@@ -847,7 +860,9 @@ void loop() {
   waitForClientData();
 
   Serial.println("Received job with size of " + String(client_buffer));
+  #ifdef USE_TELNET
   TelnetMsg("Received job ... Mining now ");
+  #endif
   MiningJob job;
   job.parse((char*)client_buffer.c_str());
   difficulty = job.difficulty;
@@ -902,6 +917,7 @@ void loop() {
                      + " kH/s ("
                      + String(elapsed_time_s)
                      + "s)");
+      #ifdef USE_TELNET
       TelnetMsg(client_buffer
                      + " share #"
                      + String(share_count)
@@ -911,6 +927,7 @@ void loop() {
                      + " kH/s ("
                      + String(elapsed_time_s)
                      + "s)");
+      #endif
       break;
     }
     if (max_micros_elapsed(micros(), 500000)) {
