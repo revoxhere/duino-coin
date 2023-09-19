@@ -1,6 +1,6 @@
 #pragma once
 
-#include <arduino.h>
+#include <Arduino.h>
 
 #define SHA1_BLOCK_LEN 64
 #define SHA1_HASH_LEN 20
