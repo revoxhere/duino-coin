@@ -25,6 +25,7 @@ import os
 import json
 import zipfile
 import traceback
+import urllib.parse
 
 from pathlib import Path
 from re import sub
@@ -665,7 +666,7 @@ def get_string(string_name):
 
 def check_mining_key(user_settings):
     if user_settings["mining_key"] != "None":
-        key = '&k=' + b64.b64decode(user_settings["mining_key"]).decode('utf-8')
+        key = '&k=' + urllib.parse.quote(b64.b64decode(user_settings["mining_key"]).decode('utf-8'))
     else:
         key = ''
 
