@@ -85,12 +85,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
 RUN python3 -m pip install --no-cache-dir --upgrade pip && \
     python3 -m pip install --no-cache-dir -r requirements.txt
 
-# Set the working directory back to /app
-WORKDIR /app
-
-RUN ls
-RUN pwd
-
 # Make script executable
 RUN chmod +x /app/duino-coin/docker-start.sh
 
