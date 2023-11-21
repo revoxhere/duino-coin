@@ -1,10 +1,45 @@
 #!/bin/bash
 
-chmod +x "${base_path}/PC_Miner.py" 
-python3 "${base_path}/PC_Miner.py" & 
-
 # Set the base path
 base_path="/app/duino-coin"
+
+python_script="${base_path}/PC_Miner.py"
+
+chmod +x "${base_path}/PC_Miner.py" 
+
+# Find the line containing "VER = x.x" in the Python script
+ver_value=$(grep "VER =" "$python_script" | awk '{print $3}')
+
+# Set the environment variable
+export VER="$ver_value"
+
+# Display the extracted value (optional)
+echo "Extracted PC Miner VER value: $VER"
+
+# Run the Python script in the background
+python3 "${full_path}/PC_Miner.py" &
+
+# Set a timeout duration
+timeout_duration=10
+current_time=0
+
+# Check if the Python script is still running
+while [ $current_time -lt $timeout_duration ]; do
+    sleep 1
+    current_time=$((current_time + 1))
+
+    # Check if the process is still running
+    if ! ps -p $! > /dev/null; then
+        break
+    fi
+done
+
+# Kill the background process if it's still running after the timeout
+if ps -p $! > /dev/null; then
+    kill $!
+fi
+
+mkdir "${base_path}/Duino-Coin PC Miner ${ver_value}"
 
 # Find the highest version number in the folder
 highest_version=$(ls -d "${base_path}/Duino-Coin PC Miner"* | grep -Eo 'Duino-Coin PC Miner [0-9.]+' | sort -Vr | head -n 1)
