@@ -35,7 +35,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
     python3-pip \
     python3-dev \
     wget \
-    git
+    git && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf archive.tar.gz
 
 # Install rustup for compilation
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -sSf | sh -s -- -y
@@ -70,6 +72,9 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt
 
 # Set the working directory back to /app
 WORKDIR /app
+
+RUN ls
+RUN pwd
 
 # Make script executable
 RUN chmod +x docker-start.sh
