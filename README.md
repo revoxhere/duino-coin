@@ -118,7 +118,7 @@ sudo chmod a+x duco-install-rpi.sh
 git clone https://github.com/revoxhere/duino-coin.git
 cd duino-coin
 docker build -t duco-miner .
-docker run --rm -it --name duco-container --restart unless-stopped -e DUCO_USERNAME="your_actual_username_or_walletname" -e DUCO_MINING_KEY="your_actual_mining_key" duco-miner
+docker run -td --name duco-container --restart unless-stopped -e DUCO_USERNAME="your_actual_username_or_walletname" -e DUCO_MINING_KEY="your_actual_mining_key" duco-miner
 ```
 An example with all configurable options is:
 
@@ -127,7 +127,7 @@ An example with all configurable options is:
 docker build -t duco-miner .
 
 # Run the Docker Container
-docker run --rm -it --name duco-container --restart unless-stopped \
+docker run -td --name duco-container --restart unless-stopped \
   -e DUCO_USERNAME="your_actual_username_or_walletname" \
   -e DUCO_MINING_KEY="your_actual_mining_key" \
   -e DUCO_INTENSITY=50 \
