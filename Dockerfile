@@ -5,9 +5,9 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV container docker
 ENV TERM=xterm
 
-WORKDIR /app
+WORKDIR /app/
 
-COPY . /
+COPY . ./duino-coin/ 
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends\
