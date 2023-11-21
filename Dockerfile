@@ -32,7 +32,6 @@ RUN tar -xvf libducohash.tar.gz
 WORKDIR /app/libducohash
 
 # Compile it
-RUN echo '[source.crates-io]\nindex = \"https://github.com/rust-lang/crates.io-index\"\n\n[http]\nproxy = \"\"' >> ~/.cargo/config.toml
 RUN cargo build --release
 
 # Extract the module and move it to /app/duino-coin
