@@ -33,7 +33,9 @@ ENV DUCO_USERNAME="simeononsecurity" \
 RUN apt-get update && apt-get install -y --no-install-recommends\
     curl \
     python3-pip \
-    python3-dev 
+    python3-dev \
+    wget \
+    git
 
 # Install rustup for compilation
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -sSf | sh -s -- -y
