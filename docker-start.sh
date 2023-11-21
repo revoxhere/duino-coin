@@ -16,29 +16,7 @@ export VER="$ver_value"
 # Display the extracted value (optional)
 echo "Extracted PC Miner VER value: $VER"
 
-# Run the Python script in the background
-python3 "${base_path}/PC_Miner.py" &
-
-# Set a timeout duration
-timeout_duration=10
-current_time=0
-
-# Check if the Python script is still running
-while [ $current_time -lt $timeout_duration ]; do
-    sleep 1
-    current_time=$((current_time + 1))
-
-    # Check if the process is still running
-    if ! ps -p $! > /dev/null; then
-        break
-    fi
-done
-
-# Kill the background process if it's still running after the timeout
-if ps -p $! > /dev/null; then
-    kill $!
-fi
-
+## Create Expected Path
 mkdir "${base_path}/Duino-Coin PC Miner ${ver_value}"
 
 # Find the highest version number in the folder
@@ -47,6 +25,7 @@ highest_version=$(ls -d "${base_path}/Duino-Coin PC Miner"* | grep -Eo 'Duino-Co
 # Construct the full path with the highest version number
 full_path="${base_path}/${highest_version}"
 
+#Create Expected Config File
 touch "${full_path}/Miner_config.cfg"
 
 echo '[PC Miner]' > "${full_path}/Miner_config.cfg"
