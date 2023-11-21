@@ -37,8 +37,11 @@ WORKDIR /app/libducohash
 # Compile it
 RUN cargo build --release
 
+# Extract the module and move it to /app/duino-coin
+RUN mv target/release/libducohasher.so /app/duino-coin/libducohasher.so
+
 # Stage 2: Create the final lightweight image
-FROM python:3-slim
+FROM python:3
 
 LABEL org.opencontainers.image.source="https://github.com/revoxhere/duino-coin"
 LABEL org.opencontainers.image.description="Dockerized Duino-Coin Miner"
@@ -76,11 +79,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
     python3-pip \
     python3-dev \
     wget \
-    git && \
+    git \
+    build-essential \
+    && \
     rm -rf /var/lib/apt/lists/*
 
 # Install pip dependencies
-RUN python3 -m pip install --no-cache-dir -r requirements.txt
+RUN python3 -m pip install --no-cache-dir --upgrade pip && \
+    python3 -m pip install --no-cache-dir -r requirements.txt
 
 # Set the working directory back to /app
 WORKDIR /app
