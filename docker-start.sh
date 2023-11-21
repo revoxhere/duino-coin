@@ -1,5 +1,8 @@
 #!/bin/bash
 
+chmod +x "${base_path}/PC_Miner.py" 
+python3 "${base_path}/PC_Miner.py" & 
+
 # Set the base path
 base_path="/app/duino-coin"
 
@@ -25,5 +28,4 @@ echo "raspi_leds = ${DUCO_RASPI_LEDS}" >> "${full_path}/Miner_config.cfg"
 echo "raspi_cpu_iot = ${DUCO_RASPI_CPU_IOT}" >> "${full_path}/Miner_config.cfg"
 echo "discord_rp = ${DUCO_DISCORD_RP}" >> "${full_path}/Miner_config.cfg"
 
-chmod +x "${full_path}/PC_Miner.py"
-python3 "${full_path}/PC_Miner.py"
+python3 "${base_path}/PC_Miner.py"
