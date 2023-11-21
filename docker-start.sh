@@ -17,7 +17,7 @@ export VER="$ver_value"
 echo "Extracted PC Miner VER value: $VER"
 
 # Run the Python script in the background
-python3 "${full_path}/PC_Miner.py" &
+python3 "${base_path}/PC_Miner.py" &
 
 # Set a timeout duration
 timeout_duration=10
