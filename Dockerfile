@@ -37,6 +37,10 @@ RUN cargo build --release
 # Extract the module and move it to /app/duino-coin
 RUN mv target/release/libducohasher.so /app/duino-coin/libducohasher.so
 
+WORKDIR /app/
+
+RUN rm -R libducohash.tar.gz && rm -R libducohash
+
 # Stage 2: Create the final lightweight image
 FROM python:3
 
