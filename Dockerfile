@@ -22,9 +22,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends\
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -sSf | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
-# Clone Duino-Coin repository
-RUN git clone https://github.com/revoxhere/duino-coin
-
 # Download duino fasthash
 RUN wget https://server.duinocoin.com/fasthash/libducohash.tar.gz
 
