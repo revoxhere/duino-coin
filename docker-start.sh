@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Set the base path
-base_path="/app/duino-coin/"
+base_path="/app/duino-coin"
 
 # Find the highest version number in the folder
-highest_version=$(ls -d "${base_path}/Duino-Coin PC Miner"/*/ | grep -Eo 'Duino-Coin PC Miner [0-9.]+' | sort -Vr | head -n 1)
+highest_version=$(ls -d "${base_path}/Duino-Coin PC Miner"* | grep -Eo 'Duino-Coin PC Miner [0-9.]+' | sort -Vr | head -n 1)
 
 # Construct the full path with the highest version number
 full_path="${base_path}/${highest_version}"
