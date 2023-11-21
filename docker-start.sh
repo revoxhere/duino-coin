@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Set the base path without the version number
-base_path="/app/duino-coin/Duino-Coin PC Miner"
+# Set the base path
+base_path="/app/duino-coin/"
 
 # Find the highest version number in the folder
-highest_version=$(ls -d "${base_path}"/*/ | grep -Eo '[0-9.]+' | sort -Vr | head -n 1)
+highest_version=$(ls -d "${base_path}/Duino-Coin PC Miner"/*/ | grep -Eo 'Duino-Coin PC Miner [0-9.]+' | sort -Vr | head -n 1)
 
 # Construct the full path with the highest version number
-full_path="${base_path} ${highest_version}"
+full_path="${base_path}/${highest_version}"
 
 echo '[PC Miner]' > "${full_path}/Miner_config.cfg"
 echo "username = ${DUCO_USERNAME}" >> "${full_path}/Miner_config.cfg"
