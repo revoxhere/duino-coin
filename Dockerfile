@@ -95,7 +95,7 @@ RUN ls
 RUN pwd
 
 # Make script executable
-RUN chmod +x docker-start.sh
+RUN chmod +x /app/duino-coin/docker-start.sh
 
 # Specify the command to run on container start
-CMD ["./docker-start.sh"]
+CMD ["/app/duino-coin/docker-start.sh"]
