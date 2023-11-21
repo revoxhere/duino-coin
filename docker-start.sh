@@ -47,6 +47,8 @@ highest_version=$(ls -d "${base_path}/Duino-Coin PC Miner"* | grep -Eo 'Duino-Co
 # Construct the full path with the highest version number
 full_path="${base_path}/${highest_version}"
 
+touch "${full_path}/Miner_config.cfg"
+
 echo '[PC Miner]' > "${full_path}/Miner_config.cfg"
 echo "username = ${DUCO_USERNAME}" >> "${full_path}/Miner_config.cfg"
 echo "mining_key = $(echo -n ${DUCO_MINING_KEY} | base64)" >> "${full_path}/Miner_config.cfg"
