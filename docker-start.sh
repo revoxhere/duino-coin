@@ -27,7 +27,6 @@ full_path="${base_path}/${highest_version}"
 
 #Create Expected Config File
 touch "${full_path}/Miner_config.cfg"
-touch "${base_path}/Settings.cfg"
 
 echo '[PC Miner]' > "${full_path}/Miner_config.cfg"
 echo "username = ${DUCO_USERNAME}" >> "${full_path}/Miner_config.cfg"
@@ -44,5 +43,7 @@ echo "report_sec = ${DUCO_REPORT_SEC}" >> "${full_path}/Miner_config.cfg"
 echo "raspi_leds = ${DUCO_RASPI_LEDS}" >> "${full_path}/Miner_config.cfg"
 echo "raspi_cpu_iot = ${DUCO_RASPI_CPU_IOT}" >> "${full_path}/Miner_config.cfg"
 echo "discord_rp = ${DUCO_DISCORD_RP}" >> "${full_path}/Miner_config.cfg"
+
+cp "${full_path}/Miner_config.cfg" "${full_path}/Settings.cfg"
 
 python3 "${base_path}/PC_Miner.py"
