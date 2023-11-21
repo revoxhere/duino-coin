@@ -60,7 +60,7 @@ COPY --from=builder /app /app
 WORKDIR /app/duino-coin
 
 ENV DUCO_USERNAME="simeononsecurity" \
-    DUCO_MINING_KEY="" \
+    DUCO_MINING_KEY="simeononsecurity" \
     DUCO_INTENSITY=50 \
     DUCO_THREADS=2 \
     DUCO_START_DIFF="MEDIUM" \
