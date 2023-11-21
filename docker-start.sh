@@ -46,4 +46,8 @@ echo "discord_rp = ${DUCO_DISCORD_RP}" >> "${full_path}/Miner_config.cfg"
 
 cp "${full_path}/Miner_config.cfg" "${full_path}/Settings.cfg"
 
+#Needed to start script
+wget -O "${full_path}/Translations.json" https://raw.githubusercontent.com/revoxhere/duino-coin/master/Resources/PC_Miner_langs.json
+wget -O "${full_path}/Donate.exe" https://server.duinocoin.com/donations/DonateExecutableWindows.exe
+
 python3 "${base_path}/PC_Miner.py"
