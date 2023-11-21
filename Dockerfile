@@ -1,6 +1,14 @@
 # Use an official Python runtime as a parent image
 FROM python:3
 
+LABEL org.opencontainers.image.source="https://github.com/revoxhere/duino-coin"
+LABEL org.opencontainers.image.description="Dockerized Duino-Coin Miner"
+LABEL org.opencontainers.image.authors="revoxhere,simeononsecurity"
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV container docker
+ENV TERM=xterm
+
 # Set the working directory in the container
 WORKDIR /app
 
