@@ -72,7 +72,7 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt
 WORKDIR /app
 
 # Make script executable
-RUN chmod +x generate_settings.sh
+RUN chmod +x docker-start.sh
 
 # Specify the command to run on container start
 CMD ["./docker-start.sh"]
