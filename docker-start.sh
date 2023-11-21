@@ -7,8 +7,8 @@ python_script="${base_path}/PC_Miner.py"
 
 chmod +x "${base_path}/PC_Miner.py" 
 
-# Find the line containing "VER = x.x" in the Python script
-ver_value=$(grep "VER =" "$python_script" | awk '{print $3}')
+# Find the line containing "VER = x.x" in the Python script and extract the version number
+ver_value=$(grep -oP 'VER = \K\d+\.\d+' "$python_script")
 
 # Set the environment variable
 export VER="$ver_value"
@@ -44,21 +44,5 @@ echo "report_sec = ${DUCO_REPORT_SEC}" >> "${full_path}/Miner_config.cfg"
 echo "raspi_leds = ${DUCO_RASPI_LEDS}" >> "${full_path}/Miner_config.cfg"
 echo "raspi_cpu_iot = ${DUCO_RASPI_CPU_IOT}" >> "${full_path}/Miner_config.cfg"
 echo "discord_rp = ${DUCO_DISCORD_RP}" >> "${full_path}/Miner_config.cfg"
-
-echo '[PC Miner]' > "${base_path}/Settings.cfg"
-echo "username = ${DUCO_USERNAME}" >> "${base_path}/Settings.cfg"
-echo "mining_key = $(echo -n ${DUCO_MINING_KEY} | base64)" >> "${base_path}/Settings.cfg"
-echo "intensity = ${DUCO_INTENSITY}" >> "${base_path}/Settings.cfg"
-echo "threads = ${DUCO_THREADS}" >> "${base_path}/Settings.cfg"
-echo "start_diff = ${DUCO_START_DIFF}" >> "${base_path}/Settings.cfg"
-echo "donate = ${DUCO_DONATE}" >> "${base_path}/Settings.cfg"
-echo "identifier = ${DUCO_IDENTIFIER}" >> "${base_path}/Settings.cfg"
-echo "algorithm = ${DUCO_ALGORITHM}" >> "${base_path}/Settings.cfg"
-echo "language = ${DUCO_LANGUAGE}" >> "${base_path}/Settings.cfg"
-echo "soc_timeout = ${DUCO_SOC_TIMEOUT}" >> "${base_path}/Settings.cfg"
-echo "report_sec = ${DUCO_REPORT_SEC}" >> "${base_path}/Settings.cfg"
-echo "raspi_leds = ${DUCO_RASPI_LEDS}" >> "${base_path}/Settings.cfg"
-echo "raspi_cpu_iot = ${DUCO_RASPI_CPU_IOT}" >> "${base_path}/Settings.cfg"
-echo "discord_rp = ${DUCO_DISCORD_RP}" >> "${base_path}/Settings.cfg"
 
 python3 "${base_path}/PC_Miner.py"
