@@ -17,7 +17,7 @@
   NOTE: For even better optimizations also edit your Crypto.h file.
   On linux that file can be found in the following location:
   ~/.arduino15//packages/esp8266/hardware/esp8266/3.0.2/cores/esp8266/ */
-#pragma GCC optimize ("-Ofast","-lto","-march=native")
+#pragma GCC optimize ("-Ofast","-lto")
 
 /* If during compilation the line below causes a
   "fatal error: arduinoJson.h: No such file or directory"
