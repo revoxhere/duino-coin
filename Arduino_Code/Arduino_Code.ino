@@ -15,7 +15,7 @@
 
 /* For microcontrollers with low memory change that to -Os in all files,
 for default settings use -O0. -O may be a good tradeoff between both */
-#pragma GCC optimize ("-Ofast")
+#pragma GCC optimize ("-Ofast","-lto","-march=native")
 /* For microcontrollers with custom LED pins, adjust the line below */
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
