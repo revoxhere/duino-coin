@@ -165,7 +165,7 @@ const bool LED_BLINKING = true;
 #define WDT_TIMEOUT 60
 
 // If optimizations cause problems, change them to -O0 (the default)
-#pragma GCC optimize ("-Ofast")
+#pragma GCC optimize ("-Ofast","-lto","-march=native")
 
 // #include "hwcrypto/sha.h" // Uncomment this line if you're using an older
 // version of the ESP32 core and sha_parellel_engine doesn't work for you
