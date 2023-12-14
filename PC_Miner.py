@@ -818,6 +818,7 @@ class Miner:
         try:
             if not Path(Settings.DATA_DIR + Settings.SETTINGS_FILE).is_file():
                 locale = getdefaultlocale()[0]
+                print("Current locale:", locale)                
                 if locale.startswith("es"):
                     lang = "spanish"
                 elif locale.startswith("pl"):
@@ -844,8 +845,10 @@ class Miner:
                     lang = "italian"
                 elif locale.startswith("sk"):
                     lang = "slovak"
+                if locale.startswith("zh_TW"):
+                    lang = "chinese_Traditional"
                 elif locale.startswith("zh"):
-                    lang = "chinese_simplified"
+                    lang = "chinese_simplified"                
                 elif locale.startswith("th"):
                     lang = "thai"
                 elif locale.startswith("ko"):
