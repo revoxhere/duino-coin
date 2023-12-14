@@ -249,7 +249,7 @@ Certaines parties du programme, incluant des fichiers, peuvent être soumises à
 *   [@connorhess](https://github.com/connorhess) (Lead dev Python, Node-S owner)
 *   [@JoyBed](https://github.com/JoyBed) (Lead dev AVR)
 *   [@Yennefer](https://www.instagram.com/vlegle/) (Lead manager réseaux sociaux)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Lead Webmaster et développeur DUCO)
+*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (Lead Webmaster et développeur DUCO)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) Dev)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (Dev AVR)

@@ -277,7 +277,7 @@ sudo chmod a+x duco-install-rpi.sh
 * [@connorhess](https://github.com/connorhess) (लीड पायथन देव, नोड-एस के मालिक)
 * [@JoyBed](https://github.com/JoyBed) (लीड AVR देव)
 * [@Yennefer](https://www.instagram.com/vlegle/) (लीड सोशल मैनेजर)
-* [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (लीड वेबमास्टर और DUCO डेवलपर)
+* [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (लीड वेबमास्टर और DUCO डेवलपर)
 * [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) देव)
 * [@Lulaschkas](https://github.com/Lulaschkas) (देव)
 * [@joaquinbvw](https://github.com/joaquinbvw) (एवीआर देव)

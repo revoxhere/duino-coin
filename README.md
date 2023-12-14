@@ -245,7 +245,7 @@ Our disclaimer is available here: <a href="https://duinocoin.com/disclaimer">dui
 *   [@connorhess](https://github.com/connorhess) (Lead Python dev, Node-S owner)
 *   [@JoyBed](https://github.com/JoyBed) (Lead AVR dev)
 *   [@Yennefer](https://www.instagram.com/vlegle/) (Lead social manager)
-*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.dev (Lead Webmaster and DUCO Developer)
+*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (Lead Webmaster and DUCO Developer)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)

@@ -255,7 +255,7 @@ I file inclusi di alcune librerie di terze parti potrebbero avere diverse licenz
 *   [@connorhess](https://github.com/connorhess) (Dev Python principale, owner Node-S)
 *   [@JoyBed](https://github.com/JoyBed) (Dev AVR principale)
 *   [@Yennefer](https://www.instagram.com/vlegle/) (Social manager principale)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster principale e dev DUCO)
+*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (Webmaster principale e dev DUCO)
 *   [@ygboucherk](https://github.com/ygboucherk) (Dev [wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2))
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (Dev AVR)

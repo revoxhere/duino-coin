@@ -267,7 +267,7 @@ Duino-CoinはほとんどMITライセンスの下で配布されています。�
 *   [@connorhess](https://github.com/connorhess) (リードPython開発者、Node-Sオーナー）
 *   [@JoyBed](https://github.com/JoyBed) (リードAVR開発)
 *   [@Yennefer](https://www.instagram.com/vlegle/) (リードソーシャルマネージャー）
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (リードウェブマスター兼DUCOデベロッパー）
+*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (リードウェブマスター兼DUCOデベロッパー）
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) 開発者)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (開発者)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR開発者)

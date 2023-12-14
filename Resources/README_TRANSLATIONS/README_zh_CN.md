@@ -243,7 +243,7 @@ Duino-Coin 主要在 MIT 许可证下分发。有关更多信息，请参阅“�
 *   [@Bilaboz](https://github.com/bilaboz/) (NodeJS 开发主管)
 *   [@connorhess](https://github.com/connorhess) (Python 开发主管，Node-S 所有者)
 *   [@JoyBed](https://github.com/JoyBed) (AVR 开发主管)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (首席网站管理员和 DUCO 开发人员)
+*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (首席网站管理员和 DUCO 开发人员)
 ##
 *   [@Pripun](https://github.com/Pripun) (移动应用开发)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) 开发工程师)
