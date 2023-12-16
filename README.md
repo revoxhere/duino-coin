@@ -16,6 +16,8 @@
     <img src="https://img.shields.io/badge/English-ff8502.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_es_LATAM.md">
     <img src="https://img.shields.io/badge/-Espa%C3%B1ol-ff7421?style=for-the-badge" /></a>
+  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_zh_TW.md">
+    <img src="https://img.shields.io/badge/繁體中文-ff6137.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_zh_CN.md">
     <img src="https://img.shields.io/badge/简体中文-ff6137.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_pl_PL.md">
