@@ -5,21 +5,19 @@
 #include <string.h>
 
 template <unsigned int max_digits>
-class Counter
-{
+class Counter {
+
 public:
   Counter() { reset(); }
 
-  void reset()
-  {
+  void reset() {
     memset(buffer, '0', max_digits);
     buffer[max_digits] = '\0';
     val = 0;
     len = 1;
   }
 
-  inline Counter &operator++()
-  {
+  inline Counter &operator++() {
     inc_string(buffer + max_digits - 1);
     ++val;
     return *this;
@@ -30,19 +28,16 @@ public:
   inline size_t strlen() const { return len; }
 
 protected:
-  inline void inc_string(char *c)
-  {
-    // In theory, the line below should be uncommented to avoid writing outside the buffer.  In practice however,
-    // with max_digits set to 10 or more, we can fit all possible unsigned 32-bit integers in the buffer.  The
-    // check is skipped to gain a small extra speed improvement.
+  inline void inc_string(char *c) {
+    // In theory, the line below should be uncommented to avoid writing outside the buffer. In practice however,
+    // with max_digits set to 10 or more, we can fit all possible unsigned 32-bit integers in the buffer.
+    // The check is skipped to gain a small extra speed improvement.
     // if (c >= buffer) return;
 
-    if (*c < '9')
-    {
+    if (*c < '9') {
       *c += 1;
     }
-    else
-    {
+    else {
       *c = '0';
       inc_string(c - 1);
       len = max(max_digits - (c - buffer) + 1, len);
