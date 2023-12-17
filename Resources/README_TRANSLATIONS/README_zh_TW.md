@@ -17,6 +17,8 @@
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_es_LATAM.md">
     <img src="https://img.shields.io/badge/-Espa%C3%B1ol-ff7421?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_zh_CN.md">
+    <img src="https://img.shields.io/badge/繁體中文-ff6137.svg?style=for-the-badge" /></a>
+  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_zh_CN.md">
     <img src="https://img.shields.io/badge/简体中文-ff6137.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_pl_PL.md">
     <img src="https://img.shields.io/badge/Polski-ff4b4c.svg?style=for-the-badge" /></a>
@@ -52,27 +54,27 @@
 <br>
 
 <h3>
-  Duino-Coin 是一种可以使用 Arduinos、ESP8266/32 开发板、Raspberry Pi、计算机等进行挖掘的硬币
-  （包括 Wi-Fi 路由器、智能电视、智能手机、智能手表、SBC、MCU 甚至 GPU） 
+    Duino-Coin 是一種可以使用 Arduinos、ESP8266/32 開發板、Raspberry Pi、電腦等進行挖掘的虛擬貨幣硬幣
+    （包括 Wi-Fi 路由器、智慧型電視、智慧型手機、智慧型手錶、SBC、MCU 甚至 GPU）。
   </h3>
 
 
-| 主要特点 | 技术规格 | 支持(超级多) 单板计算机 |
+| 主要特色 | 技術規格 | 支援(超級多) 單板微電腦 |
 |-|-|-|
-| 💻 得到大量平台的支持<br>👥 快速增长的社区<br>💱 易于使用和交换<br>(在 DUCO Exchange、Node-S、JustSwap 上)<br>🌎 随处可用<br>:创新：完全原创和开源项目<br>🌳 对初学者和环保主义者友好<br>💰 经济高效且易于开采 | ⚒️ 算法: DUCO-S1, XXHASH,<br>更多计划（包括PoS） <br>♐ 奖励：“Kolka系统”支持<br>帮助公平奖励矿工<br>⚡ 交易时间：即时<br>🪙 硬币供应：无限<br>(2020 年 12 月之前：350k Duco币)<br>(未来有新的限制计划)<br>🔤 代码: DUCO (ᕲ)<br>🔢 小数：最多 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, 等等.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, 等等.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, 等等.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, 等等.)<br>⚡ Teensy 4.1 boards |
+| 💻 得到大量平台的支援<br>👥 快速成長的社群<br>💱 簡單使用和交換<br>(在 DUCO Exchange、Node-S、JustSwap 上)<br>🌎 隨處可用<br>:創新：完全原創及開源<br>🌳 對初學者及環境友好<br>💰 經濟效益高容易開採 | ⚒️ 演算法: DUCO-S1, XXHASH,<br>更多計畫（包括PoS） <br>♐ 獎勵：“Kolka系統”支援<br>幫助公平獎勵礦工<br>⚡ 交易時間：即時<br>🪙 硬幣供應：無限<br>(2020 年 12 月之前：350k Duco幣)<br>(未來有新的限制計畫)<br>🔤 代码: DUCO (ᕲ)<br>🔢 小數：最多 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, 等等.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, 等等.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, 等等.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, 等等.)<br>⚡ Teensy 4.1 boards |
 
 
-## 入门
+## 入門
 
-#### 开始使用 Duino-Coin 的最简单方法是为您的操作系统下载 [最新版发行包](https://github.com/revoxhere/duino-coin/releases/latest) .<br>
-下载发行版后，解压缩并启动所需的程序。<br>
-不需要依赖项。
+#### 開始使用 Duino-Coin 的最簡單方法是為您的作業系統下載 [最新版軟體](https://github.com/revoxhere/duino-coin/releases/latest) .<br>
+下載發行版軟體後，解壓縮並啟動所需的步驟。<br>
+不需要依賴程式。
 
-如果需要帮助，可以查看 <a href="https://duinocoin.com/getting-started">官方入门指南</a>.<br>
-常见问题解答和故障排除帮助可以在  [Wikis](https://github.com/revoxhere/duino-coin/wiki)中找到.<br>
+如果需要協助，可以查看 <a href="https://duinocoin.com/getting-started">官方入門指南</a>.<br>
+常見問題解答及排除故障可以在 [Wikis](https://github.com/revoxhere/duino-coin/wiki)中找到.<br>
 
 
-### 手动安装
+### 手動安裝
 
 #### Linux
 
@@ -89,18 +91,18 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 
 #### Windows
 
-1. 下载安装[Python 3](https://www.python.org/downloads/) (确保将 Python 和 Pip 添加到您的 PATH)
-2. 下载[Duino-Coin仓库](https://github.com/revoxhere/duino-coin/archive/master.zip)
-3. 解压缩您下载的 zip 存档并在命令提示符下打开该文件夹
-4. 在命令提示符下输入`py -m pip install -r requirements.txt` 来安装所需的pip依赖项
+1. 下載安裝[Python 3](https://www.python.org/downloads/) (請將 Python 和 Pip 新增至系統 PATH)
+2. 下載[Duino-Coin倉庫](https://github.com/revoxhere/duino-coin/archive/master.zip)
+3. 解壓縮您下載的 ZIP 檔案並在令命提示字元下打開此文件夾
+4. 在令命提示字元下輸入`py -m pip install -r requirements.txt` 來安裝所需的pip依賴程式
 
-完成此操作后，您就可以启动软件了（只需双击所需的“.py”文件或在命令提示符中键入“py PC_Miner.py”）。
+完成此操作後，您就可以啟動軟體了，（只需雙擊所需的“.py”檔案或在令命提示字元下輸入“py PC_Miner.py”）。
 
-## 社区制作的软件
+## 社群製作的軟體
 
 <details>
   <summary>
-    由于该列表变得非常长，因此默认情况下它已折叠。单击此文本以展开它！
+    由於該列表非常長，因此默認情況下會收折。您可單擊此文件展開！
   </summary>
 
 
@@ -144,8 +146,8 @@ After doing this, you are good to go with launching the software (e.g. `python3 
   *   [Duino Stats](https://github.com/Bilaboz/duino-stats) official Discord bot by Bilaboz
   *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI Wallet by viktor02
 
-  此列表将被积极更新。如果您想将软件添加到此列表中，请提交 PR 或联系其中一位开发人员。
-  您也可以在[官网](https://duinocoin.com/apps)上查看类似的列表。
+  此列表將積極更新。如果您想將軟體添加在此列表，請提交 PR 或連繫其中一位開發人員。
+  您也可以在[官方網站](https://duinocoin.com/apps)上查看類似的列表。
 </details>
 
 ## DUCO & wDUCO
@@ -155,30 +157,30 @@ Duino-Coin 是一种混合货币，意味着它可以转换为 wDUCO，wDUCO 是
 
 ## Development
 
-贡献使开源社区成为学习、启发和创造的绝佳场所。<br>
-非常感谢您对 Duino-Coin 项目所做的任何贡献。
+貢獻使開源社群成為學習、啟發和創造的絕佳場所。<br>
+非常感謝您對 Duino-Coin 項目做的任何貢獻。
 
 如何帮助？
 
-*   分叉项目
-*   创建您的功能分支
+*   分岔項目
+*   創建您的功能分支
 *   提交您的更改
-*   确保一切按预期工作
-*   打开拉取请求
+*   確保一切按預期工作
+*   打開拉取請求
 
-服务器源代码、API调用文档和为Duino-Coin开发自己的应用程序的官方库在[有用工具](https://github.com/revoxhere/duino-coin/tree/useful-tools)分支中提供.
+伺服器代碼、API開發文件和為Duino-Coin開發自己的應用程式的官方庫在[有用工具](https://github.com/revoxhere/duino-coin/tree/useful-tools)分支中提供.
 
 
-## 官方测试设备和单板计算机的数据
+## 官方測試數據和單板電腦的數據
 
 <details>
   <summary>
-    由于该表变得非常长，因此默认情况下它是折叠的。 单击此文本以展开它！
+    由於該列表非常長，因此默認情況下會收折。您可單擊此文件展開！
   </summary>
 
-  ### 请注意，目前奖励正在更改为对数并且表格不准确。
+  ### 請注意，目前獎勵正在更改為對數且表格不準確，僅供參考。
   
-  | 设备/CPU/SBC/MCU/chip                                     | 平均算力<br>(所有线程)              | 采矿<br>线程       | 耗电<br>       | 每日收益<br>DUCO/day |
+  | 設備/CPU/SBC/MCU/chip                                     | 平均算力<br>(所有線程)              | 挖礦<br>線程       | 耗電<br>       | 每日收益<br>DUCO/day |
   |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
   | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 196 H/s                           | 1                 | 0.2 W          | 9-10                |
   | Teensy 4.1 (soft cryptography)                            | 80 kH/s                           | 1                 | 0.5 W          | -                   |
@@ -203,60 +205,60 @@ Duino-Coin 是一种混合货币，意味着它可以转换为 wDUCO，wDUCO 是
   | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | -                   |
   | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 67 W           | 15.44               |
 
-  所有测试均使用 DUCO-S1 算法进行。该表将积极更新。
+  所有測試均使用 DUCO-S1 演算馬進行。此表將積極更新。
 </details>
 
 
-## 许可证
+## 許可證
 
-Duino-Coin 主要在 MIT 许可证下分发。有关更多信息，请参阅“许可证”文件。
-一些第三方包含的文件可能有不同的许可证 - 请检查他们的“LICENSE”声明（通常在源代码文件的顶部）。
+Duino-Coin 主要在 MIT 許可證下分發。有關更多信息，請參閱“許可證”文件。
+一些第三方包含的文件可能有不同的許可證 - 請檢查他們的“LICENSE”聲明（通常在源代碼文件的頂部）。
 
 ## 服务条款
-1. Duino-Coins ("DUCOs") 是由矿工通过一个称为挖矿的过程获得的。<br/>
-2. 挖矿被描述为使用 DUCO-S1（和 XXHASH）算法(如 <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin 白皮书</a>)中所述, 找到数学问题的正确结果会给矿工一个奖励。<br/>
-3. 官方可以使用CPU、AVR板（如Arduino板）、单板机（如Raspberry Pi板）、ESP32/8266板，使用官方矿机进行挖矿（其他官方允许的矿机在本README的上半部分说明）。<br/>
-4. 允许在GPU、FPGA等高效硬件上挖矿，但只能使用“EXTREME”挖矿难度。<br/>
-5. 任何用户在不适合其硬件的难度下使用矿机 (请参阅 <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">难度列表</a>) 将通过移动到正确的难度等级来自动限制。<br/>
-6. 任何用户不断尝试使用比其适合的难度更低的难度可能会被暂时阻止。<br/>
-7. 禁止包括阻止用户访问他的硬币以及删除帐户。<br/>
-8. 只有合法赚取的硬币才有资格兑换。<br/>
-9. 帐户可能会被暂时暂停以调查（“调查”）ToS 违规（“违规”或“滥用”）。<br/>
-10. 向官方 DUCO-Exchange（“官方交易所”）提出的交换请求可能会在调查期间被延迟和/或拒绝。 <br/>
-11. 向官方交易所提出的交易所请求可能会因违反 ToS 和/或资金不足而被拒绝。<br/>
-12. 不允许使用免费的云托管服务（或免费的 VPS 服务 - 例如 Repl.it、GitHub Actions 等）进行挖矿，因为这对其他人不公平。<br />
-13. 如果可以证明违规，用户的 DUCO 可能会被烧毁。<br/>
-14. 本服务条款可随时更改，恕不另行通知。<br/>
-15. 每位使用Duino-Coin的用户均同意遵守以上规则。<br/>
+1. Duino-Coins ("DUCOs") 是由礦工通過一個稱為挖礦的過程獲得的。<br/>
+2. 挖礦被描述為使用 DUCO-S1（和 XXHASH）算法（如 <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin 白皮書</a> 中所述），找到數學問題的正確結果會給礦工一個獎勵。<br/>
+3. 官方可以使用CPU、AVR板（如Arduino板）、單板機（如Raspberry Pi板）、ESP32/8266板，使用官方礦機進行挖礦（其他官方允許的礦機在本 README 的上半部分說明）。<br/>
+4. 允許在GPU、FPGA等高效硬件上挖礦，但只能使用“EXTREME”挖礦難度。<br/>
+5. 任何用戶在不適合其硬件的難度下使用礦機 (請參閱 <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#socket-api">難度列表</a>) 將通過移動到正確的難度等級來自動限制。<br/>
+6. 任何用戶不斷嘗試使用比其適合的難度更低的難度可能會被暫時阻止。<br/>
+7. 禁止包括阻止用戶訪問他的硬幣以及刪除帳戶。<br/>
+8. 只有合法賺取的硬幣才有資格兌換。<br/>
+9. 帳戶可能會被暫時暫停以調查（“調查”）ToS 違規（“違規”或“濫用”）。<br/>
+10. 向官方 DUCO-Exchange（“官方交易所”）提出的交換請求可能會在調查期間被延遲和/或拒絕。 <br/>
+11. 向官方交易所提出的交易所請求可能會因違反 ToS 和/或資金不足而被拒絕。<br/>
+12. 不允許使用免費的雲托管服務（或免費的 VPS 服務 - 例如 Repl.it、GitHub Actions 等）進行挖礦，因為這對其他人不公平。<br />
+13. 如果可以證明違規，用戶的 DUCO 可能會被燒毀。<br/>
+14. 本服務條款可隨時更改，恕不另行通知。<br/>
+15. 每位使用 Duino-Coin 的用戶均同意遵守以上規則。<br/>
 
 
-## 隐私政策
-1. 在主服务器上，我们只存储用户名、散列密码（在 bcrypt 的帮助下）和用户的电子邮件作为他们的帐户数据。<br/>
-2. 电子邮件不公开，仅用于在需要时、确认<a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> 交易时、和在接收不定期的时事通讯（为未来计划）联系用户。<br/>
-3. 余额、交易和挖矿相关数据在公共 <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>.<br/>中公开可用。
-4. 隐私政策将来可能会在事先通知的情况下更改。
+## 隱私政策
+1. 在主伺服器上，我們只存儲用戶名、散列密碼（在 bcrypt 的幫助下）和用戶的電子郵件作為他們的帳戶數據。<br/>
+2. 電子郵件不公開，僅用於在需要時、確認<a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> 交易時、和在接收不定期的時事通訊（為未來計劃）聯繫用戶。<br/>
+3. 余額、交易和挖礦相關數據在公共 <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>中公開可用。
+4. 隱私政策將來可能會在事先通知的情況下更改。
 
 
-## 活跃的项目维护者
+## 活耀的項目維護者
 
-*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Python 开发主管，项目创始人)
-*   [@Bilaboz](https://github.com/bilaboz/) (NodeJS 开发主管)
-*   [@connorhess](https://github.com/connorhess) (Python 开发主管，Node-S 所有者)
-*   [@JoyBed](https://github.com/JoyBed) (AVR 开发主管)
-*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (首席网站管理员和 DUCO 开发人员)
+*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Python 开发主管，項目創始人)
+*   [@Bilaboz](https://github.com/bilaboz/) (NodeJS 開發主管)
+*   [@connorhess](https://github.com/connorhess) (Python 開發主管，Node-S 所有者)
+*   [@JoyBed](https://github.com/JoyBed) (AVR 開發主管)
+*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (首席網站管理員和 DUCO 開發人员)
 ##
-*   [@Pripun](https://github.com/Pripun) (移动应用开发)
-*   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) 开发工程师)
-*   [@DoctorEenot](https://github.com/DoctorEenot) (开发工程师)
-*   [@LDarki](https://github.com/LDarki) (网络开发)
-*   [@Lulaschkas](https://github.com/Lulaschkas) (开发工程师)
+*   [@Pripun](https://github.com/Pripun) (移動程式開發)
+*   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) 開發工程师)
+*   [@DoctorEenot](https://github.com/DoctorEenot) (開發工程师)
+*   [@LDarki](https://github.com/LDarki) (网络開發)
+*   [@Lulaschkas](https://github.com/Lulaschkas) (開發工程师)
 ##
-*   [@joaquinbvw](https://github.com/joaquinbvw) (AVR开发工程师)
+*   [@joaquinbvw](https://github.com/joaquinbvw) (AVR開發工程师)
 
-另外，非常感谢所有帮助开发 Duino-Coin 项目的 [贡献者](https://github.com/revoxhere/duino-coin/graphs/contributors) 。
+另外，非常感谢所有幫助開發 Duino-Coin 項目的 [貢獻者](https://github.com/revoxhere/duino-coin/graphs/contributors) 。
 
 <hr>
 
-项目链接: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
+項目連結: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
 <br/>
-网站链接: [https://duinocoin.com/](https://duinocoin.com/)
+網站連結: [https://duinocoin.com/](https://duinocoin.com/)
