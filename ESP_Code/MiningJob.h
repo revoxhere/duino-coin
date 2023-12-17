@@ -112,11 +112,9 @@ public:
             ctx.write((const unsigned char *)counter.c_str(), counter.strlen()).finalize(hashArray);
 
             #if CORE == 1
-                #if defined(ESP8266)
-                    ESP.wdtFeed();
-                #else
-                    yield();
-                #endif
+                yield();
+            #elif defined(ESP8266)
+                ESP.wdtFeed();
             #endif
 
             if (memcmp(getExpectedHash(), hashArray, 20) == 0) {
