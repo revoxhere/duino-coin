@@ -279,7 +279,7 @@ Algunos archivos de terceros incluídos pueden tener distintas licencias - por f
 *   [@connorhess](https://github.com/connorhess) (Desarrollador jefe en python, Dueño de Node-S)
 *   [@JoyBed](https://github.com/JoyBed) (Desarrollador jefe de AVR)
 *   [@Yennefer](https://www.instagram.com/vlegle/) (Manager Social Jefe)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Webmaster Jefe y Desarrollador de DUCO)
+*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (Webmaster Jefe y Desarrollador de DUCO)
 *   [@ygboucherk](https://github.com/ygboucherk) (Desarrollador de [wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2))
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Desarrollador)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (Desarrollador de AVR)

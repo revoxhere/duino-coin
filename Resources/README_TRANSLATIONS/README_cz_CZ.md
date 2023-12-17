@@ -270,7 +270,7 @@ Některé zahrnuté soubory třetích stran mohou mít odlišné licence – zko
 *   [@connorhess](https://github.com/connorhess) (Vedoucí Python vývojář, vlastník Node-S)
 *   [@JoyBed](https://github.com/JoyBed) (Vedoucí AVR vývojář)
 *   [@Yennefer](https://www.instagram.com/vlegle/) (Vedoucí správkyně sociálních sítí)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Vedoucí webmaster a vývojář DUCO)
+*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (Vedoucí webmaster a vývojář DUCO)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) vývojář)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (vývojář)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR vývojář)

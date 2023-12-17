@@ -266,7 +266,7 @@ Joissakin kolmannen osapuolen tiedostoissa saattaa olla erilaiset lisenssit - ta
 *   [@connorhess](https://github.com/connorhess) (Johtava Python-kehittäjä, Node-S:n omistaja)
 *   [@JoyBed](https://github.com/JoyBed) (Johtava AVR-kehittäjä)
 *   [@Yennefer](https://www.instagram.com/vlegle/) (Johtava sosiaalisen median manageri)
-*   [@Tech1k](https://github.com/Tech1k/) - kristian@beyondcoin.io (Johtava Webmaster ja DUCO-kehittäjä)
+*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (Johtava Webmaster ja DUCO-kehittäjä)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) kehittäjä)
 *   [@Lulaschkas](https://github.com/Lulaschkas) (Kehittäjä)
 *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR kehittäjä)
