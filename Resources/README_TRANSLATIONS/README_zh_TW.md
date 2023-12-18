@@ -214,7 +214,7 @@ Duino-Coin 是一种混合货币，意味着它可以转换为 wDUCO，wDUCO 是
 Duino-Coin 主要在 MIT 許可證下分發。有關更多信息，請參閱“許可證”文件。
 一些第三方包含的文件可能有不同的許可證 - 請檢查他們的“LICENSE”聲明（通常在源代碼文件的頂部）。
 
-## 服务条款
+## 服務條款
 1. Duino-Coins ("DUCOs") 是由礦工通過一個稱為挖礦的過程獲得的。<br/>
 2. 挖礦被描述為使用 DUCO-S1（和 XXHASH）算法（如 <a href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf">Duino-Coin 白皮書</a> 中所述），找到數學問題的正確結果會給礦工一個獎勵。<br/>
 3. 官方可以使用CPU、AVR板（如Arduino板）、單板機（如Raspberry Pi板）、ESP32/8266板，使用官方礦機進行挖礦（其他官方允許的礦機在本 README 的上半部分說明）。<br/>
@@ -235,13 +235,13 @@ Duino-Coin 主要在 MIT 許可證下分發。有關更多信息，請參閱“�
 ## 隱私政策
 1. 在主伺服器上，我們只存儲用戶名、散列密碼（在 bcrypt 的幫助下）和用戶的電子郵件作為他們的帳戶數據。<br/>
 2. 電子郵件不公開，僅用於在需要時、確認<a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> 交易時、和在接收不定期的時事通訊（為未來計劃）聯繫用戶。<br/>
-3. 余額、交易和挖礦相關數據在公共 <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>中公開可用。
+3. 餘額、交易和挖礦相關數據在公共 <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>中公開可用。
 4. 隱私政策將來可能會在事先通知的情況下更改。
 
 
 ## 活耀的項目維護者
 
-*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Python 开发主管，項目創始人)
+*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Python 開發主管，專案創始人)
 *   [@Bilaboz](https://github.com/bilaboz/) (NodeJS 開發主管)
 *   [@connorhess](https://github.com/connorhess) (Python 開發主管，Node-S 所有者)
 *   [@JoyBed](https://github.com/JoyBed) (AVR 開發主管)
@@ -262,3 +262,4 @@ Duino-Coin 主要在 MIT 許可證下分發。有關更多信息，請參閱“�
 項目連結: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
 <br/>
 網站連結: [https://duinocoin.com/](https://duinocoin.com/)
+本繁體中文由 Microlan Steven.Chen 翻譯
