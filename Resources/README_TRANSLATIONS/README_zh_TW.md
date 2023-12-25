@@ -16,7 +16,7 @@
     <img src="https://img.shields.io/badge/English-ff8502.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_es_LATAM.md">
     <img src="https://img.shields.io/badge/-Espa%C3%B1ol-ff7421?style=for-the-badge" /></a>
-  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_zh_CN.md">
+  <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_zh_TW.md">
     <img src="https://img.shields.io/badge/繁體中文-ff6137.svg?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_zh_CN.md">
     <img src="https://img.shields.io/badge/简体中文-ff6137.svg?style=for-the-badge" /></a>
@@ -61,7 +61,7 @@
 
 | 主要特色 | 技術規格 | 支援(超級多) 單板微電腦 |
 |-|-|-|
-| 💻 得到大量平台的支援<br>👥 快速成長的社群<br>💱 簡單使用和交換<br>(在 DUCO Exchange、Node-S、JustSwap 上)<br>🌎 隨處可用<br>:創新：完全原創及開源<br>🌳 對初學者及環境友好<br>💰 經濟效益高容易開採 | ⚒️ 演算法: DUCO-S1, XXHASH,<br>更多計畫（包括PoS） <br>♐ 獎勵：“Kolka系統”支援<br>幫助公平獎勵礦工<br>⚡ 交易時間：即時<br>🪙 硬幣供應：無限<br>(2020 年 12 月之前：350k Duco幣)<br>(未來有新的限制計畫)<br>🔤 代码: DUCO (ᕲ)<br>🔢 小數：最多 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, 等等.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, 等等.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, 等等.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, 等等.)<br>⚡ Teensy 4.1 boards |
+| 💻 得到大量平台的支援<br>👥 快速成長的社群<br>💱 簡單使用和交換<br>(在 DUCO Exchange、Node-S、JustSwap 上)<br>🌎 隨處可用<br>:創新：完全原創及開源<br>🌳 對初學者及環境友好<br>💰 經濟效益高容易開採 | ⚒️ 演算法: DUCO-S1, XXHASH,<br>更多計畫（包括PoS） <br>♐ 獎勵：“Kolka系統”支援<br>幫助公平獎勵礦工<br>⚡ 交易時間：即時<br>🪙 硬幣供應：無限<br>(2020 年 12 月之前：350k Duco幣)<br>(未來有新的限制計畫)<br>🔤 代碼: DUCO (ᕲ)<br>🔢 小數：最多 20 | ♾️ Arduinos<br>(Uno, Nano, Mega, Due, Pro Mini, 等等.)<br>📶 ESP8266s<br>(NodeMCU, Wemos, 等等.)<br>📶 ESP32s<br>(ESP-WROOM, ESP32-CAM, 等等.)<br>🍓 Raspberry Pis<br>(1, 2, Zero (W/WH), 3, 4, Pico, 400)<br>🍊 Orange Pis<br>(Zero, Zero 2, PC, Plus, 等等.)<br>⚡ Teensy 4.1 boards |
 
 
 ## 入門
@@ -152,15 +152,14 @@ After doing this, you are good to go with launching the software (e.g. `python3 
 
 ## DUCO & wDUCO
 
-Duino-Coin 是一种混合货币，意味着它可以转换为 wDUCO，wDUCO 是包裹在 [Tron](https://tron.network) 网络上的 DUCO（作为代币）。目前它的用途并不多，除了只是将资金存储在外部钱包中或将 wDUCO 交换为 JustSwap 上的另一个令牌。 [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial) 中提供了使用 wDUCO 的教程。
-
+Duino-Coin 是一種混合貨幣，意味著它可以轉換為 wDUCO，wDUCO 是包裝在 [Tron](https://tron.network) 網絡上的 DUCO（作為代幣）。目前它的用途並不多，除了僅是將資金存儲在外部錢包中或將 wDUCO 交換為 JustSwap 上的另一個代幣。 [wDUCO wiki](https://github.com/revoxhere/duino-coin/wiki/wDUCO-tutorial) 中提供了使用 wDUCO 的教學。
 
 ## Development
 
 貢獻使開源社群成為學習、啟發和創造的絕佳場所。<br>
 非常感謝您對 Duino-Coin 項目做的任何貢獻。
 
-如何帮助？
+如何幫助？
 
 *   分岔項目
 *   創建您的功能分支
@@ -205,7 +204,7 @@ Duino-Coin 是一种混合货币，意味着它可以转换为 wDUCO，wDUCO 是
   | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | -              | -                   |
   | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 67 W           | 15.44               |
 
-  所有測試均使用 DUCO-S1 演算馬進行。此表將積極更新。
+  所有測試均使用 DUCO-S1 演算法進行。此表將積極更新。
 </details>
 
 
@@ -233,7 +232,7 @@ Duino-Coin 主要在 MIT 許可證下分發。有關更多信息，請參閱“�
 
 
 ## 隱私政策
-1. 在主伺服器上，我們只存儲用戶名、散列密碼（在 bcrypt 的幫助下）和用戶的電子郵件作為他們的帳戶數據。<br/>
+1. 在主伺服器上，我們只儲存用戶名、散列密碼（在 bcrypt 的協助下）和用戶的電子郵件作為他們的帳戶數據。<br/>
 2. 電子郵件不公開，僅用於在需要時、確認<a href="https://revoxhere.github.io/duco-exchange/">DUCO-Exchange</a> 交易時、和在接收不定期的時事通訊（為未來計劃）聯繫用戶。<br/>
 3. 餘額、交易和挖礦相關數據在公共 <a href="https://github.com/revoxhere/duino-coin/tree/useful-tools#http-json-api">JSON APIs</a>中公開可用。
 4. 隱私政策將來可能會在事先通知的情況下更改。
@@ -262,4 +261,5 @@ Duino-Coin 主要在 MIT 許可證下分發。有關更多信息，請參閱“�
 項目連結: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
 <br/>
 網站連結: [https://duinocoin.com/](https://duinocoin.com/)
-本繁體中文由 Microlan Steven.Chen 翻譯
+<br/>
+本繁體中文由 Microlan Group Steven.Chen 翻譯
