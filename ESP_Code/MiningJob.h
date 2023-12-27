@@ -28,17 +28,6 @@ const uint8_t base36CharValues[75] PROGMEM{
 #define SEP_TOKEN ','
 #define IOT_TOKEN '@'
 
-#if defined(ESP8266)
-    // ESP8266
-    #define LED_BUILTIN 15
-#elif defined(CONFIG_FREERTOS_UNICORE) 
-    // ESP32-S2
-    #define LED_BUILTIN 15
-#else
-    // ESP32
-    #define LED_BUILTIN 2
-#endif
-
 struct MiningConfig {
     String host = "";
     int port = 0;
@@ -48,6 +37,8 @@ struct MiningConfig {
     String MINER_VER = SOFTWARE_VERSION;
     #if defined(ESP8266)
         String START_DIFF = "ESP8266H";
+    #elif defined(CONFIG_FREERTOS_UNICORE)
+        String START_DIFF = "ESP32S";
     #else
         String START_DIFF = "ESP32";
     #endif
@@ -102,7 +93,7 @@ public:
 
         dsha1->reset().write((const unsigned char *)getLastBlockHash().c_str(), getLastBlockHash().length());
 
-        float start_time = micros();
+        int start_time = micros();
         max_micros_elapsed(start_time, 0);
         #if defined(LED_BLINKING)
             digitalWrite(LED_BUILTIN, LOW);
@@ -294,7 +285,8 @@ private:
                          SEP_TOKEN + "Temp:" + String(temp) + 
                          IOT_TOKEN + "Hum:" + String(hum) +
                          END_TOKEN);
-        #else 
+        #else
+            Serial.println("");
             client.print("JOB," +
                          String(config->DUCO_USER) +
                          SEP_TOKEN + config->START_DIFF + 
