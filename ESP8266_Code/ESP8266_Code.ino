@@ -55,6 +55,9 @@
 // If you don't know what MQTT means check this link:
 // https://www.techtarget.com/iotagenda/definition/MQTT-MQ-Telemetry-Transport
 
+// Uncomment the line below if you wish to use Telnet connection
+#define USE_TELNET
+
 #ifdef USE_DHT
 float temp = 0.0;
 float hum = 0.0;
@@ -132,8 +135,17 @@ void mqttReconnect()
 }
 #endif
 
+#ifdef USE_TELNET
+uint8_t i;
+bool ConnectionEstablished; // Flag for successfully handled connection
+#define MAX_TELNET_CLIENTS 2
+WiFiServer TelnetServer(23);
+WiFiClient TelnetClient[MAX_TELNET_CLIENTS];
+#endif
+
 namespace
 {
+// Change the part in brackets to your Duino-Coin username
 // Change the part in brackets to your Duino-Coin username
 const char *DUCO_USER = "USERNAME";
 // Change the part in brackets to your mining key (if you have enabled it in the wallet)
@@ -207,7 +219,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                         <div class="columns is-multiline">
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    <span id="hashratex">@@HASHRATE@@</span>kH/s
+                                    <span id="hashratex">@@HASHRATE@@</span> kH/s
                                 </div>
                                 <div class="heading is-size-5">
                                     Hashrate
@@ -223,7 +235,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                             </div>
                             <div class="column" style="min-width:15em">
                                 <div class="title is-size-5 mb-0">
-                                    @@SHARES@@
+                                    <span id="sharex">@@SHARES@@</span> 
                                 </div>
                                 <div class="heading is-size-5">
                                     Shares
@@ -322,10 +334,10 @@ const char WEBSITE[] PROGMEM = R"=====(
         </div>
         <script>
             setInterval(function(){
-                getData();
+                getDatahashrate();
             }, 3000);
             
-            function getData() {
+            function getDatahashrate() {
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
@@ -336,16 +348,130 @@ const char WEBSITE[] PROGMEM = R"=====(
                 xhttp.send();
             }
         </script>
+        <script>
+            setInterval(function(){
+                getDatashares();
+            }, 15000);
+            
+            function getDatashares() {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("sharex").innerHTML = this.responseText;
+                    }
+                };
+                xhttp.open("GET", "shareread", true);
+                xhttp.send();
+            }
+        </script>
     </section>
 </body>
 </html>
 )=====";
+
+#ifdef USE_TELNET
+void TelnetMsg(String text)
+{
+  for(i = 0; i < MAX_TELNET_CLIENTS; i++)
+  {
+    if (TelnetClient[i] || TelnetClient[i].connected())
+    {
+      TelnetClient[i].println(text);
+    }
+  }
+  delay(10);  // to avoid strange characters left in buffer
+}
+
+// https://www.nikolaus-lueneburg.de/2017/09/wifi-telnet-server-auf-dem-esp8266/
+// English Google translation:
+// https://www-nikolaus--lueneburg-de.translate.goog/2017/09/wifi-telnet-server-auf-dem-esp8266/?_x_tr_sl=de&_x_tr_tl=en&_x_tr_hl=de&_x_tr_pto=wapp
+// Connect with Telnet client to read messages
+// changes from original
+
+void Telnet() {
+  String readTelnet;
+  // Cleanup disconnected session
+  for(i = 0; i < MAX_TELNET_CLIENTS; i++)
+  {
+    if (TelnetClient[i] && !TelnetClient[i].connected())
+    {
+      Serial.print("Client disconnected ... terminate session "); Serial.println(i+1); 
+      TelnetClient[i].stop();
+    }
+  }
+  
+  // Check new client connections
+  if (TelnetServer.hasClient())
+  {
+    ConnectionEstablished = false; // Set to false
+    
+    for(i = 0; i < MAX_TELNET_CLIENTS; i++)
+    {
+      // Serial.print("Checking telnet session "); Serial.println(i+1);
+      
+      // find free socket
+      if (!TelnetClient[i])
+      {
+        TelnetClient[i] = TelnetServer.available(); 
+        
+        Serial.print("New Telnet client connected to session "); Serial.println(i+1);
+        
+        TelnetClient[i].flush();  // clear input buffer, else you get strange characters
+        TelnetClient[i].println("Welcome!");
+        
+        TelnetClient[i].print("Seconds since start: ");
+        TelnetClient[i].println(millis()/1000);
+        
+        TelnetClient[i].print("Free Heap RAM: ");
+        TelnetClient[i].println(ESP.getFreeHeap());
+  
+        TelnetClient[i].println("----------------------------------------------------------------");
+        
+        ConnectionEstablished = true; 
+        
+        break;
+      }
+      else
+      {
+        // Serial.println("Session is in use");
+      }
+    }
+
+    if (ConnectionEstablished == false)
+    {
+      Serial.println("No free sessions ... drop connection");
+      TelnetServer.available().stop();
+      // TelnetMsg("An other user cannot connect ... MAX_TELNET_CLIENTS limit is reached!");
+    }
+  }
+
+  for(i = 0; i < MAX_TELNET_CLIENTS; i++)
+  {
+    if (TelnetClient[i] && TelnetClient[i].connected())
+    {
+      if(TelnetClient[i].available())
+      { 
+        //get data from the telnet client
+        while(TelnetClient[i].available())
+        {
+          Serial.write(TelnetClient[i].read());
+        }
+      }
+    }
+  }
+}
+#endif
 
 ESP8266WebServer server(80);
 
 void hashupdater(){ //update hashrate every 3 sec in browser without reloading page
   server.send(200, "text/plain", String(hashrate / 1000));
   Serial.println("Update hashrate on page");
+};
+
+void hashupdatershares(){ //update hashrate every 15 sec in browser without reloading page
+  server.send(200, "text/plain", String(share_count ));
+  Serial.println("Update shares on page");
 };
 
 void UpdateHostPort(String input) {
@@ -516,6 +642,9 @@ void handleSystemEvents(void) {
   VerifyWifi();
   ArduinoOTA.handle();
   yield();
+  #ifdef USE_TELNET
+  Telnet();  // Handle telnet connections
+  #endif
 }
 
 void waitForClientData(void) {
@@ -541,7 +670,7 @@ void ConnectToServer() {
   while (!client.connect(host.c_str(), port));
 
   waitForClientData();
-  Serial.println("Connected to the server. Server version: " + client_buffer );
+  Serial.println("Connected to the server. Server version: " + client_buffer);
   blink(BLINK_CLIENT_CONNECT); // Sucessfull connection with the server
 }
 
@@ -647,7 +776,11 @@ void setup() {
 
   SetupWifi();
   SetupOTA();
-
+  Serial.println("Starting Telnet server");
+  #ifdef USE_TELNET
+  TelnetServer.begin();
+  TelnetServer.setNoDelay(true);
+  #endif
   lwdtFeed();
   lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
   if (USE_HIGHER_DIFF) START_DIFF = "ESP8266NH";
@@ -665,6 +798,7 @@ void setup() {
                   + ")");
     server.on("/", dashboard);
     if (WEB_HASH_UPDATER) server.on("/hashrateread", hashupdater);
+    if (WEB_HASH_UPDATER) server.on("/shareread", hashupdatershares);
     server.begin();
   }
 
@@ -724,8 +858,11 @@ void loop() {
   #endif
 
   waitForClientData();
-  Serial.println("Received job with size of " + String(client_buffer));
 
+  Serial.println("Received job with size of " + String(client_buffer));
+  #ifdef USE_TELNET
+  TelnetMsg("Received job ... Mining now ");
+  #endif
   MiningJob job;
   job.parse((char*)client_buffer.c_str());
   difficulty = job.difficulty;
@@ -780,6 +917,17 @@ void loop() {
                      + " kH/s ("
                      + String(elapsed_time_s)
                      + "s)");
+      #ifdef USE_TELNET
+      TelnetMsg(client_buffer
+                     + " share #"
+                     + String(share_count)
+                     + " (" + String(duco_numeric_result) + ")"
+                     + " hashrate: "
+                     + String(hashrate / 1000, 2)
+                     + " kH/s ("
+                     + String(elapsed_time_s)
+                     + "s)");
+      #endif
       break;
     }
     if (max_micros_elapsed(micros(), 500000)) {
