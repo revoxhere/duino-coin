@@ -21,6 +21,17 @@ extern const char RIG_IDENTIFIER[] = "None";
 // Comment out the line below if you wish to disable LED blinking
 #define LED_BLINKING
 
+#if defined(ESP8266)
+    // ESP8266
+    #define LED_BUILTIN 2
+#elif defined(CONFIG_FREERTOS_UNICORE) 
+    // ESP32-S2
+    #define LED_BUILTIN 15
+#else
+    // ESP32
+    #define LED_BUILTIN 2
+#endif
+
 #define BLINK_SETUP_COMPLETE 2
 #define BLINK_CLIENT_CONNECT 5
 // -------------------------------------------------------------- //
