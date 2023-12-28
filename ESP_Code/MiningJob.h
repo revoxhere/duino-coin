@@ -23,10 +23,10 @@ const uint8_t base36CharValues[75] PROGMEM{
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35                    // Lower case letters
 };
 
-#define SPC_TOKEN ' '
+#define SPC_TOKEN " "
 #define END_TOKEN '\n'
-#define SEP_TOKEN ','
-#define IOT_TOKEN '@'
+#define SEP_TOKEN ","
+#define IOT_TOKEN "@"
 
 struct MiningConfig {
     String host = "";
@@ -36,17 +36,18 @@ struct MiningConfig {
     String MINER_KEY = "";
     String MINER_VER = SOFTWARE_VERSION;
     #if defined(ESP8266)
+        // "High-band" 8266 diff
         String START_DIFF = "ESP8266H";
     #elif defined(CONFIG_FREERTOS_UNICORE)
+        // Single core 32 diff
         String START_DIFF = "ESP32S";
     #else
+        // Normal 32 diff
         String START_DIFF = "ESP32";
     #endif
-    int walletid = 0;
 
     MiningConfig(String DUCO_USER, String RIG_IDENTIFIER, String MINER_KEY)
-            : DUCO_USER(DUCO_USER), RIG_IDENTIFIER(RIG_IDENTIFIER), MINER_KEY(MINER_KEY),
-                walletid(random(0, 2811)) {}
+            : DUCO_USER(DUCO_USER), RIG_IDENTIFIER(RIG_IDENTIFIER), MINER_KEY(MINER_KEY) {}
 };
 
 class MiningJob {
@@ -216,7 +217,7 @@ private:
                      SPC_TOKEN + config->MINER_VER +
                      SEP_TOKEN + config->RIG_IDENTIFIER +
                      SEP_TOKEN + "DUCOID" + String(chipID) +
-                     SEP_TOKEN + String(config->walletid) +
+                     SEP_TOKEN + String(WALLET_ID) +
                      END_TOKEN);
                      
         waitForClientData();
@@ -264,7 +265,7 @@ private:
         #if defined(USE_DS18B20)
             sensors.requestTemperatures(); 
             float temp = sensors.getTempCByIndex(0);
-            Serial.println("DS18B20 reading: " + String(temp) + "*C");
+            Serial.println("DS18B20 reading: " + String(temp) + "°C");
             
             client.print("JOB," +
                          String(config->DUCO_USER) +
@@ -275,7 +276,7 @@ private:
         #elif defined(USE_DHT)
             float temp = dht.readTemperature();
             float hum = dht.readHumidity();
-            Serial.println("DHT reading: " + String(temp) + "*C");
+            Serial.println("DHT reading: " + String(temp) + "°C");
             Serial.println("DHT reading: " + String(hum) + "%");
 
             client.print("JOB," +
@@ -284,6 +285,17 @@ private:
                          SEP_TOKEN + String(config->MINER_KEY) + 
                          SEP_TOKEN + "Temp:" + String(temp) + 
                          IOT_TOKEN + "Hum:" + String(hum) +
+                         END_TOKEN);
+        #elif defined(USE_INTERNAL_SENSOR)
+            float temp = 0;
+            temp_sensor_read_celsius(&temp);
+            Serial.println("Internal temp sensor reading: " + String(temp) + "°C");
+
+            client.print("JOB," +
+                         String(config->DUCO_USER) +
+                         SEP_TOKEN + config->START_DIFF + 
+                         SEP_TOKEN + String(config->MINER_KEY) + 
+                         SEP_TOKEN + "CPU Temp:" + String(temp) + 
                          END_TOKEN);
         #else
             client.print("JOB," +
