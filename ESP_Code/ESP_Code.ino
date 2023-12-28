@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for ESP8266/32 boards                version 4.0
+  Official code for all ESP8266/32 boards            version 4.0
   Main .ino file
 
   The Duino-Coin Team & Community 2019-2023 © MIT Licensed
@@ -258,6 +258,14 @@ void setup() {
     assert(CORE == 1 || CORE == 2);
 
     job[0] = new MiningJob(0, configuration);
+
+    #if defined(ESP8266)
+        // Fastest clock mode for 8266s
+        setCpuFrequencyMhz(160);
+    #else
+        // Fastest clock mode for 32s
+        setCpuFrequencyMhz(240);
+    #endif
 
     #if defined(USE_DHT)
         Serial.println("Initializing DHT sensor (Duino IoT)");
