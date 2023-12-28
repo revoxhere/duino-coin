@@ -55,7 +55,7 @@
 #endif
 
 // Auto adjust physical core count
-// (ESP32-S2 has 1 core, ESP32 has 2 cores, ESP8266 has 1 core)
+// (ESP32-S2/C3 have 1 core, ESP32 has 2 cores, ESP8266 has 1 core)
 #if defined(ESP8266)
     #define CORE 1
     typedef ESP8266WebServer WebServer;
@@ -208,7 +208,7 @@ namespace {
              #if defined(ESP8266)
                  s.replace("@@DEVICE@@", "ESP8266");
              #elif defined(CONFIG_FREERTOS_UNICORE)
-                 s.replace("@@DEVICE@@", "ESP32-S2");
+                 s.replace("@@DEVICE@@", "ESP32-S2/C3");
              #else
                  s.replace("@@DEVICE@@", "ESP32");
              #endif
@@ -251,34 +251,39 @@ void task2_func(void *) {
 }
 
 void setup() {
+    delay(500);
+    
     Serial.begin(500000);
-    Serial.println("\nDuino-Coin " + String(configuration->MINER_VER));
+    Serial.println("\n\nDuino-Coin " + String(configuration->MINER_VER));
     pinMode(LED_BUILTIN, OUTPUT);
 
     assert(CORE == 1 || CORE == 2);
-
+    WALLET_ID = String(random(0, 2811)); // Needed for miner grouping in the wallet
     job[0] = new MiningJob(0, configuration);
-
-    #if defined(ESP8266)
-        // Fastest clock mode for 8266s
-        system_update_cpu_freq(160);
-    #else
-        // Fastest clock mode for 32s
-        setCpuFrequencyMhz(240);
-    #endif
 
     #if defined(USE_DHT)
         Serial.println("Initializing DHT sensor (Duino IoT)");
         dht.begin();
         Serial.println("Test reading: " + String(dht.readHumidity()) + "% humidity");
-        Serial.println("Test reading: temperature " + String(dht.readTemperature()) + "*C");
+        Serial.println("Test reading: temperature " + String(dht.readTemperature()) + "°C");
     #endif
 
     #if defined(USE_DS18B20)
         Serial.println("Initializing DS18B20 sensor (Duino IoT)");
         sensors.begin();
         sensors.requestTemperatures(); 
-        Serial.println("Test reading: " + String(sensors.getTempCByIndex(0)) + "*C");
+        Serial.println("Test reading: " + String(sensors.getTempCByIndex(0)) + "°C");
+    #endif
+
+    #if defined(USE_INTERNAL_SENSOR)
+       Serial.println("Initializing internal ESP32 temperature sensor (Duino IoT)");
+       temp_sensor_config_t temp_sensor = TSENS_CONFIG_DEFAULT();
+       temp_sensor.dac_offset = TSENS_DAC_L2;
+       temp_sensor_set_config(temp_sensor);
+       temp_sensor_start();
+       float result = 0;
+       temp_sensor_read_celsius(&result);
+       Serial.println("Test reading: " + String(result) + "°C");
     #endif
 
     SetupWifi();
@@ -304,12 +309,16 @@ void setup() {
 }
 
 void loopOneCore() {
-    #if defined(ESP8266)
-        system_update_cpu_freq(SYS_CPU_160MHZ);
-    #endif
-
     job[0]->mine();
 
+    #if defined(ESP8266)
+        // Fastest clock mode for 8266s
+        system_update_cpu_freq(160);
+    #else
+        // Fastest clock mode for 32s
+        setCpuFrequencyMhz(240);
+    #endif
+    
     VerifyWifi();
     ArduinoOTA.handle();
     #if defined(WEB_DASHBOARD) 
