@@ -261,7 +261,7 @@ void setup() {
 
     #if defined(ESP8266)
         // Fastest clock mode for 8266s
-        setCpuFrequencyMhz(160);
+        system_update_cpu_freq(160);
     #else
         // Fastest clock mode for 32s
         setCpuFrequencyMhz(240);
