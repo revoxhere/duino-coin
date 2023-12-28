@@ -286,7 +286,6 @@ private:
                          IOT_TOKEN + "Hum:" + String(hum) +
                          END_TOKEN);
         #else
-            Serial.println("");
             client.print("JOB," +
                          String(config->DUCO_USER) +
                          SEP_TOKEN + config->START_DIFF + 
