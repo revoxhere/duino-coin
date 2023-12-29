@@ -1,3 +1,5 @@
+#pragma GCC optimize("-Ofast")
+
 #ifndef MINING_JOB_H
 #define MINING_JOB_H
 
@@ -23,10 +25,10 @@ const uint8_t base36CharValues[75] PROGMEM{
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35                    // Lower case letters
 };
 
-#define SPC_TOKEN " "
+#define SPC_TOKEN ' '
 #define END_TOKEN '\n'
-#define SEP_TOKEN ","
-#define IOT_TOKEN "@"
+#define SEP_TOKEN ','
+#define IOT_TOKEN '@'
 
 struct MiningConfig {
     String host = "";
@@ -271,7 +273,7 @@ private:
                          String(config->DUCO_USER) +
                          SEP_TOKEN + config->START_DIFF + 
                          SEP_TOKEN + String(config->MINER_KEY) + 
-                         SEP_TOKEN + "Temp:" + String(temp) +
+                         SEP_TOKEN + "Temp:" + String(temp) + "*C" +
                          END_TOKEN);
         #elif defined(USE_DHT)
             float temp = dht.readTemperature();
@@ -283,8 +285,8 @@ private:
                          String(config->DUCO_USER) +
                          SEP_TOKEN + config->START_DIFF + 
                          SEP_TOKEN + String(config->MINER_KEY) + 
-                         SEP_TOKEN + "Temp:" + String(temp) + 
-                         IOT_TOKEN + "Hum:" + String(hum) +
+                         SEP_TOKEN + "Temp:" + String(temp) + "*C" +
+                         IOT_TOKEN + "Hum:" + String(hum) + "%" +
                          END_TOKEN);
         #elif defined(USE_INTERNAL_SENSOR)
             float temp = 0;
@@ -295,7 +297,7 @@ private:
                          String(config->DUCO_USER) +
                          SEP_TOKEN + config->START_DIFF + 
                          SEP_TOKEN + String(config->MINER_KEY) + 
-                         SEP_TOKEN + "CPU Temp:" + String(temp) + 
+                         SEP_TOKEN + "CPU Temp:" + String(temp) + "*C" +
                          END_TOKEN);
         #else
             client.print("JOB," +
