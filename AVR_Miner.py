@@ -5,7 +5,7 @@ https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2023
 """
-
+import curses
 from os import _exit, mkdir
 from os import name as osname
 from os import path
@@ -38,8 +38,9 @@ from threading import Semaphore
 import base64 as b64
 
 import os
-printlock = Semaphore(value=1)
+#printlock = Semaphore(value=1)
 
+should_stop = False
 
 # Python <3.5 check
 f"Your Python version is too old. Duino-Coin Miner requires version 3.6 or above. Update your packages and try again"
@@ -103,10 +104,81 @@ except ModuleNotFoundError:
 def now():
     return datetime.now()
 
-
 def port_num(com):
     return str(''.join(filter(str.isdigit, com)))
 
+def run_curses_app():
+    def handle_resize(stdscr, log_window):
+        # Update the screen and get new size
+        curses.update_lines_cols()
+        max_y, max_x = stdscr.getmaxyx()
+        log_win_height = max_y - 3
+        log_window.resize(log_win_height, max_x)
+        log_window.mvwin(0, 0)
+        log_window.refresh()
+        stdscr.refresh()
+
+    def main(stdscr):
+        global log_window
+        # Setting up the screen
+        #curses.curs_set(0)  # Hide the cursor
+        stdscr.nodelay(True)  # Don't block I/O calls
+
+        #if curses.has_colors():
+        curses.start_color()
+        # Define color pairs
+        curses.use_default_colors()
+        # Extended color codes (assuming 256-color support)
+        GRAY = 242  # Approximation of gray in 256-color terminals
+        MAGENTA_BACKGROUND = 201  # Brighter magenta
+        BLUE_BACKGROUND = 27      # Specific shade of blue
+        GREEN_BACKGROUND = 42
+
+        # Initialize color pairs
+        curses.init_pair(1, GRAY, BLUE_BACKGROUND)    # Gray on Blue - net
+        curses.init_pair(2, GRAY, MAGENTA_BACKGROUND) # Gray on Magenta - avr
+        curses.init_pair(3, GRAY, GREEN_BACKGROUND)   # Gray on Green - sys
+
+        curses.init_pair(4, GRAY, -1)  # Gray text
+        curses.init_pair(5, curses.COLOR_GREEN, -1) # Green text
+        curses.init_pair(6, curses.COLOR_RED, -1) # Red text
+        curses.init_pair(7, curses.COLOR_BLUE, -1) # Blue text
+        curses.init_pair(8, curses.COLOR_YELLOW, -1) # Yellow text
+        curses.init_pair(9, curses.COLOR_MAGENTA, -1) # Magenta text
+
+        # Create a window for the log messages
+        log_win_height = curses.LINES - 1
+        log_window = curses.newwin(log_win_height-3, curses.COLS, 3, 0)
+        log_window.scrollok(True)
+
+        while True:
+            try:
+                key = stdscr.getch()  # Get user input
+                if key == curses.KEY_RESIZE:  # Terminal size has changed
+                    handle_resize(stdscr, log_window)
+
+                max_y, max_x = stdscr.getmaxyx()
+                
+                stdscr.addstr(0, 0, "Duino-Coin", curses.color_pair(8))
+                stdscr.addstr(" AVR Miner ", curses.color_pair(9))
+                stdscr.addstr("4.0")
+
+                total_hashrate = get_prefix("H/s", sum(hashrate_list), 2)
+                stdscr.addstr(1, 0, f"Total hashrate: ")
+                stdscr.addstr(total_hashrate, curses.A_REVERSE)
+                stdscr.refresh()
+
+                sleep(0.2)
+            except curses.error as e:
+                pass
+            except:
+                pass
+
+    # Run the application
+    curses.wrapper(main)
+
+curses_thread = Thread(target=run_curses_app)
+curses_thread.start()
 
 class Settings:
     VER = '3.9'
@@ -354,21 +426,21 @@ class Client:
         return data
 
     def fetch_pool():
-        while True:
+        while not should_stop:
             pretty_print("net0", get_string("connection_search"),
                          "info")
             try:
                 response = requests.get(
                     "https://server.duinocoin.com/getPool",
-                    timeout=10).json()
+                    timeout=1).json()
 
                 if response["success"] == True:
                     pretty_print("net0", get_string("connecting_node")
                                  + response["name"],
                                  "info")
 
-                    NODE_ADDRESS = response["ip"]
-                    NODE_PORT = response["port"]
+                    NODE_ADDRESS = "192.168.1.190" #response["ip"]
+                    NODE_PORT = 9875 #response["port"]
                     
                     return (NODE_ADDRESS, NODE_PORT)
 
@@ -603,16 +675,14 @@ def title(title: str):
 
 
 def handler(signal_received, frame):
-    pretty_print(
-        'sys0', get_string('sigint_detected')
-        + Style.NORMAL + Fore.RESET
-        + get_string('goodbye'), 'warning')
-
+    global should_stop
+    print("End")
+    #pretty_print(
+    #    'sys0', get_string('sigint_detected')
+    #    + Style.NORMAL + Fore.RESET
+    #    + get_string('goodbye'), 'warning')
+    should_stop = True
     _exit(0)
-
-
-# Enable signal handler
-signal(SIGINT, handler)
 
 
 def load_config():
@@ -680,7 +750,7 @@ def load_config():
 
         avrport = ''
         rig_identifier = ''
-        while True:
+        while not should_stop:
             current_port = input(
                 Style.RESET_ALL + Fore.YELLOW
                 + get_string('ask_avrport')
@@ -864,7 +934,7 @@ def init_rich_presence():
 
 def update_rich_presence():
     startTime = int(time())
-    while True:
+    while not should_stop:
         try:
             total_hashrate = get_prefix("H/s", sum(hashrate_list), 2)
             RPC.update(details="Hashrate: " + str(total_hashrate),
@@ -893,26 +963,33 @@ def pretty_print(sender: str = "sys0",
     Produces nicely formatted CLI output for messages:
     HH:MM:S |sender| msg
     """
+    #if Style.NORMAL in msg and Fore.RESET in msg:
+    msg =msg.replace(Style.NORMAL, "")
+    msg =msg.replace(Fore.RESET, "")
+
     if sender.startswith("net"):
-        bg_color = Back.BLUE
+        tag_color = 1 # blue background
     elif sender.startswith("avr"):
-        bg_color = Back.MAGENTA
+        tag_color = 2 # magenta background
     else:
-        bg_color = Back.GREEN
+        tag_color = 3 # green background
 
     if state == "success":
-        fg_color = Fore.GREEN
-    elif state == "info":
-        fg_color = Fore.BLUE
+        msg_color = 5 # green text
     elif state == "error":
-        fg_color = Fore.RED
+        msg_color = 6 # red text
+    elif state == "info":
+        msg_color = 7 # blue text
     else:
-        fg_color = Fore.YELLOW
+        msg_color = 8 # yellow text
 
-    with thread_lock():
-        print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-              + bg_color + Style.BRIGHT + " " + sender + " "
-              + Back.RESET + " " + fg_color + msg.strip())
+    timestamp = datetime.now().strftime("%H:%M:%S")
+
+    # Print each part with its respective color
+    log_window.addstr(timestamp + " ", curses.color_pair(4))  # Gray date
+    log_window.addstr(" " + sender + " ", curses.color_pair(tag_color))  # Colored tag
+    log_window.addstr(" " + msg.strip() + '\n', curses.color_pair(msg_color))  # Colored message
+    log_window.refresh()
 
 
 def share_print(id, type, accept, reject, total_hashrate,
@@ -921,7 +998,6 @@ def share_print(id, type, accept, reject, total_hashrate,
     Produces nicely formatted CLI output for shares:
     HH:MM:S |avrN| ⛏ Accepted 0/0 (100%) ∙ 0.0s ∙ 0 kH/s ⚙ diff 0 k ∙ ping 0ms
     """
-
     try:
         total_hashrate = get_prefix("H/s", total_hashrate, 2)
     except:
@@ -929,29 +1005,28 @@ def share_print(id, type, accept, reject, total_hashrate,
 
     if type == "accept":
         share_str = get_string("accepted")
-        fg_color = Fore.GREEN
+        fg_color = 5
     elif type == "block":
         share_str = get_string("block_found")
-        fg_color = Fore.YELLOW
+        fg_color = 8
     else:
         share_str = get_string("rejected")
         if reject_cause:
-            share_str += f"{Style.NORMAL}({reject_cause}) "
-        fg_color = Fore.RED
+            share_str += f"({reject_cause}) "
+        fg_color = 6
 
-    with thread_lock():
-        print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-              + Fore.WHITE + Style.BRIGHT + Back.MAGENTA + Fore.RESET
-              + " avr" + str(id) + " " + Back.RESET
-              + fg_color + Settings.PICK + share_str + Fore.RESET
-              + str(accept) + "/" + str(accept + reject) + Fore.MAGENTA
-              + " (" + str(round(accept / (accept + reject) * 100)) + "%)"
-              + Style.NORMAL + Fore.RESET
-              + " ∙ " + str("%04.1f" % float(computetime)) + "s"
-              + Style.NORMAL + " ∙ " + Fore.BLUE + Style.BRIGHT
-              + str(total_hashrate) + Fore.RESET + Style.NORMAL
-              + Settings.COG + f" diff {diff} ∙ " + Fore.CYAN
-              + f"ping {(int(ping))}ms")
+    # Construct and print the message
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    log_window.addstr(timestamp + " ", curses.color_pair(4))  # Gray date
+    log_window.addstr(f" avr{id} ", curses.color_pair(2))  # Colored tag
+    log_window.addstr(f"{share_str}", curses.color_pair(fg_color)) # Colored accept/reject
+    log_window.addstr(f"{accept}/{accept + reject} ", curses.color_pair(4)) # Gray no.
+    log_window.addstr(f"({round(accept / (accept + reject) * 100)}%)", curses.color_pair(9)) # Magenta %
+    log_window.addstr(f" ∙ {computetime:.1f}s ∙ ") # Normal sharetime
+    log_window.addstr(f"{total_hashrate} ", curses.color_pair(7)) # Blue hashrate
+    log_window.addstr(f"@ diff {diff} ∙ ") # Normal diff
+    log_window.addstr(f"ping {ping:.0f}ms\n", curses.color_pair(7)) # Light blue ping
+    log_window.refresh()
 
 
 def mine_avr(com, threadid, fastest_pool, thread_rigid):
@@ -959,9 +1034,9 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
     start_time = time()
     report_shares = 0
     last_report_share = 0
-    while True:
+    while not should_stop:
         shares = [0, 0, 0]
-        while True:
+        while not should_stop:
             try:
                 ser.close()
                 pretty_print('sys' + port_num(com),
@@ -994,7 +1069,7 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
                 sleep(10)
 
         retry_counter = 0
-        while True:
+        while not should_stop:
             try:
                 if retry_counter > 3:
                     fastest_pool = Client.fetch_pool()
@@ -1108,7 +1183,7 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
                     + get_string('hashrate_test_diff') 
                     + start_diff)
 
-        while True:
+        while not should_stop:
             try:
                 if config["AVR Miner"]["mining_key"] != "None":
                     key = b64.b64decode(config["AVR Miner"]["mining_key"]).decode()
@@ -1142,7 +1217,7 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
                 break
 
             retry_counter = 0
-            while True:
+            while not should_stop:
                 if retry_counter > 3:
                     break
 
@@ -1222,32 +1297,32 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
 
             if feedback[0] == 'GOOD':
                 shares[0] += 1
-                printlock.acquire()
+                #printlock.acquire()
                 share_print(port_num(com), "accept",
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping)
-                printlock.release()
+                #printlock.release()
             elif feedback[0] == 'BLOCK':
                 shares[0] += 1
                 shares[2] += 1
-                printlock.acquire()
+                #printlock.acquire()
                 share_print(port_num(com), "block",
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping)
-                printlock.release()
+                #printlock.release()
             elif feedback[0] == 'BAD':
                 shares[1] += 1
-                printlock.acquire()
+                #printlock.acquire()
                 share_print(port_num(com), "reject",
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping, feedback[1])
-                printlock.release()
+                #printlock.release()
             else:
-                printlock.acquire()
+                #printlock.acquire()
                 share_print(port_num(com), "reject",
                             shares[0], shares[1], hashrate,
                             computetime, diff, ping, feedback)
-                printlock.release()
+                #printlock.release()
 
             title(get_string('duco_avr_miner') + str(Settings.VER)
                   + f') - {shares[0]}/{(shares[0] + shares[1])}'
@@ -1299,6 +1374,9 @@ def calculate_uptime(start_time):
 
 
 if __name__ == '__main__':
+    # Enable signal handler
+    signal(SIGINT, handler)
+
     init(autoreset=True)
     title(f"{get_string('duco_avr_miner')}{str(Settings.VER)})")
 
@@ -1341,7 +1419,7 @@ if __name__ == '__main__':
         fastest_pool = Client.fetch_pool()
         threadid = 0
         for port in avrport:
-            Thread(target=mine_avr,
+            thr = Thread(target=mine_avr,
                    args=(port, threadid,
                          fastest_pool, rig_identifier[threadid])).start()
             threadid += 1
