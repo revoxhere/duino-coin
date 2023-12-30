@@ -107,7 +107,9 @@
         "hashrate_total": "total",
         "diff": "diff.",
         "iot_on_rpi": "Duino IoT is enabled. Miner will send the CPU temperature of your Pi to your wallet.",
-        "iot_on_rpi2": "Test reading:"
+        "iot_on_rpi2": "Test reading:",
+        "surpassed": "Congrats for surpassing",
+        "surpassed_shares": "correct shares!"
     },
     "indonesian": {
         "translation_autor": "rezafauzan945",
@@ -606,7 +608,7 @@
         "using_algo": " używając algorytmu DUCO-S1 i ",
         "using_algo_xxh": " używając algorytmu XXHASH i ",
         "efficiency": "intensywności",
-        "duco_python_miner": "Duino-Coin Python Miner (v",
+        "duco_python_miner": "Koparka Duino-Coin (v",
         "accepted_shares": " zaakceptowanych share'ów",
         "accepted": " Zaakceptowano ",
         "block_found": " Znaleziono blok ",
@@ -655,7 +657,9 @@
         "hashrate_total": "łącznie",
         "diff": "trudność",
         "iot_on_rpi": "Duino IoT włączone - koparka będzie wysyłała temperaturę procesora do portfela.",
-        "iot_on_rpi2": "Testowy odczyt:"
+        "iot_on_rpi2": "Testowy odczyt:",
+        "surpassed": "Gratulujemy osiągnięcia",
+        "surpassed_shares": "zaakceptowanych share'ów!"
     },
     "spanish": {
         "translation_autor": "HGEpro",
@@ -1438,7 +1442,6 @@
         "server_is_on_version": "is-server huwa fuq v",
         "update_warning": ", jekk jogħġbok niżżel l-aħħar verżjoni minn https://github.com/revoxhere/duino-coin/releases/",
         "connection_error": "Problema fil-konnessjoni mas-server. Erġa 'pprova f'10s",
-        "duco_avr_miner": "AVR Duino-Coin excavator (v",
         "acceptable_shares": "ishma aċċettati",
         "block_found": "Blokk misjub",
         "error_while_mining": "Żball waqt it-tħaffir - probabbilment problema ta 'konnessjoni - erġa' pprova f'5s.",
