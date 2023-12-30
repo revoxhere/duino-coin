@@ -6,7 +6,7 @@
   Official code for all ESP8266/32 boards            version 4.0
   Main .ino file
 
-  The Duino-Coin Team & Community 2019-2023 © MIT Licensed
+  The Duino-Coin Team & Community 2019-2024 © MIT Licensed
   https://duinocoin.com
   https://github.com/revoxhere/duino-coin
 
