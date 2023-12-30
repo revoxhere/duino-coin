@@ -1217,7 +1217,7 @@ class Miner:
                                         "success", "sys0", print_queue=print_queue)
 
                                 title(get_string('duco_python_miner') + str(Settings.VER)
-                                      + f') - {accept.value}/{(acept.value + reject.value)}'
+                                      + f') - {accept.value}/{(accept.value + reject.value)}'
                                       + get_string('accepted_shares'))
 
                                 if id == 0:
