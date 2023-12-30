@@ -1215,32 +1215,32 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
 
             if feedback[0] == 'GOOD':
                 shares[0] += 1
-                printlock.acquire()
                 share_print(port_num(com), "accept",
                             shares[0], shares[1], hashrate, total_hashrate,
                             computetime, diff, ping)
-                printlock.release()
+
             elif feedback[0] == 'BLOCK':
                 shares[0] += 1
                 shares[2] += 1
-                printlock.acquire()
                 share_print(port_num(com), "block",
                             shares[0], shares[1], hashrate, total_hashrate,
                             computetime, diff, ping)
-                printlock.release()
+
             elif feedback[0] == 'BAD':
                 shares[1] += 1
-                printlock.acquire()
                 share_print(port_num(com), "reject",
                             shares[0], shares[1], hashrate, total_hashrate, 
                             computetime, diff, ping, feedback[1])
-                printlock.release()
+
             else:
-                printlock.acquire()
                 share_print(port_num(com), "reject",
                             shares[0], shares[1], hashrate, total_hashrate, 
                             computetime, diff, ping, feedback)
-                printlock.release()
+
+            if shares[0] % 100 == 0 and shares[0] > 1:
+                pretty_print("sys0",
+                            f"{get_string('surpassed')} {accept.value} {get_string('surpassed_shares')}",
+                            "success")
 
             title(get_string('duco_avr_miner') + str(Settings.VER)
                   + f') - {shares[0]}/{(shares[0] + shares[1])}'
