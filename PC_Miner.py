@@ -17,6 +17,8 @@ from datetime import datetime
 from random import randint
 
 from os import execl, mkdir, _exit
+from os import name as osname
+from os import system as ossystem 
 from subprocess import DEVNULL, Popen, check_call, PIPE
 import pip
 import sys
@@ -176,6 +178,28 @@ class Settings:
         except UnicodeEncodeError: # else
             PICK = ""
             COG = " @"
+
+
+def title(title: str):
+    if osname == 'nt':
+        """
+        Changing the title in Windows' cmd
+        is easy - just use the built-in
+        title command
+        """
+        ossystem('title ' + title)
+    else:
+        """
+        Most *nix terminals use
+        this escape sequence to change
+        the console window title
+        """
+        try:
+            print('\33]0;' + title + '\a', end='')
+            sys.stdout.flush()
+        except Exception as e:
+            print(e)
+
 
 def check_updates():
     """
@@ -1187,6 +1211,15 @@ class Miner:
                                                 back_color, feedback[1],
                                                 print_queue=print_queue)
 
+                                if accept.value % 100 == 0 and accept.value > 1:
+                                    pretty_print(
+                                        f"{get_string('surpassed')} {accept.value} {get_string('surpassed_shares')}",
+                                        "success", "sys0", print_queue=print_queue)
+
+                                title(get_string('duco_python_miner') + str(Settings.VER)
+                                      + f') - {accept.value}/{(acept.value + reject.value)}'
+                                      + get_string('accepted_shares'))
+
                                 if id == 0:
                                     end_time = time()
                                     elapsed_time = end_time - last_report
@@ -1336,6 +1369,7 @@ if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
     signal(SIGINT, handler)
+    title(f"{get_string('duco_python_miner')}{str(Settings.VER)})")
 
     if sys.platform == "win32":
         os.system('') # Enable VT100 Escape Sequence for WINDOWS 10 Ver. 1607
