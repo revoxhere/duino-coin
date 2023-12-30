@@ -910,9 +910,9 @@ def pretty_print(sender: str = "sys0",
         fg_color = Fore.YELLOW
 
     
-    print_queue.append(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-              + bg_color + Style.BRIGHT + " " + sender + " "
-              + Back.RESET + " " + fg_color + msg.strip())
+    print_queue.append(Fore.RESET + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+              + Style.RESET_ALL + Fore.WHITE + bg_color + Style.BRIGHT + f" {sender} "
+              + Style.RESET_ALL + " " + fg_color + msg.strip())
 
 
 def share_print(id, type, accept, reject, thread_hashrate,
@@ -937,10 +937,10 @@ def share_print(id, type, accept, reject, thread_hashrate,
         fg_color = Fore.RED
 
     print_queue.append(
-          Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-          + Fore.WHITE + Style.BRIGHT + Back.MAGENTA + Fore.RESET
-          + " avr" + str(id) + " " + Back.RESET
-          + fg_color + Settings.PICK + share_str + Fore.RESET
+          Fore.RESET + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+          + Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + Back.MAGENTA
+          + " avr" + str(id) + " " + Style.RESET_ALL + fg_color 
+          + Settings.PICK + share_str + Fore.RESET
           + str(accept) + "/" + str(accept + reject) + Fore.MAGENTA
           + " (" + str(round(accept / (accept + reject) * 100)) + "%)"
           + Style.NORMAL + Fore.RESET
