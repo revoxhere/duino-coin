@@ -505,6 +505,7 @@ def get_prefix(symbol: str,
         val = str(round(val)) + " "
     return val + symbol
 
+
 def get_rpi_temperature():
     output = Popen(args='cat /sys/class/thermal/thermal_zone0/temp',
                     stdout=PIPE,
@@ -517,7 +518,6 @@ def periodic_report(start_time, end_time, shares,
     """
     Displays nicely formated uptime stats
     """
-    
     raspi_iot_reading = ""
     
     if running_on_rpi and user_settings["raspi_cpu_iot"] == "y":
@@ -541,7 +541,7 @@ def periodic_report(start_time, end_time, shares,
                  + get_string("report_body6")
                  + get_string("total_mining_time")
                  + str(uptime)
-                 + raspi_iot_reading, "success")
+                 + raspi_iot_reading + "\n", "success")
 
 
 def calculate_uptime(start_time):
@@ -586,13 +586,15 @@ def pretty_print(msg: str = None,
         fg_color = Fore.YELLOW
 
     if print_queue != None:
-        print_queue.append(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-            + Style.BRIGHT + bg_color + " " + sender + " "
-            + Back.RESET + " " + fg_color + msg.strip())
+        print_queue.append(
+            Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+            + Style.RESET_ALL + Style.BRIGHT + bg_color + " " + sender + " "
+            + Style.NORMAL + Back.RESET + " " + fg_color + msg.strip())
     else:
-        print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-            + Style.BRIGHT + bg_color + " " + sender + " "
-            + Back.RESET + " " + fg_color + msg.strip())
+        print(
+            Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+            + Style.RESET_ALL + Style.BRIGHT + bg_color + " " + sender + " "
+            + Style.NORMAL + Back.RESET + " " + fg_color + msg.strip())
 
 
 def share_print(id, type,
@@ -642,7 +644,7 @@ def share_print(id, type,
         fg_color = Fore.RED
 
     print_queue.append(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-              + Fore.WHITE + Style.BRIGHT + back_color + Fore.RESET
+              + Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + back_color
               + f" cpu{id} " + Back.RESET + fg_color + Settings.PICK
               + share_str + Fore.RESET + f"{accept}/{(accept + reject)}"
               + Fore.YELLOW
@@ -650,9 +652,9 @@ def share_print(id, type,
               + Style.NORMAL + Fore.RESET
               + f" ∙ {('%04.1f' % float(computetime))}s"
               + Style.NORMAL + " ∙ " + Fore.BLUE + Style.BRIGHT
-              + f"{thread_hashrate}"+ Style.DIM
+              + f"{thread_hashrate}" + Style.DIM
               + f" ({total_hashrate} {get_string('hashrate_total')})" + Fore.RESET + Style.NORMAL
-              + Settings.COG + f" diff {diff} ∙ " + Fore.CYAN
+              + Settings.COG + f" {get_string('diff')} {diff} ∙ " + Fore.CYAN
               + f"ping {(int(ping))}ms")
 
 
