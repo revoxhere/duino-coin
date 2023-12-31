@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 3.9 © MIT licensed
+Duino-Coin Official AVR Miner 4.0 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
-Duino-Coin Team & Community 2019-2023
+Duino-Coin Team & Community 2019-2024
 """
 
 from os import _exit, mkdir
@@ -109,7 +109,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '3.9'
+    VER = '4.0'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
     AVR_TIMEOUT = 10
@@ -792,7 +792,7 @@ def greeting():
         + Style.BRIGHT + get_string('banner')
         + Style.RESET_ALL + Fore.MAGENTA
         + f' {Settings.VER}' + Fore.RESET
-        + ' 2019-2023')
+        + ' 2019-2024')
 
     print(
         Style.DIM + Fore.MAGENTA
@@ -828,12 +828,12 @@ def greeting():
         + Style.BRIGHT + Fore.YELLOW
         + 'DUCO-S1A ⚙ AVR diff')
 
-    if rig_identifier != "None":
+    if rig_identifier[0] != "None" or len(rig_identifier) > 1:
         print(
             Style.DIM + Fore.MAGENTA
             + Settings.BLOCK + Style.NORMAL
             + Fore.RESET + get_string('rig_identifier')
-            + Style.BRIGHT + Fore.YELLOW + rig_identifier)
+            + Style.BRIGHT + Fore.YELLOW + ", ".join(rig_identifier))
 
     print(
         Style.DIM + Fore.MAGENTA
@@ -909,23 +909,20 @@ def pretty_print(sender: str = "sys0",
     else:
         fg_color = Fore.YELLOW
 
-    with thread_lock():
-        print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-              + bg_color + Style.BRIGHT + " " + sender + " "
-              + Back.RESET + " " + fg_color + msg.strip())
+    
+    print_queue.append(Fore.RESET + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+              + Style.RESET_ALL + Fore.WHITE + bg_color + Style.BRIGHT + f" {sender} "
+              + Style.RESET_ALL + " " + fg_color + msg.strip())
 
 
-def share_print(id, type, accept, reject, total_hashrate,
-                computetime, diff, ping, reject_cause=None):
+def share_print(id, type, accept, reject, thread_hashrate,
+                total_hashrate, computetime, diff, ping, reject_cause=None):
     """
     Produces nicely formatted CLI output for shares:
     HH:MM:S |avrN| ⛏ Accepted 0/0 (100%) ∙ 0.0s ∙ 0 kH/s ⚙ diff 0 k ∙ ping 0ms
     """
-
-    try:
-        total_hashrate = get_prefix("H/s", total_hashrate, 2)
-    except:
-        total_hashrate = "? H/s"
+    thread_hashrate = get_prefix("H/s", thread_hashrate, 2)
+    total_hashrate = get_prefix("H/s", total_hashrate, 1)
 
     if type == "accept":
         share_str = get_string("accepted")
@@ -939,23 +936,24 @@ def share_print(id, type, accept, reject, total_hashrate,
             share_str += f"{Style.NORMAL}({reject_cause}) "
         fg_color = Fore.RED
 
-    with thread_lock():
-        print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-              + Fore.WHITE + Style.BRIGHT + Back.MAGENTA + Fore.RESET
-              + " avr" + str(id) + " " + Back.RESET
-              + fg_color + Settings.PICK + share_str + Fore.RESET
-              + str(accept) + "/" + str(accept + reject) + Fore.MAGENTA
-              + " (" + str(round(accept / (accept + reject) * 100)) + "%)"
-              + Style.NORMAL + Fore.RESET
-              + " ∙ " + str("%04.1f" % float(computetime)) + "s"
-              + Style.NORMAL + " ∙ " + Fore.BLUE + Style.BRIGHT
-              + str(total_hashrate) + Fore.RESET + Style.NORMAL
-              + Settings.COG + f" diff {diff} ∙ " + Fore.CYAN
-              + f"ping {(int(ping))}ms")
+    print_queue.append(
+          Fore.RESET + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+          + Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + Back.MAGENTA
+          + " avr" + str(id) + " " + Style.RESET_ALL + fg_color 
+          + Settings.PICK + share_str + Fore.RESET
+          + str(accept) + "/" + str(accept + reject) + Fore.MAGENTA
+          + " (" + str(round(accept / (accept + reject) * 100)) + "%)"
+          + Style.NORMAL + Fore.RESET
+          + " ∙ " + str("%04.1f" % float(computetime)) + "s"
+          + Style.NORMAL + " ∙ " + Fore.BLUE + Style.BRIGHT
+          + f"{thread_hashrate}" + Style.DIM
+          + f" ({total_hashrate} {get_string('hashrate_total')})" + Fore.RESET + Style.NORMAL
+          + Settings.COG + f" {get_string('diff')} {diff} ∙ " + Fore.CYAN
+          + f"ping {(int(ping))}ms")
 
 
 def mine_avr(com, threadid, fastest_pool, thread_rigid):
-    global hashrate
+    global hashrate, shares
     start_time = time()
     report_shares = 0
     last_report_share = 0
@@ -1088,23 +1086,17 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
             break
 
         start_diff = "AVR"
-        if hashrate_test > 12000:
-            start_diff = "ESP32"
-        elif hashrate_test > 6000:
-            start_diff = "ESP8266H"
-        elif hashrate_test > 4500:
-            start_diff = "ESP8266"
-        elif hashrate_test > 1000:
+        if hashrate_test > 1000:
             start_diff = "DUE"
-        elif hashrate_test > 520:
+        elif hashrate_test > 550:
             start_diff = "ARM"
-        elif hashrate_test > 370:
+        elif hashrate_test > 380:
             start_diff = "MEGA"
 
         pretty_print('sys' + port_num(com), 
                     get_string('hashrate_test') 
                     + get_prefix("H/s", hashrate_test, 2)
-                    + Fore.RESET
+                    + Fore.RESET + Style.BRIGHT
                     + get_string('hashrate_test_diff') 
                     + start_diff)
 
@@ -1181,6 +1173,7 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
                 hashrate_mean.append(hashrate_t)
                 hashrate = mean(hashrate_mean[-5:])
                 hashrate_list[threadid] = hashrate
+                total_hashrate = sum(hashrate_list)
             except Exception as e:
                 pretty_print('sys' + port_num(com),
                              get_string('mining_avr_connection_error')
@@ -1222,32 +1215,32 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
 
             if feedback[0] == 'GOOD':
                 shares[0] += 1
-                printlock.acquire()
                 share_print(port_num(com), "accept",
-                            shares[0], shares[1], hashrate,
+                            shares[0], shares[1], hashrate, total_hashrate,
                             computetime, diff, ping)
-                printlock.release()
+
             elif feedback[0] == 'BLOCK':
                 shares[0] += 1
                 shares[2] += 1
-                printlock.acquire()
                 share_print(port_num(com), "block",
-                            shares[0], shares[1], hashrate,
+                            shares[0], shares[1], hashrate, total_hashrate,
                             computetime, diff, ping)
-                printlock.release()
+
             elif feedback[0] == 'BAD':
                 shares[1] += 1
-                printlock.acquire()
                 share_print(port_num(com), "reject",
-                            shares[0], shares[1], hashrate,
+                            shares[0], shares[1], hashrate, total_hashrate, 
                             computetime, diff, ping, feedback[1])
-                printlock.release()
+
             else:
-                printlock.acquire()
                 share_print(port_num(com), "reject",
-                            shares[0], shares[1], hashrate,
+                            shares[0], shares[1], hashrate, total_hashrate, 
                             computetime, diff, ping, feedback)
-                printlock.release()
+
+            if shares[0] % 100 == 0 and shares[0] > 1:
+                pretty_print("sys0",
+                            f"{get_string('surpassed')} {accept.value} {get_string('surpassed_shares')}",
+                            "success")
 
             title(get_string('duco_avr_miner') + str(Settings.VER)
                   + f') - {shares[0]}/{(shares[0] + shares[1])}'
@@ -1266,22 +1259,28 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
 
 
 def periodic_report(start_time, end_time, shares,
-                    block, hashrate, uptime):
+                    blocks, hashrate, uptime):
+    """
+    Displays nicely formated uptime stats
+    """
     seconds = round(end_time - start_time)
-    pretty_print("sys0",
-                 " " + get_string('periodic_mining_report')
+    pretty_print("sys0", get_string("periodic_mining_report")
                  + Fore.RESET + Style.NORMAL
-                 + get_string('report_period')
-                 + str(seconds) + get_string('report_time')
-                 + get_string('report_body1')
-                 + str(shares) + get_string('report_body2')
+                 + get_string("report_period")
+                 + str(seconds) + get_string("report_time")
+                 + get_string("report_body1")
+                 + str(shares) + get_string("report_body2")
                  + str(round(shares/seconds, 1))
-                 + get_string('report_body3')
-                 + get_string('report_body7') + str(block)
-                 + get_string('report_body4')
-                 + str(int(hashrate)) + " H/s" + get_string('report_body5')
-                 + str(int(hashrate*seconds)) + get_string('report_body6')
-                 + get_string('total_mining_time') + str(uptime), "success")
+                 + get_string("report_body3")
+                 + get_string("report_body7")
+                 + str(blocks)
+                 + get_string("report_body4")
+                 + str(get_prefix("H/s", hashrate, 2))
+                 + get_string("report_body5")
+                 + str(int(hashrate*seconds))
+                 + get_string("report_body6")
+                 + get_string("total_mining_time")
+                 + str(uptime) + "\n", "success")
 
 
 def calculate_uptime(start_time):
@@ -1298,8 +1297,22 @@ def calculate_uptime(start_time):
         return str(round(uptime)) + get_string('uptime_seconds')    
 
 
+print_queue = []
+def print_queue_handler():
+    """
+    Prevents broken console logs with many threads
+    """
+    while True:
+        if len(print_queue):
+            message = print_queue[0]
+            del print_queue[0]
+            print(message)
+        sleep(0.1)
+
+
 if __name__ == '__main__':
     init(autoreset=True)
+    Thread(target=print_queue_handler).start()
     title(f"{get_string('duco_avr_miner')}{str(Settings.VER)})")
 
     if sys.platform == "win32":

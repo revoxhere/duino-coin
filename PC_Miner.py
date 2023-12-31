@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 3.9 © MIT licensed
+Duino-Coin Official PC Miner 4.0 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
-Duino-Coin Team & Community 2019-2023
+Duino-Coin Team & Community 2019-2024
 """
 
 from time import time, sleep, strptime, ctime
@@ -17,6 +17,8 @@ from datetime import datetime
 from random import randint
 
 from os import execl, mkdir, _exit
+from os import name as osname
+from os import system as ossystem 
 from subprocess import DEVNULL, Popen, check_call, PIPE
 import pip
 import sys
@@ -42,7 +44,6 @@ import io
 
 running_on_rpi = False
 configparser = ConfigParser()
-printlock = Semaphore(value=1)
 
 # Python <3.5 check
 f"Your Python version is too old. Duino-Coin Miner requires version 3.6 or above. Update your packages and try again"
@@ -141,7 +142,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 3.9
+    VER = 4.0
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -177,6 +178,28 @@ class Settings:
         except UnicodeEncodeError: # else
             PICK = ""
             COG = " @"
+
+
+def title(title: str):
+    if osname == 'nt':
+        """
+        Changing the title in Windows' cmd
+        is easy - just use the built-in
+        title command
+        """
+        ossystem('title ' + title)
+    else:
+        """
+        Most *nix terminals use
+        this escape sequence to change
+        the console window title
+        """
+        try:
+            print('\33]0;' + title + '\a', end='')
+            sys.stdout.flush()
+        except Exception as e:
+            print(e)
+
 
 def check_updates():
     """
@@ -506,6 +529,7 @@ def get_prefix(symbol: str,
         val = str(round(val)) + " "
     return val + symbol
 
+
 def get_rpi_temperature():
     output = Popen(args='cat /sys/class/thermal/thermal_zone0/temp',
                     stdout=PIPE,
@@ -518,7 +542,6 @@ def periodic_report(start_time, end_time, shares,
     """
     Displays nicely formated uptime stats
     """
-    
     raspi_iot_reading = ""
     
     if running_on_rpi and user_settings["raspi_cpu_iot"] == "y":
@@ -542,7 +565,7 @@ def periodic_report(start_time, end_time, shares,
                  + get_string("report_body6")
                  + get_string("total_mining_time")
                  + str(uptime)
-                 + raspi_iot_reading, "success")
+                 + raspi_iot_reading + "\n", "success")
 
 
 def calculate_uptime(start_time):
@@ -565,7 +588,7 @@ def calculate_uptime(start_time):
 def pretty_print(msg: str = None,
                  state: str = "success",
                  sender: str = "sys0",
-                 printlock=printlock):
+                 print_queue = None):
     """
     Produces nicely formatted CLI output for messages:
     HH:MM:S |sender| msg
@@ -586,23 +609,30 @@ def pretty_print(msg: str = None,
     else:
         fg_color = Fore.YELLOW
 
-    with printlock:
-        print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-            + Style.BRIGHT + bg_color + " " + sender + " "
-            + Back.RESET + " " + fg_color + msg.strip())
+    if print_queue != None:
+        print_queue.append(
+            Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+            + Style.RESET_ALL + Style.BRIGHT + bg_color + " " + sender + " "
+            + Style.NORMAL + Back.RESET + " " + fg_color + msg.strip())
+    else:
+        print(
+            Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+            + Style.RESET_ALL + Style.BRIGHT + bg_color + " " + sender + " "
+            + Style.NORMAL + Back.RESET + " " + fg_color + msg.strip())
 
 
 def share_print(id, type,
                 accept, reject,
-                total_hashrate,
+                thread_hashrate, total_hashrate,
                 computetime, diff, ping,
                 back_color, reject_cause=None,
-                printlock=printlock):
+                print_queue = None):
     """
     Produces nicely formatted CLI output for shares:
     HH:MM:S |cpuN| ⛏ Accepted 0/0 (100%) ∙ 0.0s ∙ 0 kH/s ⚙ diff 0 k ∙ ping 0ms
     """
-    total_hashrate = get_prefix("H/s", total_hashrate, 2)
+    thread_hashrate = get_prefix("H/s", thread_hashrate, 2)
+    total_hashrate = get_prefix("H/s", total_hashrate, 1)
     diff = get_prefix("", int(diff), 0)
 
     def _blink_builtin(led="green"):
@@ -637,9 +667,8 @@ def share_print(id, type,
             share_str += f"{Style.NORMAL}({reject_cause}) "
         fg_color = Fore.RED
 
-    with printlock:
-        print(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
-              + Fore.WHITE + Style.BRIGHT + back_color + Fore.RESET
+    print_queue.append(Fore.WHITE + datetime.now().strftime(Style.DIM + "%H:%M:%S ")
+              + Style.RESET_ALL + Fore.WHITE + Style.BRIGHT + back_color
               + f" cpu{id} " + Back.RESET + fg_color + Settings.PICK
               + share_str + Fore.RESET + f"{accept}/{(accept + reject)}"
               + Fore.YELLOW
@@ -647,9 +676,22 @@ def share_print(id, type,
               + Style.NORMAL + Fore.RESET
               + f" ∙ {('%04.1f' % float(computetime))}s"
               + Style.NORMAL + " ∙ " + Fore.BLUE + Style.BRIGHT
-              + str(total_hashrate) + Fore.RESET + Style.NORMAL
-              + Settings.COG + f" diff {diff} ∙ " + Fore.CYAN
+              + f"{thread_hashrate}" + Style.DIM
+              + f" ({total_hashrate} {get_string('hashrate_total')})" + Fore.RESET + Style.NORMAL
+              + Settings.COG + f" {get_string('diff')} {diff} ∙ " + Fore.CYAN
               + f"ping {(int(ping))}ms")
+
+
+def print_queue_handler(print_queue):
+    """
+    Prevents broken console logs with many threads
+    """
+    while True:
+        if len(print_queue):
+            message = print_queue[0]
+            del print_queue[0]
+            print(message)
+        sleep(0.1)
 
 
 def get_string(string_name):
@@ -747,7 +789,7 @@ class Miner:
         print("\n" + Style.DIM + Fore.YELLOW + Settings.BLOCK + Fore.YELLOW
               + Style.BRIGHT + get_string("banner") + Style.RESET_ALL
               + Fore.MAGENTA + " (" + str(Settings.VER) + ") "
-              + Fore.RESET + "2019-2023")
+              + Fore.RESET + "2019-2024")
 
         print(Style.DIM + Fore.YELLOW + Settings.BLOCK + Style.NORMAL
               + Fore.YELLOW + "https://github.com/revoxhere/duino-coin")
@@ -844,10 +886,8 @@ class Miner:
                     lang = "italian"
                 elif locale.startswith("sk"):
                     lang = "slovak"
-                if locale.startswith("zh_TW"):
-                    lang = "chinese_Traditional"
                 elif locale.startswith("zh"):
-                    lang = "chinese_simplified"                
+                    lang = "chinese_simplified"
                 elif locale.startswith("th"):
                     lang = "thai"
                 elif locale.startswith("ko"):
@@ -1043,7 +1083,7 @@ class Miner:
              accept: int, reject: int,
              hashrate: list,
              single_miner_id: str,
-             printlock):
+             print_queue):
         """
         Main section that executes the functionalities from the sections above.
         """
@@ -1053,7 +1093,7 @@ class Miner:
                      + Style.NORMAL + Fore.RESET + using_algo + Fore.YELLOW
                      + str(user_settings["intensity"])
                      + "% " + get_string("efficiency"),
-                     "success", "sys"+str(id))
+                     "success", "sys"+str(id), print_queue=print_queue)
 
         last_report = time()
         r_shares, last_shares = 0, 0
@@ -1092,7 +1132,7 @@ class Miner:
                             else:
                                 pretty_print(
                                     "Node message: " + str(job[1]),
-                                    "warning")
+                                    "warning", print_queue=print_queue)
                                 sleep(3)
 
                         while True:
@@ -1147,26 +1187,38 @@ class Miner:
                                     accept.value += 1
                                     share_print(id, "accept",
                                                 accept.value, reject.value,
-                                                total_hashrate,
+                                                hashrate[id],total_hashrate,
                                                 computetime, job[2], ping,
-                                                back_color, printlock)
+                                                back_color,
+                                                print_queue=print_queue)
 
                                 elif feedback[0] == "BLOCK":
                                     accept.value += 1
                                     blocks.value += 1
                                     share_print(id, "block",
                                                 accept.value, reject.value,
-                                                total_hashrate,
+                                                hashrate[id],total_hashrate,
                                                 computetime, job[2], ping,
-                                                back_color, printlock)
+                                                back_color,
+                                                print_queue=print_queue)
 
                                 elif feedback[0] == "BAD":
                                     reject.value += 1
                                     share_print(id, "reject",
                                                 accept.value, reject.value,
-                                                total_hashrate,
+                                                hashrate[id], total_hashrate,
                                                 computetime, job[2], ping,
-                                                back_color, feedback[1], printlock)
+                                                back_color, feedback[1],
+                                                print_queue=print_queue)
+
+                                if accept.value % 100 == 0 and accept.value > 1:
+                                    pretty_print(
+                                        f"{get_string('surpassed')} {accept.value} {get_string('surpassed_shares')}",
+                                        "success", "sys0", print_queue=print_queue)
+
+                                title(get_string('duco_python_miner') + str(Settings.VER)
+                                      + f') - {accept.value}/{(accept.value + reject.value)}'
+                                      + get_string('accepted_shares'))
 
                                 if id == 0:
                                     end_time = time()
@@ -1185,12 +1237,14 @@ class Miner:
                             break
                     except Exception as e:
                         pretty_print(get_string("error_while_mining")
-                                     + " " + str(e), "error", "net" + str(id))
+                                     + " " + str(e), "error", "net" + str(id),
+                                     print_queue=print_queue)
                         sleep(5)
                         break
             except Exception as e:
                 pretty_print(get_string("error_while_mining")
-                                     + " " + str(e), "error", "net" + str(id))
+                                     + " " + str(e), "error", "net" + str(id),
+                                     print_queue=print_queue)
 
 
 class Discord_rp:
@@ -1315,6 +1369,7 @@ if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
     signal(SIGINT, handler)
+    title(f"{get_string('duco_python_miner')}{str(Settings.VER)})")
 
     if sys.platform == "win32":
         os.system('') # Enable VT100 Escape Sequence for WINDOWS 10 Ver. 1607
@@ -1326,6 +1381,8 @@ if __name__ == "__main__":
     reject = Manager().Value("i", 0)
     blocks = Manager().Value("i", 0)
     hashrate = Manager().dict()
+    print_queue = Manager().list()
+    Thread(target=print_queue_handler, args=[print_queue]).start()
 
     user_settings = Miner.load_cfg()
     Miner.greeting()
@@ -1400,10 +1457,9 @@ if __name__ == "__main__":
                     args=[i, user_settings, blocks,
                           fastest_pool, accept, reject,
                           hashrate, single_miner_id, 
-                          printlock])
+                          print_queue])
         p_list.append(p)
         p.start()
-        sleep(0.5)
 
     if user_settings["discord_rp"] == 'y':
         Discord_rp.connect()

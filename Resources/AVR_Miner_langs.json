@@ -91,7 +91,11 @@
         "using_config": "Config file: ",
         "motd": "Server message of the day: ",
         "hashrate_test": "Hashrate test ended with ",
-        "hashrate_test_diff": ", assigned starting difficulty: "
+        "hashrate_test_diff": ", assigned starting difficulty: ",
+        "diff": "diff.",
+        "hashrate_total": "total",
+        "surpassed": "Congrats for surpassing",
+        "surpassed_shares": "correct shares!"
     },
     "indonesian": {
         "translation_autor": "rezafauzan945",
@@ -439,7 +443,13 @@
         "incorrect_username": "Podana nazwa użytkownika nie istnieje!",
         "system_threads_notice": "Uwaga: próbujesz uruchomić więcej wątków niż twoje urządzenie fizycznie posiada.\n\t\tMoże to spowodować zawieszenie się systemu lub problemy z konsolą.\n\t\tUruchamiam koparkę za 10s",
         "using_config": "Plik konfiguracyjny: ",
-        "motd": "Serwerowa wiadomość dnia: "
+        "motd": "Serwerowa wiadomość dnia: ",
+        "hashrate_test": "Test wydajności zakończony z wynikiem ",
+        "hashrate_test_diff": ", dopasowana trudność kopania: ",
+        "diff": "trudność",
+        "hashrate_total": "łącznie",
+        "surpassed": "Gratulujemy osiągnięcia",
+        "surpassed_shares": "zaakceptowanych share'ów!"
     },
     "russian": {
         "translation_autor": "5Q",
