@@ -90,7 +90,7 @@
         "node_picker_unavailable": "Node picker doesn't seem to be responding properly - retrying in ",
         "node_picker_error": "Fatal error fetching server from the node picker - retrying in ",
         "connecting_node": " Retrieved mining node: ",
-        "new_version": "A new version is available, you want to update miner (Y/n) ? ",
+        "new_version": "A new version is available, do you want to update the miner (Y/n) ? ",
         "updating": "The miner is outdated. Updating....",
         "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
         "mining_key_required": "Mining key is required to mine on this account",
