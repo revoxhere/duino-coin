@@ -41,6 +41,8 @@
     <script src="assets/js/all.min.js"></script>
     <link rel="preload" href="assets/js/jquery.min.js" as="script">
     <script src="assets/js/jquery.min.js"></script>
+    <link rel="preload" href="assets/js/jszip.min.js" as="script">
+    <script src="assets/js/jszip.min.js"></script>
     <!-- Preconnect ReCaptcha resources -->
     <!-- Prevent some errors [for example timeout] -->
     <link rel="preconnect" href="https://www.google.com">
@@ -407,7 +409,7 @@
                                     Raspberry Pi
                                 </p>
                                 <p class="subtitle">
-                                    Zero, 1, 2, 3, 4 or 400 (incl. relatives - e.g. <b style="color:orange">Orange Pi</b>)
+                                    Zero, 1...5 (incl. relatives - e.g. <b style="color:orange">Orange Pi</b>)
                                 </p>
                                 <button class="button is-fullwidth is-success" onclick='$("#step1").fadeOut();$("#pi").fadeIn("slow");$(window).scrollTo("#scroll", {offset: {top:-100}})'>
                                     Select&nbsp;<i class="fa fa-arrow-alt-circle-right"></i>
@@ -563,7 +565,7 @@
                                         Click <i>Tools</i> on the top of the program, hover on the <i>Board: XXX</i> field and open the <i>Boards Manager...</i> window.
                                     </p>
                                     <p class="subtitle">
-                                        In the search box type <b>esp32</b> - a package by <b>Espressif Systems</b> should come up. Select <b>version 2.0.1</b> and click the <b>Install</b> button.
+                                        In the search box type <b>esp32</b> - a package by <b>Espressif Systems</b> should come up. <b>Install</b> the newest version.
                                     </p>
                                     <p class="subtitle">
                                         When the package finishes installing you can click the <i>Close</i> button.
@@ -595,7 +597,22 @@
                             <hr>
                             <p class="subtitle">
                                 <span class="tag is-warning">5</span>&nbsp;
-                                <b>Prepare your Duino-Coin miner code</b> to your board.
+                                <b class="has-text-danger-dark">Important information for dual-core ESP32 users:</b>
+                                If you own a dual core ESP32 board (ESP32-Wroom, -Wrover, etc.), you may get an error during compilation related to <code>TridentTD_EasyFreeRTOS32</code> missing. To fix this, please follow these steps:
+                                <p class="subtitle">
+                                    Click <i>Sketch</i> on the top of the program, hover on the <i>Include Library</i> field and click the <i>Manage Libraries...</i> entry.
+                                </p>
+                                <p class="subtitle">
+                                    In the search box type <b>TridentTD_EasyFreeRTOS32</b> - a package by <b>TridentTD</b> should come up. <b>Install</b> the newest version.
+                                </p>
+                                <p class="subtitle">
+                                    When the library finishes installing you can click the <i>Close</i> button.
+                                </p>
+                            </p>
+                            <hr>
+                            <p class="subtitle">
+                                <span class="tag is-warning">6</span>&nbsp;
+                                <b>Prepare your Duino-Coin miner code.</b>
                                 Below are fields that you should fill in. <b>They will change required variables in the code</b> so you don't have to do it manually (and possibly mess something up).
                             </p>
                             <div class="columns">
@@ -646,7 +663,7 @@
                                                 <label class="b-checkbox checkbox">
                                                     <input type="checkbox" id="esp32_dashboard">
                                                     <span class="check"></span>
-                                                    <span class="control-label">Enable web dashboard <small>(may reduce performance)</small></span>
+                                                    <span class="control-label">Enable web dashboard</span>
                                                 </label>
                                             </div>
                                             <div class="column">
@@ -658,15 +675,15 @@
                                             </div>
                                             <div class="column">
                                                 <label class="b-checkbox checkbox">
-                                                    <input type="checkbox" id="esp32_ota">
+                                                    <input type="checkbox" id="esp32_sensor">
                                                     <span class="check"></span>
-                                                    <span class="control-label">Enable wireless (OTA) updates <small>(may reduce performance)</small></span>
+                                                    <span class="control-label">Use internal temperature sensor (only new models)</span>
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
                                     <p class="subtitle">
-                                        Below you can find a button to download a <b>ready-to-use</b> ESP32 code <b>with your settings</b> from the input fields above.
+                                        Below you can find a button to download a .zip file containing your customized code from the input fields above.
                                     </p>
                                 </div>
                                 <div class="column">
@@ -681,18 +698,21 @@
                             </div>
                             <div class="buttons">
                                 <button class="button is-success" id="esp32_download_button" onclick="get_esp32_code()">
-                                    <i class="fa fa-download"></i>&nbsp;Your customized miner code for ESP32
+                                    <i class="fa fa-download"></i>&nbsp;Your customized miner code
                                 </button>
                             </div>
                             <p class="subtitle">
-                                Download your code and <b>double click on it</b> to open the source file. If Arduino IDE asks you whether to move the file, click <b>OK</b>.
-                                If it doesn't open automatically, in IDE click <i>File</i>, then <i>Open</i> and navigate to the code you just downloaded.
+                                Download the .zip and <b>extract the folder</b> to your desktop. Double click on the <b>ESP_Code.ino</b> to launch it with Arduino IDE.<br>
+                                If it doesn't open automatically, in IDE click <i>File</i>, then <i>Open</i> and navigate to the folder you just downloaded.
+                            </p>
+                            <p class="notification has-background-danger-light">
+                                At the top of Arduino IDE you should see all 6 files. If you see only one, you did not extract the .zip file correctly. Make sure all files are in the same folder.
                             </p>
                             <hr>
                             <div class="columns">
                                 <div class="column">
                                     <p class="subtitle">
-                                        <span class="tag is-warning">6</span>&nbsp;
+                                        <span class="tag is-warning">7</span>&nbsp;
                                         <b>Upload miner code</b> to your board.<br>
                                         Make sure to <b>plug in the board to your computer</b> using a USB cable, choose <b>ESP32 Dev board</b> in the <i>Tools</i>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<i>Board</i>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<i>ESP32 Arduino</i> dropdown and <b>select a COM port</b> in <i>Tools</i>&nbsp;<i class="fa fa-arrow-right icon is-small"></i>&nbsp;<i>Port</i> list. No need to change anything else - just click the "<span class="tag" style="background:#4CB5B8 !important"><i class="fa fa-arrow-right" style="color:rgb(1,97,100)"></i></span>" upload button and wait until it finishes.
                                     </p>
@@ -795,7 +815,7 @@
                                 <div class="column">
                                     <p class="subtitle">
                                         <span class="tag is-warning">1</span>&nbsp;
-                                        First up, <b>let's install Arduino IDE</b>. Using this program we can upload codes to many types of microcontrollers, including the ESP8266. You can use the button below or visit <a href="" target="_blank">Arduino.cc</a> yourself.
+                                        First up, <b>let's install Arduino IDE</b>. Using this program we can upload codes to many types of microcontrollers, including the ESP8266. You can use the button below or visit <a href="" target="_blank">Arduino.cc</a> yourself. <b>We do not recommend using Arduino IDE 2.0+ - you may face problems.</b>
                                     </p>
                                 </div>
                                 <div class="column is-one-third">
@@ -878,7 +898,7 @@
                             <hr>
                             <p class="subtitle">
                                 <span class="tag is-warning">5</span>&nbsp;
-                                <b>Prepare your Duino-Coin miner code</b> to your board.
+                                <b>Prepare your Duino-Coin miner code.</b>
                                 Below are fields that you should fill in. <b>They will change required variables in the code</b> so you don't have to do it manually (and possibly mess something up).
                             </p>
                             <div class="columns">
@@ -929,7 +949,7 @@
                                                 <label class="b-checkbox checkbox">
                                                     <input type="checkbox" id="esp8266_dashboard">
                                                     <span class="check"></span>
-                                                    <span class="control-label">Enable web dashboard <small>(may reduce performance)</small></span>
+                                                    <span class="control-label">Enable web dashboard</span>
                                                 </label>
                                             </div>
                                             <div class="column">
@@ -939,17 +959,10 @@
                                                     <span class="control-label">Use unboard status LED</span>
                                                 </label>
                                             </div>
-                                            <div class="column">
-                                                <label class="b-checkbox checkbox">
-                                                    <input type="checkbox" checked id="esp8266_oc">
-                                                    <span class="check"></span>
-                                                    <span class="control-label">Use faster clock mode <small>(recommended)</small></span>
-                                                </label>
-                                            </div>
                                         </div>
                                     </div>
                                     <p class="subtitle">
-                                        Below you can find a button to download a <b>ready-to-use</b> ESP8266 code <b>with your settings</b> from the input fields above.
+                                        Below you can find a button to download a .zip containing your customized code from the input fields above.
                                     </p>
                                 </div>
                                 <div class="column">
@@ -964,12 +977,15 @@
                             </div>
                             <div class="buttons">
                                 <button class="button is-success" id="esp8266_download_button" onclick="get_esp8266_code()">
-                                    <i class="fa fa-download"></i>&nbsp;Your customized miner code for ESP8266
+                                    <i class="fa fa-download"></i>&nbsp;Your customized miner code
                                 </button>
                             </div>
                             <p class="subtitle">
-                                Download your code and <b>double click on it</b> to open the source file. If Arduino IDE asks you whether to move the file, click <b>OK</b>.
-                                If it doesn't open automatically, in IDE click <i>File</i>, then <i>Open</i> and navigate to the code you just downloaded.
+                                Download the .zip and <b>extract the folder</b> to your desktop. Double click on the <b>ESP_Code.ino</b> to launch it with Arduino IDE.<br>
+                                If it doesn't open automatically, in IDE click <i>File</i>, then <i>Open</i> and navigate to the folder you just downloaded.
+                            </p>
+                            <p class="notification has-background-danger-light">
+                                At the top of Arduino IDE you should see all 6 files. If you see only one, you did not extract the .zip file correctly. Make sure all files are in the same folder.
                             </p>
                             <hr>
                             <div class="columns">
@@ -1155,12 +1171,12 @@
                                 <a class="button is-info windows_release_link">
                                     <i class="fa fa-download"></i>
                                     &nbsp;
-                                    Latest release (<span class="release_ver">3.3</span>) for Windows 10+
+                                    Latest release (<span class="release_ver">4.0</span>) for Windows 10+
                                 </a>
                                 <a class="button source_release_link">
                                     <i class="fa fa-download"></i>
                                     &nbsp;
-                                    Latest release (<span class="release_ver">3.3</span>) as source code
+                                    Latest release (<span class="release_ver">4.0</span>) as source code
                                 </a>
                             </div>
                             <div class="columns">
@@ -1199,7 +1215,7 @@
                             </p>
                             <div class="notification has-text-info">
                                 <i class="fa fa-info-circle"></i>
-                                If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin AVR Miner <span class="release_ver">3.3</span></b> folder.
+                                If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin AVR Miner <span class="release_ver">4.0</span></b> folder.
                             </div>
                             <hr>
                             <div class="columns">
@@ -1342,7 +1358,7 @@
                                 Raspberry Pi
                             </p>
                             <p class="subtitle">
-                                Zero, 1, 2, 3, 4 or 400 (incl. relatives - e.g. <b style="color:orange">Orange Pi</b>)
+                                Zero, 1...5 (incl. relatives - e.g. <b style="color:orange">Orange Pi</b>)
                             </p>
                             <button class="button is-fullwidth" onclick='$("#arduino_select").fadeOut();$("#arduino_pi").fadeIn("slow");$(window).scrollTo(`#scroll`, {offset: {top:-100}})'>
                                 Select&nbsp;<i class="fa fa-arrow-alt-circle-right"></i>
@@ -1524,12 +1540,12 @@
                                 <a class="button is-info windows_release_link">
                                     <i class="fa fa-download"></i>
                                     &nbsp;
-                                    Latest release (<span class="release_ver">3.3</span>) for Windows 10+
+                                    Latest release (<span class="release_ver">4.0</span>) for Windows 10+
                                 </a>
                                 <a class="button source_release_link">
                                     <i class="fa fa-download"></i>
                                     &nbsp;
-                                    Latest release (<span class="release_ver">3.3</span>) as source code
+                                    Latest release (<span class="release_ver">4.0</span>) as source code
                                 </a>
                             </div>
                             <div class="columns">
@@ -1572,7 +1588,7 @@
                             </p>
                             <div class="notification has-text-info">
                                 <i class="fa fa-info-circle"></i>
-                                If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin AVR Miner <span class="release_ver">3.3</span></b> folder.
+                                If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin AVR Miner <span class="release_ver">4.0</span></b> folder.
                             </div>
                             <hr>
                             <div class="columns">
@@ -1692,7 +1708,7 @@
                                 <a class="button source_release_link">
                                     <i class="fa fa-download"></i>
                                     &nbsp;
-                                    Latest release (<span class="release_ver">3.3</span>) as source code
+                                    Latest release (<span class="release_ver">4.0</span>) as source code
                                 </a>
                             </div>
                             <div class="columns">
@@ -1756,6 +1772,13 @@
                                         <code>
                                             python3 AVR_Miner.py
                                         </code>
+                                        <p class="subtitle">
+                                            At first, the miner will (attempt to) automatically install required dependencies via pip. If it fails, you'll need to do it manually using the command it will show.<br><br>
+                                            <b>In the newest Python versions it may be impossible to install dependencies due to PIP's policy</b>. To restore the bevahior from previous versions, use these commands:
+                                            <code>mkdir ~/.config</code>, then <code>mkdir ~/.config/pip</code> and finally 
+                                            <code>echo -e "[global]\nbreak-system-packages=true" > ~/.config/pip/pip.conf</code>
+                                            After executing these commands, launch the Miner again.
+                                        </p>
                                     </p>
                                     <p class="subtitle">
                                         When starting it for the first time answer it's questions to go through the configuration phase. Note that serial ports on linux are named <b>/dev/ttyUSB*</b> or <b>/dev/ttyACM*</b> (unlike COM* in Windows).
@@ -2009,7 +2032,7 @@
                                 <a class="button is-info source_release_link">
                                     <i class="fa fa-download"></i>
                                     &nbsp;
-                                    Latest release (<span class="release_ver">3.3</span>) as source code
+                                    Latest release (<span class="release_ver">4.0</span>) as source code
                                 </a>
                                 <a class="button" href="https://github.com/revoxhere/duino-coin/releases" target="_blank">
                                     <i class="fa fa-link"></i>
@@ -2044,7 +2067,7 @@
                                         </p>
                                         <div class="notification has-text-info">
                                             <i class="fa fa-info-circle"></i>
-                                            If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin PC Miner <span class="release_ver">3.3</span></b> folder.
+                                            If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin PC Miner <span class="release_ver">4.0</span></b> folder.
                                         </div>
                                     </p>
                                 </div>
@@ -2158,18 +2181,18 @@
                             </p>
                             <p class="subtitle">
                                 <b>To download the latest source you can use the following command:</b><br>
-                                <code>wget https://github.com/revoxhere/duino-coin/archive/refs/tags/<span class="release_ver">3.3</span>.zip</code>
+                                <code>wget https://github.com/revoxhere/duino-coin/archive/refs/tags/<span class="release_ver">4.0</span>.zip</code>
                             </p>
                             <hr>
                             <p class="subtitle">
                                 <span class="tag is-warning">3</span>&nbsp;
                                 <b>After downloading</b> you need to extract the <i>.zip</i> file. You can do this by opening it and moving the contents to your desktop or typing the following command:<br>
-                                <code>unzip <span class="release_ver">3.3</span>.zip</code>
+                                <code>unzip <span class="release_ver">4.0</span>.zip</code>
                             </p>
                             <p class="subtitle">
                                 <span class="tag is-warning">4</span>&nbsp;
                                 Navigate into the folder you extracted the release to with
-                                <code>cd duino-coin-<span class="release_ver">3.3</span></code> and <b>Launch the PC_Miner.py</b> by typing<br>
+                                <code>cd duino-coin-<span class="release_ver">4.0</span></code> and <b>Launch the PC_Miner.py</b> by typing<br>
                                 <code>python3 PC_Miner.py</code> into your terminal.
                             </p>
                             <p class="subtitle">
@@ -2178,7 +2201,7 @@
                             </p>
                             <div class="notification has-text-info">
                                 <i class="fa fa-info-circle"></i>
-                                If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin PC Miner <span class="release_ver">3.3</span></b> folder.
+                                If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin PC Miner <span class="release_ver">4.0</span></b> folder.
                             </div>
                             <hr>
                             <div class="columns">
@@ -2309,12 +2332,17 @@
                                 <code>python3 PC_Miner.py</code> into your terminal.
                             </p>
                             <p class="subtitle">
-                                At first, the miner will (attempt to) automatically install required dependencies via pip. If it fails, you'll need to do it manually using the command it will provide.<br>
+                                At first, the miner will (attempt to) automatically install required dependencies via pip. If it fails, you'll need to do it manually using the command it will show.<br><br>
+                                <b>In the newest Python versions it may be impossible to install dependencies due to PIP's policy</b>. To restore the bevahior from previous versions, use these commands:
+                                <code>mkdir ~/.config</code>, then <code>mkdir ~/.config/pip</code> and finally 
+                                <code>echo -e "[global]\nbreak-system-packages=true" > ~/.config/pip/pip.conf</code>
+                                After executing these commands, launch the Miner again.
+                                <br><br>
                                 <b>From this point the PC Miner should tell you all you need to know.</b> Answer the questions to complete the configuration phase - miner will remember the settings for the future.
                             </p>
                             <div class="notification has-text-info">
                                 <i class="fa fa-info-circle"></i>
-                                If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin PC Miner <span class="release_ver">3.3</span></b> folder.
+                                If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin PC Miner <span class="release_ver">4.0</span></b> folder.
                             </div>
                             <hr>
                             <div class="columns">
@@ -2424,18 +2452,18 @@
                             </p>
                             <p class="subtitle">
                                 <b>To download the latest source you can use the following command:</b><br>
-                                <code>wget https://github.com/revoxhere/duino-coin/archive/refs/tags/<span class="release_ver">3.3</span>.zip</code>
+                                <code>wget https://github.com/revoxhere/duino-coin/archive/refs/tags/<span class="release_ver">4.0</span>.zip</code>
                             </p>
                             <hr>
                             <p class="subtitle">
                                 <span class="tag is-warning">4</span>&nbsp;
                                 <b>After downloading</b> you need to extract the <i>.zip</i> file. You can do this by opening it and moving the contents to your desktop or typing the following command:
-                                <code>unzip <span class="release_ver">3.3</span>.zip</code>
+                                <code>unzip <span class="release_ver">4.0</span>.zip</code>
                             </p>
                             <p class="subtitle">
                                 <span class="tag is-warning">5</span>&nbsp;
                                 Navigate into the folder you extracted the release to with
-                                <code>cd duino-coin-<span class="release_ver">3.3</span></code> and <b>Launch the PC_Miner.py</b> by typing<br>
+                                <code>cd duino-coin-<span class="release_ver">4.0</span></code> and <b>Launch the PC_Miner.py</b> by typing<br>
                                 <code>python PC_Miner.py</code> into your terminal.
                             </p>
                             <p class="subtitle">
@@ -2444,7 +2472,7 @@
                             </p>
                             <div class="notification has-text-info">
                                 <i class="fa fa-info-circle"></i>
-                                If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin PC Miner <span class="release_ver">3.3</span></b> folder.
+                                If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin PC Miner <span class="release_ver">4.0</span></b> folder.
                             </div>
                             <hr>
                             <div class="columns">
@@ -2827,7 +2855,7 @@
                                 <a class="button is-info windows_release_link">
                                     <i class="fa fa-download"></i>
                                     &nbsp;
-                                    Latest release (<span class="release_ver">3.3</span>) for Windows 10+
+                                    Latest release (<span class="release_ver">4.0</span>) for Windows 10+
                                 </a>
                                 <a class="button" href="https://github.com/revoxhere/duino-coin/releases" target="_blank">
                                     <i class="fa fa-link"></i>
@@ -2857,7 +2885,7 @@
                                     </p>
                                     <div class="notification has-text-info">
                                         <i class="fa fa-info-circle"></i>
-                                        If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin PC Miner <span class="release_ver">3.3</span></b> folder.
+                                        If you want to reset the configuration in the future, simply delete the <b>Settings.cfg</b> file inside the <b>Duino-Coin PC Miner <span class="release_ver">4.0</span></b> folder.
                                     </div>
                                 </div>
                                 <div class="column is-one-third">
@@ -2988,11 +3016,10 @@ const background = document.getElementById('background');
     path: 'assets/animations/particle_bg.json'
 });*/
 
-let latest_release = "3.33";
+let latest_release = "4.03";
 $.getJSON('https://api.github.com/repos/revoxhere/duino-coin/releases',
     function(data) {
         latest_release = data[0]["tag_name"];
-        console.log(latest_release);
 
         $(".release_ver").text(latest_release);
 
@@ -3041,47 +3068,81 @@ function get_esp32_code() {
     rig_id = $("#esp32_name").val();
     enable_dash = $('#esp32_dashboard').is(':checked');
     enable_led = $('#esp32_led').is(':checked');
-    enable_ota = $('#esp32_ota').is(':checked');
+    enable_sensor = $('#esp32_sensor').is(':checked');
 
     if (!miner_pass) miner_pass = "None";
     if (!wifi_password) wifi_password = "";
+
     if (!username || !wifi_name) {
         alert("Fill in the blanks first!");
         return;
     }
 
     $("#esp32_download_button").addClass("is-loading");
-    $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP32_Code/ESP32_Code.ino',
+
+    var zip = new JSZip();
+
+    $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/Settings.h',
         function(data, textStatus, jqXHR) {
-            ESP32_CODE = data;
+            SETTINGS_CODE = data;
 
             if (rig_id) {
-                ESP32_CODE = ESP32_CODE.replace(
-                    `const char *RIG_IDENTIFIER = "None";`,
-                    `const char *RIG_IDENTIFIER = "${rig_id}";`);
+                SETTINGS_CODE = SETTINGS_CODE.replace(
+                    `extern const char RIG_IDENTIFIER[] = "None";`,
+                    `extern const char RIG_IDENTIFIER[] = "${rig_id}";`);
             }
             if (!enable_led) {
-                ESP32_CODE = ESP32_CODE.replace(
-                    `const bool LED_BLINKING = true;`,
-                    `const bool LED_BLINKING = false;`);
+                SETTINGS_CODE = SETTINGS_CODE.replace(
+                    `#define LED_BLINKING`,
+                    `// #define LED_BLINKING`);
             }
             if (enable_dash) {
-                ESP32_CODE = ESP32_CODE.replace(
+                SETTINGS_CODE = SETTINGS_CODE.replace(
                     `// #define WEB_DASHBOARD`,
                     `#define WEB_DASHBOARD`);
             }
-            if (enable_ota) {
-                ESP32_CODE = ESP32_CODE.replace(
-                    `// #define ENABLE_OTA`,
-                    `#define ENABLE_OTA`);
+            if (enable_sensor) {
+                SETTINGS_CODE = SETTINGS_CODE.replace(
+                    `// #define USE_INTERNAL_SENSOR`,
+                    `#define USE_INTERNAL_SENSOR`);
             }
 
-            ESP32_CODE = ESP32_CODE.replace(`"USERNAME"`, `"${username}"`);
-            ESP32_CODE = ESP32_CODE.replace(`"MINING_KEY"`, `"${miner_pass}"`);
-            ESP32_CODE = ESP32_CODE.replace(`"WIFI_NAME"`, `"${wifi_name}"`);
-            ESP32_CODE = ESP32_CODE.replace(`"WIFI_PASSWORD"`, `"${wifi_password}"`);
-            save(ESP32_CODE, `ESP32_Code_v${latest_release}-${username}.ino`)
-            $("#esp32_download_button").removeClass("is-loading");
+            SETTINGS_CODE = SETTINGS_CODE.replace(`"my_cool_username"`, `"${username}"`);
+            SETTINGS_CODE = SETTINGS_CODE.replace(`"mySecretPass"`, `"${miner_pass}"`);
+            SETTINGS_CODE = SETTINGS_CODE.replace(`"SSID"`, `"${wifi_name}"`);
+            SETTINGS_CODE = SETTINGS_CODE.replace(`"PASSW0RD"`, `"${wifi_password}"`);
+            zip.file("ESP_Code/Settings.h", SETTINGS_CODE);
+
+            $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/MiningJob.h',
+                function(data, textStatus, jqXHR) {
+                    zip.file("ESP_Code/MiningJob.h", data);
+
+                $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/ESP_Code.ino',
+                    function(data, textStatus, jqXHR) {
+                        zip.file("ESP_Code/ESP_Code.ino", data);
+
+                    $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/Dashboard.h',
+                        function(data, textStatus, jqXHR) {
+                            zip.file("ESP_Code/Dashboard.h", data);
+
+                        $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/DSHA1.h',
+                            function(data, textStatus, jqXHR) {
+                                zip.file("ESP_Code/DSHA1.h", data);
+
+                            $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/Counter.h',
+                                function(data, textStatus, jqXHR) {
+                                    zip.file("ESP_Code/Counter.h", data);
+
+                                zip.generateAsync({type:"blob"}).then(function(content) {
+                                    save(content, `ESP_Code-${username}.zip`);
+                                });
+
+                                $("#esp32_download_button").removeClass("is-loading");
+                            });
+                        });
+                    });
+                });
+            });
         });
 }
 
@@ -3094,47 +3155,74 @@ function get_esp8266_code() {
     rig_id = $("#esp8266_name").val();
     enable_dash = $('#esp8266_dashboard').is(':checked');
     enable_led = $('#esp8266_led').is(':checked');
-    enable_overclock = $('#esp8266_oc').is(':checked');
 
     if (!miner_pass) miner_pass = "None";
     if (!wifi_password) wifi_password = "";
+
     if (!username || !wifi_name) {
         alert("Fill in the blanks first!");
         return;
     }
 
     $("#esp8266_download_button").addClass("is-loading");
-    $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP8266_Code/ESP8266_Code.ino',
+    var zip = new JSZip();
+
+    $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/Settings.h',
         function(data, textStatus, jqXHR) {
-            ESP8266_CODE = data;
+            SETTINGS_CODE = data;
 
             if (rig_id) {
-                ESP8266_CODE = ESP8266_CODE.replace(
-                    `const char *RIG_IDENTIFIER = "None";`,
-                    `const char *RIG_IDENTIFIER = "${rig_id}";`);
+                SETTINGS_CODE = SETTINGS_CODE.replace(
+                    `extern const char RIG_IDENTIFIER[] = "None";`,
+                    `extern const char RIG_IDENTIFIER[] = "${rig_id}";`);
             }
             if (!enable_led) {
-                ESP8266_CODE = ESP8266_CODE.replace(
-                    `const bool LED_BLINKING = true;`,
-                    `const bool LED_BLINKING = false;`);
-            }
-            if (!enable_overclock) {
-                ESP8266_CODE = ESP8266_CODE.replace(
-                    `const bool USE_HIGHER_DIFF = true;`,
-                    `const bool USE_HIGHER_DIFF = false;`);
+                SETTINGS_CODE = SETTINGS_CODE.replace(
+                    `#define LED_BLINKING`,
+                    `// #define LED_BLINKING`);
             }
             if (enable_dash) {
-                ESP8266_CODE = ESP8266_CODE.replace(
-                    `const bool WEB_DASHBOARD = false;`,
-                    `const bool WEB_DASHBOARD = true;`);
+                SETTINGS_CODE = SETTINGS_CODE.replace(
+                    `// #define WEB_DASHBOARD`,
+                    `#define WEB_DASHBOARD`);
             }
 
-            ESP8266_CODE = ESP8266_CODE.replace(`"USERNAME"`, `"${username}"`);
-            ESP8266_CODE = ESP8266_CODE.replace(`"MINING_KEY"`, `"${miner_pass}"`);
-            ESP8266_CODE = ESP8266_CODE.replace(`"WIFI_NAME"`, `"${wifi_name}"`);
-            ESP8266_CODE = ESP8266_CODE.replace(`"WIFI_PASSWORD"`, `"${wifi_password}"`);
-            save(ESP8266_CODE, `ESP8266_Code_v${latest_release}-${username}.ino`)
-            $("#esp8266_download_button").removeClass("is-loading");
+            SETTINGS_CODE = SETTINGS_CODE.replace(`"my_cool_username"`, `"${username}"`);
+            SETTINGS_CODE = SETTINGS_CODE.replace(`"mySecretPass"`, `"${miner_pass}"`);
+            SETTINGS_CODE = SETTINGS_CODE.replace(`"SSID"`, `"${wifi_name}"`);
+            SETTINGS_CODE = SETTINGS_CODE.replace(`"PASSW0RD"`, `"${wifi_password}"`);
+            zip.file("ESP_Code/Settings.h", SETTINGS_CODE);
+
+            $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/MiningJob.h',
+                function(data, textStatus, jqXHR) {
+                    zip.file("ESP_Code/MiningJob.h", data);
+
+                $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/ESP_Code.ino',
+                    function(data, textStatus, jqXHR) {
+                        zip.file("ESP_Code/ESP_Code.ino", data);
+
+                    $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/Dashboard.h',
+                        function(data, textStatus, jqXHR) {
+                            zip.file("ESP_Code/Dashboard.h", data);
+
+                        $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/DSHA1.h',
+                            function(data, textStatus, jqXHR) {
+                                zip.file("ESP_Code/DSHA1.h", data);
+
+                            $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/Counter.h',
+                                function(data, textStatus, jqXHR) {
+                                    zip.file("ESP_Code/Counter.h", data);
+
+                                zip.generateAsync({type:"blob"}).then(function(content) {
+                                    save(content, `ESP_Code-${username}.zip`);
+                                });
+
+                                $("#esp8266_download_button").removeClass("is-loading");
+                            });
+                        });
+                    });
+                });
+            });
         });
 }
 
