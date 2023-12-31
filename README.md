@@ -11,6 +11,10 @@
   <a href="https://duinocoin.com">
     <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" width="430px" />
   </a>
+  <h3>
+   Simple, eco-friendly, centralized coin that can be mined with Arduinos, ESP boards, Raspberry Pis, computers, and many more 
+  (including Wi-Fi routers, smart TVs, smartphones, smartwatches, SBCs and other MCUs).
+  </h3>
   <br>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/README.md">
     <img src="https://img.shields.io/badge/English-ff8502.svg?style=for-the-badge" /></a>
@@ -63,13 +67,7 @@
   <img src="https://img.shields.io/discord/677615191793467402.svg?color=ff283a&label=Discord&logo=Discord&style=for-the-badge" /></a>
 <a href="https://github.com/revoxhere/duino-coin/releases/latest">
   <img src="https://img.shields.io/badge/release-latest-ff640a.svg?style=for-the-badge" /></a>
-<br>
-
-<h3>
-  Duino-Coin is a coin that can be mined with Arduinos, ESP8266/32 boards, Raspberry Pis, computers, and many more 
-  (including Wi-Fi routers, smart TVs, smartphones, smartwatches, SBCs, MCUs or even GPUs)
-</h3>
-
+<br><br>
 
 | Key features | Technical specifications | (Some of many) supported boards |
 |-|-|-|
@@ -78,12 +76,14 @@
 
 ## Getting started
 
-#### The easiest way to get started with Duino-Coin is to download [the latest release](https://github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
-After downloading the release, unzip it and launch the desired program.<br>
-There are no dependencies required.
+### The easy way
+Get started with Duino-Coin by downloading [the latest release](https://github.com/revoxhere/duino-coin/releases/latest) for your OS.<br>
+Then unzip it and launch the desired program. There are no dependencies required.
 
 If you need help, you can take a look at the official getting started guides located <a href="https://duinocoin.com/getting-started">on the official website</a>.<br>
 FAQ and troubleshooting help can be found in the [Wikis](https://github.com/revoxhere/duino-coin/wiki).<br>
+
+### The hard way
 
 #### Linux (manual installation)
 
@@ -134,44 +134,53 @@ How to help?
 Server source code, documentation for API calls and official libraries for developing your own apps for Duino-Coin are available in the [useful tools](https://github.com/revoxhere/duino-coin/tree/useful-tools) branch.
 
 
-## Benchmarks of officially tested devices and boards
+## Version 4.0 reward goals
 
-### Please note that the rewards depend on a lot of factors and the table below is just for orientation purposes.
+Captured at normal multiplier (no weekend boost)
+| Device                | Hashrate            | Threads | DUCO/day |
+|-----------------------|---------------------|---------|----------|
+| Arduino               | 343 H/s             | 1       | 12       |
+| ESP32                 | 84 kH/s (2x42 kH/s) | 2       | 10       |
+| ESP32-S2/C3           | 82 kH/s             | 1       | 8        |
+| ESP8266               | 66 kH/s             | 1       | 6        |
+| Raspberry Pi 4 (LOW)  | 1 MH/s (no fasthash)| 4       | 6-7      |
+| Raspberry Pi 4 (MED)  | 5.4 MH/s (fasthash) | 4       | 7-8      |
+| Low power PCs         |                     | 4       | 4-6      |
+| Medium                |                     | 4-8     | 6-10     |
+| High end              |                     | 8+      | 10-12    |
+
+<details>
+  <summary><b>Other tested devices and their benchmarks</b></summary>
   
-  | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage | Average<br>DUCO/day |
-  |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|---------------------|
-  | Arduino Pro Mini, Uno, Nano etc.<br>(Atmega 328p/pb/16u2) | 258 H/s                           | 1                 | 0.2 W          | 15-20               |
-  | Raspberry Pi Pico                                         | 5 kH/s                            | 1                 | 0.3 W          | 10                  |
-  | Teensy 4.1 (soft cryptography)                            | 80 kH/s                           | 1                 | 0.5 W          | ?                   |
-  | NodeMCU, Wemos D1 etc.<br>(ESP8266)                       | 9-10 kH/s (160MHz) 5 kH/s (80Mhz) | 1                 | 0.6 W          | 3-6                 |
-  | ESP32                                                     | 40-42 kH/s                        | 2                 | 1 W            | 6-9                 |
-  | Raspberry Pi Zero                                         | 18 kH/s                           | 1                 | 1.1 W          | ?                   |
-  | Raspberry Pi 3 **(32bit)**                                | 440 kH/s                          | 4                 | 5.1 W          | 4-5                 |
-  | Raspberry Pi 4 **(32bit)**                                | 740 kH/s                          | 4                 | 6.4 W          | ?                   |
-  | Raspberry Pi 4 **(64bit, fasthash)**                      | 6.8 MH/s                          | 4                 | 6.4 W          | 5                   |
-  | ODROID XU4                                                | 1.0 MH/s                          | 8                 | 5 W            | 6                   |
-  | Atomic Pi                                                 | 690 kH/s                          | 4                 | 6 W            | ?                   |
-  | Orange Pi Zero 2                                          | 740 kH/s                          | 4                 | 2.55 W         | ?                   |
-  | Khadas Vim 2 Pro                                          | 1.12 MH/s                         | 8                 | 6.2 W          | ?                   |
-  | Libre Computers Tritium H5CC                              | 480 kH/s                          | 4                 | 5 W            | ?                   |
-  | Libre Computers Le Potato                                 | 410 kH/s                          | 4                 | 5 W            | ?                   |
-  | Pine64 ROCK64                                             | 640 kH/s                          | 4                 | 5 W            | ?                   |
-  | Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | 53 W           | 3.3                 |
-  | Intel Core i5-2430M                                       | 1.18 MH/s                         | 4                 | 35 W           | 6.5                 |
-  | Intel Core i5-3230M                                       | 1.52 MH/s                         | 4                 | 35 W           | 7.2                 |
-  | Intel Core i5-5350U                                       | 1.35 MH/s                         | 4                 | 15 W           | 6.0                 |
-  | Intel Core i5-7200U                                       | 1.62 MH/s                         | 4                 | 15 W           | 7.5                 |
-  | Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | 45 W           | 9.1                 |   
-  | Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | 54 W           | 3.7                 |
-  | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 65 W           | 15.44               |
-  | AMD Ryzen R1505G **(fasthash)**                           | 8.5 MH/s                          | 4                 | 35 W           | -                   |   
-  | Intel Core i7-11370H **(fasthash)**                       | 17.3 MH/s                         | 8                 | 35 W           | 4.28                |
-  | Realtek RTD1295                                           | 490 kH/s                          | 4                 | -              | -                   |
-  | Realtek RTD1295 **(fasthash)**                            | 3.89 MH/s                         | 4                 | -              | -                   |
+Please note the DUCO/day column has been removed since version 4.0 changed the reward system.
+| Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage |
+|-----------------------------------------------------------|-----------------------------------|-------------------|----------------|
+| Raspberry Pi Pico                                         | 5 kH/s                            | 1                 | 0.3 W          |
+| Raspberry Pi Zero                                         | 18 kH/s                           | 1                 | 1.1 W          |
+| Raspberry Pi 3 **(32bit)**                                | 440 kH/s                          | 4                 | 5.1 W          |
+| Raspberry Pi 4 **(32bit)**                                | 740 kH/s                          | 4                 | 6.4 W          |
+| Raspberry Pi 4 **(64bit, fasthash)**                      | 6.8 MH/s                          | 4                 | 6.4 W          |
+| ODROID XU4                                                | 1.0 MH/s                          | 8                 | 5 W            |
+| Atomic Pi                                                 | 690 kH/s                          | 4                 | 6 W            |
+| Orange Pi Zero 2                                          | 740 kH/s                          | 4                 | 2.55 W         |
+| Khadas Vim 2 Pro                                          | 1.12 MH/s                         | 8                 | 6.2 W          |
+| Libre Computers Tritium H5CC                              | 480 kH/s                          | 4                 | 5 W            |
+| Libre Computers Le Potato                                 | 410 kH/s                          | 4                 | 5 W            |
+| Pine64 ROCK64                                             | 640 kH/s                          | 4                 | 5 W            |
+| Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | 53 W           |
+| Intel Core i5-2430M                                       | 1.18 MH/s                         | 4                 | 35 W           |
+| Intel Core i5-3230M                                       | 1.52 MH/s                         | 4                 | 35 W           |
+| Intel Core i5-5350U                                       | 1.35 MH/s                         | 4                 | 15 W           |
+| Intel Core i5-7200U                                       | 1.62 MH/s                         | 4                 | 15 W           |
+| Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | 45 W           |
+| Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | 54 W           |
+| AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 65 W           |
+| AMD Ryzen R1505G **(fasthash)**                           | 8.5 MH/s                          | 4                 | 35 W           |
+| Intel Core i7-11370H **(fasthash)**                       | 17.3 MH/s                         | 8                 | 35 W           |
+| Realtek RTD1295                                           | 490 kH/s                          | 4                 | -              |
+| Realtek RTD1295 **(fasthash)**                            | 3.89 MH/s                         | 4                 | -              |
 
-All tests were performed using the DUCO-S1 algorithm **without fasthash accelerations** unless stated otherwise. This table will be actively updated.
-
-
+</details>
 
 ## Community-made softwares
 
@@ -244,20 +253,20 @@ Our disclaimer is available here: <a href="https://duinocoin.com/disclaimer">dui
 
 *   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Lead Python dev, project founder)
 *   [@Bilaboz](https://github.com/bilaboz/) (Lead NodeJS dev)
-*   [@connorhess](https://github.com/connorhess) (Lead Python dev, Node-S owner)
-*   [@JoyBed](https://github.com/JoyBed) (Lead AVR dev)
-*   [@Yennefer](https://www.instagram.com/vlegle/) (Lead social manager)
 *   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (Lead Webmaster and DUCO Developer)
 *   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-*   [@Lulaschkas](https://github.com/Lulaschkas) (Dev)
-*   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev)
+<!-- *   [@connorhess](https://github.com/connorhess) (Lead Python dev, Node-S owner) -->
+<!-- *   [@JoyBed](https://github.com/JoyBed) (Lead AVR dev) -->
+<!-- *   [@Yennefer](https://www.instagram.com/vlegle/) (Lead social manager) -->
+<!-- *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev) -->
+<!-- *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev) -->
 
 Big thanks to all the [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped to develop the Duino-Coin project.
+Visit [duinocoin.com/team](https://duinocoin.com/team.html) to view more information about the Duino Team.
 
 <hr>
 
-Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/)
-<br/>
-Website Link: [https://duinocoin.com/](https://duinocoin.com/)
-<br/>
+Established August 2019 <br>
+Project Link: [https://github.com/revoxhere/duino-coin/](https://github.com/revoxhere/duino-coin/) <br>
+Website Link: [https://duinocoin.com/](https://duinocoin.com/) <br>
 Duino-Coin Status Page: [https://status.duinocoin.com](https://status.duinocoin.com)
