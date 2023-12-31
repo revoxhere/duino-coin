@@ -275,7 +275,7 @@
         "using_config": "Konfigurační soubor: ",
         "motd": "Serverová zpráva dne: ",
         "hashrate_test": "Test hashratu skončil s výsledkem ",
-        "hashrate_test_diff": ", systém přiřadil těžební obtížnost: "
+        "hashrate_test_diff": ", systém přiřadil těžební obtížnost: ",
         "diff": "obtížnost",
         "hashrate_total": "celkem",
         "surpassed": "Gratulujeme k dosažení",
