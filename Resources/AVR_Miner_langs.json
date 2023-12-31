@@ -95,7 +95,8 @@
         "diff": "diff.",
         "hashrate_total": "total",
         "surpassed": "Congrats for surpassing",
-        "surpassed_shares": "correct shares!"
+        "surpassed_shares": "correct shares!",
+        "miner_is_outdated": "Miner is outdated"
     },
     "indonesian": {
         "translation_autor": "rezafauzan945",
@@ -449,7 +450,8 @@
         "diff": "trudność",
         "hashrate_total": "łącznie",
         "surpassed": "Gratulujemy osiągnięcia",
-        "surpassed_shares": "zaakceptowanych share'ów!"
+        "surpassed_shares": "zaakceptowanych share'ów!",
+        "miner_is_outdated": "Używasz starej wersji koparki"
     },
     "russian": {
         "translation_autor": "5Q",
