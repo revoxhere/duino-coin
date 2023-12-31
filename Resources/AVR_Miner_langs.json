@@ -276,6 +276,11 @@
         "motd": "Serverová zpráva dne: ",
         "hashrate_test": "Test hashratu skončil s výsledkem ",
         "hashrate_test_diff": ", systém přiřadil těžební obtížnost: "
+        "diff": "obtížnost",
+        "hashrate_total": "celkem",
+        "surpassed": "Gratulujeme k dosažení",
+        "surpassed_shares": "úspěšných operací!",
+        "miner_is_outdated": "Težební program je zastaralý"
     },
     "korean": {
         "translation_autor": "hotmoist, roroxxn, hj-k66 ",
