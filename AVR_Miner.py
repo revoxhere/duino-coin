@@ -1239,7 +1239,7 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
 
             if shares[0] % 100 == 0 and shares[0] > 1:
                 pretty_print("sys0",
-                            f"{get_string('surpassed')} {accept.value} {get_string('surpassed_shares')}",
+                            f"{get_string('surpassed')} {shares[0]} {get_string('surpassed_shares')}",
                             "success")
 
             title(get_string('duco_avr_miner') + str(Settings.VER)
