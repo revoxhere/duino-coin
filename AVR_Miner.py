@@ -1012,7 +1012,7 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
                             'success')
                     else:
                         pretty_print(
-                            'sys0', f' Miner is outdated (v{Settings.VER}) -'
+                            'sys0', f'{get_string('miner_is_outdated')} (v{Settings.VER}) -'
                             + get_string('server_is_on_version')
                             + server_version + Style.NORMAL
                             + Fore.RESET + get_string('update_warning'),
