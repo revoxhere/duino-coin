@@ -140,7 +140,7 @@ private:
     #if defined(ESP8266)
         String MINER_BANNER = "Official ESP8266 Miner";
     #elif defined(CONFIG_FREERTOS_UNICORE)
-        String MINER_BANNER = "OFficial ESP32-S2 Miner";
+        String MINER_BANNER = "Official ESP32-S2 Miner";
     #else
         String MINER_BANNER = "Official ESP32 Miner";
     #endif
