@@ -1747,7 +1747,7 @@
         "updating": "Těžební program je zastaralý. Aktualizuji....",
         "ask_mining_key": "Zadej svůj těžební klíč (požadováno v případech, kdy tato možnost byla nastavena ve webové peněžence - stiskni enter pro přeskočení): ",
         "mining_key_required": "Těžební klíč je nutný pro těžbu na tomto účtu",
-        "invalid_mining_key": "Zadaný těžební klíč je neplatný!"
+        "invalid_mining_key": "Zadaný těžební klíč je neplatný!",
         "running_on_rpi": "Vypadá to, že tento těžební program jede na Raspberry Pi.",
         "running_on_rpi2": "Signalizační LEDky na počítači budou indikovat probíhající těžbu",
         "discord_launch_error": "Chyba při otevírání Discord RPC vlákna:",
