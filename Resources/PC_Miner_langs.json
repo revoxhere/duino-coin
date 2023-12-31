@@ -1748,6 +1748,21 @@
         "ask_mining_key": "Zadej svůj těžební klíč (požadováno v případech, kdy tato možnost byla nastavena ve webové peněžence - stiskni enter pro přeskočení): ",
         "mining_key_required": "Těžební klíč je nutný pro těžbu na tomto účtu",
         "invalid_mining_key": "Zadaný těžební klíč je neplatný!"
+        "running_on_rpi": "Vypadá to, že tento těžební program jede na Raspberry Pi.",
+        "running_on_rpi2": "Signalizační LEDky na počítači budou indikovat probíhající těžbu",
+        "discord_launch_error": "Chyba při otevírání Discord RPC vlákna:",
+        "discord_update_error": "Chyba při aktualizaci Discord RPC statistik:",
+        "key_retry": "Chceš to zkusit znovu? (Y/n): ",
+        "incorrect_username": "Zadané uživatelské jméno neexistuje!",
+        "system_threads_notice": "Varování: Pokoušíš se využít více jader, než má tvůj počítač. \n\t\tToto může vést k nepředvídatelným vedlejším účinkům a systém se může zaseknout.\n\t\tZačínám za 10s",
+        "using_config": "Konfigurační soubor: ",
+        "motd": "Serverová zpráva dne: ",
+        "hashrate_total": "celkem",
+        "diff": "obtížnost",
+        "iot_on_rpi": "Duino IoT je zapnuté. Těžební program bude posílat teplotu procesoru tvého Raspberry Pi do webové peněženky.",
+        "iot_on_rpi2": "Testuji čtení senzorů:",
+        "surpassed": "Gratulujeme k dosažení",
+        "surpassed_shares": "úspěšných operací!"
     },
     "japanese": {
         "translation_autor": "Ikko Ashimine",
