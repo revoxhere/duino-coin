@@ -173,7 +173,24 @@ namespace {
     #endif
 
     void SetupWifi() {
-      #ifndef USE_LAN
+      
+      #ifdef USE_LAN
+        Serial.println("Connecting to Ethernet...");
+        WiFi.onEvent(WiFiEvent);  // Will call WiFiEvent() from another thread.
+        ETH.begin();
+        
+
+        while (!eth_connected) {
+            delay(500);
+            Serial.print(".");
+        }
+
+        Serial.println("\n\nSuccessfully connected to Ethernet");
+        Serial.println("Local IP address: " + ETH.localIP().toString());
+        Serial.println("Rig name: " + String(RIG_IDENTIFIER));
+        Serial.println();
+
+      #else
         Serial.println("Connecting to: " + String(SSID));
         WiFi.mode(WIFI_STA); // Setup ESP in client mode
         #if defined(ESP8266)
@@ -197,23 +214,6 @@ namespace {
         Serial.println("Local IP address: " + WiFi.localIP().toString());
         Serial.println("Rig name: " + String(RIG_IDENTIFIER));
         Serial.println();
-      #endif
-      #ifdef USE_LAN
-        Serial.println("Connecting to Ethernet...");
-        WiFi.onEvent(WiFiEvent);  // Will call WiFiEvent() from another thread.
-        ETH.begin();
-        
-
-        while (!eth_connected) {
-            delay(500);
-            Serial.print(".");
-        }
-
-        Serial.println("\n\nSuccessfully connected to Ethernet");
-        Serial.println("Local IP address: " + ETH.localIP().toString());
-        Serial.println("Rig name: " + String(RIG_IDENTIFIER));
-        Serial.println();
-
 
       #endif
 
@@ -242,16 +242,14 @@ namespace {
     }
 
     void VerifyWifi() {
-      #ifndef USE_LAN
-        while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0, 0, 0, 0))
-            WiFi.reconnect();
-      #endif
-
       #ifdef USE_LAN
         while ((!eth_connected) || (ETH.localIP() == IPAddress(0, 0, 0, 0))) {
           Serial.println("Ethernet connection lost. Reconnect..." );
           SetupWifi();
         }
+      #else
+        while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0, 0, 0, 0))
+            WiFi.reconnect();
       #endif
     }
 

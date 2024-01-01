@@ -14,7 +14,7 @@ extern const char RIG_IDENTIFIER[] = "None";
 
 // Uncomment if you want to use LAN8720
 // Select correct Board in ArduinoIDE!!! Really!
- #define USE_LAN
+// #define USE_LAN
 
 // Only needed to change for using WLAN
 // Change the part in brackets to your WiFi name
