@@ -265,8 +265,7 @@ namespace {
              String s = WEBSITE;
              #ifdef USE_LAN
               s.replace("@@IP_ADDR@@", ETH.localIP().toString());
-             #endif
-             #ifndef USE_LAN
+             #else
               s.replace("@@IP_ADDR@@", WiFi.localIP().toString());
              #endif
   
@@ -367,8 +366,7 @@ void setup() {
       #ifdef USE_LAN
         Serial.println("Configured mDNS for dashboard on http://" + String(RIG_IDENTIFIER) 
                    + ".local (or http://" + ETH.localIP().toString() + ")");
-      #endif
-      #ifndef USE_LAN
+      #else
         Serial.println("Configured mDNS for dashboard on http://" + String(RIG_IDENTIFIER) 
                    + ".local (or http://" + WiFi.localIP().toString() + ")");
       #endif
