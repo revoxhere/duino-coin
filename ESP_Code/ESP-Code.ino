@@ -50,6 +50,10 @@
 #include "MiningJob.h"
 #include "Settings.h"
 
+#ifdef USE_LAN
+  #include <ETH.h>
+#endif
+
 #if defined(WEB_DASHBOARD)
   #include "Dashboard.h"
 #endif
@@ -77,6 +81,8 @@ namespace {
         RIG_IDENTIFIER,
         MINER_KEY
     );
+
+    static bool eth_connected = false;
 
     #if defined(ESP32) && CORE == 2
       EasyMutex mutexClientData, mutexConnectToServer;
@@ -134,7 +140,40 @@ namespace {
         UpdateHostPort(input);
       }
 
+    #ifdef USE_LAN
+    void WiFiEvent(WiFiEvent_t event)
+    {
+      switch (event) {
+        case ARDUINO_EVENT_ETH_START:
+          Serial.println("ETH Started");
+          // The hostname must be set after the interface is started, but needs
+          // to be set before DHCP, so set it from the event handler thread.
+          ETH.setHostname("esp32-ethernet");
+          break;
+        case ARDUINO_EVENT_ETH_CONNECTED:
+          Serial.println("ETH Connected");
+          break;
+        case ARDUINO_EVENT_ETH_GOT_IP:
+          Serial.println("ETH Got IP");
+          eth_connected = true;
+          break;
+
+        case ARDUINO_EVENT_ETH_DISCONNECTED:
+          Serial.println("ETH Disconnected");
+          eth_connected = false;
+          break;
+        case ARDUINO_EVENT_ETH_STOP:
+          Serial.println("ETH Stopped");
+          eth_connected = false;
+          break;
+        default:
+          break;
+      }
+    }
+    #endif
+
     void SetupWifi() {
+      #ifndef USE_LAN
         Serial.println("Connecting to: " + String(SSID));
         WiFi.mode(WIFI_STA); // Setup ESP in client mode
         #if defined(ESP8266)
@@ -148,16 +187,32 @@ namespace {
         while (WiFi.waitForConnectResult() != WL_CONNECTED) {
             delay(500);
             Serial.print(".");
-            if (++wait_passes >= 10) {
-                WiFi.begin(SSID, PASSWORD);
-                wait_passes = 0;
-            }
+
         }
 
         Serial.println("\n\nSuccessfully connected to WiFi");
         Serial.println("Local IP address: " + WiFi.localIP().toString());
         Serial.println("Rig name: " + String(RIG_IDENTIFIER));
         Serial.println();
+      #endif
+      #ifdef USE_LAN
+        Serial.println("Connecting to Ethernet...");
+        WiFi.onEvent(WiFiEvent);  // Will call WiFiEvent() from another thread.
+        ETH.begin();
+        
+
+        while (!eth_connected) {
+            delay(500);
+            Serial.print(".");
+        }
+
+        Serial.println("\n\nSuccessfully connected to Ethernet");
+        Serial.println("Local IP address: " + ETH.localIP().toString());
+        Serial.println("Rig name: " + String(RIG_IDENTIFIER));
+        Serial.println();
+
+
+      #endif
 
         SelectNode();
     }
@@ -184,8 +239,17 @@ namespace {
     }
 
     void VerifyWifi() {
+      #ifndef USE_LAN
         while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0, 0, 0, 0))
             WiFi.reconnect();
+      #endif
+
+      #ifdef USE_LAN
+        while ((!eth_connected) || (ETH.localIP() == IPAddress(0, 0, 0, 0))) {
+          Serial.println("Ethernet connection lost. Reconnect..." );
+          SetupWifi();
+        }
+      #endif
     }
 
     void handleSystemEvents(void) {
@@ -198,7 +262,7 @@ namespace {
         void dashboard() {
              Serial.println("Handling HTTP client");
              String s = WEBSITE;
-             s.replace("@@IP_ADDR@@", WiFi.localIP().toString());
+             s.replace("@@IP_ADDR@@", ETH.localIP().toString());
   
              s.replace("@@HASHRATE@@", String(hashrate / 1000));
              s.replace("@@DIFF@@", String(difficulty / 100));
@@ -295,7 +359,7 @@ void setup() {
       }
       MDNS.addService("http", "tcp", 80);
       Serial.println("Configured mDNS for dashboard on http://" + String(RIG_IDENTIFIER) 
-                   + ".local (or http://" + WiFi.localIP().toString() + ")");
+                   + ".local (or http://" + ETH.localIP().toString() + ")");
       server.on("/", dashboard);
       server.begin();
     #endif
