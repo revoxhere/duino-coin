@@ -187,7 +187,10 @@ namespace {
         while (WiFi.waitForConnectResult() != WL_CONNECTED) {
             delay(500);
             Serial.print(".");
-
+            if (++wait_passes >= 10) {
+                WiFi.begin(SSID, PASSWORD);
+                wait_passes = 0;
+            }
         }
 
         Serial.println("\n\nSuccessfully connected to WiFi");
