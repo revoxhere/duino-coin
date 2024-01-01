@@ -262,7 +262,12 @@ namespace {
         void dashboard() {
              Serial.println("Handling HTTP client");
              String s = WEBSITE;
-             s.replace("@@IP_ADDR@@", ETH.localIP().toString());
+             #ifdef USE_LAN
+              s.replace("@@IP_ADDR@@", ETH.localIP().toString());
+             #endif
+             #ifndef USE_LAN
+              s.replace("@@IP_ADDR@@", WiFi.localIP().toString());
+             #endif
   
              s.replace("@@HASHRATE@@", String(hashrate / 1000));
              s.replace("@@DIFF@@", String(difficulty / 100));
@@ -358,8 +363,15 @@ void setup() {
         Serial.println("mDNS unavailable");
       }
       MDNS.addService("http", "tcp", 80);
-      Serial.println("Configured mDNS for dashboard on http://" + String(RIG_IDENTIFIER) 
+      #ifdef USE_LAN
+        Serial.println("Configured mDNS for dashboard on http://" + String(RIG_IDENTIFIER) 
                    + ".local (or http://" + ETH.localIP().toString() + ")");
+      #endif
+      #ifndef USE_LAN
+        Serial.println("Configured mDNS for dashboard on http://" + String(RIG_IDENTIFIER) 
+                   + ".local (or http://" + WiFi.localIP().toString() + ")");
+      #endif
+
       server.on("/", dashboard);
       server.begin();
     #endif
