@@ -10,21 +10,17 @@ extern const char MINER_KEY[] = "mySecretPass";
 // Change the part in brackets if you want to set a custom miner name
 // Use Auto to autogenerate, None for no custom identifier
 extern const char RIG_IDENTIFIER[] = "None";
-
-
-// Uncomment if you want to use LAN8720
-// Select correct Board in ArduinoIDE!!! Really!
-// #define USE_LAN
-
-// Only needed to change for using WLAN
 // Change the part in brackets to your WiFi name
 extern const char SSID[] = "SSID";
 // Change the part in brackets to your WiFi password
 extern const char PASSWORD[] = "PASSW0RD";
 
-
 // Uncomment if you want to host the dashboard page (available on ESPs IP address)
 // #define WEB_DASHBOARD
+
+// Uncomment if you want to use LAN8720. WLAN-credentials will be ignored using LAN
+// Select correct Board in ArduinoIDE!!! Really!
+// #define USE_LAN
 
 // Comment out the line below if you wish to disable LED blinking
 #define LED_BLINKING
