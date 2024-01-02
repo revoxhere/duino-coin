@@ -7,7 +7,7 @@ const char WEBSITE[] PROGMEM = R"=====(
     <!--
         Duino-Coin self-hosted dashboard
         MIT licensed
-        The Duino-Coin Team, 2019-2023
+        The Duino-Coin Team, 2019-present
         https://github.com/revoxhere/duino-coin
         https://duinocoin.com
     -->
