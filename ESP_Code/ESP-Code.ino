@@ -82,10 +82,12 @@ namespace {
         MINER_KEY
     );
 
-    static bool eth_connected = false;
-
     #if defined(ESP32) && CORE == 2
       EasyMutex mutexClientData, mutexConnectToServer;
+    #endif
+
+    #ifdef USE_LAN
+      static bool eth_connected = false;
     #endif
 
     void UpdateHostPort(String input) {
