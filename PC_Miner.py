@@ -860,7 +860,6 @@ class Miner:
         try:
             if not Path(Settings.DATA_DIR + Settings.SETTINGS_FILE).is_file():
                 locale = getdefaultlocale()[0]
-                print("Current locale:", locale)                
                 if locale.startswith("es"):
                     lang = "spanish"
                 elif locale.startswith("pl"):
