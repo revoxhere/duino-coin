@@ -189,14 +189,16 @@ private:
     void connectToNode() {
         if (client.connected()) return;
 
-        Serial.println("Core [" + String(core) + "] - Connecting to a Duino-Coin node...");
-        while (!client.connect(config->host.c_str(), config->port));
-
-        waitForClientData();
-        Serial.println("Core [" + String(core) + "] - Connected. Node reported version: "
+         unsigned int stopWatch = millis();
+         Serial.println("Core [" + String(core) + "] - Connecting to a Duino-Coin node...");
+         while (!client.connect(config->host.c_str(), config->port)) {
+           if (millis()-stopWatch>100000) ESP.restart();
+         }
+        
+         waitForClientData();
+         Serial.println("Core [" + String(core) + "] - Connected. Node reported version: " 
                         + client_buffer);
-
-        blink(BLINK_CLIENT_CONNECT); 
+         blink(BLINK_CLIENT_CONNECT);
     }
 
     void waitForClientData() {
