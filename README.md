@@ -179,6 +179,7 @@ Please note the DUCO/day column has been removed since version 4.0 changed the r
 | Intel Core i7-11370H **(fasthash)**                       | 17.3 MH/s                         | 8                 | 35 W           |
 | Realtek RTD1295                                           | 490 kH/s                          | 4                 | -              |
 | Realtek RTD1295 **(fasthash)**                            | 3.89 MH/s                         | 4                 | -              |
+|  Ampere Altra **(fasthash)**                              | 10.1 MH/s                         | 3                 | -              |
 
 </details>
 
