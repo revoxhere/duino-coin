@@ -1529,7 +1529,7 @@
         "ask_donation_level": "Ställ in utvecklar donationsnivå(0-5) (rekommenderad: 1), det här kommer inte minska dina vinster: ",
         "config_saved": "Konfiguration sparad. Startar arbetaren!",
         "free_network_warning": " Duino-Coin är ett helt kostnadsfritt nätverk och kommer altid vara",
-        "donate_warning": "\nVi tar inga avgifter från din mining.\nDu kan hjälpa oss att upprätthålla servrarna och vår låg avgifts Cryptoväxlings tjänst genom att donera.\Besök ",
+        "donate_warning": "\nVi tar inga avgifter från din mining.\nDu kan hjälpa oss att upprätthålla servrarna och vår låg avgifts Cryptoväxlings tjänst genom att donera.\nBesök"
         "learn_more_donate": " för att läsa mer om hur du kan hjälpa oss :)",
         "starting_donation": "Börjar donationsprocess",
         "thanks_donation": " Tack för att du är en fantastisk donator ❤️ \nDin donation kommer hjälpa oss att ta upprättshålla serverna och tillåta mer utveckling",
@@ -1587,7 +1587,7 @@
         "mining_key_required": "Mining key is required to mine on this account",
         "invalid_mining_key": "Mining nyckelen du har skrivit in är fel!",
         "incorrect_username": "Annvändarnamnet du har skrivt in finns inte!",
-        "system_threads_notice": "Varning: Du försöker annvända mer trådar än vad du har tillgänligt.\n\t\tDet här kommer göra oönskade siddeffekter som att ditt system inte längre svarar.\n\t\tStartar om 10s",
+        "system_threads_notice": "Varning: Du försöker annvända mer trådar än vad du har tillgänligt.\n\t\tDet här kommer göra oönskade nackdelar som att ditt system inte längre svarar.\n\t\tStartar om 10s",
         "using_config": "Konfigurationsfil: ",
         "motd": "Dagens meddelande från server: ",
         "hashrate_test": "Hashrate-testet avslutades med ",
