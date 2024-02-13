@@ -1295,7 +1295,7 @@
                                 Android
                             </p>
                             <p class="subtitle">
-                                Use the DUCOMiner app
+                                Use the Fatorius' Miner app
                             </p>
                             <button class="button is-fullwidth" onclick='$("#smartphone_select").fadeOut();$("#android_app").fadeIn("slow");$(window).scrollTo("#scroll", {offset: {top:-100}})'>
                                 Select&nbsp;<i class="fa fa-arrow-alt-circle-right"></i>
@@ -1385,9 +1385,90 @@
                 </button>
             </div>
             <!----------------------------------------------------->
-            <!--------------------- DUCOAndroidMiner  ------------->
+            <!--------------- fatorius duinocoinminer ------------->
             <!----------------------------------------------------->
             <div id="android_app" style="display:none">
+                <div class="columns">
+                    <div class="column">
+                        <p class="title">
+                            Beep-beep boop-boop, android here!
+                        </p>
+                    </div>
+                    <div class="column is-narrow">
+                        <button class="button" onclick="$('#android_app').fadeOut();$('#smartphone_select').fadeIn();$(window).scrollTo(`#scroll`, {offset: {top:-100}})">
+                            <i class="fa fa-arrow-alt-circle-left"></i>&nbsp;Back
+                        </button>
+                    </div>
+                </div>
+                <div class="columns">
+                    <div class="column">
+                        <div class="box">
+                            <p class="subtitle">
+                                For mining on Android smartphones you can use the <b>Fatorius' DuinoCoinMiner</b> app. This app is still in development, so expect some bugs and remember to send feedback to the creator.
+                            </p>
+                            <hr>
+                            <p class="subtitle">
+                                <span class="tag is-warning">1</span>&nbsp;
+                                <b>Download and install the app</b> on your smartphone.
+                            </p>
+                            <div class="buttons">
+                                <a class="button is-success" href="https://play.google.com/store/apps/details?id=com.fatorius.duinocoinminer" target="_blank">
+                                    <i class="fab fa-google-play"></i>&nbsp;View on Google Play
+                                </a>
+                            </div>
+                            <hr>
+                            <div class="columns">
+                                <div class="column">
+                                    <p class="subtitle">
+                                        <span class="tag is-warning">2</span>&nbsp;
+                                        <b>Enter your username</b>, <b>mining key</b> and start mining - simple as that. If you want, you can change the mining intensity and the amount of mining threads, but it's best to leave them at defaults if you don't know what you're doing.
+                                    </p>
+                                </div>
+                                <div class="column">
+                                    <img src="/assets/images/android-miner-setup.jpg">
+                                </div>
+                                <div class="column">
+                                    <p class="subtitle">
+                                        <span class="tag is-warning">3</span>&nbsp;
+                                        Miner will report current hashrate (mining speed) - the higher the hashrate, the better. If you've entered everything correctly, you should see your device appear in the Wallet after a minute or two.
+                                    </p>
+                                </div>
+                                <div class="column is-one-third">
+                                    <img src="/assets/images/android-miner.jpg">
+                                </div>
+                            </div>
+                            <hr>
+                            <p class="subtitle">
+                                <b>Further reading and activities</b>
+                                <div class="buttons">
+                                    <a class="button" href="https://github.com/revoxhere/duino-coin/wiki/FAQ#q-can-i-create-a-mining-farm-with-esp-boards-or-arduinos" target="_blank">
+                                        Kolka efficiency dropoff
+                                    </a>
+                                    <a class="button" href="https://github.com/revoxhere/duino-coin/blob/gh-pages/assets/whitepaper.pdf" target="_blank">
+                                        Duino Whitepaper
+                                    </a>
+                                    <a class="button" href="https://github.com/revoxhere/duino-coin" target="_blank">
+                                        Duino GitHub
+                                    </a>
+                                    <a class="button" href="https://discord.gg/kvBkccy" target="_blank">
+                                        Chat with other Duino miners
+                                    </a>
+                                </div>
+                            </p>
+                            <p class="subtitle">
+                                You can use the <b>Back</b> button below to return to the device selection menu.
+                            </p>
+                            <button class="button" onclick="$('#android_app').fadeOut();$('#step1').fadeIn();$(window).scrollTo(`#scroll`, {offset: {top:-100}})">
+                                <i class="fa fa-arrow-alt-circle-left"></i>&nbsp;Back
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!----------------------------------------------------->
+            <!--------------------- DUCOAndroidMiner  ------------->
+            <!----------------------------------------------------->
+            <!--<div id="android_app" style="display:none">
                 <div class="columns">
                     <div class="column">
                         <p class="title">
@@ -1469,7 +1550,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
             <!----------------------------------------------------->
             <!--------------------------- Arduino PC  ------------->
             <!----------------------------------------------------->
