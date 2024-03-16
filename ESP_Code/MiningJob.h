@@ -182,19 +182,25 @@ private:
             AutoRigName.toUpperCase();
             config->RIG_IDENTIFIER = AutoRigName.c_str();
         #endif 
-        Serial.println("Core [" + String(core) + "] - Rig identifier: "
-                        + config->RIG_IDENTIFIER);
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Core [" + String(core) + "] - Rig identifier: "
+                          + config->RIG_IDENTIFIER);
+        #endif
     }
 
     void connectToNode() {
         if (client.connected()) return;
 
-        Serial.println("Core [" + String(core) + "] - Connecting to a Duino-Coin node...");
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Core [" + String(core) + "] - Connecting to a Duino-Coin node...");
+        #endif
         while (!client.connect(config->host.c_str(), config->port));
 
         waitForClientData();
-        Serial.println("Core [" + String(core) + "] - Connected. Node reported version: "
-                        + client_buffer);
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Core [" + String(core) + "] - Connected. Node reported version: "
+                          + client_buffer);
+        #endif
 
         blink(BLINK_CLIENT_CONNECT); 
     }
@@ -224,12 +230,14 @@ private:
                      
         waitForClientData();
 
-        Serial.println("Core [" + String(core) + "] - " +
-                        client_buffer +
-                        " share #" + String(share_count) +
-                        " (" + String(counter) + ")" +
-                        " hashrate: " + String(hashrate / 1000, 2) + " kH/s (" +
-                        String(elapsed_time_s) + "s)\n");
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Core [" + String(core) + "] - " +
+                          client_buffer +
+                          " share #" + String(share_count) +
+                          " (" + String(counter) + ")" +
+                          " hashrate: " + String(hashrate / 1000, 2) + " kH/s (" +
+                          String(elapsed_time_s) + "s)\n");
+        #endf
     }
 
     bool parse() {
@@ -267,8 +275,10 @@ private:
         #if defined(USE_DS18B20)
             sensors.requestTemperatures(); 
             float temp = sensors.getTempCByIndex(0);
-            Serial.println("DS18B20 reading: " + String(temp) + "°C");
-            
+            #if defined(SERIAL_PRINTING)
+              Serial.println("DS18B20 reading: " + String(temp) + "°C");
+            #endif
+        
             client.print("JOB," +
                          String(config->DUCO_USER) +
                          SEP_TOKEN + config->START_DIFF + 
@@ -278,8 +288,10 @@ private:
         #elif defined(USE_DHT)
             float temp = dht.readTemperature();
             float hum = dht.readHumidity();
-            Serial.println("DHT reading: " + String(temp) + "°C");
-            Serial.println("DHT reading: " + String(hum) + "%");
+            #if defined(SERIAL_PRINTING)
+              Serial.println("DHT reading: " + String(temp) + "°C");
+              Serial.println("DHT reading: " + String(hum) + "%");
+            #endif
 
             client.print("JOB," +
                          String(config->DUCO_USER) +
@@ -291,7 +303,9 @@ private:
         #elif defined(USE_INTERNAL_SENSOR)
             float temp = 0;
             temp_sensor_read_celsius(&temp);
-            Serial.println("Internal temp sensor reading: " + String(temp) + "°C");
+            #if defined(SERIAL_PRINTING)
+              Serial.println("Internal temp sensor reading: " + String(temp) + "°C");
+            #endif
 
             client.print("JOB," +
                          String(config->DUCO_USER) +
@@ -308,15 +322,19 @@ private:
         #endif
 
         waitForClientData();
-        Serial.println("Core [" + String(core) + "] - Received job with size of "
-                        + String(client_buffer.length()) 
-                        + " bytes " + client_buffer);
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Core [" + String(core) + "] - Received job with size of "
+                          + String(client_buffer.length()) 
+                          + " bytes " + client_buffer);
+        #endif
 
         parse();
-        Serial.println("Core [" + String(core) + "] - Parsed job: " 
-                        + getLastBlockHash() + " " 
-                        + getExpectedHashStr() + " " 
-                        + String(getDifficulty()));
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Core [" + String(core) + "] - Parsed job: " 
+                          + getLastBlockHash() + " " 
+                          + getExpectedHashStr() + " " 
+                          + String(getDifficulty()));
+        #endif
     }
 
     const String &getLastBlockHash() const { return last_block_hash; }
