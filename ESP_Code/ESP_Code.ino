@@ -100,7 +100,9 @@ namespace {
         configuration->port = doc["port"].as<int>();
         node_id = String(name);
 
-        Serial.println("Poolpicker selected the best mining node: " + node_id);
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Poolpicker selected the best mining node: " + node_id);
+        #endif
     }
 
     String httpGetString(String URL) {
@@ -115,7 +117,9 @@ namespace {
           if (httpCode == HTTP_CODE_OK)
             payload = http.getString();
           else
-            Serial.printf("Error fetching node from poolpicker: %s\n", http.errorToString(httpCode).c_str());
+            #if defined(SERIAL_PRINTING)
+               Serial.printf("Error fetching node from poolpicker: %s\n", http.errorToString(httpCode).c_str());
+            #endif
 
           http.end();
         }
@@ -128,7 +132,9 @@ namespace {
         int poolIndex = 0;
 
         while (input == "") {
-            Serial.println("Fetching mining node from the poolpicker in " + String(waitTime) + "s");
+            #if defined(SERIAL_PRINTING)
+              Serial.println("Fetching mining node from the poolpicker in " + String(waitTime) + "s");
+            #endif
             input = httpGetString("https://server.duinocoin.com/getPool");
             
             delay(waitTime * 1000);
@@ -147,25 +153,35 @@ namespace {
     {
       switch (event) {
         case ARDUINO_EVENT_ETH_START:
-          Serial.println("ETH Started");
+          #if defined(SERIAL_PRINTING)
+            Serial.println("ETH Started");
+          #endif
           // The hostname must be set after the interface is started, but needs
           // to be set before DHCP, so set it from the event handler thread.
           ETH.setHostname("esp32-ethernet");
           break;
         case ARDUINO_EVENT_ETH_CONNECTED:
-          Serial.println("ETH Connected");
+          #if defined(SERIAL_PRINTING)
+            Serial.println("ETH Connected");
+          #endif
           break;
         case ARDUINO_EVENT_ETH_GOT_IP:
-          Serial.println("ETH Got IP");
+          #if defined(SERIAL_PRINTING)
+            Serial.println("ETH Got IP");
+          #endif
           eth_connected = true;
           break;
 
         case ARDUINO_EVENT_ETH_DISCONNECTED:
-          Serial.println("ETH Disconnected");
+          #if defined(SERIAL_PRINTING)
+            Serial.println("ETH Disconnected");
+          #endif
           eth_connected = false;
           break;
         case ARDUINO_EVENT_ETH_STOP:
-          Serial.println("ETH Stopped");
+          #if defined(SERIAL_PRINTING)
+            Serial.println("ETH Stopped");
+          #endif
           eth_connected = false;
           break;
         default:
@@ -177,23 +193,30 @@ namespace {
     void SetupWifi() {
       
       #ifdef USE_LAN
-        Serial.println("Connecting to Ethernet...");
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Connecting to Ethernet...");
+        #endif
         WiFi.onEvent(WiFiEvent);  // Will call WiFiEvent() from another thread.
         ETH.begin();
         
 
         while (!eth_connected) {
             delay(500);
-            Serial.print(".");
+            #if defined(SERIAL_PRINTING)
+                Serial.print(".");
+            #endif
         }
 
-        Serial.println("\n\nSuccessfully connected to Ethernet");
-        Serial.println("Local IP address: " + ETH.localIP().toString());
-        Serial.println("Rig name: " + String(RIG_IDENTIFIER));
-        Serial.println();
+        #if defined(SERIAL_PRINTING)
+          Serial.println("\n\nSuccessfully connected to Ethernet");
+          Serial.println("Local IP address: " + ETH.localIP().toString());
+          Serial.println("Rig name: " + String(RIG_IDENTIFIER));
+          Serial.println();
 
       #else
-        Serial.println("Connecting to: " + String(SSID));
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Connecting to: " + String(SSID));
+        #endif
         WiFi.mode(WIFI_STA); // Setup ESP in client mode
         #if defined(ESP8266)
             WiFi.setSleepMode(WIFI_NONE_SLEEP);
@@ -205,17 +228,21 @@ namespace {
         int wait_passes = 0;
         while (WiFi.waitForConnectResult() != WL_CONNECTED) {
             delay(500);
-            Serial.print(".");
+            #if defined(SERIAL_PRINTING)
+              Serial.print(".");
+            #endif
             if (++wait_passes >= 10) {
                 WiFi.begin(SSID, PASSWORD);
                 wait_passes = 0;
             }
         }
 
-        Serial.println("\n\nSuccessfully connected to WiFi");
-        Serial.println("Local IP address: " + WiFi.localIP().toString());
-        Serial.println("Rig name: " + String(RIG_IDENTIFIER));
-        Serial.println();
+        #if defined(SERIAL_PRINTING)
+          Serial.println("\n\nSuccessfully connected to WiFi");
+          Serial.println("Local IP address: " + WiFi.localIP().toString());
+          Serial.println("Rig name: " + String(RIG_IDENTIFIER));
+          Serial.println();
+        #endif
 
       #endif
 
@@ -225,19 +252,33 @@ namespace {
     void SetupOTA() {
         // Prepare OTA handler
         ArduinoOTA.onStart([]()
-                           { Serial.println("Start"); });
+                           { 
+                             #if defined(SERIAL_PRINTING)
+                               Serial.println("Start"); 
+                             #endif
+                           });
         ArduinoOTA.onEnd([]()
-                         { Serial.println("\nEnd"); });
+                         { 
+                            #if defined(SERIAL_PRINTING)
+                              Serial.println("\nEnd"); 
+                            #endif
+                         });
         ArduinoOTA.onProgress([](unsigned int progress, unsigned int total)
-                              { Serial.printf("Progress: %u%%\r", (progress / (total / 100))); });
+                              { 
+                                 #if defined(SERIAL_PRINTING)
+                                   Serial.printf("Progress: %u%%\r", (progress / (total / 100))); 
+                                 #endif
+                              });
         ArduinoOTA.onError([](ota_error_t error)
                            {
         Serial.printf("Error[%u]: ", error);
-        if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-        else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-        else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-        else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-        else if (error == OTA_END_ERROR) Serial.println("End Failed"); });
+        #if defined(SERIAL_PRINTING)
+          if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+          else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+          else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+          else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+          else if (error == OTA_END_ERROR) Serial.println("End Failed"); });
+       #endif
 
         ArduinoOTA.setHostname(RIG_IDENTIFIER); // Give port a name
         ArduinoOTA.begin();
@@ -246,7 +287,9 @@ namespace {
     void VerifyWifi() {
       #ifdef USE_LAN
         while ((!eth_connected) || (ETH.localIP() == IPAddress(0, 0, 0, 0))) {
-          Serial.println("Ethernet connection lost. Reconnect..." );
+          #if defined(SERIAL_PRINTING)
+            Serial.println("Ethernet connection lost. Reconnect..." );
+          #endif
           SetupWifi();
         }
       #else
@@ -263,7 +306,9 @@ namespace {
 
     #if defined(WEB_DASHBOARD)
         void dashboard() {
-             Serial.println("Handling HTTP client");
+             #if defined(SERIAL_PRINTING)
+               Serial.println("Handling HTTP client");
+             #endif
              String s = WEBSITE;
              #ifdef USE_LAN
               s.replace("@@IP_ADDR@@", ETH.localIP().toString());
@@ -324,8 +369,10 @@ void task2_func(void *) {
 void setup() {
     delay(500);
     
-    Serial.begin(500000);
-    Serial.println("\n\nDuino-Coin " + String(configuration->MINER_VER));
+    #if defined(SERIAL_PRINTING)
+      Serial.begin(500000);
+      Serial.println("\n\nDuino-Coin " + String(configuration->MINER_VER));
+    #endif
     pinMode(LED_BUILTIN, OUTPUT);
 
     assert(CORE == 1 || CORE == 2);
@@ -333,28 +380,40 @@ void setup() {
     job[0] = new MiningJob(0, configuration);
 
     #if defined(USE_DHT)
-        Serial.println("Initializing DHT sensor (Duino IoT)");
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Initializing DHT sensor (Duino IoT)");
+        #endif
         dht.begin();
-        Serial.println("Test reading: " + String(dht.readHumidity()) + "% humidity");
-        Serial.println("Test reading: temperature " + String(dht.readTemperature()) + "°C");
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Test reading: " + String(dht.readHumidity()) + "% humidity");
+          Serial.println("Test reading: temperature " + String(dht.readTemperature()) + "°C");
+        #endif
     #endif
 
     #if defined(USE_DS18B20)
-        Serial.println("Initializing DS18B20 sensor (Duino IoT)");
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Initializing DS18B20 sensor (Duino IoT)");
+        #endif
         sensors.begin();
         sensors.requestTemperatures(); 
-        Serial.println("Test reading: " + String(sensors.getTempCByIndex(0)) + "°C");
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Test reading: " + String(sensors.getTempCByIndex(0)) + "°C");
+        #endif
     #endif
 
     #if defined(USE_INTERNAL_SENSOR)
-       Serial.println("Initializing internal ESP32 temperature sensor (Duino IoT)");
+       #if defined(SERIAL_PRINTING)
+         Serial.println("Initializing internal ESP32 temperature sensor (Duino IoT)");
+       #endif
        temp_sensor_config_t temp_sensor = TSENS_CONFIG_DEFAULT();
        temp_sensor.dac_offset = TSENS_DAC_L2;
        temp_sensor_set_config(temp_sensor);
        temp_sensor_start();
        float result = 0;
        temp_sensor_read_celsius(&result);
-       Serial.println("Test reading: " + String(result) + "°C");
+       #if defined(SERIAL_PRINTING)
+         Serial.println("Test reading: " + String(result) + "°C");
+       #endif
     #endif
 
     SetupWifi();
@@ -362,15 +421,19 @@ void setup() {
 
     #if defined(WEB_DASHBOARD)
       if (!MDNS.begin(RIG_IDENTIFIER)) {
-        Serial.println("mDNS unavailable");
+        #if defined(SERIAL_PRINTING)
+          Serial.println("mDNS unavailable");
+        #endif
       }
       MDNS.addService("http", "tcp", 80);
-      #ifdef USE_LAN
-        Serial.println("Configured mDNS for dashboard on http://" + String(RIG_IDENTIFIER) 
-                   + ".local (or http://" + ETH.localIP().toString() + ")");
-      #else
-        Serial.println("Configured mDNS for dashboard on http://" + String(RIG_IDENTIFIER) 
-                   + ".local (or http://" + WiFi.localIP().toString() + ")");
+      #if defined(SERIAL_PRINTING)
+        #ifdef USE_LAN
+          Serial.println("Configured mDNS for dashboard on http://" + String(RIG_IDENTIFIER) 
+                     + ".local (or http://" + ETH.localIP().toString() + ")");
+        #else
+          Serial.println("Configured mDNS for dashboard on http://" + String(RIG_IDENTIFIER) 
+                     + ".local (or http://" + WiFi.localIP().toString() + ")");
+        #endif
       #endif
 
       server.on("/", dashboard);
