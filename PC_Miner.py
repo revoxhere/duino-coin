@@ -6,7 +6,7 @@ https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2024
 """
 
-from time import time, sleep, strptime, ctime
+from time import time, sleep, strptime, ctime, time_ns
 from hashlib import sha1
 from socket import socket
 
@@ -346,18 +346,21 @@ class Algorithms:
             fasthash_supported = False
 
         if fasthash_supported:
-            time_start = time()
+            time_start = time_ns()
 
             hasher = libducohasher.DUCOHasher(bytes(last_h, encoding='ascii'))
             nonce = hasher.DUCOS1(
                 bytes(bytearray.fromhex(exp_h)), diff, int(eff))
 
-            time_elapsed = time() - time_start
-            hashrate = nonce / time_elapsed
+            time_elapsed = time_ns() - time_start
+            if time_elapsed > 0:
+                hashrate = 1e9 * nonce / time_elapsed
+            else:
+                return [nonce,0]
 
             return [nonce, hashrate]
         else:
-            time_start = time()
+            time_start = time_ns()
             base_hash = sha1(last_h.encode('ascii'))
 
             for nonce in range(100 * diff + 1):
@@ -370,8 +373,11 @@ class Algorithms:
                         sleep(eff / 100)
 
                 if d_res == exp_h:
-                    time_elapsed = time() - time_start
-                    hashrate = nonce / time_elapsed
+                    time_elapsed = time_ns() - time_start
+                    if time_elapsed > 0:
+                        hashrate = 1e9 * nonce / time_elapsed
+                    else:
+                        return [nonce,0]
 
                     return [nonce, hashrate]
 
