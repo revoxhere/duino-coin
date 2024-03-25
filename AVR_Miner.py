@@ -515,6 +515,8 @@ try:
             lang = 'italian'
         elif locale.startswith('pt'):
             lang = 'portuguese'
+        if locale.startswith("zh_TW"):
+            lang = "chinese_Traditional"
         elif locale.startswith('zh'):
             lang = 'chinese_simplified'
         elif locale.startswith('th'):
