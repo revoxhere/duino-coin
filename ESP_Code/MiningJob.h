@@ -191,11 +191,14 @@ private:
     void connectToNode() {
         if (client.connected()) return;
 
+        unsigned int stopWatch = millis();
         #if defined(SERIAL_PRINTING)
           Serial.println("Core [" + String(core) + "] - Connecting to a Duino-Coin node...");
         #endif
-        while (!client.connect(config->host.c_str(), config->port));
-
+        while (!client.connect(config->host.c_str(), config->port)) {
+          if (millis()-stopWatch>100000) ESP.restart();
+        }
+        
         waitForClientData();
         #if defined(SERIAL_PRINTING)
           Serial.println("Core [" + String(core) + "] - Connected. Node reported version: "
@@ -203,6 +206,7 @@ private:
         #endif
 
         blink(BLINK_CLIENT_CONNECT); 
+
     }
 
     void waitForClientData() {
