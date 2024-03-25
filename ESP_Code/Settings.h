@@ -24,6 +24,10 @@ extern const char PASSWORD[] = "PASSW0RD";
 
 // Comment out the line below if you wish to disable LED blinking
 #define LED_BLINKING
+
+// Comment out the line below if you wish to disable Serial printing
+#define SERIAL_PRINTING
+
 // -------------------------------------------------------------- //
 
 // ---------------------- IoT examples -------------------------- //
