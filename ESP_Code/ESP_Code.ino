@@ -212,6 +212,7 @@ namespace {
           Serial.println("Local IP address: " + ETH.localIP().toString());
           Serial.println("Rig name: " + String(RIG_IDENTIFIER));
           Serial.println();
+        #endif
 
       #else
         #if defined(SERIAL_PRINTING)
