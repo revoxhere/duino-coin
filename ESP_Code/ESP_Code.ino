@@ -212,6 +212,7 @@ namespace {
           Serial.println("Local IP address: " + ETH.localIP().toString());
           Serial.println("Rig name: " + String(RIG_IDENTIFIER));
           Serial.println();
+        #endif
 
       #else
         #if defined(SERIAL_PRINTING)
@@ -271,14 +272,15 @@ namespace {
                               });
         ArduinoOTA.onError([](ota_error_t error)
                            {
-        Serial.printf("Error[%u]: ", error);
-        #if defined(SERIAL_PRINTING)
-          if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-          else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-          else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-          else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-          else if (error == OTA_END_ERROR) Serial.println("End Failed"); });
-       #endif
+                                Serial.printf("Error[%u]: ", error);
+                                #if defined(SERIAL_PRINTING)
+                                  if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+                                  else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+                                  else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+                                  else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+                                  else if (error == OTA_END_ERROR) Serial.println("End Failed");
+                                #endif
+                          });
 
         ArduinoOTA.setHostname(RIG_IDENTIFIER); // Give port a name
         ArduinoOTA.begin();

@@ -241,7 +241,7 @@ private:
                           " (" + String(counter) + ")" +
                           " hashrate: " + String(hashrate / 1000, 2) + " kH/s (" +
                           String(elapsed_time_s) + "s)\n");
-        #endf
+        #endif
     }
 
     bool parse() {
