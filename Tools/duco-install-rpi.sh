@@ -19,7 +19,7 @@ if [ ! -d ~/duino-coin/ ];then
 fi
 
 cd ~/duino-coin
-echo "Installing python packages"
+echo "Installing Python packages"
 python3 -m pip install -r requirements.txt # Install pip dependencies
 
 #Check if the app exists
@@ -32,7 +32,7 @@ fi
 mkdir -p ~/.local/share/applications
 echo "[Desktop Entry]
 Name=Duino Coin PC Miner
-Comment=Duino Coin miner for the raspberry pi
+Comment=Duino Coin miner for the Raspberry Pi
 Exec=python3 /home/$u/duino-coin/PC_Miner.py
 Icon=/home/$u/duino-coin/Resources/PCMiner.png
 Terminal=true
@@ -56,7 +56,7 @@ Type=Application
 Categories=Utility;
 StartupNotify=true" > ~/.local/share/applications/duino-coin-avr.desktop
 cd ~/
-if [ -f ~/duco-install-rpi.sh]; then
+if [ -f ~/duco-install-rpi.sh ]; then
     rm duco-install-rpi.sh
 fi
 echo "Installed"
