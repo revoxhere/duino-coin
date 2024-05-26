@@ -228,6 +228,13 @@ Please note the DUCO/day column has been removed since version 4.0 changed the r
   *   [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - a Duino-Coin iOS widget by Naphob 
   *   [Duino Lookup](https://axorax.github.io/duino-lookup/) by axorax
 
+  ### Faucets:
+  *   [Duino-Coin Faucet](https://server.duinocoin.com/faucet.html) - Official faucet for new users
+  *   [Amogus Faucet](https://duco-faucet.pcgeek.pl/) - Amogus Facuet
+  *   [Pastel Faucet](https://pastelfaucet.com/) - Pastel Faucethttps://github.com/monsterofcookies
+  *   [Duino Faucet](https://duinofaucet.onrender.com/) - Duino Faucet by [_monsterofcookies](https://github.com/monsterofcookies)
+
+    
  You may also view a similar list on the [website](https://duinocoin.com/apps).
 
 
