@@ -1,5 +1,4 @@
 # Based on Minimal PC Miner by Revox
-# https://github.com/revoxhere/duino-coin-miner
 # Created by rsoda (ilnarildarovuch)
 
 import hashlib
