@@ -390,7 +390,7 @@
         "invalid_mining_key": "The mining key you provided is invalid!"
     },
     "slovak": {
-        "translation_autor": "backo",
+        "translation_autor": "backo & MatusOllah",
         "translation": "Slovenský preklad: ",
         "sigint_detected": " SIGINT detekovaný – ukončuje sa.",
         "goodbye": " Dovidenia!",
