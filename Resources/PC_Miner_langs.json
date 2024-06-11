@@ -476,7 +476,7 @@
         "total_mining_time": "\n\t\t‖ Celková doba prevádzky: ",
         "new_version": "K dispozícii je nová verzia, chcete aktualizovať miner [A/n] ? ",
         "updating": "Miner je zastaraný. Aktualizujem....",
-        "ask_mining_key": "Zadaj svoj ťažobný kľúč (povinné iba vtedy, ak si túto možnosť aktivoval vo webovej peňaženke - preskočíš stlačením Enter): ",
+        "ask_mining_key": "Zadajte svoj ťažobný kľúč (povinné iba vtedy, ak ste túto možnosť aktivovali vo webovej peňaženke - preskočíte stlačením Enter): ",
         "mining_key_required": "Na ťažbu na tomto účte je potrebný ťažobný kľúč",
         "invalid_mining_key": "Zadaný ťažobný kľúč je neplatný!"
     },
