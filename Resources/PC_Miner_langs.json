@@ -449,7 +449,7 @@
         "block_found": " Blok nájdený ",
         "internal_server_error": " Interná chyba servera.",
         "retrying": "  opätovný pokus o 10s",
-        "rejected": " Odmietnuty ",
+        "rejected": " Odmietnutý ",
         "error_while_mining": " Chyba pri ťažbe - s najväčšou pravdepodobnosťou chyba pripojenia - reštartovanie o 5 s.",
         "mining_user": " Použivateľ ",
         "mining_not_exist": " neexistuje.",
@@ -474,11 +474,11 @@
         "report_body5": "\n\t\t‖ V tomto časovom období ste vyriešili ",
         "report_body6": " hashes",
         "total_mining_time": "\n\t\t‖ Celková doba prevádzky: ",
-        "new_version": "A new version is available, you want to update miner [Y/n] ? ",
-        "updating": "The miner is outdated. Updating....",
-        "ask_mining_key": "Enter your mining key (only required if you activated this option in the webwallet - press enter to skip): ",
-        "mining_key_required": "Mining key is required to mine on this account",
-        "invalid_mining_key": "The mining key you provided is invalid!"
+        "new_version": "K dispozícii je nová verzia, chcete aktualizovať miner [A/n] ? ",
+        "updating": "Miner je zastaraný. Aktualizujem....",
+        "ask_mining_key": "Zadaj svoj ťažobný kľúč (povinné iba vtedy, ak si túto možnosť aktivoval vo webovej peňaženke - preskočíš stlačením Enter): ",
+        "mining_key_required": "Na ťažbu na tomto účte je potrebný ťažobný kľúč",
+        "invalid_mining_key": "Zadaný ťažobný kľúč je neplatný!"
     },
     "italian": {
         "translation_autor": "Il mastro Stefanuzzo",
