@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for all ESP8266/32 boards            version 4.0
+  Official code for all ESP8266/32 boards            version 4.1
   Main .ino file
 
   The Duino-Coin Team & Community 2019-2024 © MIT Licensed
