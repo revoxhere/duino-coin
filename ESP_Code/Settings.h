@@ -62,7 +62,7 @@ extern const char PASSWORD[] = "PASSW0RD";
 #define BLINK_SETUP_COMPLETE 2
 #define BLINK_CLIENT_CONNECT 5
 
-#define SOFTWARE_VERSION "4.0"
+#define SOFTWARE_VERSION "4.1"
 extern unsigned int hashrate = 0;
 extern unsigned int difficulty = 0;
 extern unsigned long share_count = 0;
