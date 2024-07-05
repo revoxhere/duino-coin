@@ -27,16 +27,15 @@ typedef uint32_t uintDiff;
 #else
 typedef uint32_t uintDiff;
 #endif
-// Arduino identifier library - https://github.com/ricaun
-#include "uniqueID.h"
 
 #include "duco_hash.h"
+#include "107-Arduino-UniqueId.h"
 
 String get_DUCOID() {
   String ID = "DUCOID";
   char buff[4];
   for (size_t i = 0; i < 8; i++) {
-    sprintf(buff, "%02X", (uint8_t)UniqueID8[i]);
+    sprintf(buff, "%02X", (uint8_t)OpenCyphalUniqueId[i]);
     ID += buff;
   }
   return ID;
