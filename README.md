@@ -186,8 +186,7 @@ Please note the DUCO/day column has been removed since version 4.0 changed the r
 
 ### Please note that these softwares are not developed by us and we do not give any guarantees that use of them will not result in an account getting banned if they get changed in the future.
 
-  ### Miners and tools built by the Duino-Coin community:
-  *   [Duinogotchi](https://github.com/OSRdesign/duinogotchi) - Duino-Coin virtual pet project by OSRdesign
+  ### Miners made by the Duino-Coin community:
   *   [Dockerized Duino-Coin Miner](https://github.com/simeononsecurity/docker-duino-coin) - A Dockerized version of the Duino-Coin Miner by simeononsecurity
   *   :point_right: [**RP2040-HAT-MINING-C**](https://github.com/Wiznet/RP2040-HAT-MINING-C) - **WIZnet RP2040 mining stack**
   *   [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Arduino Ethernet shield Miner by Pumafron
@@ -214,6 +213,7 @@ Please note the DUCO/day column has been removed since version 4.0 changed the r
       *   [Teensy 4.1 code for Arduino IDE](https://github.com/revoxhere/duino-coin/blob/master/Unofficial%20miners/Teensy_code/Teensy_code.ino) by joaquinbvw
 
   ### Other tools:
+  *   [**Duinogotchi**](https://github.com/OSRdesign/duinogotchi) - Duino-Coin virtual pet project by OSRdesign
   *   [Duino Miner](https://github.com/g7ltt/Duino-Miner) - Arduino Nano based DUCO miner files and documentation by g7ltt
   *   [DUINO Mining Rig](https://repalmakershop.com/pages/duino-mining-rig) - 3D files, PCB designs and instructions for creating your own Duino rig by ReP_AL
   *   [DuinoCoin-balance-Home-Assistant](https://github.com/NL647/DuinoCoin-balance-Home-Assistant) - addon for home assistant displaying your balance by NL647
