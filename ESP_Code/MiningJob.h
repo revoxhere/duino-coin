@@ -90,6 +90,11 @@ public:
         return false;
     }
 
+    void handleSystemEvents(void) {
+        ArduinoOTA.handle();
+        yield();
+    }
+
     void mine() {
         connectToNode();
         askForJob();
@@ -105,11 +110,9 @@ public:
             DSHA1 ctx = *dsha1;
             ctx.write((const unsigned char *)counter.c_str(), counter.strlen()).finalize(hashArray);
 
-            #if CORE == 1
-                yield();
-            #elif defined(ESP8266)
-                ESP.wdtFeed();
-            #endif
+            if (max_micros_elapsed(micros(), 500000)) {
+                handleSystemEvents();
+            }
 
             if (memcmp(getExpectedHash(), hashArray, 20) == 0) {
                 unsigned long elapsed_time = micros() - start_time;
