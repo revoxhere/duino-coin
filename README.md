@@ -184,11 +184,12 @@ Please note the DUCO/day column has been removed since version 4.0 changed the r
 
 ## Community-made softwares
 
-### Please note that these softwares are not developed by us and we do not give any guarantees that use of them will not result in an account getting banned. Treat them as a curiosity. 
+### Please note that these softwares are not developed by us and we do not give any guarantees that use of them will not result in an account getting banned if they get changed in the future.
 
-  ### Other miners known to work with Duino-Coin:
-  *   [Dockerized Duino-Coin Miner](https://github.com/simeononsecurity/docker-duino-coin) - A Dockerized version of the Duino-Coin Miner
-  *   :point_right: [**RP2040-HAT-MINING-C**](https://github.com/Wiznet/RP2040-HAT-MINING-C) - **WIZnet RP2040** mining stack
+  ### Miners and tools built by the Duino-Coin community:
+  *   [Duinogotchi](https://github.com/OSRdesign/duinogotchi) - Duino-Coin virtual pet project by OSRdesign
+  *   [Dockerized Duino-Coin Miner](https://github.com/simeononsecurity/docker-duino-coin) - A Dockerized version of the Duino-Coin Miner by simeononsecurity
+  *   :point_right: [**RP2040-HAT-MINING-C**](https://github.com/Wiznet/RP2040-HAT-MINING-C) - **WIZnet RP2040 mining stack**
   *   [DuinoCoinEthernetMiner](https://github.com/Pumafron/DuinoCoinEthernetMiner) - Arduino Ethernet shield Miner by Pumafron
   *   [STM8 DUCO Miner](https://github.com/BBS215/STM8_DUCO_miner) - STM8S firmware for mining DUCO by BBS215
   *   [DuinoCoinbyLabVIEW](https://github.com/ericddm/DuinoCoinbyLabVIEW) - miner for LabVIEW family by ericddm
