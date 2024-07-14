@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for all ESP8266/32 boards            version 4.1
+  Official code for all ESP8266/32 boards            version 4.2
   Main .ino file
 
   The Duino-Coin Team & Community 2019-2024 © MIT Licensed
@@ -34,10 +34,10 @@
     #include <ESP8266WebServer.h>
 #else
     #include <ESPmDNS.h>
-    #include <WiFiClientSecure.h>
     #include <WiFi.h>
     #include <HTTPClient.h>
     #include <WebServer.h>
+    #include <WiFiClientSecure.h>
 #endif
 
 #include <WiFiUdp.h>
@@ -74,6 +74,31 @@
 
 #if defined(WEB_DASHBOARD)
     WebServer server(80);
+#endif
+
+#if defined(ESP8266)
+    // WDT Loop 
+    // See lwdtcb() and lwdtFeed() below
+    Ticker lwdTimer;
+    
+    unsigned long lwdCurrentMillis = 0;
+    unsigned long lwdTimeOutMillis = LWD_TIMEOUT;
+
+    void RestartESP(String msg) {
+      Serial.println(msg);
+      Serial.println("Restarting ESP...");
+      ESP.reset();
+    }
+
+    void ICACHE_RAM_ATTR lwdtcb(void) {
+      if ((millis() - lwdCurrentMillis > LWD_TIMEOUT) || (lwdTimeOutMillis - lwdCurrentMillis != LWD_TIMEOUT))
+        RestartESP("Loop WDT Failed!");
+    }
+    
+    void lwdtFeed(void) {
+      lwdCurrentMillis = millis();
+      lwdTimeOutMillis = lwdCurrentMillis + LWD_TIMEOUT;
+    }
 #endif
 
 namespace {
@@ -373,7 +398,7 @@ void setup() {
     delay(500);
     
     #if defined(SERIAL_PRINTING)
-      Serial.begin(500000);
+      Serial.begin(SERIAL_BAUDRATE);
       Serial.println("\n\nDuino-Coin " + String(configuration->MINER_VER));
     #endif
     pinMode(LED_BUILTIN, OUTPUT);
@@ -443,6 +468,15 @@ void setup() {
       server.begin();
     #endif
 
+    #if defined(ESP8266)
+        // Start the WDT watchdog
+        lwdtFeed();
+        lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
+    #else
+        // Fastest clock mode for 32s
+        setCpuFrequencyMhz(240);
+    #endif
+
     job[0]->blink(BLINK_SETUP_COMPLETE);
 
     #if CORE == 2 && defined(ESP32)
@@ -452,15 +486,18 @@ void setup() {
 }
 
 void loopOneCore() {
-    job[0]->mine();
-
     #if defined(ESP8266)
         // Fastest clock mode for 8266s
         system_update_cpu_freq(160);
+        os_update_cpu_frequency(160);
+        // Feed the watchdog
+        lwdtFeed();
     #else
         // Fastest clock mode for 32s
         setCpuFrequencyMhz(240);
     #endif
+    
+    job[0]->mine();
     
     VerifyWifi();
     ArduinoOTA.handle();
