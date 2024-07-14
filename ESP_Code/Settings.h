@@ -28,6 +28,12 @@ extern const char PASSWORD[] = "PASSW0RD";
 // Comment out the line below if you wish to disable Serial printing
 #define SERIAL_PRINTING
 
+// Edit the line below if you wish to change the serial speed (low values may reduce performance but are less prone to interference)
+#define SERIAL_BAUDRATE 500000
+
+// ESP8266 WDT loop watchdog. Do not edit this value, but if you must - do not set it too low or it will falsely trigger during mining!
+#define LWD_TIMEOUT 30000
+
 // -------------------------------------------------------------- //
 
 // ---------------------- IoT examples -------------------------- //
@@ -62,7 +68,7 @@ extern const char PASSWORD[] = "PASSW0RD";
 #define BLINK_SETUP_COMPLETE 2
 #define BLINK_CLIENT_CONNECT 5
 
-#define SOFTWARE_VERSION "4.1"
+#define SOFTWARE_VERSION "4.2"
 extern unsigned int hashrate = 0;
 extern unsigned int difficulty = 0;
 extern unsigned long share_count = 0;
