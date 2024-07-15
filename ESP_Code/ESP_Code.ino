@@ -59,6 +59,10 @@
   #include "Dashboard.h"
 #endif
 
+#if defined(DISPLAY_SSD1306)
+  #include "DisplayHal.h"
+#endif
+
 // Auto adjust physical core count
 // (ESP32-S2/C3 have 1 core, ESP32 has 2 cores, ESP8266 has 1 core)
 #if defined(ESP8266)
@@ -136,6 +140,7 @@ namespace {
         WiFiClientSecure client;
         client.setInsecure();
         HTTPClient http;
+        http.setReuse(false); 
 
         if (http.begin(client, URL)) {
           int httpCode = http.GET();
@@ -175,52 +180,50 @@ namespace {
       }
 
     #ifdef USE_LAN
-    void WiFiEvent(WiFiEvent_t event)
-    {
-      switch (event) {
-        case ARDUINO_EVENT_ETH_START:
-          #if defined(SERIAL_PRINTING)
-            Serial.println("ETH Started");
-          #endif
-          // The hostname must be set after the interface is started, but needs
-          // to be set before DHCP, so set it from the event handler thread.
-          ETH.setHostname("esp32-ethernet");
-          break;
-        case ARDUINO_EVENT_ETH_CONNECTED:
-          #if defined(SERIAL_PRINTING)
-            Serial.println("ETH Connected");
-          #endif
-          break;
-        case ARDUINO_EVENT_ETH_GOT_IP:
-          #if defined(SERIAL_PRINTING)
-            Serial.println("ETH Got IP");
-          #endif
-          eth_connected = true;
-          break;
-
-        case ARDUINO_EVENT_ETH_DISCONNECTED:
-          #if defined(SERIAL_PRINTING)
-            Serial.println("ETH Disconnected");
-          #endif
-          eth_connected = false;
-          break;
-        case ARDUINO_EVENT_ETH_STOP:
-          #if defined(SERIAL_PRINTING)
-            Serial.println("ETH Stopped");
-          #endif
-          eth_connected = false;
-          break;
-        default:
-          break;
-      }
-    }
+        void WiFiEvent(WiFiEvent_t event) {
+            switch (event) {
+              case ARDUINO_EVENT_ETH_START:
+                #if defined(SERIAL_PRINTING)
+                    Serial.println("ETH Started");
+                #endif
+                // The hostname must be set after the interface is started, but needs
+                // to be set before DHCP, so set it from the event handler thread.
+                ETH.setHostname("esp32-ethernet");
+                break;
+            case ARDUINO_EVENT_ETH_CONNECTED:
+                #if defined(SERIAL_PRINTING)
+                    Serial.println("ETH Connected");
+                #endif
+                break;
+            case ARDUINO_EVENT_ETH_GOT_IP:
+                #if defined(SERIAL_PRINTING)
+                    Serial.println("ETH Got IP");
+                #endif
+                eth_connected = true;
+                break;
+            case ARDUINO_EVENT_ETH_DISCONNECTED:
+                #if defined(SERIAL_PRINTING)
+                    Serial.println("ETH Disconnected");
+                #endif
+                eth_connected = false;
+                break;
+            case ARDUINO_EVENT_ETH_STOP:
+                #if defined(SERIAL_PRINTING)
+                    Serial.println("ETH Stopped");
+                #endif
+                eth_connected = false;
+                break;
+            default:
+                break;
+            }
+        }
     #endif
 
     void SetupWifi() {
       
       #ifdef USE_LAN
         #if defined(SERIAL_PRINTING)
-          Serial.println("Connecting to Ethernet...");
+            Serial.println("Connecting to Ethernet...");
         #endif
         WiFi.onEvent(WiFiEvent);  // Will call WiFiEvent() from another thread.
         ETH.begin();
@@ -234,16 +237,17 @@ namespace {
         }
 
         #if defined(SERIAL_PRINTING)
-          Serial.println("\n\nSuccessfully connected to Ethernet");
-          Serial.println("Local IP address: " + ETH.localIP().toString());
-          Serial.println("Rig name: " + String(RIG_IDENTIFIER));
-          Serial.println();
+            Serial.println("\n\nSuccessfully connected to Ethernet");
+            Serial.println("Local IP address: " + ETH.localIP().toString());
+            Serial.println("Rig name: " + String(RIG_IDENTIFIER));
+            Serial.println();
         #endif
 
       #else
         #if defined(SERIAL_PRINTING)
-          Serial.println("Connecting to: " + String(SSID));
+            Serial.println("Connecting to: " + String(SSID));
         #endif
+        
         WiFi.mode(WIFI_STA); // Setup ESP in client mode
         #if defined(ESP8266)
             WiFi.setSleepMode(WIFI_NONE_SLEEP);
@@ -251,12 +255,15 @@ namespace {
             WiFi.setSleep(false);
         #endif
         WiFi.begin(SSID, PASSWORD);
-
+        
+        #if defined(SERIAL_PRINTING)
+            Serial.println("Connecting...");
+        #endif
         int wait_passes = 0;
         while (WiFi.waitForConnectResult() != WL_CONNECTED) {
             delay(500);
             #if defined(SERIAL_PRINTING)
-              Serial.print(".");
+                Serial.print(".");
             #endif
             if (++wait_passes >= 10) {
                 WiFi.begin(SSID, PASSWORD);
@@ -265,10 +272,10 @@ namespace {
         }
 
         #if defined(SERIAL_PRINTING)
-          Serial.println("\n\nSuccessfully connected to WiFi");
-          Serial.println("Local IP address: " + WiFi.localIP().toString());
-          Serial.println("Rig name: " + String(RIG_IDENTIFIER));
-          Serial.println();
+            Serial.println("\n\nSuccessfully connected to WiFi");
+            Serial.println("Local IP address: " + WiFi.localIP().toString());
+            Serial.println("Rig name: " + String(RIG_IDENTIFIER));
+            Serial.println();
         #endif
 
       #endif
@@ -324,12 +331,6 @@ namespace {
         while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0, 0, 0, 0))
             WiFi.reconnect();
       #endif
-    }
-
-    void handleSystemEvents(void) {
-        VerifyWifi();
-        ArduinoOTA.handle();
-        yield();
     }
 
     #if defined(WEB_DASHBOARD)
@@ -398,10 +399,14 @@ void setup() {
     delay(500);
     
     #if defined(SERIAL_PRINTING)
-      Serial.begin(SERIAL_BAUDRATE);
-      Serial.println("\n\nDuino-Coin " + String(configuration->MINER_VER));
+        Serial.begin(SERIAL_BAUDRATE);
+        Serial.println("\n\nDuino-Coin " + String(configuration->MINER_VER));
     #endif
     pinMode(LED_BUILTIN, OUTPUT);
+
+    #if defined(DISPLAY_SSD1306)
+        screen_setup();
+    #endif
 
     assert(CORE == 1 || CORE == 2);
     WALLET_ID = String(random(0, 2811)); // Needed for miner grouping in the wallet
@@ -472,9 +477,6 @@ void setup() {
         // Start the WDT watchdog
         lwdtFeed();
         lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
-    #else
-        // Fastest clock mode for 32s
-        setCpuFrequencyMhz(240);
     #endif
 
     job[0]->blink(BLINK_SETUP_COMPLETE);
@@ -499,6 +501,25 @@ void loopOneCore() {
     
     job[0]->mine();
     
+    #if defined(DISPLAY_SSD1306)
+       float hashrate_float = hashrate / 1000.0;
+       float accept_rate = (accepted_share_count / share_count) * 100.0;
+       Serial.println(accepted_share_count / share_count);
+       Serial.println(accept_rate);
+       
+       long millisecs = millis();
+       int uptime_secs = int((millisecs / 1000) % 60);
+       int uptime_mins = int((millisecs / (1000 * 60)) % 60);
+       int uptime_hours = int((millisecs / (1000 * 60 * 60)) % 24);
+       String uptime = String(uptime_hours) + "h" + String(uptime_mins) + "m" + String(uptime_secs) + "s";
+       
+       float sharerate = share_count / (millisecs / 1000.0);
+
+       display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptime), 
+                              String(node_id), String(difficulty / 100), String(sharerate, 1),
+                              String(ping), String(accept_rate, 1));
+    #endif
+
     VerifyWifi();
     ArduinoOTA.handle();
     #if defined(WEB_DASHBOARD) 
