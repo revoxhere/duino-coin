@@ -122,7 +122,7 @@ public:
 
                 #if defined(LED_BLINKING)
                     digitalWrite(LED_BUILTIN, HIGH);
-                #endif    
+                #endif
 
                 submit(counter, hashrate, elapsed_time_s);
                 break;
@@ -234,8 +234,14 @@ private:
                      SEP_TOKEN + "DUCOID" + String(chipID) +
                      SEP_TOKEN + String(WALLET_ID) +
                      END_TOKEN);
-                     
+
+        unsigned long ping_start = millis();
         waitForClientData();
+        ping = millis() - ping_start;
+
+        if (client_buffer == "GOOD") {
+          accepted_share_count++;
+        }
 
         #if defined(SERIAL_PRINTING)
           Serial.println("Core [" + String(core) + "] - " +
