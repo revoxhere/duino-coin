@@ -3214,11 +3214,16 @@ function get_esp32_code() {
                                 function(data, textStatus, jqXHR) {
                                     zip.file("ESP_Code/Counter.h", data);
 
-                                zip.generateAsync({type:"blob"}).then(function(content) {
-                                    save(content, `ESP_Code-${username}.zip`);
-                                });
+                                $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/DisplayHal.h',
+                                    function(data, textStatus, jqXHR) {
+                                        zip.file("ESP_Code/DisplayHal.h", data);
 
-                                $("#esp32_download_button").removeClass("is-loading");
+                                        zip.generateAsync({type:"blob"}).then(function(content) {
+                                            save(content, `ESP_Code-${username}.zip`);
+                                        });
+
+                                        $("#esp32_download_button").removeClass("is-loading");
+                                });
                             });
                         });
                     });
@@ -3294,11 +3299,16 @@ function get_esp8266_code() {
                                 function(data, textStatus, jqXHR) {
                                     zip.file("ESP_Code/Counter.h", data);
 
-                                zip.generateAsync({type:"blob"}).then(function(content) {
-                                    save(content, `ESP_Code-${username}.zip`);
-                                });
+                                $.get('https://raw.githubusercontent.com/revoxhere/duino-coin/master/ESP_Code/DisplayHal.h',
+                                    function(data, textStatus, jqXHR) {
+                                        zip.file("ESP_Code/DisplayHal.h", data);
 
-                                $("#esp8266_download_button").removeClass("is-loading");
+                                        zip.generateAsync({type:"blob"}).then(function(content) {
+                                            save(content, `ESP_Code-${username}.zip`);
+                                        });
+        
+                                        $("#esp8266_download_button").removeClass("is-loading");
+                                });
                             });
                         });
                     });
