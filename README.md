@@ -228,6 +228,8 @@ Please note the DUCO/day column has been removed since version 4.0 changed the r
   *   [DuCoWallet](https://github.com/viktor02/DuCoWallet) GUI Wallet by viktor02
   *   [Duco-widget-ios](https://github.com/naphob/duco-widget-ios) - a Duino-Coin iOS widget by Naphob 
   *   [Duino Lookup](https://axorax.github.io/duino-lookup/) by axorax
+  *   [Duino Miner Hassio Add-on](https://github.com/mavotronik/hassio-addons/tree/main/duino_miner_hassio_addon) by mavotronik
+  *   [Home Assistant sensors package](https://github.com/mavotronik/Duinocoin_homeassistant) by mavotronik
 
  You may also view a similar list on the [website](https://duinocoin.com/apps).
 
