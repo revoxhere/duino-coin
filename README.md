@@ -140,8 +140,8 @@ Captured at normal multiplier (no weekend boost)
 | Device                | Hashrate            | Threads | DUCO/day |
 |-----------------------|---------------------|---------|----------|
 | Arduino               | 343 H/s             | 1       | 12       |
-| ESP32                 | 115 kH/s            | 2       | 10       |
-| ESP32-S2/C3           | 85-95 kH/s          | 1       | 8        |
+| ESP32                 | 170-180 kH/s        | 2       | 10       |
+| ESP32-S2/C3           | 85-96 kH/s          | 1       | 8        |
 | ESP8266               | 66 kH/s             | 1       | 6        |
 | Raspberry Pi 4 (LOW)  | 1 MH/s (no fasthash)| 4       | 6-7      |
 | Raspberry Pi 4 (MED)  | 5.4 MH/s (fasthash) | 4       | 7-8      |
