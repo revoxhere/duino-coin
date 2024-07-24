@@ -59,7 +59,7 @@
   #include "Dashboard.h"
 #endif
 
-#if defined(DISPLAY_SSD1306)
+#if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
   #include "DisplayHal.h"
 #endif
 
@@ -78,7 +78,25 @@
 
 #if defined(WEB_DASHBOARD)
     WebServer server(80);
-#endif
+#endif 
+
+void RestartESP(String msg) {
+  #if defined(SERIAL_PRINTING)
+    Serial.println(msg);
+    Serial.println("Restarting ESP...");
+  #endif
+
+  #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+    display_info("Restarting ESP...");
+  #endif
+
+  #if defined(ESP8266)
+    ESP.reset();
+  #else
+    ESP.restart();
+    abort();
+  #endif
+}
 
 #if defined(ESP8266)
     // WDT Loop 
@@ -87,12 +105,6 @@
     
     unsigned long lwdCurrentMillis = 0;
     unsigned long lwdTimeOutMillis = LWD_TIMEOUT;
-
-    void RestartESP(String msg) {
-      Serial.println(msg);
-      Serial.println("Restarting ESP...");
-      ESP.reset();
-    }
 
     void ICACHE_RAM_ATTR lwdtcb(void) {
       if ((millis() - lwdCurrentMillis > LWD_TIMEOUT) || (lwdTimeOutMillis - lwdCurrentMillis != LWD_TIMEOUT))
@@ -133,6 +145,10 @@ namespace {
         #if defined(SERIAL_PRINTING)
           Serial.println("Poolpicker selected the best mining node: " + node_id);
         #endif
+
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+          display_info(node_id);
+        #endif
     }
 
     String httpGetString(String URL) {
@@ -150,6 +166,9 @@ namespace {
           else
             #if defined(SERIAL_PRINTING)
                Serial.printf("Error fetching node from poolpicker: %s\n", http.errorToString(httpCode).c_str());
+            #endif
+            #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+              display_info(http.errorToString(httpCode));
             #endif
 
           http.end();
@@ -172,8 +191,8 @@ namespace {
             // Increase wait time till a maximum of 32 seconds
             // (addresses: Limit connection requests on failure in ESP boards #1041)
             waitTime *= 2;
-            if (waitTime > 32)
-                  waitTime = 32;
+            if (waitTime > 32) 
+                RestartESP("Node fetch unavailable");
         }
 
         UpdateHostPort(input);
@@ -255,10 +274,15 @@ namespace {
             WiFi.setSleep(false);
         #endif
         WiFi.begin(SSID, PASSWORD);
+
+        // Set normal DNS servers
+        IPAddress primaryDNS(8, 8, 8, 8);
+        IPAddress secondaryDNS(1, 1, 1, 1);
+
+        if (!WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), primaryDNS, secondaryDNS)) {
+          Serial.println("Failed to configure DNS");
+        }
         
-        #if defined(SERIAL_PRINTING)
-            Serial.println("Connecting...");
-        #endif
         int wait_passes = 0;
         while (WiFi.waitForConnectResult() != WL_CONNECTED) {
             delay(500);
@@ -280,7 +304,10 @@ namespace {
 
       #endif
 
-        SelectNode();
+      #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+          display_info("Waiting for node...");
+      #endif
+      SelectNode();
     }
 
     void SetupOTA() {
@@ -345,7 +372,7 @@ namespace {
               s.replace("@@IP_ADDR@@", WiFi.localIP().toString());
              #endif
   
-             s.replace("@@HASHRATE@@", String(hashrate / 1000));
+             s.replace("@@HASHRATE@@", String((hashrate+hashrate_core_two) / 1000));
              s.replace("@@DIFF@@", String(difficulty / 100));
              s.replace("@@SHARES@@", String(share_count));
              s.replace("@@NODE@@", String(node_id));
@@ -379,6 +406,23 @@ void task1_func(void *) {
 
       VOID LOOP() {
         job[0]->mine();
+
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+           float hashrate_float = (hashrate+hashrate_core_two) / 1000.0;
+           float accept_rate = (accepted_share_count / 0.01 / share_count);
+           
+           long millisecs = millis();
+           int uptime_secs = int((millisecs / 1000) % 60);
+           int uptime_mins = int((millisecs / (1000 * 60)) % 60);
+           int uptime_hours = int((millisecs / (1000 * 60 * 60)) % 24);
+           String uptime = String(uptime_hours) + "h" + String(uptime_mins) + "m" + String(uptime_secs) + "s";
+           
+           float sharerate = share_count / (millisecs / 1000.0);
+          
+           display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptime), 
+                                  String(node_id), String(difficulty / 100), String(sharerate, 1),
+                                  String(ping), String(accept_rate, 1));
+        #endif
       }
     #endif
 }
@@ -391,6 +435,23 @@ void task2_func(void *) {
 
       VOID LOOP() {
         job[1]->mine();
+
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+           float hashrate_float = (hashrate+hashrate_core_two) / 1000.0;
+           float accept_rate = (accepted_share_count / 0.01 / share_count);
+           
+           long millisecs = millis();
+           int uptime_secs = int((millisecs / 1000) % 60);
+           int uptime_mins = int((millisecs / (1000 * 60)) % 60);
+           int uptime_hours = int((millisecs / (1000 * 60 * 60)) % 24);
+           String uptime = String(uptime_hours) + "h" + String(uptime_mins) + "m" + String(uptime_secs) + "s";
+           
+           float sharerate = share_count / (millisecs / 1000.0);
+    
+           display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptime), 
+                                  String(node_id), String(difficulty / 100), String(sharerate, 1),
+                                  String(ping), String(accept_rate, 1));
+        #endif
       }
     #endif
 }
@@ -404,8 +465,10 @@ void setup() {
     #endif
     pinMode(LED_BUILTIN, OUTPUT);
 
-    #if defined(DISPLAY_SSD1306)
+    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
         screen_setup();
+        display_info("Welcome back!");
+        delay(500);
     #endif
 
     assert(CORE == 1 || CORE == 2);
@@ -449,6 +512,9 @@ void setup() {
        #endif
     #endif
 
+    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+      display_info("Waiting for WiFi...");
+    #endif
     SetupWifi();
     SetupOTA();
 
@@ -479,15 +545,6 @@ void setup() {
         lwdTimer.attach_ms(LWD_TIMEOUT, lwdtcb);
     #endif
 
-    job[0]->blink(BLINK_SETUP_COMPLETE);
-
-    #if CORE == 2 && defined(ESP32)
-        task1.start(task1_func);
-        task2.start(task2_func);
-    #endif
-}
-
-void loopOneCore() {
     #if defined(ESP8266)
         // Fastest clock mode for 8266s
         system_update_cpu_freq(160);
@@ -498,14 +555,39 @@ void loopOneCore() {
         // Fastest clock mode for 32s
         setCpuFrequencyMhz(240);
     #endif
-    
+
+    job[0]->blink(BLINK_SETUP_COMPLETE);
+
+    #if defined(ESP32) && CORE == 2
+      mutexClientData = xSemaphoreCreateMutex();
+      mutexConnectToServer = xSemaphoreCreateMutex();
+
+      xTaskCreatePinnedToCore(system_events_func, "system_events_func", 10000, NULL, 1, NULL, 0);
+      xTaskCreatePinnedToCore(task1_func, "task1_func", 10000, NULL, 1, NULL, 0);
+      xTaskCreatePinnedToCore(task2_func, "task2_func", 10000, NULL, 2, NULL, 1);
+    #endif
+}
+
+void system_events_func(void* parameter) {
+  while (true) {
+    #if defined(WEB_DASHBOARD)
+      server.handleClient();
+    #endif
+    ArduinoOTA.handle();
+    delay(10);
+  }
+}
+
+void single_core_loop() {
     job[0]->mine();
     
-    #if defined(DISPLAY_SSD1306)
-       float hashrate_float = hashrate / 1000.0;
-       float accept_rate = (accepted_share_count / share_count) * 100.0;
-       Serial.println(accepted_share_count / share_count);
-       Serial.println(accept_rate);
+    #if defined(ESP8266)
+      lwdtFeed();
+    #endif
+    
+    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+       float hashrate_float = (hashrate+hashrate_core_two) / 1000.0;
+       float accept_rate = (accepted_share_count / 0.01 / share_count);
        
        long millisecs = millis();
        int uptime_secs = int((millisecs / 1000) % 60);
@@ -528,7 +610,7 @@ void loopOneCore() {
 }
 
 void loop() {
-    #if CORE == 1
-        loopOneCore();
-    #endif
+  #if defined(ESP8266) || defined(CONFIG_FREERTOS_UNICORE)
+    single_core_loop();
+  #endif
 }
