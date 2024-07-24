@@ -35,12 +35,16 @@ extern const char PASSWORD[] = "PASSW0RD";
 #define LWD_TIMEOUT 30000
 
 // Uncomment to enable a SSD1306 OLED screen on the I2C bus to display mining info in real time
-// Default connections (can be overriden with Wire.begin(SDA, SCL)):
+// Default connections (can be overriden by using a different u8g2 initializer, see line 122):
 // GND - GND
 // VCC - 5V or 3.3V depending on display
-// SCL - GPIO21 (ESP32) or GPIO5 (ESP8266) or GPIO35 (ESP32-S2)
-// SDA - GPIO22 (ESP32) or GPIO4 (ESP8266) or GPIO33 (ESP32-S2)
+// SCL - GPIO22 (ESP32) or GPIO5 (D2 on ESP8266) or GPIO35 (ESP32-S2)
+// SDA - GPIO21 (ESP32) or GPIO4 (D1 on ESP8266) or GPIO33 (ESP32-S2)
 // #define DISPLAY_SSD1306
+
+// Uncomment to enable a 16x2 LCD screen on a direct bus to display mining info in real time
+// See line 132 for connections and initializer
+// #define DISPLAY_16X2
 
 // -------------------------------------------------------------- //
 
@@ -112,10 +116,22 @@ extern unsigned int ping = 0;
 #endif
 
 #if defined(DISPLAY_SSD1306)
+    // Install "u8g2" if you get an error
     #include <U8g2lib.h>
     #include <Wire.h>
     // Display definition from the U8G2 library. Edit if you use a different display
+    // For software I2C, use ..._F_SW_I2C and define the pins in the initializer
     U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE);
+#endif
+
+#if defined(DISPLAY_16X2)
+    #include "Wire.h"
+    // Install "Adafruit_LiquidCrystal" if you get an error
+    #include "Adafruit_LiquidCrystal.h"
+
+    // initialize the library with the numbers of the interface pins
+    //                         RS E  D4 D5 D6 D7
+    Adafruit_LiquidCrystal lcd(1, 2, 3, 4, 5, 6);
 #endif
 
 #endif  // End of SETTINGS_H
