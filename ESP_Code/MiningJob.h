@@ -93,6 +93,7 @@ public:
     void handleSystemEvents(void) {
         ArduinoOTA.handle();
         yield();
+        vTaskDelay(10);
         delay(10); // Required vTaskDelay by ESP-IDF
     }
 
