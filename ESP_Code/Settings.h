@@ -82,6 +82,7 @@ extern const char PASSWORD[] = "PASSW0RD";
 
 #define SOFTWARE_VERSION "4.2"
 extern unsigned int hashrate = 0;
+extern unsigned int hashrate_core_two = 0;
 extern unsigned int difficulty = 0;
 extern unsigned long share_count = 0;
 extern unsigned long accepted_share_count = 0;
