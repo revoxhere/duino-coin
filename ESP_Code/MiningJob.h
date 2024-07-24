@@ -93,6 +93,7 @@ public:
     void handleSystemEvents(void) {
         ArduinoOTA.handle();
         yield();
+        delay(10); // Required vTaskDelay by ESP-IDF
     }
 
     void mine() {
@@ -109,22 +110,30 @@ public:
         for (Counter<10> counter; counter < difficulty; ++counter) {
             DSHA1 ctx = *dsha1;
             ctx.write((const unsigned char *)counter.c_str(), counter.strlen()).finalize(hashArray);
-
-            if (max_micros_elapsed(micros(), 500000)) {
-                handleSystemEvents();
-            }
+            
+            #ifndef CONFIG_FREERTOS_UNICORE
+                if (max_micros_elapsed(micros(), 500000)) {
+                    handleSystemEvents();
+                } 
+            #endif
 
             if (memcmp(getExpectedHash(), hashArray, 20) == 0) {
                 unsigned long elapsed_time = micros() - start_time;
                 float elapsed_time_s = elapsed_time * .000001f;
-                hashrate = counter / elapsed_time_s;
                 share_count++;
 
                 #if defined(LED_BLINKING)
                     digitalWrite(LED_BUILTIN, HIGH);
                 #endif
 
-                submit(counter, hashrate, elapsed_time_s);
+                if (String(core) == "0") {
+                    hashrate = counter / elapsed_time_s;
+                    submit(counter, hashrate, elapsed_time_s);
+                } else {
+                    hashrate_core_two = counter / elapsed_time_s;
+                    submit(counter, hashrate_core_two, elapsed_time_s);
+                }
+                
                 break;
             }
         }
@@ -210,6 +219,12 @@ private:
 
         blink(BLINK_CLIENT_CONNECT); 
 
+        /* client.print("MOTD" + END_TOKEN);
+        waitForClientData();
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Core [" + String(core) + "] - MOTD: "
+                          + client_buffer);
+        #endif */
     }
 
     void waitForClientData() {
