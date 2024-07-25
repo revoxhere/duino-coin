@@ -91,16 +91,18 @@ public:
     }
 
     void handleSystemEvents(void) {
-        ArduinoOTA.handle();
-        yield();
-        vTaskDelay(10);
+        #if defined(ESP32) && CORE == 2
+          esp_task_wdt_reset();
+        #endif
         delay(10); // Required vTaskDelay by ESP-IDF
+        yield();
+        ArduinoOTA.handle();
     }
 
     void mine() {
         connectToNode();
         askForJob();
-
+          
         dsha1->reset().write((const unsigned char *)getLastBlockHash().c_str(), getLastBlockHash().length());
 
         int start_time = micros();
@@ -113,7 +115,7 @@ public:
             ctx.write((const unsigned char *)counter.c_str(), counter.strlen()).finalize(hashArray);
             
             #ifndef CONFIG_FREERTOS_UNICORE
-                if (max_micros_elapsed(micros(), 500000)) {
+                if (max_micros_elapsed(micros(), 100000)) { // 10ms
                     handleSystemEvents();
                 } 
             #endif
@@ -209,7 +211,10 @@ private:
           Serial.println("Core [" + String(core) + "] - Connecting to a Duino-Coin node...");
         #endif
         while (!client.connect(config->host.c_str(), config->port)) {
-          if (millis()-stopWatch>100000) ESP.restart();
+            if (max_micros_elapsed(micros(), 100000)) {
+                handleSystemEvents();
+            } 
+            if (millis()-stopWatch>100000) ESP.restart();
         }
         
         waitForClientData();
