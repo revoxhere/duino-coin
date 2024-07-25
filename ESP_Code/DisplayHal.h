@@ -18,6 +18,7 @@
     static byte duco_logo[] = {0x1E, 0x01, 0x1D, 0x05, 0x1D, 0x01, 0x1E, 0x00};
     static byte check_mark[] = {0x00, 0x00, 0x00, 0x01, 0x02,0x14, 0x08, 0x00};
     static byte kh[] = {0x08, 0x0A, 0x0C, 0x0A, 0x00, 0x0A, 0x0E, 0x0A};
+    static byte msec[] = {0x0A, 0x15, 0x11, 0x06, 0x08, 0x04, 0x02, 0x0C};
 #endif
 
   #if defined(DISPLAY_SSD1306)
@@ -73,6 +74,7 @@
           lcd.createChar(0, duco_logo);
           lcd.createChar(1, check_mark);
           lcd.createChar(2, kh);
+          lcd.createChar(3, msec);
           lcd.home();
           lcd.clear();
       #endif
@@ -87,7 +89,7 @@
           #if defined(ESP8266)
             lcd.print("ESP8266 ");
           #elif defined(CONFIG_FREERTOS_UNICORE)
-            lcd.print("ESP32S2/C3 ");
+            lcd.print("ESP32S2 ");
           #else
             lcd.print("ESP32 ");
           #endif
@@ -277,13 +279,11 @@
           lcd.write(1); // checkmark
           lcd.print(accepted_shares);
 
-          lcd.print(" ");
-          //lcd.setCursor(6, 1);
+          lcd.setCursor(7, 1);
           lcd.print(ping);
-          lcd.print("ms");
+          lcd.write(3); // ms
 
-          lcd.print(" ");
-          //lcd.setCursor(12, 1);
+          lcd.setCursor(12, 1);
           lcd.print(sharerate);
           lcd.print("s");
       #endif
