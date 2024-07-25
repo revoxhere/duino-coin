@@ -115,7 +115,12 @@ public:
             ctx.write((const unsigned char *)counter.c_str(), counter.strlen()).finalize(hashArray);
             
             #ifndef CONFIG_FREERTOS_UNICORE
-                if (max_micros_elapsed(micros(), 100000)) { // 10ms
+                #if defined(ESP32)
+                    #define SYSTEM_TIMEOUT 100000 // 10ms for esp32 looks like the lowest value without false watchdog triggers
+                #else 
+                    #define SYSTEM_TIMEOUT 500000 // 50ms for 8266 for same reason as above
+                #endif
+                if (max_micros_elapsed(micros(), SYSTEM_TIMEOUT)) {
                     handleSystemEvents();
                 } 
             #endif
