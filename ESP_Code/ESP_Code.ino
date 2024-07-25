@@ -63,6 +63,11 @@
   #include "DisplayHal.h"
 #endif
 
+#if defined(DISABLE_BROWNOUT)
+    #include "soc/soc.h"
+    #include "soc/rtc_cntl_reg.h"
+#endif
+
 // Auto adjust physical core count
 // (ESP32-S2/C3 have 1 core, ESP32 has 2 cores, ESP8266 has 1 core)
 #if defined(ESP8266)
@@ -74,6 +79,11 @@
     #define CORE 2
     // Install TridentTD_EasyFreeRTOS32 if you get an error
     #include <TridentTD_EasyFreeRTOS32.h>
+
+    void Task1Code( void * parameter );
+    void Task2Code( void * parameter );
+    TaskHandle_t Task1;
+    TaskHandle_t Task2;
 #endif
 
 #if defined(WEB_DASHBOARD)
@@ -115,6 +125,10 @@ void RestartESP(String msg) {
       lwdCurrentMillis = millis();
       lwdTimeOutMillis = lwdCurrentMillis + LWD_TIMEOUT;
     }
+#else
+    void lwdtFeed(void) {
+      Serial.println("lwdtFeed()");
+    }
 #endif
 
 namespace {
@@ -155,6 +169,7 @@ namespace {
         String payload = "";
         WiFiClientSecure client;
         client.setInsecure();
+        client.setTimeout(8000);
         HTTPClient http;
         http.setReuse(false); 
 
@@ -457,7 +472,9 @@ void task2_func(void *) {
 }
 
 void setup() {
-    delay(500);
+    #if defined(DISABLE_BROWNOUT)
+        WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
+    #endif
     
     #if defined(SERIAL_PRINTING)
         Serial.begin(SERIAL_BAUDRATE);
@@ -467,8 +484,8 @@ void setup() {
 
     #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
         screen_setup();
-        display_info("Welcome back!");
-        delay(500);
+        display_boot();
+        delay(2500);
     #endif
 
     assert(CORE == 1 || CORE == 2);
@@ -563,27 +580,25 @@ void setup() {
       mutexConnectToServer = xSemaphoreCreateMutex();
 
       xTaskCreatePinnedToCore(system_events_func, "system_events_func", 10000, NULL, 1, NULL, 0);
-      xTaskCreatePinnedToCore(task1_func, "task1_func", 10000, NULL, 1, NULL, 0);
-      xTaskCreatePinnedToCore(task2_func, "task2_func", 10000, NULL, 2, NULL, 1);
+      xTaskCreatePinnedToCore(task1_func, "task1_func", 10000, NULL, 1, &Task1, 0);
+      xTaskCreatePinnedToCore(task2_func, "task2_func", 10000, NULL, 1, &Task2, 1);
     #endif
 }
 
 void system_events_func(void* parameter) {
   while (true) {
+    delay(10);
     #if defined(WEB_DASHBOARD)
       server.handleClient();
     #endif
     ArduinoOTA.handle();
-    delay(10);
   }
 }
 
 void single_core_loop() {
     job[0]->mine();
     
-    #if defined(ESP8266)
-      lwdtFeed();
-    #endif
+    lwdtFeed();
     
     #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
        float hashrate_float = (hashrate+hashrate_core_two) / 1000.0;
@@ -613,4 +628,5 @@ void loop() {
   #if defined(ESP8266) || defined(CONFIG_FREERTOS_UNICORE)
     single_core_loop();
   #endif
+  delay(10);
 }
