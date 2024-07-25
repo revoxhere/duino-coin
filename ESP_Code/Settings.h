@@ -34,8 +34,15 @@ extern const char PASSWORD[] = "PASSW0RD";
 // ESP8266 WDT loop watchdog. Do not edit this value, but if you must - do not set it too low or it will falsely trigger during mining!
 #define LWD_TIMEOUT 30000
 
+// Uncomment to disable ESP32 brownout detector if you're suffering from faulty insufficient power detection
+// #define DISABLE_BROWNOUT
+
+// -------------------------------------------------------------- //
+
+// ------------------------ Displays ---------------------------- //
+
 // Uncomment to enable a SSD1306 OLED screen on the I2C bus to display mining info in real time
-// Default connections (can be overriden by using a different u8g2 initializer, see line 122):
+// Default connections (can be overriden by using a different u8g2 initializer, see line 132):
 // GND - GND
 // VCC - 5V or 3.3V depending on display
 // SCL - GPIO22 (ESP32) or GPIO5 (D2 on ESP8266) or GPIO35 (ESP32-S2)
@@ -43,7 +50,7 @@ extern const char PASSWORD[] = "PASSW0RD";
 // #define DISPLAY_SSD1306
 
 // Uncomment to enable a 16x2 LCD screen on a direct bus to display mining info in real time
-// See line 132 for connections and initializer
+// See line 142 for connections and initializer
 // #define DISPLAY_16X2
 
 // -------------------------------------------------------------- //
