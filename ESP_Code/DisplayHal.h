@@ -20,6 +20,41 @@
     static byte kh[] = {0x08, 0x0A, 0x0C, 0x0A, 0x00, 0x0A, 0x0E, 0x0A};
 #endif
 
+  #if defined(DISPLAY_SSD1306)
+    void drawStrMultiline(const char *msg, int xloc, int yloc) {
+     //https://github.com/olikraus/u8g2/discussions/1479
+     int dspwidth = u8g2.getDisplayWidth();    
+     int strwidth = 0;          
+     char glyph[2]; glyph[1] = 0;
+  
+     for (const char *ptr = msg, *lastblank = NULL; *ptr; ++ptr) {
+        while (xloc == 0 && *msg == ' ')
+           if (ptr == msg++) ++ptr;                     
+  
+        glyph[0] = *ptr;
+        strwidth += u8g2.getStrWidth(glyph);                   
+        if (*ptr == ' ')  lastblank = ptr;                 
+        else ++strwidth;                       
+  
+        if (xloc + strwidth > dspwidth) {                       
+           int starting_xloc = xloc;
+           while (msg < (lastblank ? lastblank : ptr)) {                       
+              glyph[0] = *msg++;
+              xloc += u8g2.drawStr(xloc, yloc, glyph); 
+           }
+  
+           strwidth -= xloc - starting_xloc;                       
+           yloc += u8g2.getMaxCharHeight();                      
+           xloc = 0; lastblank = NULL;
+        }
+     }
+     while (*msg) {                        
+        glyph[0] = *msg++;
+        xloc += u8g2.drawStr(xloc, yloc, glyph);
+     }
+    }
+#endif
+
 #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
     void screen_setup() {
       // Ran during setup()
@@ -43,6 +78,91 @@
       #endif
     }
 
+
+    void display_boot() {
+      // Abstraction layer: compilation time, features, etc.
+
+      #if defined(DISPLAY_16X2)
+          lcd.clear();
+          #if defined(ESP8266)
+            lcd.print("ESP8266 ");
+          #elif defined(CONFIG_FREERTOS_UNICORE)
+            lcd.print("ESP32S2/C3 ");
+          #else
+            lcd.print("ESP32 ");
+          #endif
+          #if defined(ESP8266)
+            lcd.print(String(ESP.getCpuFreqMHz()).c_str());
+          #else
+            lcd.print(String(getCpuFrequencyMhz()).c_str());
+          #endif
+          lcd.print(" MHz");
+
+          lcd.setCursor(0, 1);
+          lcd.print(__DATE__);
+      #endif
+
+      #if defined(DISPLAY_SSD1306)
+          u8g2.clearBuffer();
+          
+          u8g2.setFont(u8g2_font_profont15_tr);
+          u8g2.setCursor(2, 13);
+          #if defined(ESP8266)
+            u8g2.print("ESP8266 ");
+          #elif defined(CONFIG_FREERTOS_UNICORE)
+            u8g2.print("ESP32S2/C3 ");
+          #else
+            u8g2.print("ESP32 ");
+          #endif
+  
+          #if defined(ESP8266)
+            u8g2.print(String(ESP.getCpuFreqMHz()).c_str());
+          #else
+            u8g2.print(String(getCpuFrequencyMhz()).c_str());
+          #endif
+          u8g2.print(" MHz");
+  
+          u8g2.setFont(u8g2_font_profont10_tr);
+          u8g2.drawLine(1, 27, 126, 27);
+          u8g2.setCursor(2, 24);
+          u8g2.print("Compiled ");
+          u8g2.print(__DATE__);
+          
+          
+          u8g2.drawStr(2, 37, "Features:");
+          u8g2.setCursor(2, 46);
+          String features_str = "OTA ";
+          #if defined(USE_LAN)
+            features_str += "LAN ";
+          #endif
+          #if defined(LED_BLINKING)
+            features_str += "Blink ";
+          #endif
+          #if defined(SERIAL_PRINTING)
+            features_str += "Serial ";
+          #endif
+          #if defined(WEB_DASHBOARD)
+            features_str += "Webserver ";
+          #endif
+          #if defined(DISPLAY_16X2)
+            features_str += "LCD16X2 ";
+          #endif
+          #if defined(DISPLAY_SSD1306)
+            features_str += "SSD1306 ";
+          #endif
+          #if defined(USE_INTERNAL_SENSOR)
+            features_str += "Int. sensor ";
+          #endif
+          #if defined(USE_DS18B20)
+            features_str += "DS18B20 ";
+          #endif
+          #if defined(USE_DHT)
+            features_str += "DHT ";
+          #endif
+          drawStrMultiline(features_str.c_str(), 2, 46);
+          u8g2.sendBuffer();
+      #endif
+    }
 
     void display_info(String message) {
       // Abstraction layer: info screens (setups)
@@ -157,11 +277,13 @@
           lcd.write(1); // checkmark
           lcd.print(accepted_shares);
 
-          lcd.setCursor(6, 1);
+          lcd.print(" ");
+          //lcd.setCursor(6, 1);
           lcd.print(ping);
           lcd.print("ms");
 
-          lcd.setCursor(12, 1);
+          lcd.print(" ");
+          //lcd.setCursor(12, 1);
           lcd.print(sharerate);
           lcd.print("s");
       #endif
