@@ -63,7 +63,7 @@
   #include "DisplayHal.h"
 #endif
 
-#if defined(DISABLE_BROWNOUT)
+#if !defined(ESP8266) && defined(DISABLE_BROWNOUT)
     #include "soc/soc.h"
     #include "soc/rtc_cntl_reg.h"
 #endif
@@ -472,7 +472,7 @@ void task2_func(void *) {
 }
 
 void setup() {
-    #if defined(DISABLE_BROWNOUT)
+    #if !defined(ESP8266) && defined(DISABLE_BROWNOUT)
         WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
     #endif
     
@@ -511,6 +511,13 @@ void setup() {
         sensors.requestTemperatures(); 
         #if defined(SERIAL_PRINTING)
           Serial.println("Test reading: " + String(sensors.getTempCByIndex(0)) + "°C");
+        #endif
+    #endif
+
+    #if defined(USE_HSU07M)
+        #if defined(SERIAL_PRINTING)
+          Serial.println("Initializing HSU07M sensor (Duino IoT)");
+          Serial.println("Test reading: " + String(read_hsu07m()) + "°C");
         #endif
     #endif
 
