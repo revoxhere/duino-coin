@@ -161,6 +161,9 @@
           #if defined(USE_DHT)
             features_str += "DHT ";
           #endif
+          #if defined(USE_HSU07M)
+            features_str += "HSU07M ";
+          #endif
           drawStrMultiline(features_str.c_str(), 2, 46);
           u8g2.sendBuffer();
       #endif
