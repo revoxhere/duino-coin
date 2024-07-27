@@ -712,6 +712,15 @@ def get_string(string_name):
         return string_name
 
 
+def has_mining_key(username):
+    response = requests.get(
+        "https://server.duinocoin.com/mining_key"
+            + "?u=" + user_settings["username"]
+        timeout=10
+    ).json()
+    return response["has_key"]
+
+
 def check_mining_key(user_settings):
     if user_settings["mining_key"] != "None":
         key = '&k=' + urllib.parse.quote(b64.b64decode(user_settings["mining_key"]).decode('utf-8'))
@@ -948,10 +957,11 @@ class Miner:
                 if not correct_username:
                     print(get_string("incorrect_username"))
 
-            mining_key = input(Style.RESET_ALL + get_string("ask_mining_key") + Style.BRIGHT)
-            if not mining_key:
-                mining_key = "None"
-            else:
+            mining_key = "None"
+            if has_mining_key(username):
+                mining_key = input(Style.RESET_ALL + 
+                                    get_string("ask_mining_key") + 
+                                    Style.BRIGHT)
                 mining_key = b64.b64encode(mining_key.encode("utf-8")).decode('utf-8')
 
             algorithm = "DUCO-S1"
