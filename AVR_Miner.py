@@ -266,6 +266,16 @@ def check_updates():
         print(e)
         sys.exit()
 
+
+def has_mining_key(username):
+    response = requests.get(
+        "https://server.duinocoin.com/mining_key"
+            + "?u=" + user_settings["username"]
+        timeout=10
+    ).json()
+    return response["has_key"]
+
+
 def check_mining_key(user_settings):
     user_settings = user_settings["AVR Miner"]
 
@@ -653,13 +663,8 @@ def load_config():
             if not correct_username:
                 print(get_string("incorrect_username"))
 
-        response = requests.get(
-            "https://server.duinocoin.com/mining_key"
-                + "?u=" + username, timeout=10
-        ).json()
-
         mining_key = "None"
-        if response["has_key"]:
+        if has_mining_key(username):
             mining_key = input(Style.RESET_ALL + Fore.YELLOW
                            + get_string("ask_mining_key")
                            + Fore.RESET + Style.BRIGHT)
