@@ -339,6 +339,18 @@ private:
                          SEP_TOKEN + "Temp:" + String(temp) + "*C" +
                          IOT_TOKEN + "Hum:" + String(hum) + "%" +
                          END_TOKEN);
+        #elif defined(USE_HSU07M)
+            float temp = read_hsu07m();
+            #if defined(SERIAL_PRINTING)
+              Serial.println("HSU reading: " + String(temp) + "°C");
+            #endif
+
+            client.print("JOB," +
+                         String(config->DUCO_USER) +
+                         SEP_TOKEN + config->START_DIFF + 
+                         SEP_TOKEN + String(config->MINER_KEY) + 
+                         SEP_TOKEN + "Temp:" + String(temp) + "*C" +
+                         END_TOKEN);
         #elif defined(USE_INTERNAL_SENSOR)
             float temp = 0;
             temp_sensor_read_celsius(&temp);
