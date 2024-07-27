@@ -715,7 +715,7 @@ def get_string(string_name):
 def has_mining_key(username):
     response = requests.get(
         "https://server.duinocoin.com/mining_key"
-            + "?u=" + user_settings["username"]
+            + "?u=" + username,
         timeout=10
     ).json()
     return response["has_key"]
