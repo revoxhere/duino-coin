@@ -601,7 +601,7 @@ def title(title: str):
             print('\33]0;' + title + '\a', end='')
             sys.stdout.flush()
         except Exception as e:
-            print(e)
+            debug_output("Error setting title: " +str(e))
 
 
 def handler(signal_received, frame):
