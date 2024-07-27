@@ -14,16 +14,18 @@ extern const char RIG_IDENTIFIER[] = "None";
 extern const char SSID[] = "SSID";
 // Change the part in brackets to your WiFi password
 extern const char PASSWORD[] = "PASSW0RD";
+// -------------------------------------------------------------- //
 
+// -------------------- Advanced options ------------------------ //
 // Uncomment if you want to host the dashboard page (available on ESPs IP address)
 // #define WEB_DASHBOARD
+
+// Comment out the line below if you wish to disable LED blinking
+#define LED_BLINKING
 
 // Uncomment if you want to use LAN8720. WLAN-credentials will be ignored using LAN
 // Select correct Board in ArduinoIDE!!! Really!
 // #define USE_LAN
-
-// Comment out the line below if you wish to disable LED blinking
-#define LED_BLINKING
 
 // Comment out the line below if you wish to disable Serial printing
 #define SERIAL_PRINTING
@@ -36,13 +38,12 @@ extern const char PASSWORD[] = "PASSW0RD";
 
 // Uncomment to disable ESP32 brownout detector if you're suffering from faulty insufficient power detection
 // #define DISABLE_BROWNOUT
-
 // -------------------------------------------------------------- //
 
 // ------------------------ Displays ---------------------------- //
 
 // Uncomment to enable a SSD1306 OLED screen on the I2C bus to display mining info in real time
-// Default connections (can be overriden by using a different u8g2 initializer, see line 132):
+// Default connections (can be overriden by using a different u8g2 initializer, see line 140):
 // GND - GND
 // VCC - 5V or 3.3V depending on display
 // SCL - GPIO22 (ESP32) or GPIO5 (D2 on ESP8266) or GPIO35 (ESP32-S2)
@@ -50,9 +51,8 @@ extern const char PASSWORD[] = "PASSW0RD";
 // #define DISPLAY_SSD1306
 
 // Uncomment to enable a 16x2 LCD screen on a direct bus to display mining info in real time
-// See line 142 for connections and initializer
-// #define DISPLAY_16X2
-
+// See line 150 for connections and initializer
+// define DISPLAY_16X2
 // -------------------------------------------------------------- //
 
 // ---------------------- IoT examples -------------------------- //
@@ -69,9 +69,17 @@ extern const char PASSWORD[] = "PASSW0RD";
 // #define USE_DS18B20
 
 // Uncomment the line below if you wish to use a DHT11/22 temperature and humidity sensor (Duino IoT example)
-// NOTE: Untested as of right now
+// NOTE: Mining performance should stay the same
 // #define USE_DHT
+
+// Uncomment the line below if you wish to use a HSU07M sensor (Duino IoT Example)
+// NOTE: Untested as of right now
+// #define USE_HSU07M
 // -------------------------------------------------------------- //
+
+// ---------------- Variables and definitions ------------------- //
+// You generally do not need to edit stuff below this line
+// unless you're know what you're doing.
 
 #if defined(ESP8266)
     // ESP8266
@@ -140,6 +148,27 @@ extern unsigned int ping = 0;
     // initialize the library with the numbers of the interface pins
     //                         RS E  D4 D5 D6 D7
     Adafruit_LiquidCrystal lcd(1, 2, 3, 4, 5, 6);
+#endif
+
+#if defined(USE_HSU07M)
+    #include "Wire.h"
+    #define HSU07M_ADDRESS 0x4B // Change this if your sensor has a different address
+
+    float read_hsu07m() {
+      Wire.beginTransmission(HSU07M_ADDRESS);
+      Wire.write(0x00);
+      Wire.endTransmission();
+      delay(100);
+      Wire.requestFrom(HSU07M_ADDRESS, 2);
+      if(Wire.available() >= 2) {
+          byte tempMSB = Wire.read();
+          byte tempLSB = Wire.read();
+          int tempRaw = (tempMSB << 8) | tempLSB;
+          float tempC = (tempRaw / 16.0) - 40.0;
+          return tempC;
+      }
+      return -1.0;
+    }
 #endif
 
 #endif  // End of SETTINGS_H
