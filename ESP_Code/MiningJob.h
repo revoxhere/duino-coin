@@ -109,7 +109,7 @@ public:
         max_micros_elapsed(start_time, 0);
         #if defined(LED_BLINKING)
             digitalWrite(LED_BUILTIN, LOW);
-        #endif    
+        #endif
         for (Counter<10> counter; counter < difficulty; ++counter) {
             DSHA1 ctx = *dsha1;
             ctx.write((const unsigned char *)counter.c_str(), counter.strlen()).finalize(hashArray);
@@ -131,7 +131,11 @@ public:
                 share_count++;
 
                 #if defined(LED_BLINKING)
-                    digitalWrite(LED_BUILTIN, HIGH);
+                    #if defined(BLUSHYBOX)
+                        analogWrite(LED_BUILTIN, 200);
+                    #else
+                        digitalWrite(LED_BUILTIN, HIGH);
+                    #endif
                 #endif
 
                 if (String(core) == "0") {
@@ -141,6 +145,10 @@ public:
                     hashrate_core_two = counter / elapsed_time_s;
                     submit(counter, hashrate_core_two, elapsed_time_s);
                 }
+
+                #if defined(BLUSHYBOX)
+                    gauge_set(hashrate + hashrate_core_two);
+                #endif
                 
                 break;
             }
@@ -158,11 +166,19 @@ private:
     String chipID = "";
 
     #if defined(ESP8266)
-        String MINER_BANNER = "Official ESP8266 Miner";
+        #if defined(BLUSHYBOX)
+          String MINER_BANNER = "Official BlushyBox Miner (ESP8266)";
+        #else
+          String MINER_BANNER = "Official ESP8266 Miner";
+        #endif
     #elif defined(CONFIG_FREERTOS_UNICORE)
         String MINER_BANNER = "Official ESP32-S2 Miner";
     #else
-        String MINER_BANNER = "Official ESP32 Miner";
+        #if defined(BLUSHYBOX)
+          String MINER_BANNER = "Official BlushyBox Miner (ESP32)";
+        #else
+          String MINER_BANNER = "Official ESP32 Miner";
+        #endif
     #endif
 
     uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, const uint32_t arrayLength) {
