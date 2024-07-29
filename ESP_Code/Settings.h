@@ -17,7 +17,7 @@ extern const char PASSWORD[] = "PASSW0RD";
 // -------------------------------------------------------------- //
 
 // -------------------- Advanced options ------------------------ //
-// Uncomment if you want to host the dashboard page (available on ESPs IP address)
+// Uncomment if you want to host the dashboard page (available on ESPs IP address and mDNS)
 // #define WEB_DASHBOARD
 
 // Comment out the line below if you wish to disable LED blinking
@@ -38,6 +38,10 @@ extern const char PASSWORD[] = "PASSW0RD";
 
 // Uncomment to disable ESP32 brownout detector if you're suffering from faulty insufficient power detection
 // #define DISABLE_BROWNOUT
+
+// Uncomment to enable WiFiManager captive portal in AP mode
+// The board will create its own network you connect to and change the settings
+// #define CAPTIVE_PORTAL
 // -------------------------------------------------------------- //
 
 // ------------------------ Displays ---------------------------- //
@@ -52,7 +56,10 @@ extern const char PASSWORD[] = "PASSW0RD";
 
 // Uncomment to enable a 16x2 LCD screen on a direct bus to display mining info in real time
 // See line 150 for connections and initializer
-// define DISPLAY_16X2
+// #define DISPLAY_16X2
+
+// Uncomment if your device is a Duino BlushyBox device
+// #define BLUSHYBOX
 // -------------------------------------------------------------- //
 
 // ---------------------- IoT examples -------------------------- //
@@ -168,6 +175,38 @@ extern unsigned int ping = 0;
           return tempC;
       }
       return -1.0;
+    }
+#endif
+
+#if defined(BLUSHYBOX)
+    #define GAUGE_PIN 5
+    #define GAUGE_MAX 190
+    #define GAUGE_MIN 0
+    #if defined(ESP8266)
+      #define GAUGE_MAX_HR 80000
+    #else
+      #define GAUGE_MAX_HR 200000
+    #endif
+    extern float hashrate_old = 0.0;
+
+    void gauge_set(float hashrate) {
+        float old = hashrate_old;
+        float new_val = hashrate;
+
+        if (hashrate_old == 0) {
+          float delta = (new_val - old) / 50;
+          for (int x=0; x < 50; x++) {
+              analogWrite(5, map(old + x*delta, 0, GAUGE_MAX_HR, GAUGE_MIN, GAUGE_MAX) + random(0, 10));
+              delay(20);
+          }
+        } else {
+          float delta = (new_val - old) / 10;
+          for (int x=0; x < 10; x++) {
+              analogWrite(5, map(old + x*delta, 0, GAUGE_MAX_HR, GAUGE_MIN, GAUGE_MAX) + random(0, 10));
+              delay(10);
+          }
+        }
+        hashrate_old = hashrate;
     }
 #endif
 
