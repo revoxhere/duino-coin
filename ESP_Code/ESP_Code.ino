@@ -90,6 +90,48 @@
     WebServer server(80);
 #endif 
 
+#if defined(CAPTIVE_PORTAL)
+  #include <FS.h> // This needs to be first, or it all crashes and burns...
+  #include <WiFiManager.h>
+  #include <Preferences.h>
+  char duco_username[40];
+  char duco_password[40];
+  char duco_rigid[24];
+  WiFiManager wifiManager;
+  Preferences preferences;
+  WiFiManagerParameter custom_duco_username("duco_usr", "Duino-Coin username", duco_username, 40);
+  WiFiManagerParameter custom_duco_password("duco_pwd", "Duino-Coin mining key (if enabled in the wallet)", duco_password, 40);
+  WiFiManagerParameter custom_duco_rigid("duco_rig", "Custom miner identifier (optional)", duco_rigid, 24);
+  
+  void saveConfigCallback() {
+    preferences.begin("duino_config", false);
+    preferences.putString("duco_username", custom_duco_username.getValue());
+    preferences.putString("duco_password", custom_duco_password.getValue());
+    preferences.putString("duco_rigid", custom_duco_rigid.getValue());
+    preferences.end();
+    RestartESP("Settings saved");
+  }
+
+  void reset_settings() {
+    wifiManager.resetSettings();
+    RestartESP("Manual settings reset");
+  }
+
+  void saveParamCallback(){
+    Serial.println("[CALLBACK] saveParamCallback fired");
+    Serial.println("PARAM customfieldid = " + getParam("customfieldid"));
+  }
+
+  String getParam(String name){
+    //read parameter from server, for customhmtl input
+    String value;
+    if(wifiManager.server->hasArg(name)) {
+      value = wifiManager.server->arg(name);
+    }
+    return value;
+  }
+#endif
+
 void RestartESP(String msg) {
   #if defined(SERIAL_PRINTING)
     Serial.println(msg);
@@ -167,16 +209,15 @@ namespace {
 
     String httpGetString(String URL) {
         String payload = "";
-        WiFiClientSecure client;
-        client.setInsecure();
-        client.setTimeout(8000);
+        WiFiClientSecure *client = new WiFiClientSecure;
+        client->setInsecure();
+        client->setTimeout(10000);
         HTTPClient http;
-        http.setReuse(false); 
 
-        if (http.begin(client, URL)) {
+        if (http.begin(*client, URL)) {
           int httpCode = http.GET();
 
-          if (httpCode == HTTP_CODE_OK)
+          if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
             payload = http.getString();
           else
             #if defined(SERIAL_PRINTING)
@@ -188,6 +229,7 @@ namespace {
 
           http.end();
         }
+        delete client;
         return payload;
     }
 
@@ -289,14 +331,6 @@ namespace {
             WiFi.setSleep(false);
         #endif
         WiFi.begin(SSID, PASSWORD);
-
-        // Set normal DNS servers
-        IPAddress primaryDNS(8, 8, 8, 8);
-        IPAddress secondaryDNS(1, 1, 1, 1);
-
-        if (!WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), primaryDNS, secondaryDNS)) {
-          Serial.println("Failed to configure DNS");
-        }
         
         int wait_passes = 0;
         while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -314,6 +348,7 @@ namespace {
             Serial.println("\n\nSuccessfully connected to WiFi");
             Serial.println("Local IP address: " + WiFi.localIP().toString());
             Serial.println("Rig name: " + String(RIG_IDENTIFIER));
+            Serial.println("DNS: " + WiFi.dnsIP().toString());
             Serial.println();
         #endif
 
@@ -482,6 +517,25 @@ void setup() {
     #endif
     pinMode(LED_BUILTIN, OUTPUT);
 
+    #if defined(BLUSHYBOX)
+        analogWrite(LED_BUILTIN, 255);
+        for (int i = 255; i > 0; i--) {
+          analogWrite(LED_BUILTIN, i);
+          delay(1);
+        }
+        pinMode(GAUGE_PIN, OUTPUT);
+      
+        // Gauge up and down effect on startup
+        for (int i = GAUGE_MIN; i < GAUGE_MAX; i++) {
+          analogWrite(GAUGE_PIN, i);
+          delay(10);
+        }
+        for (int i = GAUGE_MAX; i > GAUGE_MIN; i--) {
+          analogWrite(GAUGE_PIN, i);
+          delay(10);
+        }
+    #endif
+
     #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
         screen_setup();
         display_boot();
@@ -536,10 +590,68 @@ void setup() {
        #endif
     #endif
 
-    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
-      display_info("Waiting for WiFi...");
+    #if defined(CAPTIVE_PORTAL)
+        preferences.begin("duino_config", false);
+        strcpy(duco_username, preferences.getString("duco_username", "").c_str());
+        strcpy(duco_password, preferences.getString("duco_password", "").c_str());
+        strcpy(duco_rigid, preferences.getString("duco_rigid", "").c_str());
+        preferences.end();
+        DUCO_USER = duco_username;
+        RIG_IDENTIFIER = duco_rigid;
+        MINER_KEY = duco_password;
+
+        String captivePortalHTML = R"(
+          <title>Duino BlushyBox</title>
+          <style>
+            body {
+              background-color: #d4bff2;
+              color: #363636;
+            }
+            button {
+              box-shadow: 0px 0px 23px -7px #051700;
+              background-color:#8645ef;
+              border-radius:28px;
+              border:1px solid #8645ef;
+              display:inline-block;
+              cursor:pointer;
+              color:#ffffff;
+              font-family:Arial;
+              font-size:18px;
+              padding:8px 16px;
+              text-decoration:none;
+            }
+            input {
+              box-shadow: 0px 0px 23px -7px #051700;
+              background-color:#ffffff;
+              border-radius:28px;
+              border:1px solid #777777;
+              font-family:Arial;
+              font-size:18px;
+              text-decoration:none;
+            }
+          </style>
+        )";
+      
+        wifiManager.setCustomHeadElement(captivePortalHTML.c_str());
+        
+        wifiManager.setSaveConfigCallback(saveConfigCallback);
+        wifiManager.addParameter(&custom_duco_username);
+        wifiManager.addParameter(&custom_duco_password);
+        wifiManager.addParameter(&custom_duco_rigid);
+      
+        //blinker.attach_ms(200, changeState);
+        wifiManager.autoConnect("Duino-Coin");
+        //blinker.detach();
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+            display_info("Waiting for node...");
+        #endif
+        SelectNode();
+    #else
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+          display_info("Waiting for WiFi...");
+        #endif
+        SetupWifi();
     #endif
-    SetupWifi();
     SetupOTA();
 
     #if defined(WEB_DASHBOARD)
