@@ -346,6 +346,7 @@ namespace {
                 wait_passes = 0;
             }
         }
+        WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), DNS_SERVER);
 
         #if defined(SERIAL_PRINTING)
             Serial.println("\n\nSuccessfully connected to WiFi");
