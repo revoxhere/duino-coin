@@ -215,6 +215,7 @@ namespace {
         client->setInsecure();
         client->setTimeout(10000);
         HTTPClient http;
+        http.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
 
         if (http.begin(*client, URL)) {
           int httpCode = http.GET();
@@ -680,7 +681,9 @@ void setup() {
       #endif
 
       server.on("/", dashboard);
-      server.on("/reset", reset_settings);
+      #if defined(CAPTIVE_PORTAL)
+        server.on("/reset", reset_settings);
+      #endif
       server.begin();
     #endif
 
