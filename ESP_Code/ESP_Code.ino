@@ -113,6 +113,8 @@
   }
 
   void reset_settings() {
+    server.send(200, "text/html", "Settings have been erased. Please redo the configuration by connecting to the WiFi network that will be created");
+    delay(500);
     wifiManager.resetSettings();
     RestartESP("Manual settings reset");
   }
@@ -438,6 +440,12 @@ namespace {
              s.replace("@@ID@@", String(RIG_IDENTIFIER));
              s.replace("@@MEMORY@@", String(ESP.getFreeHeap()));
              s.replace("@@VERSION@@", String(SOFTWARE_VERSION));
+
+             #if defined(CAPTIVE_PORTAL)
+                 s.replace("@@RESET_SETTINGS@@", "&bull; <a href='/reset'>Reset settings</a>");
+             #else
+                 s.replace("@@RESET_SETTINGS@@", "");
+             #endif
              server.send(200, "text/html", s);
         }
     #endif
@@ -592,13 +600,13 @@ void setup() {
 
     #if defined(CAPTIVE_PORTAL)
         preferences.begin("duino_config", false);
-        strcpy(duco_username, preferences.getString("duco_username", "").c_str());
-        strcpy(duco_password, preferences.getString("duco_password", "").c_str());
-        strcpy(duco_rigid, preferences.getString("duco_rigid", "").c_str());
+        strcpy(duco_username, preferences.getString("duco_username", "username").c_str());
+        strcpy(duco_password, preferences.getString("duco_password", "None").c_str());
+        strcpy(duco_rigid, preferences.getString("duco_rigid", "None").c_str());
         preferences.end();
-        DUCO_USER = duco_username;
-        RIG_IDENTIFIER = duco_rigid;
-        MINER_KEY = duco_password;
+        configuration->DUCO_USER = duco_username;
+        configuration->RIG_IDENTIFIER = duco_rigid;
+        configuration->MINER_KEY = duco_password;
 
         String captivePortalHTML = R"(
           <title>Duino BlushyBox</title>
@@ -672,6 +680,7 @@ void setup() {
       #endif
 
       server.on("/", dashboard);
+      server.on("/reset", reset_settings);
       server.begin();
     #endif
 
