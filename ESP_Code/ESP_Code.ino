@@ -336,12 +336,13 @@ namespace {
         WiFi.begin(SSID, PASSWORD);
         
         int wait_passes = 0;
-        while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+        while (WiFi.waitForConnectResult() != WL_CONNECTED || WiFi.localIP() == IPAddress(192, 168, 4, 2)) {
             delay(500);
             #if defined(SERIAL_PRINTING)
                 Serial.print(".");
             #endif
             if (++wait_passes >= 10) {
+                WiFi.disconnect();
                 WiFi.begin(SSID, PASSWORD);
                 wait_passes = 0;
             }
