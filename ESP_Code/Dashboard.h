@@ -131,6 +131,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                         <a href="https://github.com/revoxhere/duino-coin">
                             github.com/revoxhere/duino-coin
                         </a>
+                        @@RESET_SETTINGS@@
                     </div>
                 </div>
             </div>
