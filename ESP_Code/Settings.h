@@ -210,4 +210,6 @@ extern unsigned int ping = 0;
     }
 #endif
 
+IPAddress DNS_SERVER(1, 1, 1, 1); // Cloudflare DNS server
+
 #endif  // End of SETTINGS_H
