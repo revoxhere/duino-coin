@@ -137,17 +137,17 @@ Server source code, documentation for API calls and official libraries for devel
 ## Version 4.0 reward goals
 
 Captured at normal multiplier (no weekend boost)
-| Device                | Hashrate            | Threads | DUCO/day |
-|-----------------------|---------------------|---------|----------|
-| Arduino               | 343 H/s             | 1       | 12       |
-| ESP32                 | 170-180 kH/s        | 2       | 10       |
-| ESP32-S2/C3           | 85-96 kH/s          | 1       | 8        |
-| ESP8266               | 66 kH/s             | 1       | 6        |
-| Raspberry Pi 4 (LOW)  | 1 MH/s (no fasthash)| 4       | 6-7      |
-| Raspberry Pi 4 (MED)  | 5.4 MH/s (fasthash) | 4       | 7-8      |
-| Low power PCs         |                     | 4       | 4-6      |
-| Medium                |                     | 4-8     | 6-10     |
-| High end              |                     | 8+      | 10-12    |
+| Device                | Hashrate            | Threads | DUCO/day | Power usage |
+|-----------------------|---------------------|---------|----------|-------------|
+| Arduino               | 343 H/s             | 1       | 12       | <0.5 W
+| ESP32                 | 170-180 kH/s        | 2       | 10       | 1.5-2 W
+| ESP32-S2/C3           | 85-96 kH/s          | 1       | 8        | 1-1.5 W
+| ESP8266               | 66 kH/s             | 1       | 6        | 1-1.5 W
+| Raspberry Pi 4 (LOW)  | 1 MH/s (no fasthash)| 4       | 6-7      | 6.5 W
+| Raspberry Pi 4 (MED)  | 5.4 MH/s (fasthash) | 4       | 7-8      | 6.5 W
+| Low power PCs         |                     | 4       | 4-6      | -
+| Medium                |                     | 4-8     | 6-10     | -
+| High end              |                     | 8+      | 10-12    | -
 
 <details>
   <summary><b>Other tested devices and their benchmarks</b></summary>
