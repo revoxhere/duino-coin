@@ -347,7 +347,9 @@ namespace {
                 wait_passes = 0;
             }
         }
-        WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), DNS_SERVER);
+        #ifndef(ESP8266)
+              WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), DNS_SERVER);
+        #endif
 
         #if defined(SERIAL_PRINTING)
             Serial.println("\n\nSuccessfully connected to WiFi");
