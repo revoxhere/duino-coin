@@ -347,7 +347,7 @@ namespace {
                 wait_passes = 0;
             }
         }
-        #ifndef(ESP8266)
+        #if !defined(ESP8266)
               WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), DNS_SERVER);
         #endif
 
