@@ -4,7 +4,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  ( 
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for Arduino boards (and relatives)   version 4.1
+  Official code for Arduino boards (and relatives)   version 4.2
   
   Duino-Coin Team & Community 2019-2024 © MIT Licensed
   https://duinocoin.com
