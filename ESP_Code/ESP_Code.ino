@@ -152,6 +152,13 @@ void RestartESP(String msg) {
   #endif
 }
 
+#if defined(BLUSHYBOX)
+    Ticker blinker;
+    void changeState() {
+      digitalWrite(LED_BUILTIN, !(digitalRead(LED_BUILTIN)));
+    }
+#endif
+
 #if defined(ESP8266)
     // WDT Loop 
     // See lwdtcb() and lwdtFeed() below
@@ -651,14 +658,24 @@ void setup() {
         wifiManager.addParameter(&custom_duco_username);
         wifiManager.addParameter(&custom_duco_password);
         wifiManager.addParameter(&custom_duco_rigid);
-      
-        //blinker.attach_ms(200, changeState);
+
+        #if defined(BLUSHYBOX)
+          blinker.attach_ms(200, changeState);
+        #endif
         wifiManager.autoConnect("Duino-Coin");
-        //blinker.detach();
+        #if defined(BLUSHYBOX)
+          blinker.detach();
+        #endif
         #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
             display_info("Waiting for node...");
         #endif
+        #if defined(BLUSHYBOX)
+          blinker.attach_ms(500, changeState);
+        #endif
         SelectNode();
+        #if defined(BLUSHYBOX)
+          blinker.detach();
+        #endif
     #else
         #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
           display_info("Waiting for WiFi...");
