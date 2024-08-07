@@ -108,7 +108,14 @@ public:
         int start_time = micros();
         max_micros_elapsed(start_time, 0);
         #if defined(LED_BLINKING)
-            digitalWrite(LED_BUILTIN, LOW);
+            #if defined(BLUSHYBOX)
+              for (int i = 0; i < 72; i++) {
+                analogWrite(LED_BUILTIN, i);
+                delay(1);
+              }
+            #else
+              digitalWrite(LED_BUILTIN, LOW);
+            #endif
         #endif
         for (Counter<10> counter; counter < difficulty; ++counter) {
             DSHA1 ctx = *dsha1;
@@ -132,7 +139,10 @@ public:
 
                 #if defined(LED_BLINKING)
                     #if defined(BLUSHYBOX)
-                        analogWrite(LED_BUILTIN, 200);
+                        for (int i = 72; i > 0; i--) {
+                          analogWrite(LED_BUILTIN, i);
+                          delay(1);
+                        }
                     #else
                         digitalWrite(LED_BUILTIN, HIGH);
                     #endif
