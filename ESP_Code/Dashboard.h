@@ -112,6 +112,14 @@ const char WEBSITE[] PROGMEM = R"=====(
                                         Miner version
                                     </div>
                                 </div>
+                                <div class="column" style="min-width:15em">
+                                    <div class="title is-size-5 mb-0">=
+                                        @@SENSOR@@
+                                    </div>
+                                    <div class="heading is-size-5">
+                                        Sensor reading(s)
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
