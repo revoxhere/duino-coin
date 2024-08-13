@@ -113,7 +113,7 @@ const char WEBSITE[] PROGMEM = R"=====(
                                     </div>
                                 </div>
                                 <div class="column" style="min-width:15em">
-                                    <div class="title is-size-5 mb-0">=
+                                    <div class="title is-size-5 mb-0">
                                         @@SENSOR@@
                                     </div>
                                     <div class="heading is-size-5">
