@@ -458,6 +458,26 @@ namespace {
              #else
                  s.replace("@@RESET_SETTINGS@@", "");
              #endif
+
+             #if defined(USE_DS18B20)
+                 sensors.requestTemperatures(); 
+                 float temp = sensors.getTempCByIndex(0);
+                 s.replace("@@SENSOR@@", "DS18B20: " + String(temp) + "*C");
+             #elif defined(USE_DHT)
+                 float temp = dht.readTemperature();
+                 float hum = dht.readHumidity();
+                 s.replace("@@SENSOR@@", "DHT11/22: " + String(temp) + "*C, " + String(hum) + "rh%");
+             #elif defined(USE_HSU07M)
+                 float temp = read_hsu07m();
+                 s.replace("@@SENSOR@@", "HSU07M: " + String(temp) + "*C");
+             #elif defined(USE_INTERNAL_SENSOR)
+                 float temp = 0;
+                 temp_sensor_read_celsius(&temp);
+                 s.replace("@@SENSOR@@", "CPU: " + String(temp) + "*C");
+             #else
+                 s.replace("@@SENSOR@@", "None");
+             #endif
+                 
              server.send(200, "text/html", s);
         }
     #endif
