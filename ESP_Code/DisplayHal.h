@@ -21,6 +21,12 @@
     static byte msec[] = {0x0A, 0x15, 0x11, 0x06, 0x08, 0x04, 0x02, 0x0C};
 #endif
 
+#if defined(DISPLAY_ST7789)
+    // Define some colors
+    #define WHITE TFT_WHITE
+    #define BLACK TFT_BLACK
+#endif
+
   #if defined(DISPLAY_SSD1306)
     void drawStrMultiline(const char *msg, int xloc, int yloc) {
      //https://github.com/olikraus/u8g2/discussions/1479
