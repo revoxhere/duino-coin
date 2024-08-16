@@ -121,7 +121,7 @@ extern unsigned int ping = 0;
   #include <OneWire.h>
   #include <DallasTemperature.h>
   // Change 12 to the pin you've connected your sensor to
-  #define DSPIN 12
+  const int DSPIN = 12;
   
   OneWire oneWire(DSPIN);
   DallasTemperature extern sensors(&oneWire);
