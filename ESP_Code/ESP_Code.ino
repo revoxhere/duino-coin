@@ -154,8 +154,10 @@ void RestartESP(String msg) {
 
 #if defined(BLUSHYBOX)
     Ticker blinker;
+    bool lastLedState = false;
     void changeState() {
-      digitalWrite(LED_BUILTIN, !(digitalRead(LED_BUILTIN)));
+      analogWrite(LED_BUILTIN, lastLedState ? 255 : 0);
+      lastLedState = !lastLedState;
     }
 #endif
 
@@ -218,28 +220,31 @@ namespace {
 
     String httpGetString(String URL) {
         String payload = "";
-        WiFiClientSecure *client = new WiFiClientSecure;
-        client->setInsecure();
-        client->setTimeout(10000);
-        HTTPClient http;
-        http.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
+        
+        WiFiClientSecure client;
+        HTTPClient https;
+        client.setInsecure();
 
-        if (http.begin(*client, URL)) {
-          int httpCode = http.GET();
+        https.begin(client, URL);
+        https.addHeader("Accept", "*/*");
+        https.addHeader("User-Agent", "ESP8266");
+        
+        int httpCode = https.GET();
+        #if defined(SERIAL_PRINTING)
+            Serial.printf("HTTP Response code: %d\n", httpCode);
+        #endif
 
-          if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
-            payload = http.getString();
-          else
+        if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
+            payload = https.getString();
+        } else {
             #if defined(SERIAL_PRINTING)
-               Serial.printf("Error fetching node from poolpicker: %s\n", http.errorToString(httpCode).c_str());
+               Serial.printf("Error fetching node from poolpicker: %s\n", https.errorToString(httpCode).c_str());
             #endif
             #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
               display_info(http.errorToString(httpCode));
             #endif
-
-          http.end();
         }
-        delete client;
+        https.end();
         return payload;
     }
 
@@ -252,9 +257,10 @@ namespace {
             #if defined(SERIAL_PRINTING)
               Serial.println("Fetching mining node from the poolpicker in " + String(waitTime) + "s");
             #endif
+            delay(waitTime * 1000);
+            
             input = httpGetString("https://server.duinocoin.com/getPool");
             
-            delay(waitTime * 1000);
             // Increase wait time till a maximum of 32 seconds
             // (addresses: Limit connection requests on failure in ESP boards #1041)
             waitTime *= 2;
