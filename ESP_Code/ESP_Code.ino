@@ -227,7 +227,6 @@ namespace {
 
         https.begin(client, URL);
         https.addHeader("Accept", "*/*");
-        https.addHeader("User-Agent", "ESP8266");
         
         int httpCode = https.GET();
         #if defined(SERIAL_PRINTING)
