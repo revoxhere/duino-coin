@@ -95,11 +95,21 @@ extern const char PASSWORD[] = "PASSW0RD";
     // ESP8266
     #define LED_BUILTIN 2
 #elif defined(CONFIG_FREERTOS_UNICORE) 
-    // ESP32-S2
-    #define LED_BUILTIN 15
+    #if defined(CONFIG_IDF_TARGET_ESP32C3)
+      // ESP32-C3
+      #define LED_BUILTIN 8
+    #else
+      // ESP32-S2
+      #define LED_BUILTIN 15
+    #endif
 #else
     // ESP32
-    #define LED_BUILTIN 2
+    #ifndef LED_BUILTIN
+      #define LED_BUILTIN 2
+    #endif
+    #if defined(BLUSHYBOX)
+      #define LED_BUILTIN 4
+    #endif
 #endif
 
 #define BLINK_SETUP_COMPLETE 2
@@ -124,7 +134,7 @@ extern unsigned int ping = 0;
   #include <OneWire.h>
   #include <DallasTemperature.h>
   // Change 12 to the pin you've connected your sensor to
-  #define DSPIN 12
+  const int DSPIN = 12;
   
   OneWire oneWire(DSPIN);
   DallasTemperature extern sensors(&oneWire);

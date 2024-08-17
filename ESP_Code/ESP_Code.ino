@@ -154,8 +154,10 @@ void RestartESP(String msg) {
 
 #if defined(BLUSHYBOX)
     Ticker blinker;
+    bool lastLedState = false;
     void changeState() {
-      digitalWrite(LED_BUILTIN, !(digitalRead(LED_BUILTIN)));
+      analogWrite(LED_BUILTIN, lastLedState ? 255 : 0);
+      lastLedState = !lastLedState;
     }
 #endif
 
@@ -216,30 +218,57 @@ namespace {
         #endif
     }
 
+    void VerifyWifi() {
+      #ifdef USE_LAN
+        while ((!eth_connected) || (ETH.localIP() == IPAddress(0, 0, 0, 0))) {
+          #if defined(SERIAL_PRINTING)
+            Serial.println("Ethernet connection lost. Reconnect..." );
+          #endif
+          SetupWifi();
+        }
+      #else
+        while (WiFi.status() != WL_CONNECTED 
+                || WiFi.localIP() == IPAddress(0, 0, 0, 0)
+                || WiFi.localIP() == IPAddress(192, 168, 4, 2) 
+                || WiFi.localIP() == IPAddress(192, 168, 4, 3)) {
+            #if defined(SERIAL_PRINTING)
+              Serial.println("WiFi reconnecting...");
+            #endif
+            WiFi.disconnect();
+            delay(200);
+            WiFi.reconnect();
+            delay(200);
+        }
+      #endif
+    }
+
     String httpGetString(String URL) {
         String payload = "";
-        WiFiClientSecure *client = new WiFiClientSecure;
-        client->setInsecure();
-        client->setTimeout(10000);
-        HTTPClient http;
-        http.setFollowRedirects(HTTPC_FORCE_FOLLOW_REDIRECTS);
+        
+        WiFiClientSecure client;
+        HTTPClient https;
+        client.setInsecure();
 
-        if (http.begin(*client, URL)) {
-          int httpCode = http.GET();
+        https.begin(client, URL);
+        https.addHeader("Accept", "*/*");
+        
+        int httpCode = https.GET();
+        #if defined(SERIAL_PRINTING)
+            Serial.printf("HTTP Response code: %d\n", httpCode);
+        #endif
 
-          if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY)
-            payload = http.getString();
-          else
+        if (httpCode == HTTP_CODE_OK || httpCode == HTTP_CODE_MOVED_PERMANENTLY) {
+            payload = https.getString();
+        } else {
             #if defined(SERIAL_PRINTING)
-               Serial.printf("Error fetching node from poolpicker: %s\n", http.errorToString(httpCode).c_str());
+               Serial.printf("Error fetching node from poolpicker: %s\n", https.errorToString(httpCode).c_str());
+               VerifyWifi();
             #endif
             #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
               display_info(http.errorToString(httpCode));
             #endif
-
-          http.end();
         }
-        delete client;
+        https.end();
         return payload;
     }
 
@@ -252,9 +281,10 @@ namespace {
             #if defined(SERIAL_PRINTING)
               Serial.println("Fetching mining node from the poolpicker in " + String(waitTime) + "s");
             #endif
+            delay(waitTime * 1000);
+            
             input = httpGetString("https://server.duinocoin.com/getPool");
             
-            delay(waitTime * 1000);
             // Increase wait time till a maximum of 32 seconds
             // (addresses: Limit connection requests on failure in ESP boards #1041)
             waitTime *= 2;
@@ -306,7 +336,6 @@ namespace {
     #endif
 
     void SetupWifi() {
-      
       #ifdef USE_LAN
         #if defined(SERIAL_PRINTING)
             Serial.println("Connecting to Ethernet...");
@@ -314,7 +343,6 @@ namespace {
         WiFi.onEvent(WiFiEvent);  // Will call WiFiEvent() from another thread.
         ETH.begin();
         
-
         while (!eth_connected) {
             delay(500);
             #if defined(SERIAL_PRINTING)
@@ -334,34 +362,18 @@ namespace {
             Serial.println("Connecting to: " + String(SSID));
         #endif
         
-        WiFi.mode(WIFI_STA); // Setup ESP in client mode
-        #if defined(ESP8266)
-            WiFi.setSleepMode(WIFI_NONE_SLEEP);
-        #else
-            WiFi.setSleep(false);
-        #endif
         WiFi.begin(SSID, PASSWORD);
+        VerifyWifi();
         
-        int wait_passes = 0;
-        while (WiFi.waitForConnectResult() != WL_CONNECTED || WiFi.localIP() == IPAddress(192, 168, 4, 2)) {
-            delay(500);
-            #if defined(SERIAL_PRINTING)
-                Serial.print(".");
-            #endif
-            if (++wait_passes >= 10) {
-                WiFi.disconnect();
-                WiFi.begin(SSID, PASSWORD);
-                wait_passes = 0;
-            }
-        }
         #if !defined(ESP8266)
               WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), DNS_SERVER);
         #endif
 
         #if defined(SERIAL_PRINTING)
             Serial.println("\n\nSuccessfully connected to WiFi");
-            Serial.println("Local IP address: " + WiFi.localIP().toString());
             Serial.println("Rig name: " + String(RIG_IDENTIFIER));
+            Serial.println("Local IP address: " + WiFi.localIP().toString());
+            Serial.println("Gateway: " + WiFi.gatewayIP().toString());
             Serial.println("DNS: " + WiFi.dnsIP().toString());
             Serial.println();
         #endif
@@ -408,20 +420,6 @@ namespace {
 
         ArduinoOTA.setHostname(RIG_IDENTIFIER); // Give port a name
         ArduinoOTA.begin();
-    }
-
-    void VerifyWifi() {
-      #ifdef USE_LAN
-        while ((!eth_connected) || (ETH.localIP() == IPAddress(0, 0, 0, 0))) {
-          #if defined(SERIAL_PRINTING)
-            Serial.println("Ethernet connection lost. Reconnect..." );
-          #endif
-          SetupWifi();
-        }
-      #else
-        while (WiFi.status() != WL_CONNECTED || WiFi.localIP() == IPAddress(0, 0, 0, 0))
-            WiFi.reconnect();
-      #endif
     }
 
     #if defined(WEB_DASHBOARD)
@@ -630,6 +628,14 @@ void setup() {
        #endif
     #endif
 
+    WiFi.mode(WIFI_STA); // Setup ESP in client mode
+    WiFi.disconnect(true);
+    #if defined(ESP8266)
+        WiFi.setSleepMode(WIFI_NONE_SLEEP);
+    #else
+        WiFi.setSleep(false);
+    #endif
+    
     #if defined(CAPTIVE_PORTAL)
         preferences.begin("duino_config", false);
         strcpy(duco_username, preferences.getString("duco_username", "username").c_str());
@@ -683,6 +689,7 @@ void setup() {
           blinker.attach_ms(200, changeState);
         #endif
         wifiManager.autoConnect("Duino-Coin");
+        VerifyWifi();
         #if defined(BLUSHYBOX)
           blinker.detach();
         #endif
