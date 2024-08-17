@@ -88,6 +88,7 @@
       #if defined(DISPLAY_ST7789)
         tft.begin();
         tft.setRotation(1); 
+        tft.init();
         tft.fillScreen(BLACK);
       #endif
     }
@@ -304,6 +305,7 @@
       #endif
 
       #if defined(DISPLAY_ST7789)
+          tft.init();
           tft.fillScreen(BLACK);
           tft.setTextColor(WHITE);
           
