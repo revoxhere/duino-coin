@@ -3,7 +3,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  (
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for all ESP8266/32 boards            version 4.2
+  Official code for all ESP8266/32 boards            version 4.3
   Main .ino file
 
   The Duino-Coin Team & Community 2019-2024 © MIT Licensed
@@ -235,9 +235,9 @@ namespace {
               Serial.println("WiFi reconnecting...");
             #endif
             WiFi.disconnect();
-            delay(200);
+            delay(500);
             WiFi.reconnect();
-            delay(200);
+            delay(500);
         }
       #endif
     }
@@ -363,6 +363,10 @@ namespace {
         #endif
         
         WiFi.begin(SSID, PASSWORD);
+        while(WiFi.status() != WL_CONNECTED) {
+            Serial.print(".");
+            delay(100);
+        }
         VerifyWifi();
         
         #if !defined(ESP8266)
@@ -629,7 +633,7 @@ void setup() {
     #endif
 
     WiFi.mode(WIFI_STA); // Setup ESP in client mode
-    WiFi.disconnect(true);
+    //WiFi.disconnect(true);
     #if defined(ESP8266)
         WiFi.setSleepMode(WIFI_NONE_SLEEP);
     #else
@@ -689,6 +693,7 @@ void setup() {
           blinker.attach_ms(200, changeState);
         #endif
         wifiManager.autoConnect("Duino-Coin");
+        delay(1000);
         VerifyWifi();
         #if defined(BLUSHYBOX)
           blinker.detach();
