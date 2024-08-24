@@ -2,18 +2,20 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+extern bool displayLock = false;
+
 // ---------------------- General settings ---------------------- //
 // Change the part in brackets to your Duino-Coin username
-extern char *DUCO_USER = "my_cool_username";
+extern char *DUCO_USER = "discopepereland";
 // Change the part in brackets to your mining key (if you have set it in the wallet)
-extern char *MINER_KEY = "mySecretPass";
+extern char *MINER_KEY = "170373";
 // Change the part in brackets if you want to set a custom miner name
 // Use Auto to autogenerate, None for no custom identifier
-extern char *RIG_IDENTIFIER = "None";
+extern char *RIG_IDENTIFIER = "esp32_TT-GO";
 // Change the part in brackets to your WiFi name
-extern const char SSID[] = "SSID";
+extern const char SSID[] = "High_speed";
 // Change the part in brackets to your WiFi password
-extern const char PASSWORD[] = "PASSW0RD";
+extern const char PASSWORD[] = "&mariagele4mai1996@";
 // -------------------------------------------------------------- //
 
 // -------------------- Advanced options ------------------------ //
@@ -53,6 +55,9 @@ extern const char PASSWORD[] = "PASSW0RD";
 // SCL - GPIO22 (ESP32) or GPIO5 (D2 on ESP8266) or GPIO35 (ESP32-S2)
 // SDA - GPIO21 (ESP32) or GPIO4 (D1 on ESP8266) or GPIO33 (ESP32-S2)
 // #define DISPLAY_SSD1306
+
+//uncomment to enable Lilygo tt display 1.14 module
+ #define DISPLAY_114
 
 // Uncomment to enable a 16x2 LCD screen on a direct bus to display mining info in real time
 // See line 150 for connections and initializer
@@ -165,6 +170,15 @@ extern unsigned int ping = 0;
     // initialize the library with the numbers of the interface pins
     //                         RS E  D4 D5 D6 D7
     Adafruit_LiquidCrystal lcd(1, 2, 3, 4, 5, 6);
+#endif
+
+#if defined(DISPLAY_114)
+    // Install "lilygo lib TFT_eSPI.h" if you get an error
+      #include <TFT_eSPI.h>
+      #include <SPI.h>
+      #include <Wire.h>
+    // Display definition from the tft_eSPI library. Edit if you use a different display
+      TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 #endif
 
 #if defined(USE_HSU07M)

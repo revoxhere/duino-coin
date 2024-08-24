@@ -90,14 +90,14 @@ public:
         return false;
     }
 
-    void handleSystemEvents(void) {
+ /*   void handleSystemEvents(void) {
         #if defined(ESP32) && CORE == 2
           esp_task_wdt_reset();
         #endif
         delay(10); // Required vTaskDelay by ESP-IDF
         yield();
         ArduinoOTA.handle();
-    }
+    }*/
 
     void mine() {
         connectToNode();
