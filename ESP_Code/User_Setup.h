@@ -90,7 +90,7 @@
 // #define TFT_WIDTH  135 // Lilygo TT-go 1.14
 // #define TFT_WIDTH  172 // ST7789 172 x 320
 // #define TFT_WIDTH  170 // ST7789 170 x 320
-// #define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320 and Lilygo TT-GO 1.14
+// #define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320
 // #define TFT_HEIGHT 160
 // #define TFT_HEIGHT 135
  #define TFT_HEIGHT 160 // st7735
