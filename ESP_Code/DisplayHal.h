@@ -27,6 +27,14 @@
     static const unsigned char PROGMEM image_network_4_bars_bits[] = {0x00,0x0e,0x00,0x0e,0x00,0x0e,0x00,0x0e,0x00,0xee,0x00,0xee,0x00,0xee,0x00,0xee,0x0e,0xee,0x0e,0xee,0x0e,0xee,0x0e,0xee,0xee,0xee,0xee,0xee,0xee,0xee,0x00,0x00};
     static const unsigned char PROGMEM image_network_3_bars_bits[] = {0x00,0x0e,0x00,0x0a,0x00,0x0a,0x00,0x0a,0x00,0xea,0x00,0xea,0x00,0xea,0x00,0xea,0x0e,0xea,0x0e,0xea,0x0e,0xea,0x0e,0xea,0xee,0xea,0xee,0xea,0xee,0xee,0x00,0x00};
 #endif
+   
+#if defined(DISPLAY_7735)
+    static const unsigned char PROGMEM image_duco_bits[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x07,0xff,0xfc,0x00,0x00,0x07,0xff,0xff,0x80,0x00,0x07,0xff,0xff,0xc0,0x00,0x07,0xff,0xff,0xe0,0x00,0x07,0xff,0xff,0xf0,0x00,0x00,0x00,0x03,0xf8,0x00,0x07,0xfe,0x01,0xfc,0x00,0x07,0xff,0xc0,0xfc,0x00,0x07,0xff,0xe0,0x7e,0x00,0x07,0xff,0xf0,0x3e,0x00,0x07,0xff,0xf8,0x3f,0x00,0x00,0x00,0xf8,0x1f,0x00,0x00,0x00,0x78,0x1f,0x00,0x00,0x00,0x7c,0x1f,0x00,0x00,0x00,0x7c,0x1f,0x00,0x00,0x00,0x7c,0x1f,0x00,0x00,0x00,0x7c,0x1f,0x00,0x00,0x00,0x78,0x1f,0x00,0x00,0x00,0xf8,0x1f,0x00,0x00,0x01,0xf8,0x1f,0x00,0x07,0xff,0xf0,0x3f,0x00,0x07,0xff,0xf0,0x3e,0x00,0x07,0xff,0xe0,0x7e,0x00,0x07,0xff,0x80,0xfc,0x00,0x00,0x00,0x01,0xfc,0x00,0x00,0x00,0x07,0xf8,0x00,0x07,0xff,0xff,0xf0,0x00,0x07,0xff,0xff,0xe0,0x00,0x07,0xff,0xff,0xc0,0x00,0x07,0xff,0xff,0x00,0x00,0x07,0xff,0xf8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    static const unsigned char PROGMEM image_check_contour_bits[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x20,0x00,0x50,0x20,0x88,0x51,0x10,0x8a,0x20,0x44,0x40,0x20,0x80,0x11,0x00,0x0a,0x00,0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+    static const unsigned char PROGMEM image_ButtonRightSmall_bits[] = {0x80,0xc0,0xe0,0xc0,0x80};
+    static const unsigned char PROGMEM image_clock_bits[] = {0x07,0xc0,0x18,0x30,0x29,0x28,0x41,0x04,0x61,0x0c,0x81,0x02,0x81,0x02,0xe1,0x0e,0x80,0x82,0x80,0x42,0x60,0x2c,0x40,0x04,0x29,0x28,0x19,0x30,0x07,0xc0,0x00,0x00};
+    static const unsigned char PROGMEM image_duco_logo_bits[] = {0xff,0xf8,0x00,0xff,0xfe,0x00,0xff,0xff,0x80,0x00,0x07,0xc0,0x00,0x03,0xe0,0x00,0x01,0xf0,0xff,0xf1,0xf0,0x00,0x18,0xf8,0x00,0x0c,0x78,0x00,0x04,0x78,0x00,0x04,0x78,0x00,0x04,0x78,0x00,0x04,0x78,0x00,0x04,0x78,0x00,0x04,0x78,0x00,0x0c,0x78,0x00,0x18,0xf0,0xff,0xf0,0xf0,0x00,0x01,0xe0,0x00,0x01,0xc0,0x00,0x07,0xc0,0xff,0xff,0x80,0xff,0xff,0x00,0xff,0xf8,0x00};
+#endif
 
 #if defined(DISPLAY_16X2)
     static byte duco_logo[] = {0x1E, 0x01, 0x1D, 0x05, 0x1D, 0x01, 0x1E, 0x00};
@@ -105,7 +113,42 @@
     }
 #endif
 
-#if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)
+#if defined(DISPLAY_7735)
+    void drawStrMultiline(const char *msg, int xloc, int yloc) {
+     //https://github.com/olikraus/u8g2/discussions/1479
+     int dspwidth = 160;    
+     int strwidth = 0;          
+     char glyph[2]; glyph[1] = 0;
+  
+     for (const char *ptr = msg, *lastblank = NULL; *ptr; ++ptr) {
+        while (xloc == 0 && *msg == ' ')
+           if (ptr == msg++) ++ptr;                     
+  
+        glyph[0] = *ptr;
+        strwidth = 10;                   
+        if (*ptr == ' ')  lastblank = ptr;                 
+        else ++strwidth;                       
+  
+        if (xloc + strwidth > dspwidth) {                       
+           int starting_xloc = xloc;
+           while (msg < (lastblank ? lastblank : ptr)) {                       
+              glyph[0] = *msg++;
+              xloc += tft.drawString(glyph,xloc, yloc ); 
+           }
+  
+           strwidth -= xloc - starting_xloc;                       
+           yloc += 10;                      
+           xloc = 0; lastblank = NULL;
+        }
+     }
+     while (*msg) {                        
+        glyph[0] = *msg++;
+        xloc += tft.drawString(glyph,xloc, yloc );
+     }
+    }
+#endif
+
+#if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)
     void screen_setup() {
       // Ran during setup()
       // Abstraction layer: screen initialization
@@ -135,6 +178,14 @@
         tft.fillScreen(TFT_BLACK); 
             
       #endif
+
+     #if defined(DISPLAY_7735)
+        tft.init();
+        tft.begin();
+        tft.setRotation(1);
+        tft.fillScreen(TFT_BLACK); 
+            
+     #endif
     }
 
 
@@ -291,6 +342,75 @@
           drawStrMultiline(features_str.c_str(), 2, 102);
           delay(2500);
       #endif
+
+      #if defined(DISPLAY_7735)
+          tft.fillScreen(TFT_BLACK);
+          tft.setTextColor(TFT_WHITE,TFT_BLACK);
+          tft.drawBitmap(0, 3, image_duco_logo_bits, 21, 24, 0xFC00);  
+          tft.setTextSize(2);
+          tft.setCursor(26, 12);
+          #if defined(ESP8266)
+            tft.print("ESP8266 ");
+          #elif defined(CONFIG_FREERTOS_UNICORE)
+            tft.print("ESP32S2/C3 ");
+          #else
+            tft.print("ESP32 ");
+          #endif
+          tft.setTextSize(1);
+          #if defined(ESP8266)
+            tft.print(String(ESP.getCpuFreqMHz()).c_str());
+          #else
+            tft.print(String(getCpuFrequencyMhz()).c_str());
+          #endif
+          tft.print(" MHz");
+          tft.setTextSize(1);
+          tft.setCursor(2, 70);
+          tft.print("Compiled ");
+          tft.print(__DATE__);
+          
+          delay(2500);
+          
+          tft.drawString("Features:",2, 85,1);
+          String features_str = "OTA ";
+          #if defined(USE_LAN)
+            features_str += "LAN ";
+          #endif
+          #if defined(LED_BLINKING)
+            features_str += "Blink ";
+          #endif
+          #if defined(SERIAL_PRINTING)
+            features_str += "Serial ";
+          #endif
+          #if defined(WEB_DASHBOARD)
+            features_str += "Webserver ";
+          #endif
+          #if defined(DISPLAY_16X2)
+            features_str += "LCD16X2 ";
+          #endif
+          #if defined(DISPLAY_SSD1306)
+            features_str += "SSD1306 ";
+          #endif
+          #if defined(DISPLAY_114)
+            features_str += "TT-GO ";
+          #endif
+          #if defined(DISPLAY_7735)
+            features_str += "7735 ";
+          #endif
+          #if defined(USE_INTERNAL_SENSOR)
+            features_str += "Int. sensor ";
+          #endif
+          #if defined(USE_DS18B20)
+            features_str += "DS18B20 ";
+          #endif
+          #if defined(USE_DHT)
+            features_str += "DHT ";
+          #endif
+          #if defined(USE_HSU07M)
+            features_str += "HSU07M ";
+          #endif
+          drawStrMultiline(features_str.c_str(), 2, 102);
+          delay(2500);
+      #endif
     }
 
     void display_info(String message) {
@@ -351,6 +471,33 @@
           tft.drawString("www.duinocoin.com",120,95 );
           tft.drawBitmap(0, 4, image_paint_0_bits, 41, 51, 0xFC00);
           tft.drawString("Rev", 189, 8);
+          delay(2500);
+      #endif
+
+      #if defined(DISPLAY_7735)
+          tft.fillScreen(TFT_BLACK); 
+          tft.setTextColor(0xFFFF);
+          tft.setTextSize(2);
+          #if defined(ESP8266)
+              tft.drawString("ESP8266",25,12);
+          #elif defined(CONFIG_FREERTOS_UNICORE)
+              tft.drawString("ESP32S2/C3",25,12);
+          #else
+              tft.drawString("ESP32",25,12);
+          #endif
+          tft.drawBitmap(0, 3, image_duco_logo_bits, 21, 24, 0xFC00);
+          tft.setTextSize(1);
+          tft.setTextColor(0x4E04);
+          tft.drawString("Rev", 115, 8);
+          tft.drawString(String(SOFTWARE_VERSION).c_str(),115, 20); 
+          tft.setTextColor(0xFFFF);
+          tft.drawString("Duino-Coin",4,60 );
+          tft.drawString("MINER",75,60 );
+          tft.setTextSize(1);
+          tft.drawString(message.c_str(),3,110 );
+          tft.drawString("www.duinocoin.com",40,87 );
+          
+          
           delay(2500);
       #endif
     }
@@ -513,6 +660,101 @@
             tft.drawBitmap(218, 86, image_network_2_bars_bits, 15, 16, 0xFFFF);
           } else {
             tft.drawBitmap(218, 86, image_network_1_bar_bits, 15, 16, 0xFFFF);
+          }
+          
+          
+      #endif
+
+      #if defined(DISPLAY_7735)
+          tft.fillScreen(TFT_BLACK);
+          tft.drawBitmap(-2, 6, image_duco_bits, 35, 35, 0xFC00);
+          tft.setTextColor(0xFC00);
+          tft.setTextSize(1);
+          tft.setFreeFont();
+          tft.drawString("uinocoin MINER", 30, 32);
+          tft.setTextColor(0x540);
+          tft.drawString("Rev", 118, 32);
+          
+          tft.setTextColor(0xFC00);
+          tft.setFreeFont();
+          tft.drawString("duinocoin.com", 73, 78);
+          tft.setFreeFont(&FreeSansBold12pt7b);
+      //    tft.setTextSize(3);
+          tft.fillRect(66, 4, 89, 21, 0xFD60);
+          tft.setTextColor(0x0);
+          if (hashrate.toFloat() < 100.0) {    
+            tft.drawString(hashrate.c_str(), 67, 5 );
+          } else {
+            tft.drawString(hashrate.c_str(), 67, 5 );
+          }
+          
+          tft.setFreeFont();
+          tft.setTextSize(1);
+          //tft.setTextColor(0x0);
+          tft.drawString("kH/s", 129, 16);
+          tft.setTextColor(0x400);
+          tft.drawString(String(SOFTWARE_VERSION).c_str(),138,32 );
+          tft.drawRect(64, 3, 92, 24, 0xB208);
+          tft.setTextColor(0xA815);
+          tft.drawString("ESP 32", 3, 45);
+          tft.drawRect(63, 2, 94, 26, 0xD2EB);
+          tft.drawLine(0, 58, 0, 126, 0xFFEA);
+          tft.drawRect(0, 0, 160, 58, 0xFFEA);
+          tft.drawLine(0, 0, 0, 0, 0xFFFF);
+          tft.drawLine(159, 126, 159, 58, 0xFFEA);
+          tft.drawRect(62, 1, 96, 28, 0xFAAA);
+          tft.setTextColor(0xAD55);
+          tft.drawString("Ip:", 52, 45);
+          tft.drawString(String(WiFi.localIP().toString()).c_str(),72, 45);
+          
+          tft.drawBitmap(3, 59, image_check_contour_bits, 13, 16, 0x540);
+          tft.setTextColor(0x52BF);
+          tft.drawString((accepted_shares + "/" + total_shares).c_str(),17,64 );
+          
+          tft.drawBitmap(99, 65, image_ButtonRightSmall_bits, 3, 5, 0x540);
+          tft.drawString(("(" + accept_rate + "%)").c_str(),107, 64 );
+          
+          tft.drawLine(0, 75, 170, 75, 0xFFEA);
+          tft.setTextColor(0xAD55);
+          tft.drawString("wifi", 35, 20);
+          tft.setTextColor(0xA800);
+          tft.drawString("diff.", 3, 79);
+          tft.setTextColor(0x57EA);
+          tft.drawString("sh/s:", 3, 90);
+          tft.setTextColor(0xAD55);
+          tft.drawString(difficulty.c_str(),35, 79 );
+          
+          tft.drawString(sharerate.c_str(),38, 90 );
+         
+          tft.drawBitmap(71, 92, image_clock_bits, 15, 16, 0x540);
+          tft.drawString(uptime.c_str(),92, 96 );
+          
+          tft.drawLine(-2, 126, 169, 126, 0xFFEA);  
+          tft.setTextColor(0x555);
+          tft.drawString("Ping:", 3, 103);
+          tft.setTextColor(0xAD55);
+          tft.drawString((ping + "ms").c_str(),35, 103 );
+          
+          tft.setTextColor(0x211D);
+          tft.drawString("Node:", 3, 115);
+          tft.setTextColor(0xAD55);
+          tft.drawString(node.c_str(), 35, 115);
+    
+          
+          if (WiFi.RSSI() > -40) {
+            tft.drawRect(51, 5, 2, 11, 0xFFFF);
+            tft.drawRect(47, 7, 2, 9, 0xFFFF);
+            tft.drawRect(43, 10, 2, 6, 0xFFFF);
+            tft.drawRect(39, 13, 2, 3, 0xFFFF);
+          } else if (WiFi.RSSI() > -60) {
+            tft.drawRect(47, 7, 2, 9, 0xFFFF);
+            tft.drawRect(43, 10, 2, 6, 0xFFFF);
+            tft.drawRect(39, 13, 2, 3, 0xFFFF);
+          } else if (WiFi.RSSI() > -75) {
+            tft.drawRect(43, 10, 2, 6, 0xFFFF);
+            tft.drawRect(39, 13, 2, 3, 0xFFFF);
+          } else {
+            tft.drawRect(39, 13, 2, 3, 0xFFFF);
           }
           
           
