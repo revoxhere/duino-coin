@@ -83,16 +83,19 @@
 // #define M5STACK
 
 // For ST7789, ST7735, ILI9163 and GC9A01 ONLY, define the pixel width and height in portrait orientation
+// for TT-GO 1.14 by Lilygo, set TFT_WIDTH to 240 and TFT_HEIGHT to 135
+// FOR ST7735 DISPLAY, SET TFT_WIDTH to 128 and TFT_HEIGHT to 160
 // #define TFT_WIDTH  80
  #define TFT_WIDTH  128  // st7735
+// #define TFT_WIDTH  135 // Lilygo TT-go 1.14
 // #define TFT_WIDTH  172 // ST7789 172 x 320
 // #define TFT_WIDTH  170 // ST7789 170 x 320
-// #define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320
+// #define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320 and Lilygo TT-GO 1.14
 // #define TFT_HEIGHT 160
 // #define TFT_HEIGHT 135
  #define TFT_HEIGHT 160 // st7735
 // #define TFT_HEIGHT 320 // ST7789 240 x 320
-// #define TFT_HEIGHT 240 // GC9A01 240 x 240
+// #define TFT_HEIGHT 240 // GC9A01 240 x 240  and Lilygo TT-GO 1.14
 
 // For ST7735 ONLY, define the type of display, originally this was based on the
 // colour of the tab on the screen protector film but this is not always true, so try
