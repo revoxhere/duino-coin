@@ -59,7 +59,7 @@
   #include "Dashboard.h"
 #endif
 
-#if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+#if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
   #include "DisplayHal.h"
 #endif
 
@@ -140,7 +140,7 @@ void RestartESP(String msg) {
     Serial.println("Restarting ESP...");
   #endif
 
-  #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+  #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
     display_info("Restarting ESP...");
   #endif
 
@@ -213,7 +213,7 @@ namespace {
           Serial.println("Poolpicker selected the best mining node: " + node_id);
         #endif
 
-        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
           display_info(node_id);
         #endif
     }
@@ -264,7 +264,7 @@ namespace {
                Serial.printf("Error fetching node from poolpicker: %s\n", https.errorToString(httpCode).c_str());
                VerifyWifi();
             #endif
-            #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+            #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
               display_info(http.errorToString(httpCode));
             #endif
         }
@@ -384,7 +384,7 @@ namespace {
 
       #endif
 
-      #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+      #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
           display_info("Waiting for node...");
       #endif
       SelectNode();
@@ -499,7 +499,7 @@ void task1_func(void *) {
       VOID LOOP() {
         job[0]->mine();
 
-        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
            float hashrate_float = (hashrate+hashrate_core_two) / 1000.0;
            float accept_rate = (accepted_share_count / 0.01 / share_count);
            
@@ -528,7 +528,7 @@ void task2_func(void *) {
       VOID LOOP() {
         job[1]->mine();
 
-        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
            float hashrate_float = (hashrate+hashrate_core_two) / 1000.0;
            float accept_rate = (accepted_share_count / 0.01 / share_count);
            
@@ -578,7 +578,7 @@ void setup() {
         }
     #endif
 
-    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
         screen_setup();
         display_boot();
         delay(2500);
@@ -698,8 +698,7 @@ void setup() {
         #if defined(BLUSHYBOX)
           blinker.detach();
         #endif
-        
-        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
             display_info("Waiting for node...");
         #endif
         #if defined(BLUSHYBOX)
@@ -710,7 +709,7 @@ void setup() {
           blinker.detach();
         #endif
     #else
-        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
           display_info("Waiting for WiFi...");
         #endif
         SetupWifi();
@@ -785,7 +784,7 @@ void single_core_loop() {
     
     lwdtFeed();
     
-    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
        float hashrate_float = (hashrate+hashrate_core_two) / 1000.0;
        float accept_rate = (accepted_share_count / 0.01 / share_count);
        

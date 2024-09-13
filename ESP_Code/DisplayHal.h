@@ -21,6 +21,12 @@
     static byte msec[] = {0x0A, 0x15, 0x11, 0x06, 0x08, 0x04, 0x02, 0x0C};
 #endif
 
+#if defined(DISPLAY_ST7789)
+    // Define some colors
+    #define WHITE TFT_WHITE
+    #define BLACK TFT_BLACK
+#endif
+
   #if defined(DISPLAY_SSD1306)
     void drawStrMultiline(const char *msg, int xloc, int yloc) {
      //https://github.com/olikraus/u8g2/discussions/1479
@@ -56,7 +62,7 @@
     }
 #endif
 
-#if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)
+#if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_ST7789)
     void screen_setup() {
       // Ran during setup()
       // Abstraction layer: screen initialization
@@ -77,6 +83,13 @@
           lcd.createChar(3, msec);
           lcd.home();
           lcd.clear();
+      #endif
+
+      #if defined(DISPLAY_ST7789)
+        tft.begin();
+        tft.setRotation(1); 
+        tft.init();
+        tft.fillScreen(BLACK);
       #endif
     }
 
@@ -289,6 +302,39 @@
           lcd.setCursor(12, 1);
           lcd.print(sharerate);
           lcd.print("s");
+      #endif
+
+      #if defined(DISPLAY_ST7789)
+          tft.init();
+          tft.fillScreen(BLACK);
+          tft.setTextColor(WHITE);
+          
+          tft.setTextSize(2);
+          tft.setCursor(2, 10);
+          tft.print("Hashrate: " + hashrate + " kH");
+        
+          tft.setCursor(2, 30);
+          tft.print("Node: " + node);
+        
+          tft.setCursor(2, 50);
+          tft.print("Accepted/Total: " + accepted_shares + "/" + total_shares);
+          tft.setCursor(2, 70);
+          tft.print("Accepted Rate: " + accept_rate + "%");
+        
+          tft.setCursor(2, 90);
+          tft.print("Ping: " + ping + " ms");
+        
+          tft.setCursor(2, 110);
+          tft.print("Uptime: " + uptime);
+        
+          tft.setCursor(2, 130);
+          tft.print("Share Rate: " + sharerate);
+          tft.setCursor(2, 150);
+          tft.print("Difficulty: " + difficulty);
+        
+          tft.setCursor(2, 200);
+          tft.print("IP: " + WiFi.localIP().toString());
+
       #endif
     }
 #endif
