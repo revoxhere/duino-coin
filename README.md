@@ -7,7 +7,7 @@
   <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/duco.png?raw=true" width="215px" align="right" />
 </a>
 
-<h1>
+<h3>
   <a href="https://duinocoin.com">
     <img src="https://github.com/revoxhere/duino-coin/blob/master/Resources/ducobanner.png?raw=true" width="430px" />
   </a>
@@ -52,7 +52,7 @@
     <img src="https://img.shields.io/badge/-日本語-orange?style=for-the-badge" /></a>
   <a href="https://github.com/revoxhere/duino-coin/blob/master/Resources/README_TRANSLATIONS/README_fi_FI.md">
     <img src="https://img.shields.io/badge/finnish-121212.svg?style=for-the-badge" /></a>
-</h1>
+</h3>
 <a href="https://wallet.duinocoin.com">
   <img src="https://img.shields.io/badge/Online Wallet-a202ff.svg?style=for-the-badge&logo=Web" /></a>
 <a href="https://play.google.com/store/apps/details?id=com.protothis.duinocoin">
@@ -236,7 +236,7 @@ Please note the DUCO/day column has been removed since version 4.0 changed the r
 
 ## License
 
-Duino-Coin is mostly distributed under the MIT License. See the `LICENSE` file for more information.
+Duino-Coin is mostly distributed under the MIT License. See the `LICENSE` file for more information.<br>
 Some third-party included files may have different licenses - please check their `LICENSE` statements (usually at the top of the source code files).
 
 
@@ -253,17 +253,8 @@ Our disclaimer is available here: <a href="https://duinocoin.com/disclaimer">dui
 
 ## Active project maintainers
 
-*   [@revoxhere](https://github.com/revoxhere/) - robik123.345@gmail.com (Lead Python dev, project founder)
-*   [@Bilaboz](https://github.com/bilaboz/) (Lead NodeJS dev)
-*   [@Tech1k](https://github.com/Tech1k/) - hello@kristiankramer.net (Lead Webmaster and DUCO Developer)
-*   [@ygboucherk](https://github.com/ygboucherk) ([wDUCO](https://github.com/ygboucherk/wrapped-duino-coin-v2) dev)
-<!-- *   [@connorhess](https://github.com/connorhess) (Lead Python dev, Node-S owner) -->
-<!-- *   [@JoyBed](https://github.com/JoyBed) (Lead AVR dev) -->
-<!-- *   [@Yennefer](https://www.instagram.com/vlegle/) (Lead social manager) -->
-<!-- *   [@Lulaschkas](https://github.com/Lulaschkas) (Dev) -->
-<!-- *   [@joaquinbvw](https://github.com/joaquinbvw) (AVR dev) -->
-
-Big thanks to all the [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped to develop the Duino-Coin project.
+Originally created and maintained by [@revoxhere](https://github.com/revoxhere).<br>
+Big thanks to all the [contributors](https://github.com/revoxhere/duino-coin/graphs/contributors) that helped to develop the Duino-Coin project.<br>
 Visit [duinocoin.com/team](https://duinocoin.com/team.html) to view more information about the Duino Team.
 
 <hr>
