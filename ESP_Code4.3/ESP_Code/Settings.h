@@ -2,20 +2,18 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-extern bool displayLock = false;
-
 // ---------------------- General settings ---------------------- //
 // Change the part in brackets to your Duino-Coin username
-extern char *DUCO_USER = "your_username";
+extern char *DUCO_USER = "your username";
 // Change the part in brackets to your mining key (if you have set it in the wallet)
-extern char *MINER_KEY = "your_mining_key";
+extern char *MINER_KEY = "your key";
 // Change the part in brackets if you want to set a custom miner name
 // Use Auto to autogenerate, None for no custom identifier
-extern char *RIG_IDENTIFIER = "your custom miner name";
+extern char *RIG_IDENTIFIER = "esp32_TT-GO";
 // Change the part in brackets to your WiFi name
-extern const char SSID[] = "your_wifi_ssid";
+extern const char SSID[] = "your ssid";
 // Change the part in brackets to your WiFi password
-extern const char PASSWORD[] = "your_wifi_psswd";
+extern const char PASSWORD[] = "your wifi pass";
 // -------------------------------------------------------------- //
 
 // -------------------- Advanced options ------------------------ //
@@ -58,9 +56,6 @@ extern const char PASSWORD[] = "your_wifi_psswd";
 
 //uncomment to enable Lilygo tt display 1.14 module
 // #define DISPLAY_114
-
-// uncomment for tft7735 display 
- #define DISPLAY_7735
 
 // Uncomment to enable a 16x2 LCD screen on a direct bus to display mining info in real time
 // See line 150 for connections and initializer
@@ -176,15 +171,6 @@ extern unsigned int ping = 0;
 #endif
 
 #if defined(DISPLAY_114)
-    // Install "lilygo lib TFT_eSPI.h" if you get an error
-      #include <TFT_eSPI.h>
-      #include <SPI.h>
-      #include <Wire.h>
-    // Display definition from the tft_eSPI library. Edit if you use a different display
-      TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
-#endif
-
-#if defined(DISPLAY_7735)
     // Install "lilygo lib TFT_eSPI.h" if you get an error
       #include <TFT_eSPI.h>
       #include <SPI.h>
