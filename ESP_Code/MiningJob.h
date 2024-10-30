@@ -266,13 +266,20 @@ private:
 
     void waitForClientData() {
         client_buffer = "";
-
+        unsigned int stopWatch = millis();
         while (client.connected()) {
             if (client.available()) {
                 client_buffer = client.readStringUntil(END_TOKEN);
                 if (client_buffer.length() == 1 && client_buffer[0] == END_TOKEN)
                     client_buffer = "???\n"; // NOTE: Should never happen
                 break;
+            }
+            if (max_micros_elapsed(micros(), 100000)) {
+                handleSystemEvents();
+            }
+            if (millis()-stopWatch>120000) {
+              Serial.println("Timeout after 120s. Forced restart..");
+              ESP.restart();
             }
         }
     }
@@ -301,7 +308,9 @@ private:
                           " share #" + String(share_count) +
                           " (" + String(counter) + ")" +
                           " hashrate: " + String(hashrate / 1000, 2) + " kH/s (" +
-                          String(elapsed_time_s) + "s)\n");
+                          String(elapsed_time_s) + "s) " + 
+                          "Ping: " + String(ping) + "ms " +
+                          "(" + node_id + ")\n");
         #endif
     }
 
