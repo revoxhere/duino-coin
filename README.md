@@ -155,7 +155,7 @@ Captured at normal multiplier (no weekend boost)
 Please note the DUCO/day column has been removed since version 4.0 changed the reward system.
 | Device/CPU/SBC/MCU/chip                                   | Average hashrate<br>(all threads) | Mining<br>threads | Power<br>usage |
 |-----------------------------------------------------------|-----------------------------------|-------------------|----------------|
-| Raspberry Pi Pico                                         | 5 kH/s                            | 1                 | 0.3 W          |
+| Raspberry Pi Pico                                         | 18 kH/s                           | 1                 | 0.3 W          |
 | Raspberry Pi Zero                                         | 18 kH/s                           | 1                 | 1.1 W          |
 | Raspberry Pi 3 **(32bit)**                                | 440 kH/s                          | 4                 | 5.1 W          |
 | Raspberry Pi 4 **(32bit)**                                | 740 kH/s                          | 4                 | 6.4 W          |
