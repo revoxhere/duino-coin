@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official AVR Miner 4.2 © MIT licensed
+Duino-Coin Official AVR Miner 4.3 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2024
@@ -27,6 +27,7 @@ from socket import socket
 from datetime import datetime
 from statistics import mean
 from signal import SIGINT, signal
+from collections import deque
 from time import ctime, sleep, strptime, time
 import pip
 
@@ -109,7 +110,7 @@ def port_num(com):
 
 
 class Settings:
-    VER = '4.2'
+    VER = '4.3'
     SOC_TIMEOUT = 15
     REPORT_TIME = 120
     AVR_TIMEOUT = 10
@@ -467,8 +468,8 @@ class Donate:
 
 
 shares = [0, 0, 0]
-hashrate_mean = []
-ping_mean = []
+hashrate_mean = deque(maxlen=25)
+ping_mean = deque(maxlen=25)
 diff = 0
 donator_running = False
 job = ''
@@ -1178,7 +1179,7 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
                 hashrate_t = round(num_res / computetime, 2)
 
                 hashrate_mean.append(hashrate_t)
-                hashrate = mean(hashrate_mean[-5:])
+                hashrate = mean(hashrate_mean)
                 hashrate_list[threadid] = hashrate
                 total_hashrate = sum(hashrate_list)
             except Exception as e:
@@ -1208,7 +1209,7 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
                 time_delta = (responsetimestop -
                               responsetimetart).microseconds
                 ping_mean.append(round(time_delta / 1000))
-                ping = mean(ping_mean[-10:])
+                ping = mean(ping_mean)
                 diff = get_prefix("", int(diff), 0)
                 debug_output(com + f': retrieved feedback: {" ".join(feedback)}')
             except Exception as e:
