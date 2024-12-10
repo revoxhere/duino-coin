@@ -4,7 +4,7 @@
   (  _ \(  )(  )(_  _)( \( )(  _  )___  / __)(  _  )(_  _)( \( )
    )(_) ))(__)(  _)(_  )  (  )(_)((___)( (__  )(_)(  _)(_  )  ( 
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
-  Official code for Arduino boards (and relatives)   version 4.2
+  Official code for Arduino boards (and relatives)   version 4.3
   
   Duino-Coin Team & Community 2019-2024 © MIT Licensed
   https://duinocoin.com
@@ -20,6 +20,8 @@ for default settings use -O0. -O may be a good tradeoff between both */
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
 #endif
+#define SEP_TOKEN ","
+#define END_TOKEN "\n"
 /* For 8-bit microcontrollers we should use 16 bit variables since the
 difficulty is low, for all the other cases should be 32 bits. */
 #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
@@ -126,7 +128,7 @@ void loop() {
   uintDiff difficulty = strtoul(Serial.readStringUntil(',').c_str(), NULL, 10);
   // Clearing the receive buffer reading one job.
   while (Serial.available()) Serial.read();
-  // Turn on the built-in led
+  // Turn off the built-in led
   #if defined(ARDUINO_ARCH_AVR)
       PORTB = PORTB | B00100000;
   #else
@@ -154,9 +156,9 @@ void loop() {
 
   // Send result back to the program with share time
   Serial.print(String(ducos1result, 2) 
-               + "," 
+               + SEP_TOKEN
                + String(elapsedTime, 2) 
-               + "," 
+               + SEP_TOKEN
                + String(DUCOID) 
-               + "\n");
+               + END_TOKEN);
 }
