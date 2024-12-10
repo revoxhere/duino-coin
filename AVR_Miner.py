@@ -32,14 +32,11 @@ from time import ctime, sleep, strptime, time
 import pip
 
 from subprocess import DEVNULL, Popen, check_call, call
-from threading import Thread
-from threading import Lock as thread_lock
-from threading import Semaphore
-
+from threading import Thread, Lock
 import base64 as b64
-
 import os
-printlock = Semaphore(value=1)
+
+printlock = Lock()
 
 
 # Python <3.5 check
@@ -119,6 +116,7 @@ class Settings:
     SEPARATOR = ","
     ENCODING = "utf-8"
     TEMP_FOLDER = "Temp"
+    disable_title = False
 
     try:
         # Raspberry Pi latin users can't display this character
@@ -600,24 +598,26 @@ def debug_output(text: str):
 
 
 def title(title: str):
-    if osname == 'nt':
-        """
-        Changing the title in Windows' cmd
-        is easy - just use the built-in
-        title command
-        """
-        ossystem('title ' + title)
-    else:
-        """
-        Most *nix terminals use
-        this escape sequence to change
-        the console window title
-        """
-        try:
-            print('\33]0;' + title + '\a', end='')
-            sys.stdout.flush()
-        except Exception as e:
-            debug_output("Error setting title: " +str(e))
+    if not Settings.disable_title:
+        if osname == 'nt':
+            """
+            Changing the title in Windows' cmd
+            is easy - just use the built-in
+            title command
+            """
+            ossystem('title ' + title)
+        else:
+            """
+            Most *nix terminals use
+            this escape sequence to change
+            the console window title
+            """
+            try:
+                print('\33]0;' + title + '\a', end='')
+                sys.stdout.flush()
+            except Exception as e:
+                debug_output("Error setting title: " +str(e))
+                Settings.disable_title = True
 
 
 def handler(signal_received, frame):
@@ -1318,9 +1318,10 @@ def print_queue_handler():
     while True:
         if len(print_queue):
             message = print_queue[0]
-            del print_queue[0]
-            print(message)
-        sleep(0.1)
+            with printlock:
+                print(message)
+            print_queue.pop(0)
+        sleep(0.01)
 
 
 if __name__ == '__main__':
