@@ -111,8 +111,8 @@ def port_num(com):
 
 class Settings:
     VER = '4.3'
-    SOC_TIMEOUT = 15
-    REPORT_TIME = 120
+    SOC_TIMEOUT = 10
+    REPORT_TIME = 300
     AVR_TIMEOUT = 10
     BAUDRATE = 115200
     DATA_DIR = "Duino-Coin AVR Miner " + str(VER)
@@ -291,6 +291,7 @@ def check_mining_key(user_settings):
             + key,
         timeout=10
     ).json()
+    debug_output(response)
 
     if response["success"] and not response["has_key"]: # if the user doesn't have a mining key
         user_settings["mining_key"] = "None"
@@ -305,6 +306,10 @@ def check_mining_key(user_settings):
         return
 
     if not response["success"]:
+        if response["message"] == "Too many requests":
+            debug_output("Skipping mining key check - getting 429")
+            return
+
         if user_settings["mining_key"] == "None":
             pretty_print(
                 "sys0",
@@ -748,10 +753,10 @@ def load_config():
             'language':         lang,
             'identifier':       rig_identifier,
             'debug':            'n',
-            "soc_timeout":      45,
+            "soc_timeout":      10,
             "avr_timeout":      10,
             "discord_presence": "y",
-            "periodic_report":  60,
+            "periodic_report":  300,
             "mining_key":       mining_key}
 
         with open(str(Settings.DATA_DIR)
