@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Duino-Coin Official PC Miner 4.2 © MIT licensed
+Duino-Coin Official PC Miner 4.3 © MIT licensed
 https://duinocoin.com
 https://github.com/revoxhere/duino-coin
 Duino-Coin Team & Community 2019-2024
@@ -12,7 +12,7 @@ from socket import socket
 
 from multiprocessing import cpu_count, current_process
 from multiprocessing import Process, Manager, Semaphore
-from threading import Thread
+from threading import Thread, Lock
 from datetime import datetime
 from random import randint
 
@@ -42,8 +42,10 @@ from configparser import ConfigParser
 
 import io
 
+debug = "n"
 running_on_rpi = False
 configparser = ConfigParser()
+printlock = Lock()
 
 # Python <3.5 check
 f"Your Python version is too old. Duino-Coin Miner requires version 3.6 or above. Update your packages and try again"
@@ -76,6 +78,13 @@ def handler(signal_received, frame):
     else: 
         Popen("kill $(ps aux | grep PC_Miner | awk '{print $2}')",
               shell=True, stdout=PIPE)
+
+
+def debug_output(text: str):
+    if debug == 'y':
+        print(Style.RESET_ALL + Fore.WHITE
+              + now().strftime(Style.DIM + '%H:%M:%S.%f ')
+              + Style.NORMAL + f'DEBUG: {text}')
 
 
 def install(package):
@@ -142,7 +151,7 @@ class Settings:
     """
     ENCODING = "UTF8"
     SEPARATOR = ","
-    VER = 4.2
+    VER = 4.3
     DATA_DIR = "Duino-Coin PC Miner " + str(VER)
     TRANSLATIONS = ("https://raw.githubusercontent.com/"
                     + "revoxhere/"
@@ -152,11 +161,12 @@ class Settings:
     SETTINGS_FILE = "/Settings.cfg"
     TEMP_FOLDER = "Temp"
 
-    SOC_TIMEOUT = 20
-    REPORT_TIME = 5*60
+    SOC_TIMEOUT = 10
+    REPORT_TIME = 300
     DONATE_LVL = 0
     RASPI_LEDS = "y"
     RASPI_CPU_IOT = "y"
+    disable_title = False
 
     try:
         # Raspberry Pi latin encoding users can't display this character
@@ -181,24 +191,26 @@ class Settings:
 
 
 def title(title: str):
-    if osname == 'nt':
-        """
-        Changing the title in Windows' cmd
-        is easy - just use the built-in
-        title command
-        """
-        ossystem('title ' + title)
-    else:
-        """
-        Most *nix terminals use
-        this escape sequence to change
-        the console window title
-        """
-        try:
-            print('\33]0;' + title + '\a', end='')
-            sys.stdout.flush()
-        except Exception as e:
-            debug_output("Error setting title: " +str(e))
+    if not Settings.disable_title:
+        if osname == 'nt':
+            """
+            Changing the title in Windows' cmd
+            is easy - just use the built-in
+            title command
+            """
+            ossystem('title ' + title)
+        else:
+            """
+            Most *nix terminals use
+            this escape sequence to change
+            the console window title
+            """
+            try:
+                print('\33]0;' + title + '\a', end='')
+                sys.stdout.flush()
+            except Exception as e:
+                debug_output("Error setting title: " +str(e))
+                Settings.disable_title = True
 
 
 def check_updates():
@@ -695,9 +707,10 @@ def print_queue_handler(print_queue):
     while True:
         if len(print_queue):
             message = print_queue[0]
-            del print_queue[0]
-            print(message)
-        sleep(0.1)
+            with printlock:
+                print(message)
+            print_queue.pop(0)
+        sleep(0.01)
 
 
 def get_string(string_name):
@@ -713,12 +726,16 @@ def get_string(string_name):
 
 
 def has_mining_key(username):
-    response = requests.get(
-        "https://server.duinocoin.com/mining_key"
-            + "?u=" + username,
-        timeout=10
-    ).json()
-    return response["has_key"]
+    try:
+        response = requests.get(
+            "https://server.duinocoin.com/mining_key"
+                + "?u=" + username,
+            timeout=10
+        ).json()
+        return response["has_key"]
+    except Exception as e:
+        debug_output("Error checking for mining key: " + str(e))
+        return False
 
 
 def check_mining_key(user_settings):
@@ -733,6 +750,7 @@ def check_mining_key(user_settings):
             + key,
         timeout=Settings.SOC_TIMEOUT
     ).json()
+    debug_output(response)
 
     if response["success"] and not response["has_key"]:
         # If user doesn't have a mining key
@@ -747,6 +765,9 @@ def check_mining_key(user_settings):
         return
 
     if not response["success"]:
+        if response["message"] == "Too many requests":
+            debug_output("Skipping mining key check - getting 429")
+            return
         if user_settings["mining_key"] == "None":
             pretty_print(get_string("mining_key_required"), "warning")
             mining_key = input("\t\t" + get_string("ask_mining_key")
@@ -1197,8 +1218,7 @@ class Miner:
                                             + f"{single_miner_id}")
 
                                 time_start = time()
-                                feedback = Client.recv(
-                                ).split(Settings.SEPARATOR)
+                                feedback = Client.recv().split(Settings.SEPARATOR)
                                 ping = (time() - time_start) * 1000
 
                                 if feedback[0] == "GOOD":
