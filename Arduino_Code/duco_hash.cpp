@@ -77,9 +77,7 @@ void duco_hash_block(duco_hash_state_t * hasher) {
 }
 
 void duco_hash_init(duco_hash_state_t * hasher, char const * prevHash) {
-	for (uint8_t i = 0; i < 40; i++) {
-		hasher->buffer[i] = prevHash[i];
-	}
+	memcpy(hasher->buffer, prevHash, 40);
 
 	if (prevHash == (void*)(0xffffffff)) {
 		// NOTE: THIS IS NEVER CALLED
