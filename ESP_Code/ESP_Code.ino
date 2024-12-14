@@ -649,6 +649,7 @@ void setup() {
         configuration->DUCO_USER = duco_username;
         configuration->RIG_IDENTIFIER = duco_rigid;
         configuration->MINER_KEY = duco_password;
+        RIG_IDENTIFIER = duco_rigid;
 
         String captivePortalHTML = R"(
           <title>Duino BlushyBox</title>
