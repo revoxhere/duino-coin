@@ -152,6 +152,18 @@ void RestartESP(String msg) {
   #endif
 }
 
+String getUptimeString() {
+  long millisecs = millis();
+
+  int uptime_secs = int((millisecs / 1000) % 60);
+  int uptime_mins = int((millisecs / (1000 * 60)) % 60);
+  int uptime_hours = int((millisecs / (1000 * 60 * 60)) % 24);
+
+  String uptimeString = String(uptime_hours) + "h" + String(uptime_mins) + "m" + String(uptime_secs) + "s";
+
+  return uptimeString;
+}
+
 #if defined(BLUSHYBOX)
     Ticker blinker;
     bool lastLedState = false;
@@ -378,6 +390,7 @@ namespace {
             Serial.println("Rig name: " + String(RIG_IDENTIFIER));
             Serial.println("Local IP address: " + WiFi.localIP().toString());
             Serial.println("Gateway: " + WiFi.gatewayIP().toString());
+            Serial.println("MAC Address: " + String(WiFi.macAddress()));
             Serial.println("DNS: " + WiFi.dnsIP().toString());
             Serial.println();
         #endif
@@ -432,16 +445,20 @@ namespace {
                Serial.println("Handling HTTP client");
              #endif
              String s = WEBSITE;
+             
              #ifdef USE_LAN
               s.replace("@@IP_ADDR@@", ETH.localIP().toString());
+              s.replace("@@MAC_ADDR@@", String(ETH.macAddress()));
              #else
               s.replace("@@IP_ADDR@@", WiFi.localIP().toString());
+              s.replace("@@MAC_ADDR@@", String(WiFi.macAddress()));
              #endif
-  
+
              s.replace("@@HASHRATE@@", String((hashrate+hashrate_core_two) / 1000));
              s.replace("@@DIFF@@", String(difficulty / 100));
              s.replace("@@SHARES@@", String(share_count));
              s.replace("@@NODE@@", String(node_id));
+             s.replace("@@UPTIME@@", String(getUptimeString()));
              
              #if defined(ESP8266)
                  s.replace("@@DEVICE@@", "ESP8266");
@@ -482,6 +499,13 @@ namespace {
                  
              server.send(200, "text/html", s);
         }
+
+        void restart_via_dashboard() {
+          server.send(200, "text/html", "Device is restarting, Click <a href='/'>here</a> in a few seconds to return to the dashboard.\n");
+          delay(500);
+          RestartESP("Restart via DashBoard");
+        }
+
     #endif
 
 } // End of namespace
@@ -504,14 +528,11 @@ void task1_func(void *) {
            float accept_rate = (accepted_share_count / 0.01 / share_count);
            
            long millisecs = millis();
-           int uptime_secs = int((millisecs / 1000) % 60);
-           int uptime_mins = int((millisecs / (1000 * 60)) % 60);
-           int uptime_hours = int((millisecs / (1000 * 60 * 60)) % 24);
-           String uptime = String(uptime_hours) + "h" + String(uptime_mins) + "m" + String(uptime_secs) + "s";
+           String uptimeString = getUptimeString();
            
            float sharerate = share_count / (millisecs / 1000.0);
           
-           display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptime), 
+           display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptimeString), 
                                   String(node_id), String(difficulty / 100), String(sharerate, 1),
                                   String(ping), String(accept_rate, 1));
         #endif
@@ -533,14 +554,11 @@ void task2_func(void *) {
            float accept_rate = (accepted_share_count / 0.01 / share_count);
            
            long millisecs = millis();
-           int uptime_secs = int((millisecs / 1000) % 60);
-           int uptime_mins = int((millisecs / (1000 * 60)) % 60);
-           int uptime_hours = int((millisecs / (1000 * 60 * 60)) % 24);
-           String uptime = String(uptime_hours) + "h" + String(uptime_mins) + "m" + String(uptime_secs) + "s";
+           String uptimeString = getUptimeString();
            
            float sharerate = share_count / (millisecs / 1000.0);
     
-           display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptime), 
+           display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptimeString), 
                                   String(node_id), String(difficulty / 100), String(sharerate, 1),
                                   String(ping), String(accept_rate, 1));
         #endif
@@ -735,6 +753,7 @@ void setup() {
       #endif
 
       server.on("/", dashboard);
+      server.on("/restart", restart_via_dashboard);
       #if defined(CAPTIVE_PORTAL)
         server.on("/reset", reset_settings);
       #endif
@@ -790,14 +809,11 @@ void single_core_loop() {
        float accept_rate = (accepted_share_count / 0.01 / share_count);
        
        long millisecs = millis();
-       int uptime_secs = int((millisecs / 1000) % 60);
-       int uptime_mins = int((millisecs / (1000 * 60)) % 60);
-       int uptime_hours = int((millisecs / (1000 * 60 * 60)) % 24);
-       String uptime = String(uptime_hours) + "h" + String(uptime_mins) + "m" + String(uptime_secs) + "s";
+       String uptimeString = getUptimeString();
        
        float sharerate = share_count / (millisecs / 1000.0);
 
-       display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptime), 
+       display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptimeString), 
                               String(node_id), String(difficulty / 100), String(sharerate, 1),
                               String(ping), String(accept_rate, 1));
     #endif
