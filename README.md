@@ -1,6 +1,6 @@
 <!--
 *** Official Duino-Coin website README
-*** by Kristian (Tech1k) and Revox, 2021-2024
+*** by Kristian (Tech1k) and Revox, 2021-2025
 -->
 
 <a href="https://duinocoin.com">
