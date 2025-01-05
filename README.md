@@ -230,6 +230,7 @@ Please note the DUCO/day column has been removed since version 4.0 changed the r
   *   [Duino Lookup](https://axorax.github.io/duino-lookup/) by axorax
   *   [Duino Miner Hassio Add-on](https://github.com/mavotronik/hassio-addons/tree/main/duino_miner_hassio_addon) by mavotronik
   *   [Home Assistant sensors package](https://github.com/mavotronik/Duinocoin_homeassistant) by mavotronik
+  *   [ESPGUITOOL](https://github.com/CGameDev/ESPGUITOOL) by kazutokirigaya
 
  You may also view a similar list on the [website](https://duinocoin.com/apps).
 
