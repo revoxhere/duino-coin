@@ -183,6 +183,16 @@ ArduinoUniqueID::ArduinoUniqueID()
   id[7] = SIGROW.SERNUM7;
   id[8] = SIGROW.SERNUM8;
   id[9] = SIGROW.SERNUM9;
+#elif defined(NRF51_SERIES) || defined(NRF52_SERIES) || defined(NRF53_SERIES)
+  NRF_FICR_Type ficr = *NRF_FICR;
+  id[0] = ficr.DEVICEID[0] >> 24;
+  id[1] = ficr.DEVICEID[0] >> 16;
+  id[2] = ficr.DEVICEID[0] >> 8;
+  id[3] = ficr.DEVICEID[0];
+  id[4] = ficr.DEVICEID[1] >> 24;
+  id[5] = ficr.DEVICEID[1] >> 16;
+  id[6] = ficr.DEVICEID[1] >> 8;
+  id[7] = ficr.DEVICEID[1];
 #endif
 }
 
