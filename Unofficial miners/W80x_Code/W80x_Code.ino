@@ -59,11 +59,6 @@ void lowercase_hex_to_bytes(char const * hexDigest, uint8_t * rawDigest) {
 
 // DUCO-S1A hasher
 uintDiff ducos1a(char const * prevBlockHash, char const * targetBlockHash, uintDiff difficulty) {
-  #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
-    // If the difficulty is too high for AVR architecture then return 0
-    if (difficulty > 655) return 0;
-  #endif
-
   uint8_t target[SHA1_HASH_LEN];
   lowercase_hex_to_bytes(targetBlockHash, target);
 
