@@ -12,8 +12,8 @@ for default settings use -O0. -O may be a good tradeoff between both */
 
 /* Sets the LED pins, adjust if necessary */
 #ifdef LED_BUILTIN
-#define LED_WAITING LED_BUILTIN_3
-#define LED_HASHING LED_BUILTIN_2
+#define LED_IDLE LED_BUILTIN_2
+#define LED_HASHING LED_BUILTIN_3
 #endif
 
 #define SEP_TOKEN ","
@@ -35,7 +35,7 @@ String DUCOID = "";
 
 void setup() {
   // Prepare built-in led pins as output
-  pinMode(LED_WAITING, OUTPUT);
+  pinMode(LED_IDLE, OUTPUT);
   pinMode(LED_HASHING, OUTPUT);
 
   DUCOID = get_DUCOID();
@@ -91,13 +91,13 @@ uintDiff ducos1a_mine(char const * prevBlockHash, uint8_t const * target, uintDi
 void loop() {
   // Wait for serial data
   if (Serial.available() <= 0) {
-    digitalWrite(LED_WAITING, HIGH);
+    digitalWrite(LED_IDLE, HIGH);
     digitalWrite(LED_HASHING, LOW);
     return;
   }
 
   // Update led state for hashing
-  digitalWrite(LED_WAITING, LOW);
+  digitalWrite(LED_IDLE, LOW);
   digitalWrite(LED_HASHING, HIGH);
 
   // Reserve 1 extra byte for comma separator (and later zero)
