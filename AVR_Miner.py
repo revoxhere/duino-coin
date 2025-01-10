@@ -990,6 +990,13 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
                 receiving the DTR signal
                 """
                 sleep(2)
+
+                """
+                Indicate to the device that the port
+                is open for receiving data after
+                reseting the board
+                """
+                ser.setRTS(False)
                 break
             except Exception as e:
                 pretty_print(
