@@ -41,6 +41,7 @@ extern const char PASSWORD[] = "PASSW0RD";
 
 // Uncomment to enable WiFiManager captive portal in AP mode
 // The board will create its own network you connect to and change the settings
+// REQUIRES WiFiManager library by tzapu (https://github.com/tzapu/WiFiManager)
 // #define CAPTIVE_PORTAL
 // -------------------------------------------------------------- //
 
