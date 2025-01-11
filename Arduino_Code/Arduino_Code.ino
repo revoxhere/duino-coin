@@ -31,13 +31,6 @@ for default settings use -O0. -O may be a good tradeoff between both */
 #define SEP_TOKEN ","
 #define END_TOKEN "\n"
 
-/* For 8-bit microcontrollers we should use 16 bit variables since the
-difficulty is low, for all the other cases should be 32 bits. */
-#if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
-typedef uint32_t uintDiff;
-#else
-typedef uint32_t uintDiff;
-#endif
 // Arduino identifier library - https://github.com/ricaun
 #include "uniqueID.h"
 
@@ -48,7 +41,7 @@ typedef uint32_t uintDiff;
 
 bool digitDrawn = false;
 bool matrixEnabled = true;
-int minedDigitCount = 0;
+byte minedDigitCount = 0;
 
 Adafruit_Microbit_Matrix microbit;
 #endif
@@ -102,7 +95,7 @@ void lowercase_hex_to_bytes(char const * hexDigest, uint8_t * rawDigest) {
 }
 
 // DUCO-S1A hasher
-uintDiff ducos1a(char const * prevBlockHash, char const * targetBlockHash, uintDiff difficulty) {
+uint32_t ducos1a(char const * prevBlockHash, char const * targetBlockHash, uint32_t difficulty) {
   #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
     // If the difficulty is too high for AVR architecture then return 0
     if (difficulty > 655) return 0;
@@ -111,16 +104,16 @@ uintDiff ducos1a(char const * prevBlockHash, char const * targetBlockHash, uintD
   uint8_t target[SHA1_HASH_LEN];
   lowercase_hex_to_bytes(targetBlockHash, target);
 
-  uintDiff const maxNonce = difficulty * 100 + 1;
+  uint32_t const maxNonce = difficulty * 100 + 1;
   return ducos1a_mine(prevBlockHash, target, maxNonce);
 }
 
-uintDiff ducos1a_mine(char const * prevBlockHash, uint8_t const * target, uintDiff maxNonce) {
+uint32_t ducos1a_mine(char const * prevBlockHash, uint8_t const * target, uint32_t maxNonce) {
   static duco_hash_state_t hash;
   duco_hash_init(&hash, prevBlockHash);
 
   char nonceStr[10 + 1];
-  for (uintDiff nonce = 0; nonce < maxNonce; nonce++) {
+  for (uint32_t nonce = 0; nonce < maxNonce; nonce++) {
     ultoa(nonce, nonceStr, 10);
 
     uint8_t const * hash_bytes = duco_hash_try_nonce(&hash, nonceStr);
@@ -174,7 +167,7 @@ void loop() {
   newBlockHash[40] = 0;
 
   // Read difficulty
-  uintDiff difficulty = strtoul(Serial.readStringUntil(',').c_str(), NULL, 10);
+  uint32_t difficulty = strtoul(Serial.readStringUntil(',').c_str(), NULL, 10);
   // Clearing the receive buffer reading one job.
   while (Serial.available()) Serial.read();
   // Turn off the built-in led
@@ -188,7 +181,7 @@ void loop() {
   uint32_t startTime = micros();
 
   // Call DUCO-S1A hasher
-  uintDiff ducos1result = ducos1a(lastBlockHash, newBlockHash, difficulty);
+  uint32_t ducos1result = ducos1a(lastBlockHash, newBlockHash, difficulty);
 
   // Calculate elapsed time
   uint32_t elapsedTime = micros() - startTime;
