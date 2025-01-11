@@ -120,6 +120,22 @@ const char WEBSITE[] PROGMEM = R"=====(
                                         Sensor reading(s)
                                     </div>
                                 </div>
+                                <div class="column" style="min-width:15em">
+                                    <div class="title is-size-5 mb-0">
+                                        @@MAC_ADDR@@
+                                    </div>
+                                    <div class="heading is-size-5">
+                                        MAC Address
+                                    </div>
+                                </div>
+                                <div class="column" style="min-width:15em">
+                                    <div class="title is-size-5 mb-0">
+                                        @@UPTIME@@
+                                    </div>
+                                    <div class="heading is-size-5">
+                                        Uptime
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -139,6 +155,8 @@ const char WEBSITE[] PROGMEM = R"=====(
                         <a href="https://github.com/revoxhere/duino-coin">
                             github.com/revoxhere/duino-coin
                         </a>
+                        &bull;
+                        <a href='/restart'>Restart Device</a>
                         @@RESET_SETTINGS@@
                     </div>
                 </div>
