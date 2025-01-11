@@ -1106,7 +1106,7 @@ def mine_avr(com, threadid, fastest_pool, thread_rigid):
             break
 
         start_diff = "AVR"
-        if hashrate_test > 1000:
+        if hashrate_test > 3500:
             start_diff = "DUE"
         elif hashrate_test > 550:
             start_diff = "ARM"
