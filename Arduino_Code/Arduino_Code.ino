@@ -16,12 +16,21 @@
 /* For microcontrollers with low memory change that to -Os in all files,
 for default settings use -O0. -O may be a good tradeoff between both */
 #pragma GCC optimize ("-Ofast")
+
 /* For microcontrollers with custom LED pins, adjust the line below */
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
 #endif
+
+/* Uncomment if you want BBC Micro:bit LED Matrix support to display total shares
+   Requires Adafruit microbit library */
+//#define MICROBIT_LED_MATRIX
+//#define MICROBIT_LED_MATRIX_BUTTONS_CONTROL
+
+/* Serial-related definitions */
 #define SEP_TOKEN ","
 #define END_TOKEN "\n"
+
 /* For 8-bit microcontrollers we should use 16 bit variables since the
 difficulty is low, for all the other cases should be 32 bits. */
 #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
@@ -33,6 +42,16 @@ typedef uint32_t uintDiff;
 #include "uniqueID.h"
 
 #include "duco_hash.h"
+
+#if defined(MICROBIT_LED_MATRIX)
+#include <Adafruit_Microbit.h>
+
+bool digitDrawn = false;
+bool matrixEnabled = true;
+int minedDigitCount = 0;
+
+Adafruit_Microbit_Matrix microbit;
+#endif
 
 String get_DUCOID() {
   String ID = "DUCOID";
@@ -50,6 +69,17 @@ void setup() {
   // Prepare built-in led pin as output
   pinMode(LED_BUILTIN, OUTPUT);
   DUCOID = get_DUCOID();
+
+  // Prepare Microbit LED matrix
+  #if defined(MICROBIT_LED_MATRIX)
+    microbit.begin();
+
+    #if defined(MICROBIT_LED_MATRIX_BUTTONS_CONTROL)
+      pinMode(PIN_BUTTON_A, INPUT);
+      pinMode(PIN_BUTTON_B, INPUT);
+    #endif
+  #endif
+
   // Open serial port
   Serial.begin(115200);
   Serial.setTimeout(10000);
@@ -103,6 +133,25 @@ uintDiff ducos1a_mine(char const * prevBlockHash, uint8_t const * target, uintDi
 }
 
 void loop() {
+  // Draw Microbit matrix and handle button presses
+  #if defined(MICROBIT_LED_MATRIX)
+    #if defined(MICROBIT_LED_MATRIX_BUTTONS_CONTROL)
+      if (!digitalRead(PIN_BUTTON_A)) {
+        matrixEnabled = true;
+        minedDigitCount = 0;
+      }
+      if (!digitalRead(PIN_BUTTON_B)) {
+        matrixEnabled = false;
+        microbit.clear();
+      }
+    #endif
+
+    if (!digitDrawn && matrixEnabled) {
+      microbit.print(minedDigitCount);
+      digitDrawn = true;
+    }
+  #endif
+
   // Wait for serial data
   if (Serial.available() <= 0) {
     return;
@@ -161,4 +210,18 @@ void loop() {
                + SEP_TOKEN
                + String(DUCOID) 
                + END_TOKEN);
+
+  // Count mined shares and clear Microbit matrix
+  #if defined(MICROBIT_LED_MATRIX)
+    if (matrixEnabled) {
+      minedDigitCount++;
+
+      // Cycle around 0-9 to prevent scrolling
+      if (minedDigitCount >= 10) {
+        minedDigitCount = 0;
+      }
+      microbit.clear();
+      digitDrawn = false;
+    }
+  #endif
 }
