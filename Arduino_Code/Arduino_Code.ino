@@ -107,6 +107,40 @@ void lowercase_hex_to_bytes(char const * hexDigest, uint8_t * rawDigest) {
   }
 }
 
+char* citoa(uint32_t num, char* str) {
+    int i = 0;
+ 
+    /* Handle 0 explicitly, otherwise empty string is
+     * printed for 0 */
+    if (num == 0) {
+        str[i++] = '0';
+        str[i] = '\0';
+        return str;
+    }
+ 
+    // Process individual digits
+    while (num != 0) {
+        int rem = num % 10;
+        str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+        num = num / 10;
+    }
+ 
+    str[i] = '\0'; // Append string terminator
+ 
+    // Reverse the string
+    int start = 0;
+    int end = i - 1;
+    while (start < end) {
+        char temp = str[start];
+        str[start] = str[end];
+        str[end] = temp;
+        end--;
+        start++;
+    }
+ 
+    return str;
+}
+
 // DUCO-S1A hasher
 uint32_t ducos1a() {
   #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
@@ -123,7 +157,7 @@ uint32_t ducos1a() {
   uint32_t const maxNonce = job->difficulty * 100 + 1;
   char nonceStr[10 + 1];
   for (uint32_t nonce = 0; nonce < maxNonce; nonce++) {
-    ultoa(nonce, nonceStr, 10);
+    citoa(nonce, nonceStr);
 
     uint8_t const * hash_bytes = duco_hash_try_nonce(&hash, nonceStr);
     if (memcmp(hash_bytes, target, SHA1_HASH_LEN) == 0) {
