@@ -27,6 +27,11 @@ for default settings use -O0. -O may be a good tradeoff between both */
 //#define MICROBIT_LED_MATRIX
 //#define MICROBIT_LED_MATRIX_BUTTONS_CONTROL
 
+/* Uncomment if you want the miner task on second core
+   Note that this may be slower than using just one core
+   Requires a board that has dual cores */
+//#define USE_SECOND_CORE
+
 /* Serial-related definitions */
 #define SEP_TOKEN ","
 #define END_TOKEN "\n"
@@ -39,12 +44,20 @@ for default settings use -O0. -O may be a good tradeoff between both */
 #if defined(MICROBIT_LED_MATRIX)
 #include <Adafruit_Microbit.h>
 
-bool digitDrawn = false;
 bool matrixEnabled = true;
 byte minedDigitCount = 0;
 
 Adafruit_Microbit_Matrix microbit;
 #endif
+
+struct duco_miner_job_t {
+  // Reserve 1 extra byte for comma separator (and later zero)
+  char lastBlockHash[40 + 1];
+  char newBlockHash[40 + 1];
+
+  uint32_t difficulty;
+};
+duco_miner_job_t *job;
 
 String get_DUCOID() {
   String ID = "DUCOID";
@@ -125,51 +138,44 @@ uint32_t ducos1a_mine(char const * prevBlockHash, uint8_t const * target, uint32
   return 0;
 }
 
-void loop() {
-  // Draw Microbit matrix and handle button presses
-  #if defined(MICROBIT_LED_MATRIX)
-    #if defined(MICROBIT_LED_MATRIX_BUTTONS_CONTROL)
-      if (!digitalRead(PIN_BUTTON_A)) {
-        matrixEnabled = true;
-        minedDigitCount = 0;
-      }
-      if (!digitalRead(PIN_BUTTON_B)) {
-        matrixEnabled = false;
-        microbit.clear();
-      }
-    #endif
-
-    if (!digitDrawn && matrixEnabled) {
-      microbit.print(minedDigitCount);
-      digitDrawn = true;
-    }
-  #endif
-
+/* This is called by loop() at the end */
+void serialEvent() {
   // Wait for serial data
   if (Serial.available() <= 0) {
     return;
   }
 
-  // Reserve 1 extra byte for comma separator (and later zero)
-  char lastBlockHash[40 + 1];
-  char newBlockHash[40 + 1];
+  // Create job object
+  duco_miner_job_t *newJob = new struct duco_miner_job_t;
 
   // Read last block hash
-  if (Serial.readBytesUntil(',', lastBlockHash, 41) != 40) {
+  if (Serial.readBytesUntil(',', newJob->lastBlockHash, 41) != 40) {
     return;
   }
-  lastBlockHash[40] = 0;
+  newJob->lastBlockHash[40] = 0;
 
   // Read expected hash
-  if (Serial.readBytesUntil(',', newBlockHash, 41) != 40) {
+  if (Serial.readBytesUntil(',', newJob->newBlockHash, 41) != 40) {
     return;
   }
-  newBlockHash[40] = 0;
+  newJob->newBlockHash[40] = 0;
 
   // Read difficulty
-  uint32_t difficulty = strtoul(Serial.readStringUntil(',').c_str(), NULL, 10);
+  newJob->difficulty = strtoul(Serial.readStringUntil(',').c_str(), NULL, 10);
+
   // Clearing the receive buffer reading one job.
   while (Serial.available()) Serial.read();
+
+  // Send job object
+  job = newJob;
+}
+
+void hashEvent() {
+  // Ensure job is not empty
+  if (job == NULL) {
+    return;
+  }
+
   // Turn off the built-in led
   #if defined(ARDUINO_ARCH_AVR)
       PORTB = PORTB | B00100000;
@@ -181,7 +187,7 @@ void loop() {
   uint32_t startTime = micros();
 
   // Call DUCO-S1A hasher
-  uint32_t ducos1result = ducos1a(lastBlockHash, newBlockHash, difficulty);
+  uint32_t ducos1result = ducos1a(job->lastBlockHash, job->newBlockHash, job->difficulty);
 
   // Calculate elapsed time
   uint32_t elapsedTime = micros() - startTime;
@@ -203,18 +209,54 @@ void loop() {
                + SEP_TOKEN
                + String(DUCOID) 
                + END_TOKEN);
+  
+  // Clear job object
+  delete job;
+  job = NULL;
+}
 
-  // Count mined shares and clear Microbit matrix
-  #if defined(MICROBIT_LED_MATRIX)
-    if (matrixEnabled) {
-      minedDigitCount++;
-
-      // Cycle around 0-9 to prevent scrolling
-      if (minedDigitCount >= 10) {
-        minedDigitCount = 0;
-      }
+#if defined(MICROBIT_LED_MATRIX)
+void microbitMatrixEvent() {
+  // Draw Microbit matrix and handle button presses
+  #if defined(MICROBIT_LED_MATRIX_BUTTONS_CONTROL)
+    if (!digitalRead(PIN_BUTTON_A)) {
+      matrixEnabled = true;
+      minedDigitCount = 0;
+    }
+    if (!digitalRead(PIN_BUTTON_B)) {
+      matrixEnabled = false;
       microbit.clear();
-      digitDrawn = false;
     }
   #endif
+
+  if (!digitDrawn && matrixEnabled) {
+    microbit.print(minedDigitCount);
+  }
+
+  // Count mined shares and clear Microbit matrix
+  if (matrixEnabled) {
+    minedDigitCount++;
+
+    // Cycle around 0-9 to prevent scrolling
+    if (minedDigitCount >= 10) {
+      minedDigitCount = 0;
+    }
+  }
 }
+#endif
+
+void loop() {
+  #if defined(MICROBIT_LED_MATRIX)
+    microbitMatrixEvent();
+  #endif
+
+  #if ! defined(USE_SECOND_CORE)
+    hashEvent();
+  #endif
+}
+
+#if defined(USE_SECOND_CORE)
+void loop1() {
+  hashEvent();
+}
+#endif
