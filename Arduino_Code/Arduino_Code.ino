@@ -108,23 +108,19 @@ void lowercase_hex_to_bytes(char const * hexDigest, uint8_t * rawDigest) {
 }
 
 // DUCO-S1A hasher
-uint32_t ducos1a(char const * prevBlockHash, char const * targetBlockHash, uint32_t difficulty) {
+uint32_t ducos1a() {
   #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_MEGAAVR)
     // If the difficulty is too high for AVR architecture then return 0
-    if (difficulty > 655) return 0;
+    if (job->difficulty > 655) return 0;
   #endif
 
   uint8_t target[SHA1_HASH_LEN];
-  lowercase_hex_to_bytes(targetBlockHash, target);
+  lowercase_hex_to_bytes(job->newBlockHash, target);
 
-  uint32_t const maxNonce = difficulty * 100 + 1;
-  return ducos1a_mine(prevBlockHash, target, maxNonce);
-}
-
-uint32_t ducos1a_mine(char const * prevBlockHash, uint8_t const * target, uint32_t maxNonce) {
   static duco_hash_state_t hash;
-  duco_hash_init(&hash, prevBlockHash);
+  duco_hash_init(&hash, job->lastBlockHash);
 
+  uint32_t const maxNonce = job->difficulty * 100 + 1;
   char nonceStr[10 + 1];
   for (uint32_t nonce = 0; nonce < maxNonce; nonce++) {
     ultoa(nonce, nonceStr, 10);
@@ -187,7 +183,7 @@ void hashEvent() {
   uint32_t startTime = micros();
 
   // Call DUCO-S1A hasher
-  uint32_t ducos1result = ducos1a(job->lastBlockHash, job->newBlockHash, job->difficulty);
+  uint32_t ducos1result = ducos1a();
 
   // Calculate elapsed time
   uint32_t elapsedTime = micros() - startTime;
