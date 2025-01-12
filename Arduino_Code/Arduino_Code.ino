@@ -6,7 +6,7 @@
   (____/(______)(____)(_)\_)(_____)     \___)(_____)(____)(_)\_)
   Official code for Arduino boards (and relatives)   version 4.3
   
-  Duino-Coin Team & Community 2019-2024 © MIT Licensed
+  Duino-Coin Team & Community 2019-2025 © MIT Licensed
   https://duinocoin.com
   https://github.com/revoxhere/duino-coin
   If you don't know where to start, visit official website and navigate to
