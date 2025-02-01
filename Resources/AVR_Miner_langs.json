@@ -1496,7 +1496,7 @@
         "internal_server_error": " Sisäinen palvelinvirhe.",
         "retrying": " Yritetään uudelleen 10s päästä",
         "mining_user": " Käyttäjä ",
-        "mining_not_exist": " ei ole olemassa.",
+        "mining_not_exist": " ei ole olemassa。",
         "mining_not_exist_warning": " Varmista, että olet syöttänyt käyttäjätunnuksen oikein. Tarkista asetustiedostosi. Yritetään uudelleen 10s päästä",
         "load_config_error": " Virhe ladattaessa asetustiedostoa (",
         "load_config_error_warning": "/Miner_config.cfg). Kokeile poistaa se ja suorittaa konfiguraatio uudelleen. Poistutaan 10s päästä",
