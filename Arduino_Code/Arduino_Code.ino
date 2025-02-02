@@ -17,6 +17,12 @@
 for default settings use -O0. -O may be a good tradeoff between both */
 #pragma GCC optimize ("-Ofast")
 
+/* Pull in non-standard functions */
+#if __has_include(<stdlib_noniso.h>)
+#include <stdlib_noniso.h>
+#endif
+
+
 /* For microcontrollers with custom LED pins, adjust the line below */
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13
