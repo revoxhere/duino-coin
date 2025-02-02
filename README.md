@@ -167,16 +167,24 @@ Please note the DUCO/day column has been removed since version 4.0 changed the r
 | Libre Computers Tritium H5CC                              | 480 kH/s                          | 4                 | 5 W            |
 | Libre Computers Le Potato                                 | 410 kH/s                          | 4                 | 5 W            |
 | Pine64 ROCK64                                             | 640 kH/s                          | 4                 | 5 W            |
+| Qualcomm Snapdragon 425 **(fasthash)**                    | 6.4 MH/s                          | 4                 | 3.5 W          |
+| Qualcomm Snapdragon 615                                   | 225 KH/s                          | 4                 | 3.5 W          |
+| Qualcomm Snapdragon 8 Gen 1 **(fasthash)**                | 27.6 MH/s                         | 8                 | 5 W            |
+| MediaTek Helio A22 **(fasthash)**                         | 9.3 MH/s                          | 4                 | 4.5 W          |
 | Intel Celeron G1840                                       | 1.25 MH/s                         | 2                 | 53 W           |
+| Intel Celeron N2840 **(fasthash)**                        | 4.4 MH/s                          | 2                 | 2.2 W          |
+| Intel Core m3-8100Y **(fasthash)**                        | 11.0 MH/s                         | 4                 | 8.1 W          |
+| Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | 54 W           |
 | Intel Core i5-2430M                                       | 1.18 MH/s                         | 4                 | 35 W           |
 | Intel Core i5-3230M                                       | 1.52 MH/s                         | 4                 | 35 W           |
 | Intel Core i5-5350U                                       | 1.35 MH/s                         | 4                 | 15 W           |
 | Intel Core i5-7200U                                       | 1.62 MH/s                         | 4                 | 15 W           |
 | Intel Core i5-8300H                                       | 3.67 MH/s                         | 8                 | 45 W           |
-| Intel Core i3-4130                                        | 1.45 MH/s                         | 4                 | 54 W           |
+| Intel Core i7-11370H **(fasthash)**                       | 17.3 MH/s                         | 8                 | 35 W           |
+| Intel Core i7-1260P **(fasthash)**                        | 73.5 MH/s                         | 16                | 25 W           |
+| Intel Core i9-13900K **(fasthash)**                       | 104.04 MH/s                       | 32                | 160 W          |
 | AMD Ryzen 5 2600                                          | 4.9 MH/s                          | 12                | 65 W           |
 | AMD Ryzen R1505G **(fasthash)**                           | 8.5 MH/s                          | 4                 | 35 W           |
-| Intel Core i7-11370H **(fasthash)**                       | 17.3 MH/s                         | 8                 | 35 W           |
 | Realtek RTD1295                                           | 490 kH/s                          | 4                 | -              |
 | Realtek RTD1295 **(fasthash)**                            | 3.89 MH/s                         | 4                 | -              |
 
