@@ -458,7 +458,6 @@ function send() {
     message = document.getElementById("message").value
     email = document.getElementById("email").value
     username = document.getElementById("username").value
-
     fetch(`https://admin.duinocoin.com/contact_form?captcha=${captcha}&message=${message}&email=${email}&username=${username}`)
         .then((response) => response.json())
         .then((data) => {
