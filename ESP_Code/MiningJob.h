@@ -66,7 +66,7 @@ public:
         dsha1->warmup();
         generateRigIdentifier();
     }
-
+    
     void blink(uint8_t count, uint8_t pin = LED_BUILTIN) {
         #if defined(LED_BLINKING)
             uint8_t state = HIGH;
@@ -333,10 +333,12 @@ private:
         }
     }
 
+
+
     void askForJob() {
         Serial.println("Core [" + String(core) + "] - Asking for a new job for user: " 
                         + String(config->DUCO_USER));
-
+                        
         #if defined(USE_DS18B20)
             sensors.requestTemperatures(); 
             float temp = sensors.getTempCByIndex(0);

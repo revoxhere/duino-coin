@@ -42,11 +42,11 @@
 //#define RPI_DISPLAY_TYPE // 20MHz maximum SPI
 
 // Only define one driver, the other ones must be commented out
-// select ST7789_DRIVER for tt-go 1.14 display, st7735_DRIVER for TFT 7735 display
+// select ST7789_DRIVER for tt-go 1.14 display, st7735_DRIVER for TFT 7735 display, ILI9341_2 for ESP32-2432S028
 
 //#define ILI9341_DRIVER       // Generic driver for common displays
-//#define ILI9341_2_DRIVER     // Alternative ILI9341 driver, see https://github.com/Bodmer/TFT_eSPI/issues/1172
-#define ST7735_DRIVER      // Define additional parameters below for this display
+#define ILI9341_2_DRIVER     // Alternative ILI9341 driver, see https://github.com/Bodmer/TFT_eSPI/issues/1172
+//#define ST7735_DRIVER      // Define additional parameters below for this display
 //#define ILI9163_DRIVER     // Define additional parameters below for this display
 //#define S6D02A1_DRIVER
 //#define RPI_ILI9486_DRIVER // 20MHz maximum SPI
@@ -86,15 +86,15 @@
 // for TT-GO 1.14 by Lilygo, set TFT_WIDTH to 240 and TFT_HEIGHT to 135
 // FOR ST7735 DISPLAY, SET TFT_WIDTH to 128 and TFT_HEIGHT to 160
 // #define TFT_WIDTH  80
- #define TFT_WIDTH  128  // st7735
+// #define TFT_WIDTH  128  // st7735
 // #define TFT_WIDTH  135 // Lilygo TT-go 1.14
 // #define TFT_WIDTH  172 // ST7789 172 x 320
 // #define TFT_WIDTH  170 // ST7789 170 x 320
-// #define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320
+ #define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320  & ESP32-2432S028
 // #define TFT_HEIGHT 160
 // #define TFT_HEIGHT 135
- #define TFT_HEIGHT 160 // st7735
-// #define TFT_HEIGHT 320 // ST7789 240 x 320
+// #define TFT_HEIGHT 160 // st7735
+ #define TFT_HEIGHT 320 // ST7789 240 x 320 & ESP32-2432S028
 // #define TFT_HEIGHT 240 // GC9A01 240 x 240  and Lilygo TT-GO 1.14
 
 // For ST7735 ONLY, define the type of display, originally this was based on the
@@ -106,7 +106,7 @@
 
 // #define ST7735_INITB
 // #define ST7735_GREENTAB
- #define ST7735_GREENTAB2
+// #define ST7735_GREENTAB2
 // #define ST7735_GREENTAB3
 // #define ST7735_GREENTAB128    // For 128 x 128 display
 // #define ST7735_GREENTAB160x80 // For 160 x 80 display (BGR, inverted, 26 offset)
@@ -217,20 +217,40 @@
 
 // FOR TFT 7735 Display uncomment the following lines
 
-#define TFT_MOSI 23
-#define TFT_SCLK 18
-#define TFT_CS   15  // Chip select control pin
-#define TFT_DC   16  // Data Command control pin
-#define TFT_RST  4  // Reset pin (could connect to RST pin)
+//#define TFT_MOSI 23
+//#define TFT_SCLK 18
+//#define TFT_CS   15  // Chip select control pin
+//#define TFT_DC   16  // Data Command control pin
+//#define TFT_RST  4  // Reset pin (could connect to RST pin)
 
 // FOR Lilygo TT-GO 1.14 uncomment the following lines
 
-//#define TFT_MOSI 19
-//#define TFT_SCLK 18
-//#define TFT_CS   5  // Chip select control pin
-//#define TFT_DC   16  // Data Command control pin
-//#define TFT_BL   4  // LED back-light
-//#define TFT_RST  23  // Reset pin (could connect to RST pin)
+////#define TFT_MOSI 19
+//#define TFT_SCLK 36
+//#define TFT_CS   37  // Chip select control pin
+//#define TFT_DC   35  // Data Command control pin
+//#define TFT_BL   38  // LED back-light
+//#define TFT_RST  33  // Reset pin (could connect to RST pin)
+
+// For ESP32 Dev board (only tested with ILI9341 display) Tested and working with ESP32-2432S028 aka CYD
+// The hardware SPI can be mapped to any pins
+
+#define TFT_BL 21 // LED back-light control pin
+#define TFT_BACKLIGHT_ON HIGH // Level to turn ON back-light (HIGH or LOW)
+
+#define TFT_MISO 12
+#define TFT_MOSI 13
+#define TFT_SCLK 14
+#define TFT_CS 15 // Chip select control pin
+#define TFT_DC 2 // Data Command control pin
+// #define TFT_RST 2 // Reset pin (could connect to RST pin)
+#define TFT_RST -1  // Set TFT_RST to -1 if display RESET is connected to ESP32 board RST
+
+//#define TOUCH_MISO 39
+//#define TOUCH_MOSI 32
+//#define TOUCH_SCLK 25
+#define TOUCH_CS 33
+//#define TOUCH_IRQ 36
 
 // For ESP32 Dev board (only tested with GC9A01 display)
 // The hardware SPI can be mapped to any pins

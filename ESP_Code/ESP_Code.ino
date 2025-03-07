@@ -6,7 +6,7 @@
   Official code for all ESP8266/32 boards            version 4.3
   Main .ino file
 
-  The Duino-Coin Team & Community 2019-2024 © MIT Licensed
+  The Duino-Coin Team & Community 2019-2025 © MIT Licensed
   https://duinocoin.com
   https://github.com/revoxhere/duino-coin
 
@@ -48,6 +48,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+//-----------------------------used for the balance display interval-------------------//
+boolean runEvery(unsigned long interval) {
+  static unsigned long previousMillis = 0;
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+    return true;
+  }
+  return false;
+}
+//-------------------------------------------------------------------------------------//
+
 void handleSystemEvents(void) {
         #if defined(ESP32) && CORE == 2
           esp_task_wdt_reset();
@@ -68,7 +81,7 @@ void handleSystemEvents(void) {
   #include "Dashboard.h"
 #endif
 
-#if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)
+#if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)|| defined(DISPLAY_2432S08)
   #include "DisplayHal.h"
 #endif
 
@@ -111,6 +124,7 @@ void handleSystemEvents(void) {
   WiFiManagerParameter custom_duco_username("duco_usr", "Duino-Coin username", duco_username, 40);
   WiFiManagerParameter custom_duco_password("duco_pwd", "Duino-Coin mining key (if enabled in the wallet)", duco_password, 40);
   WiFiManagerParameter custom_duco_rigid("duco_rig", "Custom miner identifier (optional)", duco_rigid, 24);
+
   
   void saveConfigCallback() {
     preferences.begin("duino_config", false);
@@ -120,6 +134,8 @@ void handleSystemEvents(void) {
     preferences.end();
     RestartESP("Settings saved");
   }
+
+
 
   void reset_settings() {
     server.send(200, "text/html", "Settings have been erased. Please redo the configuration by connecting to the WiFi network that will be created");
@@ -149,8 +165,11 @@ void RestartESP(String msg) {
     Serial.println("Restarting ESP...");
   #endif
 
-  #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)
+  #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)|| defined(DISPLAY_2432S08)
     display_info("Restarting ESP...");
+    #if defined(DISPLAY_2432S08)
+    display_background();
+    #endif
   #endif
 
   #if defined(ESP8266)
@@ -208,12 +227,14 @@ namespace {
       static bool eth_connected = false;
     #endif
 
+
+
     void UpdateHostPort(String input) {
         // Thanks @ricaun for the code
         DynamicJsonDocument doc(256);
         deserializeJson(doc, input);
         const char *name = doc["name"];
-
+        
         configuration->host = doc["ip"].as<String>().c_str();
         configuration->port = doc["port"].as<int>();
         node_id = String(name);
@@ -222,7 +243,7 @@ namespace {
           Serial.println("Poolpicker selected the best mining node: " + node_id);
         #endif
 
-        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)||defined(DISPLAY_2432S08)
           display_info(node_id);
         #endif
     }
@@ -273,8 +294,11 @@ namespace {
                Serial.printf("Error fetching node from poolpicker: %s\n", https.errorToString(httpCode).c_str());
                VerifyWifi();
             #endif
-            #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)
+            #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)|| defined(DISPLAY_2432S08)
               display_info(https.errorToString(httpCode));
+              #if defined(DISPLAY_2432S08)
+              display_background();
+              #endif
             #endif
         }
         https.end();
@@ -293,7 +317,7 @@ namespace {
             delay(waitTime * 1000);
             
             input = httpGetString("https://server.duinocoin.com/getPool");
-            
+
             // Increase wait time till a maximum of 32 seconds
             // (addresses: Limit connection requests on failure in ESP boards #1041)
             waitTime *= 2;
@@ -303,6 +327,8 @@ namespace {
 
         UpdateHostPort(input);
       }
+
+
 
     #ifdef USE_LAN
         void WiFiEvent(WiFiEvent_t event) {
@@ -393,11 +419,13 @@ namespace {
 
       #endif
 
-      #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)
+      #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)|| defined(DISPLAY_2432S08)
           display_info("Waiting for node...");
       #endif
       SelectNode();
+   
     }
+
 
     void SetupOTA() {
         // Prepare OTA handler
@@ -509,7 +537,7 @@ void task1_func(void *) {
       VOID LOOP() {
         job[0]->mine();
 
-        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)|| defined(DISPLAY_2432S08)
            float hashrate_float = (hashrate+hashrate_core_two) / 1000.0;
            float accept_rate = (accepted_share_count / 0.01 / share_count);
            
@@ -520,6 +548,8 @@ void task1_func(void *) {
            String uptime = String(uptime_hours) + "h" + String(uptime_mins) + "m" + String(uptime_secs) + "s";
            
            float sharerate = share_count / (millisecs / 1000.0);
+           
+           printTime();
 
            while(displayLock) {
              handleSystemEvents();
@@ -527,8 +557,13 @@ void task1_func(void *) {
              displayLock = true;
              
            display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptime), 
-                                  String(node_id), String(difficulty / 100), String(sharerate, 1),
+                                  String(node_id), String(difficulty / 100), String(sharerate, 2),
                                   String(ping), String(accept_rate, 1));
+
+            display_balance(String(result_balance_balance),String(total_miner),String(result_balance_username));
+            
+            display_time(String(mytime));
+                                  
             displayLock = false; 
         #endif
       }
@@ -543,8 +578,9 @@ void task2_func(void *) {
 
       VOID LOOP() {
         job[1]->mine();
-
-        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)
+        
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)|| defined(DISPLAY_2432S08)
+              
            float hashrate_float = (hashrate+hashrate_core_two) / 1000.0;
            float accept_rate = (accepted_share_count / 0.01 / share_count);
            
@@ -555,6 +591,8 @@ void task2_func(void *) {
            String uptime = String(uptime_hours) + "h" + String(uptime_mins) + "m" + String(uptime_secs) + "s";
            
            float sharerate = share_count / (millisecs / 1000.0);
+           
+           printTime(); 
 
            while(displayLock) {
              handleSystemEvents();
@@ -562,13 +600,55 @@ void task2_func(void *) {
              displayLock = true;
              
            display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptime), 
-                                  String(node_id), String(difficulty / 100), String(sharerate, 1),
+                                  String(node_id), String(difficulty / 100), String(sharerate, 2),
                                   String(ping), String(accept_rate, 1));
+
+           display_balance(String(result_balance_balance),String(total_miner),String(result_balance_username));
+           
+           display_time(String(mytime));
+           
           displayLock = false;
         #endif
       }
     #endif
 }
+
+//------------------------- Settings and code for time display on ESP32-2432S028 CYD-------------------------
+
+void notify(struct timeval* t) {
+  #if defined(SERIAL_PRINTING)
+    Serial.println("SNTP synchronized");
+  #endif
+}
+
+void initSNTP() {  
+  sntp_set_sync_interval(4 * 60 * 60 * 1000UL);  // 1 hour
+  sntp_set_time_sync_notification_cb(notify);
+  esp_sntp_setoperatingmode(ESP_SNTP_OPMODE_POLL);
+  esp_sntp_setservername(0, "pool.ntp.org");
+  esp_sntp_init();
+  setTimezone();
+}
+
+void setTimezone() {  
+  setenv("TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1); // Paris TZ, get your TZ at https://github.com/nayarsystems/posix_tz_db/blob/master/zones.csv
+  tzset();
+}
+
+void printTime() {
+  struct tm timeinfo;
+  getLocalTime(&timeinfo);
+  #if defined(SERIAL_PRINTING)
+    Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
+  #endif
+  strftime (mytime, sizeof (mytime), "%H:%M", &timeinfo);
+  strftime (mydate, sizeof (mydate),  "%d/%m/%Y", &timeinfo); //date in European format 
+  strftime (myday, sizeof (myday), "%A", &timeinfo);
+}
+
+//---------------------------------------------------------------------------------------------------------
+
+
 
 void setup() {
     #if !defined(ESP8266) && defined(DISABLE_BROWNOUT)
@@ -600,9 +680,9 @@ void setup() {
         }
     #endif
 
-    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)
+    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)|| defined(DISPLAY_2432S08)
         screen_setup();
-        display_boot(); 
+        display_boot();
         
     #endif
 
@@ -721,7 +801,7 @@ void setup() {
           blinker.detach();
         #endif
         
-        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)|| defined(DISPLAY_2432S08)
             display_info("Waiting for node...");
         #endif
         #if defined(BLUSHYBOX)
@@ -732,12 +812,23 @@ void setup() {
           blinker.detach();
         #endif
     #else
-        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)
+        #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2)|| defined(DISPLAY_114)|| defined(DISPLAY_7735)||defined(DISPLAY_2432S08)
           display_info("Waiting for WiFi...");
         #endif
         SetupWifi();
     #endif
     SetupOTA();
+
+  #if defined(DISPLAY_2432S08)
+          preferences.begin("duino_config", false);
+          strcpy(duco_username, preferences.getString("duco_username", "username").c_str());
+          preferences.end();
+          #if defined(SERIAL_PRINTING)
+            Serial.println("---- Welcome ---- 2438S028 user ! ----");
+            Serial.println(duco_username);
+            Serial.println("--------------------------------------");
+          #endif         
+  #endif
 
     #if defined(WEB_DASHBOARD)
       if (!MDNS.begin(RIG_IDENTIFIER)) {
@@ -790,6 +881,17 @@ void setup() {
       xTaskCreatePinnedToCore(task1_func, "task1_func", 10000, NULL, 1, &Task1, 0);
       xTaskCreatePinnedToCore(task2_func, "task2_func", 10000, NULL, 1, &Task2, 1);
     #endif
+    
+    #if defined(DISPLAY_2432S08) 
+        display_background(); 
+    #endif  
+
+//----------------------------------SNTP connect------------------------------------------------//
+
+ initSNTP();
+
+//----------------------------------------------------------------------------------------------//
+
 }
 
 void system_events_func(void* parameter) {
@@ -807,7 +909,7 @@ void single_core_loop() {
     
     lwdtFeed();
     
-    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735)
+    #if defined(DISPLAY_SSD1306) || defined(DISPLAY_16X2) || defined(DISPLAY_114)|| defined(DISPLAY_7735) // || defined(DISPLAY_2432S08)
        float hashrate_float = (hashrate+hashrate_core_two) / 1000.0;
        float accept_rate = (accepted_share_count / 0.01 / share_count);
        
@@ -820,7 +922,7 @@ void single_core_loop() {
        float sharerate = share_count / (millisecs / 1000.0);
 
        display_mining_results(String(hashrate_float, 1), String(accepted_share_count), String(share_count), String(uptime), 
-                              String(node_id), String(difficulty / 100), String(sharerate, 1),
+                              String(node_id), String(difficulty / 100), String(sharerate, 2),
                               String(ping), String(accept_rate, 1));
     #endif
 
@@ -836,4 +938,58 @@ void loop() {
     single_core_loop();
   #endif
   delay(10);
+  
+// displaying user balance and number of miners, update every 300 s (can be changed in Settings.h)
+
+#if defined(DISPLAY_2432S08)
+
+  if ((runEvery(run_in_ms)) || (first_start == true))
+    {
+   
+    String ducoReportJsonUrl = ("https://server.duinocoin.com/v2/users/" + String(duco_username));
+    
+    #if defined(SERIAL_PRINTING) 
+      Serial.println("retrieving balance from the API...");
+      Serial.println(String(ducoReportJsonUrl));
+      Serial.println();
+    #endif
+    
+    first_start = false;
+    String input2 = httpGetString(ducoReportJsonUrl);
+    DynamicJsonDocument doc (30000);
+    DeserializationError error = deserializeJson(doc, input2);
+
+    if (error) {
+      Serial.print("deserializeJson() failed: ");
+      Serial.println(error.c_str());
+      return;
+      }
+
+    JsonObject result = doc["result"];
+
+    JsonObject result_balance = result["balance"];
+    
+    total_miner = 0;
+    
+    for (JsonObject result_miner : result["miners"].as<JsonArray>()) {
+            result_balance_balance = result_balance["balance"];
+            result_balance_username = result_balance["username"].as<String>(); // Assign as String
+            total_miner++;
+
+    
+//    for (JsonObject result_miner : result["miners"].as<JsonArray>()) {
+//      result_balance_balance = result_balance["balance"];
+//      result_balance_username = result_balance["username"];
+//      total_miner++;
+    }
+    #if defined(SERIAL_PRINTING)
+      Serial.println();
+      Serial.println("Username : " + String(result_balance_username));   
+      Serial.println("Balance : " + String(result_balance_balance) + " DUCO");  
+      Serial.println("Total miners : " + String(total_miner)); 
+    #endif
+  }
+  
+#endif
+
 }

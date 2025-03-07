@@ -6,21 +6,35 @@ extern bool displayLock = false;
 
 // ---------------------- General settings ---------------------- //
 // Change the part in brackets to your Duino-Coin username
-extern char *DUCO_USER = "your_username";
+extern char *DUCO_USER = "your username";
 // Change the part in brackets to your mining key (if you have set it in the wallet)
-extern char *MINER_KEY = "your_mining_key";
+extern char *MINER_KEY = "your mining key";
 // Change the part in brackets if you want to set a custom miner name
 // Use Auto to autogenerate, None for no custom identifier
-extern char *RIG_IDENTIFIER = "your custom miner name";
+extern char *RIG_IDENTIFIER = "rig id";
 // Change the part in brackets to your WiFi name
 extern const char SSID[] = "your_wifi_ssid";
 // Change the part in brackets to your WiFi password
 extern const char PASSWORD[] = "your_wifi_psswd";
 // -------------------------------------------------------------- //
 
+//-------------------------Balance display settings--------------------------//
+extern bool first_display = true;
+extern bool first_start = true;  // to activate balance fetching on boot without waiting for the delay
+extern String ducoReportJsonUrl = ""; //  url init
+extern const int run_in_ms = 300000; //  5 minutes between each balance update
+extern double result_balance_balance = 0;
+extern String result_balance_username = "username";
+extern unsigned int total_miner = 0;
+//---------------------------------------------------------------------------//
+
+//---------------------------Time Display------------------------------------//
+extern char mytime[6] ="";
+extern char mydate[12] = "";
+extern char myday[10] = "";
 // -------------------- Advanced options ------------------------ //
 // Uncomment if you want to host the dashboard page (available on ESPs IP address and mDNS)
-// #define WEB_DASHBOARD
+ #define WEB_DASHBOARD
 
 // Comment out the line below if you wish to disable LED blinking
 #define LED_BLINKING
@@ -43,7 +57,7 @@ extern const char PASSWORD[] = "your_wifi_psswd";
 
 // Uncomment to enable WiFiManager captive portal in AP mode
 // The board will create its own network you connect to and change the settings
-// #define CAPTIVE_PORTAL
+ #define CAPTIVE_PORTAL
 // -------------------------------------------------------------- //
 
 // ------------------------ Displays ---------------------------- //
@@ -60,7 +74,10 @@ extern const char PASSWORD[] = "your_wifi_psswd";
 // #define DISPLAY_114
 
 // uncomment for tft7735 display 
- #define DISPLAY_7735
+// #define DISPLAY_7735
+
+//uncomment to enable ESP32 2432S08 module
+ #define DISPLAY_2432S08
 
 // Uncomment to enable a 16x2 LCD screen on a direct bus to display mining info in real time
 // See line 150 for connections and initializer
@@ -110,17 +127,21 @@ extern const char PASSWORD[] = "your_wifi_psswd";
 #else
     // ESP32
     #ifndef LED_BUILTIN
-      #define LED_BUILTIN 2
+      #define LED_BUILTIN 2  
     #endif
     #if defined(BLUSHYBOX)
       #define LED_BUILTIN 4
     #endif
+    #if defined(DISPLAY_2432S08)
+      #define LED_BUILTIN 4
+    #endif  
 #endif
 
 #define BLINK_SETUP_COMPLETE 2
 #define BLINK_CLIENT_CONNECT 5
 
 #define SOFTWARE_VERSION "4.3"
+
 extern unsigned int hashrate = 0;
 extern unsigned int hashrate_core_two = 0;
 extern unsigned int difficulty = 0;
@@ -180,6 +201,18 @@ extern unsigned int ping = 0;
       #include <TFT_eSPI.h>
       #include <SPI.h>
       #include <Wire.h>
+    // Display definition from the tft_eSPI library. Edit if you use a different display
+      TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
+#endif
+
+#if defined(DISPLAY_2432S08)
+    // Install "lilygo lib TFT_eSPI.h" if you get an error
+      #include "esp_sntp.h"
+      #include <TFT_eSPI.h>
+      #include <SPI.h>
+      #include <Wire.h>
+
+      
     // Display definition from the tft_eSPI library. Edit if you use a different display
       TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 #endif
