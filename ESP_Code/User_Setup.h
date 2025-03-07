@@ -45,7 +45,7 @@
 // select ST7789_DRIVER for tt-go 1.14 display, st7735_DRIVER for TFT 7735 display, ILI9341_2 for ESP32-2432S028
 
 //#define ILI9341_DRIVER       // Generic driver for common displays
-#define ILI9341_2_DRIVER     // Alternative ILI9341 driver, see https://github.com/Bodmer/TFT_eSPI/issues/1172
+#define ILI9341_2_DRIVER     // Alternative ILI9341 driver, see https://github.com/Bodmer/TFT_eSPI/issues/1172 // FOR CYD ESP32-2432S028
 //#define ST7735_DRIVER      // Define additional parameters below for this display
 //#define ILI9163_DRIVER     // Define additional parameters below for this display
 //#define S6D02A1_DRIVER
