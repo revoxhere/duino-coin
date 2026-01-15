@@ -2,6 +2,8 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
+extern bool displayLock = false;
+
 // ---------------------- General settings ---------------------- //
 // Change the part in brackets to your Duino-Coin username
 extern char *DUCO_USER = "my_cool_username";
@@ -59,6 +61,9 @@ extern const char PASSWORD[] = "PASSW0RD";
 // See line 150 for connections and initializer
 // #define DISPLAY_16X2
 
+//uncomment to enable ESP32 2432S08 module
+ #define DISPLAY_2432S08
+
 // Uncomment if your device is a Duino BlushyBox device
 // #define BLUSHYBOX
 // -------------------------------------------------------------- //
@@ -85,6 +90,22 @@ extern const char PASSWORD[] = "PASSW0RD";
 // #define USE_HSU07M
 // -------------------------------------------------------------- //
 
+//-------------------------Balance display settings--------------------------//
+extern bool first_display = true;
+extern bool first_start = true;  // to activate balance fetching on boot without waiting for the delay
+extern String ducoReportJsonUrl = ""; //  url init
+extern unsigned long run_in_ms = 300000; //  5 minutes between each balance update
+extern double result_balance_balance = 0;
+extern String result_balance_username = "username";// Change the part in brackets to your Duino-Coin username
+extern unsigned int total_miner = 0;
+//---------------------------------------------------------------------------//
+
+//---------------------------Time Display------------------------------------//
+extern char mytime[6] ="";
+extern char mydate[12] = "";
+extern char myday[10] = "";
+//---------------------------------------------------------------------------//
+
 // ---------------- Variables and definitions ------------------- //
 // You generally do not need to edit stuff below this line
 // unless you're know what you're doing.
@@ -105,7 +126,7 @@ extern const char PASSWORD[] = "PASSW0RD";
     #ifndef LED_BUILTIN
       #define LED_BUILTIN 2
     #endif
-    #if defined(BLUSHYBOX)
+    #if defined(BLUSHYBOX) || defined(DISPLAY_2432S08)
       #define LED_BUILTIN 4
     #endif
 #endif
@@ -166,6 +187,15 @@ extern unsigned int ping = 0;
     // initialize the library with the numbers of the interface pins
     //                         RS E  D4 D5 D6 D7
     Adafruit_LiquidCrystal lcd(1, 2, 3, 4, 5, 6);
+#endif
+
+#if defined(DISPLAY_2432S08)
+    // Install "lilygo lib TFT_eSPI.h" if you get an error
+      #include "esp_sntp.h"
+      #include <TFT_eSPI.h>
+      
+    // Display definition from the tft_eSPI library. Edit if you use a different display
+      TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 #endif
 
 #if defined(USE_HSU07M)

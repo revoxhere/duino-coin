@@ -328,6 +328,12 @@ private:
 
             last_block_hash = tokens[0];
             expected_hash_str = tokens[1];
+            if (expected_hash_str.length() < 40) {
+                Serial.println(F("Erro: hexString muito curta para o tamanho do array desejado."));
+                Serial.printf("hexString length: %d, esperado: %d\n", expected_hash_str.length(), 40);
+                free(job_str_copy);
+                return false;
+            }
             hexStringToUint8Array(expected_hash_str, expected_hash, 20);
             difficulty = tokens[2].toInt() * 100 + 1;
 
