@@ -4,15 +4,7 @@
 
 ##
 
-<center>
-    <a href="https://duinocoin.com">
-        <img src="assets/Api_Logo.png" width="128px"/>
-    </a>
-</center>
-
-<center>
-    <h1>Duino-Coin Master Server</h1>
-</center>
+<h1>Duino-Coin Master Server</h1>
 
 This branch of the Duino-Coin repository contains the source code of the master-server and documentation for it.
 
