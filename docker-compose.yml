@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: duco_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: duco
+      POSTGRES_USER: duco
+      POSTGRES_PASSWORD: duco
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - /home/debian/duco/db:/var/lib/postgre
+    networks:
+      - backend_net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  backend_net:
+    driver: bridge
