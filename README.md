@@ -28,17 +28,17 @@ We suggest using these colors in creating DUCO-Related apps:
 
 ### Branding colors
 
-* White accent: `#fafafa` <span style="color: #fafafa; vertical-align: middle; font-size: 2em;">■</span>
-* Orange accent: `#ff4112` <span style="color: #ff4112; vertical-align: middle; font-size: 2em;">■</span>
-* Sun yellow accent: `#ffb412` <span style="color: #ffb412; vertical-align: middle; font-size: 2em;">■</span>
-* Magenta accent: `#f31291` <span style="color: #f31291; vertical-align: middle; font-size: 2em;">■</span>
-* Dark accent: `#121212` <span style="color: #121212; vertical-align: middle; font-size: 2em;">■</span>
+* White accent: `#fafafa` ![#fafafa](https://dummyimage.com/16x16/fafafa/000&text=+)
+* Orange accent: `#ff4112` ![#ff4112](https://dummyimage.com/16x16/ff4112/fff&text=+)
+* Sun yellow accent: `#ffb412` ![#ffb412](https://dummyimage.com/16x16/ffb412/000&text=+)
+* Magenta accent: `#f31291` ![#f31291](https://dummyimage.com/16x16/f31291/fff&text=+)
+* Dark accent: `#121212` ![#121212](https://dummyimage.com/16x16/121212/fff&text=+)
 
 Gradient variations of the colors above are a welcome touch.
 
 #### GUI colors
-* Background: `#121212` (Dark) <span style="color: #121212; vertical-align: middle; font-size: 2em;">■</span> or `#fffdee` (Light) <span style="color: #fffdee; vertical-align: middle; font-size: 2em;">■</span>
-* Font color: `#fffdee` (Dark) <span style="color: #fffdee; vertical-align: middle; font-size: 2em;">■</span> or `#0f0f0f` (Light) <span style="color: #0f0f0f; vertical-align: middle; font-size: 2em;">■</span>
+* Background: `#121212` (Dark) ![#121212](https://dummyimage.com/16x16/121212/fff&text=+) or `#fffdee` (Light) ![#fffdee](https://dummyimage.com/16x16/fffdee/000&text=+)
+* Font color: `#fffdee` (Dark) ![#fffdee](https://dummyimage.com/16x16/fffdee/000&text=+) or `#0f0f0f` (Light) ![#0f0f0f](https://dummyimage.com/16x16/0f0f0f/fff&text=+)
 
 ### Icons
 
