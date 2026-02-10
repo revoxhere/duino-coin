@@ -8,6 +8,8 @@
 // Licensed under the MIT License. See LICENSE file in the project root for full license information.
 // ===============================================================
 
+pub mod create_tables;
+
 use sqlx::{Pool, Postgres, postgres::PgPoolOptions};
 use std::sync::OnceLock;
 
@@ -31,6 +33,8 @@ pub async fn connect(
         .await?;
 
     DB_POOL.set(pool).expect("DB already initialized");
+
+    create_tables::run().await?;
 
     Ok(())
 }
