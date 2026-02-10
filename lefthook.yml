@@ -1,9 +1,10 @@
 pre-commit:
   parallel: true
   jobs:
-    - name: lint staged
-      run: >
-        [ -n "$SKIP_LINT_STAGED" ] && echo "Skipping hook in favor of env variable..." || go fmt ./...
+    - name: cargo fmt
+      run: cargo fmt --all -- --check
+    - name: cargo clippy
+      run: cargo clippy --all-targets --all-features -- -D warnings
 
 prepare-commit-msg:
   commands:
