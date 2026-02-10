@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - /home/debian/duco/db:/var/lib/postgre
+      - ./db:/var/lib/postgresql
     networks:
       - backend_net
     healthcheck:
