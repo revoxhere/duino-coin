@@ -15,5 +15,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     config.load_from_file("config.toml")?;
 
+    // Start CLI
+    master_server::cli::run()?;
+
     Ok(())
 }

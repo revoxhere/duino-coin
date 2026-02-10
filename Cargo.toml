@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+crossterm = "0.28.1"
+ratatui = "0.30.0"
 serde = { version = "1.0.228", features = ["derive"] }
+sysinfo = "0.38.1"
 thiserror = "2.0.18"
+tokio = "1.49.0"
 toml = "0.9.11"
