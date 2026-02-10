@@ -24,7 +24,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-pub fn run() -> Result<(), io::Error> {
+pub async fn run() -> Result<(), io::Error> {
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
