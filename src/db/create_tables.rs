@@ -21,7 +21,8 @@ pub async fn run() -> Result<(), sqlx::Error> {
                 recipient TEXT,
                 amount REAL,
                 hash TEXT,
-                memo TEXT
+                memo TEXT,
+                ip_addr TEXT
             )
         "#,
     )
@@ -80,7 +81,14 @@ pub async fn run() -> Result<(), sqlx::Error> {
                 created TEXT DEFAULT 'before 23.08.2021',
                 rig_verified TEXT DEFAULT 'No',
                 last_seen INTEGER DEFAULT 0,
-                stake INTEGER DEFAULT 0
+                stake INTEGER DEFAULT 0,
+                warnings INTEGER DEFAULT 0,
+                ban_reason TEXT DEFAULT 'None',
+                ban INTEGER DEFAULT 0,
+                max_miners INTEGER DEFAULT 2,
+                reg_country TEXT DEFAULT 'None',
+                trustscore INTEGER DEFAULT 0,
+                miner_password INTEGER,
             )
         "#,
     )
@@ -93,6 +101,49 @@ pub async fn run() -> Result<(), sqlx::Error> {
             CREATE TABLE IF NOT EXISTS Server (
                 blocks REAL,
                 lastBlockHash TEXT
+            )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    // Pools
+    sqlx::query(
+        r#"
+            CREATE TABLE IF NOT EXISTS Pools (
+                identifier TEXT,
+                name TEXT,
+                url TEXT,
+                cpu REAL,
+                ram REAL,
+                connections INTEGER,
+                lastsync INTEGER,
+                hidden BOOLEAN DEFAULT 0,
+            )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    // Alt Accounts
+    sqlx::query(
+        r#"
+            CREATE TABLE IF NOT EXISTS alt_accounts (
+                ip_addr TEXT,
+                usernames TEXT,
+                change INTEGER,
+            )
+        "#,
+    )
+    .execute(pool)
+    .await?;
+
+    // Chain Alts
+    sqlx::query(
+        r#"
+            CREATE TABLE IF NOT EXISTS chain_accounts(
+                address TEXT,
+                username TEXT,
             )
         "#,
     )
