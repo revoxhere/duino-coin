@@ -88,7 +88,7 @@ pub async fn run() -> Result<(), sqlx::Error> {
                 max_miners INTEGER DEFAULT 2,
                 reg_country TEXT DEFAULT 'None',
                 trustscore INTEGER DEFAULT 0,
-                miner_password INTEGER,
+                miner_password INTEGER
             )
         "#,
     )
@@ -118,7 +118,7 @@ pub async fn run() -> Result<(), sqlx::Error> {
                 ram REAL,
                 connections INTEGER,
                 lastsync INTEGER,
-                hidden BOOLEAN DEFAULT 0,
+                hidden BOOLEAN DEFAULT FALSE
             )
         "#,
     )
@@ -131,7 +131,7 @@ pub async fn run() -> Result<(), sqlx::Error> {
             CREATE TABLE IF NOT EXISTS alt_accounts (
                 ip_addr TEXT,
                 usernames TEXT,
-                change INTEGER,
+                change INTEGER
             )
         "#,
     )
@@ -143,7 +143,7 @@ pub async fn run() -> Result<(), sqlx::Error> {
         r#"
             CREATE TABLE IF NOT EXISTS chain_accounts(
                 address TEXT,
-                username TEXT,
+                username TEXT
             )
         "#,
     )
