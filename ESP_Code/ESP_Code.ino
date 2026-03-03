@@ -821,7 +821,8 @@ void setup() {
 
   #if defined(DISPLAY_2432S08)
           preferences.begin("duino_config", false);
-          strcpy(duco_username, preferences.getString("duco_username", "username").c_str());
+          // strcpy(duco_username, preferences.getString("duco_username", "username").c_str());
+          strcpy(duco_username, preferences.getString("duco_username", DUCO_USER).c_str());  //DUCO_USER "username"
           preferences.end();
           #if defined(SERIAL_PRINTING)
             Serial.println("---- Welcome ---- 2438S028 user ! ----");
@@ -993,3 +994,4 @@ void loop() {
 #endif
 
 }
+
