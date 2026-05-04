@@ -1,2 +1,2 @@
 google.com, pub-2645920477107176, DIRECT, f08c47fec0942fa0
-subdomain=magi.duinocoin.com
+google.com, pub-6607105763246092, DIRECT, f08c47fec0942fa0
