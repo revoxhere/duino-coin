@@ -1361,7 +1361,7 @@ class Fasthash:
                 with open(f"libducohasher.pyd", 'wb') as f:
                     f.write(r.content)
                 return
-        elif os.name == "posix":
+        elif os.name == "posix" and uname().sysname == "Linux":
             if osprocessor() == "aarch64":
                 url = ('https://server.duinocoin.com/'
                        + 'fasthash/libducohashPi4.so')
