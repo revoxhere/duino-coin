@@ -108,10 +108,10 @@ If hashrate is not received, server estimates it from time it took to receive sh
 If software name is not received, server uses `"Software": "Unknown"` in the API
 If rig name is not received, server uses `"Identifier": "None"` in the API
 
-#### XXHASH Mining
+<!--- #### XXHASH Mining
 
 After sending `JOBXX` the server will return job for mining using XXHASH algorithm.<br>
-The documentation is the same as with the DUCO-S1 job protocol but only `XXHASH` difficulty is available.
+The documentation is the same as with the DUCO-S1 job protocol but only `XXHASH` difficulty is available. -->
 
 #### Transfer funds
 
