@@ -234,6 +234,8 @@ Please note the DUCO/day column has been removed since version 4.0 changed the r
   *   [ESPGUITOOL](https://github.com/CGameDev/ESPGUITOOL) by kazutokirigaya
   *   [DUCO Hashrate Monitor](https://gitlab.com/IT-Berater/twhashrate) hashrate java swing speedometer gui by IT-Berater
   *   [DUCO Wallet ESP32 Ticker](https://gitlab.com/IT-Berater/twesp32/-/blob/main/README-DUINO.md) Displaying Duino-Coin Wallet Status on an OLED Display with ESP32 by IT-Berater
+  *   [Duco CLI](https://codeberg.org/tomasthedev/duco-cli) - Duino-Coin CLI multiplatform wallet written in C
+  *   [Duco Bench](https://benchmark.rpiduco.space/) - Duino-Coin benchmark registry for CPUs (MCU support is planned)
 
  You may also view a similar list on the [website](https://duinocoin.com/apps).
 
