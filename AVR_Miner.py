@@ -42,8 +42,6 @@ printlock = Lock()
 # Python <3.5 check
 f"Your Python version is too old. Duino-Coin Miner requires version 3.6 or above. Update your packages and try again"
 
-setlocale(LC_ALL, "cs_CZ")
-
 def install(package):
     try:
         pip.main(["install",  package])
