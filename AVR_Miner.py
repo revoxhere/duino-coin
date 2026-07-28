@@ -19,7 +19,7 @@ from pathlib import Path
 
 from json import load as jsonload
 from random import choice
-from locale import LC_ALL, getlocale, setlocale
+from locale import getlocale, setlocale, normalize, LC_ALL
 import zipfile
 
 from re import sub
@@ -42,6 +42,7 @@ printlock = Lock()
 # Python <3.5 check
 f"Your Python version is too old. Duino-Coin Miner requires version 3.6 or above. Update your packages and try again"
 
+setlocale(LC_ALL, "cs_CZ")
 
 def install(package):
     try:
@@ -508,7 +509,14 @@ if system() == 'Darwin':
 
 try:
     if not Path(Settings.DATA_DIR + '/Settings.cfg').is_file():
-        locale = getlocale()[0]
+        setlocale(LC_ALL, '')
+
+        locale_raw = getlocale()[0]
+        if not locale_raw:   
+            lang = "english"  
+
+        locale = normalize(locale_raw)
+
         if locale.startswith("es"):
             lang = "spanish"
         elif locale.startswith("pl"):
