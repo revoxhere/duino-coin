@@ -42,7 +42,6 @@ printlock = Lock()
 # Python <3.5 check
 f"Your Python version is too old. Duino-Coin Miner requires version 3.6 or above. Update your packages and try again"
 
-
 def install(package):
     try:
         pip.main(["install",  package])
@@ -508,45 +507,51 @@ if system() == 'Darwin':
 
 try:
     if not Path(Settings.DATA_DIR + '/Settings.cfg').is_file():
-        locale = getdefaultlocale()[0]
-        if locale.startswith('es'):
-            lang = 'spanish'
-        elif locale.startswith('sk'):
-            lang = 'slovak'
-        elif locale.startswith('ru'):
-            lang = 'russian'
-        elif locale.startswith('pl'):
-            lang = 'polish'
-        elif locale.startswith('de'):
-            lang = 'german'
-        elif locale.startswith('fr'):
-            lang = 'french'
-        elif locale.startswith('jp'):
-            lang = 'japanese'
-        elif locale.startswith('tr'):
-            lang = 'turkish'
-        elif locale.startswith('it'):
-            lang = 'italian'
-        elif locale.startswith('pt'):
-            lang = 'portuguese'
-        if locale.startswith("zh_TW"):
+        locale = getlocale()[0]
+        if locale.startswith("es"):
+            lang = "spanish"
+        elif locale.startswith("pl"):
+            lang = "polish"
+        elif locale.startswith("fr"):
+            lang = "french"
+        elif locale.startswith("ja"):
+            lang = "japanese"
+        elif locale.startswith("fa"):
+            lang = "farsi"
+        elif locale.startswith("mt"):
+            lang = "maltese"
+        elif locale.startswith("ru"):
+            lang = "russian"
+        elif locale.startswith("uk"):
+            lang = "ukrainian"
+        elif locale.startswith("de"):
+            lang = "german"
+        elif locale.startswith("tr"):
+            lang = "turkish"
+        elif locale.startswith("pt"):
+            lang = "portuguese"
+        elif locale.startswith("it"):
+            lang = "italian"
+        elif locale.startswith("sk"):
+            lang = "slovak"
+        elif locale.startswith("zh_Hant") or locale.startswith("zh_TW"):
             lang = "chinese_Traditional"
-        elif locale.startswith('zh'):
-            lang = 'chinese_simplified'
-        elif locale.startswith('th'):
-            lang = 'thai'
+        elif locale.startswith("zh"):
+            lang = "chinese_simplified"                
+        elif locale.startswith("th"):
+            lang = "thai"
+        elif locale.startswith("ko"):
+            lang = "korean"
+        elif locale.startswith("id"):
+            lang = "indonesian"
+        elif locale.startswith("cs"):
+            lang = "czech"
+        elif locale.startswith("fi"):
+            lang = "finnish"
         elif locale.startswith('az'):
             lang = 'azerbaijani'
         elif locale.startswith('nl'):
             lang = 'dutch'
-        elif locale.startswith('ko'):
-            lang = 'korean'
-        elif locale.startswith("id"):
-            lang = "indonesian"
-        elif locale.startswith("cz"):
-            lang = "czech"
-        elif locale.startswith("fi"):
-            lang = "finnish"
         else:
             lang = 'english'
     else:
