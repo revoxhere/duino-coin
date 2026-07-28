@@ -960,7 +960,7 @@ class Miner:
                     lang = "italian"
                 elif locale.startswith("sk"):
                     lang = "slovak"
-                if locale.startswith("zh_Hant") or locale.startswith("zh_TW"):
+                elif locale.startswith("zh_Hant") or locale.startswith("zh_TW"):
                     lang = "chinese_Traditional"
                 elif locale.startswith("zh"):
                     lang = "chinese_simplified"                
