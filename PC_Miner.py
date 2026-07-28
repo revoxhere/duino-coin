@@ -191,6 +191,42 @@ class Settings:
             PICK = ""
             COG = " @"
 
+def get_win32_locale() -> str:
+    """
+    Windows's alternative to getlocale
+    """
+    from ctypes import (create_unicode_buffer,
+                        FormatError,
+                        GetLastError,
+                        windll)
+    bufsize = 85
+    buf = create_unicode_buffer(bufsize)
+    if windll.kernel32.GetUserDefaultLocaleName(buf, bufsize):
+        return buf.value
+    else:
+        raise OSError(FormatError(GetLastError()))
+
+def get_locale_code() -> str:
+    """
+    Wrapper to handle getlocale for all OSes
+    Reaction to: https://github.com/python/cpython/issues/90817
+    """
+
+    if os.name == 'nt':
+        try:
+            return get_win32_locale()
+        except: 
+            return "english"
+    elif os.name == "posix":
+        setlocale(LC_ALL, '')
+
+        locale_raw = getlocale()[0]
+        if locale_raw:     
+            return normalize(locale_raw)
+
+        return "english"
+    else:
+        return "english"
 
 def title(title: str):
     if not Settings.disable_title:
@@ -897,13 +933,7 @@ class Miner:
 
         try:
             if not Path(Settings.DATA_DIR + Settings.SETTINGS_FILE).is_file():
-                setlocale(LC_ALL, '')
-
-                locale_raw = getlocale()[0]
-                if not locale_raw:   
-                    lang = "english"  
-
-                locale = normalize(locale_raw)
+                locale = get_locale_code()
                 if locale.startswith("es"):
                     lang = "spanish"
                 elif locale.startswith("pl"):
