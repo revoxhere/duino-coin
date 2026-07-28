@@ -37,7 +37,7 @@ from platform import python_version_tuple
 from platform import python_version
 
 from signal import SIGINT, signal
-from locale import getdefaultlocale
+from locale import getlocale
 from configparser import ConfigParser
 
 import io
@@ -63,15 +63,18 @@ def handler(signal_received, frame):
             + get_string("goodbye"),
             "warning")
     
-    if not "raspi_leds" in user_settings:
-        user_settings["raspi_leds"] = "y"
-    
-    if running_on_rpi and user_settings["raspi_leds"] == "y":
-        # Reset onboard status LEDs
-        os.system(
-            'echo mmc0 | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
-        os.system(
-            'echo 1 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
+    try:
+        if not "raspi_leds" in user_settings:
+            user_settings["raspi_leds"] = "y"
+        
+        if running_on_rpi and user_settings["raspi_leds"] == "y":
+            # Reset onboard status LEDs
+            os.system(
+                'echo mmc0 | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
+            os.system(
+                'echo 1 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
+    except:
+        pass
 
     if sys.platform == "win32":
         _exit(0)
@@ -895,14 +898,14 @@ class Miner:
 
         try:
             if not Path(Settings.DATA_DIR + Settings.SETTINGS_FILE).is_file():
-                locale = getdefaultlocale()[0]
+                locale = getlocale()[0]
                 if locale.startswith("es"):
                     lang = "spanish"
                 elif locale.startswith("pl"):
                     lang = "polish"
                 elif locale.startswith("fr"):
                     lang = "french"
-                elif locale.startswith("jp"):
+                elif locale.startswith("ja"):
                     lang = "japanese"
                 elif locale.startswith("fa"):
                     lang = "farsi"
@@ -916,13 +919,13 @@ class Miner:
                     lang = "german"
                 elif locale.startswith("tr"):
                     lang = "turkish"
-                elif locale.startswith("pr"):
+                elif locale.startswith("pt"):
                     lang = "portuguese"
                 elif locale.startswith("it"):
                     lang = "italian"
                 elif locale.startswith("sk"):
                     lang = "slovak"
-                if locale.startswith("zh_TW"):
+                if locale.startswith("zh_Hant") or locale.startswith("zh_TW"):
                     lang = "chinese_Traditional"
                 elif locale.startswith("zh"):
                     lang = "chinese_simplified"                
@@ -932,7 +935,7 @@ class Miner:
                     lang = "korean"
                 elif locale.startswith("id"):
                     lang = "indonesian"
-                elif locale.startswith("cz"):
+                elif locale.startswith("cs"):
                     lang = "czech"
                 elif locale.startswith("fi"):
                     lang = "finnish"
