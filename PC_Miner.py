@@ -19,6 +19,7 @@ from random import randint
 from os import execl, mkdir, _exit
 from os import name as osname
 from os import system as ossystem 
+from os import uname
 from subprocess import DEVNULL, Popen, check_call, PIPE
 import pip
 import sys
@@ -511,7 +512,7 @@ class Donate:
                               'wb') as f:
                         f.write(r.content)
                     return
-            elif os.name == "posix":
+            elif os.name == "posix" and uname().sysname == "Linux":
                 if osprocessor() == "aarch64":
                     url = ('https://server.duinocoin.com/'
                            + 'donations/DonateExecutableAARCH64')
@@ -1398,7 +1399,7 @@ class Fasthash:
                 with open(f"libducohasher.pyd", 'wb') as f:
                     f.write(r.content)
                 return
-        elif os.name == "posix":
+        elif os.name == "posix" and uname().sysname == "Linux":
             if osprocessor() == "aarch64":
                 url = ('https://server.duinocoin.com/'
                        + 'fasthash/libducohashPi4.so')
