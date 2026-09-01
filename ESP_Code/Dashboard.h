@@ -41,7 +41,6 @@ const char WEBSITE[] PROGMEM = R"=====(
             font-family: var(--font-mono);
             min-height: 100vh;
             padding: 2rem;
-            /* Subtle CRT scanline effect for texture without killing performance */
             background-image: linear-gradient(rgba(0, 0, 0, 0.3) 50%, transparent 50%);
             background-size: 100% 4px;
         }
@@ -54,7 +53,6 @@ const char WEBSITE[] PROGMEM = R"=====(
             text-shadow: 0 0 5px var(--phosphor-glow);
         }
 
-        /* Log lines */
         .log-line {
             opacity: 0.9;
             margin-bottom: 0.2rem;
@@ -68,11 +66,8 @@ const char WEBSITE[] PROGMEM = R"=====(
             margin-right: 0.5rem;
         }
 
-        .log-success {
-            color: var(--phosphor);
-        }
+        .log-success { color: var(--phosphor); }
 
-        /* The Hero / Readout */
         .payload-separator {
             margin: 3rem 0;
             border: none;
@@ -116,7 +111,6 @@ const char WEBSITE[] PROGMEM = R"=====(
             text-shadow: none;
         }
 
-        /* Blinking block cursor */
         .cursor {
             display: inline-block;
             width: 0.6em;
@@ -132,7 +126,13 @@ const char WEBSITE[] PROGMEM = R"=====(
             50% { opacity: 0; }
         }
 
-        /* Footer / Meta */
+        /* Эффект обновления данных в терминале */
+        .data-flash {
+            color: #ffffff;
+            text-shadow: 0 0 8px #ffffff;
+            transition: color 0.1s ease, text-shadow 0.1s ease;
+        }
+
         .meta-container {
             margin-top: 3rem;
             font-size: 0.75rem;
@@ -159,15 +159,10 @@ const char WEBSITE[] PROGMEM = R"=====(
             text-shadow: 0 0 8px #fff;
         }
 
-        /* Accessibility & Motion */
         @media (prefers-reduced-motion: reduce) {
-            .cursor {
-                animation: none;
-                opacity: 0.6;
-            }
-            body {
-                background-image: none;
-            }
+            .cursor { animation: none; opacity: 0.6; }
+            body { background-image: none; }
+            .data-flash { transition: none; }
         }
 
         *:focus-visible {
@@ -184,19 +179,18 @@ const char WEBSITE[] PROGMEM = R"=====(
 <body>
     <main class="terminal" role="img" aria-label="Device terminal output showing mining status">
         
-        <!-- Simulated Boot/Init Log -->
+        <!-- Добавлены id="..." к динамическим переменным -->
         <div class="log-line"><span class="log-prefix">[SYS]</span> INIT @@DEVICE@@ // ID: @@ID@@</div>
         <div class="log-line"><span class="log-prefix">[SYS]</span> FW VER: @@VERSION@@</div>
-        <div class="log-line"><span class="log-prefix">[SYS]</span> HEAP ALLOC: @@MEMORY@@ FREE</div>
-        <div class="log-line"><span class="log-prefix">[ENV]</span> PAYLOAD: @@SENSOR@@</div>
-        <div class="log-line"><span class="log-prefix">[NET]</span> RESOLVING @@NODE@@...</div>
+        <div class="log-line"><span class="log-prefix">[SYS]</span> HEAP ALLOC: <span id="stat-memory">@@MEMORY@@</span> FREE</div>
+        <div class="log-line"><span class="log-prefix">[ENV]</span> PAYLOAD: <span id="stat-sensor">@@SENSOR@@</span></div>
+        <div class="log-line"><span class="log-prefix">[NET]</span> RESOLVING <span id="stat-node">@@NODE@@</span>...</div>
         <div class="log-line log-success"><span class="log-prefix">[NET]</span> CONNECTION ESTABLISHED</div>
-        <div class="log-line log-success"><span class="log-prefix">[MIN]</span> DIFFICULTY SET: @@DIFF@@</div>
-        <div class="log-line log-success"><span class="log-prefix">[MIN]</span> SHARES OK: @@SHARES@@</div>
+        <div class="log-line log-success"><span class="log-prefix">[MIN]</span> DIFFICULTY SET: <span id="stat-diff">@@DIFF@@</span></div>
+        <div class="log-line log-success"><span class="log-prefix">[MIN]</span> SHARES OK: <span id="stat-shares">@@SHARES@@</span></div>
 
         <hr class="payload-separator">
 
-        <!-- The Thesis / Hero -->
         <div class="readout-container">
             <div class="readout-label">Current Hashrate</div>
             <div>
@@ -206,7 +200,6 @@ const char WEBSITE[] PROGMEM = R"=====(
             </div>
         </div>
 
-        <!-- Footer Meta -->
         <div class="meta-container">
             <div>
                 HOST: <a href="http://@@IP_ADDR@@">@@IP_ADDR@@</a> &middot; 
@@ -219,8 +212,52 @@ const char WEBSITE[] PROGMEM = R"=====(
         </div>
 
     </main>
+
+    <script>
+        // Список ID элементов, которые нужно обновлять
+        const dynamicIds = ['hashratex', 'stat-diff', 'stat-shares', 'stat-memory', 'stat-sensor', 'stat-node'];
+
+        async function fetchLiveStats() {
+            try {
+                // Запрашиваем ту же самую страницу в фоне
+                const response = await fetch(window.location.href);
+                if (!response.ok) return;
+                
+                const htmlText = await response.text();
+                
+                // Создаем временный скрытый DOM, чтобы вытащить оттуда новые значения
+                const parser = new DOMParser();
+                const tempDoc = parser.parseFromString(htmlText, 'text/html');
+
+                dynamicIds.forEach(id => {
+                    const liveEl = document.getElementById(id);
+                    const fetchedEl = tempDoc.getElementById(id);
+                    
+                    // Если элемент существует и значение изменилось
+                    if (liveEl && fetchedEl && liveEl.innerText !== fetchedEl.innerText) {
+                        liveEl.innerText = fetchedEl.innerText;
+                        
+                        // Добавляем эффект вспышки
+                        liveEl.classList.add('data-flash');
+                        
+                        // Убираем вспышку через 150 мс
+                        setTimeout(() => {
+                            liveEl.classList.remove('data-flash');
+                        }, 150);
+                    }
+                });
+            } catch (e) {
+                // Тихо игнорируем ошибки сети (например, если ESP перезагружается)
+                console.error("Sync failed", e);
+            }
+        }
+
+        // Запускаем первый запрос сразу, затем каждые 5 секунд
+        setTimeout(fetchLiveStats, 1000);
+        setInterval(fetchLiveStats, 5000);
+    </script>
 </body>
 </html>
 )=====";
 
-#endif
+#endif 
