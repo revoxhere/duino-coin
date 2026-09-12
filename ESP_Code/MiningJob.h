@@ -155,7 +155,7 @@ public:
               digitalWrite(LED_BUILTIN, LOW);
             #endif
         #endif
-        for (Counter<10> counter; counter < difficulty; ++counter) {
+        for (Counter<10> counter; counter < job_difficulty; ++counter) {
             DSHA1 ctx = *dsha1;
             ctx.write((const unsigned char *)counter.c_str(), counter.strlen()).finalize(hashArray);
             
@@ -469,6 +469,8 @@ private:
             expected_hash_str = tokens[1];
             hexStringToUint8Array(expected_hash_str, expected_hash, 20);
             job_difficulty = tokens[2].toInt() * 100 + 1;
+            // Keep the legacy global updated for dashboard/telemetry compatibility,
+            // but mining itself uses this MiningJob's own difficulty value.
             difficulty = job_difficulty;
 
             // Free the memory allocated by strdup
@@ -566,7 +568,7 @@ private:
     const String &getLastBlockHash() const { return last_block_hash; }
     const String &getExpectedHashStr() const { return expected_hash_str; }
     const uint8_t *getExpectedHash() const { return expected_hash; }
-    unsigned int getDifficulty() const { return difficulty; }
+    unsigned int getDifficulty() const { return job_difficulty; }
 };
 
 #endif
