@@ -13,6 +13,30 @@
 #include "Counter.h"
 #include "Settings.h"
 
+// Classic dual-core ESP32 can use the on-chip SHA-1 accelerator.
+// Other ESP variants and ESP8266 keep the existing software path unchanged.
+#if defined(CONFIG_IDF_TARGET_ESP32) && !defined(CONFIG_FREERTOS_UNICORE) && \
+    !defined(DISABLE_ESP32_HARDWARE_SHA1)
+    #if defined(__has_include)
+        #if __has_include(<sha/sha_parallel_engine.h>)
+            #include <esp_timer.h>
+            #include "HardwareSHA1.h"
+            #define DUCO_USE_ESP32_HARDWARE_SHA1 1
+        #else
+            #define DUCO_USE_ESP32_HARDWARE_SHA1 0
+        #endif
+    #else
+        #define DUCO_USE_ESP32_HARDWARE_SHA1 0
+    #endif
+#else
+    #define DUCO_USE_ESP32_HARDWARE_SHA1 0
+#endif
+
+#ifndef DUCO_ESP32_HW_SHA1_TARGET_HPS
+    // Public daily-use target per existing ESP32 worker. Two workers target ~220 kH/s total.
+    #define DUCO_ESP32_HW_SHA1_TARGET_HPS 110000UL
+#endif
+
 // https://github.com/esp8266/Arduino/blob/master/cores/esp8266/TypeConversion.cpp
 const char base36Chars[36] PROGMEM = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
@@ -64,6 +88,13 @@ public:
         this->client_buffer = "";
         dsha1 = new DSHA1();
         dsha1->warmup();
+        #if DUCO_USE_ESP32_HARDWARE_SHA1
+            hardware_sha1_ready = HardwareSHA1::selfTest();
+            #if defined(SERIAL_PRINTING)
+              Serial.println("Core [" + String(core) + "] - Hardware SHA-1: "
+                              + String(hardware_sha1_ready ? "PASS" : "FAIL - software fallback"));
+            #endif
+        #endif
         generateRigIdentifier();
     }
 
@@ -102,6 +133,13 @@ public:
     void mine() {
         connectToNode();
         askForJob();
+
+        #if DUCO_USE_ESP32_HARDWARE_SHA1
+            if (hardware_sha1_ready) {
+                mineHardwareSHA1();
+                return;
+            }
+        #endif
           
         dsha1->reset().write((const unsigned char *)getLastBlockHash().c_str(), getLastBlockHash().length());
 
@@ -117,7 +155,7 @@ public:
               digitalWrite(LED_BUILTIN, LOW);
             #endif
         #endif
-        for (Counter<10> counter; counter < difficulty; ++counter) {
+        for (Counter<10> counter; counter < job_difficulty; ++counter) {
             DSHA1 ctx = *dsha1;
             ctx.write((const unsigned char *)counter.c_str(), counter.strlen()).finalize(hashArray);
             
@@ -174,6 +212,11 @@ private:
     DSHA1 *dsha1;
     WiFiClient client;
     String chipID = "";
+    uint32_t job_difficulty = 0;
+
+    #if DUCO_USE_ESP32_HARDWARE_SHA1
+        bool hardware_sha1_ready = false;
+    #endif
 
     #if defined(ESP8266)
         #if defined(BLUSHYBOX)
@@ -189,6 +232,102 @@ private:
         #else
           String MINER_BANNER = "Official ESP32 Miner";
         #endif
+    #endif
+
+    #if DUCO_USE_ESP32_HARDWARE_SHA1
+    void mineHardwareSHA1() {
+        uint32_t prefix[10];
+        uint32_t expected_words[5];
+        HardwareSHA1::preparePrefix40(last_block_hash.c_str(), prefix);
+        HardwareSHA1::expectedWords(expected_hash, expected_words);
+
+        uint32_t found_nonce = 0;
+        uint32_t attempts = 0;
+        bool hit = false;
+        const uint32_t job_limit = job_difficulty;
+        const uint64_t start_us = esp_timer_get_time();
+
+        #if defined(LED_BLINKING)
+            #if defined(BLUSHYBOX)
+              for (int i = 0; i < 72; i++) {
+                analogWrite(LED_BUILTIN, i);
+                delay(1);
+              }
+            #else
+              digitalWrite(LED_BUILTIN, LOW);
+            #endif
+        #endif
+
+        // The original ESP32 has one SHA accelerator shared by both CPU cores.
+        // Serialize only the raw search; release it before rate pacing/network I/O
+        // so the second official mining worker can use the engine immediately.
+        HardwareSHA1::lock();
+        for (Counter<10> counter; counter < job_limit; ++counter) {
+            ++attempts;
+            if (HardwareSHA1::hash40Locked(
+                    prefix, counter.c_str(), counter.strlen(), expected_words)) {
+                found_nonce = counter;
+                hit = true;
+                break;
+            }
+        }
+        HardwareSHA1::unlock();
+
+        if (!hit) return;
+
+        // Pace each existing ESP32 worker to the public daily-use target. Waiting
+        // time is included in reported hashrate, so the submitted figure reflects
+        // actual worker throughput rather than the accelerator's short burst rate.
+        const uint64_t target_us =
+            (uint64_t(attempts) * 1000000ULL + DUCO_ESP32_HW_SHA1_TARGET_HPS - 1ULL)
+            / DUCO_ESP32_HW_SHA1_TARGET_HPS;
+
+        while ((uint64_t)(esp_timer_get_time() - start_us) < target_us) {
+            const uint64_t elapsed_us = (uint64_t)(esp_timer_get_time() - start_us);
+            const uint64_t remain_us = target_us - elapsed_us;
+
+            if (remain_us >= 20000ULL) {
+                delay(10);
+                yield();
+                ArduinoOTA.handle();
+            } else if (remain_us >= 2000ULL) {
+                delay(1);
+            } else {
+                delayMicroseconds(50);
+            }
+        }
+
+        const uint64_t elapsed_us = (uint64_t)(esp_timer_get_time() - start_us);
+        const float elapsed_time_s = elapsed_us * .000001f;
+        const float hardware_hashrate = elapsed_time_s > 0.0f
+            ? attempts / elapsed_time_s
+            : 0.0f;
+
+        share_count++;
+
+        #if defined(LED_BLINKING)
+            #if defined(BLUSHYBOX)
+                for (int i = 72; i > 0; i--) {
+                  analogWrite(LED_BUILTIN, i);
+                  delay(1);
+                }
+            #else
+                digitalWrite(LED_BUILTIN, HIGH);
+            #endif
+        #endif
+
+        if (core == 0) {
+            hashrate = hardware_hashrate;
+            submit(found_nonce, hashrate, elapsed_time_s);
+        } else {
+            hashrate_core_two = hardware_hashrate;
+            submit(found_nonce, hashrate_core_two, elapsed_time_s);
+        }
+
+        #if defined(BLUSHYBOX)
+            gauge_set(hashrate + hashrate_core_two);
+        #endif
+    }
     #endif
 
     uint8_t *hexStringToUint8Array(const String &hexString, uint8_t *uint8Array, const uint32_t arrayLength) {
@@ -329,7 +468,10 @@ private:
             last_block_hash = tokens[0];
             expected_hash_str = tokens[1];
             hexStringToUint8Array(expected_hash_str, expected_hash, 20);
-            difficulty = tokens[2].toInt() * 100 + 1;
+            job_difficulty = tokens[2].toInt() * 100 + 1;
+            // Keep the legacy global updated for dashboard/telemetry compatibility,
+            // but mining itself uses this MiningJob's own difficulty value.
+            difficulty = job_difficulty;
 
             // Free the memory allocated by strdup
             free(job_str_copy);
@@ -426,7 +568,7 @@ private:
     const String &getLastBlockHash() const { return last_block_hash; }
     const String &getExpectedHashStr() const { return expected_hash_str; }
     const uint8_t *getExpectedHash() const { return expected_hash; }
-    unsigned int getDifficulty() const { return difficulty; }
+    unsigned int getDifficulty() const { return job_difficulty; }
 };
 
 #endif
