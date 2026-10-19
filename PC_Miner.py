@@ -44,6 +44,12 @@ import io
 
 debug = "n"
 running_on_rpi = False
+# Onboard LEDs of the Raspberry Pi: current kernels name them ACT (green)
+# and PWR (red), older ones led0 and led1
+RPI_LED_ACT = ("/sys/class/leds/ACT" if os.path.exists("/sys/class/leds/ACT")
+               else "/sys/class/leds/led0")
+RPI_LED_PWR = ("/sys/class/leds/PWR" if os.path.exists("/sys/class/leds/PWR")
+               else "/sys/class/leds/led1")
 configparser = ConfigParser()
 printlock = Lock()
 
@@ -69,9 +75,9 @@ def handler(signal_received, frame):
         if running_on_rpi and user_settings["raspi_leds"] == "y":
             # Reset onboard status LEDs
             os.system(
-                'echo mmc0 | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
+                f'echo mmc0 | sudo tee {RPI_LED_ACT}/trigger >/dev/null 2>&1')
             os.system(
-                'echo 1 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
+                f'echo 1 | sudo tee {RPI_LED_PWR}/brightness >/dev/null 2>&1')
     except:
         pass
 
@@ -694,16 +700,16 @@ def share_print(id, type,
     def _blink_builtin(led="green"):
         if led == "green":
             os.system(
-                'echo 1 | sudo tee /sys/class/leds/led0/brightness >/dev/null 2>&1')
+                f'echo 1 | sudo tee {RPI_LED_ACT}/brightness >/dev/null 2>&1')
             sleep(0.1)
             os.system(
-                'echo 0 | sudo tee /sys/class/leds/led0/brightness >/dev/null 2>&1')
+                f'echo 0 | sudo tee {RPI_LED_ACT}/brightness >/dev/null 2>&1')
         else:
             os.system(
-                'echo 1 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
+                f'echo 1 | sudo tee {RPI_LED_PWR}/brightness >/dev/null 2>&1')
             sleep(0.1)
             os.system(
-                'echo 0 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
+                f'echo 0 | sudo tee {RPI_LED_PWR}/brightness >/dev/null 2>&1')
     
     if type == "accept":
         if running_on_rpi and user_settings["raspi_leds"] == "y":
@@ -1486,9 +1492,9 @@ if __name__ == "__main__":
         if running_on_rpi:
             # Prepare onboard LEDs to be controlled
             os.system(
-                'echo gpio | sudo tee /sys/class/leds/led1/trigger >/dev/null 2>&1')
+                f'echo none | sudo tee {RPI_LED_PWR}/trigger >/dev/null 2>&1')
             os.system(
-                'echo gpio | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
+                f'echo none | sudo tee {RPI_LED_ACT}/trigger >/dev/null 2>&1')
 
     if user_settings["raspi_cpu_iot"] == "y" and running_on_rpi:
         try:
