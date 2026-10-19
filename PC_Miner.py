@@ -586,22 +586,59 @@ def get_prefix(symbol: str,
     return val + symbol
 
 
-def get_rpi_temperature():
-    output = Popen(args='cat /sys/class/thermal/thermal_zone0/temp',
-                    stdout=PIPE,
-                    shell=True).communicate()[0].decode()
-    return round(int(output) / 1000, 2)
+def get_board_model():
+    """
+    Returns the board model from the device tree (Raspberry Pi,
+    Orange Pi, Pine64...) or an empty string if there is none (most PCs)
+    """
+    try:
+        with io.open('/sys/firmware/devicetree/base/model', 'r') as m:
+            return m.read().strip('\x00').strip()
+    except Exception:
+        return ""
+
+
+def find_cpu_thermal_zone():
+    """
+    Returns the sysfs temperature file of the CPU, or None if there is none.
+    Prefers a thermal zone whose type names the CPU (cpu-thermal on
+    Raspberry Pi, cpu0-thermal on Allwinner boards...) and falls back
+    to thermal_zone0
+    """
+    base = '/sys/class/thermal'
+    try:
+        zones = sorted(z for z in os.listdir(base)
+                       if z.startswith('thermal_zone'))
+    except Exception:
+        return None
+
+    for zone in zones:
+        try:
+            with io.open(os.path.join(base, zone, 'type'), 'r') as t:
+                if 'cpu' in t.read().lower():
+                    return os.path.join(base, zone, 'temp')
+        except Exception:
+            pass
+
+    if zones:
+        return os.path.join(base, zones[0], 'temp')
+    return None
+
+
+def get_cpu_temperature():
+    with io.open(cpu_thermal_zone, 'r') as t:
+        return round(int(t.read()) / 1000, 2)
 
 
 def periodic_report(start_time, end_time, shares,
-                    blocks, hashrate, uptime):
+                    blocks, hashrate, uptime, cpu_iot=False):
     """
     Displays nicely formated uptime stats
     """
     raspi_iot_reading = ""
     
-    if running_on_rpi and user_settings["raspi_cpu_iot"] == "y":
-        raspi_iot_reading = f"{get_string('rpi_cpu_temp')} {get_rpi_temperature()}°C"
+    if cpu_iot:
+        raspi_iot_reading = f"{get_string('rpi_cpu_temp')} {get_cpu_temperature()}°C"
 
     seconds = round(end_time - start_time)
     pretty_print(get_string("periodic_mining_report")
@@ -682,7 +719,7 @@ def share_print(id, type,
                 thread_hashrate, total_hashrate,
                 computetime, diff, ping,
                 back_color, reject_cause=None,
-                print_queue = None):
+                print_queue = None, blink_leds=False):
     """
     Produces nicely formatted CLI output for shares:
     HH:MM:S |cpuN| ⛏ Accepted 0/0 (100%) ∙ 0.0s ∙ 0 kH/s ⚙ diff 0 k ∙ ping 0ms
@@ -706,17 +743,17 @@ def share_print(id, type,
                 'echo 0 | sudo tee /sys/class/leds/led1/brightness >/dev/null 2>&1')
     
     if type == "accept":
-        if running_on_rpi and user_settings["raspi_leds"] == "y":
+        if blink_leds:
             _blink_builtin()
         share_str = get_string("accepted")
         fg_color = Fore.GREEN
     elif type == "block":
-        if running_on_rpi and user_settings["raspi_leds"] == "y":
+        if blink_leds:
             _blink_builtin()
         share_str = get_string("block_found")
         fg_color = Fore.YELLOW
     else:
-        if running_on_rpi and user_settings["raspi_leds"] == "y":
+        if blink_leds:
             _blink_builtin("red")
         share_str = get_string("rejected")
         if reject_cause:
@@ -1172,6 +1209,12 @@ class Miner:
                      + "% " + get_string("efficiency"),
                      "success", "sys"+str(id), print_queue=print_queue)
 
+        # Mining processes don't see the globals set in __main__ when they
+        # are started with spawn or forkserver, so use the passed settings
+        blink_leds = running_on_rpi and user_settings["raspi_leds"] == "y"
+        cpu_iot = (user_settings["raspi_cpu_iot"] == "y"
+                   and cpu_thermal_zone is not None)
+
         last_report = time()
         r_shares, last_shares = 0, 0
         while True:
@@ -1187,9 +1230,9 @@ class Miner:
                             key = user_settings["mining_key"]
 
                         raspi_iot_reading = ""
-                        if user_settings["raspi_cpu_iot"] == "y" and running_on_rpi:
+                        if cpu_iot:
                             # * instead of the degree symbol because nodes use basic encoding
-                            raspi_iot_reading = f"CPU temperature:{get_rpi_temperature()}*C"
+                            raspi_iot_reading = f"CPU temperature:{get_cpu_temperature()}*C"
 
                         while True:
                             job_req = "JOB"
@@ -1266,7 +1309,8 @@ class Miner:
                                                 hashrate[id],total_hashrate,
                                                 computetime, job[2], ping,
                                                 back_color,
-                                                print_queue=print_queue)
+                                                print_queue=print_queue,
+                                                blink_leds=blink_leds)
 
                                 elif feedback[0] == "BLOCK":
                                     accept.value += 1
@@ -1276,7 +1320,8 @@ class Miner:
                                                 hashrate[id],total_hashrate,
                                                 computetime, job[2], ping,
                                                 back_color,
-                                                print_queue=print_queue)
+                                                print_queue=print_queue,
+                                                blink_leds=blink_leds)
 
                                 elif feedback[0] == "BAD":
                                     reject.value += 1
@@ -1285,7 +1330,8 @@ class Miner:
                                                 hashrate[id], total_hashrate,
                                                 computetime, job[2], ping,
                                                 back_color, feedback[1],
-                                                print_queue=print_queue)
+                                                print_queue=print_queue,
+                                                blink_leds=blink_leds)
 
                                 if accept.value % 100 == 0 and accept.value > 1:
                                     pretty_print(
@@ -1306,7 +1352,7 @@ class Miner:
                                         periodic_report(last_report, end_time,
                                                         r_shares, blocks.value,
                                                         sum(hashrate.values()),
-                                                        uptime)
+                                                        uptime, cpu_iot)
                                         last_report = time()
                                         last_shares = accept.value
                                 break
@@ -1441,6 +1487,15 @@ Miner.preload()
 p_list = []
 mining_start_time = time()
 
+# Detected at import time so that the mining processes see it too,
+# also when they are started with spawn or forkserver
+# (the default on Linux since Python 3.14)
+board_model = get_board_model()
+running_on_rpi = 'raspberry pi' in board_model.lower()
+# Only boards with a device tree (Raspberry Pi, Orange Pi, Pine64...)
+# report their CPU temperature, PCs keep working as before
+cpu_thermal_zone = find_cpu_thermal_zone() if board_model else None
+
 if __name__ == "__main__":
     from multiprocessing import freeze_support
     freeze_support()
@@ -1471,28 +1526,21 @@ if __name__ == "__main__":
     if not "raspi_cpu_iot" in user_settings:
         user_settings["raspi_cpu_iot"] = "y"
     
-    if user_settings["raspi_leds"] == "y":
-        try:
-            with io.open('/sys/firmware/devicetree/base/model', 'r') as m:
-                if 'raspberry pi' in m.read().lower():
-                    running_on_rpi = True
-                    pretty_print(
-                        get_string("running_on_rpi") +
-                        Style.NORMAL + Fore.RESET + " " +
-                        get_string("running_on_rpi2"), "success")
-        except:
-            running_on_rpi = False
+    if user_settings["raspi_leds"] == "y" and running_on_rpi:
+        pretty_print(
+            get_string("running_on_rpi") +
+            Style.NORMAL + Fore.RESET + " " +
+            get_string("running_on_rpi2"), "success")
 
-        if running_on_rpi:
-            # Prepare onboard LEDs to be controlled
-            os.system(
-                'echo gpio | sudo tee /sys/class/leds/led1/trigger >/dev/null 2>&1')
-            os.system(
-                'echo gpio | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
+        # Prepare onboard LEDs to be controlled
+        os.system(
+            'echo gpio | sudo tee /sys/class/leds/led1/trigger >/dev/null 2>&1')
+        os.system(
+            'echo gpio | sudo tee /sys/class/leds/led0/trigger >/dev/null 2>&1')
 
-    if user_settings["raspi_cpu_iot"] == "y" and running_on_rpi:
+    if user_settings["raspi_cpu_iot"] == "y" and cpu_thermal_zone:
         try:
-            temp = get_rpi_temperature()
+            temp = get_cpu_temperature()
             pretty_print(get_string("iot_on_rpi") +
                          Style.NORMAL + Fore.RESET + " " +
                          f"{get_string('iot_on_rpi2')} {temp}°C",
